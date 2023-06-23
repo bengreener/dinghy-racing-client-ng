@@ -1,8 +1,18 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+
+it('renders banner', async () => {
+  render(<App />);  
+  const banner = await screen.findByRole('banner');
+  expect(banner).toBeInTheDocument();
+});
+
+it('displays menu buttons', async () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const button1 = await screen.findByRole('button', {name: /create dinghy class\b/i});
+  expect(button1).toBeInTheDocument();
 });

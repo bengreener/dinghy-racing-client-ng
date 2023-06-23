@@ -1,0 +1,77 @@
+@charset "ISO-8859-1";
+
+* {
+	font-family: Arial;
+}
+
+body {
+	margin: 0px;	
+}
+
+div {
+	outline: 1px solid CadetBlue;
+}
+
+button {
+	font-size: rem;
+	padding: .25em;
+}
+
+input.field {
+    width: 90%;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+td, th {
+    border: 1px solid #999;
+    padding: 0.5em;
+    text-align: left;
+}
+
+.container-fluid {
+	display: grid;
+	grid-template-columns: 15vw 85vw;
+	grid-template-rows: 15vh 75vh 10vh;
+	grid-template-areas: 	'header header'
+							'menu main'
+							'footer footer';
+}
+
+header {
+	grid-area: header;
+	background-size: contain;
+}
+
+/* .jumbotron {
+	grid-area: header;
+	background-size: contain;
+} */
+
+.list-group {
+	grid-area: menu;
+}
+
+.list-group button {
+	background-color: #f1f1f1;
+	display: block;
+	width: 100%;
+}
+
+.link-primary {
+	color: blue;
+	text-decoration: underline;
+	cursor: auto;
+}
+
+.display-port {
+	grid-area: main;
+	overflow: scroll;
+}
+
+footer {
+	grid-area: footer;
+	background-size: contain;
+}
