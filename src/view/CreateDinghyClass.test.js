@@ -18,24 +18,24 @@ it('accepts the name of a dinghy class', async () => {
 
 it('calls the function passed in to onCreate prop', async () => {
     const user = userEvent.setup();
-    const fncOnCreate = jest.fn();
+    const fnOnCreate = jest.fn();
     
-    render(<CreateDinghyClass onCreate={fncOnCreate}/>);
+    render(<CreateDinghyClass onCreate={fnOnCreate}/>);
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
     await user.click(btnCreate);
 
-    expect(fncOnCreate).toBeCalledTimes(1);
+    expect(fnOnCreate).toBeCalledTimes(1);
 });
 
 it('calls the function passed in to onCreate prop with new dinghy class as parameter', async () => {
     const user = userEvent.setup();
-    const fncOnCreate = jest.fn();
+    const fnOnCreate = jest.fn();
     
-    render(<CreateDinghyClass onCreate={fncOnCreate}/>);
+    render(<CreateDinghyClass onCreate={fnOnCreate}/>);
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
     const txtClassName = screen.getByLabelText('Class Name');
     await user.type(txtClassName, 'Scorpion');
     await user.click(btnCreate);
 
-    expect(fncOnCreate).toBeCalledWith({'name': 'Scorpion'});
+    expect(fnOnCreate).toBeCalledWith({'name': 'Scorpion'});
 });

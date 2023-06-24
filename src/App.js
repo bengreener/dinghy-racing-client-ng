@@ -1,5 +1,5 @@
 import React from 'react';
-import CreateDinghyClass from './component/CreateDinghyClass';
+import CreateDinghyClass from './view/CreateDinghyClass';
 
 function App() {
   const [displayPort, setDisplayPort] = React.useState();
