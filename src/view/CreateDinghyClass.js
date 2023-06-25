@@ -1,9 +1,8 @@
 import React from 'react';
-import { screen } from 'react';
 
 function CreateDinghyClass({ onCreate }) {
 
-    function handleClick(event) {
+    function handleCreate(event) {
         event.preventDefault();
         const input = document.getElementById('dinghy-class-input');
         onCreate({'name': input.value});
@@ -13,7 +12,7 @@ function CreateDinghyClass({ onCreate }) {
         <form action="" method="get">
             <label htmlFor="dinghy-class-input">Class Name</label>
             <input id="dinghy-class-input" type="text" />
-            <button id="dinghy-class-create-button" type="button" onClick={handleClick}>Create</button>
+            <button id="dinghy-class-create-button" type="button" onClick={handleCreate}>Create</button>
         </form>
     )
 }
