@@ -1,19 +1,22 @@
 import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
+import controller from './controller/controller'; 
+
+jest.mock('./controller/controller');
 
 beforeEach(() => {
   jest.clearAllMocks();
 });
 
 it('renders banner', async () => {
-  render(<App />);  
+  render(<App controller={controller} />);  
   const banner = await screen.findByRole('banner');
   expect(banner).toBeInTheDocument();
 });
 
 it('displays menu buttons', () => {
-  render(<App />);
+  render(<App controller={controller} />);
   const btnCreateDinghyClass = screen.getByRole('button', {name: /create dinghy class\b/i});
   expect(btnCreateDinghyClass).toBeInTheDocument();
 });
@@ -22,7 +25,7 @@ describe('when create dinghy class button clicked', () => {
   it('displays create dinghy class form', async () => {
     const user = userEvent.setup();
 
-    render(<App />);
+    render(<App controller={controller} />);
     const btnCreateDinghyClass = await screen.findByRole('button', {name: /create dinghy class\b/i});
     await act(async () => {
       await user.click(btnCreateDinghyClass);

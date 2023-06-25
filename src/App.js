@@ -1,11 +1,11 @@
 import React from 'react';
 import CreateDinghyClass from './view/CreateDinghyClass';
 
-function App() {
+function App({controller}) {
   const [displayPort, setDisplayPort] = React.useState();
 
   function showCreateDinghyClassForm() {
-    setDisplayPort(<CreateDinghyClass onCreate={(dinghyClass) => alert(`New dinghy class: ${dinghyClass.name}`)} />);
+    setDisplayPort(<CreateDinghyClass onCreate={controller.createDinghyClass} />);
   }
 
   return (
