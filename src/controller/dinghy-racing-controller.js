@@ -1,4 +1,4 @@
-const controller = {
+const DinghyRacingController = {
     createDinghyClass: function ({name}) {
         if (name === null || name === '') {
             return Promise.resolve({'success': false, 'message': 'A name is required for a new dinghy class.'})
@@ -7,4 +7,4 @@ const controller = {
     }
 };
 
-export default controller
+export default DinghyRacingController
