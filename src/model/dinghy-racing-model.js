@@ -1,13 +1,27 @@
 class DinghyRacingModel {
+    rootURL;
+
+    /**
+     * 
+     * @param {string} rootURL
+     * @returns {DinghyRacingModel} 
+     */
+    constructor(rootURL) {
+        if (!rootURL) {
+            throw new Error('A URL is required when creating an instance of DinghyRacingModel');
+        }
+        this.rootURL = rootURL;
+    }
+
     /**
      * Creates a new dinghy class
      * @param {DinghyClass} dinghyClass 
-     * @returns {Result}
+     * @returns {Promise<Result>}
      */
      async createDinghyClass(dinghyClass) {
-        const uri = 'http://localhost:8081/dinghyracing/api/dinghyclasses';
+        const urlPathSegment = 'dinghyclasses';
         try {
-            const response = await fetch(uri, {method: 'POST', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, body: dinghyClass});
+            const response = await fetch(this.rootURL + '/' + urlPathSegment, {method: 'POST', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, body: dinghyClass});
             const json = await response.json();
             if(response.ok) {
                 return Promise.resolve({'success': true});
