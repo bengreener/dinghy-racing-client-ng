@@ -6,7 +6,7 @@ class DinghyRacingController {
         if (!model) {
             throw new Error('A dinghy racing model is required when creating an instance of DinghyRacingController');
         }
-        this.model=model;
+        this.model = model;
     }
 
     /**
@@ -18,7 +18,7 @@ class DinghyRacingController {
         if (dinghyClass.name === null || dinghyClass.name === '') {
             return Promise.resolve({'success': false, 'message': 'A name is required for a new dinghy class.'})
         }
-        return Promise.resolve({'success': true});
+        return this.model.createDinghyClass(dinghyClass);
     }
 }
 
