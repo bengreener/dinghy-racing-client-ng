@@ -10,7 +10,8 @@ beforeEach(() => {
 describe('when creating a new dinghy class', () => {
     it('returns a promise that resolves to a result indicating success when dinghy class is created with http status 200', async () => {
         fetch.mockImplementationOnce(() => {
-            return Promise.resolve({ 
+            return Promise.resolve({
+                ok: true,
                 status: 200, 
                 json: () => Promise.resolve(dinghyClassScorpionHAL)
             });
@@ -22,7 +23,8 @@ describe('when creating a new dinghy class', () => {
     })
     it('returns a promise that resolves to a result indicating failure when dinghy class is created with http status 201', async () => {
         fetch.mockImplementationOnce(() => {
-            return Promise.resolve({ 
+            return Promise.resolve({
+                ok: true,
                 status: 201, 
                 json: () => Promise.resolve(dinghyClassScorpionHAL)
             });
@@ -34,7 +36,8 @@ describe('when creating a new dinghy class', () => {
     })
     it('returns a promise that resolves to a result indicating failure when dinghy class is not created with http status 400 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
-            return Promise.resolve({ 
+            return Promise.resolve({
+                ok: false,
                 status: 400, 
                 json: () => Promise.resolve({'success': false, 'message': 'Bad request'})
             });
@@ -103,5 +106,14 @@ describe('when creating a new dinghy class', () => {
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 503 Message: Service Unavailable'}); 
+    })
+    it('returns a promise that resolves to a result indicating failure when dinghy class is not created due to an error that causes fetch to reject; such as a network failure', async () => {
+        fetch.mockImplementationOnce(() => {
+            throw new TypeError('Failed to fetch');
+        });
+        const promise = DinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'TypeError: Failed to fetch'});
     })
 });
