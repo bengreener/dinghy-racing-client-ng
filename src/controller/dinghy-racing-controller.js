@@ -1,4 +1,14 @@
 class DinghyRacingController {
+    
+    model;
+
+    constructor(model) {
+        if (!model) {
+            throw new Error('A dinghy racing model is required when creating an instance of DinghyRacingController');
+        }
+        this.model=model;
+    }
+
     /**
      * Create a new dinghy class
      * @param {DinghyClass} dinghyClass
