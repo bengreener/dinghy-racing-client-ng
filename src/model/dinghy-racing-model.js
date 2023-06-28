@@ -9,14 +9,12 @@ const DinghyRacingModel = {
         try {
             const response = await fetch(uri, {method: 'POST', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, body: dinghyClass});
             const json = await response.json();
-            switch(response.status) {
-                case 200:
-                case 201:
-                    return Promise.resolve({'success': true});
-                    break;
-                default:
-                    const message = json.message ? 'HTTP Error: ' + response.status + ' Message: ' + json.message : 'HTTP Error: ' + response.status + 'Message: No additional information available';
-                    return Promise.resolve({'success': false, 'message': message});
+            if(response.ok) {
+                return Promise.resolve({'success': true});
+            }
+            else {
+                const message = json.message ? 'HTTP Error: ' + response.status + ' Message: ' + json.message : 'HTTP Error: ' + response.status + 'Message: No additional information available';
+                return Promise.resolve({'success': false, 'message': message});
             }
         }
         catch (error) {
