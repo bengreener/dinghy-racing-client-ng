@@ -1,10 +1,10 @@
-const DinghyRacingModel = {
+class DinghyRacingModel {
     /**
      * Creates a new dinghy class
      * @param {DinghyClass} dinghyClass 
      * @returns {Result}
      */
-    createDinghyClass: async function (dinghyClass) {
+     async createDinghyClass(dinghyClass) {
         const uri = 'http://localhost:8081/dinghyracing/api/dinghyclasses';
         try {
             const response = await fetch(uri, {method: 'POST', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, body: dinghyClass});

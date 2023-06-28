@@ -16,7 +16,8 @@ describe('when creating a new dinghy class', () => {
                 json: () => Promise.resolve(dinghyClassScorpionHAL)
             });
         });
-        const promise = DinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
+        const dinghyRacingModel = new DinghyRacingModel();
+        const promise = dinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});
@@ -29,7 +30,8 @@ describe('when creating a new dinghy class', () => {
                 json: () => Promise.resolve(dinghyClassScorpionHAL)
             });
         });
-        const promise = DinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
+        const dinghyRacingModel = new DinghyRacingModel();
+        const promise = dinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});
@@ -42,7 +44,8 @@ describe('when creating a new dinghy class', () => {
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 400'}, 'message': 'Some error resulting in HTTP 400'})
             });
         });
-        const promise = DinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
+        const dinghyRacingModel = new DinghyRacingModel();
+        const promise = dinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Message: Some error resulting in HTTP 400'}); 
@@ -55,7 +58,8 @@ describe('when creating a new dinghy class', () => {
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
             });
         });
-        const promise = DinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
+        const dinghyRacingModel = new DinghyRacingModel();
+        const promise = dinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'}); 
@@ -68,7 +72,8 @@ describe('when creating a new dinghy class', () => {
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 408'}, 'message': 'Some error resulting in HTTP 408'})
             });
         });
-        const promise = DinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
+        const dinghyRacingModel = new DinghyRacingModel();
+        const promise = dinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 408 Message: Some error resulting in HTTP 408'}); 
@@ -81,7 +86,8 @@ describe('when creating a new dinghy class', () => {
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 409'}, 'message': 'Some error resulting in HTTP 409'})
             });
         });
-        const promise = DinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
+        const dinghyRacingModel = new DinghyRacingModel();
+        const promise = dinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 409 Message: Some error resulting in HTTP 409'});
@@ -94,7 +100,8 @@ describe('when creating a new dinghy class', () => {
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 500'}, 'message': 'Some error resulting in HTTP 500'})
             });
         });
-        const promise = DinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
+        const dinghyRacingModel = new DinghyRacingModel();
+        const promise = dinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 500 Message: Some error resulting in HTTP 500'}); 
@@ -107,7 +114,8 @@ describe('when creating a new dinghy class', () => {
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 503'}, 'message': 'Some error resulting in HTTP 503'})
             });
         });
-        const promise = DinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
+        const dinghyRacingModel = new DinghyRacingModel();
+        const promise = dinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 503 Message: Some error resulting in HTTP 503'}); 
@@ -116,7 +124,8 @@ describe('when creating a new dinghy class', () => {
         fetch.mockImplementationOnce(() => {
             throw new TypeError('Failed to fetch');
         });
-        const promise = DinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
+        const dinghyRacingModel = new DinghyRacingModel();
+        const promise = dinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'TypeError: Failed to fetch'});
