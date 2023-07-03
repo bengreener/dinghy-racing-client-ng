@@ -20,8 +20,9 @@ class DinghyRacingModel {
      */
      async createDinghyClass(dinghyClass) {
         const urlPathSegment = 'dinghyclasses';
+        const body = JSON.stringify(dinghyClass); // convert to string so can be serialized into object by receiving service
         try {
-            const response = await fetch(this.rootURL + '/' + urlPathSegment, {method: 'POST', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, body: dinghyClass});
+            const response = await fetch(this.rootURL + '/' + urlPathSegment, {method: 'POST', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, 'body': body});
             const json = await response.json();
             if(response.ok) {
                 return Promise.resolve({'success': true});
