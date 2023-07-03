@@ -7,6 +7,7 @@ class DinghyRacingController {
             throw new Error('A dinghy racing model is required when creating an instance of DinghyRacingController');
         }
         this.model = model;
+        this.createDinghyClass = this.createDinghyClass.bind(this);
     }
 
     /**
