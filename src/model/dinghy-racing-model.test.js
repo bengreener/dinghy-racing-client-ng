@@ -1,5 +1,5 @@
 import DinghyRacingModel from './dinghy-racing-model';
-import { dinghyClassScorpionHAL } from './__mocks__/test-data';
+import { rootURL, dinghyClassScorpionHAL, raceScorpion_AHAL } from './__mocks__/test-data';
 
 global.fetch = jest.fn();
 
@@ -139,3 +139,34 @@ describe('when creating a new dinghy class', () => {
         expect(result).toEqual({'success': false, 'message': 'TypeError: Failed to fetch'});
     })
 });
+
+describe('when searcing for a dinghy class by name', () => {
+    it('returns a promise that resolves to a result indicating success and containing the dinghy class when dinghy class is found and http status 200', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: true,
+                status: 200, 
+                json: () => Promise.resolve(dinghyClassScorpionHAL)
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
+        const promise = dinghyRacingModel.getDinghyClassByName('Scorpion');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': dinghyClassScorpionHAL});
+    })
+    it('returns a promise that resolves to a result indicating failure when dinghy class is not found', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 404, 
+                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
+        const promise = dinghyRacingModel.getDinghyClassByName('Scorpion');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'});
+    })
+})

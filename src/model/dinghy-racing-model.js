@@ -35,7 +35,30 @@ class DinghyRacingModel {
         catch (error) {
             return Promise.resolve({'success': false, 'message': error.toString()});
         }
-        
+    }
+
+    /**
+     * Get a dinghy class by the name of the class
+     * @param {String} name
+     * @returns {Promise<Result>}
+     */
+    async getDinghyClassByName(name) {
+        const urlPathSegment = 'dinghyclasses/search/findByName';
+        const query = 'name=' + name;
+        try {
+            const response = await fetch(this.rootURL + '/' + urlPathSegment + '?' + query, {method: 'GET', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}});
+            const json = await response.json();
+            if(response.ok) {
+                return Promise.resolve({'success': true, 'domainObject': json});
+            }
+            else {
+                const message = json.message ? 'HTTP Error: ' + response.status + ' Message: ' + json.message : 'HTTP Error: ' + response.status + 'Message: No additional information available';
+                return Promise.resolve({'success': false, 'message': message});
+            }
+        }
+        catch (error) {
+            return Promise.resolve({'success': false, 'message': error.toString()});
+        }
     }
 }
 
