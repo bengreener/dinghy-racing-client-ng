@@ -38,3 +38,18 @@ describe('when creating a new Dinghy Class', () => {
         expect(result).toEqual({'success': false, 'message': 'A name is required for a new dinghy class.'});
     });
 })
+
+describe('when creating a new race', () => {
+    it('returns a promise that resolves to a result indicating success when operation is successful', async () => {
+
+    })
+    it('returns a promise that resolves to a result indicating failure when operation is unsuccessful and provides a message explaining the cause of failure', async () => {
+        
+    })
+    it('returns a promise that resolves to a result indicating failure when name is null and provides a message explaining the cause of failure', async () => {
+        
+    });
+    it('returns a promise that resolves to a result indicating failure when name is \'\' and provides a message explaining the cause of failure', async () => {
+        
+    });
+})

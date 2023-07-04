@@ -1,22 +1,27 @@
 import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
-import DinghyRacingController from './controller/dinghy-racing-controller'; 
+import DinghyRacingController from './controller/dinghy-racing-controller';
+import DinghyRacingModel from './model/dinghy-racing-model';
+import { rootURL } from './model/__mocks__/test-data';
 
 jest.mock('./controller/dinghy-racing-controller');
+jest.mock('./model/dinghy-racing-model');
 
 beforeEach(() => {
   jest.clearAllMocks();
 });
 
 it('renders banner', async () => {
-  render(<App controller={DinghyRacingController} />);  
+  const dinghyRacingController = new DinghyRacingController(new DinghyRacingModel(rootURL));
+  render(<App controller={dinghyRacingController} />);  
   const banner = await screen.findByRole('banner');
   expect(banner).toBeInTheDocument();
 });
 
 it('displays menu buttons', () => {
-  render(<App controller={DinghyRacingController} />);
+  const dinghyRacingController = new DinghyRacingController(new DinghyRacingModel(rootURL));
+  render(<App controller={dinghyRacingController} />);
   const btnCreateDinghyClass = screen.getByRole('button', {name: /create dinghy class\b/i});
   const btnCreateRace = screen.getByRole('button', {name: /create race\b/i});
   expect(btnCreateDinghyClass).toBeInTheDocument();
@@ -26,8 +31,9 @@ it('displays menu buttons', () => {
 describe('when create dinghy class button clicked', () => {
   it('displays create dinghy class form', async () => {
     const user = userEvent.setup();
+    const dinghyRacingController = new DinghyRacingController(new DinghyRacingModel(rootURL));
 
-    render(<App controller={DinghyRacingController} />);
+    render(<App controller={dinghyRacingController} />);
     const btnCreateDinghyClass = await screen.findByRole('button', {name: /create dinghy class\b/i});
     await act(async () => {
       await user.click(btnCreateDinghyClass);
@@ -39,8 +45,9 @@ describe('when create dinghy class button clicked', () => {
 describe('when create race button clicked', () => {
   it('displays create race form', async () => {
     const user = userEvent.setup();
+    const dinghyRacingController = new DinghyRacingController(new DinghyRacingModel(rootURL));
 
-    render(<App controller={DinghyRacingController} />);
+    render(<App controller={dinghyRacingController} />);
     const btnCreateRace = await screen.findByRole('button', {name: /create race\b/i});
     await act(async () => {
       await user.click(btnCreateRace);
