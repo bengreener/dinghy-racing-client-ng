@@ -34,6 +34,7 @@ const raceSchemaALPS = { 'alps' : { 'version' : '1.0', 'descriptor' : [ { 'id' :
 
 const dinghyClassScorpion = { 'name' : 'Scorpion', 'url': 'http://localhost:8081/dinghyracing/api/dinghyclasses/1' };
 
+const raceScorpionA = {'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': {'name': 'Scorpion', 'url': 'http://localhost:8081/dinghyracing/api/dinghyclasses/1'}};
 
 export {
 	rootURL,
@@ -51,5 +52,6 @@ export {
 	raceGraduate_AHAL, raceGraduate_ADinghyClassHAL, raceGraduate_ASignedUpHAL,
 	raceSchemaJSON, raceSchemaALPS,
 
-	dinghyClassScorpion
+	dinghyClassScorpion,
+	raceScorpionA
 }
