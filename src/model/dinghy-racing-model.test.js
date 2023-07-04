@@ -1,5 +1,5 @@
 import DinghyRacingModel from './dinghy-racing-model';
-import { rootURL, dinghyClassScorpionHAL, raceScorpion_AHAL } from './__mocks__/test-data';
+import { rootURL, dinghyClassScorpionHAL, raceScorpion_AHAL, dinghyClassScorpion } from './__mocks__/test-data';
 
 global.fetch = jest.fn();
 
@@ -153,7 +153,7 @@ describe('when searcing for a dinghy class by name', () => {
         const promise = dinghyRacingModel.getDinghyClassByName('Scorpion');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, 'domainObject': dinghyClassScorpionHAL});
+        expect(result).toEqual({'success': true, 'domainObject': dinghyClassScorpion});
     })
     it('returns a promise that resolves to a result indicating failure when dinghy class is not found', async () => {
         fetch.mockImplementationOnce(() => {
