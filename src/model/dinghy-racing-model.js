@@ -23,6 +23,23 @@ class DinghyRacingModel {
     }
 
     /**
+     * Create a new race
+     * @param {Race} race 
+     * @returns {Promise<Result>}
+     */
+    async createRace(race) {
+        // get url for dinghyClass
+        const result = await this.getDinghyClassByName(race.dinghyClass.name);
+        if (result.success) {
+            const newRace = {...race, 'dinghyClass': result.domainObject.url};
+            return this.create('races', newRace);
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
      * Get a dinghy class by the name of the class
      * @param {String} name
      * @returns {Promise<Result>}
