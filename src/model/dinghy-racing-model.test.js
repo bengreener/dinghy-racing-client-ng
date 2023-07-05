@@ -172,7 +172,7 @@ describe('when searcing for a dinghy class by name', () => {
 })
 
 describe('when creating a new race', () => {
-    it('returns a promise that resolves to a result indicating success when race is created with http status 200', async () => {
+    it('if a dinghy class URL is not supplied looks up dinghy class to get URL and returns a promise that resolves to a result indicating success when race is created with http status 200', async () => {
         fetch.mockImplementationOnce((resource, options) => {
             // check format of data passed to fetch to reduce risk of false positive
             if(options.body !== '{"name":"Scorpion A","time":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","plannedStartTime":"2021-10-14T14:10:00.000Z"}') {
@@ -189,9 +189,34 @@ describe('when creating a new race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(rootURL);
-        jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return {'success': true, 'domainObject': dinghyClassScorpion}});
+        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return {'success': true, 'domainObject': dinghyClassScorpion}});
         const promise = dinghyRacingModel.createRace({'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': {'name': 'Scorpion'}});
         const result = await promise;
+        expect(getDinghyClassByNameSpy).toHaveBeenCalled();
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true});
+    })
+    it('if a dinghy class URL is supplied does not look up dinghy class to get URL and returns a promise that resolves to a result indicating success when race is created with http status 200', async () => {
+        fetch.mockImplementationOnce((resource, options) => {
+            // check format of data passed to fetch to reduce risk of false positive
+            if(options.body !== '{"name":"Scorpion A","time":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","plannedStartTime":"2021-10-14T14:10:00.000Z"}') {
+                return Promise.resolve({
+                    ok: false,
+                    status: 400, 
+                    json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Data passed to fetch was not in format required to create a Race'}, 'message': 'Data passed to fetch was not in format required to create a Race'})
+                });
+            }
+            return Promise.resolve({
+                ok: true,
+                status: 200, 
+                json: () => Promise.resolve(raceScorpion_AHAL)
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return {'success': true, 'domainObject': dinghyClassScorpion}});
+        const promise = dinghyRacingModel.createRace({'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': dinghyClassScorpion});
+        const result = await promise;
+        expect(getDinghyClassByNameSpy).not.toHaveBeenCalled();
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});
     })

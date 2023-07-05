@@ -28,16 +28,22 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async createRace(race) {
-        // get url for dinghyClass
-        const result = await this.getDinghyClassByName(race.dinghyClass.name);
-        if (result.success) {
-            // convert local race domain type into format required by REST service
-            const newRace = {...race, 'plannedStartTime': race.time, 'dinghyClass': result.domainObject.url};
-            return this.create('races', newRace);
-        }
+        var dinghyClassURL;
+        // if not supplied get url for dinghyClass
+        if (!(race.dinghyClass.url)) {
+            const result = await this.getDinghyClassByName(race.dinghyClass.name);
+            if (!result.success) {
+                return Promise.resolve(result);
+            }
+            dinghyClassURL = result.domainObject.url;
+        } 
         else {
-            return Promise.resolve(result);
+            dinghyClassURL = race.dinghyClass.url;
         }
+
+        // convert local race domain type into format required by REST service
+        const newRace = {...race, 'plannedStartTime': race.time, 'dinghyClass': dinghyClassURL};
+        return this.create('races', newRace);
     }
 
     /**
