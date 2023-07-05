@@ -31,7 +31,8 @@ class DinghyRacingModel {
         // get url for dinghyClass
         const result = await this.getDinghyClassByName(race.dinghyClass.name);
         if (result.success) {
-            const newRace = {...race, 'dinghyClass': result.domainObject.url};
+            // convert local race domain type into format required by REST service
+            const newRace = {...race, 'plannedStartTime': race.time, 'dinghyClass': result.domainObject.url};
             return this.create('races', newRace);
         }
         else {
