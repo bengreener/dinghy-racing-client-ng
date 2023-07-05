@@ -10,7 +10,7 @@ function App({controller}) {
   }
 
   function showCreateRaceForm() {
-    setDisplayPort(<CreateRace />);
+    setDisplayPort(<CreateRace onCreate={controller.createRace} />);
   }
 
   return (
