@@ -32,7 +32,7 @@ class DinghyRacingController {
         if (race.name === undefined || race.name === null || race.name === '') {
             return Promise.resolve({'success': false, 'message': 'A name is required for a new race.'});
         }
-        if (race.time instanceof Date) {
+        if (!(race.time instanceof Date)) {
             return Promise.resolve({'success': false, 'message': 'A time is required for a new race.'});
         }
         return this.model.createRace(race);
