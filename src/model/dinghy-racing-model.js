@@ -62,7 +62,7 @@ class DinghyRacingModel {
                 json = await response.json();
             } 
             catch (error) {
-                if (error.message = 'Unexpected end of JSON input') {
+                if (error.message === 'Unexpected end of JSON input') {
                     json = {message: 'Dinghy class not found'};
                 }
                 else {
