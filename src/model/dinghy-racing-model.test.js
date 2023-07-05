@@ -7,6 +7,23 @@ beforeEach(() => {
     fetch.mockClear();
 });
 
+describe('when creating a new object via REST', () => {
+    it('Handles a situation where no body is returned', async () => {
+        fetch.mockImplementationOnce((resource, options) => {
+            return Promise.resolve({
+                ok: false,
+                status: 400,
+                json: () => {throw new SyntaxError('Unexpected end of JSON input')}
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
+        const promise = dinghyRacingModel.create('someobject', {'prop1': 'foo', 'prop2': 'bar'});
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Message: No additional information available'});
+    });
+})
+
 describe('when creating a new instance of DinghyRacingModel', () => {
     it('requires a URL', () => {
         expect(() => {
@@ -159,15 +176,15 @@ describe('when searcing for a dinghy class by name', () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
-                status: 404, 
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
+                status: 404,
+                json: () => {throw new SyntaxError('Unexpected end of JSON input')}
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
         const promise = dinghyRacingModel.getDinghyClassByName('Scorpion');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Dinghy class not found'});
     })
 })
 

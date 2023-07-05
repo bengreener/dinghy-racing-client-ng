@@ -55,14 +55,26 @@ class DinghyRacingModel {
         const urlPathSegment = 'dinghyclasses/search/findByName';
         const query = 'name=' + name;
         try {
+            var json;
             const response = await fetch(this.rootURL + '/' + urlPathSegment + '?' + query, {method: 'GET', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}});
-            const json = await response.json();
+            try {
+                // if body is empty reading json() will result in an error 
+                json = await response.json();
+            } 
+            catch (error) {
+                if (error.message = 'Unexpected end of JSON input') {
+                    json = {message: 'Dinghy class not found'};
+                }
+                else {
+                    json = {};
+                }
+            }
             if(response.ok) {
                 const domainObject = {'name': json.name, 'url': json._links.self.href};
                 return Promise.resolve({'success': true, 'domainObject': domainObject});
             }
             else {
-                const message = json.message ? 'HTTP Error: ' + response.status + ' Message: ' + json.message : 'HTTP Error: ' + response.status + 'Message: No additional information available';
+                const message = json.message ? 'HTTP Error: ' + response.status + ' Message: ' + json.message : 'HTTP Error: ' + response.status + ' Message: No additional information available';
                 return Promise.resolve({'success': false, 'message': message});
             }
         }
@@ -79,13 +91,20 @@ class DinghyRacingModel {
     async create(urlPathSegment, object) {
         const body = JSON.stringify(object); // convert to string so can be serialized into object by receiving service
         try {
+            var json;
             const response = await fetch(this.rootURL + '/' + urlPathSegment, {method: 'POST', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, 'body': body});
-            const json = await response.json();
+            try {
+                // if body is empty reading json() will result in an error
+                json = await response.json();
+            }
+            catch (error) {
+                json = {};
+            }
             if(response.ok) {
                 return Promise.resolve({'success': true});
             }
             else {
-                const message = json.message ? 'HTTP Error: ' + response.status + ' Message: ' + json.message : 'HTTP Error: ' + response.status + 'Message: No additional information available';
+                const message = json.message ? 'HTTP Error: ' + response.status + ' Message: ' + json.message : 'HTTP Error: ' + response.status + ' Message: No additional information available';
                 return Promise.resolve({'success': false, 'message': message});
             }
         }
