@@ -1,13 +1,29 @@
 import React from 'react';
+import { useContext } from 'react';
+import { ModelContext } from './ModelContext';
 
 function CreateRace({ onCreate }) {
+    const model = useContext(ModelContext);
     const [race, setRace] = React.useState({'name': '', 'time': new Date().toISOString().substring(0, 16), 'dinghyClass': {'name': ''}});
     const [result, setResult] = React.useState({'message': ''});
+    const [dinghyClasses, setDinghyClasses] = React.useState([]);
 
     const clear = React.useCallback(() => {
         setRace({'name': '', 'time': new Date().toISOString().substring(0, 16), 'dinghyClass': {'name': ''}});
         showMessage('');
     }, []);
+
+    React.useEffect(() => {
+        model.getDinghyClasses().then(result => {
+            if (result.success) {
+                setDinghyClasses(result.domainObject.map(dinghyClass => <option key={dinghyClass.name} value={dinghyClass}>{dinghyClass.name}</option>));
+            }
+            else {
+                showMessage('Unable to load dinghy classes\n' + result.message);
+            }
+        });
+
+    }, [model]);
 
     React.useEffect(() => {
         if (result && result.success) {

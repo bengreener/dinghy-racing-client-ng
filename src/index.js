@@ -10,6 +10,6 @@ const controller = new DinghyRacingController(model);
 
 root.render(
   <React.StrictMode>
-    <App controller={controller}/>
+    <App model={model} controller={controller}/>
   </React.StrictMode>
 );
