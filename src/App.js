@@ -1,6 +1,7 @@
 import React from 'react';
 import CreateDinghyClass from './view/CreateDinghyClass';
 import CreateRace from './view/CreateRace';
+import ErrorBoundary from './view/ErrorBoundary';
 
 function App({controller}) {
   const [displayPort, setDisplayPort] = React.useState();
@@ -14,6 +15,7 @@ function App({controller}) {
   }
 
   return (
+    <ErrorBoundary>
       <div className="container-fluid">
         <header style={{backgroundImage: 'url("./images/home-jumbotron-image.jpg")',}}>
             <h1 className='display-4'>Dinghy Racing</h1>
@@ -24,10 +26,13 @@ function App({controller}) {
           <button key={1} type='button' className='list-group-item list-group-item-action' onClick={showCreateRaceForm}>Create Race</button>
         </div>
         <div className="display-port">
-          {displayPort}
+          <ErrorBoundary>
+            {displayPort}
+          </ErrorBoundary>
         </div>
         <footer style={{backgroundImage: 'url("./images/home-footer-image.jpg")',}} />
       </div>
+    </ErrorBoundary>
   );
 }
 
