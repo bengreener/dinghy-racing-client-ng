@@ -225,7 +225,7 @@ describe('when searcing for a dinghy class by name', () => {
         const promise = dinghyRacingModel.getDinghyClassByName('Scorpion');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Dinghy class not found'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Resource not found'});
     });
 })
 

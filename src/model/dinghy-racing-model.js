@@ -52,34 +52,15 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async getDinghyClassByName(name) {
-        const urlPathSegment = 'dinghyclasses/search/findByName';
-        const query = 'name=' + name;
-        try {
-            var json;
-            const response = await fetch(this.rootURL + '/' + urlPathSegment + '?' + query, {method: 'GET', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}});
-            try {
-                // if body is empty reading json() will result in an error 
-                json = await response.json();
-            } 
-            catch (error) {
-                if (error.message === 'Unexpected end of JSON input') {
-                    json = {message: 'Dinghy class not found'};
-                }
-                else {
-                    json = {};
-                }
-            }
-            if(response.ok) {
-                const domainObject = {'name': json.name, 'url': json._links.self.href};
-                return Promise.resolve({'success': true, 'domainObject': domainObject});
-            }
-            else {
-                const message = json.message ? 'HTTP Error: ' + response.status + ' Message: ' + json.message : 'HTTP Error: ' + response.status + ' Message: No additional information available';
-                return Promise.resolve({'success': false, 'message': message});
-            }
+        const resource = this.rootURL + '/' + 'dinghyclasses/search/findByName' + '?' + 'name=' + name;
+
+        const result = await this.read(resource);
+        if(result.success) {
+            const domainObject = {'name': result.domainObject.name, 'url': result.domainObject._links.self.href};
+            return Promise.resolve({'success': true, 'domainObject': domainObject});
         }
-        catch (error) {
-            return Promise.resolve({'success': false, 'message': error.toString()});
+        else {
+            return Promise.resolve(result);
         }
     }
 
