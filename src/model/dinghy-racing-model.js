@@ -52,7 +52,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async getDinghyClassByName(name) {
-        const resource = this.rootURL + '/' + 'dinghyclasses/search/findByName' + '?' + 'name=' + name;
+        const resource = this.rootURL + '/dinghyclasses/search/findByName?name=' + name;
 
         const result = await this.read(resource);
         if(result.success) {
@@ -69,7 +69,7 @@ class DinghyRacingModel {
      * @return {Promise<Array<DinghyClass>>}
      */
     async getDinghyClasses() {
-        const resource = this.rootURL + '/' + 'dinghyclasses?sort=name,asc';
+        const resource = this.rootURL + '/dinghyclasses?sort=name,asc';
 
         const result = await this.read(resource);
         if(result.success) {
