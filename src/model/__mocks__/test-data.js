@@ -33,6 +33,7 @@ const raceSchemaJSON = { 'title' : 'Race', 'properties' : { 'signedUp' : { 'titl
 const raceSchemaALPS = { 'alps' : { 'version' : '1.0', 'descriptor' : [ { 'id' : 'race-representation', 'href' : 'http://localhost:8081/dinghyracing/api/profile/races', 'descriptor' : [ { 'name' : 'name', 'type' : 'SEMANTIC', 'doc' : { 'format' : 'TEXT', 'value' : 'identifier' } }, { 'name' : 'plannedStartTime', 'type' : 'SEMANTIC' }, { 'name' : 'signedUp', 'type' : 'SAFE', 'doc' : { 'format' : 'TEXT', 'value' : 'ToMany' }, 'rt' : 'http://localhost:8081/dinghyracing/api/profile/dinghies#dinghy-representation' }, { 'name' : 'dinghyClass', 'type' : 'SAFE', 'doc' : { 'format' : 'TEXT', 'value' : 'ToOne' }, 'rt' : 'http://localhost:8081/dinghyracing/api/profile/dinghyclasses#dinghyClass-representation' } ] }, { 'id' : 'create-races', 'name' : 'races', 'type' : 'UNSAFE', 'descriptor' : [ ], 'rt' : '#race-representation' }, { 'id' : 'get-races', 'name' : 'races', 'type' : 'SAFE', 'descriptor' : [ { 'name' : 'page', 'type' : 'SEMANTIC', 'doc' : { 'format' : 'TEXT', 'value' : 'The page to return.' } }, { 'name' : 'size', 'type' : 'SEMANTIC', 'doc' : { 'format' : 'TEXT', 'value' : 'The size of the page to return.' } }, { 'name' : 'sort', 'type' : 'SEMANTIC', 'doc' : { 'format' : 'TEXT', 'value' : 'The sorting criteria to use to calculate the content of the page.' } } ], 'rt' : '#race-representation' }, { 'id' : 'delete-race', 'name' : 'race', 'type' : 'IDEMPOTENT', 'descriptor' : [ ], 'rt' : '#race-representation' }, { 'id' : 'update-race', 'name' : 'race', 'type' : 'IDEMPOTENT', 'descriptor' : [ ], 'rt' : '#race-representation' }, { 'id' : 'get-race', 'name' : 'race', 'type' : 'SAFE', 'descriptor' : [ ], 'rt' : '#race-representation' }, { 'id' : 'patch-race', 'name' : 'race', 'type' : 'UNSAFE', 'descriptor' : [ ], 'rt' : '#race-representation' } ] } };
 
 const dinghyClasses = [{'name':'Scorpion','url':'http://localhost:8081/dinghyracing/api/dinghyclasses/1'},{'name':'Graduate','url':'http://localhost:8081/dinghyracing/api/dinghyclasses/5'}];
+const dinghyClassesByNameAsc = [{'name':'Graduate','url':'http://localhost:8081/dinghyracing/api/dinghyclasses/5'}, {'name':'Scorpion','url':'http://localhost:8081/dinghyracing/api/dinghyclasses/1'}];
 const dinghyClassScorpion = { 'name' : 'Scorpion', 'url': 'http://localhost:8081/dinghyracing/api/dinghyclasses/1' };
 
 const raceScorpionA = {'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': {'name': 'Scorpion', 'url': 'http://localhost:8081/dinghyracing/api/dinghyclasses/1'}};
@@ -53,6 +54,6 @@ export {
 	raceGraduate_AHAL, raceGraduate_ADinghyClassHAL, raceGraduate_ASignedUpHAL,
 	raceSchemaJSON, raceSchemaALPS,
 
-	dinghyClasses, dinghyClassScorpion,
+	dinghyClasses, dinghyClassesByNameAsc, dinghyClassScorpion, 
 	raceScorpionA
 }

@@ -66,7 +66,7 @@ class DinghyRacingModel {
 
     /**
      * Get dinghy classes
-     * @return {Promise<Array<DinghyClass>>}
+     * @return {Promise<Result>>} If successful Result.domainObject will be an Array<DinghyClass>
      */
     async getDinghyClasses() {
         const resource = this.rootURL + '/dinghyclasses?sort=name,asc';
