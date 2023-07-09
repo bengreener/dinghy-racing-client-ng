@@ -52,34 +52,33 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async getDinghyClassByName(name) {
-        const urlPathSegment = 'dinghyclasses/search/findByName';
-        const query = 'name=' + name;
-        try {
-            var json;
-            const response = await fetch(this.rootURL + '/' + urlPathSegment + '?' + query, {method: 'GET', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}});
-            try {
-                // if body is empty reading json() will result in an error 
-                json = await response.json();
-            } 
-            catch (error) {
-                if (error.message === 'Unexpected end of JSON input') {
-                    json = {message: 'Dinghy class not found'};
-                }
-                else {
-                    json = {};
-                }
-            }
-            if(response.ok) {
-                const domainObject = {'name': json.name, 'url': json._links.self.href};
-                return Promise.resolve({'success': true, 'domainObject': domainObject});
-            }
-            else {
-                const message = json.message ? 'HTTP Error: ' + response.status + ' Message: ' + json.message : 'HTTP Error: ' + response.status + ' Message: No additional information available';
-                return Promise.resolve({'success': false, 'message': message});
-            }
+        const resource = this.rootURL + '/dinghyclasses/search/findByName?name=' + name;
+
+        const result = await this.read(resource);
+        if(result.success) {
+            const domainObject = {'name': result.domainObject.name, 'url': result.domainObject._links.self.href};
+            return Promise.resolve({'success': true, 'domainObject': domainObject});
         }
-        catch (error) {
-            return Promise.resolve({'success': false, 'message': error.toString()});
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
+     * Get dinghy classes
+     * @return {Promise<Result>>} If successful Result.domainObject will be an Array<DinghyClass>
+     */
+    async getDinghyClasses() {
+        const resource = this.rootURL + '/dinghyclasses?sort=name,asc';
+
+        const result = await this.read(resource);
+        if(result.success) {
+            const collection = result.domainObject._embedded.dinghyClasses;
+            const dinghyCollection = collection.map(dinghyClass => {return {'name': dinghyClass.name, 'url': dinghyClass._links.self.href}});
+            return Promise.resolve({'success': true, 'domainObject': dinghyCollection});
+        }
+        else {
+            return Promise.resolve(result);
         }
     }
 
@@ -102,6 +101,40 @@ class DinghyRacingModel {
             }
             if(response.ok) {
                 return Promise.resolve({'success': true});
+            }
+            else {
+                const message = json.message ? 'HTTP Error: ' + response.status + ' Message: ' + json.message : 'HTTP Error: ' + response.status + ' Message: No additional information available';
+                return Promise.resolve({'success': false, 'message': message});
+            }
+        }
+        catch (error) {
+            return Promise.resolve({'success': false, 'message': error.toString()});
+        }
+    }
+
+    /**
+     * Get a HAL+JSON representation of a domain resource
+     * @param {String} resource
+     * @returns {Promise<Result>}
+     */
+    async read(resource) {
+        try {
+            var json;
+            const response = await fetch(resource, {method: 'GET', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}});
+            try {
+                // if body is empty reading json() will result in an error 
+                json = await response.json();
+            } 
+            catch (error) {
+                if (error.message === 'Unexpected end of JSON input') {
+                    json = {message: 'Resource not found'};
+                }
+                else {
+                    json = {};
+                }
+            }
+            if(response.ok) {
+                return Promise.resolve({'success': true, 'domainObject': json});
             }
             else {
                 const message = json.message ? 'HTTP Error: ' + response.status + ' Message: ' + json.message : 'HTTP Error: ' + response.status + ' Message: No additional information available';

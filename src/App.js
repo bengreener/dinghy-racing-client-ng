@@ -2,8 +2,9 @@ import React from 'react';
 import CreateDinghyClass from './view/CreateDinghyClass';
 import CreateRace from './view/CreateRace';
 import ErrorBoundary from './view/ErrorBoundary';
+import { ModelContext } from './view/ModelContext';
 
-function App({controller}) {
+function App({model, controller}) {
   const [displayPort, setDisplayPort] = React.useState();
 
   function showCreateDinghyClassForm() {
@@ -15,6 +16,7 @@ function App({controller}) {
   }
 
   return (
+    <ModelContext.Provider value={model}>
     <ErrorBoundary>
       <div className="container-fluid">
         <header style={{backgroundImage: 'url("./images/home-jumbotron-image.jpg")',}}>
@@ -33,6 +35,7 @@ function App({controller}) {
         <footer style={{backgroundImage: 'url("./images/home-footer-image.jpg")',}} />
       </div>
     </ErrorBoundary>
+    </ModelContext.Provider>
   );
 }
 
