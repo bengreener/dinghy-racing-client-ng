@@ -8,14 +8,14 @@ function ViewUpcomingRaces() {
 
 
     useEffect(() => {
-        model.getRacesOnOrAfterTime(new Date).then(result => {
+        model.getRacesOnOrAfterTime(new Date()).then(result => {
             if (result.success) {
                 // setRaces(result.domainObject);
                 const races = result.domainObject;
-                setRows(races.map(race => <tr><td>{race.name}</td><td>{race.dinghyClass ? race.dinghyClass.name : ''}</td><td>{race.time.toLocaleString()}</td></tr>));
+                setRows(races.map(race => <tr key={race.url}><td>{race.name}</td><td>{race.dinghyClass ? race.dinghyClass.name : ''}</td><td>{race.time.toLocaleString()}</td></tr>));
             }
         });
-    }, [])
+    }, [model])
 
     return (
         <table>
