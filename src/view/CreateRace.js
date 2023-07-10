@@ -1,6 +1,6 @@
 import React from 'react';
 import { useContext } from 'react';
-import { ModelContext } from './ModelContext';
+import ModelContext from './ModelContext';
 
 function CreateRace({ onCreate }) {
     const model = useContext(ModelContext);

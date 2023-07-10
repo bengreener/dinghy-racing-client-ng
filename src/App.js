@@ -2,7 +2,7 @@ import React from 'react';
 import CreateDinghyClass from './view/CreateDinghyClass';
 import CreateRace from './view/CreateRace';
 import ErrorBoundary from './view/ErrorBoundary';
-import { ModelContext } from './view/ModelContext';
+import ModelContext from './view/ModelContext';
 
 function App({model, controller}) {
   const [displayPort, setDisplayPort] = React.useState();

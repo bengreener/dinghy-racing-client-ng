@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import { ModelContext } from '../view/ModelContext';
+import ModelContext from '../view/ModelContext';
 
 beforeEach(() => {
     jest.spyOn(console, 'error');
