@@ -3,6 +3,7 @@ import CreateDinghyClass from './view/CreateDinghyClass';
 import CreateRace from './view/CreateRace';
 import ErrorBoundary from './view/ErrorBoundary';
 import ModelContext from './view/ModelContext';
+import ViewUpcomingRaces from './view/ViewUpcomingRaces';
 
 function App({model, controller}) {
   const [displayPort, setDisplayPort] = React.useState();
@@ -13,6 +14,10 @@ function App({model, controller}) {
 
   function showCreateRaceForm() {
     setDisplayPort(<CreateRace onCreate={controller.createRace} />);
+  }
+
+  function showUpcomingRaces() {
+    setDisplayPort(<ViewUpcomingRaces />);
   }
 
   return (
@@ -26,6 +31,7 @@ function App({model, controller}) {
         <div className='list-group'>
           <button key={0} type='button' className='list-group-item list-group-item-action' onClick={showCreateDinghyClassForm}>Create Dinghy Class</button>
           <button key={1} type='button' className='list-group-item list-group-item-action' onClick={showCreateRaceForm}>Create Race</button>
+          <button key={2} type='button' className='list-group-item list-group-item-action' onClick={showUpcomingRaces}>Upcoming Races</button>
         </div>
         <div className="display-port">
           <ErrorBoundary>
