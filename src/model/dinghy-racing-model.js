@@ -83,6 +83,33 @@ class DinghyRacingModel {
     }
 
     /**
+     * Get races scheduled to start after the specified time
+     * @param {Date} startTime The start time of the race
+     * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
+     */
+    async getRacesOnOrAfterTime(startTime) {
+        const resource = this.rootURL + '/races/search/findByPlannedStartTimeGreaterThanEqual?time=' + startTime.toISOString();
+
+        const result = await this.read(resource);
+        if (result.success) {
+            const racesHAL = result.domainObject._embedded.races;
+            const dinghyClassURLs = racesHAL.map(race => race._links.dinghyClass.href);
+            const dinghyClassResults = await Promise.all(dinghyClassURLs.map(url => this.read(url)));
+            
+            const races = [];
+            for (let i = 0; i < racesHAL.length; i++  ) {
+                const dinghyClass = dinghyClassResults[i].success ? {'name': dinghyClassResults[i].domainObject.name, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
+                races.push({'name': racesHAL[i].name, 'time': new Date(racesHAL[i].plannedStartTime), 
+                    'dinghyClass': dinghyClass, 'url': racesHAL[i]._links.self.href});
+            };
+            return Promise.resolve({'success': true, 'domainObject': races});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
      * Create a new domain object
      * @param {string} urlPathSegment
      * @param {Object} object

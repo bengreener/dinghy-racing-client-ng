@@ -1,5 +1,5 @@
 import DinghyRacingModel from './dinghy-racing-model';
-import { rootURL, dinghyClassCollectionHAL, dinghyClassScorpionHAL, raceScorpion_AHAL, dinghyClasses, dinghyClassScorpion } from './__mocks__/test-data';
+import { rootURL, dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, raceScorpion_AHAL, dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, races, racesCollectionHAL } from './__mocks__/test-data';
 
 global.fetch = jest.fn();
 
@@ -437,3 +437,42 @@ describe('when retrieving a list of dinghy classes', () => {
         expect(result).toEqual({'success': false, 'message': 'TypeError: Failed to fetch'});
     });
 });
+
+// Can this test can be affected by BST, or other time zones
+it('returns a collection of races that start at or after the specified time', async () => {
+    fetch.mockImplementation((resource) => {
+        if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z') {
+            return Promise.resolve({
+                ok: true,
+                status: 200, 
+                json: () => Promise.resolve(racesCollectionHAL)
+            });
+        }
+        if (resource === 'http://localhost:8081/dinghyracing/api/races/4/dinghyClass') {
+            return Promise.resolve({
+                ok: true,
+                status: 200, 
+                json: () => Promise.resolve(dinghyClassScorpionHAL)
+            });
+        }
+        if (resource === 'http://localhost:8081/dinghyracing/api/races/7/dinghyClass') {
+            return Promise.resolve({
+                ok: true,
+                status: 200, 
+                json: () => Promise.resolve(dinghyClassGraduateHAL)
+            });
+        }
+        else {
+            return Promise.resolve({
+                ok: false,
+                status: 404
+            });
+        }
+    });
+
+    const dinghyRacingModel = new DinghyRacingModel(rootURL);
+    const promise = dinghyRacingModel.getRacesOnOrAfterTime(new Date('2022-10-10T10:00:00.000Z'));
+    const result = await promise;
+    expect(promise).toBeInstanceOf(Promise);
+    expect(result).toEqual({'success': true, 'domainObject': races});
+})
