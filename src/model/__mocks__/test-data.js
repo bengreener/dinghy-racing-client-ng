@@ -37,8 +37,11 @@ const dinghyClassesByNameAsc = [{'name':'Graduate','url':'http://localhost:8081/
 const dinghyClassScorpion = { 'name' : 'Scorpion', 'url': 'http://localhost:8081/dinghyracing/api/dinghyclasses/1' };
 const dinghyClassGraduate = {'name':'Graduate','url':'http://localhost:8081/dinghyracing/api/dinghyclasses/5'};
 
-const races = [{'name':'Scorpion A','plannedStartTime':'2021-10-14T14:10:00','dinghyClass':dinghyClassScorpion,'url':'http://localhost:8081/dinghyracing/api/races/4'},{'name':'Graduate A','plannedStartTime':'2021-10-14T10:30:00','dinghyClass':dinghyClassGraduate,'url':'http://localhost:8081/dinghyracing/api/races/7'},{'name':'No Class','plannedStartTime':'2023-02-14T18:26:00','dinghyClass':null,'url':'http://localhost:8081/dinghyracing/api/races/8'}];
-const raceScorpionA = {'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': {'name': 'Scorpion', 'url': 'http://localhost:8081/dinghyracing/api/dinghyclasses/1'}};
+// const races = [{'name':'Scorpion A','time': new Date('2021-10-14T14:10:00'),'dinghyClass':dinghyClassScorpion,'url':'http://localhost:8081/dinghyracing/api/races/4'},{'name':'Graduate A','time': new Date('2021-10-14T10:30:00'),'dinghyClass':dinghyClassGraduate,'url':'http://localhost:8081/dinghyracing/api/races/7'},{'name':'No Class','time': new Date('2023-02-14T18:26:00'),'dinghyClass':null,'url':'http://localhost:8081/dinghyracing/api/races/8'}];
+const raceScorpionA = { 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00'), 'dinghyClass': dinghyClassScorpion, 'url': 'http://localhost:8081/dinghyracing/api/races/4' };
+const raceGraduateA = { 'name': 'Graduate A', 'time' : new Date('2021-10-14T10:30:00'), 'dinghyClass': dinghyClassGraduate, 'url': 'http://localhost:8081/dinghyracing/api/races/7' };
+const raceNoClass = { 'name': 'No Class', 'time': new Date('2023-02-14T18:26:00'), 'dinghyClass': null, 'url': 'http://localhost:8081/dinghyracing/api/races/8' };
+const races = [raceScorpionA, raceGraduateA, raceNoClass];
 
 export {
 	rootURL,
@@ -58,5 +61,5 @@ export {
 
 	dinghyClasses, dinghyClassesByNameAsc, dinghyClassScorpion, dinghyClassGraduate,
 
-	races, raceScorpionA
+	races, raceScorpionA, raceGraduateA, raceNoClass
 }
