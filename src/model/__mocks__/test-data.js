@@ -35,7 +35,9 @@ const raceSchemaALPS = { 'alps' : { 'version' : '1.0', 'descriptor' : [ { 'id' :
 const dinghyClasses = [{'name':'Scorpion','url':'http://localhost:8081/dinghyracing/api/dinghyclasses/1'},{'name':'Graduate','url':'http://localhost:8081/dinghyracing/api/dinghyclasses/5'}];
 const dinghyClassesByNameAsc = [{'name':'Graduate','url':'http://localhost:8081/dinghyracing/api/dinghyclasses/5'}, {'name':'Scorpion','url':'http://localhost:8081/dinghyracing/api/dinghyclasses/1'}];
 const dinghyClassScorpion = { 'name' : 'Scorpion', 'url': 'http://localhost:8081/dinghyracing/api/dinghyclasses/1' };
+const dinghyClassGraduate = {'name':'Graduate','url':'http://localhost:8081/dinghyracing/api/dinghyclasses/5'};
 
+const races = [{'name':'Scorpion A','plannedStartTime':'2021-10-14T14:10:00','dinghyClass':dinghyClassScorpion,'url':'http://localhost:8081/dinghyracing/api/races/4'},{'name':'Graduate A','plannedStartTime':'2021-10-14T10:30:00','dinghyClass':dinghyClassGraduate,'url':'http://localhost:8081/dinghyracing/api/races/7'},{'name':'No Class','plannedStartTime':'2023-02-14T18:26:00','dinghyClass':null,'url':'http://localhost:8081/dinghyracing/api/races/8'}];
 const raceScorpionA = {'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': {'name': 'Scorpion', 'url': 'http://localhost:8081/dinghyracing/api/dinghyclasses/1'}};
 
 export {
@@ -54,6 +56,7 @@ export {
 	raceGraduate_AHAL, raceGraduate_ADinghyClassHAL, raceGraduate_ASignedUpHAL,
 	raceSchemaJSON, raceSchemaALPS,
 
-	dinghyClasses, dinghyClassesByNameAsc, dinghyClassScorpion, 
-	raceScorpionA
+	dinghyClasses, dinghyClassesByNameAsc, dinghyClassScorpion, dinghyClassGraduate,
+
+	races, raceScorpionA
 }
