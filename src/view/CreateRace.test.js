@@ -27,7 +27,6 @@ it('displays the available dinghyClasses and handicap option', async () => {
     
     const options = await screen.findAllByRole('option');
     const optionsAvailable = options.map(element => {return {'text': element.text, 'value': element.value}});
-    console.log(optionsAvailable);
     expect(optionsAvailable).toEqual([{'text': '', 'value': ''}, {'text': 'Graduate', 'value': 'Graduate'}, {'text': 'Scorpion', 'value': 'Scorpion'}]);
 })
 
