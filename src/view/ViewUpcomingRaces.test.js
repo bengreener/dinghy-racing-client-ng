@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, prettyDOM, logRoles } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { customRender } from '../test-utilities/custom-renders';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import ViewUpcomingRaces from './ViewUpcomingRaces';
@@ -30,4 +31,19 @@ it('displays the details of upcoming races', async () => {
     expect(cellValues).toContain('Scorpion A');
     expect(cellValues).toContain('Graduate');
     expect(cellValues).toContain('14/02/2023, 18:26:00');
+});
+
+describe('when a race is selected', () => {
+    it('the method passed to showSignUpForm is called with the selected race', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(rootURL);
+        jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        const showSignUpFormMock = jest.fn();
+
+        await customRender(<ViewUpcomingRaces showSignUpForm={showSignUpFormMock}/>, model);
+        const cellRaceScorpionA = await screen.findByRole('cell', {name: 'Scorpion A'});
+        await user.click(cellRaceScorpionA);
+
+        expect(showSignUpFormMock).toBeCalled();
+    });
 });

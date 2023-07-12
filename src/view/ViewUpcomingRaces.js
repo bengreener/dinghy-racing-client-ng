@@ -1,18 +1,31 @@
 import React, { useContext, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
 
-function ViewUpcomingRaces() {
+/**
+ * Show races that are scheduled to be held
+ * @param {Object} props
+ * @param {ViewUpcomingRaces~showSignUpForm} props.showSignUpForm A function that will result in a sign up form for a race being displayed
+ * @returns {HTMLElement}
+ */
+function ViewUpcomingRaces({ showSignUpForm = false }) {
     const model = useContext(ModelContext);
-    // const [races, setRaces] = useState([]);
-    const [rows, setRows] = useState();
+    const [raceMap, setRaceMap] = useState(new Map());
 
+    function handleRowClick({currentTarget}) {
+        if (showSignUpForm) {
+            showSignUpForm(raceMap.get(currentTarget.id));
+        }
+    }
 
     useEffect(() => {
         model.getRacesOnOrAfterTime(new Date()).then(result => {
             if (result.success) {
-                // setRaces(result.domainObject);
+                var map = new Map();
                 const races = result.domainObject;
-                setRows(races.map(race => <tr key={race.url}><td>{race.name}</td><td>{race.dinghyClass ? race.dinghyClass.name : ''}</td><td>{race.time.toLocaleString()}</td></tr>));
+                races.forEach(race => {
+                    map.set(race.url, race);
+                });
+                setRaceMap(map);
             }
         });
     }, [model])
@@ -25,10 +38,15 @@ function ViewUpcomingRaces() {
                 </tr>
             </thead>
             <tbody>
-                {rows}
+                {Array.from(raceMap.values()).map(race => <tr key={race.url} id={race.url} onClick={handleRowClick}><td>{race.name}</td><td>{race.dinghyClass ? race.dinghyClass.name : ''}</td><td>{race.time.toLocaleString()}</td></tr>)}
             </tbody>
         </table>
     );
 }
 
 export default ViewUpcomingRaces;
+
+/**
+ * @callback ViewUpcomingRaces~showSignUpForm
+ * @param {Race} race The race to sign up to
+ */
