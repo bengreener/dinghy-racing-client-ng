@@ -4,6 +4,7 @@ import CreateRace from './view/CreateRace';
 import ErrorBoundary from './view/ErrorBoundary';
 import ModelContext from './view/ModelContext';
 import ViewUpcomingRaces from './view/ViewUpcomingRaces';
+import SignUp from './view/SignUp';
 
 function App({model, controller}) {
   const [displayPort, setDisplayPort] = React.useState();
@@ -17,7 +18,11 @@ function App({model, controller}) {
   }
 
   function showUpcomingRaces() {
-    setDisplayPort(<ViewUpcomingRaces />);
+    setDisplayPort(<ViewUpcomingRaces showSignUpForm={showSignUpForm}/>);
+  }
+
+  function showSignUpForm(race) {
+    setDisplayPort(<SignUp race={race} />)
   }
 
   return (
@@ -46,3 +51,4 @@ function App({model, controller}) {
 }
 
 export default App;
+
