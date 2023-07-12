@@ -2,6 +2,10 @@ const rootURL = 'http://localhost:8081/dinghyracing/api';
 
 const emptyCollectionHAL = {'_embedded':{'dinghies':[]},'_links':{'self':null}};
 
+const competitorsCollectionHAL = {'_embedded':{'competitors':[{'name':'Chris Marshall','_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/competitors/8'},'competitor':{'href':'http://localhost:8081/dinghyracing/api/competitors/8'}}},{'name':'Sarah Pascal','_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/competitors/9'},'competitor':{'href':'http://localhost:8081/dinghyracing/api/competitors/9'}}}]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/competitors'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/competitors'}},'page':{'size':20,'totalElements':2,'totalPages':1,'number':0}};
+const competitorChrisMarsahll = {'name':'Chris Marshall','_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/competitors/8'},'competitor':{'href':'http://localhost:8081/dinghyracing/api/competitors/8'}}};
+const competitorSarahPascal = {'name':'Sarah Pascal','_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/competitors/9'},'competitor':{'href':'http://localhost:8081/dinghyracing/api/competitors/9'}}};
+
 const dinghyClassCollectionHAL = { '_embedded' : { 'dinghyClasses' : [ { 'name' : 'Scorpion', '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses/1' }, 'dinghyClass' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses/1' } } }, { 'name' : 'Graduate', '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses/5' }, 'dinghyClass' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses/5' } } } ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses' }, 'profile' : { 'href' : 'http://localhost:8081/dinghyracing/api/profile/dinghyclasses' } }, 'page' : { 'size' : 20, 'totalElements' : 2, 'totalPages' : 1, 'number' : 0 } };
 const dinghyClassScorpionHAL = { 'name' : 'Scorpion', '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses/1' }, 'dinghyClass' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses/1' } } };
 const dinghyClassGraduateHAL = { 'name' : 'Graduate', '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses/5' }, 'dinghyClass' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses/5' } } };
@@ -50,6 +54,8 @@ export {
 	
 	emptyCollectionHAL, 
 
+	competitorsCollectionHAL, competitorChrisMarsahll, competitorSarahPascal,
+	
 	dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghyClassNotSetHAL, 
 	dinghyClassSchemaJSON, dinghyClassSchemaALPS,
 	
