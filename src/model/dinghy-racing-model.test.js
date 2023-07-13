@@ -1,5 +1,5 @@
 import DinghyRacingModel from './dinghy-racing-model';
-import { rootURL, dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, raceScorpion_AHAL, dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, races, racesCollectionHAL } from './__mocks__/test-data';
+import { rootURL, dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, raceScorpion_AHAL, dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, races, racesCollectionHAL, competitorChrisMarshall, competitorChrisMarshallHAL } from './__mocks__/test-data';
 
 global.fetch = jest.fn();
 
@@ -475,4 +475,56 @@ it('returns a collection of races that start at or after the specified time', as
     const result = await promise;
     expect(promise).toBeInstanceOf(Promise);
     expect(result).toEqual({'success': true, 'domainObject': races});
+})
+
+describe('when signing up to a race', () => {
+    it('if competitor exists and URL provided and dinghy exist and URL provided then creates race entry', async () => {
+
+    });
+    it('if competitor exists but URL not provided and dinghy exists and URL provided then creates race entry', async () => {
+        
+    });
+    it('if competitor exists and URL provided and dinghy exists but URL not provided then creates race entry', async () => {
+        
+    });
+    it('if competitor does not exist and dingy does create competitor and then create race entry', async () => {
+
+    });
+    it('if dinghy does not exist and competitor does create dinghy and then create race entry', async () => {
+
+    });
+    it('if competitor and dinghy do not exist create them and then create race entry', async () => {
+
+    });
+})
+
+describe('when searcing for a competitor by name', () => {
+    it('returns a promise that resolves to a result indicating success and containing the competitor when competitor is found and http status 200', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: true,
+                status: 200, 
+                json: () => Promise.resolve(competitorChrisMarshallHAL)
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
+        const promise = dinghyRacingModel.getCompetitorByName('Chris Marshall');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': competitorChrisMarshall});
+    });
+    it('returns a promise that resolves to a result indicating failure when competitor is not found', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 404,
+                json: () => {throw new SyntaxError('Unexpected end of JSON input')}
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
+        const promise = dinghyRacingModel.getCompetitorByName('Bob Smith');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Resource not found'});
+    });
 })

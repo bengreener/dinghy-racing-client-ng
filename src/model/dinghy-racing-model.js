@@ -110,6 +110,24 @@ class DinghyRacingModel {
     }
 
     /**
+     * get a competitor by name
+     * @param {string} name Name of the competitor
+     * @returns {Promise<Result>}
+     */
+    async getCompetitorByName(name) {
+        const resource = this.rootURL + '/competitors/search/findByName?name=' + name;
+
+        const result = await this.read(resource);
+        if(result.success) {
+            const domainObject = {'name': result.domainObject.name, 'url': result.domainObject._links.self.href};
+            return Promise.resolve({'success': true, 'domainObject': domainObject});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
      * Create a new domain object
      * @param {string} urlPathSegment
      * @param {Object} object
