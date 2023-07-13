@@ -14,16 +14,24 @@ class DinghyRacingModel {
     }
 
     /**
-     * Creates a new competitor
+     * Create a new competitor
      * @param {Competitor} competitor 
      * @returns {Promise<Result>}
      */
     async createCompetitor(competitor) {
         return this.create('competitors', competitor);
     }
+/**
+     * Create a new dinghy
+     * @param {Dinghy} dinghy 
+     * @returns {Promise<Result>}
+     */
+    async createDinghy(dinghy) {
+        return this.create('dinghies', dinghy);
+    }
 
     /**
-     * Creates a new dinghy class
+     * Create a new dinghy class
      * @param {DinghyClass} dinghyClass 
      * @returns {Promise<Result>}
      */
