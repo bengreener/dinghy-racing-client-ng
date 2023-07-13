@@ -47,6 +47,22 @@ class DinghyRacingModel {
     }
 
     /**
+     * 
+     */
+    async getDinghyBySailNumberAndDinghyClass(sailNumber, dinghyClass) {
+        const resource = this.rootURL + '/dinghyclasses/search/findByName?name=' + sailNumber + '&dinghyClass=' + dinghyClass.url;
+
+        const result = await this.read(resource);
+        if(result.success) {
+            const domainObject = {'sailNumber': result.domainObject.sailNumber, 'dinghyClass': dinghyClass, 'url': result.domainObject._links.self.href}; // should this go back to REST service and pull DinghyClass instead of assuming?
+            return Promise.resolve({'success': true, 'domainObject': domainObject});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
      * Get a dinghy class by the name of the class
      * @param {String} name
      * @returns {Promise<Result>}

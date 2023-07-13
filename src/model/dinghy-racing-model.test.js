@@ -1,5 +1,6 @@
 import DinghyRacingModel from './dinghy-racing-model';
-import { rootURL, dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, raceScorpion_AHAL, dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, races, racesCollectionHAL, competitorChrisMarshall, competitorChrisMarshallHAL } from './__mocks__/test-data';
+import { rootURL, dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghy1234HAL, raceScorpion_AHAL, dinghyClasses, 
+    dinghyClassScorpion, dinghyClassGraduate, dinghy1234, races, racesCollectionHAL, competitorChrisMarshall, competitorChrisMarshallHAL } from './__mocks__/test-data';
 
 global.fetch = jest.fn();
 
@@ -523,6 +524,37 @@ describe('when searcing for a competitor by name', () => {
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
         const promise = dinghyRacingModel.getCompetitorByName('Bob Smith');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Resource not found'});
+    });
+})
+
+describe('when searcing for a dinghy by sail number and dinghy class', () => {
+    it('returns a promise that resolves to a result indicating success and containing the dinghy when dinghy is found and http status 200', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: true,
+                status: 200, 
+                json: () => Promise.resolve(dinghy1234HAL)
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
+        const promise = dinghyRacingModel.getDinghyBySailNumberAndDinghyClass('1234', dinghyClassScorpion);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': dinghy1234});
+    });
+    it('returns a promise that resolves to a result indicating failure when dinghy is not found', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 404,
+                json: () => {throw new SyntaxError('Unexpected end of JSON input')}
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
+        const promise = dinghyRacingModel.getDinghyBySailNumberAndDinghyClass('999', dinghyClassScorpion);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Resource not found'});
