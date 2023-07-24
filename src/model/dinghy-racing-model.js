@@ -40,6 +40,73 @@ class DinghyRacingModel {
     }
 
     /**
+     * Creata a new entry to a race
+     * @param {Race} race Race to enter
+     * @param {Competitor} competitor Competitor entering race
+     * @param {Dinghy} dinghy Dinghy to be sailed in race
+     * @returns {Promise<Result>}
+     */
+    async createEntry(race, competitor, dinghy) {
+        let finalCompetitor;
+        let finalDinghy;
+        let finalDinghyClass;
+
+        // check if competitor and dinghy have reference to remote resource and if not fetch
+        // assuming if a URL supplied resource exists in REST service
+        let promises = [];
+        let results = [];
+        if (!competitor.url) {
+            promises.push(this.getCompetitorByName(competitor.name));
+        }
+        else {
+            promises.push(Promise.resolve({'success': true, 'domainObject': competitor}));
+        }
+        if (!dinghy.url) {
+            if (!dinghy.dinghyClass.url) {
+                finalDinghyClass = await this.getDinghyClassByName(dinghy.dinghyClass.name);
+            }
+            else {
+                finalDinghyClass = dinghy.dinghyClass;
+            }
+            promises.push(this.getDinghyBySailNumberAndDinghyClass(dinghy.sailNumber, finalDinghyClass));
+        }
+        else {
+            promises.push(Promise.resolve({'success': true, 'domainObject': dinghy}));
+        }
+        // check if competitor and dinghy retrieved via REST and if not create
+        // if fetch was not required use competitor or dinghy passed as parameters
+        results = await Promise.all(promises);
+        promises = [];
+        if(results[0].success) {
+            promises.push(Promise.resolve(results[0]));
+        }
+        else {
+            promises.push(this.createCompetitor(competitor));
+        }
+        if(results[1].success) {
+            promises.push(Promise.resolve(results[1]));
+        }
+        else {
+            promises.push(this.createDinghy(dinghy));
+        }
+        results = await Promise.all(promises);
+        // if successful return success result
+        if (results[0].success && results[1].success) {
+            return this.create('entries', {'competitor': results[0].domainObject.url, 'dinghy': results[1].domainObject.url});
+        }
+        // if creation fails for competitor and dinghy combine messages and return failure
+        if (!results[0].success && !results[1].success) {
+            return Promise.resolve({'success': false, 'message': results[0].message + '\n' + results[1].message});
+        }
+        // if creation fails for competitor return failure
+        if (!results[0].success) {
+            return Promise.resolve({'success': false, 'message': results[0].message});
+        }
+        // if creation fails for dinghy return failure
+        return Promise.resolve({'success': false, 'message': results[1].message});
+    }
+
+    /**
      * Create a new race
      * @param {Race} race 
      * @returns {Promise<Result>}
