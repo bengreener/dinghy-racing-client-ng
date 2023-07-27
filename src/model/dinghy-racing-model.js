@@ -40,55 +40,49 @@ class DinghyRacingModel {
     }
 
     /**
-     * Creata a new entry to a race
+     * Create a new entry to a race
+     * Supplied competitor and dinghy must exist
      * @param {Race} race Race to enter
      * @param {Competitor} competitor Competitor entering race
      * @param {Dinghy} dinghy Dinghy to be sailed in race
      * @returns {Promise<Result>}
      */
     async createEntry(race, competitor, dinghy) {
-        let finalCompetitor;
-        let finalDinghy;
-        let finalDinghyClass;
+        let finalCompetitorUrl;
+        let finalDinghyUrl;
+        let finalDinghyClassUrl;
 
         // check if competitor and dinghy have reference to remote resource and if not fetch
         // assuming if a URL supplied resource exists in REST service
         let promises = [];
         let results = [];
+        // need competitor url
         if (!competitor.url) {
+            // lookup competitor
             promises.push(this.getCompetitorByName(competitor.name));
         }
         else {
+            // use supplied competitor url
             promises.push(Promise.resolve({'success': true, 'domainObject': competitor}));
         }
+        // need dinghy url
         if (!dinghy.url) {
+            // Need dinghy class url to lookup dinghy
             if (!dinghy.dinghyClass.url) {
-                finalDinghyClass = await this.getDinghyClassByName(dinghy.dinghyClass.name);
+                finalDinghyClassUrl = await this.getDinghyClassByName(dinghy.dinghyClass.name).url;
             }
             else {
-                finalDinghyClass = dinghy.dinghyClass;
+                finalDinghyClassUrl = dinghy.dinghyClass.url;
             }
-            promises.push(this.getDinghyBySailNumberAndDinghyClass(dinghy.sailNumber, finalDinghyClass));
+            // lookup dinghy
+            promises.push(this.getDinghyBySailNumberAndDinghyClass(dinghy.sailNumber, finalDinghyClassUrl));
         }
         else {
+            // use supplied dinghy url
             promises.push(Promise.resolve({'success': true, 'domainObject': dinghy}));
         }
-        // check if competitor and dinghy retrieved via REST and if not create
+        // check if competitor and dinghy retrieved via REST
         // if fetch was not required use competitor or dinghy passed as parameters
-        results = await Promise.all(promises);
-        promises = [];
-        if(results[0].success) {
-            promises.push(Promise.resolve(results[0]));
-        }
-        else {
-            promises.push(this.createCompetitor(competitor));
-        }
-        if(results[1].success) {
-            promises.push(Promise.resolve(results[1]));
-        }
-        else {
-            promises.push(this.createDinghy(dinghy));
-        }
         results = await Promise.all(promises);
         // if successful return success result
         if (results[0].success && results[1].success) {
