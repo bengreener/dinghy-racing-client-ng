@@ -3,6 +3,7 @@ import CreateDinghyClass from './view/CreateDinghyClass';
 import CreateRace from './view/CreateRace';
 import ErrorBoundary from './view/ErrorBoundary';
 import ModelContext from './view/ModelContext';
+import ControllerContext from './view/ControllerContext';
 import ViewUpcomingRaces from './view/ViewUpcomingRaces';
 import SignUp from './view/SignUp';
 
@@ -27,6 +28,7 @@ function App({model, controller}) {
 
   return (
     <ModelContext.Provider value={model}>
+    <ControllerContext.Provider value={controller}>
     <ErrorBoundary>
       <div className="container-fluid">
         <header style={{backgroundImage: 'url("./images/home-jumbotron-image.jpg")',}}>
@@ -46,6 +48,7 @@ function App({model, controller}) {
         <footer style={{backgroundImage: 'url("./images/home-footer-image.jpg")',}} />
       </div>
     </ErrorBoundary>
+    </ControllerContext.Provider>
     </ModelContext.Provider>
   );
 }
