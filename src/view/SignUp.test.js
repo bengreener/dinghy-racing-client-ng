@@ -1,7 +1,13 @@
 import { render, screen, act } from '@testing-library/react';
+import { customRender } from '../test-utilities/custom-renders';
 import userEvent from '@testing-library/user-event';
+import DinghyRacingModel from '../model/dinghy-racing-model';
+import DinghyRacingController from '../controller/dinghy-racing-controller';
 import SignUp from './SignUp';
-import { raceScorpionA, raceNoClass, dinghyClassScorpion } from '../model/__mocks__/test-data';
+import { raceScorpionA, raceNoClass, dinghyClassScorpion, rootURL } from '../model/__mocks__/test-data';
+
+jest.mock('../model/dinghy-racing-model');
+jest.mock('../controller/dinghy-racing-controller');
 
 it('renders', () => {
     render(<SignUp race={raceScorpionA}/>);
@@ -70,11 +76,13 @@ it('when dinghy class is entered then displays dinghy class', async () => {
     expect(inputDinghyClass).toHaveValue('Scorpion');
 });
 
-it('when create button is clicked and race has a specified dinghy class then function passed to onCreate prop is called with values entered into form and dinghy dinghy class set per race', async () => {
-    const onCreateMock = jest.fn();
+it('when create button is clicked and race has a specified dinghy class then create function is called with values entered into form and dinghy dinghy class set per race', async () => {
+    const model = new DinghyRacingModel(rootURL);
+    const controller = new DinghyRacingController(model);
+    const onCreateSpy = jest.spyOn(controller, 'signupToRace');
     const user = userEvent.setup();
 
-    render(<SignUp race={raceScorpionA} onCreate={onCreateMock} />);
+    customRender(<SignUp race={raceScorpionA} />, model, controller);
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
     const inputCompetitor = await screen.findByLabelText(/competitor/i);
     const inputSailNumber = await screen.findByLabelText(/sail/i);
@@ -85,14 +93,16 @@ it('when create button is clicked and race has a specified dinghy class then fun
         await user.click(btnCreate);
     });
 
-    expect(onCreateMock).toHaveBeenCalledWith(raceScorpionA, {'name': 'Bob Dunn', 'url': ''}, {'sailNumber': '1234', 'dinghyClass': dinghyClassScorpion, 'url': ''});
+    expect(onCreateSpy).toHaveBeenCalledWith(raceScorpionA, {'name': 'Bob Dunn', 'url': ''}, {'sailNumber': '1234', 'dinghyClass': dinghyClassScorpion, 'url': ''});
 });
 
-it('when create button is clicked and race does not have a specified dinghy class then function passed to onCreate prop is called with values entered into form', async () => {
-    const onCreateMock = jest.fn();
+it('when create button is clicked and race does not have a specified dinghy class then create function is called with values entered into form', async () => {
+    const model = new DinghyRacingModel(rootURL);
+    const controller = new DinghyRacingController(model);
+    const onCreateSpy = jest.spyOn(controller, 'signupToRace');
     const user = userEvent.setup();
 
-    render(<SignUp race={raceNoClass} onCreate={onCreateMock} />);
+    customRender(<SignUp race={raceNoClass} />, model, controller);
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
     
     const inputCompetitor = await screen.findByLabelText(/competitor/i);
@@ -106,16 +116,18 @@ it('when create button is clicked and race does not have a specified dinghy clas
         await user.click(btnCreate);
     });
     
-    expect(onCreateMock).toHaveBeenCalledWith(raceNoClass, {'name': 'Bob Dunn', 'url': ''}, {'sailNumber': '1234', 'dinghyClass': {'name': 'Graduate', 'url': ''}, 'url': ''});
+    expect(onCreateSpy).toHaveBeenCalledWith(raceNoClass, {'name': 'Bob Dunn', 'url': ''}, {'sailNumber': '1234', 'dinghyClass': {'name': 'Graduate', 'url': ''}, 'url': ''});
 });
 
-it('when create button is clicked if onCreate function returns success then form is cleared', async () => {
-    const onCreateMock = jest.fn(() => {
+it('when create button is clicked if create function returns success then form is cleared', async () => {
+    const model = new DinghyRacingModel(rootURL);
+    const controller = new DinghyRacingController(model);
+    const onCreateSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
         return Promise.resolve({'success': true});
     });
     const user = userEvent.setup();
 
-    render(<SignUp race={raceNoClass} onCreate={onCreateMock} />);
+    customRender(<SignUp race={raceNoClass} />, model, controller);
     
     const inputCompetitor = await screen.findByLabelText(/competitor/i);
     const inputSailNumber = await screen.findByLabelText(/sail/i);
@@ -139,13 +151,15 @@ it('when create button is clicked if onCreate function returns success then form
     expect(inputDinghyClass).toHaveValue('');
 });
 
-it('when create button is clicked if onCreate function returns failure then failure message is displayed and entered values remain on form', async () => {
-    const onCreateMock = jest.fn(() => {
+it('when create button is clicked if create function returns failure then failure message is displayed and entered values remain on form', async () => {
+    const model = new DinghyRacingModel(rootURL);
+    const controller = new DinghyRacingController(model);
+    const onCreateSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
         return Promise.resolve({'success': false, 'message': 'Something went wrong'});
     });
     const user = userEvent.setup();
 
-    render(<SignUp race={raceNoClass} onCreate={onCreateMock} />);
+    customRender(<SignUp race={raceNoClass} />, model, controller);
     
     const inputCompetitor = await screen.findByLabelText(/competitor/i);
     const inputSailNumber = await screen.findByLabelText(/sail/i);

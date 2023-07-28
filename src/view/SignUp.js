@@ -1,13 +1,14 @@
 import React from 'react';
-import { useState } from 'react';
-
+import { useContext, useState } from 'react';
+import ControllerContext from './ControllerContext';
 /**
  * Form for signing up to a race
  * @param {Object} props
  * @param {Race} props.race The race to sign up to
  * @returns {HTMLFormElement}
  */
-function SignUp({ race, onCreate }) {
+function SignUp({ race }) {
+    const controller = useContext(ControllerContext);
     const [competitor, setCompetitor] = useState({'name': '', 'url': ''});
     const [dinghy, setDinghy] = useState({'sailNumber': '', 'dinghyClass': {'name': '', 'url': ''}, 'url': ''});
     const [result, setResult] = useState({'message': ''});
@@ -41,7 +42,7 @@ function SignUp({ race, onCreate }) {
 
     async function handleCreate(event) {
         event.preventDefault();
-        setResult(await onCreate(race, competitor, dinghy));
+        setResult(await controller.signupToRace(race, competitor, dinghy));
     }
 
     function dinghyClass(race) {
