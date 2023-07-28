@@ -479,6 +479,7 @@ it('returns a collection of races that start at or after the specified time', as
 })
 
 describe('when signing up to a race', () => {
+    // these tests can return a false positive if the logic makes a call to fetch but passes invalid argument as fetch mock does not check input
     it('if competitor exists and URL provided and dinghy exist and URL provided then creates race entry', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
@@ -714,6 +715,7 @@ describe('when searching for a competitor by name', () => {
 
 describe('when searching for a dinghy by sail number and dinghy class', () => {
     it('returns a promise that resolves to a result indicating success and containing the dinghy when dinghy is found and http status 200', async () => {
+        // this test can return a false positive if the logic makes a call to fetch but passes invalid argument as fetch mock does not check input
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,

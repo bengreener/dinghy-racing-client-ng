@@ -48,9 +48,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async createEntry(race, competitor, dinghy) {
-        let finalCompetitorUrl;
-        let finalDinghyUrl;
-        let finalDinghyClassUrl;
+        let dinghyClass;
 
         // check if competitor and dinghy have reference to remote resource and if not fetch
         // assuming if a URL supplied resource exists in REST service
@@ -69,13 +67,13 @@ class DinghyRacingModel {
         if (!dinghy.url) {
             // Need dinghy class url to lookup dinghy
             if (!dinghy.dinghyClass.url) {
-                finalDinghyClassUrl = await this.getDinghyClassByName(dinghy.dinghyClass.name).url;
+                dinghyClass = await this.getDinghyClassByName(dinghy.dinghyClass.name).domainObject;
             }
             else {
-                finalDinghyClassUrl = dinghy.dinghyClass.url;
+                dinghyClass = dinghy.dinghyClass;
             }
             // lookup dinghy
-            promises.push(this.getDinghyBySailNumberAndDinghyClass(dinghy.sailNumber, finalDinghyClassUrl));
+            promises.push(this.getDinghyBySailNumberAndDinghyClass(dinghy.sailNumber, dinghyClass));
         }
         else {
             // use supplied dinghy url
@@ -86,7 +84,7 @@ class DinghyRacingModel {
         results = await Promise.all(promises);
         // if successful return success result
         if (results[0].success && results[1].success) {
-            return this.create('entries', {'competitor': results[0].domainObject.url, 'dinghy': results[1].domainObject.url});
+            return this.create('entries', {'race': race.url, 'competitor': results[0].domainObject.url, 'dinghy': results[1].domainObject.url});
         }
         // if creation fails for competitor and dinghy combine messages and return failure
         if (!results[0].success && !results[1].success) {
@@ -125,10 +123,13 @@ class DinghyRacingModel {
     }
 
     /**
-     * 
+     * Get a dinghy by it's sail number and dinghy class
+     * @param {String} sailNumber
+     * @param {DinghyClass} dinghyClass
+     * @returns {Promise<Result>}
      */
     async getDinghyBySailNumberAndDinghyClass(sailNumber, dinghyClass) {
-        const resource = this.rootURL + '/dinghyclasses/search/findByName?name=' + sailNumber + '&dinghyClass=' + dinghyClass.url;
+        const resource = this.rootURL + '/dinghies/search/findBySailNumberAndDinghyClass?sailNumber=' + sailNumber + '&dinghyClass=' + dinghyClass.url;
 
         const result = await this.read(resource);
         if(result.success) {
