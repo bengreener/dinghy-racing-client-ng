@@ -67,7 +67,13 @@ class DinghyRacingModel {
         if (!dinghy.url) {
             // Need dinghy class url to lookup dinghy
             if (!dinghy.dinghyClass.url) {
-                dinghyClass = await this.getDinghyClassByName(dinghy.dinghyClass.name).domainObject;
+                const result = await this.getDinghyClassByName(dinghy.dinghyClass.name);
+                if (result.success) {
+                    dinghyClass = result.domainObject;
+                }
+                else {
+                    return Promise.resolve(result);
+                }
             }
             else {
                 dinghyClass = dinghy.dinghyClass;
@@ -105,16 +111,19 @@ class DinghyRacingModel {
      */
     async createRace(race) {
         var dinghyClassURL;
-        // if not supplied get url for dinghyClass
-        if (!(race.dinghyClass.url)) {
-            const result = await this.getDinghyClassByName(race.dinghyClass.name);
-            if (!result.success) {
-                return Promise.resolve(result);
+        // if no dinghy class supplied than is a handicap race
+        if (race.dinghyClass !== null && race.dinghyClass.name !== '') {
+            // if not supplied get url for dinghyClass
+            if (!(race.dinghyClass.url)) {
+                const result = await this.getDinghyClassByName(race.dinghyClass.name);
+                if (!result.success) {
+                    return Promise.resolve(result);
+                }
+                dinghyClassURL = result.domainObject.url;
+            } 
+            else {
+                dinghyClassURL = race.dinghyClass.url;
             }
-            dinghyClassURL = result.domainObject.url;
-        } 
-        else {
-            dinghyClassURL = race.dinghyClass.url;
         }
 
         // convert local race domain type into format required by REST service
