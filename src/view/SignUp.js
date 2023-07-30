@@ -1,6 +1,7 @@
 import React from 'react';
 import { useContext, useState } from 'react';
 import ControllerContext from './ControllerContext';
+import ModelContext from './ModelContext';
 /**
  * Form for signing up to a race
  * @param {Object} props
@@ -8,16 +9,64 @@ import ControllerContext from './ControllerContext';
  * @returns {HTMLFormElement}
  */
 function SignUp({ race }) {
+    const model = useContext(ModelContext);
     const controller = useContext(ControllerContext);
     const [competitor, setCompetitor] = useState({'name': '', 'url': ''});
     const [dinghy, setDinghy] = useState({'sailNumber': '', 'dinghyClass': {'name': '', 'url': ''}, 'url': ''});
     const [result, setResult] = useState({'message': ''});
+    const [competitorMap, setCompetitorMap] = useState(new Map());
+    const [competitorOptions, setCompetitorOptions] = useState([]);
+    const [dinghyClassMap, setDinghyClassMap] = React.useState(new Map());
+    const [dinghyClassOptions, setDinghyClassOptions] = React.useState([]);
 
     const clear = React.useCallback(() => {
-        setCompetitor({'name': ''});
+        setCompetitor({'name': '', 'url': ''});
         setDinghy({'sailNumber': '', 'dinghyClass': {'name': '', 'url': ''}, 'url': ''});
         showMessage('');
     }, []);
+
+    React.useEffect(() => {
+        model.getCompetitors().then((result) => {
+            if (result.success) {
+                const competitorMap = new Map();
+                const options = [];
+                competitorMap.set('', {'name': '', 'url': ''});
+                options.push(<option key={''} value={''}>{''}</option>);
+                result.domainObject.forEach(competitor => {
+                   competitorMap.set(competitor.name, competitor);
+                   options.push(<option key={competitor.name} value={competitor.name}>{competitor.name}</option>);
+                });
+                setCompetitorMap(competitorMap);
+                setCompetitorOptions(options);
+            }
+            else {
+                showMessage('Unable to load competitors\n' + result.message);
+            }
+        });
+    }, [model]);
+
+    React.useEffect(() => {
+        model.getDinghyClasses().then(result => {
+            if (result.success) {
+                // build dinghy class options
+                var options = [];
+                var map = new Map();
+                // set handicap options
+                options.push(<option key={''} value={''}></option> );
+                map.set('', null);
+                // set dinghy classes
+                result.domainObject.forEach(dinghyClass => {
+                    options.push(<option key={dinghyClass.name} value={dinghyClass.name}>{dinghyClass.name}</option>);
+                    map.set(dinghyClass.name, dinghyClass);
+                });
+                setDinghyClassMap(map);
+                setDinghyClassOptions(options);
+            }
+            else {
+                showMessage('Unable to load dinghy classes\n' + result.message);
+            }
+        });
+    }, [model]);
 
     React.useEffect(() => {
         if (result && result.success) {
@@ -33,10 +82,10 @@ function SignUp({ race }) {
             setDinghy({...dinghy, 'sailNumber': target.value});
         }
         if (target.name === 'competitor') {
-            setCompetitor({...competitor, 'name': target.value});
+            setCompetitor(competitorMap.get(target.value));
         }
         if (target.name === 'dinghyClass') {
-            setDinghy({...dinghy, 'dinghyClass': {...dinghy.dinghyClass, 'name': target.value}});
+            setDinghy({...dinghy, 'dinghyClass': dinghyClassMap.get(target.value)});
         }
     }
 
@@ -51,8 +100,8 @@ function SignUp({ race }) {
         if (!race.dinghyClass) {
             dinghyClass = (
                 <>
-                    <label htmlFor="dinghy-class-input">Dinghy Class</label>
-                    <input id="dinghy-class-input" name="dinghyClass" type="text" onChange={handleChange} value={dinghy.dinghyClass.name} />
+                    <label htmlFor="dinghy-class-select">Dinghy Class</label>
+                    <select id="dinghy-class-select" name="dinghyClass" multiple={false} onChange={handleChange} value={dinghy.dinghyClass ? dinghy.dinghyClass.name : ''} >{dinghyClassOptions}</select>
                 </>
             );
         }
@@ -70,8 +119,9 @@ function SignUp({ race }) {
 
     return (
         <form action="" method="get">
-            <label htmlFor="competitor-input">Competitor's Name</label>
-            <input id="competitor-input" name="competitor" type="text" onChange={handleChange} value={competitor.name} />
+            <label htmlFor="competitor-select">Competitor's Name</label>
+            <select id="competitor-select" name="competitor" multiple={false} onChange={handleChange} value={competitor.name} >{competitorOptions}</select>
+            <output id="race-message-output" />
             {dinghyClass(race)}
             <label htmlFor="sail-number-input">Sail Number</label>
             <input id="sail-number-input" name="sailNumber" type="text" onChange={handleChange} value={dinghy.sailNumber}/>
