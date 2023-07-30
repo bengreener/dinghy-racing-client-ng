@@ -214,7 +214,25 @@ class DinghyRacingModel {
     }
 
     /**
-     * get a competitor by name
+     * Get a collection of competitors, sorted by name in ascending order
+     * @returns {Promise<Result>} If successful Result.domainObject will be an Array<Competitor>
+     */
+    async getCompetitors() {
+        const resource = this.rootURL + '/competitors?sort=name,asc';
+
+        const result = await this.read(resource);
+        if (result.success) {
+            const collection = result.domainObject._embedded.competitors;
+            const competitorCollection = collection.map(competitor => {return {'name': competitor.name, 'url': competitor._links.self.href}});
+            return Promise.resolve({'success': true, 'domainObject': competitorCollection});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
+     * Get a competitor by name
      * @param {string} name Name of the competitor
      * @returns {Promise<Result>}
      */
