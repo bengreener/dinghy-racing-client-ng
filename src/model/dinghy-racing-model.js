@@ -36,7 +36,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
      async createDinghyClass(dinghyClass) {
-        return this.create('dinghyclasses', dinghyClass);
+        return this.create('dinghyClasses', dinghyClass);
     }
 
     /**
@@ -186,7 +186,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async getDinghyClassByName(name) {
-        const resource = this.rootURL + '/dinghyclasses/search/findByName?name=' + name;
+        const resource = this.rootURL + '/dinghyClasses/search/findByName?name=' + name;
 
         const result = await this.read(resource);
         if(result.success) {
@@ -203,7 +203,7 @@ class DinghyRacingModel {
      * @return {Promise<Result>>} If successful Result.domainObject will be an Array<DinghyClass>
      */
     async getDinghyClasses() {
-        const resource = this.rootURL + '/dinghyclasses?sort=name,asc';
+        const resource = this.rootURL + '/dinghyClasses?sort=name,asc';
 
         const result = await this.read(resource);
         if (result.success) {
