@@ -37,6 +37,27 @@ class DinghyRacingController {
         }
         return this.model.createRace(race);
     }
+
+    /**
+     * Sign up to a race
+     * @param {Race} race Race to sign up to
+     * @param {competitor} competitor Competitor signing up
+     * @param {Dinghy} dinghy Dinghy to be sailed in race
+     * @returns {Promise<Result>}
+     */
+    signupToRace(race, competitor, dinghy) {
+        // check valid race, competitor, and dinghy provided
+        if (!race.name || race.name === '' || !race.time) {
+            return Promise.resolve({'success': false, 'message': 'Please provide details of the race.'});
+        }
+        if (!competitor.name || competitor.name === '') {
+            return Promise.resolve({'success': false, 'message': 'Please provide details for the competitor.'});
+        }
+        if (!dinghy.sailNumber || dinghy.sailNumber === '' || !dinghy.dinghyClass || !dinghy.dinghyClass.name || dinghy.dinghyClass.name === '') {
+            return Promise.resolve({'success': false, 'message': 'Please provide details for the dinghy.'});
+        }
+        return this.model.createEntry(race, competitor, dinghy);
+    }
 }
 
 export default DinghyRacingController

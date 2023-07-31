@@ -1,6 +1,6 @@
 import DinghyRacingController from './dinghy-racing-controller.js';
 import DinghyRacingModel from '../model/dinghy-racing-model.js';
-import { rootURL, raceScorpionA } from '../model/__mocks__/test-data.js';
+import { rootURL, competitorChrisMarshall, dinghyClassScorpion, dinghy1234, raceScorpionA } from '../model/__mocks__/test-data.js';
 
 jest.mock('../model/dinghy-racing-model');
 
@@ -81,5 +81,98 @@ describe('when creating a new race', () => {
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'A time is required for a new race.'});
+    });
+})
+
+describe('when signing up to a race', () => {
+    it('returns a promise that resolves to a result indicating success when operation is successful', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        jest.spyOn(dinghyRacingModel, 'createEntry').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
+        const promise = dinghyRacingController.signupToRace(raceScorpionA, competitorChrisMarshall, dinghy1234);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true});
+    })
+    it('returns a promise that resolves to a result indicating failure when operation is unsuccessful and provides a message explaining the cause of failure', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        jest.spyOn(dinghyRacingModel, 'createEntry').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
+        const promise = dinghyRacingController.signupToRace(raceScorpionA, competitorChrisMarshall, dinghy1234);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Something went wrong'});
+    })
+    it('returns a promise that resolves to a result indicating failure when race name is null or undefined and provides a message explaining the cause of failure', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        const promise = dinghyRacingController.signupToRace({ 'name': null, 'time': new Date('2021-10-14T14:10:00'), 'dinghyClass': dinghyClassScorpion, 'url': 'http://localhost:8081/dinghyracing/api/races/4' }, competitorChrisMarshall, dinghy1234);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Please provide details of the race.'});
+    });
+    it('returns a promise that resolves to a result indicating failure when race name is \'\' and provides a message explaining the cause of failure', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        const promise = dinghyRacingController.signupToRace({ 'name': '', 'time': undefined, 'dinghyClass': dinghyClassScorpion, 'url': 'http://localhost:8081/dinghyracing/api/races/4' }, competitorChrisMarshall, dinghy1234);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Please provide details of the race.'});
+    });
+    it('returns a promise that resolves to a result indicating failure when no time is provided a message explaining the cause of failure', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        const promise = dinghyRacingController.signupToRace({ 'name': 'Scorpion A', 'time': undefined, 'dinghyClass': dinghyClassScorpion, 'url': 'http://localhost:8081/dinghyracing/api/races/4' }, competitorChrisMarshall, dinghy1234);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Please provide details of the race.'});
+    });
+    it('returns a promise that resolves to a result indicating failure when competitors name is null or undefined and provides a message explaining the cause of failure', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        const promise = dinghyRacingController.signupToRace(raceScorpionA, {'name':undefined}, dinghy1234);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Please provide details for the competitor.'});
+    });
+    it('returns a promise that resolves to a result indicating failure when competitora name is \'\' and provides a message explaining the cause of failure', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        const promise = dinghyRacingController.signupToRace(raceScorpionA, {'name':''}, dinghy1234);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Please provide details for the competitor.'});
+    });
+    it('returns a promise that resolves to a result indicating failure when dinghy sail number is null or undefined and provides a message explaining the cause of failure', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        const promise = dinghyRacingController.signupToRace(raceScorpionA, competitorChrisMarshall, {'sailNumber':null,'dinghyClass':{'name':'Scorpion','url':'http://localhost:8081/dinghyracing/api/dinghyclasses/1'},'url':'http://localhost:8081/dinghyracing/api/dinghies/2'});
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Please provide details for the dinghy.'});
+    });
+    it('returns a promise that resolves to a result indicating failure when dinghy sail number is \'\' and provides a message explaining the cause of failure', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        const promise = dinghyRacingController.signupToRace(raceScorpionA, competitorChrisMarshall, {'sailNumber':'','dinghyClass':{'name':'Scorpion','url':'http://localhost:8081/dinghyracing/api/dinghyclasses/1'},'url':'http://localhost:8081/dinghyracing/api/dinghies/2'});
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Please provide details for the dinghy.'});
+    });
+    it('returns a promise that resolves to a result indicating failure when dinghy class name is not provided and provides a message explaining the cause of failure', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        const promise = dinghyRacingController.signupToRace(raceScorpionA, competitorChrisMarshall, {'sailNumber':'','dinghyClass':{'name':null},'url':'http://localhost:8081/dinghyracing/api/dinghies/2'});
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Please provide details for the dinghy.'});
+    });
+    it('returns a promise that resolves to a result indicating failure when dinghy class name is \'\' and provides a message explaining the cause of failure', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        const promise = dinghyRacingController.signupToRace(raceScorpionA, competitorChrisMarshall, {'sailNumber':'','dinghyClass':{'name':''},'url':'http://localhost:8081/dinghyracing/api/dinghies/2'});
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Please provide details for the dinghy.'});
     });
 })

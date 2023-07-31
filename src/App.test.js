@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import App from './App';
 import DinghyRacingController from './controller/dinghy-racing-controller';
 import DinghyRacingModel from './model/dinghy-racing-model';
-import { rootURL, dinghyClasses } from './model/__mocks__/test-data';
+import { rootURL, dinghyClasses, races } from './model/__mocks__/test-data';
 
 jest.mock('./controller/dinghy-racing-controller');
 jest.mock('./model/dinghy-racing-model');
@@ -40,7 +40,7 @@ describe('when create dinghy class button clicked', () => {
     });
     expect(await screen.findByLabelText('Class Name')).toBeInTheDocument();
   })
-})
+});
 
 describe('when create race button clicked', () => {
   it('displays create race form', async () => {
@@ -56,4 +56,22 @@ describe('when create race button clicked', () => {
     });
     expect(await screen.findByLabelText('Race Name')).toBeInTheDocument();
   })
-})
+});
+
+describe('when upcoming races button clicked', () => {
+  it('displays upcoming races', async () => {
+    const user = userEvent.setup();
+    const model = new DinghyRacingModel(rootURL);
+    const dinghyRacingController = new DinghyRacingController(model);
+    jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+
+    render(<App model={model} controller={dinghyRacingController} />);
+    const btnViewUpcomingRaces = await screen.findByRole('button', {name: /upcoming races\b/i});
+    await act(async () => {
+      await user.click(btnViewUpcomingRaces);
+    });
+    expect(await screen.findByText('Scorpion A')).toBeInTheDocument();
+    expect(await screen.findByText('Graduate')).toBeInTheDocument();
+    expect(await screen.findByText('14/02/2023, 18:26:00')).toBeInTheDocument();
+  })
+});
