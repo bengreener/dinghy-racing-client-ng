@@ -18,6 +18,8 @@ function SignUp({ race }) {
     const [competitorOptions, setCompetitorOptions] = useState([]);
     const [dinghyClassMap, setDinghyClassMap] = React.useState(new Map());
     const [dinghyClassOptions, setDinghyClassOptions] = React.useState([]);
+    const [dinghyMap, setDinghyMap] = React.useState(new Map());
+    const [dinghyOptions, setDinghyOptions] = React.useState([]);
 
     const clear = React.useCallback(() => {
         setCompetitor({'name': '', 'url': ''});
@@ -53,7 +55,7 @@ function SignUp({ race }) {
                 var map = new Map();
                 // set handicap options
                 options.push(<option key={''} value={''}></option> );
-                map.set('', null);
+                map.set('', {'name': '', 'url': ''});
                 // set dinghy classes
                 result.domainObject.forEach(dinghyClass => {
                     options.push(<option key={dinghyClass.name} value={dinghyClass.name}>{dinghyClass.name}</option>);
@@ -69,6 +71,30 @@ function SignUp({ race }) {
     }, [model]);
 
     React.useEffect(() => {
+        let dinghyClass = race.dinghyClass;
+        if (!dinghyClass && dinghy.dinghyClass && dinghy.dinghyClass.url) {
+            dinghyClass = dinghy.dinghyClass;
+        }
+        model.getDinghies(dinghyClass).then(result => {
+            if (result.success) {
+                var options = [];
+                var map = new Map();
+                options.push(<option key={''} value = {''}></option>);
+                map.set('', {'sailNumber': '', 'dinghyClass': {'name': '', 'url': ''}, 'url': ''});
+                result.domainObject.forEach(dinghy => {
+                    options.push(<option key={dinghy.sailNumber} value={dinghy.sailNumber}>{dinghy.sailNumber}</option>)
+                    map.set(dinghy.sailNumber, dinghy);
+                });
+                setDinghyMap(map);
+                setDinghyOptions(options);
+            }
+            else {
+                showMessage('Unable to load dinghy classes\n' + result.message);
+            }
+        })
+    }, [model, race.dinghyClass, dinghy])
+
+    React.useEffect(() => {
         if (result && result.success) {
             clear();
         }
@@ -79,7 +105,7 @@ function SignUp({ race }) {
     
     function handleChange({target}) {
         if (target.name === 'sailNumber') {
-            setDinghy({...dinghy, 'sailNumber': target.value});
+            setDinghy(dinghyMap.get(target.value));
         }
         if (target.name === 'competitor') {
             setCompetitor(competitorMap.get(target.value));
@@ -123,8 +149,8 @@ function SignUp({ race }) {
             <select id="competitor-select" name="competitor" multiple={false} onChange={handleChange} value={competitor.name} >{competitorOptions}</select>
             <output id="race-message-output" />
             {dinghyClass(race)}
-            <label htmlFor="sail-number-input">Sail Number</label>
-            <input id="sail-number-input" name="sailNumber" type="text" onChange={handleChange} value={dinghy.sailNumber}/>
+            <label htmlFor="sail-number-select">Sail Number</label>
+            <select id="sail-number-select" name="sailNumber" multiple={false} onChange={handleChange} value={dinghy.sailNumber} >{dinghyOptions}</select>
             <output id="entry-message-output" />
             <button id="entry-create-button" type="button" onClick={handleCreate} >Create</button>
         </form>
