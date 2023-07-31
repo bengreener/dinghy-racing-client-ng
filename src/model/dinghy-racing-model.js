@@ -132,6 +132,36 @@ class DinghyRacingModel {
     }
 
     /**
+     * Get dinghies. If a dinghy class is provided only dinhies with that class will be returned
+     * @param {dinghyClass} [dinghyClass] The dinghy class to filter by
+     */
+    async getDinghies(dinghyClass) {
+        let resource;
+        if (!dinghyClass) {
+            resource = this.rootURL + '/dinghies';
+        }
+        else {
+            resource = this.rootURL + '/dinghies/search/findByDinghyClass?dinghyClass=' + dinghyClass.url;
+        }
+        const result = await this.read(resource);
+        if (result.success) {
+            const dinghiesHAL = result.domainObject._embedded.dinghies;
+            const dinghyClassURLs = dinghiesHAL.map(race => race._links.dinghyClass.href);
+            const dinghyClassResults = await Promise.all(dinghyClassURLs.map(url => this.read(url)));
+            
+            const dinghies = [];
+            for (let i = 0; i < dinghiesHAL.length; i++  ) {
+                const dinghyClass = dinghyClassResults[i].success ? {'name': dinghyClassResults[i].domainObject.name, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
+                dinghies.push({'sailNumber': dinghiesHAL[i].sailNumber, 'dinghyClass': dinghyClass, 'url': dinghiesHAL[i]._links.self.href});
+            };
+            return Promise.resolve({'success': true, 'domainObject': dinghies});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
      * Get a dinghy by it's sail number and dinghy class
      * @param {String} sailNumber
      * @param {DinghyClass} dinghyClass
@@ -141,7 +171,7 @@ class DinghyRacingModel {
         const resource = this.rootURL + '/dinghies/search/findBySailNumberAndDinghyClass?sailNumber=' + sailNumber + '&dinghyClass=' + dinghyClass.url;
 
         const result = await this.read(resource);
-        if(result.success) {
+        if (result.success) {
             const domainObject = {'sailNumber': result.domainObject.sailNumber, 'dinghyClass': dinghyClass, 'url': result.domainObject._links.self.href}; // should this go back to REST service and pull DinghyClass instead of assuming?
             return Promise.resolve({'success': true, 'domainObject': domainObject});
         }
@@ -176,10 +206,10 @@ class DinghyRacingModel {
         const resource = this.rootURL + '/dinghyclasses?sort=name,asc';
 
         const result = await this.read(resource);
-        if(result.success) {
+        if (result.success) {
             const collection = result.domainObject._embedded.dinghyClasses;
-            const dinghyCollection = collection.map(dinghyClass => {return {'name': dinghyClass.name, 'url': dinghyClass._links.self.href}});
-            return Promise.resolve({'success': true, 'domainObject': dinghyCollection});
+            const dinghyClassCollection = collection.map(dinghyClass => {return {'name': dinghyClass.name, 'url': dinghyClass._links.self.href}});
+            return Promise.resolve({'success': true, 'domainObject': dinghyClassCollection});
         }
         else {
             return Promise.resolve(result);
@@ -214,7 +244,25 @@ class DinghyRacingModel {
     }
 
     /**
-     * get a competitor by name
+     * Get a collection of competitors, sorted by name in ascending order
+     * @returns {Promise<Result>} If successful Result.domainObject will be an Array<Competitor>
+     */
+    async getCompetitors() {
+        const resource = this.rootURL + '/competitors?sort=name,asc';
+
+        const result = await this.read(resource);
+        if (result.success) {
+            const collection = result.domainObject._embedded.competitors;
+            const competitorCollection = collection.map(competitor => {return {'name': competitor.name, 'url': competitor._links.self.href}});
+            return Promise.resolve({'success': true, 'domainObject': competitorCollection});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
+     * Get a competitor by name
      * @param {string} name Name of the competitor
      * @returns {Promise<Result>}
      */
