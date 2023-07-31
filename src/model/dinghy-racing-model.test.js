@@ -1,6 +1,9 @@
 import DinghyRacingModel from './dinghy-racing-model';
-import { rootURL, competitorsCollectionHAL, dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghy1234HAL, raceScorpion_AHAL, 
-    dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, dinghy1234, 
+import { rootURL, competitorsCollectionHAL, 
+    dinghiesCollectionHAL, dinghiesScorpionCollectionHAL, 
+    dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghy1234HAL, raceScorpion_AHAL, 
+    dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, 
+    dinghies, dinghiesScorpion, dinghy1234, 
     races, racesCollectionHAL, raceScorpionA, 
     competitorsCollection, competitorChrisMarshall, competitorChrisMarshallHAL, entryChrisMarshallDinghy1234HAL } from './__mocks__/test-data';
 
@@ -1010,5 +1013,108 @@ describe('when creating a new dinghy', () => {
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'TypeError: Failed to fetch'});
+    });
+});
+
+describe('when retrieving a list of dinghies', () => {
+    it('when no dinghy class is supplied it returns a success result containing all dinghies', async () => {
+        fetch.mockImplementation((resource) => {
+            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghiesCollectionHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghiesScorpionCollectionHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassScorpionHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassGraduateHAL)
+                });
+            }
+            else {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404
+                });
+            }
+        });
+        const model = new DinghyRacingModel(rootURL);
+        const promise = model.getDinghies();
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': dinghies});
+    });
+    it('when a dinghy class is supplied it only returns a success result containing only dinghies for that dinghy class', async () => {
+        fetch.mockImplementation((resource) => {
+            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghiesCollectionHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghiesScorpionCollectionHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassScorpionHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassGraduateHAL)
+                });
+            }
+            else {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404
+                });
+            }
+        });
+        const model = new DinghyRacingModel(rootURL);
+        const promise = model.getDinghies(dinghyClassScorpion);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': dinghiesScorpion});
+    });
+    it('when no dinghies are found for the supplied dinghy class it returns a failed result containing a message explaining the cause of the failure', async () =>{
+        fetch.mockImplementation((resource) => {
+            return Promise.resolve({
+                ok: false,
+                status: 404,
+                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
+            });
+        });
+        const model = new DinghyRacingModel(rootURL);
+        const promise = model.getDinghies(dinghyClassScorpion);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'});
     });
 });
