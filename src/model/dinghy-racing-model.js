@@ -233,7 +233,8 @@ class DinghyRacingModel {
             const races = [];
             for (let i = 0; i < racesHAL.length; i++  ) {
                 const dinghyClass = dinghyClassResults[i].success ? {'name': dinghyClassResults[i].domainObject.name, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
-                races.push({'name': racesHAL[i].name, 'time': new Date(racesHAL[i].plannedStartTime), 
+                // assume time received has been stored in UTC
+                races.push({'name': racesHAL[i].name, 'time': new Date(racesHAL[i].plannedStartTime + 'Z'), 
                     'dinghyClass': dinghyClass, 'url': racesHAL[i]._links.self.href});
             };
             return Promise.resolve({'success': true, 'domainObject': races});

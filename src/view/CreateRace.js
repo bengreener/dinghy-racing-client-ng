@@ -4,13 +4,14 @@ import ModelContext from './ModelContext';
 
 function CreateRace({ onCreate }) {
     const model = useContext(ModelContext);
-    const [race, setRace] = React.useState({'name': '', 'time': new Date().toISOString().substring(0, 16), 'dinghyClass': {'name': ''}});
+    // race.time is stored here as a string to avoid conversion issues if a new time is being typed in (mostly an issue with unit testing :-( )
+    const [race, setRace] = React.useState({'name': '', 'time': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'dinghyClass': {'name': ''}});
     const [result, setResult] = React.useState({'message': ''});
     const [dinghyClassMap, setDinghyClassMap] = React.useState(new Map());
     const [dinghyClassOptions, setDinghyClassOptions] = React.useState([]);
 
     const clear = React.useCallback(() => {
-        setRace({'name': '', 'time': new Date().toISOString().substring(0, 16), 'dinghyClass': {'name': ''}});
+        setRace({'name': '', 'time': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'dinghyClass': {'name': ''}});
         showMessage('');
     }, []);
 

@@ -59,6 +59,7 @@ describe('when create race button clicked', () => {
 });
 
 describe('when upcoming races button clicked', () => {
+  // test could be affected by timezone changes; for example move from British Summer Time to GMT
   it('displays upcoming races', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(rootURL);

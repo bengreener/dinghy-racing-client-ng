@@ -132,7 +132,7 @@ describe('when creating a new dinghy class', () => {
     
         expect(inputName).toHaveValue('');
         // expect(inputTime).toHaveValue('');
-        expect(inputTime).toHaveValue(new Date().toISOString().substring(0, 16));
+        expect(inputTime).toHaveValue(new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16));
         expect(inputDinghyClass).toHaveValue('');
     })
     it('displays the failure message on failure', async () => {

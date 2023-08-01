@@ -444,7 +444,7 @@ describe('when retrieving a list of dinghy classes', () => {
     });
 });
 
-// Can this test can be affected by BST, or other time zones
+// Can this test can be affected by BST, or other time zones (yes, if timezone changes test data (races) will need to be adjusted to reflect the change in the timezone (currently set up for British Summer Time))
 it('returns a collection of races that start at or after the specified time', async () => {
     fetch.mockImplementation((resource) => {
         if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z') {
