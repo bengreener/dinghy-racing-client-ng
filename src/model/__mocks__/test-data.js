@@ -55,9 +55,9 @@ const dinghy1234 = {'sailNumber':'1234','dinghyClass':{'name':'Scorpion','url':'
 const dinghy2726 = {'sailNumber':'2726','dinghyClass': dinghyClassGraduate,'url':'http://localhost:8081/dinghyracing/api/dinghies/6'};
 
 // const races = [{'name':'Scorpion A','time': new Date('2021-10-14T14:10:00'),'dinghyClass':dinghyClassScorpion,'url':'http://localhost:8081/dinghyracing/api/races/4'},{'name':'Graduate A','time': new Date('2021-10-14T10:30:00'),'dinghyClass':dinghyClassGraduate,'url':'http://localhost:8081/dinghyracing/api/races/7'},{'name':'No Class','time': new Date('2023-02-14T18:26:00'),'dinghyClass':null,'url':'http://localhost:8081/dinghyracing/api/races/8'}];
-const raceScorpionA = { 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00'), 'dinghyClass': dinghyClassScorpion, 'url': 'http://localhost:8081/dinghyracing/api/races/4' };
-const raceGraduateA = { 'name': 'Graduate A', 'time' : new Date('2021-10-14T10:30:00'), 'dinghyClass': dinghyClassGraduate, 'url': 'http://localhost:8081/dinghyracing/api/races/7' };
-const raceNoClass = { 'name': 'No Class', 'time': new Date('2023-02-14T18:26:00'), 'dinghyClass': null, 'url': 'http://localhost:8081/dinghyracing/api/races/8' };
+const raceScorpionA = { 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00Z'), 'dinghyClass': dinghyClassScorpion, 'url': 'http://localhost:8081/dinghyracing/api/races/4' };
+const raceGraduateA = { 'name': 'Graduate A', 'time' : new Date('2021-10-14T10:30:00Z'), 'dinghyClass': dinghyClassGraduate, 'url': 'http://localhost:8081/dinghyracing/api/races/7' };
+const raceNoClass = { 'name': 'No Class', 'time': new Date('2023-02-14T18:26:00Z'), 'dinghyClass': null, 'url': 'http://localhost:8081/dinghyracing/api/races/8' };
 const races = [raceScorpionA, raceGraduateA, raceNoClass];
 
 export {
