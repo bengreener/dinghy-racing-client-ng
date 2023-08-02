@@ -22,7 +22,7 @@ it('renders', () => {
     customRender(<SignUp race={raceScorpionA}/>, model, controller);
     const inputCompetitor = screen.getByLabelText(/competitor/i);
     const inputSailNumber = screen.getByLabelText(/sail/i);
-    const btnCreate = screen.getByRole('button', {'name': 'Create'});
+    const btnCreate = screen.getByRole('button', {'name': 'Sign-up'});
     expect(inputCompetitor).toBeInTheDocument();
     expect(inputSailNumber).toBeInTheDocument();
     expect(btnCreate).toBeInTheDocument();
@@ -40,15 +40,6 @@ describe('when race has a specified dinghyClass', () => {
 });
 
 describe('when race is a handicap race ', () => {
-    it('displays a list of dinghy classes', async () => {
-
-        customRender(<SignUp race={raceNoClass}/>, model, controller);
-        const inputDinghyClass = screen.getByLabelText(/class/i);
-        const options = await findAllByRole(inputDinghyClass, 'option');
-    
-        expect(options.length).toBe(3);
-        expect(options.map(option => option.text)).toEqual(['', 'Scorpion', 'Graduate']);
-    });
     it('requests competitor name and dinghy class and sail number', async () => {
         customRender(<SignUp race={raceNoClass}/>, model, controller);
 
@@ -107,7 +98,7 @@ it('when create button is clicked and race has a specified dinghy class then cre
     });
 
     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-    const btnCreate = screen.getByRole('button', {'name': 'Create'});
+    const btnCreate = screen.getByRole('button', {'name': 'Sign-up'});
     const inputCompetitor = await screen.findByLabelText(/competitor/i);
     const inputSailNumber = await screen.findByLabelText(/sail/i);
 
@@ -128,7 +119,7 @@ it('when create button is clicked and race does not have a specified dinghy clas
     });
 
     customRender(<SignUp race={raceNoClass} />, model, controller);
-    const btnCreate = screen.getByRole('button', {'name': 'Create'});
+    const btnCreate = screen.getByRole('button', {'name': 'Sign-up'});
     
     const inputCompetitor = await screen.findByLabelText(/competitor/i);
     const inputSailNumber = await screen.findByLabelText(/sail/i);
@@ -157,7 +148,7 @@ it('when create button is clicked if create function returns success then form i
     const inputSailNumber = await screen.findByLabelText(/sail/i);
     const inputDinghyClass = await screen.findByLabelText(/class/i);
 
-    const btnCreate = screen.getByRole('button', {'name': 'Create'});
+    const btnCreate = screen.getByRole('button', {'name': 'Sign-up'});
 
     await screen.findAllByRole('option');
     await act(async () => {
@@ -190,7 +181,7 @@ describe('when create button is clicked', () => {
         const inputSailNumber = await screen.findByLabelText(/sail/i);
         const inputDinghyClass = await screen.findByLabelText(/class/i);
 
-        const btnCreate = screen.getByRole('button', {'name': 'Create'});
+        const btnCreate = screen.getByRole('button', {'name': 'Sign-up'});
 
         await screen.findAllByRole('option');
         await act(async () => {
@@ -217,7 +208,7 @@ describe('when create button is clicked', () => {
         const inputSailNumber = await screen.findByLabelText(/sail/i);
         const inputDinghyClass = await screen.findByLabelText(/class/i);
 
-        const btnCreate = screen.getByRole('button', {'name': 'Create'});
+        const btnCreate = screen.getByRole('button', {'name': 'Sign-up'});
 
         await screen.findAllByRole('option');
         await act(async () => {

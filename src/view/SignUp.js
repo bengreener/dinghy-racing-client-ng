@@ -165,7 +165,7 @@ function SignUp({ race }) {
             <label htmlFor="sail-number-input">Sail Number</label>
             <input id="sail-number-input" name="sailNumber" list="dinghy-datalist" onChange={handleChange} value={sailNumber} />
             <output id="entry-message-output" />
-            <button id="entry-create-button" type="button" onClick={handleCreate} >Create</button>
+            <button id="entry-create-button" type="button" onClick={handleCreate} >Sign-up</button>
         </form>
     )
 }
