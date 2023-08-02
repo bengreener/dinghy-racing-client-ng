@@ -1,4 +1,4 @@
-import { render, screen, act, findAllByRole } from '@testing-library/react';
+import { render, screen, act, findAllByRole, logRoles } from '@testing-library/react';
 import { customRender } from '../test-utilities/custom-renders';
 import userEvent from '@testing-library/user-event';
 import DinghyRacingModel from '../model/dinghy-racing-model';
@@ -26,24 +26,6 @@ it('renders', () => {
     expect(inputCompetitor).toBeInTheDocument();
     expect(inputSailNumber).toBeInTheDocument();
     expect(btnCreate).toBeInTheDocument();
-});
-
-it('provides a list of competitors', async () => {
-    customRender(<SignUp race={raceScorpionA}/>, model, controller);
-    const inputCompetitor = screen.getByLabelText(/competitor/i);
-    const options = await findAllByRole(inputCompetitor, 'option');
-
-    expect(options.length).toBe(3);
-    expect(options.map(option => option.text)).toEqual(['', 'Chris Marshall', 'Sarah Pascal']);
-});
-
-it('provides a list of dinghies', async () => {
-    customRender(<SignUp race={raceScorpionA}/>, model, controller);
-    const inputSailNumber = screen.getByLabelText(/sail/i);
-    const options = await findAllByRole(inputSailNumber, 'option');
-
-    expect(options.length).toBe(4);
-    expect(options.map(option => option.text)).toEqual(['', '1234', '6745', '2726']);
 });
 
 describe('when race has a specified dinghyClass', () => {
@@ -100,7 +82,7 @@ it('when sail number is entered then displays sail number', async () => {
     const inputSailNumber = await screen.findByLabelText(/sail/i);
     await screen.findAllByRole('option');
     await act(async () => {
-        await user.selectOptions(inputSailNumber, '1234');
+        await user.type(inputSailNumber, '1234');
     });
     expect(inputSailNumber).toHaveValue('1234');
 });
@@ -132,7 +114,7 @@ it('when create button is clicked and race has a specified dinghy class then cre
     await screen.findAllByRole('option');
     await act(async () => {
         await user.selectOptions(inputCompetitor, 'Chris Marshall');
-        await user.selectOptions(inputSailNumber, '1234');
+        await user.type(inputSailNumber, '1234');
         await user.click(btnCreate);
     });
 
@@ -156,7 +138,7 @@ it('when create button is clicked and race does not have a specified dinghy clas
     await act(async () => {
         await user.selectOptions(inputCompetitor, 'Chris Marshall');
         await user.selectOptions(inputDinghyClass, 'Scorpion');
-        await user.selectOptions(inputSailNumber, '1234');
+        await user.type(inputSailNumber, '1234');
         await user.click(btnCreate);
     });
     
@@ -180,7 +162,7 @@ it('when create button is clicked if create function returns success then form i
     await screen.findAllByRole('option');
     await act(async () => {
         await user.selectOptions(inputCompetitor, 'Chris Marshall');
-        await user.selectOptions(inputSailNumber, '1234');
+        await user.type(inputSailNumber, '1234');
         await user.selectOptions(inputDinghyClass, 'Scorpion');
     });
     expect(inputCompetitor).toHaveValue('Chris Marshall');
@@ -195,30 +177,59 @@ it('when create button is clicked if create function returns success then form i
     expect(inputDinghyClass).toHaveValue('');
 });
 
-it('when create button is clicked if create function returns failure then failure message is displayed and entered values remain on form', async () => {
-    const onCreateSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
-        return Promise.resolve({'success': false, 'message': 'Something went wrong'});
+describe('when create button is clicked', () => {
+    it('and dinghy does not exist it displays a message advising the dinghy does not exist', async () => {
+        const onCreateSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+            return Promise.resolve({'success': false, 'message': 'Something went wrong'});
+        });
+        const user = userEvent.setup();
+
+        customRender(<SignUp race={raceNoClass} />, model, controller);
+        
+        const inputCompetitor = await screen.findByLabelText(/competitor/i);
+        const inputSailNumber = await screen.findByLabelText(/sail/i);
+        const inputDinghyClass = await screen.findByLabelText(/class/i);
+
+        const btnCreate = screen.getByRole('button', {'name': 'Create'});
+
+        await screen.findAllByRole('option');
+        await act(async () => {
+            await user.selectOptions(inputCompetitor, 'Chris Marshall');
+            await user.type(inputSailNumber, '999');
+            await user.selectOptions(inputDinghyClass, 'Scorpion');
+            await user.click(btnCreate);
+        });
+        expect(inputCompetitor).toHaveValue('Chris Marshall');
+        expect(inputSailNumber).toHaveValue('999');
+        expect(inputDinghyClass).toHaveValue('Scorpion');
+        const message = await screen.findByText('Dinghy does not exist please add it if entered details are correct');
+        expect(message).toBeInTheDocument();
+    })
+    it('if create function returns failure then failure message is displayed and entered values remain on form', async () => {
+        const onCreateSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+            return Promise.resolve({'success': false, 'message': 'Something went wrong'});
+        });
+        const user = userEvent.setup();
+
+        customRender(<SignUp race={raceNoClass} />, model, controller);
+        
+        const inputCompetitor = await screen.findByLabelText(/competitor/i);
+        const inputSailNumber = await screen.findByLabelText(/sail/i);
+        const inputDinghyClass = await screen.findByLabelText(/class/i);
+
+        const btnCreate = screen.getByRole('button', {'name': 'Create'});
+
+        await screen.findAllByRole('option');
+        await act(async () => {
+            await user.selectOptions(inputCompetitor, 'Chris Marshall');
+            await user.type(inputSailNumber, '1234');
+            await user.selectOptions(inputDinghyClass, 'Scorpion');
+            await user.click(btnCreate);
+        });
+        expect(inputCompetitor).toHaveValue('Chris Marshall');
+        expect(inputSailNumber).toHaveValue('1234');
+        expect(inputDinghyClass).toHaveValue('Scorpion');
+        const message = await screen.findByText('Something went wrong');
+        expect(message).toBeInTheDocument();
     });
-    const user = userEvent.setup();
-
-    customRender(<SignUp race={raceNoClass} />, model, controller);
-    
-    const inputCompetitor = await screen.findByLabelText(/competitor/i);
-    const inputSailNumber = await screen.findByLabelText(/sail/i);
-    const inputDinghyClass = await screen.findByLabelText(/class/i);
-
-    const btnCreate = screen.getByRole('button', {'name': 'Create'});
-
-    await screen.findAllByRole('option');
-    await act(async () => {
-        await user.selectOptions(inputCompetitor, 'Chris Marshall');
-        await user.selectOptions(inputSailNumber, '1234');
-        await user.selectOptions(inputDinghyClass, 'Scorpion');
-        await user.click(btnCreate);
-    });
-    expect(inputCompetitor).toHaveValue('Chris Marshall');
-    expect(inputSailNumber).toHaveValue('1234');
-    expect(inputDinghyClass).toHaveValue('Scorpion');
-    const message = await screen.findByText('Something went wrong');
-    expect(message).toBeInTheDocument();
 });

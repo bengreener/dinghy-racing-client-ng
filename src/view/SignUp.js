@@ -12,6 +12,7 @@ function SignUp({ race }) {
     const model = useContext(ModelContext);
     const controller = useContext(ControllerContext);
     const [competitor, setCompetitor] = useState({'name': '', 'url': ''});
+    const [sailNumber, setSailNumber] = useState('');
     const [dinghy, setDinghy] = useState({'sailNumber': '', 'dinghyClass': {'name': '', 'url': ''}, 'url': ''});
     const [result, setResult] = useState({'message': ''});
     const [competitorMap, setCompetitorMap] = useState(new Map());
@@ -23,6 +24,7 @@ function SignUp({ race }) {
 
     const clear = React.useCallback(() => {
         setCompetitor({'name': '', 'url': ''});
+        setSailNumber('');
         setDinghy({'sailNumber': '', 'dinghyClass': {'name': '', 'url': ''}, 'url': ''});
         showMessage('');
     }, []);
@@ -105,7 +107,14 @@ function SignUp({ race }) {
     
     function handleChange({target}) {
         if (target.name === 'sailNumber') {
-            setDinghy(dinghyMap.get(target.value));
+            if (dinghyMap.has(target.value)) {
+                setDinghy(dinghyMap.get(target.value));
+            }
+            else if (dinghyClass.sailNumber) {
+                // remove any earlier match
+                setDinghy({'sailNumber': '', 'dinghyClass': {'name': '', 'url': ''}, 'url': ''});
+            }
+            setSailNumber(target.value);
         }
         if (target.name === 'competitor') {
             setCompetitor(competitorMap.get(target.value));
@@ -117,6 +126,10 @@ function SignUp({ race }) {
 
     async function handleCreate(event) {
         event.preventDefault();
+        if (!dinghyMap.has(sailNumber)) {
+            setResult({'success': false, 'message': 'Dinghy does not exist please add it if entered details are correct'});
+            return;
+        }
         setResult(await controller.signupToRace(race, competitor, dinghy));
     }
 
@@ -147,10 +160,10 @@ function SignUp({ race }) {
         <form action="" method="get">
             <label htmlFor="competitor-select">Competitor's Name</label>
             <select id="competitor-select" name="competitor" multiple={false} onChange={handleChange} value={competitor.name} >{competitorOptions}</select>
-            <output id="race-message-output" />
             {dinghyClass(race)}
-            <label htmlFor="sail-number-select">Sail Number</label>
-            <select id="sail-number-select" name="sailNumber" multiple={false} onChange={handleChange} value={dinghy.sailNumber} >{dinghyOptions}</select>
+            <datalist id="dinghy-datalist">{dinghyOptions}</datalist>
+            <label htmlFor="sail-number-input">Sail Number</label>
+            <input id="sail-number-input" name="sailNumber" list="dinghy-datalist" onChange={handleChange} value={sailNumber} />
             <output id="entry-message-output" />
             <button id="entry-create-button" type="button" onClick={handleCreate} >Create</button>
         </form>
