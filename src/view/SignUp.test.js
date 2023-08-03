@@ -58,9 +58,8 @@ it('when competitor name is entered then displays name', async () => {
     customRender(<SignUp race={raceScorpionA}/>, model, controller);
 
     const inputCompetitor = await screen.findByLabelText(/competitor/i);
-    await screen.findAllByRole('option');
     await act(async () => {
-        await user.selectOptions(inputCompetitor, 'Chris Marshall');
+        await user.type(inputCompetitor, 'Chris Marshall');
     });
     expect(inputCompetitor).toHaveValue('Chris Marshall');
 });
@@ -72,7 +71,6 @@ describe('when sail number is entered then', () => {
         customRender(<SignUp race={raceScorpionA}/>, model, controller);
     
         const inputSailNumber = await screen.findByLabelText(/sail/i);
-        await screen.findAllByRole('option');
         await act(async () => {
             await user.type(inputSailNumber, '1234');
         });
@@ -84,7 +82,6 @@ describe('when sail number is entered then', () => {
         customRender(<SignUp race={raceScorpionA}/>, model, controller);
     
         const inputSailNumber = await screen.findByLabelText(/sail/i);
-        await screen.findAllByRole('option');
         await act(async () => {
             await user.type(inputSailNumber, '1234');
         });
@@ -96,7 +93,6 @@ describe('when sail number is entered then', () => {
         customRender(<SignUp race={raceScorpionA}/>, model, controller);
     
         const inputSailNumber = await screen.findByLabelText(/sail/i);
-        await screen.findAllByRole('option');
         await act(async () => {
             await user.type(inputSailNumber, '999');
         });
@@ -130,9 +126,8 @@ describe('when create button is clicked', () => {
             const inputCompetitor = await screen.findByLabelText(/competitor/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
         
-            await screen.findAllByRole('option');
             await act(async () => {
-                await user.selectOptions(inputCompetitor, 'Chris Marshall');
+                await user.type(inputCompetitor, 'Chris Marshall');
                 await user.type(inputSailNumber, '1234');
                 await user.click(screen.getByRole('button', {'name': 'Sign-up'}));
             });
@@ -153,9 +148,8 @@ describe('when create button is clicked', () => {
             const inputSailNumber = await screen.findByLabelText(/sail/i);
             const inputDinghyClass = await screen.findByLabelText(/class/i);
         
-            await screen.findAllByRole('option');
             await act(async () => {
-                await user.selectOptions(inputCompetitor, 'Chris Marshall');
+                await user.type(inputCompetitor, 'Chris Marshall');
                 await user.selectOptions(inputDinghyClass, 'Scorpion');
                 await user.type(inputSailNumber, '1234');
                 await user.click(screen.getByRole('button', {'name': 'Sign-up'}));
@@ -166,7 +160,7 @@ describe('when create button is clicked', () => {
     });
     it('clears form on success', async () => {
         const user = userEvent.setup();
-        const onCreateSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+        jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
             return Promise.resolve({'success': true});
         });
     
@@ -176,11 +170,8 @@ describe('when create button is clicked', () => {
         const inputSailNumber = await screen.findByLabelText(/sail/i);
         const inputDinghyClass = await screen.findByLabelText(/class/i);
     
-        // const btnCreate = screen.getByRole('button', {'name': 'Sign-up'});
-    
-        await screen.findAllByRole('option');
         await act(async () => {
-            await user.selectOptions(inputCompetitor, 'Chris Marshall');
+            await user.type(inputCompetitor, 'Chris Marshall');
             await user.type(inputSailNumber, '1234');
             await user.selectOptions(inputDinghyClass, 'Scorpion');
         });
@@ -209,9 +200,8 @@ describe('when create button is clicked', () => {
             const inputCompetitor = await screen.findByLabelText(/competitor/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
             const inputDinghyClass = await screen.findByLabelText(/class/i);
-            await screen.findAllByRole('option');
             await act(async () => {
-                await user.selectOptions(inputCompetitor, 'Chris Marshall');
+                await user.type(inputCompetitor, 'Chris Marshall');
                 await user.type(inputSailNumber, '999');
                 await user.selectOptions(inputDinghyClass, 'Scorpion');
                 await user.click(screen.getByRole('button', {'name': 'Add dinghy & sign-up'}));
@@ -222,7 +212,7 @@ describe('when create button is clicked', () => {
         });
     });
     it('displays failure message on failure and entered values remain on form', async () => {
-        const onCreateSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+        jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
             return Promise.resolve({'success': false, 'message': 'Something went wrong'});
         });
         const user = userEvent.setup();
@@ -233,9 +223,8 @@ describe('when create button is clicked', () => {
         const inputSailNumber = await screen.findByLabelText(/sail/i);
         const inputDinghyClass = await screen.findByLabelText(/class/i);
 
-        await screen.findAllByRole('option');
         await act(async () => {
-            await user.selectOptions(inputCompetitor, 'Chris Marshall');
+            await user.type(inputCompetitor, 'Chris Marshall');
             await user.type(inputSailNumber, '1234');
             await user.selectOptions(inputDinghyClass, 'Scorpion');
             await user.click(screen.getByRole('button', {'name': 'Sign-up'}));

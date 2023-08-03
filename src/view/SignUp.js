@@ -11,6 +11,7 @@ import ModelContext from './ModelContext';
 function SignUp({ race }) {
     const model = useContext(ModelContext);
     const controller = useContext(ControllerContext);
+    const [competitorName, setCompetitorName] = useState('');
     const [competitor, setCompetitor] = useState({'name': '', 'url': ''});
     const [sailNumber, setSailNumber] = useState('');
     const [dinghy, setDinghy] = useState({'sailNumber': '', 'dinghyClass': {'name': '', 'url': ''}, 'url': ''});
@@ -23,6 +24,7 @@ function SignUp({ race }) {
     const [dinghyOptions, setDinghyOptions] = React.useState([]);
 
     const clear = React.useCallback(() => {
+        setCompetitorName('');
         setCompetitor({'name': '', 'url': ''});
         setSailNumber('');
         setDinghy({'sailNumber': '', 'dinghyClass': {'name': '', 'url': ''}, 'url': ''});
@@ -117,7 +119,14 @@ function SignUp({ race }) {
             setSailNumber(target.value);
         }
         if (target.name === 'competitor') {
-            setCompetitor(competitorMap.get(target.value));
+            if (competitorMap.has(target.value)) {
+                setCompetitor(competitorMap.get(target.value));
+            }
+            else if (competitor.name) {
+                // remove any earlier match
+                setCompetitor({'name': '', 'url': ''});
+            }
+            setCompetitorName(target.value);
         }
         if (target.name === 'dinghyClass') {
             setDinghy({...dinghy, 'dinghyClass': dinghyClassMap.get(target.value)});
@@ -165,8 +174,9 @@ function SignUp({ race }) {
 
     return (
         <form action="" method="get">
-            <label htmlFor="competitor-select">Competitor's Name</label>
-            <select id="competitor-select" name="competitor" multiple={false} onChange={handleChange} value={competitor.name} >{competitorOptions}</select>
+            <datalist id="competitor-datalist">{competitorOptions}</datalist>
+            <label htmlFor="competitor-input">Competitor's Name</label>
+            <input id="competitor-input" name="competitor" list="competitor-datalist" onChange={handleChange} value={competitorName} />
             {dinghyClass(race)}
             <datalist id="dinghy-datalist">{dinghyOptions}</datalist>
             <label htmlFor="sail-number-input">Sail Number</label>
