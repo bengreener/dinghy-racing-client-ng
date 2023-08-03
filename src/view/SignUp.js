@@ -127,10 +127,17 @@ function SignUp({ race }) {
     async function handleCreate(event) {
         event.preventDefault();
         if (!dinghyMap.has(sailNumber)) {
-            setResult({'success': false, 'message': 'Dinghy does not exist please add it if entered details are correct'});
-            return;
+            const addDinghyResult = await controller.createDinghy({'sailNumber': sailNumber, 'dinghyClass': dinghy.dinghyClass});
+            if (addDinghyResult.success) {
+                setResult(await controller.signupToRace(race, competitor, {'sailNumber': sailNumber, 'dinghyClass': dinghy.dinghyClass}));
+            }
+            else {
+                setResult(addDinghyResult);
+            }
         }
-        setResult(await controller.signupToRace(race, competitor, dinghy));
+        else {
+            setResult(await controller.signupToRace(race, competitor, dinghy));
+        }
     }
 
     function dinghyClass(race) {
@@ -165,7 +172,7 @@ function SignUp({ race }) {
             <label htmlFor="sail-number-input">Sail Number</label>
             <input id="sail-number-input" name="sailNumber" list="dinghy-datalist" onChange={handleChange} value={sailNumber} />
             <output id="entry-message-output" />
-            <button id="entry-create-button" type="button" onClick={handleCreate} >Sign-up</button>
+            <button id="entry-create-button" type="button" onClick={handleCreate} >{dinghyMap.has(sailNumber) ? 'Sign-up' : 'Add dinghy & sign-up'}</button>
         </form>
     )
 }
