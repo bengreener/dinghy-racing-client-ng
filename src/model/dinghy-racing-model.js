@@ -27,7 +27,20 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async createDinghy(dinghy) {
-        return this.create('dinghies', dinghy);
+        let dinghyClassURL;
+        // if not supplied get url for dinghyClass
+        if (!dinghy.dinghyClass.url) {
+            const result = await this.getDinghyClassByName(dinghy.dinghyClass.name);
+            if (!result.success) {
+                return Promise.resolve(result);
+            }
+            dinghyClassURL = result.domainObject.url;
+        } 
+        else {
+            dinghyClassURL = dinghy.dinghyClass.url;
+        }
+        // convert local dinghy domain type into format required for REST service
+        return this.create('dinghies', {...dinghy, 'dinghyClass': dinghyClassURL});
     }
 
     /**

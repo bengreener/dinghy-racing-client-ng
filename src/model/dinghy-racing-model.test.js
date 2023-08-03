@@ -892,8 +892,8 @@ describe('when creating a new competitor', () => {
 });
 
 describe('when creating a new dinghy', () => {
-    it('returns a promise that resolves to a result indicating success when dinghy is created with http status 200', async () => {
-        fetch.mockImplementationOnce(() => {
+    it('when supplied dinghy class includes URL returns a promise that resolves to a result indicating success when dinghy is created', async () => {
+        fetch.mockImplementation(() => {
             return Promise.resolve({
                 ok: true,
                 status: 200, 
@@ -901,26 +901,43 @@ describe('when creating a new dinghy', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', dinghyClassScorpion});
+
+        const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', 'dinghyClass': dinghyClassScorpion});
         const result = await promise;
+
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});
     });
-    it('returns a promise that resolves to a result indicating success when dinghy is created with http status 201', async () => {
-        fetch.mockImplementationOnce(() => {
+    it('when supplied dinghy class does not contain URL but dinghy class exists returns a promise that resolves to a result indicating success when dinghy is created', async () => {
+        fetch.mockImplementation(() => {
             return Promise.resolve({
                 ok: true,
-                status: 201, 
+                status: 200, 
                 json: () => Promise.resolve(dinghy1234HAL)
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', dinghyClassScorpion});
+        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
+
+        const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', 'dinghyClass': {'name': 'Scorpion'}});
         const result = await promise;
+        
+        expect(getDinghyClassByNameSpy).toBeCalled();
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});
     });
-    it('returns a promise that resolves to a result indicating failure when dinghy is not created with http status 400 and provides a message explaining the cause of failure', async () => {
+    it('when supplied dinghy class does not contain URL and dinghy class does not exist returns a promise that resolves to a result indicating failure', async () => {        
+        const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
+        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': false, 'message': 'Dinghy class does not exist.'}));
+
+        const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', 'dinghyClass': {'name': 'Not a Dinghy Class'}});
+        const result = await promise;
+        
+        expect(getDinghyClassByNameSpy).toBeCalled();
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Dinghy class does not exist.'});
+    });
+    it('returns a promise that resolves to a result indicating failure when request is rejected by REST service', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
@@ -929,87 +946,17 @@ describe('when creating a new dinghy', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', dinghyClassScorpion});
+        const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', 'dinghyClass': dinghyClassScorpion});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Message: Some error resulting in HTTP 400'}); 
-    });
-    it('returns a promise that resolves to a result indicating failure when dinghy is not created with http status 404 and provides a message explaining the cause of failure', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: false,
-                status: 404, 
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', dinghyClassScorpion});
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'}); 
-    });
-    it('returns a promise that resolves to a result indicating failure when dinghy is not created with http status 408 and provides a message explaining the cause of failure', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: false,
-                status: 408, 
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 408'}, 'message': 'Some error resulting in HTTP 408'})
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', dinghyClassScorpion});
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 408 Message: Some error resulting in HTTP 408'}); 
-    });
-    it('returns a promise that resolves to a result indicating failure when dinghy is not created with http status 409 and provides a message explaining the cause of failure', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: false,
-                status: 409, 
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 409'}, 'message': 'Some error resulting in HTTP 409'})
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', dinghyClassScorpion});
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 409 Message: Some error resulting in HTTP 409'});
-    });
-    it('returns a promise that resolves to a result indicating failure when dinghy is not created with http status 500 and provides a message explaining the cause of failure', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: false,
-                status: 500, 
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 500'}, 'message': 'Some error resulting in HTTP 500'})
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', dinghyClassScorpion});
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 500 Message: Some error resulting in HTTP 500'}); 
-    });
-    it('returns a promise that resolves to a result indicating failure when dinghy is not created with http status 503 and provides a message explaining the cause of failure', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: false,
-                status: 503, 
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 503'}, 'message': 'Some error resulting in HTTP 503'})
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', dinghyClassScorpion});
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 503 Message: Some error resulting in HTTP 503'}); 
     });
     it('returns a promise that resolves to a result indicating failure when dinghy is not created due to an error that causes fetch to reject; such as a network failure', async () => {
         fetch.mockImplementationOnce(() => {
             throw new TypeError('Failed to fetch');
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', dinghyClassScorpion});
+        const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', 'dinghyClass': dinghyClassScorpion});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'TypeError: Failed to fetch'});
