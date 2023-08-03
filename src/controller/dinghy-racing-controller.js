@@ -12,6 +12,18 @@ class DinghyRacingController {
     }
 
     /**
+     * Add a new competitor
+     * @param {Competitor} competitor
+     * @returns {Promise<Result>}
+     */
+    createCompetitor(competitor) {
+        if (!competitor || !competitor.name) {
+            return Promise.resolve({'success': false, 'message': 'A name is required for a new competitor'});
+        }
+        return this.model.createCompetitor(competitor);
+    }
+
+    /**
      * Add a new dinghy
      * @param {Dinghy} dinghy
      * @returns {Promise<Result>} 

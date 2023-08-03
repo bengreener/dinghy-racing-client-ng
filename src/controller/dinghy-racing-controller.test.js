@@ -223,4 +223,28 @@ describe('when creating a new dinghy then', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'A dinghy class is required for a new dinghy.'});
     });
-})
+});
+
+describe('when creating a new competitor', () => {
+    describe('when operation is successful', () => {
+        it('returns a promise that resolves to a result indicating success', async () => {
+            const dinghyRacingModel = new DinghyRacingModel(rootURL);
+            jest.spyOn(dinghyRacingModel, 'createCompetitor').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
+            const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+            const promise = dinghyRacingController.createCompetitor({'name': 'Bill Withers'});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true});
+        });
+    });
+    describe('when competitor name is not provided', () => {
+        it('returns a promise that resolves to a result inficating failure and provides a message explaining the cause of failure', async () => {
+            const dinghyRacingModel = new DinghyRacingModel(rootURL);
+            const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+            const promise = dinghyRacingController.createCompetitor({'name': null});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'A name is required for a new competitor'});
+        });
+    });
+});
