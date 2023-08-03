@@ -123,7 +123,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async createRace(race) {
-        var dinghyClassURL;
+        let dinghyClassURL;
         // if no dinghy class supplied than is a handicap race
         if (race.dinghyClass !== null && race.dinghyClass.name !== '') {
             // if not supplied get url for dinghyClass
@@ -301,7 +301,7 @@ class DinghyRacingModel {
     async create(urlPathSegment, object) {
         const body = JSON.stringify(object); // convert to string so can be serialized into object by receiving service
         try {
-            var json;
+            let json;
             const response = await fetch(this.rootURL + '/' + urlPathSegment, {method: 'POST', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, 'body': body});
             try {
                 // if body is empty reading json() will result in an error
@@ -330,7 +330,7 @@ class DinghyRacingModel {
      */
     async read(resource) {
         try {
-            var json;
+            let json;
             const response = await fetch(resource, {method: 'GET', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}});
             try {
                 // if body is empty reading json() will result in an error 

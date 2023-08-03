@@ -20,7 +20,7 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
     useEffect(() => {
         model.getRacesOnOrAfterTime(new Date()).then(result => {
             if (result.success) {
-                var map = new Map();
+                let map = new Map();
                 const races = result.domainObject;
                 races.forEach(race => {
                     map.set(race.url, race);

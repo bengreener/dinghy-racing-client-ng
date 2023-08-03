@@ -19,8 +19,8 @@ function CreateRace({ onCreate }) {
         model.getDinghyClasses().then(result => {
             if (result.success) {
                 // build dinghy class options
-                var options = [];
-                var map = new Map();
+                let options = [];
+                let map = new Map();
                 // set handicap options
                 options.push(<option key="handicap" value={null}></option> );
                 map.set('', null);

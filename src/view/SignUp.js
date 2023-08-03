@@ -53,8 +53,8 @@ function SignUp({ race }) {
         model.getDinghyClasses().then(result => {
             if (result.success) {
                 // build dinghy class options
-                var options = [];
-                var map = new Map();
+                let options = [];
+                let map = new Map();
                 // set handicap options
                 options.push(<option key={''} value={''}></option> );
                 map.set('', {'name': '', 'url': ''});
@@ -79,8 +79,8 @@ function SignUp({ race }) {
         }
         model.getDinghies(dinghyClass).then(result => {
             if (result.success) {
-                var options = [];
-                var map = new Map();
+                let options = [];
+                let map = new Map();
                 options.push(<option key={''} value = {''}></option>);
                 map.set('', {'sailNumber': '', 'dinghyClass': {'name': '', 'url': ''}, 'url': ''});
                 result.domainObject.forEach(dinghy => {
