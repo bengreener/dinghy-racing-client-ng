@@ -12,6 +12,21 @@ class DinghyRacingController {
     }
 
     /**
+     * Add a new dinghy
+     * @param {Dinghy} dinghy
+     * @returns {Promise<Result>} 
+     */
+    createDinghy(dinghy) {
+        if (!dinghy || !dinghy.sailNumber) {
+            return Promise.resolve({'success': false, 'message': 'A sail number is required for a new dinghy.'});
+        }
+        if (!dinghy.dinghyClass || !dinghy.dinghyClass.name) {
+            return Promise.resolve({'success': false, 'message': 'A dinghy class is required for a new dinghy.'});
+        }
+        return this.model.createDinghy(dinghy);
+    }
+
+    /**
      * Create a new dinghy class
      * @param {DinghyClass} dinghyClass
      * @returns {Promise<Result>}
