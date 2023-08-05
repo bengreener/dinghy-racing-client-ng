@@ -1065,3 +1065,33 @@ describe('when retrieving a list of dinghies', () => {
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'});
     });
 });
+
+it('provides a blank template for a competitor', () => {
+    const competitor = DinghyRacingModel.competitorTemplate();
+
+    expect(competitor).toEqual({'name': '', 'url': ''});
+});
+
+it('provides a blank template for a dinghy class', () => {
+    const dinghyClass = DinghyRacingModel.dinghyClassTemplate();
+
+    expect(dinghyClass).toEqual({'name': '', 'url': ''});
+});
+
+it('provides a blank template for a dinghy', () => {
+    const dinghy = DinghyRacingModel.dinghyTemplate();
+
+    expect(dinghy).toEqual({'sailNumber': '', 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'url': ''});
+});
+
+it('provides a blank template for a race', () => {
+    const race = DinghyRacingModel.raceTemplate();
+
+    expect(race).toEqual({'name': '', 'time': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'url': ''});
+});
+
+it('provides a blank template for a result', () => {
+    const result = DinghyRacingModel.resultTemplate();
+
+    expect(result).toEqual({'success': null, 'domainObject': null, 'message': ''});
+});

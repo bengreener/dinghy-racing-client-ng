@@ -2,6 +2,54 @@ class DinghyRacingModel {
     rootURL;
 
     /**
+     * Provides a blank competitor template
+     * @returns {Competitor}
+     */
+    static competitorTemplate() {
+        return {'name': '', 'url': ''};
+    }
+
+    /**
+     * Provides a blank dinghy class template
+     * @returns {DinghyClass}
+     */
+    static dinghyClassTemplate() {
+        return {'name': '', 'url': ''};
+    }
+
+    /**
+     * Provides a blank dinghy template
+     * @returns {Dinghy}
+     */
+    static dinghyTemplate() {
+        return {'sailNumber': '', 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'url': ''};
+    }
+
+    /**
+     * Provides a blank race template
+     * @returns {Race}
+     */
+    static raceTemplate() {
+        return {'name': '', 'time': null,  'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'url': ''};
+    }
+
+    /**
+     * Provides a blank result template
+     * @returns {Result}
+     */
+    static resultTemplate() {
+        return {'success': null, 'message': '', 'domainObject': null};
+    }
+
+    /**
+     * Provides a blank competitor template
+     * @returns {Competitor}
+     */
+    static competitorTemplate() {
+        return {'name': '', 'url': ''};
+    }
+
+    /**
      * 
      * @param {string} rootURL
      * @returns {DinghyRacingModel} 
