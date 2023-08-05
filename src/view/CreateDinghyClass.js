@@ -1,11 +1,12 @@
 import React from 'react';
+import DinghyRacingModel from '../model/dinghy-racing-model';
 
 function CreateDinghyClass({ onCreate }) {
-    const [dinghyClass, setDinghyClass] = React.useState({'name': ''});
+    const [dinghyClass, setDinghyClass] = React.useState(DinghyRacingModel.dinghyClassTemplate());
     const [result, setResult] = React.useState({message: ''});
     
     const clear = React.useCallback(() => {
-        setDinghyClass({'name': ''});
+        setDinghyClass(DinghyRacingModel.dinghyClassTemplate());
         showMessage('');
     }, []);
 

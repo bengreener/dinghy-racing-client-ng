@@ -35,8 +35,6 @@ function SignUp({ race }) {
             if (result.success) {
                 const competitorMap = new Map();
                 const options = [];
-                // competitorMap.set('', {'name': '', 'url': ''});
-                // options.push(<option key={''} value={''}>{''}</option>);
                 result.domainObject.forEach(competitor => {
                    competitorMap.set(competitor.name, competitor);
                    options.push(<option key={competitor.name} value={competitor.name}>{competitor.name}</option>);
@@ -59,7 +57,6 @@ function SignUp({ race }) {
                 let map = new Map();
                 // set handicap options
                 options.push(<option key={''} value={''}></option> );
-                // map.set('', {'name': '', 'url': ''});
                 // set dinghy classes
                 result.domainObject.forEach(dinghyClass => {
                     options.push(<option key={dinghyClass.name} value={dinghyClass.name}>{dinghyClass.name}</option>);
@@ -85,7 +82,6 @@ function SignUp({ race }) {
                 let options = [];
                 let map = new Map();
                 options.push(<option key={''} value = {''}></option>);
-                // map.set('', {'sailNumber': '', 'dinghyClass': {'name': '', 'url': ''}, 'url': ''});
                 result.domainObject.forEach(dinghy => {
                     options.push(<option key={dinghy.sailNumber} value={dinghy.sailNumber}>{dinghy.sailNumber}</option>)
                     map.set(dinghy.sailNumber, dinghy);

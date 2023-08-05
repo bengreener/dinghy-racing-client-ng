@@ -2,6 +2,38 @@ class DinghyRacingModel {
     rootURL;
 
     /**
+     * Provides a blank competitor template
+     * @returns {Competitor}
+     */
+    static competitorTemplate() {
+        return {'name': '', 'url': ''};
+    }
+
+    /**
+     * Provides a blank dinghy class template
+     * @returns {DinghyClass}
+     */
+    static dinghyClassTemplate() {
+        return {'name': '', 'url': ''};
+    }
+
+    /**
+     * Provides a blank dinghy template
+     * @returns {Dinghy}
+     */
+    static dinghyTemplate() {
+        return {'sailNumber': '', 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'url': ''};
+    }
+
+    /**
+     * Provides a blank race template
+     * @returns {Race}
+     */
+    static raceTemplate() {
+        return {'name': '', 'time': null,  'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'url': ''};
+    }
+
+    /**
      * 
      * @param {string} rootURL
      * @returns {DinghyRacingModel} 
@@ -164,7 +196,7 @@ class DinghyRacingModel {
             
             const dinghies = [];
             for (let i = 0; i < dinghiesHAL.length; i++  ) {
-                const dinghyClass = dinghyClassResults[i].success ? {'name': dinghyClassResults[i].domainObject.name, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
+                const dinghyClass = dinghyClassResults[i].success ? {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassResults[i].domainObject.name, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
                 dinghies.push({'sailNumber': dinghiesHAL[i].sailNumber, 'dinghyClass': dinghyClass, 'url': dinghiesHAL[i]._links.self.href});
             };
             return Promise.resolve({'success': true, 'domainObject': dinghies});
@@ -203,7 +235,7 @@ class DinghyRacingModel {
 
         const result = await this.read(resource);
         if(result.success) {
-            const domainObject = {'name': result.domainObject.name, 'url': result.domainObject._links.self.href};
+            const domainObject = {...DinghyRacingModel.dinghyClassTemplate(), 'name': result.domainObject.name, 'url': result.domainObject._links.self.href};
             return Promise.resolve({'success': true, 'domainObject': domainObject});
         }
         else {
@@ -221,7 +253,7 @@ class DinghyRacingModel {
         const result = await this.read(resource);
         if (result.success) {
             const collection = result.domainObject._embedded.dinghyClasses;
-            const dinghyClassCollection = collection.map(dinghyClass => {return {'name': dinghyClass.name, 'url': dinghyClass._links.self.href}});
+            const dinghyClassCollection = collection.map(dinghyClass => {return {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClass.name, 'url': dinghyClass._links.self.href}});
             return Promise.resolve({'success': true, 'domainObject': dinghyClassCollection});
         }
         else {
@@ -245,9 +277,9 @@ class DinghyRacingModel {
             
             const races = [];
             for (let i = 0; i < racesHAL.length; i++  ) {
-                const dinghyClass = dinghyClassResults[i].success ? {'name': dinghyClassResults[i].domainObject.name, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
+                const dinghyClass = dinghyClassResults[i].success ? {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassResults[i].domainObject.name, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
                 // assume time received has been stored in UTC
-                races.push({'name': racesHAL[i].name, 'time': new Date(racesHAL[i].plannedStartTime + 'Z'), 
+                races.push({...DinghyRacingModel.raceTemplate(), 'name': racesHAL[i].name, 'time': new Date(racesHAL[i].plannedStartTime + 'Z'), 
                     'dinghyClass': dinghyClass, 'url': racesHAL[i]._links.self.href});
             };
             return Promise.resolve({'success': true, 'domainObject': races});
@@ -267,7 +299,7 @@ class DinghyRacingModel {
         const result = await this.read(resource);
         if (result.success) {
             const collection = result.domainObject._embedded.competitors;
-            const competitorCollection = collection.map(competitor => {return {'name': competitor.name, 'url': competitor._links.self.href}});
+            const competitorCollection = collection.map(competitor => {return {...DinghyRacingModel.competitorTemplate(), 'name': competitor.name, 'url': competitor._links.self.href}});
             return Promise.resolve({'success': true, 'domainObject': competitorCollection});
         }
         else {
@@ -285,7 +317,7 @@ class DinghyRacingModel {
 
         const result = await this.read(resource);
         if(result.success) {
-            const domainObject = {'name': result.domainObject.name, 'url': result.domainObject._links.self.href};
+            const domainObject = {...DinghyRacingModel.competitorTemplate(), 'name': result.domainObject.name, 'url': result.domainObject._links.self.href};
             return Promise.resolve({'success': true, 'domainObject': domainObject});
         }
         else {

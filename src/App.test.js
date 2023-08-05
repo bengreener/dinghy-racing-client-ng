@@ -31,7 +31,9 @@ it('displays menu buttons', () => {
 describe('when create dinghy class button clicked', () => {
   it('displays create dinghy class form', async () => {
     const user = userEvent.setup();
-    const dinghyRacingController = new DinghyRacingController(new DinghyRacingModel(rootURL));
+    const model = new DinghyRacingModel(rootURL);
+    jest.spyOn(DinghyRacingModel, 'dinghyClassTemplate').mockImplementation(() => {return {'name': '', 'url': ''}});
+    const dinghyRacingController = new DinghyRacingController(model);
 
     render(<App controller={dinghyRacingController} />);
     const btnCreateDinghyClass = await screen.findByRole('button', {name: /create dinghy class\b/i});
