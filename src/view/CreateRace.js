@@ -1,17 +1,17 @@
 import React from 'react';
 import { useContext } from 'react';
+import DinghyRacingModel from '../model/dinghy-racing-model';
 import ModelContext from './ModelContext';
 
 function CreateRace({ onCreate }) {
     const model = useContext(ModelContext);
-    // race.time is stored here as a string to avoid conversion issues if a new time is being typed in (mostly an issue with unit testing :-( )
-    const [race, setRace] = React.useState({'name': '', 'time': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'dinghyClass': {'name': ''}});
+    const [race, setRace] = React.useState({...DinghyRacingModel.raceTemplate(), 'time': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16)});
     const [result, setResult] = React.useState({'message': ''});
     const [dinghyClassMap, setDinghyClassMap] = React.useState(new Map());
     const [dinghyClassOptions, setDinghyClassOptions] = React.useState([]);
 
     const clear = React.useCallback(() => {
-        setRace({'name': '', 'time': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'dinghyClass': {'name': ''}});
+        setRace({...DinghyRacingModel.raceTemplate(), 'time': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16)});
         showMessage('');
     }, []);
 
@@ -23,7 +23,6 @@ function CreateRace({ onCreate }) {
                 let map = new Map();
                 // set handicap options
                 options.push(<option key="handicap" value={null}></option> );
-                map.set('', null);
                 // set dinghy classes
                 result.domainObject.forEach(dinghyClass => {
                     options.push(<option key={dinghyClass.name} value={dinghyClass.name}>{dinghyClass.name}</option>);

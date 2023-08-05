@@ -89,7 +89,7 @@ describe('when creating a new dinghy class', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
+        const promise = dinghyRacingModel.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});
@@ -103,7 +103,7 @@ describe('when creating a new dinghy class', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
+        const promise = dinghyRacingModel.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});
@@ -117,7 +117,7 @@ describe('when creating a new dinghy class', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
+        const promise = dinghyRacingModel.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Message: Some error resulting in HTTP 400'}); 
@@ -131,7 +131,7 @@ describe('when creating a new dinghy class', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
+        const promise = dinghyRacingModel.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'}); 
@@ -145,7 +145,7 @@ describe('when creating a new dinghy class', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
+        const promise = dinghyRacingModel.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 408 Message: Some error resulting in HTTP 408'}); 
@@ -159,7 +159,7 @@ describe('when creating a new dinghy class', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
+        const promise = dinghyRacingModel.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 409 Message: Some error resulting in HTTP 409'});
@@ -173,7 +173,7 @@ describe('when creating a new dinghy class', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
+        const promise = dinghyRacingModel.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 500 Message: Some error resulting in HTTP 500'}); 
@@ -187,7 +187,7 @@ describe('when creating a new dinghy class', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
+        const promise = dinghyRacingModel.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 503 Message: Some error resulting in HTTP 503'}); 
@@ -197,7 +197,7 @@ describe('when creating a new dinghy class', () => {
             throw new TypeError('Failed to fetch');
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createDinghyClass({'name': 'Scorpion'});
+        const promise = dinghyRacingModel.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'TypeError: Failed to fetch'});
@@ -239,7 +239,7 @@ describe('when creating a new race', () => {
     it('if a dinghy class URL is not supplied looks up dinghy class to get URL and returns a promise that resolves to a result indicating success when race is created with http status 200', async () => {
         fetch.mockImplementationOnce((resource, options) => {
             // check format of data passed to fetch to reduce risk of false positive
-            if(options.body !== '{"name":"Scorpion A","time":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","plannedStartTime":"2021-10-14T14:10:00.000Z"}') {
+            if(options.body !== '{"name":"Scorpion A","time":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","url":"","plannedStartTime":"2021-10-14T14:10:00.000Z"}') {
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -254,7 +254,7 @@ describe('when creating a new race', () => {
         });
         const dinghyRacingModel = new DinghyRacingModel(rootURL);
         const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return {'success': true, 'domainObject': dinghyClassScorpion}});
-        const promise = dinghyRacingModel.createRace({'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': {'name': 'Scorpion'}});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
         const result = await promise;
         expect(getDinghyClassByNameSpy).toHaveBeenCalled();
         expect(promise).toBeInstanceOf(Promise);
@@ -263,7 +263,7 @@ describe('when creating a new race', () => {
     it('if a dinghy class URL is supplied does not look up dinghy class to get URL and returns a promise that resolves to a result indicating success when race is created with http status 200', async () => {
         fetch.mockImplementationOnce((resource, options) => {
             // check format of data passed to fetch to reduce risk of false positive
-            if(options.body !== '{"name":"Scorpion A","time":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","plannedStartTime":"2021-10-14T14:10:00.000Z"}') {
+            if(options.body !== '{"name":"Scorpion A","time":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","url":"","plannedStartTime":"2021-10-14T14:10:00.000Z"}') {
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -278,7 +278,7 @@ describe('when creating a new race', () => {
         });
         const dinghyRacingModel = new DinghyRacingModel(rootURL);
         const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return {'success': true, 'domainObject': dinghyClassScorpion}});
-        const promise = dinghyRacingModel.createRace({'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': dinghyClassScorpion});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': dinghyClassScorpion});
         const result = await promise;
         expect(getDinghyClassByNameSpy).not.toHaveBeenCalled();
         expect(promise).toBeInstanceOf(Promise);
@@ -287,7 +287,7 @@ describe('when creating a new race', () => {
     it('returns a promise that resolves to a result indicating success when race is created with http status 201', async () => {
         fetch.mockImplementationOnce((resource, options) => {// check format of data passed to fetch to reduce risk of false positive
             // check format of data passed to fetch to reduce risk of false positive
-            if(options.body !== '{"name":"Scorpion A","time":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","plannedStartTime":"2021-10-14T14:10:00.000Z"}') {
+            if(options.body !== '{"name":"Scorpion A","time":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","url":"","plannedStartTime":"2021-10-14T14:10:00.000Z"}') {
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -302,7 +302,7 @@ describe('when creating a new race', () => {
         });
         const dinghyRacingModel = new DinghyRacingModel(rootURL);
         jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return {'success': true, 'domainObject': dinghyClassScorpion}});
-        const promise = dinghyRacingModel.createRace({'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': {'name': 'Scorpion'}});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});
@@ -316,7 +316,7 @@ describe('when creating a new race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(rootURL);
-        const promise = dinghyRacingModel.createRace({'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00'), 'dinghyClass': {'name': 'Scorpion'}});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Message: Some error resulting in HTTP 400'}); 
@@ -330,7 +330,7 @@ describe('when creating a new race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(rootURL);
-        const promise = dinghyRacingModel.createRace({'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00'), 'dinghyClass': {'name': 'Scorpion'}});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'}); 
@@ -344,7 +344,7 @@ describe('when creating a new race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(rootURL);
-        const promise = dinghyRacingModel.createRace({'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00'), 'dinghyClass': {'name': 'Scorpion'}});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 408 Message: Some error resulting in HTTP 408'}); 
@@ -358,7 +358,7 @@ describe('when creating a new race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(rootURL);
-        const promise = dinghyRacingModel.createRace({'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00'), 'dinghyClass': {'name': 'Scorpion'}});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 409 Message: Some error resulting in HTTP 409'});
@@ -372,7 +372,7 @@ describe('when creating a new race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(rootURL);
-        const promise = dinghyRacingModel.createRace({'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00'), 'dinghyClass': {'name': 'Scorpion'}});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 500 Message: Some error resulting in HTTP 500'}); 
@@ -386,7 +386,7 @@ describe('when creating a new race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(rootURL);
-        const promise = dinghyRacingModel.createRace({'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00'), 'dinghyClass': {'name': 'Scorpion'}});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 503 Message: Some error resulting in HTTP 503'}); 
@@ -396,7 +396,7 @@ describe('when creating a new race', () => {
             throw new TypeError('Failed to fetch');
         });
         const dinghyRacingModel = new DinghyRacingModel(rootURL);
-        const promise = dinghyRacingModel.createRace({'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00'), 'dinghyClass': {'name': 'Scorpion'}});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'TypeError: Failed to fetch'});
@@ -776,7 +776,7 @@ describe('when creating a new competitor', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createCompetitor({'name': 'Chris Marshall'});
+        const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});
@@ -790,7 +790,7 @@ describe('when creating a new competitor', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createCompetitor({'name': 'Chris Marshall'});
+        const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});
@@ -804,7 +804,7 @@ describe('when creating a new competitor', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createCompetitor({'name': 'Chris Marshall'});
+        const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Message: Some error resulting in HTTP 400'}); 
@@ -818,7 +818,7 @@ describe('when creating a new competitor', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createCompetitor({'name': 'Chris Marshall'});
+        const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'}); 
@@ -832,7 +832,7 @@ describe('when creating a new competitor', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createCompetitor({'name': 'Chris Marshall'});
+        const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 408 Message: Some error resulting in HTTP 408'}); 
@@ -846,7 +846,7 @@ describe('when creating a new competitor', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createCompetitor({'name': 'Chris Marshall'});
+        const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 409 Message: Some error resulting in HTTP 409'});
@@ -860,7 +860,7 @@ describe('when creating a new competitor', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createCompetitor({'name': 'Chris Marshall'});
+        const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 500 Message: Some error resulting in HTTP 500'}); 
@@ -874,7 +874,7 @@ describe('when creating a new competitor', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createCompetitor({'name': 'Chris Marshall'});
+        const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 503 Message: Some error resulting in HTTP 503'}); 
@@ -884,7 +884,7 @@ describe('when creating a new competitor', () => {
             throw new TypeError('Failed to fetch');
         });
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
-        const promise = dinghyRacingModel.createCompetitor({'name': 'Chris Marshall'});
+        const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'TypeError: Failed to fetch'});
@@ -930,7 +930,7 @@ describe('when creating a new dinghy', () => {
         const dinghyRacingModel = new DinghyRacingModel('https://host:8080/dinghyracing/api');
         const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': false, 'message': 'Dinghy class does not exist.'}));
 
-        const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', 'dinghyClass': {'name': 'Not a Dinghy Class'}});
+        const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Not a Dinghy Class'}});
         const result = await promise;
         
         expect(getDinghyClassByNameSpy).toBeCalled();
@@ -1088,10 +1088,4 @@ it('provides a blank template for a race', () => {
     const race = DinghyRacingModel.raceTemplate();
 
     expect(race).toEqual({'name': '', 'time': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'url': ''});
-});
-
-it('provides a blank template for a result', () => {
-    const result = DinghyRacingModel.resultTemplate();
-
-    expect(result).toEqual({'success': null, 'domainObject': null, 'message': ''});
 });

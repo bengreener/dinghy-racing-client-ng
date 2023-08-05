@@ -2,6 +2,7 @@ import { screen, prettyDOM, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CreateDinghyClass from './CreateDinghyClass';
 import { act } from 'react-dom/test-utils';
+import DinghyRacingModel from '../model/dinghy-racing-model';
 
 it('renders', () => {
     render(<CreateDinghyClass />);
@@ -45,7 +46,7 @@ it('calls the function passed in to onCreate prop with new dinghy class as param
         await user.click(btnCreate);
     });
 
-    expect(fnOnCreate).toBeCalledWith({'name': 'Scorpion'});
+    expect(fnOnCreate).toBeCalledWith({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
 });
 
 describe('when creating a new dinghy class', () => {

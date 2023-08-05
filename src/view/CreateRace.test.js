@@ -108,16 +108,18 @@ it('calls the function passed in to onCreate prop with new race as parameter', a
         await user.click(btnCreate);
     });
 
-    expect(fnOnCreate).toBeCalledWith({'name': 'Scorpion A', 'time': new Date('2020-05-12T12:30'), 'dinghyClass': dinghyClassScorpion});
+    expect(fnOnCreate).toBeCalledWith({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'time': new Date('2020-05-12T12:30'), 'dinghyClass': dinghyClassScorpion});
 });
 
-describe('when creating a new dinghy class', () => {
+describe('when creating a new race', () => {
     it('clears the input on success', async () => {
         const user = userEvent.setup();
         const fnOnCreate = jest.fn(() => {return {'success': true}});
         
         const model = new DinghyRacingModel(rootURL);
         jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
+        jest.spyOn(DinghyRacingModel, 'dinghyClassTemplate').mockImplementation(() => {return {'name': '', 'url': ''}});
+        jest.spyOn(DinghyRacingModel, 'raceTemplate').mockImplementation(() => {return {'name': '', 'time': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'url': ''}});
         customRender(<CreateRace onCreate={fnOnCreate} />, model);
         const inputName = screen.getByLabelText(/name/i);
         const inputTime = screen.getByLabelText(/time/i);
@@ -131,7 +133,6 @@ describe('when creating a new dinghy class', () => {
         });
     
         expect(inputName).toHaveValue('');
-        // expect(inputTime).toHaveValue('');
         expect(inputTime).toHaveValue(new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16));
         expect(inputDinghyClass).toHaveValue('');
     })
