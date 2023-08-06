@@ -1089,3 +1089,9 @@ it('provides a blank template for a race', () => {
 
     expect(race).toEqual({'name': '', 'time': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'url': ''});
 });
+
+it('provides a blank template for a race entry', () => {
+    const race = DinghyRacingModel.entryTemplate();
+
+    expect(race).toEqual({'race': DinghyRacingModel.raceTemplate(), 'competitor': DinghyRacingModel.competitorTemplate(), 'dinghy': DinghyRacingModel.dinghyTemplate(), 'url': ''});
+});
