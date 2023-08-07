@@ -2,7 +2,7 @@ class DinghyRacingModel {
     rootURL;
 
     /**
-     * Provides a blank competitor template
+     * Provide a blank competitor template
      * @returns {Competitor}
      */
     static competitorTemplate() {
@@ -10,7 +10,7 @@ class DinghyRacingModel {
     }
 
     /**
-     * Provides a blank dinghy class template
+     * Provide a blank dinghy class template
      * @returns {DinghyClass}
      */
     static dinghyClassTemplate() {
@@ -18,7 +18,7 @@ class DinghyRacingModel {
     }
 
     /**
-     * Provides a blank dinghy template
+     * Provide a blank dinghy template
      * @returns {Dinghy}
      */
     static dinghyTemplate() {
@@ -26,11 +26,18 @@ class DinghyRacingModel {
     }
 
     /**
-     * Provides a blank race template
+     * Provide a blank race template
      * @returns {Race}
      */
     static raceTemplate() {
         return {'name': '', 'time': null,  'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'url': ''};
+    }
+
+    /**
+     * Provide a blank entry template
+     */
+    static entryTemplate() {
+        return {'race': DinghyRacingModel.raceTemplate(), 'competitor': DinghyRacingModel.competitorTemplate(), 'dinghy': DinghyRacingModel.dinghyTemplate(), 'url': ''};
     }
 
     /**
@@ -177,7 +184,45 @@ class DinghyRacingModel {
     }
 
     /**
-     * Get dinghies. If a dinghy class is provided only dinhies with that class will be returned
+     * Get competitor
+     * @param {String} url Address of the remote resource
+     * @returns {Promise<Result>}
+     */
+    async getCompetitor(url) {
+        const result = await this.read(url);
+        if (result.success) {
+            return Promise.resolve({'success': true, 'domainObject': {...DinghyRacingModel.competitorTemplate(), 'name': result.domainObject.name, 'url': result.domainObject._links.self.href}});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
+     * Get dinghy
+     * @param {String} url Address of the remote resource
+     * @returns {Promise<Result>}
+     */
+    async getDinghy(url) {
+        const result = await this.read(url);
+        if (result.success) {
+            // get dinghyClass
+            const dinghyClassResult = await this.getDinghyClass(result.domainObject._links.dinghyClass.href);
+            if (dinghyClassResult.success) {
+                return Promise.resolve({'success': true, 'domainObject': {...DinghyRacingModel.dinghyTemplate(), 'sailNumber': result.domainObject.sailNumber, 
+                'dinghyClass': dinghyClassResult.domainObject, 'url': result.domainObject._links.self.href}});
+            }
+            else {
+                return Promise.resolve(dinghyClassResult);
+            }
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
+     * Get dinghies. If a dinghy class is provided only dinghies with that class will be returned
      * @param {dinghyClass} [dinghyClass] The dinghy class to filter by
      */
     async getDinghies(dinghyClass) {
@@ -226,6 +271,21 @@ class DinghyRacingModel {
     }
 
     /**
+     * Get dinghy class
+     * @param {String} url Address of the remote resource
+     * @returns {Promise<Result>}
+     */
+    async getDinghyClass(url) {
+        const result = await this.read(url);
+        if (result.success) {
+            return Promise.resolve({'success': true, 'domainObject': {...DinghyRacingModel.dinghyClassTemplate(), 'name': result.domainObject.name, 'url': result.domainObject._links.self.href}});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
      * Get a dinghy class by the name of the class
      * @param {String} name
      * @returns {Promise<Result>}
@@ -255,6 +315,82 @@ class DinghyRacingModel {
             const collection = result.domainObject._embedded.dinghyClasses;
             const dinghyClassCollection = collection.map(dinghyClass => {return {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClass.name, 'url': dinghyClass._links.self.href}});
             return Promise.resolve({'success': true, 'domainObject': dinghyClassCollection});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
+     * Get entries for a race
+     * On success result domain object will be an array of Entry types; {Array<Entry>}
+     * @param {Race} race
+     * @returns {Promise<Result>}
+     */
+    async getEntriesByRace(race) {
+        // if race does not have a URL cannot get entries
+        if (!race.url) {
+            return Promise.resolve({'success': false, 'message': 'Cannot retrieve race entries without URL for race.'});
+        }
+        // get entries
+        const resource = this.rootURL + '/entries/search/findByRace?race=' + race.url;
+        const result = await this.read(resource);
+        if (!result.success) {
+            return Promise.resolve(result);
+        }
+        const entryCollectionHAL = result.domainObject._embedded.entries;
+        if (entryCollectionHAL.length === 0) {
+            // no entries for race
+            return Promise.resolve({'success': true, 'domainObject': []})
+        }
+        // get race, competitors, and dinghies
+        const raceResult = await this.getRace(entryCollectionHAL[0]._links.race.href);
+        if (!raceResult.success) {
+            return Promise.resolve(raceResult);
+        }
+        const competitorPromises = [];
+        const dinghyPromises = [];
+        entryCollectionHAL.forEach(entry => {
+            competitorPromises.push(this.getCompetitor(entry._links.competitor.href));
+            dinghyPromises.push(this.getDinghy(entry._links.dinghy.href));
+        });
+        const competitorResults = await Promise.all(competitorPromises);
+        const dinghyResults = await Promise.all(dinghyPromises);
+        const entries = [];
+        for (let i = 0; i < entryCollectionHAL.length; i++) {
+            if(!competitorResults[i].success) {
+                return Promise.resolve(competitorResults[i]);
+            }
+            if(!dinghyResults[i].success) {
+                return Promise.resolve(dinghyResults[i]);
+            }
+            entries.push({'race': raceResult.domainObject, 'competitor': competitorResults[i].domainObject, 'dinghy': dinghyResults[i].domainObject, 'url': entryCollectionHAL[i]._links.self.href});
+        };
+        return Promise.resolve({'success': true, 'domainObject': entries});
+    }
+
+    /**
+     * Get race
+     * @param {String} url Address of the remote resource
+     * @returns {Promise<Result>}
+     */
+    async getRace(url) {
+        const result = await this.read(url);
+        if (result.success) {
+            // get dinghyClass
+            let dinghyClassResult = await this.getDinghyClass(result.domainObject._links.dinghyClass.href);
+            // if race is a a handicap it will not have a dinghy class set and REST service will return a 404 not found error so in this case assume 404 error is a 'success' and provide an empty dinghy class 
+            const regex404 = /HTTP Error: 404/i;
+            if (!dinghyClassResult.success && regex404.test(dinghyClassResult.message)) {
+                dinghyClassResult = {'success': true, 'domainObject': null};
+            }
+            if (dinghyClassResult.success) {
+                return Promise.resolve({'success': true, 'domainObject': {...DinghyRacingModel.raceTemplate(), 'name': result.domainObject.name, 'time': new Date(result.domainObject.plannedStartTime + 'Z'), 
+                'dinghyClass': dinghyClassResult.domainObject, 'url': result.domainObject._links.self.href}});
+            }
+            else {
+                return Promise.resolve(dinghyClassResult);
+            }
         }
         else {
             return Promise.resolve(result);

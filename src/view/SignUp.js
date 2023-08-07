@@ -21,6 +21,7 @@ function SignUp({ race }) {
     const [dinghyClassOptions, setDinghyClassOptions] = React.useState([]);
     const [dinghyMap, setDinghyMap] = React.useState(new Map());
     const [dinghyOptions, setDinghyOptions] = React.useState([]);
+    const [entriesTable, setEntriesTable] = React.useState([]);
 
     const clear = React.useCallback(() => {
         setCompetitorName('');
@@ -83,7 +84,7 @@ function SignUp({ race }) {
                 let map = new Map();
                 options.push(<option key={''} value = {''}></option>);
                 result.domainObject.forEach(dinghy => {
-                    options.push(<option key={dinghy.sailNumber} value={dinghy.sailNumber}>{dinghy.sailNumber}</option>)
+                    options.push(<option key={dinghy.dinghyClass.name + dinghy.sailNumber} value={dinghy.sailNumber}>{dinghy.sailNumber}</option>)
                     map.set(dinghy.sailNumber, dinghy);
                 });
                 setDinghyMap(map);
@@ -95,6 +96,34 @@ function SignUp({ race }) {
         })
     }, [model, race.dinghyClass, dinghyClassName, dinghyClassMap]);
 
+    // build entries table
+    React.useEffect(() => {
+        model.getEntriesByRace(race).then(result => {
+            if (result.success) {
+                const rows = result.domainObject.map(entry => <tr key={entry.competitor.name}>
+                    <td key={'competitor'}>{entry.competitor.name}</td>
+                    <td key={'sailNumber'}>{entry.dinghy.sailNumber}</td>
+                    <td key={'dinghyClass'}>{entry.dinghy.dinghyClass.name}</td>
+                </tr>);
+                setEntriesTable(<table>
+                    <thead>
+                        <tr>
+                            <th key="competitor">Competitor</th>
+                            <th key="sailNumber">Sail Number</th>
+                            <th key="dinghyClass">Class</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {rows}
+                    </tbody>
+                    </table>);
+            }
+            else {
+                showMessage('Unable to load race entries\n' + result.message);
+            }
+        });
+    }, [race, model, result]);
+    
     React.useEffect(() => {
         if (result && result.success) {
             clear();
@@ -196,6 +225,8 @@ function SignUp({ race }) {
             <input id="sail-number-input" name="sailNumber" list="dinghy-datalist" onChange={handleChange} value={sailNumber} />
             <output id="entry-message-output" />
             <button id="entry-create-button" type="button" onClick={handleCreate} >{getButtonText()}</button>
+            <h3>Signed-up</h3>
+            {entriesTable}
         </form>
     )
 }
