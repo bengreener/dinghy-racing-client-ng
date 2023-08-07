@@ -1,10 +1,10 @@
-import { render, screen, act, findAllByRole, logRoles, getByLabelText } from '@testing-library/react';
+import { render, screen, act, findAllByRole, logRoles, getByLabelText, findByText } from '@testing-library/react';
 import { customRender } from '../test-utilities/custom-renders';
 import userEvent from '@testing-library/user-event';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 import SignUp from './SignUp';
-import { competitorsCollection, competitorChrisMarshall, raceScorpionA, raceNoClass, dinghies, dinghy1234, dinghyClasses, rootURL, dinghyClassScorpion } from '../model/__mocks__/test-data';
+import { competitorsCollection, competitorChrisMarshall, raceScorpionA, raceNoClass, dinghies, dinghy1234, dinghy6745, dinghyClasses, rootURL, dinghyClassScorpion, competitorSarahPascal, entriesScorpionA } from '../model/__mocks__/test-data';
 
 jest.mock('../model/dinghy-racing-model');
 jest.mock('../controller/dinghy-racing-controller');
@@ -16,6 +16,7 @@ beforeEach(() => {
     jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': competitorsCollection})});
     jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClasses})});
     jest.spyOn(model, 'getDinghies').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghies})});
+    jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
 })
 
 it('renders', () => {
@@ -318,4 +319,22 @@ describe('when create button is clicked', () => {
         const message = await screen.findByText('Something went wrong');
         expect(message).toBeInTheDocument();
     });
+});
+
+it('displays entries for race', async () => {
+    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+    // jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+
+    const competitor1 = await screen.findByRole('cell', {'name': /Chris Marshall/i});
+    const competitor2 = await screen.findByRole('cell', {'name': /Sarah Pascal/i});
+    const dinghyClass = await screen.findAllByRole('cell', {'name': /Scorpion/i});
+    const dinghy1 = await screen.findByRole('cell', {'name': /1234/i});
+    const dinghy2 = await screen.findByRole('cell', {'name': /6745/i});
+
+    expect(competitor1).toBeInTheDocument();
+    expect(competitor2).toBeInTheDocument();
+    expect(dinghyClass[0]).toBeInTheDocument();
+    expect(dinghyClass[1]).toBeInTheDocument();
+    expect(dinghy1).toBeInTheDocument();
+    expect(dinghy2).toBeInTheDocument();
 });
