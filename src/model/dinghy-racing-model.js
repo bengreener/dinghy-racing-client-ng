@@ -378,7 +378,12 @@ class DinghyRacingModel {
         const result = await this.read(url);
         if (result.success) {
             // get dinghyClass
-            const dinghyClassResult = await this.getDinghyClass(result.domainObject._links.dinghyClass.href);
+            let dinghyClassResult = await this.getDinghyClass(result.domainObject._links.dinghyClass.href);
+            // if race is a a handicap it will not have a dinghy class set and REST service will return a 404 not found error so in this case assume 404 error is a 'success' and provide an empty dinghy class 
+            const regex404 = /HTTP Error: 404/i;
+            if (!dinghyClassResult.success && regex404.test(dinghyClassResult.message)) {
+                dinghyClassResult = {'success': true, 'domainObject': null};
+            }
             if (dinghyClassResult.success) {
                 return Promise.resolve({'success': true, 'domainObject': {...DinghyRacingModel.raceTemplate(), 'name': result.domainObject.name, 'time': new Date(result.domainObject.plannedStartTime + 'Z'), 
                 'dinghyClass': dinghyClassResult.domainObject, 'url': result.domainObject._links.self.href}});
