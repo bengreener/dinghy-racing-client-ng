@@ -105,7 +105,7 @@ function SignUp({ race }) {
                     <td key={'sailNumber'}>{entry.dinghy.sailNumber}</td>
                     <td key={'dinghyClass'}>{entry.dinghy.dinghyClass.name}</td>
                 </tr>);
-                setEntriesTable(<table>{rows}</table>);
+                setEntriesTable(<table><tbody>{rows}</tbody></table>);
             }
             else {
                 showMessage('Unable to load race entries\n' + result.message);
