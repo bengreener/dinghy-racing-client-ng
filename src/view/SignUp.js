@@ -84,7 +84,7 @@ function SignUp({ race }) {
                 let map = new Map();
                 options.push(<option key={''} value = {''}></option>);
                 result.domainObject.forEach(dinghy => {
-                    options.push(<option key={dinghy.sailNumber} value={dinghy.sailNumber}>{dinghy.sailNumber}</option>)
+                    options.push(<option key={dinghy.dinghyClass.name + dinghy.sailNumber} value={dinghy.sailNumber}>{dinghy.sailNumber}</option>)
                     map.set(dinghy.sailNumber, dinghy);
                 });
                 setDinghyMap(map);
@@ -105,7 +105,18 @@ function SignUp({ race }) {
                     <td key={'sailNumber'}>{entry.dinghy.sailNumber}</td>
                     <td key={'dinghyClass'}>{entry.dinghy.dinghyClass.name}</td>
                 </tr>);
-                setEntriesTable(<table><tbody>{rows}</tbody></table>);
+                setEntriesTable(<table>
+                    <thead>
+                        <tr>
+                            <th key="competitor">Competitor</th>
+                            <th key="sailNumber">Sail Number</th>
+                            <th key="dinghyClass">Class</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {rows}
+                    </tbody>
+                    </table>);
             }
             else {
                 showMessage('Unable to load race entries\n' + result.message);
