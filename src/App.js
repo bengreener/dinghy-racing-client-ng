@@ -6,6 +6,7 @@ import ModelContext from './view/ModelContext';
 import ControllerContext from './view/ControllerContext';
 import ViewUpcomingRaces from './view/ViewUpcomingRaces';
 import SignUp from './view/SignUp';
+import RaceConsole from './view/RaceConsole';
 
 function App({model, controller}) {
   const [displayPort, setDisplayPort] = React.useState();
@@ -26,6 +27,10 @@ function App({model, controller}) {
     setDisplayPort(<SignUp race={race} />)
   }
 
+  function showRaceConsole() {
+    setDisplayPort(<RaceConsole />);
+  }
+
   return (
     <ModelContext.Provider value={model}>
     <ControllerContext.Provider value={controller}>
@@ -39,6 +44,7 @@ function App({model, controller}) {
           <button key={0} type='button' className='list-group-item list-group-item-action' onClick={showCreateDinghyClassForm}>Create Dinghy Class</button>
           <button key={1} type='button' className='list-group-item list-group-item-action' onClick={showCreateRaceForm}>Create Race</button>
           <button key={2} type='button' className='list-group-item list-group-item-action' onClick={showUpcomingRaces}>Upcoming Races</button>
+          <button key={3} type='button' className='list-group-item list-group-item-action' onClick={showRaceConsole}>Race Console</button>
         </div>
         <div className="display-port">
           <ErrorBoundary>
