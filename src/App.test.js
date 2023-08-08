@@ -83,6 +83,7 @@ describe('when race console button is clicked', ()  => {
   it('displays race console', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(rootURL);
+    jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     const dinghyRacingController = new DinghyRacingController(model);
 
     render(<App model={model} controller={dinghyRacingController} />);
