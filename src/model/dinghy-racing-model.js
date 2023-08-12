@@ -512,7 +512,7 @@ class DinghyRacingModel {
                     json = {};
                 }
             }
-            if(response.ok) {
+            if (response.ok) {
                 return Promise.resolve({'success': true, 'domainObject': json});
             }
             else {
@@ -523,6 +523,29 @@ class DinghyRacingModel {
         catch (error) {
             return Promise.resolve({'success': false, 'message': error.toString()});
         }
+    }
+
+    /**
+     * Update an entity via REST
+	 * PATCH is used as PUT does not update association links. Also allows for partial updates
+     * @param {String} resource
+     * @param {JSON} json JSON representation of the entity to be updated
+     * @returns {Promise<Result}
+     */
+    async update(resource, json) {
+        try {
+            const response = await fetch(resource, {method: 'PATCH', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, body: json});
+            if (response.ok) {
+                return Promise.resolve({'success': true});
+            }
+            else {
+                const message = 'HTTP Error: ' + response.status + ' Message: No additional information available';
+                return Promise.resolve({'success': false, 'message': message});
+            }
+        }
+        catch (error) {
+            return Promise.resolve({'success': false, 'message': error.toString()});
+        }        
     }
 }
 

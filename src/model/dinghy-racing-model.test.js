@@ -1299,4 +1299,35 @@ describe('when a dinghy class is requested', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'});
     });
+});
+
+describe('when updating an object via REST', () => {
+    it('returns a promise that resolves to a success response when update is successful', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: true,
+                status: 200,
+                json: () => Promise.resolve({})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const promise = dinghyRacingModel.update(rootURL, {});
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result.success).toBeTruthy();
+    });
+    it('resturns a promise that resolves to a failed response and probviding the cause of failure when update is unsuccessful', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 404, 
+                json: () => Promise.resolve({})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const promise = dinghyRacingModel.update(rootURL, {});
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
+    });
 })
