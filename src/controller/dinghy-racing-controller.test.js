@@ -254,7 +254,8 @@ describe('when starting a race', () => {
         const dinghyRacingModel = new DinghyRacingModel(rootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         jest.spyOn(dinghyRacingModel, 'startRace').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
-        const promise = controller.startRace(raceScorpionA);
+        const promise = dinghyRacingController.startRace(raceScorpionA);
+        const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});
     });
@@ -262,7 +263,8 @@ describe('when starting a race', () => {
         const dinghyRacingModel = new DinghyRacingModel(rootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         jest.spyOn(dinghyRacingModel, 'startRace').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
-        const promise = controller.startRace(raceScorpionA);
+        const promise = dinghyRacingController.startRace(raceScorpionA);
+        const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Something went wrong'});
     });
@@ -270,7 +272,8 @@ describe('when starting a race', () => {
         const dinghyRacingModel = new DinghyRacingModel(rootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         jest.spyOn(dinghyRacingModel, 'startRace').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
-        const promise = controller.startRace({'name': null});
+        const promise = dinghyRacingController.startRace({'name': null});
+        const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Please provide details of the race.'});
     });
@@ -278,7 +281,8 @@ describe('when starting a race', () => {
         const dinghyRacingModel = new DinghyRacingModel(rootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         jest.spyOn(dinghyRacingModel, 'startRace').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
-        const promise = controller.startRace({'name': ''});
+        const promise = dinghyRacingController.startRace({'name': ''});
+        const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Please provide details of the race.'});
     });
