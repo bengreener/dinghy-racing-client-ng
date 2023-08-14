@@ -435,7 +435,7 @@ class DinghyRacingModel {
     async getRaceByNameAndPlannedStartTime(name, time) {
         const resource = this.rootUrl + 'races/search?name=' + name + '&time='+ time.toISOString();
 
-        const result = this.getRace(resource);
+        return this.getRace(resource);
     }
 
     /**
