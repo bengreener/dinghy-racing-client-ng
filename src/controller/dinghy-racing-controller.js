@@ -85,6 +85,19 @@ class DinghyRacingController {
         }
         return this.model.createEntry(race, competitor, dinghy);
     }
+
+    /**
+     * Start a race
+     * @param {Race} Race to start
+     * @return {Promise<Result>}
+     */
+    startRace(race) {
+        // check valid race (a URL is sufficient, otherwise a name and start time is required)
+        if (!race.url && (!race.name || race.name === '' || !race.time)) {
+            return Promise.resolve({'success': false, 'message': 'Please provide details of the race.'});
+        }
+        return this.model.startRace(race, new Date());
+    }
 }
 
 export default DinghyRacingController

@@ -78,3 +78,18 @@ describe('when upcoming races button clicked', () => {
     expect(await screen.findByText('14/02/2023, 18:26:00')).toBeInTheDocument();
   })
 });
+
+describe('when race console button is clicked', ()  => {
+  it('displays race console', async () => {
+    const user = userEvent.setup();
+    const model = new DinghyRacingModel(rootURL);
+    jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    const dinghyRacingController = new DinghyRacingController(model);
+
+    render(<App model={model} controller={dinghyRacingController} />);
+    const btnRaceConsole = await screen.findByRole('button', {name: /race console\b/i});
+    await act(async () => {
+      await user.click(btnRaceConsole);
+    });
+  });
+});

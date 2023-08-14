@@ -60,7 +60,8 @@ class DinghyRacingModel {
     async createCompetitor(competitor) {
         return this.create('competitors', competitor);
     }
-/**
+
+    /**
      * Create a new dinghy
      * @param {Dinghy} dinghy 
      * @returns {Promise<Result>}
@@ -426,6 +427,40 @@ class DinghyRacingModel {
     }
 
     /**
+     * Get race by name and planned start time
+     * @param {String} name Name of the race
+     * @param {Date} time Planned start time of the race
+     * @returns {Promise<Result>}
+     */
+    async getRaceByNameAndPlannedStartTime(name, time) {
+        const resource = this.rootUrl + 'races/search?name=' + name + '&time='+ time.toISOString();
+
+        return this.getRace(resource);
+    }
+
+    /**
+     * Start a race
+     * @param {Race} race
+     * @param {Date} startTime
+    */
+    async startRace(race, startTime) {
+        let result;
+        // need URL for race
+        if (!race.url) {
+            result = await this.getRaceByNameAndPlannedStartTime(race.name, race.time);
+        }
+        else {
+            result = {'success': true, 'domainObject': race};
+        }
+        if (result.success) {
+            return this.update(result.domainObject.url, {'actualStartTime': startTime});
+        }
+        else {
+            return result;
+        }
+    }
+
+    /**
      * Get a collection of competitors, sorted by name in ascending order
      * @returns {Promise<Result>} If successful Result.domainObject will be an Array<Competitor>
      */
@@ -512,7 +547,7 @@ class DinghyRacingModel {
                     json = {};
                 }
             }
-            if(response.ok) {
+            if (response.ok) {
                 return Promise.resolve({'success': true, 'domainObject': json});
             }
             else {
@@ -523,6 +558,30 @@ class DinghyRacingModel {
         catch (error) {
             return Promise.resolve({'success': false, 'message': error.toString()});
         }
+    }
+
+    /**
+     * Update an entity via REST
+	 * PATCH is used as PUT does not update association links. Also allows for partial updates
+     * @param {String} resource
+     * @param {Object} object
+     * @returns {Promise<Result}
+     */
+    async update(resource, object) {
+        const body = JSON.stringify(object); // convert to string so can be serialized into object by receiving service
+        try {
+            const response = await fetch(resource, {method: 'PATCH', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, 'body': body});
+            if (response.ok) {
+                return Promise.resolve({'success': true});
+            }
+            else {
+                const message = 'HTTP Error: ' + response.status + ' Message: No additional information available';
+                return Promise.resolve({'success': false, 'message': message});
+            }
+        }
+        catch (error) {
+            return Promise.resolve({'success': false, 'message': error.toString()});
+        }        
     }
 }
 
