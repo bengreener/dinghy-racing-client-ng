@@ -453,7 +453,7 @@ class DinghyRacingModel {
             result = {'success': true, 'domainObject': race};
         }
         if (result.success) {
-            return this.update(result.domainObject.url, {'actualStartTime': startTime});
+            return this.update(result.domainObject.url, JSON.stringify({'actualStartTime': startTime}));
         }
         else {
             return result;
@@ -564,12 +564,13 @@ class DinghyRacingModel {
      * Update an entity via REST
 	 * PATCH is used as PUT does not update association links. Also allows for partial updates
      * @param {String} resource
-     * @param {JSON} json JSON representation of the entity to be updated
+     * @param {Object} object
      * @returns {Promise<Result}
      */
-    async update(resource, json) {
+    async update(resource, object) {
+        const body = JSON.stringify(object); // convert to string so can be serialized into object by receiving service
         try {
-            const response = await fetch(resource, {method: 'PATCH', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, body: json});
+            const response = await fetch(resource, {method: 'PATCH', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, 'body': body});
             if (response.ok) {
                 return Promise.resolve({'success': true});
             }
