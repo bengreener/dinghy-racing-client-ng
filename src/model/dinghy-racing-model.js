@@ -453,7 +453,7 @@ class DinghyRacingModel {
             result = {'success': true, 'domainObject': race};
         }
         if (result.success) {
-            return this.update(result.domainObject.url, JSON.stringify({'actualStartTime': startTime}));
+            return this.update(result.domainObject.url, {'actualStartTime': startTime});
         }
         else {
             return result;
