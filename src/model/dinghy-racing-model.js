@@ -60,7 +60,8 @@ class DinghyRacingModel {
     async createCompetitor(competitor) {
         return this.create('competitors', competitor);
     }
-/**
+
+    /**
      * Create a new dinghy
      * @param {Dinghy} dinghy 
      * @returns {Promise<Result>}
@@ -422,6 +423,40 @@ class DinghyRacingModel {
         }
         else {
             return Promise.resolve(result);
+        }
+    }
+
+    /**
+     * Get race by name and planned start time
+     * @param {String} name Name of the race
+     * @param {Date} time Planned start time of the race
+     * @returns {Promise<Result>}
+     */
+    async getRaceByNameAndPlannedStartTime(name, time) {
+        const resource = this.rootUrl + 'races/search?name=' + name + '&time='+ time.toISOString();
+
+        const result = this.getRace(resource);
+    }
+
+    /**
+     * Start a race
+     * @param {Race} race
+     * @param {Date} startTime
+    */
+    async startRace(race, startTime) {
+        let result;
+        // need URL for race
+        if (!race.url) {
+            result = await this.getRaceByNameAndPlannedStartTime(race.name, race.time);
+        }
+        else {
+            result = {'success': true, 'domainObject': race};
+        }
+        if (result.success) {
+            return this.update(result.domainObject.url, {'actualStartTime': startTime});
+        }
+        else {
+            return result;
         }
     }
 
