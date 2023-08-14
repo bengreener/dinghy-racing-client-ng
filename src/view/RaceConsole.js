@@ -1,10 +1,11 @@
 import React from 'react';
 import { useContext, useEffect, useState } from 'react';
-// import DinghyRacingModel from '../model/dinghy-racing-model';
 import ModelContext from './ModelContext';
+import ControllerContext from './ControllerContext';
 
 function RaceConsole() {
     const model = useContext(ModelContext);
+    const controller = useContext(ControllerContext);
     const [selectedRace, setSelectedRace] = useState('');
     const [raceOptions, setRaceOptions] = useState([]);
     const [raceMap, setRaceMap] = useState(new Map());
@@ -35,7 +36,7 @@ function RaceConsole() {
     }
 
     function handleStartRaceClick() {
-        model.startRace(raceMap.get(selectedRace));
+        controller.startRace(raceMap.get(selectedRace));
     }
 
     return (
