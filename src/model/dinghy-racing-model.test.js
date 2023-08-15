@@ -239,7 +239,7 @@ describe('when creating a new race', () => {
     it('if a dinghy class URL is not supplied looks up dinghy class to get URL and returns a promise that resolves to a result indicating success when race is created with http status 200', async () => {
         fetch.mockImplementationOnce((resource, options) => {
             // check format of data passed to fetch to reduce risk of false positive
-            if(options.body !== '{"name":"Scorpion A","time":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","url":"","plannedStartTime":"2021-10-14T14:10:00.000Z"}') {
+            if(options.body !== '{"name":"Scorpion A","time":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700000,"url":"","plannedStartTime":"2021-10-14T14:10:00.000Z"}') {
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -254,7 +254,7 @@ describe('when creating a new race', () => {
         });
         const dinghyRacingModel = new DinghyRacingModel(rootURL);
         const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return {'success': true, 'domainObject': dinghyClassScorpion}});
-        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}, 'duration': 2700000});
         const result = await promise;
         expect(getDinghyClassByNameSpy).toHaveBeenCalled();
         expect(promise).toBeInstanceOf(Promise);
@@ -263,7 +263,8 @@ describe('when creating a new race', () => {
     it('if a dinghy class URL is supplied does not look up dinghy class to get URL and returns a promise that resolves to a result indicating success when race is created with http status 200', async () => {
         fetch.mockImplementationOnce((resource, options) => {
             // check format of data passed to fetch to reduce risk of false positive
-            if(options.body !== '{"name":"Scorpion A","time":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","url":"","plannedStartTime":"2021-10-14T14:10:00.000Z"}') {
+            if(options.body !== '{"name":"Scorpion A","time":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700000,"url":"","plannedStartTime":"2021-10-14T14:10:00.000Z"}') {
+                console.log(options.body);
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -278,7 +279,7 @@ describe('when creating a new race', () => {
         });
         const dinghyRacingModel = new DinghyRacingModel(rootURL);
         const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return {'success': true, 'domainObject': dinghyClassScorpion}});
-        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': dinghyClassScorpion});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': dinghyClassScorpion, 'duration': 2700000});
         const result = await promise;
         expect(getDinghyClassByNameSpy).not.toHaveBeenCalled();
         expect(promise).toBeInstanceOf(Promise);
@@ -287,7 +288,7 @@ describe('when creating a new race', () => {
     it('returns a promise that resolves to a result indicating success when race is created with http status 201', async () => {
         fetch.mockImplementationOnce((resource, options) => {// check format of data passed to fetch to reduce risk of false positive
             // check format of data passed to fetch to reduce risk of false positive
-            if(options.body !== '{"name":"Scorpion A","time":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","url":"","plannedStartTime":"2021-10-14T14:10:00.000Z"}') {
+            if(options.body !== '{"name":"Scorpion A","time":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700000,"url":"","plannedStartTime":"2021-10-14T14:10:00.000Z"}') {
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -302,7 +303,7 @@ describe('when creating a new race', () => {
         });
         const dinghyRacingModel = new DinghyRacingModel(rootURL);
         jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return {'success': true, 'domainObject': dinghyClassScorpion}});
-        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}, 'duration': 2700000});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});
@@ -1087,7 +1088,7 @@ it('provides a blank template for a dinghy', () => {
 it('provides a blank template for a race', () => {
     const race = DinghyRacingModel.raceTemplate();
 
-    expect(race).toEqual({'name': '', 'time': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'url': ''});
+    expect(race).toEqual({'name': '', 'time': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'url': ''});
 });
 
 it('provides a blank template for a race entry', () => {
@@ -1396,3 +1397,94 @@ describe('when starting a race', () => {
         });
     });
 });
+
+describe('when provided with a duration in ISO 8601 format', () => {
+    it('converts pt12h13m17.08s to 43,997,080 milliseconds', () => {
+        const model = new DinghyRacingModel(rootURL);
+        const result = model.convertISO8601DurationToMilliseconds('pt12h13m17.08s');
+        expect(result).toBe(43997080);
+    });
+    it('converts PT12H13M17,08S to 43,997,080 milliseconds', () => {
+        const model = new DinghyRacingModel(rootURL);
+        const result = model.convertISO8601DurationToMilliseconds('PT12H13M17,08S');
+        expect(result).toBe(43997080);
+    });
+    it('converts +PT12H13M17.08S to 43,997,080 milliseconds', () => {
+        const model = new DinghyRacingModel(rootURL);
+        const result = model.convertISO8601DurationToMilliseconds('+PT12H13M17.08S');
+        expect(result).toBe(43997080);
+    });
+    it('converts PT+12H13M17.08S to 43,997,080 milliseconds', () => {
+        const model = new DinghyRacingModel(rootURL);
+        const result = model.convertISO8601DurationToMilliseconds('PT+12H13M17.08S');
+        expect(result).toBe(43997080);
+    });
+    it('converts PT12H+13M17.08S to 43,997,080 milliseconds', () => {
+        const model = new DinghyRacingModel(rootURL);
+        const result = model.convertISO8601DurationToMilliseconds('PT12H+13M17.08S');
+        expect(result).toBe(43997080);
+    });
+    it('converts PT12H13M+17.08S to 43,997,080 milliseconds', () => {
+        const model = new DinghyRacingModel(rootURL);
+        const result = model.convertISO8601DurationToMilliseconds('PT12H13M+17.08S');
+        expect(result).toBe(43997080);
+    });
+    it('converts PT23M to 1,380,000 milliseconds', () => {
+        const model = new DinghyRacingModel(rootURL);
+        const result = model.convertISO8601DurationToMilliseconds('PT23M');
+        expect(result).toBe(1380000);
+    });
+    it('converts PT1H15M to 4,500,000 milliseconds', () => {
+        const model = new DinghyRacingModel(rootURL);
+        const result = model.convertISO8601DurationToMilliseconds('PT1H15M');
+        expect(result).toBe(4500000);
+    });
+    it('throws error on -PT1H', () => {
+        const model = new DinghyRacingModel(rootURL);
+        expect(() => {
+            const result = model.convertISO8601DurationToMilliseconds('-PT1H');
+        }).toThrow(TypeError);
+    });
+    it('throws error on P1YT1H13M', () => {
+        const model = new DinghyRacingModel(rootURL);
+        expect(() => {
+            const result = model.convertISO8601DurationToMilliseconds('P1YT1H13M');
+        }).toThrow(TypeError);
+    });
+    it('throws error on P1DT12H13M', () => {
+        const model = new DinghyRacingModel(rootURL);
+        expect(() => {
+            const result = model.convertISO8601DurationToMilliseconds('P1DT12H13M');
+        }).toThrow(TypeError);
+    });
+    it('throws error on P1MT12H13M', () => {
+        const model = new DinghyRacingModel(rootURL);
+        expect(() => {
+            const result = model.convertISO8601DurationToMilliseconds('P1MT12H13M');
+        }).toThrow(TypeError);
+    });
+    it('throws error on P1WT12H13M', () => {
+        const model = new DinghyRacingModel(rootURL);
+        expect(() => {
+            const result = model.convertISO8601DurationToMilliseconds('P1WT12H13M');
+        }).toThrow(TypeError);
+    });
+    it('throws error on PT12H13', () => {
+        const model = new DinghyRacingModel(rootURL);
+        expect(() => {
+            const result = model.convertISO8601DurationToMilliseconds('PT12H13');
+        }).toThrow(TypeError);
+    });
+    it('throws error on PT12H13M12', () => {
+        const model = new DinghyRacingModel(rootURL);
+        expect(() => {
+            const result = model.convertISO8601DurationToMilliseconds('PT12H13M12');
+        }).toThrow(TypeError);
+    });
+    it('throws error on PT12', () => {
+        const model = new DinghyRacingModel(rootURL);
+        expect(() => {
+            const result = model.convertISO8601DurationToMilliseconds('PT12');
+        }).toThrow(TypeError);
+    });
+})

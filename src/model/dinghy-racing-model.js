@@ -30,7 +30,7 @@ class DinghyRacingModel {
      * @returns {Race}
      */
     static raceTemplate() {
-        return {'name': '', 'time': null,  'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'url': ''};
+        return {'name': '', 'time': null,  'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'url': ''};
     }
 
     /**
@@ -387,7 +387,7 @@ class DinghyRacingModel {
             }
             if (dinghyClassResult.success) {
                 return Promise.resolve({'success': true, 'domainObject': {...DinghyRacingModel.raceTemplate(), 'name': result.domainObject.name, 'time': new Date(result.domainObject.plannedStartTime + 'Z'), 
-                'dinghyClass': dinghyClassResult.domainObject, 'url': result.domainObject._links.self.href}});
+                'dinghyClass': dinghyClassResult.domainObject, 'duration': this.convertISO8601DurationToMilliseconds(result.domainObject.duration), 'url': result.domainObject._links.self.href}});
             }
             else {
                 return Promise.resolve(dinghyClassResult);
@@ -417,7 +417,7 @@ class DinghyRacingModel {
                 const dinghyClass = dinghyClassResults[i].success ? {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassResults[i].domainObject.name, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
                 // assume time received has been stored in UTC
                 races.push({...DinghyRacingModel.raceTemplate(), 'name': racesHAL[i].name, 'time': new Date(racesHAL[i].plannedStartTime + 'Z'), 
-                    'dinghyClass': dinghyClass, 'url': racesHAL[i]._links.self.href});
+                    'dinghyClass': dinghyClass, 'duration': this.convertISO8601DurationToMilliseconds(racesHAL[i].duration), 'url': racesHAL[i]._links.self.href});
             };
             return Promise.resolve({'success': true, 'domainObject': races});
         }
@@ -582,6 +582,32 @@ class DinghyRacingModel {
         catch (error) {
             return Promise.resolve({'success': false, 'message': error.toString()});
         }        
+    }
+
+    /**
+     * Convert a duration into milliseconds
+     * Format of duration is based on ISO 8601 duration format; with further restrictions on expected values.
+     * Overall period is expected to be positive.
+     * Duration provided by REST service is expected to be in positive time units (hours, minutes, seconds); no year, month, or day units.
+     * If format ore range is not as expected throws a TypeException error.
+     * @param {String} duration
+     * @returns {Number}
+     */
+    convertISO8601DurationToMilliseconds(duration) {
+        const match = /(^|\+)[Pp][Tt](\+?(\d+)[Hh])?(\+?(\d+)[Mm])?(\+?(\d+([.,]\d+)?)[Ss])?$/.exec(duration);
+        // check id duration is a valid ISO 801 duration format
+        if (!match) {
+            throw new TypeError('Duration not in expected format or range. ISO 8601 format, positive time values only expected.');
+        }
+        // get hour component (group 3)
+        const hourMS = match[3] ? match[3] * 3600000 : 0;
+        // get minute component (group 5)
+        const minuteMS = match[5] ? match[5] * 60000 : 0;
+        // get second component (group 7)
+        const secondDuration = /,/.test(match[7]) ? match[7].replace(',', '.') : match[7];
+        const secondMS =  secondDuration ? secondDuration * 1000 : 0;
+
+        return hourMS + minuteMS + secondMS;
     }
 }
 
