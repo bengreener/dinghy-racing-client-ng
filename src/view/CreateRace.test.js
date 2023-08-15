@@ -14,9 +14,11 @@ it('renders', () => {
     customRender(<CreateRace />, model);
     const inputName = screen.getByLabelText(/name/i);
     const inputTime = screen.getByLabelText(/time/i);
+    const inputDuration = screen.getByLabelText(/duration/i);
     const selectRaceClass = screen.getByLabelText(/class/i);
     expect(inputName).toBeInTheDocument();
     expect(inputTime).toBeInTheDocument();
+    expect(inputDuration).toBeInTheDocument();
     expect(selectRaceClass).toBeInTheDocument();
 })
 
@@ -73,6 +75,21 @@ it('accepts the class for the race', async () => {
     expect(selectRaceClass).toHaveValue('Scorpion');
 })
 
+it('accepts the duration of the race', async () => {
+    const user = userEvent.setup();
+
+    const model = new DinghyRacingModel(rootURL);
+    jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
+    customRender(<CreateRace />, model);
+    const inputDuration = screen.getByLabelText(/duration/i);
+    await act(async () => {
+        await user.clear(inputDuration);
+        await user.type(inputDuration, '65');
+    });
+    
+    expect(inputDuration).toHaveValue(65);
+})
+
 it('calls the function passed in to onCreate prop', async () => {
     const user = userEvent.setup();
     const fnOnCreate = jest.fn((race) => {return {'success': true}});
@@ -97,6 +114,7 @@ it('calls the function passed in to onCreate prop with new race as parameter', a
     customRender(<CreateRace onCreate={fnOnCreate} />, model);
     const inputName = screen.getByLabelText(/name/i);
     const inputTime = screen.getByLabelText(/time/i);
+    const inputDuration = screen.getByLabelText(/duration/i);
     const selectRaceClass = screen.getByLabelText(/class/i);
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
     await screen.findAllByRole('option'); // wait for dinghy class options to be built
@@ -104,11 +122,13 @@ it('calls the function passed in to onCreate prop with new race as parameter', a
         await user.type(inputName, 'Scorpion A');
         await user.clear(inputTime); // clear input to avoid errors when typing in new value
         await user.type(inputTime, '2020-05-12T12:30');
+        await user.clear(inputDuration);
+        await user.type(inputDuration, '65');
         await user.selectOptions(selectRaceClass, 'Scorpion');
         await user.click(btnCreate);
     });
 
-    expect(fnOnCreate).toBeCalledWith({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'time': new Date('2020-05-12T12:30'), 'dinghyClass': dinghyClassScorpion});
+    expect(fnOnCreate).toBeCalledWith({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'time': new Date('2020-05-12T12:30'), 'dinghyClass': dinghyClassScorpion, 'duration': 3900000});
 });
 
 describe('when creating a new race', () => {
@@ -123,17 +143,21 @@ describe('when creating a new race', () => {
         customRender(<CreateRace onCreate={fnOnCreate} />, model);
         const inputName = screen.getByLabelText(/name/i);
         const inputTime = screen.getByLabelText(/time/i);
+        const inputDuration = screen.getByLabelText(/duration/i);
         const inputDinghyClass = screen.getByLabelText(/class/i);
         const btnCreate = screen.getByRole('button', {'name': 'Create'});
         await act(async () => {
             await user.type(inputName, 'Scorpion A');
             await user.type(inputTime, '2020-05-12T12:30');
+            await user.clear(inputDuration);
+            await user.type(inputDuration, '65');
             await user.type(inputDinghyClass, 'Scorpion');
             await user.click(btnCreate);
         });
     
         expect(inputName).toHaveValue('');
         expect(inputTime).toHaveValue(new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16));
+        expect(inputDuration).toHaveValue(45);
         expect(inputDinghyClass).toHaveValue('');
     })
     it('displays the failure message on failure', async () => {

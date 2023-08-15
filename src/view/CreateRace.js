@@ -5,13 +5,13 @@ import ModelContext from './ModelContext';
 
 function CreateRace({ onCreate }) {
     const model = useContext(ModelContext);
-    const [race, setRace] = React.useState({...DinghyRacingModel.raceTemplate(), 'time': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16)});
+    const [race, setRace] = React.useState({...DinghyRacingModel.raceTemplate(), 'time': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000});
     const [result, setResult] = React.useState({'message': ''});
     const [dinghyClassMap, setDinghyClassMap] = React.useState(new Map());
     const [dinghyClassOptions, setDinghyClassOptions] = React.useState([]);
 
     const clear = React.useCallback(() => {
-        setRace({...DinghyRacingModel.raceTemplate(), 'time': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16)});
+        setRace({...DinghyRacingModel.raceTemplate(), 'time': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000});
         showMessage('');
     }, []);
 
@@ -54,11 +54,14 @@ function CreateRace({ onCreate }) {
     }
 
     function handleChange({target}) {
-        if (target.name !== 'dinghyClass') {
-            setRace({...race, [target.name]: target.value});
+        if (target.name === 'dinghyClass') {
+            setRace({...race, 'dinghyClass': dinghyClassMap.get(target.value)});
+        }
+        else if (target.name === 'duration') {
+            setRace({...race, [target.name]: target.value * 60000});
         }
         else {
-            setRace({...race, 'dinghyClass': dinghyClassMap.get(target.value)});
+            setRace({...race, [target.name]: target.value});
         }
     }
 
@@ -73,6 +76,8 @@ function CreateRace({ onCreate }) {
             <input id="race-name-input" name="name" type="text" onChange={handleChange} value={race.name} />
             <label htmlFor="race-time-input">Race Time</label>
             <input id="race-time-input" name="time" type="datetime-local" onChange={handleChange} value={race.time} />
+            <label htmlFor="race-duration-input">Duration</label>
+            <input id="race-duration-input" name="duration" type="number" onChange={handleChange} value={race.duration / 60000} />
             <label htmlFor="race-class-select">Race Class</label>
             <select id="race-class-select" name="dinghyClass" multiple={false} onChange={handleChange} value={race.dinghyClass ? race.dinghyClass.name : ''} >{dinghyClassOptions}</select>
             <output id="race-message-output" />
