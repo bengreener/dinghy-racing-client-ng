@@ -180,7 +180,8 @@ class DinghyRacingModel {
         }
 
         // convert local race domain type into format required by REST service
-        const newRace = {...race, 'plannedStartTime': race.time, 'dinghyClass': dinghyClassURL};
+        // REST service will accept a value in ISO 8601 format (time units only PT[n]H[n]M,n]S) or in seconds
+        const newRace = {...race, 'plannedStartTime': race.time, 'dinghyClass': dinghyClassURL, 'duration': race.duration / 1000};
         return this.create('races', newRace);
     }
 
