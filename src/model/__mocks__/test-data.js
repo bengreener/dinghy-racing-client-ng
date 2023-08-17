@@ -64,7 +64,7 @@ const raceNoClass = { 'name': 'No Class', 'time': new Date('2023-02-14T18:26:00Z
 const races = [raceScorpionA, raceGraduateA, raceNoClass];
 
 const entriesScorpionA = [{'competitor': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234,'url': 'http://localhost:8081/dinghyracing/api/entries/10'},{'competitor': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745,'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
-
+const entryChrisMarshallScorpionA1234 = {'competitor': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234,'url': 'http://localhost:8081/dinghyracing/api/entries/10'};
 export {
 	rootURL,
 	
@@ -94,5 +94,5 @@ export {
 
 	races, raceScorpionA, raceGraduateA, raceNoClass,
 
-	entriesScorpionA
+	entriesScorpionA, entryChrisMarshallScorpionA1234
 }
