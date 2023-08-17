@@ -48,8 +48,8 @@ function RaceConsole() {
             <label htmlFor="race-duration">Duration</label>
             <output id="race-duration">{new Date(0, 0, 0, 0, 0, selectedRace.duration / 1000).toLocaleTimeString()}</output>
             <p id="race-console-message">{message}</p>
-            <RaceEntriesView race={selectedRace} />
             <button id="race-start-button" onClick={handleStartRaceClick}>Start Race</button>
+            <RaceEntriesView race={selectedRace} />
         </>
     );
 }
