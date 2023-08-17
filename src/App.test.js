@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import App from './App';
 import DinghyRacingController from './controller/dinghy-racing-controller';
 import DinghyRacingModel from './model/dinghy-racing-model';
-import { rootURL, dinghyClasses, races } from './model/__mocks__/test-data';
+import { rootURL, dinghyClasses, races, entriesScorpionA } from './model/__mocks__/test-data';
 
 jest.mock('./controller/dinghy-racing-controller');
 jest.mock('./model/dinghy-racing-model');
@@ -84,6 +84,7 @@ describe('when race console button is clicked', ()  => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(rootURL);
     jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
     const dinghyRacingController = new DinghyRacingController(model);
 
     render(<App model={model} controller={dinghyRacingController} />);
