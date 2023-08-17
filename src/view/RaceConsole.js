@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
 import ControllerContext from './ControllerContext';
 import DinghyRacingModel from '../model/dinghy-racing-model';
+import RaceEntriesView from './RaceEntriesView';
 
 function RaceConsole() {
     const model = useContext(ModelContext);
@@ -47,6 +48,7 @@ function RaceConsole() {
             <label htmlFor="race-duration">Duration</label>
             <output id="race-duration">{new Date(0, 0, 0, 0, 0, selectedRace.duration / 1000).toLocaleTimeString()}</output>
             <p id="race-console-message">{message}</p>
+            <RaceEntriesView race={selectedRace} />
             <button id="race-start-button" onClick={handleStartRaceClick}>Start Race</button>
         </>
     );
