@@ -22,7 +22,7 @@ function RaceEntriesView({race}) {
     return (
         <table id="race-entries-table">
             <tbody>
-            {entries.map(entry => <RaceEntryView entry={entry} />)}
+            {entries.map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name} entry={entry} />)}
             </tbody>
         </table>
     );
