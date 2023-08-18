@@ -17,7 +17,7 @@ function RaceEntriesView({race}) {
                 setEntries(result.domainObject);
             }
         })
-    })
+    }, [race]);
 
     return (
         <table id="race-entries-table">
