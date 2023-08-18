@@ -1,9 +1,10 @@
 import React from 'react';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useCallback } from 'react';
 import ModelContext from './ModelContext';
 import ControllerContext from './ControllerContext';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import RaceEntriesView from './RaceEntriesView';
+import Clock from '../model/domain-classes/clock';
 
 function RaceConsole() {
     const model = useContext(ModelContext);
@@ -12,7 +13,14 @@ function RaceConsole() {
     const [raceOptions, setRaceOptions] = useState([]);
     const [raceMap, setRaceMap] = useState(new Map());
     const [message, setMessage] = useState('');
+    const [clock, setClock] = useState(new Clock());
 
+    const tickHandler = useCallback(() => {
+        // TODO: update display or something on tick
+    }, [clock]);
+    
+    clock.addTickHandler(tickHandler);
+    
     useEffect(() => {
         model.getRacesOnOrAfterTime(new Date()).then(result => {
             if (!result.success) {
@@ -39,6 +47,7 @@ function RaceConsole() {
 
     function handleStartRaceClick() {
         controller.startRace(selectedRace);
+        clock.start();
     }
 
     return (
