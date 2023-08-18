@@ -3,32 +3,20 @@ class Clock {
     _elapsedTime = 0;
     _tickHandler;
     _ticker;
-    
-    constructor() {
-        if (window.Worker) {
-            this._ticker = new Worker('./modules/tick-worker.js');
-            this._ticker.onmessage = function(event) {
-                if (this._tickHandler) {
-                    this.tickHandler();
-                }
-            }
-        }
-        else {
-            console.log(`clock: Your browser does not support web workers.`)
-        }
-    }
-    
+        
     start() {
         this._startTime = Date.now();
-        if (this._tickHandler) {
-            this._ticker.postMessage('start');
-        }
+        this._ticker = setInterval(() => {
+            if (this._tickHandler) {
+                this._tickHandler();
+            };
+        }, 1000);
     }
-    
+
     stop() {
+        clearInterval(this._ticker);
         this._elapsedTime = this._elapsedTime + Date.now() - this._startTime;
         this._startTime = null;
-        this._ticker.postMessage('stop');
     }
     
     reset() {
@@ -53,6 +41,8 @@ class Clock {
     removeTickHandler() {
         this._tickHandler = null;
     }
+
+
     
     
 }

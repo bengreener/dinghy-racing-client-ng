@@ -1,6 +1,3 @@
-// JSDOM does not support background workers. Should be possible to mock a workaround based on jsdom-worker
-// import 'jsdom-worker'; // this didn't work error reported node:http using import outside module
-
 import Clock from './clock';
 
 it('starts', () => {
@@ -8,37 +5,33 @@ it('starts', () => {
     clock.start();
     // sleep thread and then check time is as expected
     // TODO: thread sleep for 1000 milliseconds
-    const elapsed = clock._elapsedTime;
-    expect(elapsed).toBe(1000);
+    setTimeout(() => {
+        const elapsed = clock.getElapsedTime();
+    expect(elapsed).toBe(1000);    
+    }, 1000);
 });
 
 it('stops', () => {
     const clock = new Clock();
     clock.start();
-    // sleep thread and then check time is as expected
-    // TODO: thread sleep for 1000 milliseconds
-    clock.stop();
-    const elapsed = clock._elapsedTime;
-    // TODO: thread sleep for 1000 milliseconds
-    expect(clock._elapsedTime).toBe(elapsed);
+    setTimeout(() => {
+        clock.stop();
+        const elapsed = clock.getElapsedTime();
+    }, 1000);
+    // const elapsed = clock.getElapsedTime();
+    setTimeout(() => {
+        expect(clock.getElapsedTime()).toBe(elapsed);
+    }, 10);
 });
 
 it('resets', () => {
     const clock = new Clock();
     clock.start();
-    // TODO: thread sleep for 1000 milliseconds
-    clock.stop();
+    setTimeout(() => {
+        clock.stop();
+    }, 1000);
     clock.reset();
-    expect(clock._elapsedTime).toBe(0);
-});
-
-it('returns elapsed time', () => {
-    const clock = new Clock();
-    clock.start();
-    // sleep thread and then check time is as expected
-    // TODO: thread sleep for 1000 milliseconds
-    const elapsed = clock.getElapsedTime();
-    expect(elapsed).toBe(1000);
+    expect(clock.getElapsedTime()).toBe(0);
 });
 
 it('calls handler on tick', () => {
@@ -47,6 +40,7 @@ it('calls handler on tick', () => {
     const clock = new Clock();
     clock.addTickHandler(handler);
     clock.start();
-    // TODO:  thread sleep for 10 milliseconds
-    expect(handler).toBeCalledTimes(10);
+    setTimeout(() => {
+        expect(handler).toBeCalledTimes(10);
+    }, 10);
 });
