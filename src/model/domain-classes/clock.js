@@ -21,7 +21,7 @@ class Clock {
     
     reset() {
         if (this._startTime) {
-            this. _startTime = Date.now();
+            this._startTime = Date.now();
         }
         this._elapsedTime = 0;
     }
