@@ -264,7 +264,6 @@ describe('when creating a new race', () => {
         fetch.mockImplementationOnce((resource, options) => {
             // check format of data passed to fetch to reduce risk of false positive
             if(options.body !== '{"name":"Scorpion A","time":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700,"url":"","plannedStartTime":"2021-10-14T14:10:00.000Z"}') {
-                console.log(options.body);
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
