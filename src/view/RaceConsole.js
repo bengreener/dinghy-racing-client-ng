@@ -13,11 +13,12 @@ function RaceConsole() {
     const [raceOptions, setRaceOptions] = useState([]);
     const [raceMap, setRaceMap] = useState(new Map());
     const [message, setMessage] = useState('');
-    const [clock, setClock] = useState(new Clock());
+    const [clock] = useState(new Clock());
 
     const tickHandler = useCallback(() => {
         // TODO: update display or something on tick
-    }, [clock]);
+        console.log('tick');
+    }, []);
     
     clock.addTickHandler(tickHandler);
     
@@ -50,6 +51,10 @@ function RaceConsole() {
         clock.start();
     }
 
+    function handleStopRaceClick() {
+        clock.stop();
+    }
+
     return (
         <>
             <label htmlFor="race-select">Select Race</label>
@@ -58,6 +63,7 @@ function RaceConsole() {
             <output id="race-duration">{new Date(0, 0, 0, 0, 0, selectedRace.duration / 1000).toLocaleTimeString()}</output>
             <p id="race-console-message">{message}</p>
             <button id="race-start-button" onClick={handleStartRaceClick}>Start Race</button>
+            <button id="race-start-button" onClick={handleStopRaceClick}>Stop Race</button>
             <RaceEntriesView race={selectedRace} />
         </>
     );

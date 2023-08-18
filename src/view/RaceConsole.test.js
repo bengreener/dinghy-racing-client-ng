@@ -89,6 +89,23 @@ describe('when a race is selected', () => {
         await user.click(buttonStart);
         expect(controllerStartRaceSpy).toBeCalledWith(raceScorpionA);
     });
+    it('stops the selected race', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(rootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    
+        customRender(<RaceConsole />, model, controller);
+        const selectRace = await screen.findByLabelText(/Race/i);
+        await screen.findAllByRole('option');
+        await user.selectOptions(selectRace, 'Scorpion A');
+        
+        const buttonStart = screen.getByText(/start/i);
+        const buttonStop = screen.getByText(/stop/i);
+        await user.click(buttonStart);
+        await user.click(buttonStop);
+    });
     it('displays the entries for the selected race', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(rootURL);
