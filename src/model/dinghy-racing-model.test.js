@@ -1091,10 +1091,16 @@ it('provides a blank template for a race', () => {
 });
 
 it('provides a blank template for a race entry', () => {
-    const race = DinghyRacingModel.entryTemplate();
+    const entry = DinghyRacingModel.entryTemplate();
 
-    expect(race).toEqual({'race': DinghyRacingModel.raceTemplate(), 'competitor': DinghyRacingModel.competitorTemplate(), 'dinghy': DinghyRacingModel.dinghyTemplate(), 'url': ''});
+    expect(entry).toEqual({'race': DinghyRacingModel.raceTemplate(), 'competitor': DinghyRacingModel.competitorTemplate(), 'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [],'url': ''});
 });
+
+it('provides a blank template for a lap', () => {
+    const lap = DinghyRacingModel.lapTemplate();
+
+    expect(lap).toEqual({'number': null, 'time': 0});
+})
 
 describe('when searching for entries by race', () => {
     it('returns a promise that resolves to a result indicating success and containing the entries when entries are found', async () => {
