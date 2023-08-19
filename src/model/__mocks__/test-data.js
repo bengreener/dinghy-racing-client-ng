@@ -63,8 +63,8 @@ const raceGraduateA = { 'name': 'Graduate A', 'time' : new Date('2021-10-14T10:3
 const raceNoClass = { 'name': 'No Class', 'time': new Date('2023-02-14T18:26:00Z'), 'dinghyClass': null, 'duration': 2700000, 'url': 'http://localhost:8081/dinghyracing/api/races/8' };
 const races = [raceScorpionA, raceGraduateA, raceNoClass];
 
-const entriesScorpionA = [{'competitor': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234,'url': 'http://localhost:8081/dinghyracing/api/entries/10'},{'competitor': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745,'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
-const entryChrisMarshallScorpionA1234 = {'competitor': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234,'url': 'http://localhost:8081/dinghyracing/api/entries/10'};
+const entriesScorpionA = [{'competitor': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},{'competitor': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
+const entryChrisMarshallScorpionA1234 = {'competitor': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'};
 export {
 	rootURL,
 	
