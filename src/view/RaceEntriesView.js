@@ -10,18 +10,24 @@ function RaceEntriesView({race, clock}) {
 
     // get entries
     useEffect(() => {
-        model.getEntriesByRace(race).then(result => {
-            if (!result.success) {
-                setMessage('Unable to load entries\n' + result.message);
-            }
-            else {
-                const entriesMap = new Map();
-                result.domainObject.forEach(entry => {
-                    entriesMap.set(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name, entry) ;
-                });
-                setEntriesMap(entriesMap);
-            }
-        })
+        // if a blank race template provided then skip lookup and show no entries
+        if (!race || (!race.name && !race.url)) {
+            setEntriesMap(new Map());
+        }
+        else {
+            model.getEntriesByRace(race).then(result => {
+                if (!result.success) {
+                    setMessage('Unable to load entries\n' + result.message);
+                }
+                else {
+                    const entriesMap = new Map();
+                    result.domainObject.forEach(entry => {
+                        entriesMap.set(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name, entry) ;
+                    });
+                    setEntriesMap(entriesMap);
+                }
+            })
+        }
     }, [model, race]);
 
     function setLap(entry) {
@@ -29,11 +35,14 @@ function RaceEntriesView({race, clock}) {
     }
 
     return (
+        <>
+        <p id="race-console-message">{message}</p>
         <table id="race-entries-table">
             <tbody>
             {Array.from(entriesMap.values()).map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name} entry={entry} onClick={(setLap)}/>)}
             </tbody>
         </table>
+        </>
     );
 }
 
