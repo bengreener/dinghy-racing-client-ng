@@ -3,32 +3,37 @@ import ModelContext from './ModelContext';
 import RaceEntryView from './RaceEntryView';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 
-function RaceEntriesView({race, clock}) {
+function RaceEntriesView({races, clock}) {
     const model = useContext(ModelContext);
     const [entriesMap, setEntriesMap] = useState(new Map());
     const [message, setMessage] = useState('');
 
     // get entries
     useEffect(() => {
-        // if a blank race template provided then skip lookup and show no entries
-        if (!race || (!race.name && !race.url)) {
-            setEntriesMap(new Map());
-        }
-        else {
-            model.getEntriesByRace(race).then(result => {
+        const entriesMap = new Map();
+        // build promises
+        const promises = races.map(race => {
+            if (!race || (!race.name && !race.url)) {
+                return Promise.resolve({'success': true, 'domainObject': new Map()});
+            }
+            else {
+                return model.getEntriesByRace(race);
+            }
+        });
+        Promise.all(promises).then(results => {
+            results.forEach(result => {
                 if (!result.success) {
                     setMessage('Unable to load entries\n' + result.message);
                 }
                 else {
-                    const entriesMap = new Map();
                     result.domainObject.forEach(entry => {
                         entriesMap.set(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name, entry) ;
                     });
-                    setEntriesMap(entriesMap);
                 }
-            })
-        }
-    }, [model, race]);
+            });
+            setEntriesMap(entriesMap);
+        });
+    }, [model, races]);
 
     function setLap(entry) {
         entriesMap.get(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name).laps.push({...DinghyRacingModel.lapTemplate(), 'number': entry.laps.length + 1, 'time': clock.getElapsedTime()});
