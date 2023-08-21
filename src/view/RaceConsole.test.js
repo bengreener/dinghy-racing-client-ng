@@ -1,7 +1,7 @@
 import { customRender } from '../test-utilities/custom-renders';import userEvent from '@testing-library/user-event';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import RaceConsole from './RaceConsole';
-import { rootURL, racesCollectionHAL, races, raceScorpionA, entriesScorpionA } from '../model/__mocks__/test-data';
+import { rootURL, dinghyClassScorpion, racesCollectionHAL, races, raceScorpionA, entriesScorpionA } from '../model/__mocks__/test-data';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 
@@ -124,5 +124,61 @@ describe('when a race is selected', () => {
         const entry2 = await screen.findByText(/Scorpion 6745 Sarah Pascal/i);
         expect(entry1).toBeInTheDocument();
         expect(entry2).toBeInTheDocument();
+    });
+    it('shows the remaining time', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(rootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+
+        customRender(<RaceConsole />, model, controller);
+        const selectRace = await screen.findByLabelText(/Race/i);
+        const outputRemaining = screen.getByLabelText(/remaining/i)
+        await screen.findAllByRole('option');
+        await user.selectOptions(selectRace, 'Scorpion A');
+        expect(outputRemaining).toHaveValue('00:45:00');
+    })
+});
+
+describe('when a race has been started', () => {
+    it('updates the remaining time field to show the time remaining', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(rootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+        jest.spyOn(controller, 'startRace').mockImplementation(() => {return Promise.resolve({'success': true})});;
+    
+        customRender(<RaceConsole />, model, controller);
+        const selectRace = await screen.findByLabelText(/Race/i);
+        const outputRemaining = screen.getByLabelText(/remaining/i)
+
+        await screen.findAllByRole('option');
+        await user.selectOptions(selectRace, 'Scorpion A');
+        const buttonStart = screen.getByText(/start/i);
+        await user.click(buttonStart);
+        await waitFor(() => expect(outputRemaining).toHaveValue('00:44:58'), {'timeout': 5000});
+    });
+    it('updates the time field correcyly after race duration has completely run down', async () => {
+        const raceScorpionA = { 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00Z'), 'dinghyClass': dinghyClassScorpion, 'duration': -3797900, 'url': 'http://localhost:8081/dinghyracing/api/races/4' };
+        const races = [raceScorpionA];
+
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(rootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+        jest.spyOn(controller, 'startRace').mockImplementation(() => {return Promise.resolve({'success': true})});;
+    
+        customRender(<RaceConsole />, model, controller);
+        const selectRace = await screen.findByLabelText(/Race/i);
+        const outputRemaining = screen.getByLabelText(/remaining/i)
+
+        await screen.findAllByRole('option');
+        await user.selectOptions(selectRace, 'Scorpion A');
+        const buttonStart = screen.getByText(/start/i);
+        await user.click(buttonStart);
+        await waitFor(() => expect(outputRemaining).toHaveValue('-01:03:19'), {'timeout': 5000});
     });
 });

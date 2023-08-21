@@ -14,11 +14,11 @@ function RaceConsole() {
     const [raceMap, setRaceMap] = useState(new Map());
     const [message, setMessage] = useState('');
     const [clock] = useState(new Clock());
+    const [remainingTime, setRemainingTime] = useState(0);
 
     const tickHandler = useCallback(() => {
-        // TODO: update display or something on tick
-        console.log('tick');
-    }, []);
+        setRemainingTime(selectedRace.duration - clock.getElapsedTime());
+    }, [clock, selectedRace.duration]);
     
     clock.addTickHandler(tickHandler);
     
@@ -43,7 +43,9 @@ function RaceConsole() {
 
     function handleRaceSelect(event) {
         event.preventDefault();
-        setSelectedRace(raceMap.get(event.target.value));
+        const race = raceMap.get(event.target.value);
+        setSelectedRace(race);
+        setRemainingTime(race.duration);
     }
 
     function handleStartRaceClick() {
@@ -55,12 +57,30 @@ function RaceConsole() {
         clock.stop();
     }
 
+    /**
+     * Formats a duration in milliseconds into a string; format hh:mm:ss
+     * @param {Number} duration Duration in milliseconds
+     * @returns {String}
+     */
+    function formatDuration(duration) {
+        const d = Math.abs(duration);
+        const hours = Math.floor(d / 3600000);
+        const minutes = Math.floor((d % 3600000) / 60000);
+        const seconds = Math.round((d % 60000) / 1000);
+        const formatHours = hours < 10 ? '0' + hours : hours;
+        const formatMinutes = minutes < 10 ? '0' + minutes : minutes;
+        const formatSeconds = seconds < 10 ? '0' + seconds : seconds;
+        return ((duration < 0 ? '-' : '') + formatHours + ':' + formatMinutes + ':' + formatSeconds);
+    }
+
     return (
         <>
             <label htmlFor="race-select">Select Race</label>
             <select id="race-select" name="race" onChange={handleRaceSelect}>{raceOptions}</select>
             <label htmlFor="race-duration">Duration</label>
-            <output id="race-duration">{new Date(0, 0, 0, 0, 0, selectedRace.duration / 1000).toLocaleTimeString()}</output>
+            <output id="race-duration">{formatDuration(selectedRace.duration)}</output>
+            <label htmlFor="race-duration-remaining">Remaining</label>
+            <output id="race-duration-remaining">{formatDuration(remainingTime)}</output>
             <p id="race-console-message">{message}</p>
             <button id="race-start-button" onClick={handleStartRaceClick}>Start Race</button>
             <button id="race-start-button" onClick={handleStopRaceClick}>Stop Race</button>
