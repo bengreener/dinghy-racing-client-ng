@@ -264,7 +264,6 @@ describe('when creating a new race', () => {
         fetch.mockImplementationOnce((resource, options) => {
             // check format of data passed to fetch to reduce risk of false positive
             if(options.body !== '{"name":"Scorpion A","time":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700,"url":"","plannedStartTime":"2021-10-14T14:10:00.000Z"}') {
-                console.log(options.body);
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -1092,10 +1091,16 @@ it('provides a blank template for a race', () => {
 });
 
 it('provides a blank template for a race entry', () => {
-    const race = DinghyRacingModel.entryTemplate();
+    const entry = DinghyRacingModel.entryTemplate();
 
-    expect(race).toEqual({'race': DinghyRacingModel.raceTemplate(), 'competitor': DinghyRacingModel.competitorTemplate(), 'dinghy': DinghyRacingModel.dinghyTemplate(), 'url': ''});
+    expect(entry).toEqual({'race': DinghyRacingModel.raceTemplate(), 'competitor': DinghyRacingModel.competitorTemplate(), 'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [],'url': ''});
 });
+
+it('provides a blank template for a lap', () => {
+    const lap = DinghyRacingModel.lapTemplate();
+
+    expect(lap).toEqual({'number': null, 'time': 0});
+})
 
 describe('when searching for entries by race', () => {
     it('returns a promise that resolves to a result indicating success and containing the entries when entries are found', async () => {

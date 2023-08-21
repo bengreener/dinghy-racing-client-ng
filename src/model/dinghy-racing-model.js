@@ -37,7 +37,14 @@ class DinghyRacingModel {
      * Provide a blank entry template
      */
     static entryTemplate() {
-        return {'race': DinghyRacingModel.raceTemplate(), 'competitor': DinghyRacingModel.competitorTemplate(), 'dinghy': DinghyRacingModel.dinghyTemplate(), 'url': ''};
+        return {'race': DinghyRacingModel.raceTemplate(), 'competitor': DinghyRacingModel.competitorTemplate(), 'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'url': ''};
+    }
+
+    /**
+     * Provide a blank lap template
+     */
+    static lapTemplate() {
+        return {'number': null, 'time': 0};
     }
 
     /**
@@ -366,7 +373,7 @@ class DinghyRacingModel {
             if(!dinghyResults[i].success) {
                 return Promise.resolve(dinghyResults[i]);
             }
-            entries.push({'race': raceResult.domainObject, 'competitor': competitorResults[i].domainObject, 'dinghy': dinghyResults[i].domainObject, 'url': entryCollectionHAL[i]._links.self.href});
+            entries.push({...DinghyRacingModel.entryTemplate(), 'race': raceResult.domainObject, 'competitor': competitorResults[i].domainObject, 'dinghy': dinghyResults[i].domainObject, 'url': entryCollectionHAL[i]._links.self.href});
         };
         return Promise.resolve({'success': true, 'domainObject': entries});
     }

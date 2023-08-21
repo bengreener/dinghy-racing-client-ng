@@ -1,8 +1,10 @@
 import React from 'react';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useCallback } from 'react';
 import ModelContext from './ModelContext';
 import ControllerContext from './ControllerContext';
 import DinghyRacingModel from '../model/dinghy-racing-model';
+import RaceEntriesView from './RaceEntriesView';
+import Clock from '../model/domain-classes/clock';
 
 function RaceConsole() {
     const model = useContext(ModelContext);
@@ -11,7 +13,15 @@ function RaceConsole() {
     const [raceOptions, setRaceOptions] = useState([]);
     const [raceMap, setRaceMap] = useState(new Map());
     const [message, setMessage] = useState('');
+    const [clock] = useState(new Clock());
 
+    const tickHandler = useCallback(() => {
+        // TODO: update display or something on tick
+        console.log('tick');
+    }, []);
+    
+    clock.addTickHandler(tickHandler);
+    
     useEffect(() => {
         model.getRacesOnOrAfterTime(new Date()).then(result => {
             if (!result.success) {
@@ -38,6 +48,11 @@ function RaceConsole() {
 
     function handleStartRaceClick() {
         controller.startRace(selectedRace);
+        clock.start();
+    }
+
+    function handleStopRaceClick() {
+        clock.stop();
     }
 
     return (
@@ -48,6 +63,8 @@ function RaceConsole() {
             <output id="race-duration">{new Date(0, 0, 0, 0, 0, selectedRace.duration / 1000).toLocaleTimeString()}</output>
             <p id="race-console-message">{message}</p>
             <button id="race-start-button" onClick={handleStartRaceClick}>Start Race</button>
+            <button id="race-start-button" onClick={handleStopRaceClick}>Stop Race</button>
+            <RaceEntriesView race={selectedRace} clock={clock} />
         </>
     );
 }
