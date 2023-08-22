@@ -75,7 +75,7 @@ function CreateRace({ onCreate }) {
             <label htmlFor="race-name-input">Race Name</label>
             <input id="race-name-input" name="name" type="text" onChange={handleChange} value={race.name} />
             <label htmlFor="race-time-input">Race Time</label>
-            <input id="race-time-input" name="time" type="datetime-local" onChange={handleChange} value={race.plannedStartTime} />
+            <input id="race-time-input" name="plannedStartTime" type="datetime-local" onChange={handleChange} value={race.plannedStartTime} />
             <label htmlFor="race-duration-input">Duration</label>
             <input id="race-duration-input" name="duration" type="number" onChange={handleChange} value={race.duration / 60000} />
             <label htmlFor="race-class-select">Race Class</label>
