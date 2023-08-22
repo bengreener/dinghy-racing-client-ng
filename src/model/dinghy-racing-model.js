@@ -30,7 +30,7 @@ class DinghyRacingModel {
      * @returns {Race}
      */
     static raceTemplate() {
-        return {'name': '', 'time': null,  'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'url': ''};
+        return {'name': '', 'plannedStartTime': null, 'actualStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'url': ''};
     }
 
     /**
@@ -188,7 +188,7 @@ class DinghyRacingModel {
 
         // convert local race domain type into format required by REST service
         // REST service will accept a value in ISO 8601 format (time units only PT[n]H[n]M,n]S) or in seconds
-        const newRace = {...race, 'plannedStartTime': race.time, 'dinghyClass': dinghyClassURL, 'duration': race.duration / 1000};
+        const newRace = {...race, 'dinghyClass': dinghyClassURL, 'duration': race.duration / 1000};
         return this.create('races', newRace);
     }
 
@@ -394,8 +394,9 @@ class DinghyRacingModel {
                 dinghyClassResult = {'success': true, 'domainObject': null};
             }
             if (dinghyClassResult.success) {
-                return Promise.resolve({'success': true, 'domainObject': {...DinghyRacingModel.raceTemplate(), 'name': result.domainObject.name, 'time': new Date(result.domainObject.plannedStartTime + 'Z'), 
-                'dinghyClass': dinghyClassResult.domainObject, 'duration': this.convertISO8601DurationToMilliseconds(result.domainObject.duration), 'url': result.domainObject._links.self.href}});
+                return Promise.resolve({'success': true, 'domainObject': {...DinghyRacingModel.raceTemplate(), 'name': result.domainObject.name, 'plannedStartTime': new Date(result.domainObject.plannedStartTime + 'Z'), 
+                    'actualStartTime': result.domainObject.actualStartTime ? new Date(result.domainObject.actualStartTime + 'Z') : null, 
+                    'dinghyClass': dinghyClassResult.domainObject, 'duration': this.convertISO8601DurationToMilliseconds(result.domainObject.duration), 'url': result.domainObject._links.self.href}});
             }
             else {
                 return Promise.resolve(dinghyClassResult);
@@ -424,7 +425,8 @@ class DinghyRacingModel {
             for (let i = 0; i < racesHAL.length; i++  ) {
                 const dinghyClass = dinghyClassResults[i].success ? {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassResults[i].domainObject.name, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
                 // assume time received has been stored in UTC
-                races.push({...DinghyRacingModel.raceTemplate(), 'name': racesHAL[i].name, 'time': new Date(racesHAL[i].plannedStartTime + 'Z'), 
+                races.push({...DinghyRacingModel.raceTemplate(), 'name': racesHAL[i].name, 'plannedStartTime': new Date(racesHAL[i].plannedStartTime + 'Z'), 
+                    'actualStartTime': racesHAL[i].actualStartTime ? new Date(racesHAL[i].actualStartTime + 'Z') : null, 
                     'dinghyClass': dinghyClass, 'duration': this.convertISO8601DurationToMilliseconds(racesHAL[i].duration), 'url': racesHAL[i]._links.self.href});
             };
             return Promise.resolve({'success': true, 'domainObject': races});
@@ -455,7 +457,7 @@ class DinghyRacingModel {
         let result;
         // need URL for race
         if (!race.url) {
-            result = await this.getRaceByNameAndPlannedStartTime(race.name, race.time);
+            result = await this.getRaceByNameAndPlannedStartTime(race.name, race.plannedStartTime);
         }
         else {
             result = {'success': true, 'domainObject': race};
@@ -463,7 +465,7 @@ class DinghyRacingModel {
         if (result.success) {
             return this.update(result.domainObject.url, {'actualStartTime': startTime});
         }
-        else {
+        else { 
             return result;
         }
     }

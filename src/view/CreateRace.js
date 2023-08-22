@@ -5,13 +5,13 @@ import ModelContext from './ModelContext';
 
 function CreateRace({ onCreate }) {
     const model = useContext(ModelContext);
-    const [race, setRace] = React.useState({...DinghyRacingModel.raceTemplate(), 'time': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000});
+    const [race, setRace] = React.useState({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000});
     const [result, setResult] = React.useState({'message': ''});
     const [dinghyClassMap, setDinghyClassMap] = React.useState(new Map());
     const [dinghyClassOptions, setDinghyClassOptions] = React.useState([]);
 
     const clear = React.useCallback(() => {
-        setRace({...DinghyRacingModel.raceTemplate(), 'time': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000});
+        setRace({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000});
         showMessage('');
     }, []);
 
@@ -49,7 +49,7 @@ function CreateRace({ onCreate }) {
 
     async function handleCreate(event) {
         event.preventDefault();
-        const domainRace = {...race, 'time': new Date(race.time)};
+        const domainRace = {...race, 'plannedStartTime': new Date(race.plannedStartTime)};
         setResult(await onCreate(domainRace));
     }
 
@@ -75,7 +75,7 @@ function CreateRace({ onCreate }) {
             <label htmlFor="race-name-input">Race Name</label>
             <input id="race-name-input" name="name" type="text" onChange={handleChange} value={race.name} />
             <label htmlFor="race-time-input">Race Time</label>
-            <input id="race-time-input" name="time" type="datetime-local" onChange={handleChange} value={race.time} />
+            <input id="race-time-input" name="plannedStartTime" type="datetime-local" onChange={handleChange} value={race.plannedStartTime} />
             <label htmlFor="race-duration-input">Duration</label>
             <input id="race-duration-input" name="duration" type="number" onChange={handleChange} value={race.duration / 60000} />
             <label htmlFor="race-class-select">Race Class</label>

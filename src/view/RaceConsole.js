@@ -30,10 +30,10 @@ function RaceConsole() {
             else {
                 const options = [];
                 const map = new Map();
-                options.push(<option key={''}></option>)
+                options.push(<option key={''}></option>);
                 result.domainObject.forEach(race => {
-                    options.push(<option key={race.name + race.time.toISOString()}>{race.name}</option>);
-                    map.set(race.name, race)
+                    options.push(<option key={race.name + race.plannedStartTime.toISOString()}>{race.name}</option>);
+                    map.set(race.name, race);
                 });
                 setRaceOptions(options);
                 setRaceMap(map);

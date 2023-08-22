@@ -59,7 +59,7 @@ class DinghyRacingController {
         if (race.name === undefined || race.name === null || race.name === '') {
             return Promise.resolve({'success': false, 'message': 'A name is required for a new race.'});
         }
-        if (!(race.time instanceof Date)) {
+        if (!(race.plannedStartTime instanceof Date)) {
             return Promise.resolve({'success': false, 'message': 'A time is required for a new race.'});
         }
         return this.model.createRace(race);
@@ -74,7 +74,7 @@ class DinghyRacingController {
      */
     signupToRace(race, competitor, dinghy) {
         // check valid race, competitor, and dinghy provided
-        if (!race.name || race.name === '' || !race.time) {
+        if (!race.name || race.name === '' || !race.plannedStartTime) {
             return Promise.resolve({'success': false, 'message': 'Please provide details of the race.'});
         }
         if (!competitor.name || competitor.name === '') {
@@ -93,7 +93,7 @@ class DinghyRacingController {
      */
     startRace(race) {
         // check valid race (a URL is sufficient, otherwise a name and start time is required)
-        if (!race.url && (!race.name || race.name === '' || !race.time)) {
+        if (!race.url && (!race.name || race.name === '' || !race.plannedStartTime)) {
             return Promise.resolve({'success': false, 'message': 'Please provide details of the race.'});
         }
         return this.model.startRace(race, new Date());
