@@ -161,7 +161,7 @@ describe('when a race has been started', () => {
         await waitFor(() => expect(outputRemaining).toHaveValue('00:44:58'), {'timeout': 5000});
     });
     it('updates the time field correcyly after race duration has completely run down', async () => {
-        const raceScorpionA = { 'name': 'Scorpion A', 'time': new Date('2021-10-14T14:10:00Z'), 'dinghyClass': dinghyClassScorpion, 'duration': -3797900, 'url': 'http://localhost:8081/dinghyracing/api/races/4' };
+        const raceScorpionA = { 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00Z'), 'actualStartTime': null, 'dinghyClass': dinghyClassScorpion, 'duration': -3797900, 'url': 'http://localhost:8081/dinghyracing/api/races/4' };
         const races = [raceScorpionA];
 
         const user = userEvent.setup();
