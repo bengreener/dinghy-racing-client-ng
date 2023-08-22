@@ -84,7 +84,7 @@ function RaceConsole() {
             <p id="race-console-message">{message}</p>
             <button id="race-start-button" onClick={handleStartRaceClick}>Start Race</button>
             <button id="race-start-button" onClick={handleStopRaceClick}>Stop Race</button>
-            <RaceEntriesView race={selectedRace} clock={clock} />
+            <RaceEntriesView races={[selectedRace]} clock={clock} />
         </>
     );
 }
