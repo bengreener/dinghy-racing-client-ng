@@ -10,12 +10,13 @@ function RaceHeaderView({ race }) {
 
     useEffect(() => {
         setRemainingTime(race.duration - race.clock.getElapsedTime());
-        race.clock.addTickHandler(() => {
-            setRemainingTime(race.duration - race.clock.getElapsedTime());
-        });
+        // previousRace.current.removeTickHandler is before adding new handler as otherwise if app is run in strict mode extra render will cause previously added handler to be removed
         if (previousRace.current && previousRace.current.clock) {
             previousRace.current.clock.removeTickHandler();
         }
+        race.clock.addTickHandler(() => {
+            setRemainingTime(race.duration - race.clock.getElapsedTime());
+        });
         previousRace.current = race;
     }, [race]);
 
