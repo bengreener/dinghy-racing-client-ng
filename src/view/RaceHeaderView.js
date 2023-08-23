@@ -1,30 +1,31 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import Clock from '../model/domain-classes/clock';
 import ControllerContext from './ControllerContext';
 
 function RaceHeaderView({ race }) {
     const controller = useContext(ControllerContext);
-    const [clock, setClock] = useState(new Clock());
-    const [remainingTime, setRemainingTime] = useState();
-    
-    useEffect(() => {
-        setRemainingTime(race.duration);
-        setClock(new Clock());
-    }, [race]);
+    // const [clock, setClock] = useState(new Clock());
+    const [remainingTime, setRemainingTime] = useState();    
+    const previousRace = useRef(); // enables removal of tickHandler from previous race when rendered with new race 
 
-    const tickHandler = useCallback(() => {
-        setRemainingTime(race.duration - clock.getElapsedTime());
-    }, [clock, race.duration]);
-    
-    clock.addTickHandler(tickHandler);
+    useEffect(() => {
+        setRemainingTime(race.duration - race.clock.getElapsedTime());
+        race.clock.addTickHandler(() => {
+            setRemainingTime(race.duration - race.clock.getElapsedTime());
+        });
+        if (previousRace.current && previousRace.current.clock) {
+            previousRace.current.clock.removeTickHandler();
+        }
+        previousRace.current = race;
+    }, [race]);
 
     function handleStartRaceClick() {
         controller.startRace(race);
-        clock.start();
+        race.clock.start();
     }
 
     function handleStopRaceClick() {
-        clock.stop();
+        race.clock.stop();
     }
 
     return (
@@ -33,7 +34,7 @@ function RaceHeaderView({ race }) {
         <label htmlFor="race-duration">Duration</label>
         <output id="race-duration">{Clock.formatDuration(race.duration)}</output>
         <label htmlFor="race-duration-remaining">Remaining</label>
-        <output id="race-duration-remaining">{isNaN(remainingTime) ? Clock.formatDuration(race.duration) : Clock.formatDuration(remainingTime)}</output>
+        <output id="race-duration-remaining">{Clock.formatDuration(remainingTime)}</output>
         <button id="race-start-button" onClick={handleStartRaceClick}>Start Race</button>
         <button id="race-stop-button" onClick={handleStopRaceClick}>Stop Race</button>
         </>

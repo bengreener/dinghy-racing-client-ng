@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
 import RaceEntriesView from './RaceEntriesView';
 import RaceHeaderView from './RaceHeaderView';
+import Clock from '../model/domain-classes/clock';
 
 function RaceConsole() {
     const model = useContext(ModelContext);
@@ -33,6 +34,11 @@ function RaceConsole() {
     function handleRaceSelect(event) {
         event.preventDefault();
         const race = raceMap.get(event.target.value);
+        if (race) {
+            if (!race.clock) {
+                race.clock = new Clock();
+            }
+        }
         setSelectedRace(race);
     }
 

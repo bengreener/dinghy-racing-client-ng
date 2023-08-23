@@ -4,33 +4,34 @@ import RaceHeaderView from './RaceHeaderView';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 import { rootURL, raceScorpionA, raceGraduateA } from '../model/__mocks__/test-data';
+import Clock from '../model/domain-classes/clock';
 
 it('renders', () => {
-    render(<RaceHeaderView race={ raceScorpionA }/>);
+    render(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} }/>);
 });
 
 it('displays race name', () => {
-    render(<RaceHeaderView race={ raceScorpionA } />);
+    render(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />);
     expect(screen.getByText(/scorpion a/i)).toBeInTheDocument();
 });
 
 it('displays initial race duration', () => {
-    render(<RaceHeaderView race={ raceScorpionA } />);
+    render(<RaceHeaderView race={{...raceScorpionA, 'clock': new Clock()}} />);
     expect(screen.getByLabelText(/duration/i)).toHaveValue('00:45:00');
 });
 
 it('displays remaining race duration', () => {
-    render(<RaceHeaderView race={ raceScorpionA } />);
+    render(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />);
     expect(screen.getByLabelText(/remaining/i)).toHaveValue('00:45:00');
 });
 
 it('displays start race button', () => {
-    render(<RaceHeaderView race={ raceScorpionA } />);
+    render(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />);
     expect(screen.getByText(/start/i)).toBeInTheDocument();
 });
 
 it('displays stop race button', () => {
-    render(<RaceHeaderView race={ raceScorpionA } />);
+    render(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />);
     expect(screen.getByText(/stop/i)).toBeInTheDocument();
 });
 
@@ -40,11 +41,12 @@ it('starts the selected race', async () => {
     const controller = new DinghyRacingController(model);
     const controllerStartRaceSpy = jest.spyOn(controller, 'startRace');
 
-    customRender(<RaceHeaderView race={ raceScorpionA } />, model, controller);
+    const race = {...raceScorpionA, 'clock': new Clock()};
+    customRender(<RaceHeaderView race={ race } />, model, controller);
     
     const buttonStart = screen.getByText(/start/i);
     await user.click(buttonStart);
-    expect(controllerStartRaceSpy).toBeCalledWith(raceScorpionA);
+    expect(controllerStartRaceSpy).toBeCalledWith(race);
 });
 
 describe('when a race is started', () => {
@@ -54,7 +56,7 @@ describe('when a race is started', () => {
         const controller = new DinghyRacingController(model);
         jest.spyOn(controller, 'startRace');
 
-        customRender(<RaceHeaderView race={ raceScorpionA } />, model, controller);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
 
         const buttonStart = screen.getByText(/start/i);
         const outputRemaining = screen.getByLabelText(/remaining/i);
@@ -96,14 +98,14 @@ it('resets the duration and clock when a new race is selected', async () => {
     const controller = new DinghyRacingController(model);
     jest.spyOn(controller, 'startRace');
 
-    const {rerender} = customRender(<RaceHeaderView race={ raceScorpionA } />, model, controller);
+    const {rerender} = customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
 
     const buttonStart = screen.getByText(/start/i);
     const outputRemaining = screen.getByLabelText(/remaining/i);
 
     await user.click(buttonStart);
     await waitFor(() => expect(outputRemaining).toHaveValue('00:44:58'), {'timeout': 3000});
-    rerender(<RaceHeaderView race={raceGraduateA} />);
+    rerender(<RaceHeaderView race={{...raceGraduateA, 'clock': new Clock()}} />);
 
     expect(screen.getByLabelText(/remaining/i)).toHaveValue('00:45:00');
     await user.click(buttonStart);
