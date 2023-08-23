@@ -38,7 +38,7 @@ function RaceEntriesView({ races }) {
     function setLap(entry) {
         // if race was referenced by entries wouldn't need to keep looking it up. fix this in getEntries useEffect by replacing referenced race data from REST with that from races prop 
         const race = races.find((r) => {
-            return r.name == entry.race.name && r.plannedStartTime.valueOf() == entry.race.plannedStartTime.valueOf();
+            return r.name === entry.race.name && r.plannedStartTime.valueOf() === entry.race.plannedStartTime.valueOf();
         });
         entriesMap.get(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name).laps.push({...DinghyRacingModel.lapTemplate(), 'number': entry.laps.length + 1, 'time': race.clock.getElapsedTime()});
     }
