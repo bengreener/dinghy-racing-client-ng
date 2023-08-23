@@ -3,7 +3,7 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import RaceHeaderView from './RaceHeaderView';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
-import { rootURL, raceScorpionA } from '../model/__mocks__/test-data';
+import { rootURL, raceScorpionA, raceGraduateA } from '../model/__mocks__/test-data';
 
 it('renders', () => {
     render(<RaceHeaderView race={ raceScorpionA }/>);
@@ -88,4 +88,24 @@ describe('when a race is started', () => {
         // })
         // screen.debug();
     });
+});
+
+it('resets the duration and clock when a new race is selected', async () => {
+    const user = userEvent.setup();
+    const model = new DinghyRacingModel(rootURL);
+    const controller = new DinghyRacingController(model);
+    jest.spyOn(controller, 'startRace');
+
+    const {rerender} = customRender(<RaceHeaderView race={ raceScorpionA } />, model, controller);
+
+    const buttonStart = screen.getByText(/start/i);
+    const outputRemaining = screen.getByLabelText(/remaining/i);
+
+    await user.click(buttonStart);
+    await waitFor(() => expect(outputRemaining).toHaveValue('00:44:58'), {'timeout': 3000});
+    rerender(<RaceHeaderView race={raceGraduateA} />);
+
+    expect(screen.getByLabelText(/remaining/i)).toHaveValue('00:45:00');
+    await user.click(buttonStart);
+    await waitFor(() => expect(outputRemaining).toHaveValue('00:44:58'), {'timeout': 3000});
 })

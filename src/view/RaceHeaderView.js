@@ -1,12 +1,17 @@
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import Clock from '../model/domain-classes/clock';
 import ControllerContext from './ControllerContext';
 
 function RaceHeaderView({ race }) {
     const controller = useContext(ControllerContext);
-    const [clock] = useState(new Clock());
+    const [clock, setClock] = useState(new Clock());
     const [remainingTime, setRemainingTime] = useState();
     
+    useEffect(() => {
+        setRemainingTime(race.duration);
+        setClock(new Clock());
+    }, [race]);
+
     const tickHandler = useCallback(() => {
         setRemainingTime(race.duration - clock.getElapsedTime());
     }, [clock, race.duration]);
