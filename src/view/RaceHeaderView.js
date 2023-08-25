@@ -30,15 +30,15 @@ function RaceHeaderView({ race }) {
     }
 
     return (
-        <>
+        <div>
         <label>{race.name}</label>
-        <label htmlFor="race-duration">Duration</label>
-        <output id="race-duration">{Clock.formatDuration(race.duration)}</output>
-        <label htmlFor="race-duration-remaining">Remaining</label>
-        <output id="race-duration-remaining">{Clock.formatDuration(remainingTime)}</output>
+        <label htmlFor={'race-duration-' + race.name}>Duration</label>
+        <output id={'race-duration-' + race.name}>{Clock.formatDuration(race.duration)}</output>
+        <label htmlFor={'race-duration-remaining-' + race.name}>Remaining</label>
+        <output id={'race-duration-remaining-' + race.name}>{Clock.formatDuration(remainingTime)}</output>
         <button id="race-start-button" onClick={handleStartRaceClick}>Start Race</button>
         <button id="race-stop-button" onClick={handleStopRaceClick}>Stop Race</button>
-        </>
+        </div>
     );
 }
 
