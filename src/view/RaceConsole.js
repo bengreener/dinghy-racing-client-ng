@@ -7,7 +7,7 @@ import Clock from '../model/domain-classes/clock';
 
 function RaceConsole() {
     const model = useContext(ModelContext);
-    const [selectedRace, setSelectedRace] = useState();
+    const [selectedRaces, setSelectedRaces] = useState([]);
     const [raceOptions, setRaceOptions] = useState([]);
     const [raceMap, setRaceMap] = useState(new Map());
     const [message, setMessage] = useState('');
@@ -20,7 +20,7 @@ function RaceConsole() {
             else {
                 const options = [];
                 const map = new Map();
-                options.push(<option key={''}></option>);
+                // options.push(<option key={''}></option>);
                 result.domainObject.forEach(race => {
                     options.push(<option key={race.name + race.plannedStartTime.toISOString()}>{race.name}</option>);
                     map.set(race.name, race);
@@ -32,23 +32,28 @@ function RaceConsole() {
     }, [model]);
 
     function handleRaceSelect(event) {
+        const etso = event.target.selectedOptions
         event.preventDefault();
-        const race = raceMap.get(event.target.value);
-        if (race) {
-            if (!race.clock) {
-                race.clock = new Clock();
+        const races = [];
+        for (let i = 0; i < etso.length; i++) {
+            const race = raceMap.get(etso[i].value);
+            if (race) {
+                if (!race.clock) {
+                    race.clock = new Clock();
+                }
             }
+            races.push(race);
         }
-        setSelectedRace(race);
+        setSelectedRaces(races);
     }
 
     return (
         <>
             <label htmlFor="race-select">Select Race</label>
-            <select id="race-select" name="race" onChange={handleRaceSelect}>{raceOptions}</select>
-            {selectedRace ? <RaceHeaderView race={selectedRace} /> : null }
+            <select id="race-select" name="race" multiple={true} onChange={handleRaceSelect}>{raceOptions}</select>
+            {selectedRaces.map(race => <RaceHeaderView race={race} />)}
             <p id="race-console-message">{message}</p>
-            <RaceEntriesView races={[selectedRace]} />
+            <RaceEntriesView races={selectedRaces} />
         </>
     );
 }
