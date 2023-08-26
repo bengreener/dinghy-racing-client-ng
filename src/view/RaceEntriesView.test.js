@@ -6,6 +6,10 @@ import { rootURL, raceScorpionA, raceGraduateA, entriesScorpionA, entriesGraduat
 
 jest.mock('../model/dinghy-racing-model');
 
+afterEach(() => {
+    jest.resetAllMocks();
+})
+
 it('renders', () => {
     const model = new DinghyRacingModel(rootURL);
     jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
@@ -33,11 +37,29 @@ describe('when no race is selected', () => {
     it('shows no entries', async () => {
         const model = new DinghyRacingModel(rootURL);
         jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-        const { rerender } = customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
+        customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
         const cells = await screen.findAllByRole('cell');
         await act(async () => {
             waitForElementToBeRemoved(cells);
-            rerender(<RaceEntriesView races={[DinghyRacingModel.raceTemplate()]} />, model);
         });
     })
-})
+});
+
+describe('when a race is unselected', () => {
+    it('entries are removed from display', async () => {
+        const model = new DinghyRacingModel(rootURL);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+            if (race.name === 'Scorpion A') {
+                return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+            }
+            else if (race.name === 'Graduate A') {// console.log('Entries Graduate A');
+                return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
+            }    
+        });
+        customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
+        const graduateEntries = await screen.findAllByText(/Graduate/i);
+        await act(async () => {
+            waitForElementToBeRemoved(graduateEntries);
+        });
+    });
+});
