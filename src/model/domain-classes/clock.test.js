@@ -66,3 +66,18 @@ it('calls handler on tick', () => {
         expect(handler).toBeCalledTimes(10);
     }, 10);
 });
+
+describe('when formatting a duration', () => {
+    it('converts 0ms to 00:00:00', () => {
+        expect(Clock.formatDuration(0)).toBe('00:00:00');
+    });
+    it('converts 5256000ms to 01:27:36', () => {
+        expect(Clock.formatDuration(5256000)).toBe('01:27:36');
+    });
+    it('converts 43323000ms to 12:02:03', () => {
+        expect(Clock.formatDuration(43323000)).toBe('12:02:03');
+    });
+    it('coonverts -1379000ms to -00:22:59', () => {
+        expect(Clock.formatDuration(-1379000)).toBe('-00:22:59');
+    });
+});

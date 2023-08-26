@@ -3,7 +3,23 @@ class Clock {
     _elapsedTime = 0;
     _tickHandler;
     _ticker;
-        
+    
+    /**
+     * Formats a duration in milliseconds into a string; format hh:mm:ss
+     * @param {Number} duration Duration in milliseconds
+     * @returns {String}
+     */
+    static formatDuration(duration) {
+        const d = Math.abs(duration);
+        const hours = Math.floor(d / 3600000);
+        const minutes = Math.floor((d % 3600000) / 60000);
+        const seconds = Math.round((d % 60000) / 1000);
+        const formatHours = hours < 10 ? '0' + hours : hours;
+        const formatMinutes = minutes < 10 ? '0' + minutes : minutes;
+        const formatSeconds = seconds < 10 ? '0' + seconds : seconds;
+        return ((duration < 0 ? '-' : '') + formatHours + ':' + formatMinutes + ':' + formatSeconds);
+    }
+
     start() {
         // if clock stopped start it else do nothing
         if (!this._startTime) {
