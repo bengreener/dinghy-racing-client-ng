@@ -1,4 +1,4 @@
-import { sortArray, findIndexOfLowest } from './utilities';
+import { sortArray, findIndexOfLowest } from './array-utilities';
 
 it('finds lowest value in array', () => {
     const array = ['d', 'b', 'h', 'z'];
@@ -11,4 +11,3 @@ it('sorts an array', () => {
     const sortedArray = sortArray(startArray, (value) => value);
     expect(sortedArray).toEqual([1, 2, 3, 7, 12]);
 });
-

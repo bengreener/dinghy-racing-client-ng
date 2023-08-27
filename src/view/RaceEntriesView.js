@@ -7,6 +7,7 @@ function RaceEntriesView({ races }) {
     const model = useContext(ModelContext);
     const [entriesMap, setEntriesMap] = useState(new Map());
     const [message, setMessage] = useState('');
+    const [sortOrder, setSortOrder] = useState('default');
 
     // get entries
     useEffect(() => {
@@ -35,6 +36,19 @@ function RaceEntriesView({ races }) {
         });
     }, [model, races]);
 
+    // return array of entries sorted according to selected sort order
+    function sorted() {
+        let ordered = [];
+        switch (sortOrder) {
+            case 'default':
+                ordered = Array.from(entriesMap.values());
+                break;
+            default:
+                ordered = Array.from(entriesMap.values());
+        }
+        return ordered;
+    }
+
     function setLap(entry) {
         // if race was referenced by entries wouldn't need to keep looking it up. fix this in getEntries useEffect by replacing referenced race data from REST with that from races prop 
         const race = races.find((r) => {
@@ -48,7 +62,7 @@ function RaceEntriesView({ races }) {
         <p id="race-console-message">{message}</p>
         <table id="race-entries-table">
             <tbody>
-            {Array.from(entriesMap.values()).map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name} entry={entry} onClick={(setLap)}/>)}
+            {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name} entry={entry} onClick={(setLap)}/>)}
             </tbody>
         </table>
         </>
