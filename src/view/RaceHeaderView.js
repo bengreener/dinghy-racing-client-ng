@@ -4,7 +4,6 @@ import ControllerContext from './ControllerContext';
 
 function RaceHeaderView({ race }) {
     const controller = useContext(ControllerContext);
-    // const [clock, setClock] = useState(new Clock());
     const [remainingTime, setRemainingTime] = useState();    
     const previousRace = useRef(); // enables removal of tickHandler from previous race when rendered with new race 
 

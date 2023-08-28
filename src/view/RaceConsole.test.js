@@ -236,7 +236,7 @@ describe('when a race is unselected', () => {
             if (race.name === 'Scorpion A') {
                 return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
             }
-            else if (race.name === 'Graduate A') {// console.log('Entries Graduate A');
+            else if (race.name === 'Graduate A') {
                 return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
             }    
         });

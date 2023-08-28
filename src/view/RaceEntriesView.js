@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
 import RaceEntryView from './RaceEntryView';
 import DinghyRacingModel from '../model/dinghy-racing-model';
+import { sortArray } from '../utilities/array-utilities';
 
 function RaceEntriesView({ races }) {
     const model = useContext(ModelContext);
@@ -28,7 +29,7 @@ function RaceEntriesView({ races }) {
                 }
                 else {
                     result.domainObject.forEach(entry => {
-                        entriesMap.set(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name, entry) ;
+                        entriesMap.set(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name, entry);
                     });
                 }
             });
@@ -42,6 +43,13 @@ function RaceEntriesView({ races }) {
         switch (sortOrder) {
             case 'default':
                 ordered = Array.from(entriesMap.values());
+                break;
+            case 'lastThree':
+                ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
+                    const sn = entry.dinghy.sailNumber;
+                    const snEndDigits = sn.substring(sn.length - 3, sn.length);
+                    return Number(snEndDigits);
+                });
                 break;
             default:
                 ordered = Array.from(entriesMap.values());
@@ -60,6 +68,8 @@ function RaceEntriesView({ races }) {
     return (
         <>
         <p id="race-console-message">{message}</p>
+        <button onClick={() => setSortOrder('default')}>Default</button>
+        <button onClick={() => setSortOrder('lastThree')}>By last 3</button>
         <table id="race-entries-table">
             <tbody>
             {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name} entry={entry} onClick={(setLap)}/>)}
