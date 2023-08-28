@@ -51,6 +51,13 @@ function RaceEntriesView({ races }) {
                     return Number(snEndDigits);
                 });
                 break;
+            case 'classLastThree':
+                ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
+                    const sn = entry.dinghy.sailNumber;
+                    const snEndDigits = sn.substring(sn.length - 3, sn.length);
+                    return [entry.dinghy.dinghyClass.name, Number(snEndDigits)];
+                });
+                break;    
             default:
                 ordered = Array.from(entriesMap.values());
         }
@@ -70,6 +77,7 @@ function RaceEntriesView({ races }) {
         <p id="race-console-message">{message}</p>
         <button onClick={() => setSortOrder('default')}>Default</button>
         <button onClick={() => setSortOrder('lastThree')}>By last 3</button>
+        <button onClick={() => setSortOrder('classLastThree')}>By class & last 3</button>
         <table id="race-entries-table">
             <tbody>
             {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name} entry={entry} onClick={(setLap)}/>)}

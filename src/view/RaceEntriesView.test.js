@@ -111,4 +111,24 @@ describe('when sorting entries', () => {
 
         expect(orderedEntries).toEqual(['Scorpion 6745 Sarah Pascal', 'Scorpion 1234 Chris Marshall', 'Graduate 2928 Jill Myer']);
     });
+    it('sorts by the dinghy class and last three digits of the sail number', async () => {
+        const entriesScorpionA = [{'competitor': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'},{'competitor': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'}];
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(rootURL);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+            if (race.name === 'Scorpion A') {
+                return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+            }
+            else if (race.name === 'Graduate A') {
+                return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
+            }    
+        });
+        customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
+        const sortByClassAndLastThreeButton = screen.getByRole('button', {'name': /by class & last 3/i});
+        await user.click(sortByClassAndLastThreeButton);
+        const cells = await screen.findAllByText(/\w+ (\d+) [\w ]+/i);
+        const orderedEntries = cells.map(cell => cell.textContent);
+
+        expect(orderedEntries).toEqual(['Graduate 2928 Jill Myer', 'Scorpion 1234 Chris Marshall', 'Scorpion 6745 Sarah Pascal']);
+    });
 });
