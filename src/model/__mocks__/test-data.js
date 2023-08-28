@@ -42,7 +42,7 @@ const entryChrisMarshallDinghy1234HAL = {'_links':{'self':{'href':'http://localh
 const competitorsCollection = [{'name':'Chris Marshall','url':'http://localhost:8081/dinghyracing/api/competitors/8'},{'name':'Sarah Pascal','url':'http://localhost:8081/dinghyracing/api/competitors/9'}];
 const competitorChrisMarshall = {'name':'Chris Marshall','url':'http://localhost:8081/dinghyracing/api/competitors/8'};
 const competitorSarahPascal = {'name':'Sarah Pascal','url':'http://localhost:8081/dinghyracing/api/competitors/9'};
-const competitorJillMyer = {'name':'Jill myer','url':'http://localhost:8081/dinghyracing/api/competitors/10'};
+const competitorJillMyer = {'name':'Jill Myer','url':'http://localhost:8081/dinghyracing/api/competitors/10'};
 
 const dinghyClasses = [{'name':'Scorpion','url':'http://localhost:8081/dinghyracing/api/dinghyclasses/1'},{'name':'Graduate','url':'http://localhost:8081/dinghyracing/api/dinghyclasses/5'}];
 const dinghyClassesByNameAsc = [{'name':'Graduate','url':'http://localhost:8081/dinghyracing/api/dinghyclasses/5'}, {'name':'Scorpion','url':'http://localhost:8081/dinghyracing/api/dinghyclasses/1'}];
