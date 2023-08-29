@@ -4,7 +4,6 @@ import ControllerContext from './ControllerContext';
 
 function RaceHeaderView({ race }) {
     const controller = useContext(ControllerContext);
-    // const [clock, setClock] = useState(new Clock());
     const [remainingTime, setRemainingTime] = useState();    
     const previousRace = useRef(); // enables removal of tickHandler from previous race when rendered with new race 
 
@@ -30,7 +29,7 @@ function RaceHeaderView({ race }) {
     }
 
     return (
-        <form>
+        <div>
         <label>{race.name}</label>
         <label htmlFor={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()}>Duration</label>
         <output id={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(race.duration)}</output>
@@ -38,7 +37,7 @@ function RaceHeaderView({ race }) {
         <output id={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(remainingTime)}</output>
         <button id="race-start-button" onClick={handleStartRaceClick}>Start Race</button>
         <button id="race-stop-button" onClick={handleStopRaceClick}>Stop Race</button>
-        </form>
+        </div>
     );
 }
 
