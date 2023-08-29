@@ -131,4 +131,22 @@ describe('when sorting entries', () => {
 
         expect(orderedEntries).toEqual(['Graduate 2928 Jill Myer', 'Scorpion 1234 Chris Marshall', 'Scorpion 6745 Sarah Pascal']);
     });
+    it('sorts by the total recorded lap times of dinghies in ascending order', async () => {
+        const entriesScorpionA = [{'competitor': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
+            {'number': 1, 'time': 2}, {'number': 2, 'time': 2}
+        ],'url': 'http://localhost:8081/dinghyracing/api/entries/11'},
+        {'competitor': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [
+            {'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}
+        ], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'}];
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(rootURL);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+        customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
+        const sortByLapTimeButton = screen.getByRole('button', {'name': /by lap time/i});
+        await user.click(sortByLapTimeButton);
+        const cells = await screen.findAllByText(/\w+ (\d+) [\w ]+/i);
+        const orderedEntries = cells.map(cell => cell.textContent);
+
+        expect(orderedEntries).toEqual(['Scorpion 1234 Chris Marshall', 'Scorpion 6745 Sarah Pascal']);
+    });
 });

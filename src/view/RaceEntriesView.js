@@ -57,7 +57,17 @@ function RaceEntriesView({ races }) {
                     const snEndDigits = sn.substring(sn.length - 3, sn.length);
                     return [entry.dinghy.dinghyClass.name, Number(snEndDigits)];
                 });
-                break;    
+                break;
+            // sort by the sum of all recorded lap times
+            case 'lapTimes':
+                ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
+                    const totalTime = entry.laps.reduce((accumulator, initialValue) => {
+                        const sum =  accumulator + initialValue.time;
+                        return sum;
+                    }, 0);
+                    return totalTime;
+                });
+                break;
             default:
                 ordered = Array.from(entriesMap.values());
         }
@@ -65,11 +75,15 @@ function RaceEntriesView({ races }) {
     }
 
     function setLap(entry) {
-        // if race was referenced by entries wouldn't need to keep looking it up. fix this in getEntries useEffect by replacing referenced race data from REST with that from races prop 
+        // if race was referenced by entries wouldn't need to keep looking it up. 
+        // fix this in getEntries useEffect by replacing referenced race data from REST with that from races prop 
         const race = races.find((r) => {
             return r.name === entry.race.name && r.plannedStartTime.valueOf() === entry.race.plannedStartTime.valueOf();
         });
-        entriesMap.get(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name).laps.push({...DinghyRacingModel.lapTemplate(), 'number': entry.laps.length + 1, 'time': race.clock.getElapsedTime()});
+        const newMap = new Map(entriesMap);
+        newMap.get(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name).laps
+            .push({...DinghyRacingModel.lapTemplate(), 'number': entry.laps.length + 1, 'time': race.clock.getElapsedTime()});
+        setEntriesMap(newMap);
     }
 
     return (
@@ -78,6 +92,7 @@ function RaceEntriesView({ races }) {
         <button onClick={() => setSortOrder('default')}>Default</button>
         <button onClick={() => setSortOrder('lastThree')}>By last 3</button>
         <button onClick={() => setSortOrder('classLastThree')}>By class & last 3</button>
+        <button onClick={() => setSortOrder('lapTimes')}>By lap time</button>
         <table id="race-entries-table">
             <tbody>
             {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name} entry={entry} onClick={(setLap)}/>)}
