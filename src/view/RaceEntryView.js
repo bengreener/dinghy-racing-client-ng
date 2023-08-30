@@ -1,10 +1,17 @@
 import React from 'react';
 
-function RaceEntryView({entry, addLap}) {
+function RaceEntryView({entry, addLap, removeLap}) {
 
     function handleClick(event) {
-        if (addLap) {
-            addLap(entry);
+        if (event.ctrlKey) {
+            if (removeLap) {
+                removeLap(entry);
+            }    
+        }
+        else {
+            if (addLap) {
+                addLap(entry);
+            }
         }
     }
 

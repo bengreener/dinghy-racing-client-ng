@@ -18,15 +18,29 @@ it('displays lap times', async () => {
     expect(screen.getByText(1234)).toBeInTheDocument();
 });
 
-it('calls onClick handler with entry', async () => {
+it('calls addLap callback with entry', async () => {
     const user = userEvent.setup();
     const entry = {...entryChrisMarshallScorpionA1234};
-    const clickHandler = jest.fn((e) => {entry.laps.push({'number': 1, 'time': 1234})});
+    const addLapCallback = jest.fn((e) => {entry.laps.push({'number': 1, 'time': 1234})});
     const tableBody = document.createElement('tbody');
-    render(<RaceEntryView entry={entry} addLap={clickHandler} />, {container: document.body.appendChild(tableBody)});
+    render(<RaceEntryView entry={entry} addLap={addLapCallback} />, {container: document.body.appendChild(tableBody)});
     const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i);
     await act(async () => {
         await user.click(SMScorp1234entry);
     });
-    expect(clickHandler).toBeCalledWith(entry);
+    expect(addLapCallback).toBeCalledWith(entry);
+})
+
+it('calls removeLap callback with entry', async () => {
+    const user = userEvent.setup();
+    const entry = {...entryChrisMarshallScorpionA1234};
+    const removeLapCallback = jest.fn((e) => {entry.laps.pop()});
+    const tableBody = document.createElement('tbody');
+    render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />, {container: document.body.appendChild(tableBody)});
+    const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i);
+    await act(async () => {
+        await user.keyboard('{Control>}');
+        await user.click(SMScorp1234entry);
+    });
+    expect(removeLapCallback).toBeCalledWith(entry);
 })
