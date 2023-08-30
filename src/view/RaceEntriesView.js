@@ -102,7 +102,7 @@ function RaceEntriesView({ races }) {
         <button onClick={() => setSortOrder('lapTimes')}>By lap time</button>
         <table id="race-entries-table">
             <tbody>
-            {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name} entry={entry} onClick={(setLap)}/>)}
+            {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name} entry={entry} addLap={(setLap)}/>)}
             </tbody>
         </table>
         </>

@@ -23,7 +23,7 @@ it('calls onClick handler with entry', async () => {
     const entry = {...entryChrisMarshallScorpionA1234};
     const clickHandler = jest.fn((e) => {entry.laps.push({'number': 1, 'time': 1234})});
     const tableBody = document.createElement('tbody');
-    render(<RaceEntryView entry={entry} onClick={clickHandler} />, {container: document.body.appendChild(tableBody)});
+    render(<RaceEntryView entry={entry} addLap={clickHandler} />, {container: document.body.appendChild(tableBody)});
     const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i);
     await act(async () => {
         await user.click(SMScorp1234entry);
