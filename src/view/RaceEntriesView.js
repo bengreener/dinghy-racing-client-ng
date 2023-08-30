@@ -81,9 +81,16 @@ function RaceEntriesView({ races }) {
             return r.name === entry.race.name && r.plannedStartTime.valueOf() === entry.race.plannedStartTime.valueOf();
         });
         const newMap = new Map(entriesMap);
-        newMap.get(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name).laps
-            .push({...DinghyRacingModel.lapTemplate(), 'number': entry.laps.length + 1, 'time': race.clock.getElapsedTime()});
+        const lapTime = calculateLapTime(race.clock.getElapsedTime(), entry.laps);
+        entry.laps.push({...DinghyRacingModel.lapTemplate(), 'number': entry.laps.length + 1, 'time': lapTime});
         setEntriesMap(newMap);
+    }
+
+    function calculateLapTime(elapsedTime, laps) {
+        const lapTimes = laps.reduce((accumulator, initialValue) => {
+            return accumulator + initialValue.time;
+        }, 0);
+        return elapsedTime - lapTimes;
     }
 
     return (
