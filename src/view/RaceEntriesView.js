@@ -80,9 +80,19 @@ function RaceEntriesView({ races }) {
         const race = races.find((r) => {
             return r.name === entry.race.name && r.plannedStartTime.valueOf() === entry.race.plannedStartTime.valueOf();
         });
+        // new map is created to drive state change and rerender. Is there a better way?
         const newMap = new Map(entriesMap);
         const lapTime = calculateLapTime(race.clock.getElapsedTime(), entry.laps);
         entry.laps.push({...DinghyRacingModel.lapTemplate(), 'number': entry.laps.length + 1, 'time': lapTime});
+        setEntriesMap(newMap);
+    }
+
+    function removeLap(entry) {
+        // if race was referenced by entries wouldn't need to keep looking it up. 
+        // fix this in getEntries useEffect by replacing referenced race data from REST with that from races prop
+        // new map is created to drive state change and rerender. Is there a better way?
+        const newMap = new Map(entriesMap);
+        entry.laps.pop();
         setEntriesMap(newMap);
     }
 
@@ -102,7 +112,7 @@ function RaceEntriesView({ races }) {
         <button onClick={() => setSortOrder('lapTimes')}>By lap time</button>
         <table id="race-entries-table">
             <tbody>
-            {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name} entry={entry} onClick={(setLap)}/>)}
+            {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name} entry={entry} addLap={setLap} removeLap={removeLap}/>)}
             </tbody>
         </table>
         </>

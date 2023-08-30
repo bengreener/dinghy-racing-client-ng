@@ -1,20 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-function RaceEntryView({entry, onClick}) {
-    const [laps, setLaps] = useState([]);
+function RaceEntryView({entry, addLap, removeLap}) {
 
     function handleClick(event) {
-        if (onClick) {
-            onClick(entry);
-            // onClick is expected to update the entries laps information
-            setLaps([...entry.laps]);
+        if (event.ctrlKey) {
+            if (removeLap) {
+                removeLap(entry);
+            }    
+        }
+        else {
+            if (addLap) {
+                addLap(entry);
+            }
         }
     }
 
     return (
         <tr onClick={handleClick}>
             <td>{entry.dinghy.dinghyClass.name + ' ' + entry.dinghy.sailNumber + ' ' + entry.competitor.name}</td>
-            {laps.map(lap => <td key={lap.number} >{lap.time}</td>)}
+            {entry.laps.map(lap => <td key={lap.number} >{lap.time}</td>)}
         </tr>
     )
 }
