@@ -15,6 +15,11 @@ it('displays race name', () => {
     expect(screen.getByText(/scorpion a/i)).toBeInTheDocument();
 });
 
+it('displays number of laps', () => {
+    render(<RaceHeaderView race={{...raceScorpionA, 'laps': 5, 'clock': new Clock()}} />);
+    expect(screen.getByLabelText(/laps/i)).toHaveValue('5');
+});
+
 it('displays initial race duration', () => {
     render(<RaceHeaderView race={{...raceScorpionA, 'clock': new Clock()}} />);
     expect(screen.getByLabelText(/duration/i)).toHaveValue('00:45:00');
