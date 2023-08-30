@@ -12,13 +12,21 @@ it('renders', () => {
 
 it('displays lap times', async () => {
     const user = userEvent.setup();
+    const entry = {...entryChrisMarshallScorpionA1234, laps: [{'number': 1, 'time': 1234}]};
+    const tableBody = document.createElement('tbody');
+    render(<RaceEntryView entry={entry} />, {container: document.body.appendChild(tableBody)});
+    expect(screen.getByText(1234)).toBeInTheDocument();
+});
+
+it('calls onClick handler with entry', async () => {
+    const user = userEvent.setup();
     const entry = {...entryChrisMarshallScorpionA1234};
-    const clickHandler = jest.fn(() => {entry.laps.push({'number': 1, 'time': 1234})});
+    const clickHandler = jest.fn((e) => {entry.laps.push({'number': 1, 'time': 1234})});
     const tableBody = document.createElement('tbody');
     render(<RaceEntryView entry={entry} onClick={clickHandler} />, {container: document.body.appendChild(tableBody)});
     const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i);
     await act(async () => {
         await user.click(SMScorp1234entry);
     });
-    expect(screen.getByText(1234)).toBeInTheDocument();
-});
+    expect(clickHandler).toBeCalledWith(entry);
+})
