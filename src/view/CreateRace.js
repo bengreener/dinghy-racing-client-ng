@@ -60,6 +60,9 @@ function CreateRace({ onCreate }) {
         else if (target.name === 'duration') {
             setRace({...race, [target.name]: target.value * 60000});
         }
+        else if (target.name === 'plannedLaps') {
+            setRace({...race, [target.name]: Number(target.value)});
+        }
         else {
             setRace({...race, [target.name]: target.value});
         }
@@ -78,6 +81,8 @@ function CreateRace({ onCreate }) {
             <input id="race-time-input" name="plannedStartTime" type="datetime-local" onChange={handleChange} value={race.plannedStartTime} />
             <label htmlFor="race-duration-input">Duration</label>
             <input id="race-duration-input" name="duration" type="number" onChange={handleChange} value={race.duration / 60000} />
+            <label htmlFor="race-laps-input">Laps</label>
+            <input id="race-laps-input" name="plannedLaps" type="number" onChange={handleChange} value={race.plannedLaps ? race.plannedLaps : ''} />
             <label htmlFor="race-class-select">Race Class</label>
             <select id="race-class-select" name="dinghyClass" multiple={false} onChange={handleChange} value={race.dinghyClass ? race.dinghyClass.name : ''} >{dinghyClassOptions}</select>
             <output id="race-message-output" />

@@ -90,6 +90,21 @@ it('accepts the duration of the race', async () => {
     expect(inputDuration).toHaveValue(65);
 })
 
+it('accepts the number of laps for the race', async () => {
+    const user = userEvent.setup();
+
+    const model = new DinghyRacingModel(rootURL);
+    jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
+    customRender(<CreateRace />, model);
+    const inputLaps = screen.getByLabelText(/laps/i);
+    await act(async () => {
+        await user.clear(inputLaps);
+        await user.type(inputLaps, '10');
+    });
+    
+    expect(inputLaps).toHaveValue(10);
+});
+
 it('calls the function passed in to onCreate prop', async () => {
     const user = userEvent.setup();
     const fnOnCreate = jest.fn((race) => {return {'success': true}});
@@ -115,6 +130,7 @@ it('calls the function passed in to onCreate prop with new race as parameter', a
     const inputName = screen.getByLabelText(/name/i);
     const inputTime = screen.getByLabelText(/time/i);
     const inputDuration = screen.getByLabelText(/duration/i);
+    const inputLaps = screen.getByLabelText(/laps/i);
     const selectRaceClass = screen.getByLabelText(/class/i);
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
     await screen.findAllByRole('option'); // wait for dinghy class options to be built
@@ -124,11 +140,13 @@ it('calls the function passed in to onCreate prop with new race as parameter', a
         await user.type(inputTime, '2020-05-12T12:30');
         await user.clear(inputDuration);
         await user.type(inputDuration, '65');
+        await user.clear(inputLaps);
+        await user.type(inputLaps, '7');
         await user.selectOptions(selectRaceClass, 'Scorpion');
         await user.click(btnCreate);
     });
 
-    expect(fnOnCreate).toBeCalledWith({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2020-05-12T12:30'), 'dinghyClass': dinghyClassScorpion, 'duration': 3900000});
+    expect(fnOnCreate).toBeCalledWith({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2020-05-12T12:30'), 'dinghyClass': dinghyClassScorpion, 'plannedLaps': 7, 'duration': 3900000});
 });
 
 describe('when creating a new race', () => {
