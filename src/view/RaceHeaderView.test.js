@@ -16,7 +16,7 @@ it('displays race name', () => {
 });
 
 it('displays number of laps', () => {
-    render(<RaceHeaderView race={{...raceScorpionA, 'laps': 5, 'clock': new Clock()}} />);
+    render(<RaceHeaderView race={{...raceScorpionA, 'clock': new Clock()}} />);
     expect(screen.getByLabelText(/laps/i)).toHaveValue('5');
 });
 

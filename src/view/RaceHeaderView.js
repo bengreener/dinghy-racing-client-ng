@@ -32,7 +32,7 @@ function RaceHeaderView({ race }) {
         <div>
         <label>{race.name}</label>
         <label htmlFor={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>Laps</label>
-        <output id={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{race.laps}</output>
+        <output id={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{race.plannedLaps}</output>
         <label htmlFor={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()}>Duration</label>
         <output id={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(race.duration)}</output>
         <label htmlFor={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>Remaining</label>
