@@ -6,7 +6,7 @@ import { rootURL, competitorsCollectionHAL,
     dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, 
     dinghies, dinghiesScorpion, dinghy1234, dinghy6745,
     races, racesCollectionHAL, raceScorpionA, raceNoClassHAL,
-    competitorsCollection, competitorChrisMarshall, competitorChrisMarshallHAL, entriesScorpionAHAL, entryChrisMarshallDinghy1234HAL, entriesScorpionA, competitorSarahPascal, raceNoClass } from './__mocks__/test-data';
+    competitorsCollection, competitorChrisMarshall, competitorChrisMarshallHAL, entriesScorpionAHAL, entryChrisMarshallDinghy1234HAL, entriesScorpionA, competitorSarahPascal, raceNoClass, entryChrisMarshallScorpionA1234 } from './__mocks__/test-data';
 
 global.fetch = jest.fn();
 
@@ -1493,4 +1493,36 @@ describe('when provided with a duration in ISO 8601 format', () => {
             const result = model.convertISO8601DurationToMilliseconds('PT12');
         }).toThrow(TypeError);
     });
-})
+});
+
+describe('when adding a lap to a race', () => {
+    it('returns a promise that resolves to a success response when lap is successfully added', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: true,
+                status: 200,
+                json: () => Promise.resolve({})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const promise = dinghyRacingModel.addLap(entryChrisMarshallScorpionA1234, 1000);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result.success).toBeTruthy();
+    });
+    it('returns a promise that resolves to a result indicating failure when lap is rejected by REST service', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 404, 
+                json: () => Promise.resolve({})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const promise = dinghyRacingModel.addLap(entryChrisMarshallScorpionA1234, 1000);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
+    });
+});
+
