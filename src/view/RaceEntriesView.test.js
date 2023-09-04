@@ -4,7 +4,8 @@ import DinghyRacingModel from '../model/dinghy-racing-model';
 import { customRender } from '../test-utilities/custom-renders';
 import RaceEntriesView from './RaceEntriesView';
 import Clock from '../model/domain-classes/clock';
-import { rootURL, competitorSarahPascal, competitorChrisMarshall, dinghy6745, dinghy1234, raceScorpionA, raceGraduateA, entriesScorpionA, entriesGraduateA } from '../model/__mocks__/test-data';
+import { rootURL, competitorSarahPascal, competitorChrisMarshall, dinghy6745, dinghy1234, raceScorpionA, raceGraduateA, entriesScorpionA, entriesGraduateA, entryChrisMarshallScorpionA1234 } from '../model/__mocks__/test-data';
+import DinghyRacingController from '../controller/dinghy-racing-controller';
 
 jest.mock('../model/dinghy-racing-model');
 
@@ -153,21 +154,36 @@ describe('when sorting entries', () => {
 });
 
 describe('when setting lap time', () => {
-    it('calculates a lap time correctly as total elapsed time less sum of previous lap times', async () => {
+    it('shows lap time correctly as total elapsed time less sum of previous lap times', async () => {
         const entriesScorpionA = [{'competitor': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
             {'number': 1, 'time': 1}, {'number': 2, 'time': 2}
         ],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
 
         const user = userEvent.setup();
         const model = new DinghyRacingModel(rootURL);
+        const controller = new DinghyRacingController(model);
         const clock = {getElapsedTime: () => {return 7}};
         jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-        customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model);
+        jest.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true, 'domainObject': {}})});
+        customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         
         const entry = await screen.findByText(/scorpion 6745/i);
         await user.click(entry);
         const cells = await screen.findAllByRole('cell', {'name': /\d+/i});
         const lapTimes = cells.map(cell => cell.textContent);
         expect(lapTimes[3]).toBe('4');
+    });
+    it('updates model', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(rootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = {getElapsedTime: () => {return 4}};
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+        const addLapSpy = jest.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true, 'domainObject': {}})});
+        customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
+        
+        const entry = await screen.findByText(/scorpion 1234/i);
+        await user.click(entry);
+        expect(addLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234, 4);
     });
 });
