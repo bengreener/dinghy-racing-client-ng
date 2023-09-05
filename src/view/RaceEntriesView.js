@@ -87,19 +87,18 @@ function RaceEntriesView({ races }) {
         });
         const lapTime = calculateLapTime(race.clock.getElapsedTime(), entry.laps);
         const result = await controller.addLap(entry, lapTime);
-        if (!result.success) {            
+        if (!result.success) {
             setMessage(result.message);
         }
         updateEntries();
     }
 
-    function removeLap(entry) {
-        // if race was referenced by entries wouldn't need to keep looking it up. 
-        // fix this in getEntries useEffect by replacing referenced race data from REST with that from races prop
-        // new map is created to drive state change and rerender. Is there a better way?
-        const newMap = new Map(entriesMap);
-        entry.laps.pop();
-        setEntriesMap(newMap);
+    async function removeLap(entry) {
+        const result = await controller.removeLap(entry, entry.laps[entry.laps.length - 1]);
+        if (!result.success) {
+            setMessage(result.message);
+        }
+        updateEntries();
     }
 
     function calculateLapTime(elapsedTime, laps) {

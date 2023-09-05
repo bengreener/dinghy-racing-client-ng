@@ -152,7 +152,7 @@ describe('when sorting entries', () => {
     });
 });
 
-describe('when setting lap time', () => {
+describe('when adding a lap time', () => {
     it('calculates lap time correctly as total elapsed time less sum of previous lap times', async () => {
         const entrySarahPascalScorpionA6745 = {'competitor': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
             {'number': 1, 'time': 1}, {'number': 2, 'time': 2}
@@ -193,11 +193,47 @@ describe('when setting lap time', () => {
         jest.spyOn(model, 'getEntriesByRace')
             .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
             .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-        const addLapSpy = jest.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true, 'domainObject': {}})});
+        jest.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true, 'domainObject': {}})});
         customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         
         const entry = await screen.findByText(/scorpion 1234/i);
         await user.click(entry);
         expect(await screen.findByRole('cell', {'name': 7})).toBeInTheDocument();
+    });
+});
+
+describe('when removing a lap time', () => {
+    it('updates model', async () => {
+        const entryChrisMarshallScorpionA1234Pre = {'competitor': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7}], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'};
+        const entriesScorpionAPre = [entryChrisMarshallScorpionA1234Pre, {'competitor': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
+
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(rootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+        const removeLapSpy = jest.spyOn(controller, 'removeLap').mockImplementation((entry, lap) => {return Promise.resolve({'success': true})});
+        customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
+        const entry = await screen.findByText(/scorpion 1234/i);
+        await user.keyboard('{Control>}');
+        await user.click(entry);
+        expect(removeLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234Pre, {'number': 1, 'time': 7});
+    });
+    it('refreshes display after lap time removed', async () => {
+        const entriesScorpionAPre = [{'competitor': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7}], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},{'competitor': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(rootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getEntriesByRace')
+            .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})})
+            .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+        jest.spyOn(controller, 'removeLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true})});
+        customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
+        
+        const entry = await screen.findByText(/scorpion 1234/i);
+        const cells = await screen.findAllByRole('cell', {'name': 7});
+        
+        waitForElementToBeRemoved(cells);
+        await user.keyboard('{Control>}');
+        await user.click(entry);
     });
 });
