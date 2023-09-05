@@ -79,18 +79,17 @@ function RaceEntriesView({ races }) {
         return ordered;
     }
 
-    function addLap(entry) {
+    async function addLap(entry) {
         // if race was referenced by entries wouldn't need to keep looking it up. 
         // fix this in getEntries useEffect by replacing referenced race data from REST with that from races prop 
         const race = races.find((r) => {
             return r.name === entry.race.name && r.plannedStartTime.valueOf() === entry.race.plannedStartTime.valueOf();
         });
         const lapTime = calculateLapTime(race.clock.getElapsedTime(), entry.laps);
-        controller.addLap(entry, lapTime).then(result => {
-            if (!result.success) {
-                setMessage(result.message);
-            }
-        });
+        const result = await controller.addLap(entry, lapTime);
+        if (!result.success) {            
+            setMessage(result.message);
+        }
         updateEntries();
     }
 
