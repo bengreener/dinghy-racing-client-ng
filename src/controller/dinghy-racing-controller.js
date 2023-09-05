@@ -30,6 +30,23 @@ class DinghyRacingController {
     }
 
     /**
+     * Remove a lap from a race entry
+     * @param {Entry} entry
+     * @param {Lap} lap The lap to remove
+     * @returns {Promise<Result}
+     */
+    removeLap(entry, lap) {
+        if (!entry || !entry.url) {
+            return Promise.resolve({'success': false, 'message': 'A valid entry is required to remove a lap.'});
+        }
+        // time can't be null and must be number
+        if (!lap) {
+            return Promise.resolve({'success': false, 'message': 'A lap to remove is required.'});   
+        }
+        return this.model.removeLap(entry, lap);
+    }
+
+    /**
      * Add a new competitor
      * @param {Competitor} competitor
      * @returns {Promise<Result>}

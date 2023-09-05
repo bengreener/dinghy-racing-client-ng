@@ -354,3 +354,40 @@ describe('when adding a lap to an entry', () => {
     });
 });
 
+describe('when removing a lap from an entry', () => {
+    it('returns a promise that resolves to a result indicating success when operation is successful', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        jest.spyOn(dinghyRacingModel, 'removeLap').mockImplementationOnce((entry) => {return Promise.resolve({'success': true})});
+        const promise = dinghyRacingController.removeLap(entryChrisMarshallScorpionA1234, {...DinghyRacingModel.lapTemplate(), 'number': 1, 'time': 1000});
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true});
+    });
+    it('returns a promise that resolves to a result indicating failure when operation is unsuccessful and provides a message explaining the cause of failure', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        jest.spyOn(dinghyRacingModel, 'removeLap').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
+        const promise = dinghyRacingController.removeLap(entryChrisMarshallScorpionA1234, {...DinghyRacingModel.lapTemplate(), 'number': 1, 'time': 1000});
+        const result = await promise;
+        expect(result).toEqual({'success': false, 'message': 'Something went wrong'});
+    });
+    it('returns a promise that resolves to a result indicating failure when entry is null or undefined and provides a message explaining the cause of failure', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        jest.spyOn(dinghyRacingModel, 'removeLap').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
+        const promise = dinghyRacingController.removeLap(null, {...DinghyRacingModel.lapTemplate(), 'number': 1, 'time': 1000});
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'A valid entry is required to remove a lap.'});
+    });
+    it('returns a promise that resolves to a result indicating failure when lap is null or undefined and provides a message explaining the cause of failure', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        jest.spyOn(dinghyRacingModel, 'removeLap').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
+        const promise = dinghyRacingController.removeLap(entryChrisMarshallScorpionA1234, null);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'A lap to remove is required.'});
+    });
+});
