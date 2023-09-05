@@ -370,30 +370,57 @@ class DinghyRacingModel {
             // no entries for race
             return Promise.resolve({'success': true, 'domainObject': []})
         }
-        // get race, competitors, and dinghies
+        // get race, competitors, dinghies, and laps
         const raceResult = await this.getRace(entryCollectionHAL[0]._links.race.href);
         if (!raceResult.success) {
             return Promise.resolve(raceResult);
         }
         const competitorPromises = [];
         const dinghyPromises = [];
+        const lapsPromises = [];
         entryCollectionHAL.forEach(entry => {
             competitorPromises.push(this.getCompetitor(entry._links.competitor.href));
             dinghyPromises.push(this.getDinghy(entry._links.dinghy.href));
+            lapsPromises.push(this.getLaps(entry._links.laps.href));
         });
         const competitorResults = await Promise.all(competitorPromises);
         const dinghyResults = await Promise.all(dinghyPromises);
+        const lapsResults = await Promise.all(lapsPromises);
         const entries = [];
         for (let i = 0; i < entryCollectionHAL.length; i++) {
-            if(!competitorResults[i].success) {
+            if (!competitorResults[i].success) {
                 return Promise.resolve(competitorResults[i]);
             }
-            if(!dinghyResults[i].success) {
+            if (!dinghyResults[i].success) {
                 return Promise.resolve(dinghyResults[i]);
             }
-            entries.push({...DinghyRacingModel.entryTemplate(), 'race': raceResult.domainObject, 'competitor': competitorResults[i].domainObject, 'dinghy': dinghyResults[i].domainObject, 'url': entryCollectionHAL[i]._links.self.href});
+            if (!lapsResults[i].success) {
+                return Promise.resolve(lapsResults[i]);
+            }
+            entries.push({...DinghyRacingModel.entryTemplate(), 'race': raceResult.domainObject, 'competitor': competitorResults[i].domainObject, 
+                'dinghy': dinghyResults[i].domainObject, 'laps': lapsResults[i].domainObject, 'url': entryCollectionHAL[i]._links.self.href});
         };
         return Promise.resolve({'success': true, 'domainObject': entries});
+    }
+
+    /**
+     * Get laps
+     * On success result domain object will be an array of Lap types; {Array<Lap>}
+     * @param {String} url Address of the remote resource
+     * @returns {Promise<Result>}
+     */
+    async getLaps(url) {
+        const result = await this.read(url);
+        if (!result.success) {
+            return result;
+        }
+        const lapsCollectionHAL = result.domainObject._embedded.laps;
+        if (lapsCollectionHAL.length === 0) {
+            return Promise.resolve({'success': true, 'domainObject': []});
+        }
+        // convert REST data to local format
+        const laps = lapsCollectionHAL.map(lap => {return {...DinghyRacingModel.lapTemplate, 'number': lap.number, 'time': this.convertISO8601DurationToMilliseconds(lap.time)}});
+        return Promise.resolve({'success': true, 'domainObject': laps});
     }
 
     /**

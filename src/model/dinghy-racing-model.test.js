@@ -1137,7 +1137,7 @@ describe('when searching for entries by race', () => {
             }
         });
         jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
-
+        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
         const promise = dinghyRacingModel.getEntriesByRace(raceScorpionA);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -1525,4 +1525,3 @@ describe('when adding a lap to a race', () => {
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
     });
 });
-
