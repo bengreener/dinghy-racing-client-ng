@@ -1525,3 +1525,34 @@ describe('when adding a lap to a race', () => {
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
     });
 });
+
+describe('when removing a lap from a race', () => {
+    it('returns a promise that resolves to a success response when lap is successfully removed', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: true,
+                status: 200,
+                json: () => Promise.resolve({})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const promise = dinghyRacingModel.removeLap(entryChrisMarshallScorpionA1234, {...DinghyRacingModel.lapTemplate(),'number': 1, 'time': 1000});
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result.success).toBeTruthy();
+    });
+    it('returns a promise that resolves to a result indicating failure when lap removal is rejected by REST service', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 404, 
+                json: () => Promise.resolve({})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        const promise = dinghyRacingModel.removeLap(entryChrisMarshallScorpionA1234, {...DinghyRacingModel.lapTemplate(),'number': 1, 'time': 1000});
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
+    });
+});

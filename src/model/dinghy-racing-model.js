@@ -76,6 +76,17 @@ class DinghyRacingModel {
             return result;
         }
     }
+    
+    /**
+     * Remove a lap from a race entry
+     * @param {Entry} entry
+     * @param {Lap} lap The lap to remove
+     * @returns {Promise<Result}
+     */
+    async removeLap(entry, lap) {
+        const result = await this.update(entry.url + '/removeLap', lap);
+        return result;
+    }
 
     /**
      * Create a new competitor
