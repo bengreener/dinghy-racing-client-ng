@@ -240,7 +240,8 @@ describe('when creating a new race', () => {
     it('if a dinghy class URL is not supplied looks up dinghy class to get URL and returns a promise that resolves to a result indicating success when race is created with http status 200', async () => {
         fetch.mockImplementationOnce((resource, options) => {
             // check format of data passed to fetch to reduce risk of false positive
-            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","actualStartTime":null,"dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700,"plannedLaps":null,"clock":null,"url":""}') {
+            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","actualStartTime":null,"dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700,"plannedLaps":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"url":""}') {
+                console.log(options.body);
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -264,7 +265,7 @@ describe('when creating a new race', () => {
     it('if a dinghy class URL is supplied does not look up dinghy class to get URL and returns a promise that resolves to a result indicating success when race is created with http status 200', async () => {
         fetch.mockImplementationOnce((resource, options) => {
             // check format of data passed to fetch to reduce risk of false positive
-            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","actualStartTime":null,"dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700,"plannedLaps":null,"clock":null,"url":""}') {
+            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","actualStartTime":null,"dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700,"plannedLaps":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"url":""}') {
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -288,7 +289,7 @@ describe('when creating a new race', () => {
     it('returns a promise that resolves to a result indicating success when race is created with http status 201', async () => {
         fetch.mockImplementationOnce((resource, options) => {// check format of data passed to fetch to reduce risk of false positive
             // check format of data passed to fetch to reduce risk of false positive
-            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","actualStartTime":null,"dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700,"plannedLaps":null,"clock":null,"url":""}') {
+            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","actualStartTime":null,"dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700,"plannedLaps":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"url":""}') {
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -1088,7 +1089,7 @@ it('provides a blank template for a dinghy', () => {
 it('provides a blank template for a race', () => {
     const race = DinghyRacingModel.raceTemplate();
 
-    expect(race).toEqual({'name': '', 'plannedStartTime': null, 'actualStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'plannedLaps': null, 'clock': null, 'url': ''});
+    expect(race).toEqual({'name': '', 'plannedStartTime': null, 'actualStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'plannedLaps': null, 'lapForecast': null, 'lastLapTime': null, 'averageLapTime': null, 'clock': null, 'url': ''});
 });
 
 it('provides a blank template for a race entry', () => {
