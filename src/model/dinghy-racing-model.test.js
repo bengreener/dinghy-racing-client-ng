@@ -5,7 +5,7 @@ import { rootURL, competitorsCollectionHAL,
     dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghy1234HAL, raceScorpion_AHAL, 
     dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, 
     dinghies, dinghiesScorpion, dinghy1234, dinghy6745,
-    races, racesCollectionHAL, raceScorpionA, raceNoClassHAL,
+    races, racesCollectionHAL, raceScorpionA, raceNoClassHAL, raceGraduateA, raceGraduate_AHAL,
     competitorsCollection, competitorChrisMarshall, competitorChrisMarshallHAL, entriesScorpionAHAL, entryChrisMarshallDinghy1234HAL, entriesScorpionA, competitorSarahPascal, raceNoClass, entryChrisMarshallScorpionA1234 } from './__mocks__/test-data';
 
 global.fetch = jest.fn();
@@ -1213,6 +1213,21 @@ describe('when a race is requested', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'});
     });
+    it('returns a promise that resolves to a result indicating success and containing the race when the race is found and lead entry is null', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: true,
+                status: 200, 
+                json: () => Promise.resolve(raceGraduate_AHAL)
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(rootURL);
+        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassGraduate})});
+        const promise = dinghyRacingModel.getRace(raceGraduateA.url);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': raceGraduateA});
+    })
 });
 
 describe('when a competitor is requested', () => {

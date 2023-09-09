@@ -457,8 +457,8 @@ class DinghyRacingModel {
                     'actualStartTime': result.domainObject.actualStartTime ? new Date(result.domainObject.actualStartTime + 'Z') : null, 
                     'dinghyClass': dinghyClassResult.domainObject, 'duration': this.convertISO8601DurationToMilliseconds(result.domainObject.duration), 
                     'plannedLaps': result.domainObject.plannedLaps, 'lapForecast': result.domainObject.lapForecast, 
-                    'lastLapTime': this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.lastLapTime), 
-                    'averageLapTime': this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.averageLapTime), 
+                    'lastLapTime': result.domainObject.leadEntry ? this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.lastLapTime) : null, 
+                    'averageLapTime': result.domainObject.leadEntry ? this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.averageLapTime) : null, 
                     'url': result.domainObject._links.self.href
                 }});
             }
@@ -494,8 +494,8 @@ class DinghyRacingModel {
                     'actualStartTime': racesHAL[i].actualStartTime ? new Date(racesHAL[i].actualStartTime + 'Z') : null, 
                     'dinghyClass': dinghyClass, 'duration': this.convertISO8601DurationToMilliseconds(racesHAL[i].duration), 'plannedLaps': racesHAL[i].plannedLaps, 
                     'lapForecast': racesHAL[i].lapForecast, 
-                    'lastLapTime': this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.lastLapTime), 
-                    'averageLapTime': this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.averageLapTime), 
+                    'lastLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.lastLapTime) : null, 
+                    'averageLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.averageLapTime) : null, 
                     'url': racesHAL[i]._links.self.href});
             };
             return Promise.resolve({'success': true, 'domainObject': races});
