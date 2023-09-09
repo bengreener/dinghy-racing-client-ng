@@ -456,7 +456,11 @@ class DinghyRacingModel {
                     'plannedStartTime': new Date(result.domainObject.plannedStartTime + 'Z'), 
                     'actualStartTime': result.domainObject.actualStartTime ? new Date(result.domainObject.actualStartTime + 'Z') : null, 
                     'dinghyClass': dinghyClassResult.domainObject, 'duration': this.convertISO8601DurationToMilliseconds(result.domainObject.duration), 
-                    'plannedLaps': result.domainObject.plannedLaps, 'url': result.domainObject._links.self.href}});
+                    'plannedLaps': result.domainObject.plannedLaps, 'lapForecast': result.domainObject.lapForecast, 
+                    'lastLapTime': this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.lastLapTime), 
+                    'averageLapTime': this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.averageLapTime), 
+                    'url': result.domainObject._links.self.href
+                }});
             }
             else {
                 return Promise.resolve(dinghyClassResult);
@@ -489,6 +493,9 @@ class DinghyRacingModel {
                 races.push({...DinghyRacingModel.raceTemplate(), 'name': racesHAL[i].name, 'plannedStartTime': new Date(racesHAL[i].plannedStartTime + 'Z'), 
                     'actualStartTime': racesHAL[i].actualStartTime ? new Date(racesHAL[i].actualStartTime + 'Z') : null, 
                     'dinghyClass': dinghyClass, 'duration': this.convertISO8601DurationToMilliseconds(racesHAL[i].duration), 'plannedLaps': racesHAL[i].plannedLaps, 
+                    'lapForecast': racesHAL[i].lapForecast, 
+                    'lastLapTime': this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.lastLapTime), 
+                    'averageLapTime': this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.averageLapTime), 
                     'url': racesHAL[i]._links.self.href});
             };
             return Promise.resolve({'success': true, 'domainObject': races});
