@@ -37,6 +37,12 @@ function RaceHeaderView({ race }) {
         <output id={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(race.duration)}</output>
         <label htmlFor={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>Remaining</label>
         <output id={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(remainingTime)}</output>
+        <label htmlFor={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>Laps estimate</label>
+        <output id={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{race.lapForecast}</output>
+        <label htmlFor={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Last lap time</label>
+        <output id={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(race.lastLapTime)}</output>
+        <label htmlFor={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Average lap time</label>
+        <output id={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(race.averageLapTime)}</output>
         <button id="race-start-button" onClick={handleStartRaceClick}>Start Race</button>
         <button id="race-stop-button" onClick={handleStopRaceClick}>Stop Race</button>
         </div>

@@ -1,33 +1,40 @@
 import { customRender } from '../test-utilities/custom-renders';import userEvent from '@testing-library/user-event';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import RaceHeaderView from './RaceHeaderView';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 import { rootURL, raceScorpionA, raceGraduateA } from '../model/__mocks__/test-data';
 import Clock from '../model/domain-classes/clock';
 
-it('renders', () => {
-    render(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} }/>);
-});
-
-it('displays race name', () => {
-    render(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />);
-    expect(screen.getByText(/scorpion a/i)).toBeInTheDocument();
-});
-
-it('displays number of laps', () => {
-    render(<RaceHeaderView race={{...raceScorpionA, 'clock': new Clock()}} />);
-    expect(screen.getByLabelText(/laps/i)).toHaveValue('5');
-});
-
-it('displays initial race duration', () => {
-    render(<RaceHeaderView race={{...raceScorpionA, 'clock': new Clock()}} />);
-    expect(screen.getByLabelText(/duration/i)).toHaveValue('00:45:00');
-});
-
-it('displays remaining race duration', () => {
-    render(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />);
-    expect(screen.getByLabelText(/remaining/i)).toHaveValue('00:45:00');
+describe('when rendered', () => {
+    it('displays race name', () => {
+        render(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />);
+        expect(screen.getByText(/scorpion a/i)).toBeInTheDocument();
+    });    
+    it('displays number of laps', () => {
+        render(<RaceHeaderView race={{...raceScorpionA, 'clock': new Clock()}} />);
+        expect(screen.getByLabelText(/laps(?!.)/i)).toHaveValue('5');
+    });
+    it('displays initial race duration', () => {
+        render(<RaceHeaderView race={{...raceScorpionA, 'clock': new Clock()}} />);
+        expect(screen.getByLabelText(/duration/i)).toHaveValue('00:45:00');
+    });
+    it('displays remaining race duration', () => {
+        render(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />);
+        expect(screen.getByLabelText(/remaining/i)).toHaveValue('00:45:00');
+    });
+    it('displays estimate for number of laps that will be completed', () => {
+        render(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />);
+        expect(screen.getByLabelText(/estimate/i)).toHaveValue('5');
+    });
+    it('displays the last lap time for the lead entry', () => {
+        render(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />);
+        expect(screen.getByLabelText(/last/i)).toHaveValue('00:00:00');
+    });
+    it('displays the average lap time for the lead entry', () => {
+        render(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />);
+        expect(screen.getByLabelText(/average/i)).toHaveValue('00:00:00');
+    });
 });
 
 it('displays start race button', () => {
