@@ -16,7 +16,7 @@ function RaceEntriesView({ races }) {
         // build promises
         const promises = races.map(race => {
             if (!race || (!race.name && !race.url)) {
-                return Promise.resolve({'success': true, 'domainObject': new Map()});
+                return Promise.resolve({'success': true, 'domainObject': []});
             }
             else {
                 return model.getEntriesByRace(race);

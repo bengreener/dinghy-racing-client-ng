@@ -1,15 +1,15 @@
-import { render, screen, act, findAllByRole, logRoles, getByLabelText, findByText } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import { customRender } from '../test-utilities/custom-renders';
 import userEvent from '@testing-library/user-event';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 import SignUp from './SignUp';
-import { competitorsCollection, competitorChrisMarshall, raceScorpionA, raceNoClass, dinghies, dinghy1234, dinghy6745, dinghyClasses, rootURL, dinghyClassScorpion, competitorSarahPascal, entriesScorpionA } from '../model/__mocks__/test-data';
+import { httpRootURL, wsRootURL, competitorsCollection, competitorChrisMarshall, raceScorpionA, raceNoClass, dinghies, dinghy1234, dinghy6745, dinghyClasses, dinghyClassScorpion, competitorSarahPascal, entriesScorpionA } from '../model/__mocks__/test-data';
 
 jest.mock('../model/dinghy-racing-model');
 jest.mock('../controller/dinghy-racing-controller');
 
-const model = new DinghyRacingModel(rootURL);
+const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 const controller = new DinghyRacingController(model);    
 
 beforeEach(() => {
@@ -19,8 +19,10 @@ beforeEach(() => {
     jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
 })
 
-it('renders', () => {
-    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+it('renders', async () => {
+    await act(async () => {
+        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+    })
     const inputCompetitor = screen.getByLabelText(/competitor/i);
     const inputSailNumber = screen.getByLabelText(/sail/i);
     const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
@@ -30,9 +32,10 @@ it('renders', () => {
 });
 
 describe('when race has a specified dinghyClass', () => {
-    it('requests competitor name and dinghy sail number', () => {    
-        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-
+    it('requests competitor name and dinghy sail number', async () => {    
+        await act(async () => {
+            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+        });
         const inputCompetitor = screen.getByLabelText(/competitor/i);
         const inputSailNumber = screen.getByLabelText(/sail/i);
         expect(inputCompetitor).toBeInTheDocument();
@@ -42,7 +45,9 @@ describe('when race has a specified dinghyClass', () => {
 
 describe('when race is a handicap race ', () => {
     it('requests competitor name and dinghy class and sail number', async () => {
-        customRender(<SignUp race={raceNoClass}/>, model, controller);
+        await act(async () => {
+            customRender(<SignUp race={raceNoClass}/>, model, controller);
+        });
 
         const inputCompetitor = screen.getByLabelText(/competitor/i);
         const inputDingyClass = screen.getByLabelText(/class/i);
@@ -72,7 +77,6 @@ describe('when competitor name is entered then ', () => {
         const inputCompetitor = await screen.findByLabelText(/competitor/i);
         const inputSailNumber = await screen.findByLabelText(/sail/i);
         await act(async () => {
-
             await user.type(inputCompetitor, 'Chris Marshall');
             await user.type(inputSailNumber, '1234');
         });
