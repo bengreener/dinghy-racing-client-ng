@@ -1,5 +1,10 @@
+import { Client } from '@stomp/stompjs';
+
 class DinghyRacingModel {
-    rootURL;
+    httpRootURL;
+    wsRootURL;
+    stompClient;
+    entryUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
 
     /**
      * Provide a blank competitor template
@@ -50,14 +55,50 @@ class DinghyRacingModel {
 
     /**
      * 
-     * @param {string} rootURL
+     * @param {string} httpRootURL
+     * @param {string} wsRootURL
      * @returns {DinghyRacingModel} 
      */
-    constructor(rootURL) {
-        if (!rootURL) {
-            throw new Error('A URL is required when creating an instance of DinghyRacingModel');
+    constructor(httpRootURL, wsRootURL) {
+        this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
+        if (!httpRootURL) {
+            throw new Error('An HTTP root URL is required when creating an instance of DinghyRacingModel');
         }
-        this.rootURL = rootURL;
+        if (!wsRootURL) {
+            throw new Error('A WebSocket root URL is required when creating an instance of DinghyRacingModel');
+        }
+        this.httpRootURL = httpRootURL;
+        this.wsRootURL = wsRootURL;
+        this.stompClient = new Client({
+            'brokerURL': wsRootURL
+        });
+        this.stompClient.onStompError = (frame) => {
+            console.error(frame);
+        };
+        this.stompClient.onConnect = (frame) => {
+            this.stompClient.subscribe('/topic/updateEntry', this.handleEntryUpdate);
+        };
+        this.stompClient.activate();
+    }
+
+    /**
+     * Register a callback for when an entry idenified by key is updated 
+     * @param {*} key 
+     * @param {*} callback 
+     */
+    registerEntryUpdateCallback(key, callback) {
+        if (this.entryUpdateCallbacks.has(key)) {
+            this.entryUpdateCallbacks.get(key).push(callback);
+        }
+        else {
+            this.entryUpdateCallbacks.set(key, [callback]);
+        }
+    }
+
+    handleEntryUpdate(message) {
+        if (this.entryUpdateCallbacks.has(message.body)) {
+            this.entryUpdateCallbacks.get(message.body).forEach(cb => cb());
+        }
     }
 
     /**
@@ -267,10 +308,10 @@ class DinghyRacingModel {
     async getDinghies(dinghyClass) {
         let resource;
         if (!dinghyClass) {
-            resource = this.rootURL + '/dinghies';
+            resource = this.httpRootURL + '/dinghies';
         }
         else {
-            resource = this.rootURL + '/dinghies/search/findByDinghyClass?dinghyClass=' + dinghyClass.url;
+            resource = this.httpRootURL + '/dinghies/search/findByDinghyClass?dinghyClass=' + dinghyClass.url;
         }
         const result = await this.read(resource);
         if (result.success) {
@@ -297,7 +338,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async getDinghyBySailNumberAndDinghyClass(sailNumber, dinghyClass) {
-        const resource = this.rootURL + '/dinghies/search/findBySailNumberAndDinghyClass?sailNumber=' + sailNumber + '&dinghyClass=' + dinghyClass.url;
+        const resource = this.httpRootURL + '/dinghies/search/findBySailNumberAndDinghyClass?sailNumber=' + sailNumber + '&dinghyClass=' + dinghyClass.url;
 
         const result = await this.read(resource);
         if (result.success) {
@@ -330,7 +371,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async getDinghyClassByName(name) {
-        const resource = this.rootURL + '/dinghyClasses/search/findByName?name=' + name;
+        const resource = this.httpRootURL + '/dinghyClasses/search/findByName?name=' + name;
 
         const result = await this.read(resource);
         if(result.success) {
@@ -347,7 +388,7 @@ class DinghyRacingModel {
      * @return {Promise<Result>>} If successful Result.domainObject will be an Array<DinghyClass>
      */
     async getDinghyClasses() {
-        const resource = this.rootURL + '/dinghyClasses?sort=name,asc';
+        const resource = this.httpRootURL + '/dinghyClasses?sort=name,asc';
 
         const result = await this.read(resource);
         if (result.success) {
@@ -372,7 +413,7 @@ class DinghyRacingModel {
             return Promise.resolve({'success': false, 'message': 'Cannot retrieve race entries without URL for race.'});
         }
         // get entries
-        const resource = this.rootURL + '/entries/search/findByRace?race=' + race.url;
+        const resource = this.httpRootURL + '/entries/search/findByRace?race=' + race.url;
         const result = await this.read(resource);
         if (!result.success) {
             return Promise.resolve(result);
@@ -477,7 +518,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
     async getRacesOnOrAfterTime(startTime) {
-        const resource = this.rootURL + '/races/search/findByPlannedStartTimeGreaterThanEqual?time=' + startTime.toISOString();
+        const resource = this.httpRootURL + '/races/search/findByPlannedStartTimeGreaterThanEqual?time=' + startTime.toISOString();
 
         const result = await this.read(resource);
         if (result.success) {
@@ -544,7 +585,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>} If successful Result.domainObject will be an Array<Competitor>
      */
     async getCompetitors() {
-        const resource = this.rootURL + '/competitors?sort=name,asc';
+        const resource = this.httpRootURL + '/competitors?sort=name,asc';
 
         const result = await this.read(resource);
         if (result.success) {
@@ -563,7 +604,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async getCompetitorByName(name) {
-        const resource = this.rootURL + '/competitors/search/findByName?name=' + name;
+        const resource = this.httpRootURL + '/competitors/search/findByName?name=' + name;
 
         const result = await this.read(resource);
         if(result.success) {
@@ -584,7 +625,7 @@ class DinghyRacingModel {
         const body = JSON.stringify(object); // convert to string so can be serialized into object by receiving service
         try {
             let json;
-            const response = await fetch(this.rootURL + '/' + urlPathSegment, {method: 'POST', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, 'body': body});
+            const response = await fetch(this.httpRootURL + '/' + urlPathSegment, {method: 'POST', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, 'body': body});
             try {
                 // if body is empty reading json() will result in an error
                 json = await response.json();
@@ -613,7 +654,7 @@ class DinghyRacingModel {
     async read(resource) {
         try {
             let json;
-            const response = await fetch(resource, {method: 'GET', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}});
+            const response = await fetch(resource, {method: 'GET', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, cache: 'no-store'});
             try {
                 // if body is empty reading json() will result in an error 
                 json = await response.json();

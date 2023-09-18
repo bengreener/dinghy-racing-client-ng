@@ -1,4 +1,5 @@
-const rootURL = 'http://localhost:8081/dinghyracing/api';
+const httpRootURL = 'http://localhost:8081/dinghyracing/api';
+const wsRootURL = 'ws://localhost:8081/dinghyracing';
 
 const emptyCollectionHAL = {'_embedded':{'dinghies':[]},'_links':{'self':null}};
 
@@ -71,7 +72,7 @@ const entriesScorpionA = [{'competitor': competitorChrisMarshall,'race': raceSco
 const entriesGraduateA = [{'competitor': competitorJillMyer,'race': raceGraduateA,'dinghy': dinghy2928, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/12'}];
 const entryChrisMarshallScorpionA1234 = {'competitor': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'};
 export {
-	rootURL,
+	httpRootURL, wsRootURL,
 	
 	emptyCollectionHAL, 
 

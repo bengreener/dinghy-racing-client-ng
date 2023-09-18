@@ -5,7 +5,7 @@ import DinghyRacingModel from './model/dinghy-racing-model';
 import DinghyRacingController from './controller/dinghy-racing-controller'; 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-const model = new DinghyRacingModel('http://localhost:8081/dinghyracing/api');
+const model = new DinghyRacingModel('http://localhost:8081/dinghyracing/api', 'ws://localhost:8081/dinghyracingws');
 const controller = new DinghyRacingController(model);
 
 root.render(
