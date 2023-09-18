@@ -29,7 +29,7 @@ it('calls addLap callback with entry', async () => {
         await user.click(SMScorp1234entry);
     });
     expect(addLapCallback).toBeCalledWith(entry);
-})
+});
 
 it('calls removeLap callback with entry', async () => {
     const user = userEvent.setup();
@@ -43,4 +43,4 @@ it('calls removeLap callback with entry', async () => {
         await user.click(SMScorp1234entry);
     });
     expect(removeLapCallback).toBeCalledWith(entry);
-})
+});

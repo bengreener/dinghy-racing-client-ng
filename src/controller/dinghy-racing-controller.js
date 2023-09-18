@@ -9,6 +9,41 @@ class DinghyRacingController {
         this.model = model;
         this.createDinghyClass = this.createDinghyClass.bind(this);
         this.createRace = this.createRace.bind(this);
+        this.addLap = this.addLap.bind(this);
+    }
+
+    /**
+     * Add a lap to race entry
+     * @param {Entry} entry
+     * @param {Number} time The lap time duration in milliseconds
+     * @returns {Promise<Result}
+     */
+    addLap(entry, time) {
+        if (!entry || !entry.url) {
+            return Promise.resolve({'success': false, 'message': 'A valid entry is required to add a lap time.'});
+        }
+        // time can't be null and must be number
+        if (isNaN(time)) {
+            return Promise.resolve({'success': false, 'message': 'Time must be a number; in milliseconds.'});   
+        }
+        return this.model.addLap(entry, time);
+    }
+
+    /**
+     * Remove a lap from a race entry
+     * @param {Entry} entry
+     * @param {Lap} lap The lap to remove
+     * @returns {Promise<Result}
+     */
+    removeLap(entry, lap) {
+        if (!entry || !entry.url) {
+            return Promise.resolve({'success': false, 'message': 'A valid entry is required to remove a lap.'});
+        }
+        // time can't be null and must be number
+        if (!lap) {
+            return Promise.resolve({'success': false, 'message': 'A lap to remove is required.'});   
+        }
+        return this.model.removeLap(entry, lap);
     }
 
     /**

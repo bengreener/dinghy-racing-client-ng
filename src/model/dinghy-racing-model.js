@@ -1,5 +1,10 @@
+import { Client } from '@stomp/stompjs';
+
 class DinghyRacingModel {
-    rootURL;
+    httpRootURL;
+    wsRootURL;
+    stompClient;
+    entryUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
 
     /**
      * Provide a blank competitor template
@@ -30,7 +35,8 @@ class DinghyRacingModel {
      * @returns {Race}
      */
     static raceTemplate() {
-        return {'name': '', 'plannedStartTime': null, 'actualStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'plannedLaps': null, 'clock': null, 'url': ''};
+        return {'name': '', 'plannedStartTime': null, 'actualStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'plannedLaps': null, 'lapForecast': null, 
+            'lastLapTime': null, 'averageLapTime': null, 'clock': null, 'url': ''};
     }
 
     /**
@@ -49,14 +55,79 @@ class DinghyRacingModel {
 
     /**
      * 
-     * @param {string} rootURL
+     * @param {string} httpRootURL
+     * @param {string} wsRootURL
      * @returns {DinghyRacingModel} 
      */
-    constructor(rootURL) {
-        if (!rootURL) {
-            throw new Error('A URL is required when creating an instance of DinghyRacingModel');
+    constructor(httpRootURL, wsRootURL) {
+        this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
+        if (!httpRootURL) {
+            throw new Error('An HTTP root URL is required when creating an instance of DinghyRacingModel');
         }
-        this.rootURL = rootURL;
+        if (!wsRootURL) {
+            throw new Error('A WebSocket root URL is required when creating an instance of DinghyRacingModel');
+        }
+        this.httpRootURL = httpRootURL;
+        this.wsRootURL = wsRootURL;
+        this.stompClient = new Client({
+            'brokerURL': wsRootURL
+        });
+        this.stompClient.onStompError = (frame) => {
+            console.error(frame);
+        };
+        this.stompClient.onConnect = (frame) => {
+            this.stompClient.subscribe('/topic/updateEntry', this.handleEntryUpdate);
+        };
+        this.stompClient.activate();
+    }
+
+    /**
+     * Register a callback for when an entry idenified by key is updated 
+     * @param {*} key 
+     * @param {*} callback 
+     */
+    registerEntryUpdateCallback(key, callback) {
+        if (this.entryUpdateCallbacks.has(key)) {
+            this.entryUpdateCallbacks.get(key).push(callback);
+        }
+        else {
+            this.entryUpdateCallbacks.set(key, [callback]);
+        }
+    }
+
+    handleEntryUpdate(message) {
+        if (this.entryUpdateCallbacks.has(message.body)) {
+            this.entryUpdateCallbacks.get(message.body).forEach(cb => cb());
+        }
+    }
+
+    /**
+     * Add a lap to race entry
+     * @param {Entry} entry
+     * @param {Number} time The lap time duration in milliseconds
+     * @returns {Promise<Result}
+     */
+    async addLap(entry, time) {
+        const lapNumber = entry.laps.length + 1;
+        const result = await this.update(entry.url + '/addLap', {'number': lapNumber, 'time': time / 1000}); 
+        if (result.success) {
+            entry.laps.push({...DinghyRacingModel.lapTemplate(), 'number': lapNumber, 'time': time}); 
+            return Promise.resolve({...result, 'domainObject': entry});
+        }
+        else {
+            return result;
+        }
+    }
+    
+    /**
+     * Remove a lap from a race entry
+     * @param {Entry} entry
+     * @param {Lap} lap The lap to remove
+     * @returns {Promise<Result}
+     */
+    async removeLap(entry, lap) {
+        const result = await this.update(entry.url + '/removeLap', lap);
+        return result;
     }
 
     /**
@@ -237,10 +308,10 @@ class DinghyRacingModel {
     async getDinghies(dinghyClass) {
         let resource;
         if (!dinghyClass) {
-            resource = this.rootURL + '/dinghies';
+            resource = this.httpRootURL + '/dinghies';
         }
         else {
-            resource = this.rootURL + '/dinghies/search/findByDinghyClass?dinghyClass=' + dinghyClass.url;
+            resource = this.httpRootURL + '/dinghies/search/findByDinghyClass?dinghyClass=' + dinghyClass.url;
         }
         const result = await this.read(resource);
         if (result.success) {
@@ -267,7 +338,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async getDinghyBySailNumberAndDinghyClass(sailNumber, dinghyClass) {
-        const resource = this.rootURL + '/dinghies/search/findBySailNumberAndDinghyClass?sailNumber=' + sailNumber + '&dinghyClass=' + dinghyClass.url;
+        const resource = this.httpRootURL + '/dinghies/search/findBySailNumberAndDinghyClass?sailNumber=' + sailNumber + '&dinghyClass=' + dinghyClass.url;
 
         const result = await this.read(resource);
         if (result.success) {
@@ -300,7 +371,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async getDinghyClassByName(name) {
-        const resource = this.rootURL + '/dinghyClasses/search/findByName?name=' + name;
+        const resource = this.httpRootURL + '/dinghyClasses/search/findByName?name=' + name;
 
         const result = await this.read(resource);
         if(result.success) {
@@ -317,7 +388,7 @@ class DinghyRacingModel {
      * @return {Promise<Result>>} If successful Result.domainObject will be an Array<DinghyClass>
      */
     async getDinghyClasses() {
-        const resource = this.rootURL + '/dinghyClasses?sort=name,asc';
+        const resource = this.httpRootURL + '/dinghyClasses?sort=name,asc';
 
         const result = await this.read(resource);
         if (result.success) {
@@ -342,7 +413,7 @@ class DinghyRacingModel {
             return Promise.resolve({'success': false, 'message': 'Cannot retrieve race entries without URL for race.'});
         }
         // get entries
-        const resource = this.rootURL + '/entries/search/findByRace?race=' + race.url;
+        const resource = this.httpRootURL + '/entries/search/findByRace?race=' + race.url;
         const result = await this.read(resource);
         if (!result.success) {
             return Promise.resolve(result);
@@ -352,30 +423,57 @@ class DinghyRacingModel {
             // no entries for race
             return Promise.resolve({'success': true, 'domainObject': []})
         }
-        // get race, competitors, and dinghies
+        // get race, competitors, dinghies, and laps
         const raceResult = await this.getRace(entryCollectionHAL[0]._links.race.href);
         if (!raceResult.success) {
             return Promise.resolve(raceResult);
         }
         const competitorPromises = [];
         const dinghyPromises = [];
+        const lapsPromises = [];
         entryCollectionHAL.forEach(entry => {
             competitorPromises.push(this.getCompetitor(entry._links.competitor.href));
             dinghyPromises.push(this.getDinghy(entry._links.dinghy.href));
+            lapsPromises.push(this.getLaps(entry._links.laps.href));
         });
         const competitorResults = await Promise.all(competitorPromises);
         const dinghyResults = await Promise.all(dinghyPromises);
+        const lapsResults = await Promise.all(lapsPromises);
         const entries = [];
         for (let i = 0; i < entryCollectionHAL.length; i++) {
-            if(!competitorResults[i].success) {
+            if (!competitorResults[i].success) {
                 return Promise.resolve(competitorResults[i]);
             }
-            if(!dinghyResults[i].success) {
+            if (!dinghyResults[i].success) {
                 return Promise.resolve(dinghyResults[i]);
             }
-            entries.push({...DinghyRacingModel.entryTemplate(), 'race': raceResult.domainObject, 'competitor': competitorResults[i].domainObject, 'dinghy': dinghyResults[i].domainObject, 'url': entryCollectionHAL[i]._links.self.href});
+            if (!lapsResults[i].success) {
+                return Promise.resolve(lapsResults[i]);
+            }
+            entries.push({...DinghyRacingModel.entryTemplate(), 'race': raceResult.domainObject, 'competitor': competitorResults[i].domainObject, 
+                'dinghy': dinghyResults[i].domainObject, 'laps': lapsResults[i].domainObject, 'url': entryCollectionHAL[i]._links.self.href});
         };
         return Promise.resolve({'success': true, 'domainObject': entries});
+    }
+
+    /**
+     * Get laps
+     * On success result domain object will be an array of Lap types; {Array<Lap>}
+     * @param {String} url Address of the remote resource
+     * @returns {Promise<Result>}
+     */
+    async getLaps(url) {
+        const result = await this.read(url);
+        if (!result.success) {
+            return result;
+        }
+        const lapsCollectionHAL = result.domainObject._embedded.laps;
+        if (lapsCollectionHAL.length === 0) {
+            return Promise.resolve({'success': true, 'domainObject': []});
+        }
+        // convert REST data to local format
+        const laps = lapsCollectionHAL.map(lap => {return {...DinghyRacingModel.lapTemplate, 'number': lap.number, 'time': this.convertISO8601DurationToMilliseconds(lap.time)}});
+        return Promise.resolve({'success': true, 'domainObject': laps});
     }
 
     /**
@@ -388,15 +486,22 @@ class DinghyRacingModel {
         if (result.success) {
             // get dinghyClass
             let dinghyClassResult = await this.getDinghyClass(result.domainObject._links.dinghyClass.href);
-            // if race is a a handicap it will not have a dinghy class set and REST service will return a 404 not found error so in this case assume 404 error is a 'success' and provide an empty dinghy class 
+            // if race is a a handicap it will not have a dinghy class set and REST service will return a 404 not found error so in this case assume 404 error is a 
+            // 'success' and provide an empty dinghy class 
             const regex404 = /HTTP Error: 404/i;
             if (!dinghyClassResult.success && regex404.test(dinghyClassResult.message)) {
                 dinghyClassResult = {'success': true, 'domainObject': null};
             }
             if (dinghyClassResult.success) {
-                return Promise.resolve({'success': true, 'domainObject': {...DinghyRacingModel.raceTemplate(), 'name': result.domainObject.name, 'plannedStartTime': new Date(result.domainObject.plannedStartTime + 'Z'), 
+                return Promise.resolve({'success': true, 'domainObject': {...DinghyRacingModel.raceTemplate(), 'name': result.domainObject.name, 
+                    'plannedStartTime': new Date(result.domainObject.plannedStartTime + 'Z'), 
                     'actualStartTime': result.domainObject.actualStartTime ? new Date(result.domainObject.actualStartTime + 'Z') : null, 
-                    'dinghyClass': dinghyClassResult.domainObject, 'duration': this.convertISO8601DurationToMilliseconds(result.domainObject.duration), 'url': result.domainObject._links.self.href}});
+                    'dinghyClass': dinghyClassResult.domainObject, 'duration': this.convertISO8601DurationToMilliseconds(result.domainObject.duration), 
+                    'plannedLaps': result.domainObject.plannedLaps, 'lapForecast': result.domainObject.lapForecast, 
+                    'lastLapTime': result.domainObject.leadEntry ? this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.lastLapTime) : null, 
+                    'averageLapTime': result.domainObject.leadEntry ? this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.averageLapTime) : null, 
+                    'url': result.domainObject._links.self.href
+                }});
             }
             else {
                 return Promise.resolve(dinghyClassResult);
@@ -413,7 +518,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
     async getRacesOnOrAfterTime(startTime) {
-        const resource = this.rootURL + '/races/search/findByPlannedStartTimeGreaterThanEqual?time=' + startTime.toISOString();
+        const resource = this.httpRootURL + '/races/search/findByPlannedStartTimeGreaterThanEqual?time=' + startTime.toISOString();
 
         const result = await this.read(resource);
         if (result.success) {
@@ -423,11 +528,16 @@ class DinghyRacingModel {
             
             const races = [];
             for (let i = 0; i < racesHAL.length; i++  ) {
-                const dinghyClass = dinghyClassResults[i].success ? {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassResults[i].domainObject.name, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
+                const dinghyClass = dinghyClassResults[i].success ? {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassResults[i].domainObject.name, 
+                    'url': dinghyClassResults[i].domainObject._links.self.href} : null;
                 // assume time received has been stored in UTC
                 races.push({...DinghyRacingModel.raceTemplate(), 'name': racesHAL[i].name, 'plannedStartTime': new Date(racesHAL[i].plannedStartTime + 'Z'), 
                     'actualStartTime': racesHAL[i].actualStartTime ? new Date(racesHAL[i].actualStartTime + 'Z') : null, 
-                    'dinghyClass': dinghyClass, 'duration': this.convertISO8601DurationToMilliseconds(racesHAL[i].duration), 'url': racesHAL[i]._links.self.href});
+                    'dinghyClass': dinghyClass, 'duration': this.convertISO8601DurationToMilliseconds(racesHAL[i].duration), 'plannedLaps': racesHAL[i].plannedLaps, 
+                    'lapForecast': racesHAL[i].lapForecast, 
+                    'lastLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.lastLapTime) : null, 
+                    'averageLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.averageLapTime) : null, 
+                    'url': racesHAL[i]._links.self.href});
             };
             return Promise.resolve({'success': true, 'domainObject': races});
         }
@@ -475,7 +585,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>} If successful Result.domainObject will be an Array<Competitor>
      */
     async getCompetitors() {
-        const resource = this.rootURL + '/competitors?sort=name,asc';
+        const resource = this.httpRootURL + '/competitors?sort=name,asc';
 
         const result = await this.read(resource);
         if (result.success) {
@@ -494,7 +604,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async getCompetitorByName(name) {
-        const resource = this.rootURL + '/competitors/search/findByName?name=' + name;
+        const resource = this.httpRootURL + '/competitors/search/findByName?name=' + name;
 
         const result = await this.read(resource);
         if(result.success) {
@@ -515,7 +625,7 @@ class DinghyRacingModel {
         const body = JSON.stringify(object); // convert to string so can be serialized into object by receiving service
         try {
             let json;
-            const response = await fetch(this.rootURL + '/' + urlPathSegment, {method: 'POST', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, 'body': body});
+            const response = await fetch(this.httpRootURL + '/' + urlPathSegment, {method: 'POST', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, 'body': body});
             try {
                 // if body is empty reading json() will result in an error
                 json = await response.json();
@@ -544,7 +654,7 @@ class DinghyRacingModel {
     async read(resource) {
         try {
             let json;
-            const response = await fetch(resource, {method: 'GET', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}});
+            const response = await fetch(resource, {method: 'GET', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, cache: 'no-store'});
             try {
                 // if body is empty reading json() will result in an error 
                 json = await response.json();

@@ -1,22 +1,22 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
 import RaceEntryView from './RaceEntryView';
-import DinghyRacingModel from '../model/dinghy-racing-model';
 import { sortArray } from '../utilities/array-utilities';
+import ControllerContext from './ControllerContext';
 
 function RaceEntriesView({ races }) {
     const model = useContext(ModelContext);
+    const controller = useContext(ControllerContext);
     const [entriesMap, setEntriesMap] = useState(new Map());
     const [message, setMessage] = useState('');
     const [sortOrder, setSortOrder] = useState('default');
 
-    // get entries
-    useEffect(() => {
+    const updateEntries = useCallback(() => {
         const entriesMap = new Map();
         // build promises
         const promises = races.map(race => {
             if (!race || (!race.name && !race.url)) {
-                return Promise.resolve({'success': true, 'domainObject': new Map()});
+                return Promise.resolve({'success': true, 'domainObject': []});
             }
             else {
                 return model.getEntriesByRace(race);
@@ -36,6 +36,11 @@ function RaceEntriesView({ races }) {
             setEntriesMap(entriesMap);
         });
     }, [model, races]);
+
+    // get entries
+    useEffect(() => {
+        updateEntries();
+    }, [model, races, updateEntries]);
 
     // return array of entries sorted according to selected sort order
     function sorted() {
@@ -74,26 +79,26 @@ function RaceEntriesView({ races }) {
         return ordered;
     }
 
-    function setLap(entry) {
+    async function addLap(entry) {
         // if race was referenced by entries wouldn't need to keep looking it up. 
         // fix this in getEntries useEffect by replacing referenced race data from REST with that from races prop 
         const race = races.find((r) => {
             return r.name === entry.race.name && r.plannedStartTime.valueOf() === entry.race.plannedStartTime.valueOf();
         });
-        // new map is created to drive state change and rerender. Is there a better way?
-        const newMap = new Map(entriesMap);
         const lapTime = calculateLapTime(race.clock.getElapsedTime(), entry.laps);
-        entry.laps.push({...DinghyRacingModel.lapTemplate(), 'number': entry.laps.length + 1, 'time': lapTime});
-        setEntriesMap(newMap);
+        const result = await controller.addLap(entry, lapTime);
+        if (!result.success) {
+            setMessage(result.message);
+        }
+        updateEntries();
     }
 
-    function removeLap(entry) {
-        // if race was referenced by entries wouldn't need to keep looking it up. 
-        // fix this in getEntries useEffect by replacing referenced race data from REST with that from races prop
-        // new map is created to drive state change and rerender. Is there a better way?
-        const newMap = new Map(entriesMap);
-        entry.laps.pop();
-        setEntriesMap(newMap);
+    async function removeLap(entry) {
+        const result = await controller.removeLap(entry, entry.laps[entry.laps.length - 1]);
+        if (!result.success) {
+            setMessage(result.message);
+        }
+        updateEntries();
     }
 
     function calculateLapTime(elapsedTime, laps) {
@@ -112,7 +117,7 @@ function RaceEntriesView({ races }) {
         <button onClick={() => setSortOrder('lapTimes')}>By lap time</button>
         <table id="race-entries-table">
             <tbody>
-            {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name} entry={entry} addLap={setLap} removeLap={removeLap}/>)}
+            {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name} entry={entry} addLap={addLap} removeLap={removeLap}/>)}
             </tbody>
         </table>
         </>
