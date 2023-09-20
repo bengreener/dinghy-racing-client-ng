@@ -101,6 +101,14 @@ function RaceEntriesView({ races }) {
         updateEntries();
     }
 
+    async function updateLap(entry, value) {
+        const result = await controller.updateLap(entry, value);
+        if (!result.success) {
+            setMessage(result.message);
+        }
+        updateEntries();
+    }
+
     function calculateLapTime(elapsedTime, laps) {
         const lapTimes = laps.reduce((accumulator, initialValue) => {
             return accumulator + initialValue.time;
@@ -117,7 +125,7 @@ function RaceEntriesView({ races }) {
         <button onClick={() => setSortOrder('lapTimes')}>By lap time</button>
         <table id="race-entries-table">
             <tbody>
-            {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name} entry={entry} addLap={addLap} removeLap={removeLap}/>)}
+            {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap}/>)}
             </tbody>
         </table>
         </>

@@ -246,3 +246,50 @@ describe('when removing a lap time', () => {
         expect(cell).not.toBeInTheDocument();
     });
 });
+
+describe('when updating a lap time', () => {
+    it('updates model', async () => {
+        const entryChrisMarshallScorpionA1234Pre = {'competitor': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7}], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'};
+        const entriesScorpionAPre = [entryChrisMarshallScorpionA1234Pre, {'competitor': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
+
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+        const updateLapSpy = jest.spyOn(controller, 'updateLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true})});
+        await act(async () => {
+            customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
+        });        
+        const entry = await screen.findByText(/scorpion 1234/i);
+        const lastCell = entry.parentElement.lastChild;
+        await act(async () => {
+            await user.pointer({target: lastCell, keys: '[MouseRight]'});
+            await user.type(lastCell.lastChild, '15678');
+            await user.keyboard('{Enter}');
+        });        
+        expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234Pre, 15678);
+    });
+    it('refreshes display after lap time updated', async () => {
+        const entriesScorpionAPre = [{'competitor': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7}], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},{'competitor': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
+        const entriesScorpionAPost = [{'competitor': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 15678}], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},{'competitor': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getEntriesByRace')
+            .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
+            .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+        jest.spyOn(controller, 'updateLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true})});
+        await act(async () => {
+            customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
+        });
+        const entry = await screen.findByText(/scorpion 1234/i);
+        screen.findByRole('cell', {'name': 7});
+        const lastCell = entry.parentElement.lastChild;
+        await act(async ()=> {
+            await user.pointer({target: lastCell, keys: '[MouseRight]'});
+            await user.type(lastCell.lastChild, '15678');
+            await user.keyboard('{Enter}');
+        });
+        expect(await screen.findByRole('cell', {'name': 15678})).toBeInTheDocument();
+    });
+});
