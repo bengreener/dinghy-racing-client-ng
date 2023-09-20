@@ -47,6 +47,23 @@ class DinghyRacingController {
     }
 
     /**
+     * Update the last lap time recorded for an entry in a race
+     * @param {Entry} entry
+     * @param {Number} time The lap time duration in milliseconds
+     * @returns {Promise<Result}
+     */
+    updateLap(entry, time) {
+        if (!entry || !entry.url) {
+            return Promise.resolve({'success': false, 'message': 'A valid entry is required to update a lap time.'});
+        }
+        // time can't be null and must be number
+        if (isNaN(time)) {
+            return Promise.resolve({'success': false, 'message': 'Time must be a number; in milliseconds.'});   
+        }
+        return this.model.updateLap(entry, time);
+    }
+
+    /**
      * Add a new competitor
      * @param {Competitor} competitor
      * @returns {Promise<Result>}
