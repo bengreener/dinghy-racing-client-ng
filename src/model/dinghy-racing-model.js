@@ -131,6 +131,24 @@ class DinghyRacingModel {
     }
 
     /**
+     * Update the last lap time recorded for an entry in a race
+     * @param {Entry} entry
+     * @param {Number} time The lap time duration in milliseconds
+     * @returns {Promise<Result>}
+     */
+    async updateLap(entry, time) {
+        const lapNumber = entry.laps.length;
+        const result = await this.update(entry.url + '/updateLap', {'number': lapNumber, 'time': time / 1000}); 
+        if (result.success) {
+            entry.laps.push({...DinghyRacingModel.lapTemplate(), 'number': lapNumber, 'time': time}); 
+            return Promise.resolve({...result, 'domainObject': entry});
+        }
+        else {
+            return result;
+        }
+    }
+
+    /**
      * Create a new competitor
      * @param {Competitor} competitor 
      * @returns {Promise<Result>}
