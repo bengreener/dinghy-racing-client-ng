@@ -79,6 +79,10 @@ class DinghyRacingModel {
         return null;
     }
 
+    async updateLap(entry, time) {
+        return null;
+    }
+
     async createCompetitor(competitor) {
         return null;
     }

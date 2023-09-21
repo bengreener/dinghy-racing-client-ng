@@ -1579,6 +1579,37 @@ describe('when removing a lap from a race', () => {
     });
 });
 
+describe('when updating a lap from a race', () => {
+    it('returns a promise that resolves to a success response when lap is successfully updated', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: true,
+                status: 200,
+                json: () => Promise.resolve({})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.updateLap(entryChrisMarshallScorpionA1234, 2000);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result.success).toBeTruthy();
+    });
+    it('returns a promise that resolves to a result indicating failure when lap update is rejected by REST service', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 404, 
+                json: () => Promise.resolve({})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.updateLap(entryChrisMarshallScorpionA1234, 2000);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
+    });
+});
+
 describe('when a websocket message callback has been set for entry update', () => {
     it('calls the callback', done => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
