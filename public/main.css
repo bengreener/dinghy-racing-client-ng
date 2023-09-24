@@ -13,12 +13,21 @@ body {
 } */
 
 button {
-	font-size: rem;
-	padding: .25em;
+	border-radius: 25pt;
+    padding: 10pt;
+    margin: 5px;
+    border: 0pt;
+    cursor: pointer;
+    background-color: #85D6FF;
 }
 
-input.field {
-    width: 90%;
+input {
+    border-radius: 25pt;
+    padding: 5pt;
+}
+
+label {
+	padding: 5pt;
 }
 
 table {
