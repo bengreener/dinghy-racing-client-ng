@@ -1,16 +1,16 @@
 @charset "ISO-8859-1";
 
 * {
-	font-family: Arial;
+	font-family: Helvetica;
 }
 
 body {
 	margin: 0px;	
 }
 
-div {
+/* div {
 	outline: 1px solid CadetBlue;
-}
+} */
 
 button {
 	font-size: rem;
@@ -55,9 +55,18 @@ header {
 }
 
 .list-group button {
-	background-color: #f1f1f1;
+	/* background-color: #f1f1f1; */
 	display: block;
 	width: 100%;
+}
+
+.list-group-item {
+	border-radius: 25pt;
+    /* padding: 10pt; */
+    margin: 5px 0px 5px 0px;
+    border: 0pt;
+    cursor: pointer;
+    background-color: #85D6FF;
 }
 
 .link-primary {
