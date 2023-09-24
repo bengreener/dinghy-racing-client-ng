@@ -26,6 +26,11 @@ input {
     padding: 5pt;
 }
 
+select {
+	border-radius: 25pt;
+    padding: 5pt;
+}
+
 label {
 	padding: 5pt;
 }
