@@ -37,6 +37,7 @@ label {
 
 table {
     border-collapse: collapse;
+	margin: 5px;
 }
 
 td, th {
