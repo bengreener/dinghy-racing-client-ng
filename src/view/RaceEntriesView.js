@@ -117,7 +117,7 @@ function RaceEntriesView({ races }) {
     }
 
     return (
-        <>
+        <div>
         <p id="race-entries-message" className={!message ? "hidden" : ""}>{message}</p>
         <button onClick={() => setSortOrder('default')}>Default</button>
         <button onClick={() => setSortOrder('lastThree')}>By last 3</button>
@@ -128,7 +128,7 @@ function RaceEntriesView({ races }) {
             {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap}/>)}
             </tbody>
         </table>
-        </>
+        </div>
     );
 }
 
