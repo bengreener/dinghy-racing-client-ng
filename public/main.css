@@ -27,6 +27,13 @@ button {
     cursor: pointer;
     background-color: #85D6FF;
 }
+button:active {
+    transform: translateY(.5px);
+}
+button:hover {
+    /* filter: brighten(5.75); */
+    background-color: #0096E0;
+}
 input {
     border-radius: 25pt;
     padding: 5pt;
