@@ -57,7 +57,7 @@ function RaceHeaderView({ race }) {
     }
 
     return (
-        <div>
+        <>
         <label>{race.name}</label>
         <label htmlFor={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>Laps</label>
         <output id={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{race.plannedLaps}</output>
@@ -73,8 +73,8 @@ function RaceHeaderView({ race }) {
         <output id={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.averageLapTime)}</output>
         <button id="race-start-button" onClick={handleStartRaceClick}>Start Race</button>
         <button id="race-stop-button" onClick={handleStopRaceClick}>Stop Race</button>
-        <p id="race-console-message">{message}</p>
-        </div>
+        <p id="race-header-message" className={!message ? "hidden" : ""}>{message}</p>
+        </>
     );
 }
 

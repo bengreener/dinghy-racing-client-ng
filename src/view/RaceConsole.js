@@ -51,8 +51,10 @@ function RaceConsole() {
         <>
             <label htmlFor="race-select">Select Race</label>
             <select id="race-select" name="race" multiple={true} onChange={handleRaceSelect}>{raceOptions}</select>
+            <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
+            <div>
             {selectedRaces.map(race => <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} />)}
-            <p id="race-console-message">{message}</p>
+            </div>
             <RaceEntriesView races={selectedRaces} />
         </>
     );

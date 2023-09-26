@@ -118,7 +118,7 @@ function RaceEntriesView({ races }) {
 
     return (
         <>
-        <p id="race-console-message">{message}</p>
+        <p id="race-entries-message" className={!message ? "hidden" : ""}>{message}</p>
         <button onClick={() => setSortOrder('default')}>Default</button>
         <button onClick={() => setSortOrder('lastThree')}>By last 3</button>
         <button onClick={() => setSortOrder('classLastThree')}>By class & last 3</button>

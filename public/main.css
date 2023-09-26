@@ -3,22 +3,22 @@
 * {
 	font-family: Helvetica;
 }
-
 body {
 	margin: 0px;	
 }
-
+footer {
+	grid-area: footer;
+	background-size: contain;
+}
 h3 {
 	margin-top: 5px;
 	margin-bottom: 5px;
 	margin-left: 5px;
 
 }
-
 /* div {
 	outline: 1px solid CadetBlue;
 } */
-
 button {
 	border-radius: 25pt;
     padding: 10pt;
@@ -27,32 +27,26 @@ button {
     cursor: pointer;
     background-color: #85D6FF;
 }
-
 input {
     border-radius: 25pt;
     padding: 5pt;
 }
-
 select {
 	border-radius: 25pt;
     padding: 5pt;
 }
-
 label {
 	padding: 5pt;
 }
-
 table {
     border-collapse: collapse;
 	margin: 5px;
 }
-
 td, th {
     border: 1px solid #999;
     padding: 0.5em;
     text-align: left;
 }
-
 .container-fluid {
 	display: grid;
 	grid-template-columns: 15vw 85vw;
@@ -61,27 +55,25 @@ td, th {
 							'menu main'
 							'footer footer';
 }
-
 header {
 	grid-area: header;
 	background-size: contain;
 }
-
 /* .jumbotron {
 	grid-area: header;
 	background-size: contain;
 } */
-
+.hidden {
+    display: none;
+}
 .list-group {
 	grid-area: menu;
 }
-
 .list-group button {
 	/* background-color: #f1f1f1; */
 	display: block;
 	width: 100%;
 }
-
 .list-group-item {
 	border-radius: 25pt;
     /* padding: 10pt; */
@@ -90,19 +82,12 @@ header {
     cursor: pointer;
     background-color: #85D6FF;
 }
-
 .link-primary {
 	color: blue;
 	text-decoration: underline;
 	cursor: auto;
 }
-
 .display-port {
 	grid-area: main;
 	overflow: scroll;
-}
-
-footer {
-	grid-area: footer;
-	background-size: contain;
 }
