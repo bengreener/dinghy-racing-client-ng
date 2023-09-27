@@ -31,7 +31,6 @@ button:active {
     transform: translateY(.5px);
 }
 button:hover {
-    /* filter: brighten(5.75); */
     background-color: #0096E0;
 }
 input {
@@ -39,11 +38,13 @@ input {
     padding: 5pt;
 }
 select {
+	border-width: 2px;
 	border-radius: 25pt;
-    padding: 5pt;
+	padding: 5pt;
 }
 label {
 	padding: 5pt;
+	font-weight: bold;
 }
 table {
     border-collapse: collapse;
@@ -66,10 +67,10 @@ header {
 	grid-area: header;
 	background-size: contain;
 }
-/* .jumbotron {
-	grid-area: header;
-	background-size: contain;
-} */
+.display-port {
+	grid-area: main;
+	overflow: hidden;
+}
 .hidden {
     display: none;
 }
@@ -77,13 +78,11 @@ header {
 	grid-area: menu;
 }
 .list-group button {
-	/* background-color: #f1f1f1; */
 	display: block;
 	width: 100%;
 }
 .list-group-item {
 	border-radius: 25pt;
-    /* padding: 10pt; */
     margin: 5px 0px 5px 0px;
     border: 0pt;
     cursor: pointer;
@@ -93,8 +92,4 @@ header {
 	color: blue;
 	text-decoration: underline;
 	cursor: auto;
-}
-.display-port {
-	grid-area: main;
-	overflow: scroll;
 }

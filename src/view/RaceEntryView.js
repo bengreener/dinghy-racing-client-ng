@@ -46,7 +46,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
     }
 
     return (
-        <tr onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}>
+        <tr className="race-entry-view" onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}>
             <td>{entry.dinghy.dinghyClass.name + ' ' + entry.dinghy.sailNumber + ' ' + entry.competitor.name}</td>
             {entry.laps.map(lap => <td key={lap.number} >{lap.time}</td>)}
         </tr>
