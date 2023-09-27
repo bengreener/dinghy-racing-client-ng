@@ -117,18 +117,22 @@ function RaceEntriesView({ races }) {
     }
 
     return (
-        <>
-        <p id="race-console-message">{message}</p>
+        <div className="race-entries-view">
+        <p id="race-entries-message" className={!message ? "hidden" : ""}>{message}</p>
+        <div>
         <button onClick={() => setSortOrder('default')}>Default</button>
         <button onClick={() => setSortOrder('lastThree')}>By last 3</button>
         <button onClick={() => setSortOrder('classLastThree')}>By class & last 3</button>
         <button onClick={() => setSortOrder('lapTimes')}>By lap time</button>
+        </div>
+        <div className="scrollable">
         <table id="race-entries-table">
             <tbody>
             {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap}/>)}
             </tbody>
         </table>
-        </>
+        </div>
+        </div>
     );
 }
 

@@ -48,13 +48,15 @@ function RaceConsole() {
     }
 
     return (
-        <>
-            <label htmlFor="race-select">Select Race</label>
-            <select id="race-select" name="race" multiple={true} onChange={handleRaceSelect}>{raceOptions}</select>
+        <div className="race-console">
+            <div className="select-race">
+                <label htmlFor="race-select">Select Race</label>
+                <select id="race-select" name="race" multiple={true} onChange={handleRaceSelect}>{raceOptions}</select>
+            </div>
+            <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
             {selectedRaces.map(race => <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} />)}
-            <p id="race-console-message">{message}</p>
             <RaceEntriesView races={selectedRaces} />
-        </>
+        </div>
     );
 }
 

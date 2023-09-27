@@ -1,36 +1,60 @@
 @charset "ISO-8859-1";
 
 * {
-	font-family: Arial;
+	font-family: Helvetica;
 }
-
 body {
 	margin: 0px;	
 }
+footer {
+	grid-area: footer;
+	background-size: contain;
+}
+h3 {
+	margin-top: 5px;
+	margin-bottom: 5px;
+	margin-left: 5px;
 
-div {
+}
+/* div {
 	outline: 1px solid CadetBlue;
-}
-
+} */
 button {
-	font-size: rem;
-	padding: .25em;
+	border-radius: 25pt;
+    padding: 10pt;
+    margin: 5px;
+    border: 0pt;
+    cursor: pointer;
+    background-color: #85D6FF;
 }
-
-input.field {
-    width: 90%;
+button:active {
+    transform: translateY(.5px);
 }
-
+button:hover {
+    background-color: #0096E0;
+}
+input {
+    border-radius: 25pt;
+    padding: 5pt;
+}
+select {
+	border-width: 2px;
+	border-radius: 25pt;
+	padding: 5pt;
+}
+label {
+	padding: 5pt;
+	font-weight: bold;
+}
 table {
     border-collapse: collapse;
+	margin: 5px;
 }
-
 td, th {
     border: 1px solid #999;
     padding: 0.5em;
     text-align: left;
 }
-
 .container-fluid {
 	display: grid;
 	grid-template-columns: 15vw 85vw;
@@ -39,39 +63,33 @@ td, th {
 							'menu main'
 							'footer footer';
 }
-
 header {
 	grid-area: header;
 	background-size: contain;
 }
-
-/* .jumbotron {
-	grid-area: header;
-	background-size: contain;
-} */
-
+.display-port {
+	grid-area: main;
+	overflow: hidden;
+}
+.hidden {
+    display: none;
+}
 .list-group {
 	grid-area: menu;
 }
-
 .list-group button {
-	background-color: #f1f1f1;
 	display: block;
 	width: 100%;
 }
-
+.list-group-item {
+	border-radius: 25pt;
+    margin: 5px 0px 5px 0px;
+    border: 0pt;
+    cursor: pointer;
+    background-color: #85D6FF;
+}
 .link-primary {
 	color: blue;
 	text-decoration: underline;
 	cursor: auto;
-}
-
-.display-port {
-	grid-area: main;
-	overflow: scroll;
-}
-
-footer {
-	grid-area: footer;
-	background-size: contain;
 }
