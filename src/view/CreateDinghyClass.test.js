@@ -1,7 +1,6 @@
-import { screen, prettyDOM, render } from '@testing-library/react';
+import { act, screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CreateDinghyClass from './CreateDinghyClass';
-import { act } from 'react-dom/test-utils';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 
 it('renders', () => {
@@ -40,7 +39,6 @@ it('calls the function passed in to onCreate prop with new dinghy class as param
     render(<CreateDinghyClass onCreate={fnOnCreate} />);
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
     const txtClassName = screen.getByLabelText('Class Name');
-    // await user.type(txtClassName, 'Scorpion');
     await act(async () => {
         await user.type(txtClassName, 'Scorpion');
         await user.click(btnCreate);
