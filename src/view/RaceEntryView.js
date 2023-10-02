@@ -1,7 +1,21 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
+import LapView from './LapView';
 
 function RaceEntryView({entry, addLap, removeLap, updateLap}) {
-    let editMode = false;
+    const [editMode, setEditMode] = useState(false);
+
+    const handleLastLapCellKeyUp = useCallback((event) => {
+        if (event.key === 'Enter') {
+            if (updateLap) {
+                updateLap(entry, Number(event.target.value));
+                setEditMode(false);
+            }
+        }
+    }, [entry, updateLap]);
+
+    const handleLastLapCellFocusOut = useCallback((event) => {
+        setEditMode(false);
+    }, []);
 
     function handleClick(event) {
         if (!editMode) {
@@ -20,23 +34,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
 
     function handleAuxClick(event) {
         if (!editMode) {
-            editMode  = true;
-            // clear current contents of cell
-            const value = event.target.parentElement.lastChild.innerText;
-            event.target.parentElement.lastChild.replaceChildren();
-            // add an input for amended value
-            const input = document.createElement('INPUT');
-            input.setAttribute('type', 'number');
-            input.setAttribute('value', value);
-            input.addEventListener('keyup', (event) => {
-                if (event.key === 'Enter') {
-                    if (updateLap) {
-                        updateLap(entry, Number(event.target.value));
-                        editMode = false;
-                    }
-                }
-            });
-            event.target.parentElement.lastChild.appendChild(input);
+            setEditMode(true);
         }
     }
 
@@ -45,10 +43,29 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
         event.preventDefault();
     }
 
+    const lapsView = [];
+
+    for (let i = 0; i < entry.laps.length; i++) {
+        const lap = entry.laps[i];
+        let lapView;
+        if (i === (entry.laps.length - 1)) {
+            if (editMode) {
+                lapView = <LapView key={lap.number} value={lap.time} editable={true} keyup={handleLastLapCellKeyUp} focusout={handleLastLapCellFocusOut} />    
+            }
+            else {
+                lapView = <LapView key={lap.number} value={lap.time} editable={false} />
+            }
+        }
+        else {
+            lapView = <LapView key={lap.number} value={lap.time} editable={false} />
+        }
+        lapsView.push(lapView);
+    }
+
     return (
         <tr className="race-entry-view" onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}>
             <td>{entry.dinghy.dinghyClass.name + ' ' + entry.dinghy.sailNumber + ' ' + entry.competitor.name}</td>
-            {entry.laps.map(lap => <td key={lap.number} >{lap.time}</td>)}
+            {lapsView}
         </tr>
     )
 }

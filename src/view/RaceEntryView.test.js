@@ -56,6 +56,7 @@ it('when secondary mouse button is clicked accepts a new lap time input in the l
     await act(async () => {
         await user.pointer({target: lastCell, keys: '[MouseRight]'});
     });
+    await user.clear(lastCell.lastChild);
     await user.type(lastCell.lastChild, '15678');
     expect(lastCell.lastChild).toHaveValue(15678);
 });
@@ -105,10 +106,11 @@ describe('when editing a lap time', () => {
         await act(async () => {
             await user.pointer({target: lastCell, keys: '[MouseRight]'});
         });
+        await user.clear(lastCell.lastChild);
         await user.type(lastCell.lastChild, '15678');
         await act(async () => {
             await user.keyboard('{Enter}');
         });
         expect(updateLapCallback).toBeCalledWith(entry, 15678);
     });
-})
+});
