@@ -277,7 +277,6 @@ describe('when a race is unselected', () => {
         
         const graduateEntries = await screen.findAllByRole('cell', {'name': /Graduate/i});
         graduateEntries.forEach(entry => expect(entry).toBeInTheDocument());
-        // expect(graduateEntries).toBeInTheDocument();
         await act(async () => {
             await user.deselectOptions(selectRace, ['Graduate A']);
         });
