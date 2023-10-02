@@ -327,7 +327,6 @@ describe('when create button is clicked', () => {
 
 it('displays entries for race', async () => {
     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-    // jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
 
     const competitor1 = await screen.findByRole('cell', {'name': /Chris Marshall/i});
     const competitor2 = await screen.findByRole('cell', {'name': /Sarah Pascal/i});
