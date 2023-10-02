@@ -262,11 +262,16 @@ describe('when updating a lap time', () => {
         });        
         const entry = await screen.findByText(/scorpion 1234/i);
         const lastCell = entry.parentElement.lastChild;
+        // render updated components
         await act(async () => {
             await user.pointer({target: lastCell, keys: '[MouseRight]'});
+        });
+        // after render perform update
+        await act(async () => {
+            await user.clear(lastCell.lastChild);
             await user.type(lastCell.lastChild, '15678');
             await user.keyboard('{Enter}');
-        });        
+        });
         expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234Pre, 15678);
     });
     it('refreshes display after lap time updated', async () => {
@@ -285,8 +290,13 @@ describe('when updating a lap time', () => {
         const entry = await screen.findByText(/scorpion 1234/i);
         screen.findByRole('cell', {'name': 7});
         const lastCell = entry.parentElement.lastChild;
-        await act(async ()=> {
+        // render updated components
+        await act(async () => {
             await user.pointer({target: lastCell, keys: '[MouseRight]'});
+        });
+        // after render perform update
+        await act(async () => { 
+            await user.clear(lastCell.lastChild);
             await user.type(lastCell.lastChild, '15678');
             await user.keyboard('{Enter}');
         });
