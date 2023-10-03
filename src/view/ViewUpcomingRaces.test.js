@@ -1,4 +1,4 @@
-import { act, render, screen, prettyDOM, logRoles } from '@testing-library/react';
+import { act, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { customRender } from '../test-utilities/custom-renders';
 import DinghyRacingModel from '../model/dinghy-racing-model';
@@ -53,4 +53,16 @@ describe('when a race is selected', () => {
 
         expect(showSignUpFormMock).toBeCalled();
     });
+});
+
+describe('when races fail to load', () => {
+    it('displays the error message', async () => {
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'That was a bust!'})});
+        await act(async () => {
+            await customRender(<ViewUpcomingRaces />, model);
+        });
+        const message = await screen.findByText(/That was a bust!/);
+        expect(message).toBeInTheDocument();
+    })
 });

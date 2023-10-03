@@ -9,7 +9,8 @@ import ModelContext from './ModelContext';
  */
 function ViewUpcomingRaces({ showSignUpForm = false }) {
     const model = useContext(ModelContext);
-    const [raceMap, setRaceMap] = useState(new Map());
+    const [raceMap, setRaceMap] = useState(new Map());  
+    const [message, setMessage] = useState('');
 
     function handleRowClick({currentTarget}) {
         if (showSignUpForm) {
@@ -27,10 +28,14 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
                 });
                 setRaceMap(map);
             }
+            else {
+                setMessage('Unable to load races\n' + result.message);
+            }
         });
     }, [model])
 
     return (
+        <>
         <table>
             <thead>
                 <tr>
@@ -41,6 +46,8 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
                 {Array.from(raceMap.values()).map(race => <tr key={race.url} id={race.url} onClick={handleRowClick}><td>{race.name}</td><td>{race.dinghyClass ? race.dinghyClass.name : ''}</td><td>{race.plannedStartTime.toLocaleString()}</td></tr>)}
             </tbody>
         </table>
+        <p id="view-upcoming-races-message" className={!message ? "hidden" : ""}>{message}</p>
+        </>
     );
 }
 
