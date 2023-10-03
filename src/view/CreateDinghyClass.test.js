@@ -21,7 +21,7 @@ it('accepts the name of a dinghy class', async () => {
 
 it('calls the function passed in to onCreate prop', async () => {
     const user = userEvent.setup();
-    const fnOnCreate = jest.fn(() => {return {'success': true}});
+    const fnOnCreate = jest.fn(() => {return Promise.resolve({'success': true})});
     
     render(<CreateDinghyClass onCreate={fnOnCreate} />);
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
@@ -34,7 +34,7 @@ it('calls the function passed in to onCreate prop', async () => {
 
 it('calls the function passed in to onCreate prop with new dinghy class as parameter', async () => {
     const user = userEvent.setup();
-    const fnOnCreate = jest.fn((dinghyClass) => {return {'success': true}});
+    const fnOnCreate = jest.fn((dinghyClass) => {return Promise.resolve({'success': true})});
     
     render(<CreateDinghyClass onCreate={fnOnCreate} />);
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
@@ -50,7 +50,7 @@ it('calls the function passed in to onCreate prop with new dinghy class as param
 describe('when creating a new dinghy class', () => {
     it('clears the input on success', async () => {
         const user = userEvent.setup();
-        const fnOnCreate = jest.fn(() => {return {'success': true}});
+        const fnOnCreate = jest.fn(() => {return Promise.resolve({'success': true})});
         
         render(<CreateDinghyClass onCreate={fnOnCreate} />);
         const btnCreate = screen.getByRole('button', {'name': 'Create'});
@@ -64,7 +64,7 @@ describe('when creating a new dinghy class', () => {
     })
     it('displays the failure message on failure', async () => {
         const user = userEvent.setup();
-        const fnOnCreate = jest.fn(() => {return {'success': false, 'message': 'That was a bust!'}});
+        const fnOnCreate = jest.fn(() => {return Promise.resolve({'success': false, 'message': 'That was a bust!'})});
         
         render(<CreateDinghyClass onCreate={fnOnCreate} />);
         const btnCreate = screen.getByRole('button', {'name': 'Create'});

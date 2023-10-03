@@ -122,7 +122,7 @@ it('accepts the number of laps for the race', async () => {
 
 it('calls the function passed in to onCreate prop', async () => {
     const user = userEvent.setup();
-    const fnOnCreate = jest.fn((race) => {return {'success': true}});
+    const fnOnCreate = jest.fn((race) => {return Promise.resolve({'success': true})});
     
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
@@ -140,7 +140,7 @@ it('calls the function passed in to onCreate prop', async () => {
 
 it('calls the function passed in to onCreate prop with new race as parameter', async () => {
     const user = userEvent.setup();
-    const fnOnCreate = jest.fn((race) => {return {'success': true}});
+    const fnOnCreate = jest.fn((race) => {return Promise.resolve({'success': true})});
     
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
@@ -172,11 +172,11 @@ it('calls the function passed in to onCreate prop with new race as parameter', a
 describe('when creating a new race', () => {
     it('clears the input on success', async () => {
         const user = userEvent.setup();
-        const fnOnCreate = jest.fn(() => {return {'success': true}});
+        const fnOnCreate = jest.fn(() => {return Promise.resolve({'success': true})});
         
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
-        jest.spyOn(DinghyRacingModel, 'dinghyClassTemplate').mockImplementation(() => {return {'name': '', 'url': ''}});
+        jest.spyOn(DinghyRacingModel, 'dinghyClassTemplate').mockImplementation(() => {return Promise.resolve({'name': '', 'url': ''})});
         jest.spyOn(DinghyRacingModel, 'raceTemplate').mockImplementation(() => {return {'name': '', 'plannedStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'url': ''}});
         await act(async () => {
             customRender(<CreateRace onCreate={fnOnCreate} />, model);
@@ -202,7 +202,7 @@ describe('when creating a new race', () => {
     })
     it('displays the failure message on failure', async () => {
         const user = userEvent.setup();
-        const fnOnCreate = jest.fn(() => {return {'success': false, 'message': 'That was a bust!'}});
+        const fnOnCreate = jest.fn(() => {return Promise.resolve({'success': false, 'message': 'That was a bust!'})});
         
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});

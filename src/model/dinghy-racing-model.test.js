@@ -261,7 +261,7 @@ describe('when creating a new race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return {'success': true, 'domainObject': dinghyClassScorpion}});
+        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
         const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}, 'duration': 2700000});
         const result = await promise;
         expect(getDinghyClassByNameSpy).toHaveBeenCalled();
@@ -285,7 +285,7 @@ describe('when creating a new race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return {'success': true, 'domainObject': dinghyClassScorpion}});
+        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
         const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': dinghyClassScorpion, 'duration': 2700000});
         const result = await promise;
         expect(getDinghyClassByNameSpy).not.toHaveBeenCalled();
@@ -309,7 +309,7 @@ describe('when creating a new race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return {'success': true, 'domainObject': dinghyClassScorpion}});
+        jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
         const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}, 'duration': 2700000});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
