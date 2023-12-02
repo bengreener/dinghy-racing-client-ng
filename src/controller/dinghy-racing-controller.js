@@ -114,6 +114,9 @@ class DinghyRacingController {
         if (!(race.plannedStartTime instanceof Date)) {
             return Promise.resolve({'success': false, 'message': 'A time is required for a new race.'});
         }
+        if ((race.plannedLaps === undefined || race.plannedLaps === null || race.plannedLaps === '')) {
+            return Promise.resolve({'success': false, 'message': 'Planned laps is required for a new race.'});
+        }
         return this.model.createRace(race);
     }
 
