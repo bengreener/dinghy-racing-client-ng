@@ -37,6 +37,17 @@ it('displays the available dinghyClasses and handicap option', async () => {
     expect(optionsAvailable).toEqual([{'text': '', 'value': ''}, {'text': 'Graduate', 'value': 'Graduate'}, {'text': 'Scorpion', 'value': 'Scorpion'}]);
 })
 
+it('provides a default option of 5 for the number of laps for the race', async () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
+    await act(async () => {
+        customRender(<CreateRace />, model);
+    });
+    
+    const inputLaps = screen.getByLabelText(/laps/i);
+    expect(inputLaps).toHaveValue(5);
+})
+
 it('accepts the name for a race', async () => {
     const user = userEvent.setup();
     
