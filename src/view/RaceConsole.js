@@ -38,7 +38,7 @@ function RaceConsole() {
             const race = raceMap.get(etso[i].value);
             if (race) {
                 if (!race.clock) {
-                    race.clock = new Clock();
+                    race.clock = new Clock(race.plannedStartTime);
                 }
             }
             races.push(race);
