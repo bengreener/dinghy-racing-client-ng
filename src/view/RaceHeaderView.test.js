@@ -43,7 +43,7 @@ describe('when rendered', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
-        expect(screen.getByLabelText(/estimate/i)).toHaveValue('5');
+        expect(screen.getByLabelText(/estimate/i)).toHaveValue('5.00');
     });
     it('displays the last lap time for the lead entry', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -146,5 +146,5 @@ it('updates values when a new race is selected', async () => {
     expect(screen.getByLabelText(/laps(?!.)/i)).toHaveValue('4');
     expect(screen.getByLabelText(/duration/i)).toHaveValue('00:22:30');
     expect(screen.getByLabelText(/remaining/i)).toHaveValue('00:22:25');
-    expect(screen.getByLabelText(/estimate/i)).toHaveValue('4');
+    expect(screen.getByLabelText(/estimate/i)).toHaveValue('4.00');
 });

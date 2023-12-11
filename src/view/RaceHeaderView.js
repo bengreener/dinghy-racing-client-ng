@@ -59,7 +59,7 @@ function RaceHeaderView({ race }) {
             <label htmlFor={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>{(elapsedTime < 0) ? 'Countdown' : 'Remaining'}</label>
             <output id={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>{(elapsedTime < 0) ? Clock.formatDuration(elapsedTime) : Clock.formatDuration(race.duration - elapsedTime)}</output>
             <label htmlFor={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>Laps estimate</label>
-            <output id={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{updatedRace.lapForecast}</output>
+            <output id={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{Number(updatedRace.lapForecast).toFixed(2)}</output>
             <label htmlFor={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Last lap time</label>
             <output id={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.lastLapTime)}</output>
             <label htmlFor={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Average lap time</label>
