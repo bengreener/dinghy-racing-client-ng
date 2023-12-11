@@ -183,11 +183,11 @@ describe('when adding a lap time', () => {
         expect(addLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234, 7);
     });
     it('refreshes display after addLap completed', async () => {
-        const entriesScorpionAPost = [{'competitor': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7}], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},{'competitor': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
+        const entriesScorpionAPost = [{'competitor': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},{'competitor': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        const clock = {getElapsedTime: () => {return 7}};
+        const clock = {getElapsedTime: () => {return 312568}};
         jest.spyOn(model, 'getEntriesByRace')
             .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
             .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
@@ -200,7 +200,7 @@ describe('when adding a lap time', () => {
         await act(async () => {
             await user.click(entry);
         });
-        expect(await screen.findByRole('cell', {'name': 7})).toBeInTheDocument();
+        expect(await screen.findByRole('cell', {'name': '00:05:12'})).toBeInTheDocument();
     });
 });
 
@@ -225,7 +225,7 @@ describe('when removing a lap time', () => {
         expect(removeLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234Pre, {'number': 1, 'time': 7});
     });
     it('refreshes display after lap time removed', async () => {
-        const entriesScorpionAPre = [{'competitor': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7}], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},{'competitor': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
+        const entriesScorpionAPre = [{'competitor': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},{'competitor': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -237,7 +237,7 @@ describe('when removing a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
         const entry = await screen.findByText(/scorpion 1234/i);
-        const cell = await screen.findByRole('cell', {'name': 7});
+        const cell = await screen.findByRole('cell', {'name': '00:05:12'});
         expect(cell).toBeInTheDocument();
         await act(async ()=> {
             await user.keyboard('{Control>}');
@@ -300,6 +300,6 @@ describe('when updating a lap time', () => {
             await user.type(lastCell.lastChild, '15678');
             await user.keyboard('{Enter}');
         });
-        expect(await screen.findByRole('cell', {'name': 15678})).toBeInTheDocument();
+        expect(await screen.findByRole('cell', {'name': '00:00:15'})).toBeInTheDocument();
     });
 });
