@@ -727,7 +727,7 @@ class DinghyRacingModel {
      * Format of duration is based on ISO 8601 duration format; with further restrictions on expected values.
      * Overall period is expected to be positive.
      * Duration provided by REST service is expected to be in positive time units (hours, minutes, seconds); no year, month, or day units.
-     * If format ore range is not as expected throws a TypeException error.
+     * If format or range is not as expected throws a TypeException error.
      * @param {String} duration
      * @returns {Number}
      */

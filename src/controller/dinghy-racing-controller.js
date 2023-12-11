@@ -26,6 +26,10 @@ class DinghyRacingController {
         if (isNaN(time)) {
             return Promise.resolve({'success': false, 'message': 'Time must be a number; in milliseconds.'});   
         }
+        // time must be greater than zero
+        if (time <= 0) {
+            return Promise.resolve({'success': false, 'message': 'Time must be greater than zero.'});   
+        }
         return this.model.addLap(entry, time);
     }
 
@@ -59,6 +63,10 @@ class DinghyRacingController {
         // time can't be null and must be number
         if (isNaN(time)) {
             return Promise.resolve({'success': false, 'message': 'Time must be a number; in milliseconds.'});   
+        }
+        // time must be greater than zero
+        if (time <= 0) {
+            return Promise.resolve({'success': false, 'message': 'Time must be greater than zero.'});   
         }
         return this.model.updateLap(entry, time);
     }
