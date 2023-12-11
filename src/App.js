@@ -12,15 +12,15 @@ function App({model, controller}) {
   const [displayPort, setDisplayPort] = React.useState();
 
   function showCreateDinghyClassForm() {
-    setDisplayPort(<CreateDinghyClass onCreate={controller.createDinghyClass} />);
+    setDisplayPort(<CreateDinghyClass key={Date.now()} onCreate={controller.createDinghyClass} />);
   }
 
   function showCreateRaceForm() {
-    setDisplayPort(<CreateRace onCreate={controller.createRace} />);
+    setDisplayPort(<CreateRace key={Date.now()} onCreate={controller.createRace} />);
   }
 
   function showUpcomingRaces() {
-    setDisplayPort(<ViewUpcomingRaces showSignUpForm={showSignUpForm}/>);
+    setDisplayPort(<ViewUpcomingRaces key={Date.now()} showSignUpForm={showSignUpForm}/>);
   }
 
   function showSignUpForm(race) {
