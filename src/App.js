@@ -28,7 +28,7 @@ function App({model, controller}) {
   }
 
   function showRaceConsole() {
-    setDisplayPort(<RaceConsole />);
+    setDisplayPort(<RaceConsole key={Date.now()}/>);
   }
 
   return (
