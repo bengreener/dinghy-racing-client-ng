@@ -240,3 +240,37 @@ describe('when a race is unselected', () => {
         graduateEntries.forEach(entry => expect(entry).not.toBeInTheDocument());
     });
 });
+
+describe('when a error is received', () => {
+    it('displays error message', async () => {
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+        jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
+        
+        await act(async () => {        
+            customRender(<RaceConsole />, model);
+        });
+    
+        const errorMessage = screen.getByText(/Unable to load races/i);
+        expect(errorMessage).toBeInTheDocument();
+    });
+    it('clears eror message when a successful response is received', async () => {
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+        jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})}).mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
+        
+        let render;
+
+        await act(async () => {        
+            render = customRender(<RaceConsole key={Date.now()}/>, model);
+        });
+    
+        const errorMessage = screen.getByText(/Unable to load races/i);
+        expect(errorMessage).toBeInTheDocument();
+
+        await act(async () => {
+            render.rerender(<RaceConsole key={Date.now()}/>, model);
+        });
+        expect(screen.queryByText(/Unable to load races/i)).not.toBeInTheDocument();
+    });
+});
