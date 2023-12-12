@@ -12,6 +12,7 @@ function RaceEntriesView({ races }) {
     const [sortOrder, setSortOrder] = useState('default');
 
     const updateEntries = useCallback(() => {
+        setMessage(''); // clear any previous message
         const entriesMap = new Map();
         // build promises
         const promises = races.map(race => {
@@ -90,7 +91,9 @@ function RaceEntriesView({ races }) {
         if (!result.success) {
             setMessage(result.message);
         }
-        updateEntries();
+        else {
+            updateEntries();
+        }
     }
 
     async function removeLap(entry) {
@@ -98,7 +101,9 @@ function RaceEntriesView({ races }) {
         if (!result.success) {
             setMessage(result.message);
         }
-        updateEntries();
+        else {
+            updateEntries();
+        }
     }
 
     async function updateLap(entry, value) {
@@ -106,7 +111,9 @@ function RaceEntriesView({ races }) {
         if (!result.success) {
             setMessage(result.message);
         }
-        updateEntries();
+        else {
+            updateEntries();
+        }
     }
 
     function calculateLapTime(elapsedTime, laps) {
