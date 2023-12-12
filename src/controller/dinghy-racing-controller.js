@@ -16,7 +16,7 @@ class DinghyRacingController {
      * Add a lap to race entry
      * @param {Entry} entry
      * @param {Number} time The lap time duration in milliseconds
-     * @returns {Promise<Result}
+     * @returns {Promise<Result>}
      */
     addLap(entry, time) {
         if (!entry || !entry.url) {
@@ -37,7 +37,7 @@ class DinghyRacingController {
      * Remove a lap from a race entry
      * @param {Entry} entry
      * @param {Lap} lap The lap to remove
-     * @returns {Promise<Result}
+     * @returns {Promise<Result>}
      */
     removeLap(entry, lap) {
         if (!entry || !entry.url) {
@@ -54,7 +54,7 @@ class DinghyRacingController {
      * Update the last lap time recorded for an entry in a race
      * @param {Entry} entry
      * @param {Number} time The lap time duration in milliseconds
-     * @returns {Promise<Result}
+     * @returns {Promise<Result>}
      */
     updateLap(entry, time) {
         if (!entry || !entry.url) {
@@ -113,7 +113,7 @@ class DinghyRacingController {
     /**
      * Create a new race
      * @param {Race} race
-     * @returns {Promise<Result}
+     * @returns {Promise<Result>}
      */
     createRace(race) {
         if (race.name === undefined || race.name === null || race.name === '') {
