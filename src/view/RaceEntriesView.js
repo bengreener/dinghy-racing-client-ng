@@ -130,7 +130,7 @@ function RaceEntriesView({ races }) {
         <button onClick={() => setSortOrder('default')}>Default</button>
         <button onClick={() => setSortOrder('lastThree')}>By last 3</button>
         <button onClick={() => setSortOrder('classLastThree')}>By class & last 3</button>
-        <button onClick={() => setSortOrder('lapTimes')}>By lap time</button>
+        <button onClick={() => setSortOrder('lapTimes')}>By lap times</button>
         </div>
         <div className="scrollable">
         <table id="race-entries-table">
