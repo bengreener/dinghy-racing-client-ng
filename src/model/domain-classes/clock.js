@@ -47,7 +47,7 @@ class Clock {
                 if (this._tickHandler) {
                     this._tickHandler();
                 };
-            }, Date.now() % 1000);
+            }, 1000 - Date.now() % 1000);
         }
     }
 
