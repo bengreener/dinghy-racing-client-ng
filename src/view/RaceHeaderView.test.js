@@ -1,6 +1,6 @@
 import { customRender } from '../test-utilities/custom-renders';
 import userEvent from '@testing-library/user-event';
-import { screen, } from '@testing-library/react';
+import { screen, act } from '@testing-library/react';
 import RaceHeaderView from './RaceHeaderView';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
@@ -57,11 +57,11 @@ describe('when rendered', () => {
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
         expect(screen.getByLabelText(/average/i)).toHaveValue('00:00:00');
     });
-    it('displays stop race button', () => {
+    it('displays download results button', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
-        expect(screen.getByText(/stop/i)).toBeInTheDocument();
+        expect(screen.getByText(/download results/i)).toBeInTheDocument();
     });
 });
 
@@ -147,4 +147,29 @@ it('updates values when a new race is selected', async () => {
     expect(screen.getByLabelText(/duration/i)).toHaveValue('00:22:30');
     expect(screen.getByLabelText(/remaining/i)).toHaveValue('00:22:25');
     expect(screen.getByLabelText(/estimate/i)).toHaveValue('4.00');
+});
+
+describe('when download results button clicked', () => {
+    it('calls controller download results function', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const downloadFunctionSpy = jest.spyOn(controller, 'downloadRaceResults').mockImplementation(() => {return Promise.resolve({'success': true})});
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
+        await user.click(screen.getByText(/download results/i));
+
+        expect(downloadFunctionSpy).toBeCalledTimes(1);
+    });
+    it('displays the error message if the request to download is unsuccessful', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const downloadFunctionSpy = jest.spyOn(controller, 'downloadRaceResults').mockImplementation(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
+        await act(async () => {
+            await user.click(screen.getByText(/download results/i));
+        });
+        
+        expect(screen.getByText(/oops/i)).toBeInTheDocument();
+    })
 });

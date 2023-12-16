@@ -1,3 +1,4 @@
+import { downloadRaceEntriesCSV } from '../utilities/csv-writer'
 class DinghyRacingController {
     
     model;
@@ -160,6 +161,25 @@ class DinghyRacingController {
             return Promise.resolve({'success': false, 'message': 'Please provide details of the race.'});
         }
         return this.model.startRace(race, new Date());
+    }
+
+    /**
+     * Download a file containing the results for race
+     * @param {Race} Race to donwload results for
+     * @return {Promise<Result>}
+     */
+    async downloadRaceResults(race) {
+        // check valid race (a URL is sufficient, otherwise a name and start time is required)
+        if (!race.url && (!race.name || race.name === '' || !race.plannedStartTime)) {
+            return Promise.resolve({'success': false, 'message': 'Please provide details of the race.'});
+        }
+        const result = await this.model.getEntriesByRace(race);
+        if (result.success) {
+            return downloadRaceEntriesCSV(race, result.domainObject);
+        }
+        else {
+            return Promise.resolve(result);
+        }
     }
 }
 
