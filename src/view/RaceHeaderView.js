@@ -1,9 +1,11 @@
 import React, { useContext, useEffect, useState, useRef, useCallback } from 'react';
 import Clock from '../model/domain-classes/clock';
 import ModelContext from './ModelContext';
+import ControllerContext from './ControllerContext';
 
 function RaceHeaderView({ race }) {
     const model = useContext(ModelContext);
+    const controller = useContext(ControllerContext);
     const [updatedRace, setUpdatedRace] = useState(race);
     const [elapsedTime, setElapsedTime] = useState(race.clock.getElapsedTime());
     const [message, setMessage] = useState('');
@@ -19,6 +21,14 @@ function RaceHeaderView({ race }) {
             }
         });
     }, [model, race]);
+
+    const handleRaceResultDownloadClick = useCallback(() => {
+        controller.downloadRaceResults(race).then(result => {
+            if (!result.success) {
+                setMessage('Unable to download results\n' + result.message);
+            }
+        });
+    }, [controller, race]);
 
     useEffect(() => {
         model.getEntriesByRace(race).then(result => {
@@ -43,10 +53,6 @@ function RaceHeaderView({ race }) {
         previousRace.current = race;
     }, [race]);
 
-    function handleStopRaceClick() {
-        race.clock.stop();
-    }
-
     race.clock.start();
 
     return (
@@ -64,7 +70,7 @@ function RaceHeaderView({ race }) {
             <output id={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.lastLapTime)}</output>
             <label htmlFor={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Average lap time</label>
             <output id={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.averageLapTime)}</output>
-            <button id="race-stop-button" onClick={handleStopRaceClick}>Stop Race</button>
+            <button id="race-result-download-button" onClick={handleRaceResultDownloadClick}>Download Results</button>
             <p id="race-header-message" className={!message ? "hidden" : ""}>{message}</p>
         </div>
     );
