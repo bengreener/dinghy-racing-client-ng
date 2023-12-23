@@ -147,6 +147,10 @@ class DinghyRacingModel {
         return null;
     }
 
+    async getRacesBetweenTimes(startTime, endTime) {
+        return null;
+    }
+
     async getRaceByNameAndPlannedStartTime(name, time) {
         return null;
     }

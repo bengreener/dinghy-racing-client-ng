@@ -11,6 +11,7 @@ it('renders', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
     jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     
     await act(async () => {        
         customRender(<RaceConsole />, model);
@@ -24,6 +25,7 @@ it('displays races available for selection', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
 
     customRender(<RaceConsole />, model);
 
@@ -36,8 +38,8 @@ it('displays races available for selection', async () => {
 
 it('notifies user if races cannot be retrieved', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Http 404 Error'})});
     jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Http 404 Error'})});
 
     customRender(<RaceConsole />, model);
     const message = await screen.findByText(/Unable to load races/i);
@@ -49,6 +51,7 @@ it('enables a race to be selected', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
 
     customRender(<RaceConsole />, model);
     
@@ -66,6 +69,7 @@ it('enables more than one race to be selected', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
 
     customRender(<RaceConsole />, model);
     const selectRace = await screen.findByLabelText(/Race/i);
@@ -89,6 +93,7 @@ describe('when a race is selected', () => {
         const controller = new DinghyRacingController(model);
         jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
 
         customRender(<RaceConsole />, model, controller);
         const selectRace = await screen.findByLabelText(/Race/i);
@@ -105,6 +110,7 @@ describe('when a race is selected', () => {
         const controller = new DinghyRacingController(model);
         jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         jest.spyOn(model, 'startRace').mockImplementation(() => {return Promise.resolve({'success': true})});
         const controllerStartRaceSpy = jest.spyOn(controller, 'startRace');
     
@@ -137,6 +143,7 @@ describe('when more than one race is selected', () => {
             }
             
         });
+        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
 
         customRender(<RaceConsole />, model, controller);
         const selectRace = await screen.findByLabelText(/Race/i);
@@ -164,6 +171,7 @@ describe('when more than one race is selected', () => {
             }
             
         });
+        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         jest.spyOn(model, 'startRace').mockImplementation(() => {return Promise.resolve({'success': true})});
         const controllerStartRaceSpy = jest.spyOn(controller, 'startRace');
     
@@ -197,6 +205,7 @@ describe('when a race is unselected', () => {
                 return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
             }
         });
+        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
 
         customRender(<RaceConsole />, model, controller);
         const selectRace = await screen.findByLabelText(/Race/i);
@@ -225,6 +234,7 @@ describe('when a race is unselected', () => {
                 return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
             }    
         });
+        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         customRender(<RaceConsole />, model, controller);
         const selectRace = await screen.findByLabelText(/Race/i);
         await screen.findAllByRole('option');
@@ -245,7 +255,7 @@ describe('when a error is received', () => {
     it('displays error message', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-        jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
+        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
         
         await act(async () => {        
             customRender(<RaceConsole />, model);
@@ -257,8 +267,8 @@ describe('when a error is received', () => {
     it('clears eror message when a successful response is received', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-        jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})}).mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
-        
+        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})})
+            .mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
         let render;
 
         await act(async () => {        
@@ -273,4 +283,32 @@ describe('when a error is received', () => {
         });
         expect(screen.queryByText(/Unable to load races/i)).not.toBeInTheDocument();
     });
+});
+
+it('provides option to select start time for first race', async () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    
+    await act(async () => {        
+        customRender(<RaceConsole />, model);
+    });
+
+    const selectSessionStart = screen.getByLabelText(/session start/i);
+    expect(selectSessionStart).toBeInTheDocument();
+});
+
+it('provides option to select start time for first race', async () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    
+    await act(async () => {        
+        customRender(<RaceConsole />, model);
+    });
+
+    const selectSessionEnd = screen.getByLabelText(/session end/i);
+    expect(selectSessionEnd).toBeInTheDocument();
 });
