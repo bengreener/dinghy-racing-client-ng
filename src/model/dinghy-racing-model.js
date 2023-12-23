@@ -571,7 +571,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
     async getRacesBetweenTimes(startTime, endTime) {
-        const resource = this.httpRootURL + '/races/search/findByPlannedStartTimeBetween?startTime=' + startTime.toISOString() + ',endTime=' + endTime.toISOString();
+        const resource = this.httpRootURL + '/races/search/findByPlannedStartTimeBetween?startTime=' + startTime.toISOString() + '&endTime=' + endTime.toISOString();
 
         const result = await this.read(resource);
         if (result.success) {
