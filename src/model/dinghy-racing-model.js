@@ -19,7 +19,7 @@ class DinghyRacingModel {
      * @returns {DinghyClass}
      */
     static dinghyClassTemplate() {
-        return {'name': '', 'url': ''};
+        return {'name': '', 'crewSize': 1, 'url': ''};
     }
 
     /**
@@ -339,7 +339,8 @@ class DinghyRacingModel {
             
             const dinghies = [];
             for (let i = 0; i < dinghiesHAL.length; i++  ) {
-                const dinghyClass = dinghyClassResults[i].success ? {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassResults[i].domainObject.name, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
+                const dinghyClass = dinghyClassResults[i].success ? {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassResults[i].domainObject.name, 
+                    'crewSize': dinghyClassResults[i].domainObject.crewSize, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
                 dinghies.push({'sailNumber': dinghiesHAL[i].sailNumber, 'dinghyClass': dinghyClass, 'url': dinghiesHAL[i]._links.self.href});
             };
             return Promise.resolve({'success': true, 'domainObject': dinghies});
@@ -376,7 +377,8 @@ class DinghyRacingModel {
     async getDinghyClass(url) {
         const result = await this.read(url);
         if (result.success) {
-            return Promise.resolve({'success': true, 'domainObject': {...DinghyRacingModel.dinghyClassTemplate(), 'name': result.domainObject.name, 'url': result.domainObject._links.self.href}});
+            return Promise.resolve({'success': true, 'domainObject': {...DinghyRacingModel.dinghyClassTemplate(), 'name': result.domainObject.name, 
+            'crewSize': result.domainObject.crewSize, 'url': result.domainObject._links.self.href}});
         }
         else {
             return Promise.resolve(result);
@@ -393,7 +395,8 @@ class DinghyRacingModel {
 
         const result = await this.read(resource);
         if(result.success) {
-            const domainObject = {...DinghyRacingModel.dinghyClassTemplate(), 'name': result.domainObject.name, 'url': result.domainObject._links.self.href};
+            const domainObject = {...DinghyRacingModel.dinghyClassTemplate(), 'name': result.domainObject.name, 
+                'crewSize': result.domainObject.crewSize, 'url': result.domainObject._links.self.href};
             return Promise.resolve({'success': true, 'domainObject': domainObject});
         }
         else {
@@ -411,7 +414,8 @@ class DinghyRacingModel {
         const result = await this.read(resource);
         if (result.success) {
             const collection = result.domainObject._embedded.dinghyClasses;
-            const dinghyClassCollection = collection.map(dinghyClass => {return {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClass.name, 'url': dinghyClass._links.self.href}});
+            const dinghyClassCollection = collection.map(dinghyClass => {return {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClass.name, 
+                'crewSize': dinghyClass.crewSize, 'url': dinghyClass._links.self.href}});
             return Promise.resolve({'success': true, 'domainObject': dinghyClassCollection});
         }
         else {
@@ -547,7 +551,7 @@ class DinghyRacingModel {
             const races = [];
             for (let i = 0; i < racesHAL.length; i++  ) {
                 const dinghyClass = dinghyClassResults[i].success ? {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassResults[i].domainObject.name, 
-                    'url': dinghyClassResults[i].domainObject._links.self.href} : null;
+                    'crewSize': dinghyClassResults[i].domainObject.crewSize, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
                 // assume time received has been stored in UTC
                 races.push({...DinghyRacingModel.raceTemplate(), 'name': racesHAL[i].name, 'plannedStartTime': new Date(racesHAL[i].plannedStartTime + 'Z'), 
                     'actualStartTime': racesHAL[i].actualStartTime ? new Date(racesHAL[i].actualStartTime + 'Z') : null, 
@@ -582,7 +586,7 @@ class DinghyRacingModel {
             const races = [];
             for (let i = 0; i < racesHAL.length; i++  ) {
                 const dinghyClass = dinghyClassResults[i].success ? {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassResults[i].domainObject.name, 
-                    'url': dinghyClassResults[i].domainObject._links.self.href} : null;
+                    'crewSize': dinghyClassResults[i].domainObject.crewSize, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
                 // assume time received has been stored in UTC
                 races.push({...DinghyRacingModel.raceTemplate(), 'name': racesHAL[i].name, 'plannedStartTime': new Date(racesHAL[i].plannedStartTime + 'Z'), 
                     'actualStartTime': racesHAL[i].actualStartTime ? new Date(racesHAL[i].actualStartTime + 'Z') : null, 

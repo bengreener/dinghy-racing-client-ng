@@ -150,6 +150,7 @@ it('calls the function passed in to onCreate prop', async () => {
 });
 
 it('calls the function passed in to onCreate prop with new race as parameter', async () => {
+    
     const user = userEvent.setup();
     const fnOnCreate = jest.fn((race) => {return Promise.resolve({'success': true})});
     
