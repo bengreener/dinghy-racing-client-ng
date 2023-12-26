@@ -29,7 +29,7 @@ function convertRaceEntriesToCSVArray(race, entries) {
             race.plannedStartTime.toISOString() + ',' + 
             // race.actualStartTime.toISOString() + ',' + 
             race.dinghyClass.name + ',' + 
-            entry.competitor.name + ',' + 
+            entry.helm.name + ',' + 
             entry.dinghy.dinghyClass.name + ',' + 
             entry.laps.length + ',' + 
             entry.laps.reduce((accumulator, currentValue) => {

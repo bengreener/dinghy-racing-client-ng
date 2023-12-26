@@ -43,7 +43,7 @@ class DinghyRacingModel {
      * Provide a blank entry template
      */
     static entryTemplate() {
-        return {'race': DinghyRacingModel.raceTemplate(), 'competitor': DinghyRacingModel.competitorTemplate(), 'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'url': ''};
+        return {'race': DinghyRacingModel.raceTemplate(), 'helm': DinghyRacingModel.competitorTemplate(), 'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'url': ''};
     }
 
     /**
@@ -190,27 +190,27 @@ class DinghyRacingModel {
 
     /**
      * Create a new entry to a race
-     * Supplied competitor and dinghy must exist
+     * Supplied helm and dinghy must exist
      * @param {Race} race Race to enter
-     * @param {Competitor} competitor Competitor entering race
+     * @param {Competitor} helm Competitor entering race as the helm
      * @param {Dinghy} dinghy Dinghy to be sailed in race
      * @returns {Promise<Result>}
      */
-    async createEntry(race, competitor, dinghy) {
+    async createEntry(race, helm, dinghy) {
         let dinghyClass;
 
-        // check if competitor and dinghy have reference to remote resource and if not fetch
+        // check if helm and dinghy have reference to remote resource and if not fetch
         // assuming if a URL supplied resource exists in REST service
         let promises = [];
         let results = [];
-        // need competitor url
-        if (!competitor.url) {
-            // lookup competitor
-            promises.push(this.getCompetitorByName(competitor.name));
+        // need helm url
+        if (!helm.url) {
+            // lookup helm
+            promises.push(this.getCompetitorByName(helm.name));
         }
         else {
-            // use supplied competitor url
-            promises.push(Promise.resolve({'success': true, 'domainObject': competitor}));
+            // use supplied  url
+            promises.push(Promise.resolve({'success': true, 'domainObject': helm}));
         }
         // need dinghy url
         if (!dinghy.url) {
@@ -234,18 +234,18 @@ class DinghyRacingModel {
             // use supplied dinghy url
             promises.push(Promise.resolve({'success': true, 'domainObject': dinghy}));
         }
-        // check if competitor and dinghy retrieved via REST
-        // if fetch was not required use competitor or dinghy passed as parameters
+        // check if helm and dinghy retrieved via REST
+        // if fetch was not required use helm or dinghy passed as parameters
         results = await Promise.all(promises);
         // if successful return success result
         if (results[0].success && results[1].success) {
-            return this.create('entries', {'race': race.url, 'competitor': results[0].domainObject.url, 'dinghy': results[1].domainObject.url});
+            return this.create('entries', {'race': race.url, 'helm': results[0].domainObject.url, 'dinghy': results[1].domainObject.url});
         }
-        // if creation fails for competitor and dinghy combine messages and return failure
+        // if creation fails for helm and dinghy combine messages and return failure
         if (!results[0].success && !results[1].success) {
             return Promise.resolve({'success': false, 'message': results[0].message + '\n' + results[1].message});
         }
-        // if creation fails for competitor return failure
+        // if creation fails for helm return failure
         if (!results[0].success) {
             return Promise.resolve({'success': false, 'message': results[0].message});
         }
@@ -445,26 +445,26 @@ class DinghyRacingModel {
             // no entries for race
             return Promise.resolve({'success': true, 'domainObject': []})
         }
-        // get race, competitors, dinghies, and laps
+        // get race, helm, dinghies, and laps
         const raceResult = await this.getRace(entryCollectionHAL[0]._links.race.href);
         if (!raceResult.success) {
             return Promise.resolve(raceResult);
         }
-        const competitorPromises = [];
+        const helmPromises = [];
         const dinghyPromises = [];
         const lapsPromises = [];
         entryCollectionHAL.forEach(entry => {
-            competitorPromises.push(this.getCompetitor(entry._links.competitor.href));
+            helmPromises.push(this.getCompetitor(entry._links.helm.href));
             dinghyPromises.push(this.getDinghy(entry._links.dinghy.href));
             lapsPromises.push(this.getLaps(entry._links.laps.href));
         });
-        const competitorResults = await Promise.all(competitorPromises);
+        const helmResults = await Promise.all(helmPromises);
         const dinghyResults = await Promise.all(dinghyPromises);
         const lapsResults = await Promise.all(lapsPromises);
         const entries = [];
         for (let i = 0; i < entryCollectionHAL.length; i++) {
-            if (!competitorResults[i].success) {
-                return Promise.resolve(competitorResults[i]);
+            if (!helmResults[i].success) {
+                return Promise.resolve(helmResults[i]);
             }
             if (!dinghyResults[i].success) {
                 return Promise.resolve(dinghyResults[i]);
@@ -472,7 +472,7 @@ class DinghyRacingModel {
             if (!lapsResults[i].success) {
                 return Promise.resolve(lapsResults[i]);
             }
-            entries.push({...DinghyRacingModel.entryTemplate(), 'race': raceResult.domainObject, 'competitor': competitorResults[i].domainObject, 
+            entries.push({...DinghyRacingModel.entryTemplate(), 'race': raceResult.domainObject, 'helm': helmResults[i].domainObject, 
                 'dinghy': dinghyResults[i].domainObject, 'laps': lapsResults[i].domainObject, 'url': entryCollectionHAL[i]._links.self.href});
         };
         return Promise.resolve({'success': true, 'domainObject': entries});

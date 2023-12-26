@@ -11,7 +11,7 @@ import ModelContext from './ModelContext';
 function SignUp({ race }) {
     const model = useContext(ModelContext);
     const controller = useContext(ControllerContext);
-    const [competitorName, setCompetitorName] = useState('');
+    const [helmName, setHelmName] = useState('');
     const [sailNumber, setSailNumber] = useState('');
     const [dinghyClassName, setDinghyClassName] = useState('');
     const [result, setResult] = useState({'message': ''});
@@ -24,7 +24,7 @@ function SignUp({ race }) {
     const [entriesTable, setEntriesTable] = React.useState([]);
 
     const clear = React.useCallback(() => {
-        setCompetitorName('');
+        setHelmName('');
         setSailNumber('');
         setDinghyClassName('');
         showMessage('');
@@ -100,15 +100,15 @@ function SignUp({ race }) {
     React.useEffect(() => {
         model.getEntriesByRace(race).then(result => {
             if (result.success) {
-                const rows = result.domainObject.map(entry => <tr key={entry.competitor.name}>
-                    <td key={'competitor'}>{entry.competitor.name}</td>
+                const rows = result.domainObject.map(entry => <tr key={entry.helm.name}>
+                    <td key={'helm'}>{entry.helm.name}</td>
                     <td key={'sailNumber'}>{entry.dinghy.sailNumber}</td>
                     <td key={'dinghyClass'}>{entry.dinghy.dinghyClass.name}</td>
                 </tr>);
                 setEntriesTable(<table>
                     <thead>
                         <tr>
-                            <th key="competitor">Competitor</th>
+                            <th key="helm">Helm</th>
                             <th key="sailNumber">Sail Number</th>
                             <th key="dinghyClass">Class</th>
                         </tr>
@@ -137,8 +137,8 @@ function SignUp({ race }) {
         if (target.name === 'sailNumber') {
             setSailNumber(target.value);
         }
-        if (target.name === 'competitor') {
-            setCompetitorName(target.value);
+        if (target.name === 'helm') {
+            setHelmName(target.value);
         }
         if (target.name === 'dinghyClass') {
             setDinghyClassName(target.value);
@@ -149,8 +149,8 @@ function SignUp({ race }) {
         event.preventDefault();        
         const creationPromises = [];
         // handle creation of 
-        if (!competitorMap.has(competitorName)) {
-            creationPromises.push(controller.createCompetitor({'name': competitorName, 'url': ''}));
+        if (!competitorMap.has(helmName)) {
+            creationPromises.push(controller.createCompetitor({'name': helmName, 'url': ''}));
         }
         else {
             creationPromises.push(Promise.resolve({'success': true}));
@@ -164,7 +164,7 @@ function SignUp({ race }) {
         const creationResults = await Promise.all(creationPromises);
         if (creationResults[0].success && creationResults[1].success) {
             setResult(await controller.signupToRace(race, 
-                competitorMap.has(competitorName) ? competitorMap.get(competitorName) : {'name': competitorName, 'url': ''}, 
+                competitorMap.has(helmName) ? competitorMap.get(helmName) : {'name': helmName, 'url': ''}, 
                 dinghyMap.has(sailNumber) ? dinghyMap.get(sailNumber) : {'sailNumber': sailNumber, 'dinghyClass': dinghyClassMap.get(dinghyClassName), 'url': ''}
             ));
         }
@@ -202,11 +202,11 @@ function SignUp({ race }) {
     }
 
     function getButtonText() {
-        if (!competitorMap.has(competitorName) && !dinghyMap.has(sailNumber)) {
-            return 'Add competitor & dinghy & sign-up';
+        if (!competitorMap.has(helmName) && !dinghyMap.has(sailNumber)) {
+            return 'Add helm & dinghy & sign-up';
         }
-        if (!competitorMap.has(competitorName)) {
-            return 'Add competitor & sign-up';
+        if (!competitorMap.has(helmName)) {
+            return 'Add helm & sign-up';
         }
         if (!dinghyMap.has(sailNumber)) {
             return 'Add dinghy & sign-up';
@@ -217,8 +217,8 @@ function SignUp({ race }) {
     return (
         <form action="" method="get">
             <datalist id="competitor-datalist">{competitorOptions}</datalist>
-            <label htmlFor="competitor-input">Competitor's Name</label>
-            <input id="competitor-input" name="competitor" list="competitor-datalist" onChange={handleChange} value={competitorName} />
+            <label htmlFor="helm-input">Helm's Name</label>
+            <input id="helm-input" name="helm" list="competitor-datalist" onChange={handleChange} value={helmName} />
             {dinghyClassInput(race)}
             <datalist id="dinghy-datalist">{dinghyOptions}</datalist>
             <label htmlFor="sail-number-input">Sail Number</label>

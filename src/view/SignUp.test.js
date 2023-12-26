@@ -23,7 +23,7 @@ it('renders', async () => {
     await act(async () => {
         customRender(<SignUp race={raceScorpionA}/>, model, controller);
     })
-    const inputCompetitor = screen.getByLabelText(/competitor/i);
+    const inputCompetitor = screen.getByLabelText(/helm/i);
     const inputSailNumber = screen.getByLabelText(/sail/i);
     const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
     expect(inputCompetitor).toBeInTheDocument();
@@ -32,11 +32,11 @@ it('renders', async () => {
 });
 
 describe('when race has a specified dinghyClass', () => {
-    it('requests competitor name and dinghy sail number', async () => {    
+    it('requests helm name and dinghy sail number', async () => {    
         await act(async () => {
             customRender(<SignUp race={raceScorpionA}/>, model, controller);
         });
-        const inputCompetitor = screen.getByLabelText(/competitor/i);
+        const inputCompetitor = screen.getByLabelText(/helm/i);
         const inputSailNumber = screen.getByLabelText(/sail/i);
         expect(inputCompetitor).toBeInTheDocument();
         expect(inputSailNumber).toBeInTheDocument();
@@ -44,12 +44,12 @@ describe('when race has a specified dinghyClass', () => {
 });
 
 describe('when race is a handicap race ', () => {
-    it('requests competitor name and dinghy class and sail number', async () => {
+    it('requests helm name and dinghy class and sail number', async () => {
         await act(async () => {
             customRender(<SignUp race={raceNoClass}/>, model, controller);
         });
 
-        const inputCompetitor = screen.getByLabelText(/competitor/i);
+        const inputCompetitor = screen.getByLabelText(/helm/i);
         const inputDingyClass = screen.getByLabelText(/class/i);
         const inputSailNumber = screen.getByLabelText(/sail/i);
         expect(inputCompetitor).toBeInTheDocument();
@@ -58,23 +58,23 @@ describe('when race is a handicap race ', () => {
     });
 });
 
-describe('when competitor name is entered then ', () => {
+describe('when helm name is entered then ', () => {
     it('displays name', async () => {
         const user = userEvent.setup();
     
         customRender(<SignUp race={raceScorpionA}/>, model, controller);
     
-        const inputCompetitor = await screen.findByLabelText(/competitor/i);
+        const inputCompetitor = await screen.findByLabelText(/helm/i);
         await act(async () => {
             await user.type(inputCompetitor, 'Chris Marshall');
         });
         expect(inputCompetitor).toHaveValue('Chris Marshall');
     });
-    it('displays sign-up button if competitor is in system already', async () => {
+    it('displays sign-up button if helm is in system already', async () => {
         const user = userEvent.setup();
     
         customRender(<SignUp race={raceScorpionA}/>, model, controller);    
-        const inputCompetitor = await screen.findByLabelText(/competitor/i);
+        const inputCompetitor = await screen.findByLabelText(/helm/i);
         const inputSailNumber = await screen.findByLabelText(/sail/i);
         await act(async () => {
             await user.type(inputCompetitor, 'Chris Marshall');
@@ -82,17 +82,17 @@ describe('when competitor name is entered then ', () => {
         });
         expect(screen.getByRole('button', {'name': 'Sign-up'})).toBeInTheDocument();
     });
-    it('displays add competitor and sign-up button if competitor not in system', async () => {
+    it('displays add helm and sign-up button if helm not in system', async () => {
         const user = userEvent.setup();
     
         customRender(<SignUp race={raceScorpionA}/>, model, controller);    
-        const inputCompetitor = await screen.findByLabelText(/competitor/i);
+        const inputCompetitor = await screen.findByLabelText(/helm/i);
         const inputSailNumber = await screen.findByLabelText(/sail/i);
         await act(async () => {
             await user.type(inputCompetitor, 'Mary Shelley');
             await user.type(inputSailNumber, '1234');
         });
-        expect(screen.getByRole('button', {'name': 'Add competitor & sign-up'})).toBeInTheDocument();
+        expect(screen.getByRole('button', {'name': 'Add helm & sign-up'})).toBeInTheDocument();
     });
 })
 
@@ -112,7 +112,7 @@ describe('when sail number is entered then', () => {
         const user = userEvent.setup();
     
         customRender(<SignUp race={raceScorpionA}/>, model, controller);
-        const inputCompetitor = await screen.findByLabelText(/competitor/i);
+        const inputCompetitor = await screen.findByLabelText(/helm/i);
         const inputSailNumber = await screen.findByLabelText(/sail/i);
         await act(async () => {
             await user.type(inputCompetitor, 'Chris Marshall');
@@ -124,7 +124,7 @@ describe('when sail number is entered then', () => {
         const user = userEvent.setup();
     
         customRender(<SignUp race={raceScorpionA}/>, model, controller);
-        const inputCompetitor = await screen.findByLabelText(/competitor/i);
+        const inputCompetitor = await screen.findByLabelText(/helm/i);
         const inputSailNumber = await screen.findByLabelText(/sail/i);
         await act(async () => {
             await user.type(inputCompetitor, 'Chris Marshall');
@@ -156,7 +156,7 @@ describe('when create button is clicked', () => {
             });
         
             customRender(<SignUp race={raceScorpionA}/>, model, controller);
-            const inputCompetitor = await screen.findByLabelText(/competitor/i);
+            const inputCompetitor = await screen.findByLabelText(/helm/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
         
             await act(async () => {
@@ -177,7 +177,7 @@ describe('when create button is clicked', () => {
         
             customRender(<SignUp race={raceNoClass} />, model, controller);
             
-            const inputCompetitor = await screen.findByLabelText(/competitor/i);
+            const inputCompetitor = await screen.findByLabelText(/helm/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
             const inputDinghyClass = await screen.findByLabelText(/class/i);
         
@@ -199,7 +199,7 @@ describe('when create button is clicked', () => {
     
         customRender(<SignUp race={raceNoClass} />, model, controller);
         
-        const inputCompetitor = await screen.findByLabelText(/competitor/i);
+        const inputCompetitor = await screen.findByLabelText(/helm/i);
         const inputSailNumber = await screen.findByLabelText(/sail/i);
         const inputDinghyClass = await screen.findByLabelText(/class/i);
     
@@ -220,7 +220,7 @@ describe('when create button is clicked', () => {
         expect(inputDinghyClass).toHaveValue('');
     });
     describe('when dinghy does not exist', () => {
-        it('creates dinghy and then signs competitor up to race', async () => {
+        it('creates dinghy and then signs helm up to race', async () => {
             const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
                 return Promise.resolve({'success': true});
             });
@@ -230,7 +230,7 @@ describe('when create button is clicked', () => {
             const user = userEvent.setup();
     
             customRender(<SignUp race={raceNoClass} />, model, controller);
-            const inputCompetitor = await screen.findByLabelText(/competitor/i);
+            const inputCompetitor = await screen.findByLabelText(/helm/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
             const inputDinghyClass = await screen.findByLabelText(/class/i);
             await act(async () => {
@@ -244,8 +244,8 @@ describe('when create button is clicked', () => {
             expect(signupToRaceSpy).toHaveBeenCalledWith(raceNoClass, competitorChrisMarshall, {'sailNumber':'999', 'dinghyClass': dinghyClassScorpion, 'url': ''});
         });
     });
-    describe('when competitor does not exist', () => {
-        it('creates competitor and then signs competitor up for race', async () => {
+    describe('when helm does not exist', () => {
+        it('creates competitor and then signs helm up for race', async () => {
             const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                 return Promise.resolve({'success': true});
             });
@@ -255,22 +255,22 @@ describe('when create button is clicked', () => {
             const user = userEvent.setup();
     
             customRender(<SignUp race={raceNoClass} />, model, controller);
-            const inputCompetitor = await screen.findByLabelText(/competitor/i);
+            const inputCompetitor = await screen.findByLabelText(/helm/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
             const inputDinghyClass = await screen.findByLabelText(/class/i);
             await act(async () => {
                 await user.type(inputCompetitor, 'Bill Wilkins');
                 await user.type(inputSailNumber, '1234');
                 await user.selectOptions(inputDinghyClass, 'Scorpion');
-                await user.click(screen.getByRole('button', {'name': 'Add competitor & sign-up'}));
+                await user.click(screen.getByRole('button', {'name': 'Add helm & sign-up'}));
             });
 
             expect(createCompetitorSpy).toHaveBeenCalledWith({'name':'Bill Wilkins', 'url': ''});
             expect(signupToRaceSpy).toHaveBeenCalledWith(raceNoClass, {'name': 'Bill Wilkins', 'url': ''}, {...dinghy1234});
         })
     });
-    describe('when neither competitor or dinghy exists', () => {
-        it('creates competitor and dinghy and then signs competitor up for race', async () => {
+    describe('when neither helm or dinghy exists', () => {
+        it('creates competitor and dinghy and then signs helm up for race', async () => {
             const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                 return Promise.resolve({'success': true});
             });
@@ -283,14 +283,14 @@ describe('when create button is clicked', () => {
             const user = userEvent.setup();
     
             customRender(<SignUp race={raceNoClass} />, model, controller);
-            const inputCompetitor = await screen.findByLabelText(/competitor/i);
+            const inputCompetitor = await screen.findByLabelText(/helm/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
             const inputDinghyClass = await screen.findByLabelText(/class/i);
             await act(async () => {
                 await user.type(inputCompetitor, 'Bill Wilkins');
                 await user.type(inputSailNumber, '999');
                 await user.selectOptions(inputDinghyClass, 'Scorpion');
-                await user.click(screen.getByRole('button', {'name': 'Add competitor & dinghy & sign-up'}));
+                await user.click(screen.getByRole('button', {'name': 'Add helm & dinghy & sign-up'}));
             });
 
             expect(createCompetitorSpy).toHaveBeenCalledWith({'name':'Bill Wilkins', 'url': ''});
@@ -306,7 +306,7 @@ describe('when create button is clicked', () => {
 
         customRender(<SignUp race={raceNoClass} />, model, controller);
         
-        const inputCompetitor = await screen.findByLabelText(/competitor/i);
+        const inputCompetitor = await screen.findByLabelText(/helm/i);
         const inputSailNumber = await screen.findByLabelText(/sail/i);
         const inputDinghyClass = await screen.findByLabelText(/class/i);
 

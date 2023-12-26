@@ -135,21 +135,21 @@ describe('when signing up to a race', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Please provide details of the race.'});
     });
-    it('returns a promise that resolves to a result indicating failure when competitors name is null or undefined and provides a message explaining the cause of failure', async () => {
+    it('returns a promise that resolves to a result indicating failure when helms name is null or undefined and provides a message explaining the cause of failure', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         const promise = dinghyRacingController.signupToRace(raceScorpionA, {'name':undefined}, dinghy1234);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'Please provide details for the competitor.'});
+        expect(result).toEqual({'success': false, 'message': 'Please provide details for the helm.'});
     });
-    it('returns a promise that resolves to a result indicating failure when competitora name is \'\' and provides a message explaining the cause of failure', async () => {
+    it('returns a promise that resolves to a result indicating failure when helm name is \'\' and provides a message explaining the cause of failure', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         const promise = dinghyRacingController.signupToRace(raceScorpionA, {'name':''}, dinghy1234);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'Please provide details for the competitor.'});
+        expect(result).toEqual({'success': false, 'message': 'Please provide details for the helm.'});
     });
     it('returns a promise that resolves to a result indicating failure when dinghy sail number is null or undefined and provides a message explaining the cause of failure', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);

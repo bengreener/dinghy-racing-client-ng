@@ -493,7 +493,7 @@ it('returns a collection of races that start at or after the specified time', as
 
 describe('when signing up to a race', () => {
     // these tests can return a false positive if the logic makes a call to fetch but passes invalid argument as fetch mock does not check input
-    it('if competitor exists and URL provided and dinghy exist and URL provided then creates race entry', async () => {
+    it('if helm exists and URL provided and dinghy exist and URL provided then creates race entry', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,
@@ -514,7 +514,7 @@ describe('when signing up to a race', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});
     });
-    it('if competitor exists but URL not provided and dinghy exists and URL provided then creates race entry', async () => {
+    it('if helm exists but URL not provided and dinghy exists and URL provided then creates race entry', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,
@@ -1101,7 +1101,7 @@ it('provides a blank template for a race', () => {
 it('provides a blank template for a race entry', () => {
     const entry = DinghyRacingModel.entryTemplate();
 
-    expect(entry).toEqual({'race': DinghyRacingModel.raceTemplate(), 'competitor': DinghyRacingModel.competitorTemplate(), 'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [],'url': ''});
+    expect(entry).toEqual({'race': DinghyRacingModel.raceTemplate(), 'helm': DinghyRacingModel.competitorTemplate(), 'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [],'url': ''});
 });
 
 it('provides a blank template for a lap', () => {

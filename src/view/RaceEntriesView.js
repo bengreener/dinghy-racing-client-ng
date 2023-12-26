@@ -30,7 +30,7 @@ function RaceEntriesView({ races }) {
                 }
                 else {
                     result.domainObject.forEach(entry => {
-                        entriesMap.set(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name, entry);
+                        entriesMap.set(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name, entry);
                     });
                 }
             });
@@ -135,7 +135,7 @@ function RaceEntriesView({ races }) {
         <div className="scrollable">
         <table id="race-entries-table">
             <tbody>
-            {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap}/>)}
+            {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap}/>)}
             </tbody>
         </table>
         </div>
