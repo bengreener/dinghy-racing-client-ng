@@ -3,9 +3,10 @@ const wsRootURL = 'ws://localhost:8081/dinghyracing';
 
 const emptyCollectionHAL = {'_embedded':{'dinghies':[]},'_links':{'self':null}};
 
-const competitorsCollectionHAL = {'_embedded':{'competitors':[{'name':'Chris Marshall','_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/competitors/8'},'competitor':{'href':'http://localhost:8081/dinghyracing/api/competitors/8'}}},{'name':'Sarah Pascal','_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/competitors/9'},'competitor':{'href':'http://localhost:8081/dinghyracing/api/competitors/9'}}}]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/competitors'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/competitors'}},'page':{'size':20,'totalElements':2,'totalPages':1,'number':0}};
+// const competitorsCollectionHAL = {'_embedded':{'competitors':[{'name':'Chris Marshall','_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/competitors/8'},'competitor':{'href':'http://localhost:8081/dinghyracing/api/competitors/8'}}},{'name':'Sarah Pascal','_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/competitors/9'},'competitor':{'href':'http://localhost:8081/dinghyracing/api/competitors/9'}}}]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/competitors'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/competitors'}},'page':{'size':20,'totalElements':2,'totalPages':1,'number':0}};
 const competitorChrisMarshallHAL = {'name':'Chris Marshall','_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/competitors/8'},'competitor':{'href':'http://localhost:8081/dinghyracing/api/competitors/8'}}};
 const competitorSarahPascalHAL = {'name':'Sarah Pascal','_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/competitors/9'},'competitor':{'href':'http://localhost:8081/dinghyracing/api/competitors/9'}}};
+const competitorsCollectionHAL = {'_embedded':{'competitors':[{'name':'Chris Marshall','_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/competitors/8'},'competitor':{'href':'http://localhost:8081/dinghyracing/api/competitors/8'}}},{'name':'Sarah Pascal','_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/competitors/9'},'competitor':{'href':'http://localhost:8081/dinghyracing/api/competitors/9'}}}]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/competitors'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/competitors'}},'page':{'size':20,'totalElements':2,'totalPages':1,'number':0}};
 
 const dinghyClassCollectionHAL = {
 	'_embedded' : { 'dinghyClasses' : [ 
@@ -76,15 +77,29 @@ const raceSchemaALPS = { 'alps' : { 'version' : '1.0', 'descriptor' : [ { 'id' :
 
 const entriesHAL = {'_embedded':{'entries':[
 	{'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/entries/10'},'entry':{'href':'http://localhost:8081/dinghyracing/api/entries/10'},'dinghy':{'href':'http://localhost:8081/dinghyracing/api/entries/10/dinghy'},
-		'helm':{'href':'http://localhost:8081/dinghyracing/api/entries/10/competitor'},'laps':{'href':'http://localhost:8081/dinghyracing/api/entries/10/laps'},'race':{'href':'http://localhost:8081/dinghyracing/api/entries/10/race'}}},
+		'helm':{'href':'http://localhost:8081/dinghyracing/api/entries/10/helm'},'laps':{'href':'http://localhost:8081/dinghyracing/api/entries/10/laps'},'race':{'href':'http://localhost:8081/dinghyracing/api/entries/10/race'}}},
 	{'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/entries/11'},'entry':{'href':'http://localhost:8081/dinghyracing/api/entries/11'},'dinghy':{'href':'http://localhost:8081/dinghyracing/api/entries/11/dinghy'},
-		'helm':{'href':'http://localhost:8081/dinghyracing/api/entries/11/competitor'},'laps':{'href':'http://localhost:8081/dinghyracing/api/entries/11/laps'},'race':{'href':'http://localhost:8081/dinghyracing/api/entries/11/race'}}}
+		'helm':{'href':'http://localhost:8081/dinghyracing/api/entries/11/helm'},'laps':{'href':'http://localhost:8081/dinghyracing/api/entries/11/laps'},'race':{'href':'http://localhost:8081/dinghyracing/api/entries/11/race'}}}
 	]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/entries'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/entries'}},'page':{'size':20,'totalElements':2,'totalPages':1,'number':0}};
 const entriesScorpionAHAL = { '_embedded' : { 'entries' : [
-	{ '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/10' }, 'entry' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/10' }, 'helm' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/10/competitor' }, 'laps' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/10/laps' }, 'race' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/10/race' }, 'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/10/dinghy' } } }, 
-	{ '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/11' }, 'entry' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/11' }, 'helm' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/11/competitor' }, 'laps' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/11/laps' }, 'race' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/11/race' }, 'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/11/dinghy' } } } 
+	{ '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/10' }, 
+		'entry' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/10' }, 
+		'helm' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/10/helm' }, 
+		'crew' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/10/crew' }, 
+		'laps' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/10/laps' }, 
+		'race' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/10/race' }, 
+		'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/10/dinghy' } } 
+	}, 
+	{ '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/11' }, 
+		'entry' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/11' }, 
+		'helm' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/11/helm' }, 
+		'crew' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/11/crew' }, 
+		'laps' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/11/laps' }, 
+		'race' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/11/race' }, 
+		'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/11/dinghy' } } 
+	} 
 ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/races/4/signedUp' } } };
-const entryChrisMarshallDinghy1234HAL = {'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/entries/10'},'entry':{'href':'http://localhost:8081/dinghyracing/api/entries/10'},'dinghy':{'href':'http://localhost:8081/dinghyracing/api/entries/10/dinghy'},'helm':{'href':'http://localhost:8081/dinghyracing/api/entries/10/competitor'}}}; 
+const entryChrisMarshallDinghy1234HAL = {'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/entries/10'},'entry':{'href':'http://localhost:8081/dinghyracing/api/entries/10'},'dinghy':{'href':'http://localhost:8081/dinghyracing/api/entries/10/dinghy'},'helm':{'href':'http://localhost:8081/dinghyracing/api/entries/10/helm'}, 'crew':{'href':'http://localhost:8081/dinghyracing/api/entries/10/crew'}}}; 
 
 const competitorsCollection = [{'name':'Chris Marshall','url':'http://localhost:8081/dinghyracing/api/competitors/8'},{'name':'Sarah Pascal','url':'http://localhost:8081/dinghyracing/api/competitors/9'}];
 const competitorChrisMarshall = {'name':'Chris Marshall','url':'http://localhost:8081/dinghyracing/api/competitors/8'};
@@ -113,9 +128,12 @@ const raceGraduateA = { 'name': 'Graduate A', 'plannedStartTime' : new Date('202
 const raceNoClass = { 'name': 'No Class', 'plannedStartTime': new Date('2023-02-14T18:26:00Z'), 'actualStartTime': null, 'dinghyClass': null, 'duration': 2700000, 'plannedLaps': 5, 'lapForecast': 5.0, 'lastLapTime': 0, 'averageLapTime': 0, 'clock': null, 'url': 'http://localhost:8081/dinghyracing/api/races/8' };
 const races = [raceScorpionA, raceGraduateA, raceNoClass];
 
-const entriesScorpionA = [{'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},{'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
-const entriesGraduateA = [{'helm': competitorJillMyer,'race': raceGraduateA,'dinghy': dinghy2928, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/12'}];
-const entryChrisMarshallScorpionA1234 = {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'};
+const entriesScorpionA = [
+	{'helm': competitorChrisMarshall, 'crew': null, 'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
+	{'helm': competitorSarahPascal, 'crew': null, 'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}
+];
+const entriesGraduateA = [{'helm': competitorJillMyer, 'crew': null, 'race': raceGraduateA,'dinghy': dinghy2928, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/12'}];
+const entryChrisMarshallScorpionA1234 = {'helm': competitorChrisMarshall, 'crew': null, 'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'};
 export {
 	httpRootURL, wsRootURL,
 	

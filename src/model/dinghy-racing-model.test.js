@@ -1101,7 +1101,7 @@ it('provides a blank template for a race', () => {
 it('provides a blank template for a race entry', () => {
     const entry = DinghyRacingModel.entryTemplate();
 
-    expect(entry).toEqual({'race': DinghyRacingModel.raceTemplate(), 'helm': DinghyRacingModel.competitorTemplate(), 'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [],'url': ''});
+    expect(entry).toEqual({'race': DinghyRacingModel.raceTemplate(), 'helm': DinghyRacingModel.competitorTemplate(), 'crew': null, 'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [],'url': ''});
 });
 
 it('provides a blank template for a lap', () => {
@@ -1122,10 +1122,10 @@ describe('when searching for entries by race', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceScorpionA})});
         jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/competitor') {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
                 return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
             }
-            else if (url === 'http://localhost:8081/dinghyracing/api/entries/11/competitor') {
+            else if (url === 'http://localhost:8081/dinghyracing/api/entries/11/helm') {
                 return Promise.resolve({'success': true, 'domainObject': competitorSarahPascal});
             }
             else {
