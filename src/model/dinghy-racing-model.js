@@ -197,10 +197,10 @@ class DinghyRacingModel {
      * @param {Dinghy} dinghy Dinghy to be sailed in race
      * @returns {Promise<Result>}
      */
-    async createEntry(race, helm, dinghy) {
+    async createEntry(race, helm, dinghy, crew = null) {
         let dinghyClass;
 
-        // check if helm and dinghy have reference to remote resource and if not fetch
+        // check if helm, crew, and dinghy have reference to remote resource and if not fetch
         // assuming if a URL supplied resource exists in REST service
         let promises = [];
         let results = [];
@@ -235,23 +235,39 @@ class DinghyRacingModel {
             // use supplied dinghy url
             promises.push(Promise.resolve({'success': true, 'domainObject': dinghy}));
         }
+        // if crew supplied need crew URL
+        if (crew && !crew.url) {
+            promises.push(this.getCompetitorByName(crew.name));
+        }
+        else {
+            // deal with a null crew later
+            promises.push(Promise.resolve({'success': true, 'domainObject': crew}));
+        }
         // check if helm and dinghy retrieved via REST
         // if fetch was not required use helm or dinghy passed as parameters
         results = await Promise.all(promises);
         // if successful return success result
-        if (results[0].success && results[1].success) {
+        if (results[0].success && results[1].success && results[2].success) {
+            if (crew) {
+                // console.log(`crew = true`);
+                return this.create('entries', {'race': race.url, 'helm': results[0].domainObject.url, 'dinghy': results[1].domainObject.url, 'crew': results[2].domainObject.url});    
+            }
+            // console.log(`crew = false`);
             return this.create('entries', {'race': race.url, 'helm': results[0].domainObject.url, 'dinghy': results[1].domainObject.url});
         }
-        // if creation fails for helm and dinghy combine messages and return failure
-        if (!results[0].success && !results[1].success) {
-            return Promise.resolve({'success': false, 'message': results[0].message + '\n' + results[1].message});
+        else {
+            // combine failure messages and return failure
+            let message = '';
+            results.forEach(result => {
+                if (!result.success) {
+                    if (message) {
+                        message += '\n';
+                    }
+                    message += result.message;
+                }
+            })
+            return Promise.resolve({'success': false, 'message': message});
         }
-        // if creation fails for helm return failure
-        if (!results[0].success) {
-            return Promise.resolve({'success': false, 'message': results[0].message});
-        }
-        // if creation fails for dinghy return failure
-        return Promise.resolve({'success': false, 'message': results[1].message});
     }
 
     /**
