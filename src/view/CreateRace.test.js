@@ -34,7 +34,7 @@ it('displays the available dinghyClasses and handicap option', async () => {
     
     const options = await screen.findAllByRole('option');
     const optionsAvailable = options.map(element => {return {'text': element.text, 'value': element.value}});
-    expect(optionsAvailable).toEqual([{'text': '', 'value': ''}, {'text': 'Graduate', 'value': 'Graduate'}, {'text': 'Scorpion', 'value': 'Scorpion'}]);
+    expect(optionsAvailable).toEqual([{'text': '', 'value': ''}, {'text': 'Comet', 'value': 'Comet'}, {'text': 'Graduate', 'value': 'Graduate'}, {'text': 'Scorpion', 'value': 'Scorpion'}]);
 })
 
 it('provides a default option of 5 for the number of laps for the race', async () => {

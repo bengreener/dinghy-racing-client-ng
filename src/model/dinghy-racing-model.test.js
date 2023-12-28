@@ -3,12 +3,14 @@ import DinghyRacingModel from './dinghy-racing-model';
 // import Clock from './domain-classes/clock';
 import { httpRootURL, wsRootURL, competitorsCollectionHAL, 
     dinghiesCollectionHAL, dinghiesScorpionCollectionHAL, 
-    dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghy1234HAL, raceScorpion_AHAL, 
-    dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, 
-    dinghies, dinghiesScorpion, dinghy1234, dinghy6745,
-    races, racesCollectionHAL, raceScorpionA, raceNoClassHAL, raceGraduateA, raceGraduate_AHAL,
+    dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghyClassCometHAL, dinghy1234HAL, raceScorpion_AHAL, 
+    dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet,
+    dinghies, dinghiesScorpion, dinghy1234, dinghy6745, dinghy826,
+    races, racesCollectionHAL, raceScorpionA, raceNoClassHAL, raceGraduateA, raceCometA, raceGraduate_AHAL,
     competitorsCollection, competitorChrisMarshall, competitorChrisMarshallHAL, competitorLouScrew, 
-    entriesScorpionAHAL, entryChrisMarshallDinghy1234HAL, entriesScorpionA, competitorSarahPascal, raceNoClass, entryChrisMarshallScorpionA1234 } from './__mocks__/test-data';
+    entriesScorpionAHAL, entriesCometAHAL, entryChrisMarshallDinghy1234HAL, entriesNoClassHAL,
+    entriesScorpionA, entriesCometA, entriesNoClass,
+    competitorSarahPascal, raceNoClass, entryChrisMarshallScorpionA1234, competitorOwainDavies, competitorJillMyer } from './__mocks__/test-data';
 
 global.fetch = jest.fn();
 // jest.mock('@stomp/stompjs');
@@ -475,6 +477,13 @@ it('returns a collection of races that start at or after the specified time', as
                 ok: true,
                 status: 200, 
                 json: () => Promise.resolve(dinghyClassGraduateHAL)
+            });
+        }
+        if (resource === 'http://localhost:8081/dinghyracing/api/races/17/dinghyClass') {
+            return Promise.resolve({
+                ok: true,
+                status: 200, 
+                json: () => Promise.resolve(dinghyClassCometHAL)
             });
         }
         else {
@@ -1177,7 +1186,7 @@ it('provides a blank template for a lap', () => {
 })
 
 describe('when searching for entries by race', () => {
-    it('returns a promise that resolves to a result indicating success and containing the entries when entries are found', async () => {
+    it('returns a promise that resolves to a result indicating success and containing the entries when entries are found and entries have crew recorded', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,
@@ -1193,6 +1202,12 @@ describe('when searching for entries by race', () => {
             }
             else if (url === 'http://localhost:8081/dinghyracing/api/entries/11/helm') {
                 return Promise.resolve({'success': true, 'domainObject': competitorSarahPascal});
+            }
+            else if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
+                return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
+            }
+            else if (url === 'http://localhost:8081/dinghyracing/api/entries/11/crew') {
+                return Promise.resolve({'success': true, 'domainObject': competitorOwainDavies});
             }
             else {
                 return Promise.resolve({'success': false, 'message': 'Unable to identify competitor.'});
@@ -1216,7 +1231,92 @@ describe('when searching for entries by race', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true, 'domainObject': entriesScorpionA});
     });
-    it('returns a promise that resolves to a result indicating failure when dinghy class is not found', async () => {
+    it('returns a promise that resolves to a result indicating success and containing the entries when entries are found and entries do not have crew recorded', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: true,
+                status: 200, 
+                json: () => Promise.resolve(entriesCometAHAL)
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceCometA})});
+        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/19/helm') {
+                return Promise.resolve({'success': true, 'domainObject': competitorJillMyer});
+            }
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/19/crew') {
+                return Promise.resolve({'success': false, 'message': '404 Not Found'});
+            }
+            else {
+                return Promise.resolve({'success': false, 'message': 'Unable to identify competitor.'});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/19/dinghy') {
+                return Promise.resolve({'success': true, 'domainObject': dinghy826});
+            }
+            else {
+                return Promise.resolve({'success': false, 'message': 'Unable to identify dinghy.'});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassComet})});
+        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
+        const promise = dinghyRacingModel.getEntriesByRace(raceCometA);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': entriesCometA});
+    });
+    it('returns a promise that resolves to a result indicating success and containing the entries when entries are found and some entries have crew recorded and some do not', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: true,
+                status: 200, 
+                json: () => Promise.resolve(entriesNoClassHAL)
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceNoClass})});
+        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/20/helm') {
+                return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
+            };
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/20/crew') {
+                return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
+            };
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/21/helm') {
+                return Promise.resolve({'success': true, 'domainObject': competitorJillMyer});
+            };
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/21/crew') {
+                return Promise.resolve({'success': false, 'message': 'Error 404 Not Found'});
+            };
+            return Promise.resolve({'success': false, 'message': 'Unable to identify competitor.'});
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/20/dinghy') {
+                return Promise.resolve({'success': true, 'domainObject': dinghy1234});
+            };
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/21/dinghy') {
+                return Promise.resolve({'success': true, 'domainObject': dinghy826});
+            };
+            return Promise.resolve({'success': false, 'message': 'Unable to identify dinghy.'});
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass') {
+                return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion});
+            }
+            if (url === 'http://localhost:8081/dinghyracing/api/dinghies/18/dinghyClass') {
+                return Promise.resolve({'success': true, 'domainObject': dinghyClassComet});
+            }
+            return Promise.resolve({'success': false, 'message': 'Error 404 Not Found'});
+        });
+        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
+        const promise = dinghyRacingModel.getEntriesByRace(raceNoClass);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': entriesNoClass});
+    });
+    it('returns a promise that resolves to a result indicating failure when race is not found', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
@@ -1711,6 +1811,13 @@ it('returns a collection of races that start between the specified times', async
                 ok: true,
                 status: 200, 
                 json: () => Promise.resolve(dinghyClassGraduateHAL)
+            });
+        }
+        if (resource === 'http://localhost:8081/dinghyracing/api/races/17/dinghyClass') {
+            return Promise.resolve({
+                ok: true,
+                status: 200, 
+                json: () => Promise.resolve(dinghyClassCometHAL)
             });
         }
         else {

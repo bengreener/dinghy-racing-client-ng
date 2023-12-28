@@ -249,10 +249,8 @@ class DinghyRacingModel {
         // if successful return success result
         if (results[0].success && results[1].success && results[2].success) {
             if (crew) {
-                // console.log(`crew = true`);
                 return this.create('entries', {'race': race.url, 'helm': results[0].domainObject.url, 'dinghy': results[1].domainObject.url, 'crew': results[2].domainObject.url});    
             }
-            // console.log(`crew = false`);
             return this.create('entries', {'race': race.url, 'helm': results[0].domainObject.url, 'dinghy': results[1].domainObject.url});
         }
         else {
@@ -470,14 +468,17 @@ class DinghyRacingModel {
         const helmPromises = [];
         const dinghyPromises = [];
         const lapsPromises = [];
+        const crewPromises = [];
         entryCollectionHAL.forEach(entry => {
             helmPromises.push(this.getCompetitor(entry._links.helm.href));
             dinghyPromises.push(this.getDinghy(entry._links.dinghy.href));
             lapsPromises.push(this.getLaps(entry._links.laps.href));
+            crewPromises.push(this.getCompetitor(entry._links.crew.href));
         });
         const helmResults = await Promise.all(helmPromises);
         const dinghyResults = await Promise.all(dinghyPromises);
         const lapsResults = await Promise.all(lapsPromises);
+        const crewResults = await Promise.all(crewPromises);
         const entries = [];
         for (let i = 0; i < entryCollectionHAL.length; i++) {
             if (!helmResults[i].success) {
@@ -489,8 +490,18 @@ class DinghyRacingModel {
             if (!lapsResults[i].success) {
                 return Promise.resolve(lapsResults[i]);
             }
+            if (!crewResults[i].success) {
+                // return Promise.resolve(crewResults[i]);
+                if (/404/.test(crewResults[i].message)) {
+                    crewResults[i] = {...crewResults[i], 'domainObject': null};
+                }
+                else {
+                    return Promise.resolve(crewResults[i]);
+                }
+            }
             entries.push({...DinghyRacingModel.entryTemplate(), 'race': raceResult.domainObject, 'helm': helmResults[i].domainObject, 
-                'dinghy': dinghyResults[i].domainObject, 'laps': lapsResults[i].domainObject, 'url': entryCollectionHAL[i]._links.self.href});
+                'dinghy': dinghyResults[i].domainObject, 'laps': lapsResults[i].domainObject,  'crew': crewResults[i].domainObject, 
+                'url': entryCollectionHAL[i]._links.self.href});
         };
         return Promise.resolve({'success': true, 'domainObject': entries});
     }
