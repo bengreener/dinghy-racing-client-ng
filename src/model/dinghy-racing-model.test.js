@@ -1070,11 +1070,18 @@ describe('when retrieving a list of dinghies', () => {
                     json: () => Promise.resolve(dinghyClassScorpionHAL)
                 });
             }
-            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass') {
+            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/7/dinghyClass') {
                 return Promise.resolve({
                     ok: true,
                     status: 200, 
                     json: () => Promise.resolve(dinghyClassGraduateHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/18/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassCometHAL)
                 });
             }
             else {
@@ -1183,7 +1190,7 @@ it('provides a blank template for a lap', () => {
     const lap = DinghyRacingModel.lapTemplate();
 
     expect(lap).toEqual({'number': null, 'time': 0});
-})
+});
 
 describe('when searching for entries by race', () => {
     it('returns a promise that resolves to a result indicating success and containing the entries when entries are found and entries have crew recorded', async () => {
@@ -1399,7 +1406,7 @@ describe('when a race is requested', () => {
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true, 'domainObject': raceGraduateA});
-    })
+    });
 });
 
 describe('when a competitor is requested', () => {

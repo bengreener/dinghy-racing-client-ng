@@ -12,8 +12,10 @@ function SignUp({ race }) {
     const model = useContext(ModelContext);
     const controller = useContext(ControllerContext);
     const [helmName, setHelmName] = useState('');
+    const [crewName, setCrewName] = useState('');
     const [sailNumber, setSailNumber] = useState('');
     const [dinghyClassName, setDinghyClassName] = useState('');
+    const [dinghyClassHasCrew, setDinghyClassHasCrew] = useState(false);
     const [result, setResult] = useState({'message': ''});
     const [competitorMap, setCompetitorMap] = useState(new Map());
     const [competitorOptions, setCompetitorOptions] = useState([]);
@@ -25,6 +27,7 @@ function SignUp({ race }) {
 
     const clear = React.useCallback(() => {
         setHelmName('');
+        setCrewName('');
         setSailNumber('');
         setDinghyClassName('');
         showMessage('');
@@ -124,6 +127,7 @@ function SignUp({ race }) {
         });
     }, [race, model, result]);
     
+    // if error display message 
     React.useEffect(() => {
         if (result && result.success) {
             clear();
@@ -132,6 +136,19 @@ function SignUp({ race }) {
             showMessage(result.message);
         }
     }, [result, clear]);
+
+    // check if dinghy class has crew
+    React.useEffect(() => {
+        if (race.dinghyClass) {
+            setDinghyClassHasCrew(race.dinghyClass.crewSize > 1);
+        }
+        else if (dinghyClassName) {
+            setDinghyClassHasCrew(dinghyClassMap.get(dinghyClassName).crewSize > 1);
+        }
+        else {
+            setDinghyClassHasCrew(false);
+        }
+    }, [race, dinghyClassName, dinghyClassMap]);
     
     function handleChange({target}) {
         if (target.name === 'sailNumber') {
@@ -139,6 +156,9 @@ function SignUp({ race }) {
         }
         if (target.name === 'helm') {
             setHelmName(target.value);
+        }
+        if (target.name === 'crew') {
+            setCrewName(target.value);
         }
         if (target.name === 'dinghyClass') {
             setDinghyClassName(target.value);
@@ -161,21 +181,37 @@ function SignUp({ race }) {
         else {
             creationPromises.push(Promise.resolve({'success': true}));
         }
+        if (crewName && !competitorMap.has(crewName)) {
+            creationPromises.push(controller.createCompetitor({'name': crewName, 'url': ''}));
+        }
+        else {
+            creationPromises.push(Promise.resolve({'success': true}));
+        }
         const creationResults = await Promise.all(creationPromises);
-        if (creationResults[0].success && creationResults[1].success) {
-            setResult(await controller.signupToRace(race, 
-                competitorMap.has(helmName) ? competitorMap.get(helmName) : {'name': helmName, 'url': ''}, 
-                dinghyMap.has(sailNumber) ? dinghyMap.get(sailNumber) : {'sailNumber': sailNumber, 'dinghyClass': dinghyClassMap.get(dinghyClassName), 'url': ''}
-            ));
+        let success = true;
+        let message = '';
+        creationResults.forEach(result => {
+            if (!result.success) {
+                if (message) {
+                    message =+ '/n';
+                }
+                success = result.success;
+                message =+ message;
+            }
+        });
+        if (success) {
+            const helm = competitorMap.has(helmName) ? competitorMap.get(helmName) : {'name': helmName, 'url': ''};
+            const dinghy = dinghyMap.has(sailNumber) ? dinghyMap.get(sailNumber) : {'sailNumber': sailNumber, 'dinghyClass': dinghyClassMap.get(dinghyClassName), 'url': ''};
+            const crew = crewName ? (competitorMap.has(crewName) ? competitorMap.get(crewName) : {'name': crewName, 'url': ''}) : null;
+            if (crew) {
+                setResult(await controller.signupToRace(race, helm, dinghy, crew));
+            }
+            else {
+                setResult(await controller.signupToRace(race, helm, dinghy));
+            }
         }
-        else if (!creationResults[0].success && !creationResults[1].success) {
-            setResult({'success': false, 'message': creationResults[0].message + '\n' + creationResults[1].message});
-        }
-        else if (!creationResults[0].success) {
-            setResult({'success': false, 'message': creationResults[0].message});
-        }
-        else if (!creationResults[1].success) {
-            setResult({'success': false, 'message': creationResults[1].message});
+        else {
+            setResult({'success': false, 'message': message});
         }
     }
 
@@ -196,17 +232,42 @@ function SignUp({ race }) {
         return dinghyClassInput;
     }
 
+    function crewInput() {
+        let crewInput = null;
+        if (dinghyClassHasCrew) {
+            crewInput = (
+                <>
+                    <label htmlFor="crew-input">Crew's Name</label>
+                    <input id="crew-input" name="crew" list="competitor-datalist" onChange={handleChange} value={crewName} />
+                </>
+            );
+        };
+        return crewInput;
+    }
+
     function showMessage(message) {
         const output = document.getElementById('entry-message-output');
         output.value = message;
     }
 
     function getButtonText() {
+        if (!competitorMap.has(helmName) && (crewName && !competitorMap.has(crewName)) && !dinghyMap.has(sailNumber)) {
+            return 'Add helm & crew & dinghy & sign-up';
+        }
         if (!competitorMap.has(helmName) && !dinghyMap.has(sailNumber)) {
             return 'Add helm & dinghy & sign-up';
         }
+        if ((crewName && !competitorMap.has(crewName)) && !dinghyMap.has(sailNumber)) {
+            return 'Add crew & dinghy & sign-up';
+        }
+        if (!competitorMap.has(helmName) && !competitorMap.has(crewName)) {
+            return 'Add helm & crew & sign-up';
+        }
         if (!competitorMap.has(helmName)) {
             return 'Add helm & sign-up';
+        }
+        if (crewName && !competitorMap.has(crewName)) {
+            return 'Add crew & sign-up';
         }
         if (!dinghyMap.has(sailNumber)) {
             return 'Add dinghy & sign-up';
@@ -219,6 +280,7 @@ function SignUp({ race }) {
             <datalist id="competitor-datalist">{competitorOptions}</datalist>
             <label htmlFor="helm-input">Helm's Name</label>
             <input id="helm-input" name="helm" list="competitor-datalist" onChange={handleChange} value={helmName} />
+            {crewInput()}
             {dinghyClassInput(race)}
             <datalist id="dinghy-datalist">{dinghyOptions}</datalist>
             <label htmlFor="sail-number-input">Sail Number</label>
