@@ -103,17 +103,21 @@ function SignUp({ race }) {
     React.useEffect(() => {
         model.getEntriesByRace(race).then(result => {
             if (result.success) {
-                const rows = result.domainObject.map(entry => <tr key={entry.helm.name}>
-                    <td key={'helm'}>{entry.helm.name}</td>
-                    <td key={'sailNumber'}>{entry.dinghy.sailNumber}</td>
-                    <td key={'dinghyClass'}>{entry.dinghy.dinghyClass.name}</td>
-                </tr>);
+                const rows = result.domainObject.map(entry => {
+                    return <tr key={entry.helm.name}>
+                        <td key={'helm'}>{entry.helm.name}</td>
+                        <td key={'sailNumber'}>{entry.dinghy.sailNumber}</td>
+                        <td key={'dinghyClass'}>{entry.dinghy.dinghyClass.name}</td>
+                        {(!race.dinghyClass || race.dinghyClass.crewSize > 1) ? <td key={'crew'}>{entry.crew ? entry.crew.name : ''}</td> : null}
+                    </tr>
+                });
                 setEntriesTable(<table>
                     <thead>
                         <tr>
                             <th key="helm">Helm</th>
                             <th key="sailNumber">Sail Number</th>
                             <th key="dinghyClass">Class</th>
+                            {(!race.dinghyClass || race.dinghyClass.crewSize > 1) ? <th key="crew">Crew</th> : null}
                         </tr>
                     </thead>
                     <tbody>

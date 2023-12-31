@@ -544,12 +544,14 @@ it('displays entries for race', async () => {
 
     const competitor1 = await screen.findByRole('cell', {'name': /Chris Marshall/i});
     const competitor2 = await screen.findByRole('cell', {'name': /Sarah Pascal/i});
+    const competitor3 = await screen.findByRole('cell', {'name': /Lou Screw/i});
     const dinghyClass = await screen.findAllByRole('cell', {'name': /Scorpion/i});
     const dinghy1 = await screen.findByRole('cell', {'name': /1234/i});
     const dinghy2 = await screen.findByRole('cell', {'name': /6745/i});
 
     expect(competitor1).toBeInTheDocument();
     expect(competitor2).toBeInTheDocument();
+    expect(competitor3).toBeInTheDocument();
     expect(dinghyClass[0]).toBeInTheDocument();
     expect(dinghyClass[1]).toBeInTheDocument();
     expect(dinghy1).toBeInTheDocument();
