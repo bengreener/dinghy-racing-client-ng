@@ -23,10 +23,12 @@ beforeEach(() => {
 it('renders', async () => {
     await act(async () => {
         customRender(<SignUp race={raceScorpionA}/>, model, controller);
-    })
+    });
+    const raceTitle = screen.getByRole('heading', {'name': /scorpion A/i});
     const inputHelm = screen.getByLabelText(/helm/i);
     const inputSailNumber = screen.getByLabelText(/sail/i);
     const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
+    expect(raceTitle).toBeInTheDocument();
     expect(inputHelm).toBeInTheDocument();
     expect(inputSailNumber).toBeInTheDocument();
     expect(btnCreate).toBeInTheDocument();

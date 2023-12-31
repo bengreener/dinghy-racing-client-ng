@@ -281,6 +281,7 @@ function SignUp({ race }) {
 
     return (
         <form action="" method="get">
+            <h1>{race.name}</h1>
             <datalist id="competitor-datalist">{competitorOptions}</datalist>
             <label htmlFor="helm-input">Helm's Name</label>
             <input id="helm-input" name="helm" list="competitor-datalist" onChange={handleChange} value={helmName} />
