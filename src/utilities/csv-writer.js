@@ -25,16 +25,20 @@ function downloadRaceEntriesCSV(race, entries) {
 
 function convertRaceEntriesToCSVArray(race, entries) {
     return entries.map(entry => {
-        return race.name + ',' + 
-            race.plannedStartTime.toISOString() + ',' + 
-            // race.actualStartTime.toISOString() + ',' + 
-            race.dinghyClass.name + ',' + 
-            entry.helm.name + ',' + 
-            entry.dinghy.dinghyClass.name + ',' + 
-            entry.laps.length + ',' + 
-            entry.laps.reduce((accumulator, currentValue) => {
-                return {'time': accumulator.time + currentValue.time};
-            }, {'time': 0}).time + '\n';
+        let record = '';
+        record += race.name + ',';
+        record += race.plannedStartTime.toISOString() + ',';
+        record += race.dinghyClass ? race.dinghyClass.name + ',' : ',';
+        record += entry.helm.name + ',';
+        if (!race.dinghyClass || race.dinghyClass.crewSize > 1) {
+            record += entry.crew ? entry.crew.name + ',' : ',';
+        }
+        record += entry.dinghy.dinghyClass.name + ',';
+        record += entry.laps.length + ',';
+        record += entry.laps.reduce((accumulator, currentValue) => {
+            return {'time': accumulator.time + currentValue.time};
+        }, {'time': 0}).time + '\n';
+        return record;
     });
 };
 

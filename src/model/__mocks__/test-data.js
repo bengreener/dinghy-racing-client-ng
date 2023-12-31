@@ -187,11 +187,6 @@ const dinghyClassComet = {'name':'Comet', 'crewSize':1, 'url':'http://localhost:
 const dinghyClasses = [dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet];
 const dinghyClassesByNameAsc = [dinghyClassComet, dinghyClassGraduate, dinghyClassScorpion];
 
-// const dinghies = [
-// 	{'sailNumber':'1234','dinghyClass':dinghyClassScorpion,'url':'http://localhost:8081/dinghyracing/api/dinghies/2'},
-// 	{'sailNumber':'6745','dinghyClass': dinghyClassScorpion,'url':'http://localhost:8081/dinghyracing/api/dinghies/3'},
-// 	{'sailNumber':'2726','dinghyClass': dinghyClassGraduate,'url':'http://localhost:8081/dinghyracing/api/dinghies/6'}
-// ];
 const dinghiesScorpion = [{'sailNumber':'1234','dinghyClass':dinghyClassScorpion,'url':'http://localhost:8081/dinghyracing/api/dinghies/2'},{'sailNumber':'6745','dinghyClass': dinghyClassScorpion,'url':'http://localhost:8081/dinghyracing/api/dinghies/3'}];
 const dinghy1234 = {'sailNumber':'1234','dinghyClass': dinghyClassScorpion,'url':'http://localhost:8081/dinghyracing/api/dinghies/2'};
 const dinghy2726 = {'sailNumber':'2726','dinghyClass': dinghyClassGraduate,'url':'http://localhost:8081/dinghyracing/api/dinghies/6'};
@@ -211,7 +206,9 @@ const entriesScorpionA = [
 	{'helm': competitorSarahPascal, 'crew': competitorOwainDavies, 'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}
 ];
 const entriesGraduateA = [{'helm': competitorJillMyer, 'crew': null, 'race': raceGraduateA,'dinghy': dinghy2928, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/12'}];
-const entriesCometA = [{'helm': competitorJillMyer, 'crew': null, 'race': raceCometA, 'dinghy': dinghy826, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/19'}];
+const entriesCometA = [
+	{'helm': competitorJillMyer, 'crew': null, 'race': raceCometA, 'dinghy': dinghy826, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/19'}
+];
 const entriesNoClass = [
 	{'helm': competitorChrisMarshall, 'crew': competitorLouScrew, 'race': raceNoClass, 'dinghy': dinghy1234, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/20'}, 
 	{'helm': competitorJillMyer, 'crew': null, 'race': raceNoClass, 'dinghy': dinghy826, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/21'}
