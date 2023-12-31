@@ -74,7 +74,7 @@ class DinghyRacingController {
 
     /**
      * Add a new competitor
-     * @param {Competitor} competitor
+     * @param {Competitor} 
      * @returns {Promise<Result>}
      */
     createCompetitor(competitor) {
@@ -132,22 +132,25 @@ class DinghyRacingController {
     /**
      * Sign up to a race
      * @param {Race} race Race to sign up to
-     * @param {competitor} competitor Competitor signing up
+     * @param {competitor} helm Competitor signing up to helm dinghy
      * @param {Dinghy} dinghy Dinghy to be sailed in race
      * @returns {Promise<Result>}
      */
-    signupToRace(race, competitor, dinghy) {
+    signupToRace(race, helm, dinghy, crew = null) {
         // check valid race, competitor, and dinghy provided
         if (!race.name || race.name === '' || !race.plannedStartTime) {
             return Promise.resolve({'success': false, 'message': 'Please provide details of the race.'});
         }
-        if (!competitor.name || competitor.name === '') {
-            return Promise.resolve({'success': false, 'message': 'Please provide details for the competitor.'});
+        if (!helm.name || helm.name === '') {
+            return Promise.resolve({'success': false, 'message': 'Please provide details for the helm.'});
         }
         if (!dinghy.sailNumber || dinghy.sailNumber === '' || !dinghy.dinghyClass || !dinghy.dinghyClass.name || dinghy.dinghyClass.name === '') {
             return Promise.resolve({'success': false, 'message': 'Please provide details for the dinghy.'});
         }
-        return this.model.createEntry(race, competitor, dinghy);
+        if (crew && (!crew.name || crew.name === '')) {
+            return Promise.resolve({'success': false, 'message': 'Please provide details for the crew.'});
+        }
+        return this.model.createEntry(race, helm, dinghy, crew);
     }
 
     /**

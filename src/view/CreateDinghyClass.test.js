@@ -19,6 +19,19 @@ it('accepts the name of a dinghy class', async () => {
     expect(txtClassName).toHaveValue('Scorpion');
 });
 
+it('accepts the crew size', async () => {
+    const user = userEvent.setup();
+    
+    render(<CreateDinghyClass />);
+    const crewSizeInput = await screen.findByLabelText('Crew Size');
+    await act(async () => {
+        await user.clear(crewSizeInput);
+        await user.type(crewSizeInput, '2');
+    });
+    
+    expect(crewSizeInput).toHaveValue(2);
+});
+
 it('calls the function passed in to onCreate prop', async () => {
     const user = userEvent.setup();
     const fnOnCreate = jest.fn(() => {return Promise.resolve({'success': true})});
@@ -39,12 +52,15 @@ it('calls the function passed in to onCreate prop with new dinghy class as param
     render(<CreateDinghyClass onCreate={fnOnCreate} />);
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
     const txtClassName = screen.getByLabelText('Class Name');
+    const crewSizeInput = await screen.findByLabelText('Crew Size');
     await act(async () => {
         await user.type(txtClassName, 'Scorpion');
+        await user.clear(crewSizeInput);
+        await user.type(crewSizeInput, '2');
         await user.click(btnCreate);
     });
 
-    expect(fnOnCreate).toBeCalledWith({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
+    expect(fnOnCreate).toBeCalledWith({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion', 'crewSize': 2});
 });
 
 describe('when creating a new dinghy class', () => {

@@ -43,7 +43,7 @@ class DinghyRacingModel {
      * Provide a blank entry template
      */
     static entryTemplate() {
-        return {'race': DinghyRacingModel.raceTemplate(), 'competitor': DinghyRacingModel.competitorTemplate(), 'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'url': ''};
+        return {'race': DinghyRacingModel.raceTemplate(), 'helm': DinghyRacingModel.competitorTemplate(), 'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'url': ''};
     }
 
     /**
@@ -95,7 +95,7 @@ class DinghyRacingModel {
         return null;
     }
 
-    async createEntry(race, competitor, dinghy) {
+    async createEntry(race, helm, dinghy) {
         return null;
     }
 

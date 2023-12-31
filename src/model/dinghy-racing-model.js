@@ -19,7 +19,7 @@ class DinghyRacingModel {
      * @returns {DinghyClass}
      */
     static dinghyClassTemplate() {
-        return {'name': '', 'url': ''};
+        return {'name': '', 'crewSize': 1, 'url': ''};
     }
 
     /**
@@ -43,7 +43,8 @@ class DinghyRacingModel {
      * Provide a blank entry template
      */
     static entryTemplate() {
-        return {'race': DinghyRacingModel.raceTemplate(), 'competitor': DinghyRacingModel.competitorTemplate(), 'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'url': ''};
+        return {'race': DinghyRacingModel.raceTemplate(), 'helm': DinghyRacingModel.competitorTemplate(), 'crew': null, 
+        'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'url': ''};
     }
 
     /**
@@ -190,27 +191,27 @@ class DinghyRacingModel {
 
     /**
      * Create a new entry to a race
-     * Supplied competitor and dinghy must exist
+     * Supplied helm and dinghy must exist
      * @param {Race} race Race to enter
-     * @param {Competitor} competitor Competitor entering race
+     * @param {Competitor} helm Competitor entering race as the helm
      * @param {Dinghy} dinghy Dinghy to be sailed in race
      * @returns {Promise<Result>}
      */
-    async createEntry(race, competitor, dinghy) {
+    async createEntry(race, helm, dinghy, crew = null) {
         let dinghyClass;
 
-        // check if competitor and dinghy have reference to remote resource and if not fetch
+        // check if helm, crew, and dinghy have reference to remote resource and if not fetch
         // assuming if a URL supplied resource exists in REST service
         let promises = [];
         let results = [];
-        // need competitor url
-        if (!competitor.url) {
-            // lookup competitor
-            promises.push(this.getCompetitorByName(competitor.name));
+        // need helm url
+        if (!helm.url) {
+            // lookup helm
+            promises.push(this.getCompetitorByName(helm.name));
         }
         else {
-            // use supplied competitor url
-            promises.push(Promise.resolve({'success': true, 'domainObject': competitor}));
+            // use supplied  url
+            promises.push(Promise.resolve({'success': true, 'domainObject': helm}));
         }
         // need dinghy url
         if (!dinghy.url) {
@@ -234,23 +235,37 @@ class DinghyRacingModel {
             // use supplied dinghy url
             promises.push(Promise.resolve({'success': true, 'domainObject': dinghy}));
         }
-        // check if competitor and dinghy retrieved via REST
-        // if fetch was not required use competitor or dinghy passed as parameters
+        // if crew supplied need crew URL
+        if (crew && !crew.url) {
+            promises.push(this.getCompetitorByName(crew.name));
+        }
+        else {
+            // deal with a null crew later
+            promises.push(Promise.resolve({'success': true, 'domainObject': crew}));
+        }
+        // check if helm and dinghy retrieved via REST
+        // if fetch was not required use helm or dinghy passed as parameters
         results = await Promise.all(promises);
         // if successful return success result
-        if (results[0].success && results[1].success) {
-            return this.create('entries', {'race': race.url, 'competitor': results[0].domainObject.url, 'dinghy': results[1].domainObject.url});
+        if (results[0].success && results[1].success && results[2].success) {
+            if (crew) {
+                return this.create('entries', {'race': race.url, 'helm': results[0].domainObject.url, 'dinghy': results[1].domainObject.url, 'crew': results[2].domainObject.url});    
+            }
+            return this.create('entries', {'race': race.url, 'helm': results[0].domainObject.url, 'dinghy': results[1].domainObject.url});
         }
-        // if creation fails for competitor and dinghy combine messages and return failure
-        if (!results[0].success && !results[1].success) {
-            return Promise.resolve({'success': false, 'message': results[0].message + '\n' + results[1].message});
+        else {
+            // combine failure messages and return failure
+            let message = '';
+            results.forEach(result => {
+                if (!result.success) {
+                    if (message) {
+                        message += '\n';
+                    }
+                    message += result.message;
+                }
+            })
+            return Promise.resolve({'success': false, 'message': message});
         }
-        // if creation fails for competitor return failure
-        if (!results[0].success) {
-            return Promise.resolve({'success': false, 'message': results[0].message});
-        }
-        // if creation fails for dinghy return failure
-        return Promise.resolve({'success': false, 'message': results[1].message});
     }
 
     /**
@@ -339,7 +354,8 @@ class DinghyRacingModel {
             
             const dinghies = [];
             for (let i = 0; i < dinghiesHAL.length; i++  ) {
-                const dinghyClass = dinghyClassResults[i].success ? {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassResults[i].domainObject.name, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
+                const dinghyClass = dinghyClassResults[i].success ? {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassResults[i].domainObject.name, 
+                    'crewSize': dinghyClassResults[i].domainObject.crewSize, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
                 dinghies.push({'sailNumber': dinghiesHAL[i].sailNumber, 'dinghyClass': dinghyClass, 'url': dinghiesHAL[i]._links.self.href});
             };
             return Promise.resolve({'success': true, 'domainObject': dinghies});
@@ -376,7 +392,8 @@ class DinghyRacingModel {
     async getDinghyClass(url) {
         const result = await this.read(url);
         if (result.success) {
-            return Promise.resolve({'success': true, 'domainObject': {...DinghyRacingModel.dinghyClassTemplate(), 'name': result.domainObject.name, 'url': result.domainObject._links.self.href}});
+            return Promise.resolve({'success': true, 'domainObject': {...DinghyRacingModel.dinghyClassTemplate(), 'name': result.domainObject.name, 
+            'crewSize': result.domainObject.crewSize, 'url': result.domainObject._links.self.href}});
         }
         else {
             return Promise.resolve(result);
@@ -393,7 +410,8 @@ class DinghyRacingModel {
 
         const result = await this.read(resource);
         if(result.success) {
-            const domainObject = {...DinghyRacingModel.dinghyClassTemplate(), 'name': result.domainObject.name, 'url': result.domainObject._links.self.href};
+            const domainObject = {...DinghyRacingModel.dinghyClassTemplate(), 'name': result.domainObject.name, 
+                'crewSize': result.domainObject.crewSize, 'url': result.domainObject._links.self.href};
             return Promise.resolve({'success': true, 'domainObject': domainObject});
         }
         else {
@@ -411,7 +429,8 @@ class DinghyRacingModel {
         const result = await this.read(resource);
         if (result.success) {
             const collection = result.domainObject._embedded.dinghyClasses;
-            const dinghyClassCollection = collection.map(dinghyClass => {return {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClass.name, 'url': dinghyClass._links.self.href}});
+            const dinghyClassCollection = collection.map(dinghyClass => {return {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClass.name, 
+                'crewSize': dinghyClass.crewSize, 'url': dinghyClass._links.self.href}});
             return Promise.resolve({'success': true, 'domainObject': dinghyClassCollection});
         }
         else {
@@ -441,26 +460,29 @@ class DinghyRacingModel {
             // no entries for race
             return Promise.resolve({'success': true, 'domainObject': []})
         }
-        // get race, competitors, dinghies, and laps
+        // get race, helm, dinghies, and laps
         const raceResult = await this.getRace(entryCollectionHAL[0]._links.race.href);
         if (!raceResult.success) {
             return Promise.resolve(raceResult);
         }
-        const competitorPromises = [];
+        const helmPromises = [];
         const dinghyPromises = [];
         const lapsPromises = [];
+        const crewPromises = [];
         entryCollectionHAL.forEach(entry => {
-            competitorPromises.push(this.getCompetitor(entry._links.competitor.href));
+            helmPromises.push(this.getCompetitor(entry._links.helm.href));
             dinghyPromises.push(this.getDinghy(entry._links.dinghy.href));
             lapsPromises.push(this.getLaps(entry._links.laps.href));
+            crewPromises.push(this.getCompetitor(entry._links.crew.href));
         });
-        const competitorResults = await Promise.all(competitorPromises);
+        const helmResults = await Promise.all(helmPromises);
         const dinghyResults = await Promise.all(dinghyPromises);
         const lapsResults = await Promise.all(lapsPromises);
+        const crewResults = await Promise.all(crewPromises);
         const entries = [];
         for (let i = 0; i < entryCollectionHAL.length; i++) {
-            if (!competitorResults[i].success) {
-                return Promise.resolve(competitorResults[i]);
+            if (!helmResults[i].success) {
+                return Promise.resolve(helmResults[i]);
             }
             if (!dinghyResults[i].success) {
                 return Promise.resolve(dinghyResults[i]);
@@ -468,8 +490,18 @@ class DinghyRacingModel {
             if (!lapsResults[i].success) {
                 return Promise.resolve(lapsResults[i]);
             }
-            entries.push({...DinghyRacingModel.entryTemplate(), 'race': raceResult.domainObject, 'competitor': competitorResults[i].domainObject, 
-                'dinghy': dinghyResults[i].domainObject, 'laps': lapsResults[i].domainObject, 'url': entryCollectionHAL[i]._links.self.href});
+            if (!crewResults[i].success) {
+                // return Promise.resolve(crewResults[i]);
+                if (/404/.test(crewResults[i].message)) {
+                    crewResults[i] = {...crewResults[i], 'domainObject': null};
+                }
+                else {
+                    return Promise.resolve(crewResults[i]);
+                }
+            }
+            entries.push({...DinghyRacingModel.entryTemplate(), 'race': raceResult.domainObject, 'helm': helmResults[i].domainObject, 
+                'dinghy': dinghyResults[i].domainObject, 'laps': lapsResults[i].domainObject,  'crew': crewResults[i].domainObject, 
+                'url': entryCollectionHAL[i]._links.self.href});
         };
         return Promise.resolve({'success': true, 'domainObject': entries});
     }
@@ -547,7 +579,7 @@ class DinghyRacingModel {
             const races = [];
             for (let i = 0; i < racesHAL.length; i++  ) {
                 const dinghyClass = dinghyClassResults[i].success ? {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassResults[i].domainObject.name, 
-                    'url': dinghyClassResults[i].domainObject._links.self.href} : null;
+                    'crewSize': dinghyClassResults[i].domainObject.crewSize, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
                 // assume time received has been stored in UTC
                 races.push({...DinghyRacingModel.raceTemplate(), 'name': racesHAL[i].name, 'plannedStartTime': new Date(racesHAL[i].plannedStartTime + 'Z'), 
                     'actualStartTime': racesHAL[i].actualStartTime ? new Date(racesHAL[i].actualStartTime + 'Z') : null, 
@@ -582,7 +614,7 @@ class DinghyRacingModel {
             const races = [];
             for (let i = 0; i < racesHAL.length; i++  ) {
                 const dinghyClass = dinghyClassResults[i].success ? {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassResults[i].domainObject.name, 
-                    'url': dinghyClassResults[i].domainObject._links.self.href} : null;
+                    'crewSize': dinghyClassResults[i].domainObject.crewSize, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
                 // assume time received has been stored in UTC
                 races.push({...DinghyRacingModel.raceTemplate(), 'name': racesHAL[i].name, 'plannedStartTime': new Date(racesHAL[i].plannedStartTime + 'Z'), 
                     'actualStartTime': racesHAL[i].actualStartTime ? new Date(racesHAL[i].actualStartTime + 'Z') : null, 
