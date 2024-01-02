@@ -432,6 +432,7 @@ describe('when create button is clicked', () => {
             expect(createCompetitorSpy).toHaveBeenCalledWith({'name':'Bill Wilkins', 'url': ''});
             expect(signupToRaceSpy).toHaveBeenCalledWith(raceNoClass, {'name': 'Asmee Varma', 'url': ''}, {...dinghy1234}, {'name': 'Bill Wilkins', 'url': ''});
         });
+    });
     describe('when neither crew or dinghy exists', () => {
         it('creates competitor and dinghy and then signs helm up for race', async () => {
             const user = userEvent.setup();
@@ -469,7 +470,6 @@ describe('when create button is clicked', () => {
             expect(signupToRaceSpy).toHaveBeenCalledWith(raceNoClass, competitorChrisMarshall, {'sailNumber':'6754', 'dinghyClass': dinghyClassScorpion, 'url': ''}, 
                 {'name': 'Bill Wilkins', 'url': ''});
         });
-    });
     });
     describe('when neither helm, crew, nor dinghy exists', () => {
         it('creates helm competitor, crew competitor, and dinghy, and then signs helm up for race', async () => {
