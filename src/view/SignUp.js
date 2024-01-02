@@ -197,10 +197,10 @@ function SignUp({ race }) {
         creationResults.forEach(result => {
             if (!result.success) {
                 if (message) {
-                    message =+ '/n';
+                    message += '/n';
                 }
                 success = result.success;
-                message =+ message;
+                message += result.message;
             }
         });
         if (success) {
@@ -255,7 +255,6 @@ function SignUp({ race }) {
     }
 
     function getButtonText() {
-        // console.log(`helm?=${!competitorMap.has(helmName)} crew?=${crewName != '' && crewName != null && !competitorMap.has(crewName)} dinghy?=${!dinghyMap.has(sailNumber)}`);
         if (!competitorMap.has(helmName) && (crewName !== '' && crewName != null && !competitorMap.has(crewName)) && !dinghyMap.has(sailNumber)) {
             return 'Add helm & crew & dinghy & sign-up';
         }

@@ -98,7 +98,7 @@ describe('when race for dinghy class with no crew', () => {
 		
 		describe('when create button clicked', () => {
             it('creates entry with values entered into form and dinghy class set per race', async () => {
-                const onCreateSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
                 const user = userEvent.setup();
@@ -117,12 +117,12 @@ describe('when race for dinghy class with no crew', () => {
                 await act(async () => {
                     await user.click(buttonCreate);
                 });
-                expect(onCreateSpy).toHaveBeenCalledWith(raceCometA, competitorJillMyer, dinghy826);
+                expect(onSignupToRaceSpy).toHaveBeenCalledWith(raceCometA, competitorJillMyer, dinghy826);
             });
 		
 			describe('when entry not created', () => {
                 it('displays failure message and entered values remain on form', async () => {
-                    const onCreateSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                    const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': false, 'message': 'Entry not created'});
                     });
                     const user = userEvent.setup();
@@ -161,17 +161,59 @@ describe('when race for dinghy class with no crew', () => {
             await act(async () => {
                 await user.type(inputSail, '826');
             });
-            expect(await screen.findByRole('button', {'name': /add helm & sign-up/i}));
+            expect(screen.getByRole('button', {'name': /add helm & sign-up/i}));
         });
 	
 		describe('when create button clicked', () => {
-            it('creates helm and then creates entry with values entered into form', () => {
+            it('creates helm and then creates entry with values entered into form', async () => {
+                const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                    return Promise.resolve({'success': true});
+                });
+                jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    return Promise.resolve({'success': true});
+                });
+                const user = userEvent.setup();
 
+                customRender(<SignUp race={raceCometA}/>, model, controller);
+    
+                const inputHelm = await screen.findByLabelText(/helm/i);
+                const inputSail = await screen.findByLabelText(/sail/i);
+                await act(async () => {
+                    await user.type(inputHelm, 'Not There');
+                });
+                await act(async () => {
+                    await user.type(inputSail, '826');
+                });
+                const createButton = screen.getByRole('button', {'name': /add helm & sign-up/i});
+                await act(async () => {
+                    await user.click(createButton);
+                });
+                expect(signupToRaceSpy).toHaveBeenCalledWith(raceCometA, {'name': 'Not There', 'url': ''}, dinghy826);
             })
 			
 			describe('when helm not created', () => {
-				it('displays failure message and entered values remain on form', () => {
-
+				it('displays failure message and entered values remain on form', async () => {
+                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        return Promise.resolve({'success': false, 'message': 'Competitor not created'});
+                    });
+                    const user = userEvent.setup();
+    
+                    customRender(<SignUp race={raceCometA}/>, model, controller);
+        
+                    const inputHelm = await screen.findByLabelText(/helm/i);
+                    const inputSail = await screen.findByLabelText(/sail/i);
+                    await act(async () => {
+                        await user.type(inputHelm, 'Not There');
+                    });
+                    await act(async () => {
+                        await user.type(inputSail, '826');
+                    });
+                    const createButton = screen.getByRole('button', {'name': /add helm & sign-up/i});
+                    await act(async () => {
+                        await user.click(createButton);
+                    });
+                    expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
+                    expect(screen.getByText('Competitor not created')).toBeInTheDocument();
                 });
             });
 			
