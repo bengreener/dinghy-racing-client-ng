@@ -121,8 +121,27 @@ describe('when race for dinghy class with no crew', () => {
             });
 		
 			describe('when entry not created', () => {
-                it('displays failure message and entered values remain on form', () => {
+                it('displays failure message and entered values remain on form', async () => {
+                    const onCreateSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        return Promise.resolve({'success': false, 'message': 'Entry not created'});
+                    });
+                    const user = userEvent.setup();
 
+                    customRender(<SignUp race={raceCometA}/>, model, controller);
+
+                    const inputHelm = await screen.findByLabelText(/helm/i);
+                    const inputSail = await screen.findByLabelText(/sail/i);
+                    await act(async () => {
+                        await user.type(inputHelm, 'Jill Myer');
+                    });
+                    await act(async () => {
+                        await user.type(inputSail, '826');
+                    });
+                    const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
+                    await act(async () => {
+                        await user.click(buttonCreate);
+                    });
+                    expect(screen.getByText('Entry not created')).toBeInTheDocument();
                 });
             });	
         });
