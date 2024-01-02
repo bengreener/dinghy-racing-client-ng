@@ -255,22 +255,23 @@ function SignUp({ race }) {
     }
 
     function getButtonText() {
-        if (!competitorMap.has(helmName) && (crewName && !competitorMap.has(crewName)) && !dinghyMap.has(sailNumber)) {
+        // console.log(`helm?=${!competitorMap.has(helmName)} crew?=${crewName != '' && crewName != null && !competitorMap.has(crewName)} dinghy?=${!dinghyMap.has(sailNumber)}`);
+        if (!competitorMap.has(helmName) && (crewName !== '' && crewName != null && !competitorMap.has(crewName)) && !dinghyMap.has(sailNumber)) {
             return 'Add helm & crew & dinghy & sign-up';
         }
         if (!competitorMap.has(helmName) && !dinghyMap.has(sailNumber)) {
             return 'Add helm & dinghy & sign-up';
         }
-        if ((crewName && !competitorMap.has(crewName)) && !dinghyMap.has(sailNumber)) {
+        if ((crewName !== '' && crewName != null && !competitorMap.has(crewName)) && !dinghyMap.has(sailNumber)) {
             return 'Add crew & dinghy & sign-up';
         }
-        if (!competitorMap.has(helmName) && !competitorMap.has(crewName)) {
+        if (!competitorMap.has(helmName) && (crewName !== '' && crewName != null && !competitorMap.has(crewName))) {
             return 'Add helm & crew & sign-up';
         }
         if (!competitorMap.has(helmName)) {
             return 'Add helm & sign-up';
         }
-        if (crewName && !competitorMap.has(crewName)) {
+        if ((crewName !== '' && crewName != null && !competitorMap.has(crewName))) {
             return 'Add crew & sign-up';
         }
         if (!dinghyMap.has(sailNumber)) {
