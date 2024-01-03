@@ -530,7 +530,13 @@ describe('when race for dinghy class with crew', () => {
 
     describe('when helm name is entered', () => {
         it('displays helm name', async () => {
-
+            const user = userEvent.setup();
+            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+            const inputHelm = await screen.findByLabelText(/helm/i);
+            await act(async () => {
+                await user.type(inputHelm, 'Chris Marshall');
+            });
+            expect(inputHelm).toHaveValue('Chris Marshall');
         });
     });
 
