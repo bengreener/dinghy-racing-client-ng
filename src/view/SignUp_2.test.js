@@ -513,7 +513,19 @@ describe('when race for dinghy class with no crew', () => {
 
 describe('when race for dinghy class with crew', () => {
     it('renders', async () => {
-
+        await act(async () => {
+            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+        });
+        const raceTitle = screen.getByRole('heading', {'name': /scorpion a/i});
+        const inputHelm = screen.getByLabelText(/helm/i);
+        const inputSailNumber = screen.getByLabelText(/sail/i);
+        const inputCrew = screen.getByLabelText(/crew/i);
+        const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
+        expect(raceTitle).toBeInTheDocument();
+        expect(inputHelm).toBeInTheDocument();
+        expect(inputSailNumber).toBeInTheDocument();
+        expect(inputCrew).toBeInTheDocument();
+        expect(btnCreate).toBeInTheDocument();
     });
 
     describe('when helm name is entered', () => {
