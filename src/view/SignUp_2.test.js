@@ -4,8 +4,12 @@ import userEvent from '@testing-library/user-event';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 import SignUp from './SignUp';
-import { httpRootURL, wsRootURL, competitorsCollection, competitorChrisMarshall, raceScorpionA, raceNoClass, dinghies, dinghy1234, dinghy6745, 
-    dinghyClasses, dinghyClassScorpion, dinghyClassComet, competitorSarahPascal, entriesScorpionA, competitorLouScrew, raceCometA, competitorJillMyer, dinghy826 } from '../model/__mocks__/test-data';
+import { httpRootURL, wsRootURL, 
+    competitorsCollection, competitorChrisMarshall, competitorSarahPascal, competitorLouScrew, competitorJillMyer,
+    dinghyClasses, dinghyClassScorpion, dinghyClassComet,
+    dinghies, dinghy1234, dinghy6745, dinghy826,
+    raceScorpionA, raceNoClass, raceCometA,
+    entriesScorpionA, entriesCometA} from '../model/__mocks__/test-data';
 
 jest.mock('../model/dinghy-racing-model');
 jest.mock('../controller/dinghy-racing-controller');
@@ -535,8 +539,14 @@ describe('when race for dinghy class with no crew', () => {
     });
     
     it('displays entries for race', async () => {
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesCometA})});
 
-    }); 
+        customRender(<SignUp race={raceCometA}/>, model, controller);
+
+        const competitor1 = await screen.findByRole('cell', {'name': /Jill Myer/i});
+        const dinghyClass = await screen.findAllByRole('cell', {'name': /Comet/i});
+        const dinghy1 = await screen.findByRole('cell', {'name': /826/i});
+    });
 });
 
 describe('when race for dinghy class with crew', () => {
