@@ -490,7 +490,32 @@ describe('when race for dinghy class with no crew', () => {
     });
     
     it('clears form on success', async () => {
+        const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+            return Promise.resolve({'success': true});
+        });
+        const user = userEvent.setup();
 
+        customRender(<SignUp race={raceCometA}/>, model, controller);
+
+        const inputHelm = await screen.findByLabelText(/helm/i);
+        const inputSailNumber = await screen.findByLabelText(/sail/i);
+        await act(async () => {
+            await user.type(inputHelm, 'Jill Myer');
+        });
+        await act(async () => {
+            await user.type(inputSailNumber, '826');
+        });
+        const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
+        await act(async () => {
+            await user.click(buttonCreate);
+        });
+        const raceTitle = screen.getByRole('heading', {'name': /comet a/i});
+        const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
+        expect(raceTitle).toBeInTheDocument();
+        expect(inputHelm).toHaveValue('');
+        expect(inputSailNumber).toHaveValue('');
+        expect(screen.queryByLabelText(/crew/i)).not.toBeInTheDocument();
+        expect(btnCreate).toBeInTheDocument();
     });
     
     it('displays entries for race', async () => {
