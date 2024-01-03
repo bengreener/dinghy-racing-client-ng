@@ -541,8 +541,14 @@ describe('when race for dinghy class with crew', () => {
     });
 
     describe('when sail number is entered', () => {
-        it('displays sail number', () => {
-
+        it('displays sail number', async () => {
+            const user = userEvent.setup();
+            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+            const inputSailNumber = await screen.findByLabelText(/sail/i);
+            await act(async () => {
+                await user.type(inputSailNumber, 'g6754i');
+            });
+            expect(inputSailNumber).toHaveValue('g6754i');
         });
     });
     
