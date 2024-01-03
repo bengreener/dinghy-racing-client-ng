@@ -562,8 +562,14 @@ describe('when race for dinghy class with crew', () => {
     });
 
     describe('when crew name is entered', () => {
-        it('displays crew name', () => {
-
+        it('displays crew name', async () => {
+            const user = userEvent.setup();
+            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+            const inputCrew = await screen.findByLabelText(/crew/i);
+            await act(async () => {
+                await user.type(inputCrew, 'Lou Screw');
+            });
+            expect(inputCrew).toHaveValue('Lou Screw');
         });
     });
     
