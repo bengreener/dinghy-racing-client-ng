@@ -552,7 +552,13 @@ describe('when race for dinghy class with crew', () => {
         });
     });
     
-    it('does not request entry of dinghy class', () => {
+    it('does not request entry of dinghy class', async () => {
+        await act(async () => {
+            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+        });
+        const inputDinghyClass = screen.queryByLabelText(/class/i);
+
+        expect(inputDinghyClass).not.toBeInTheDocument();
     });
 
     describe('when crew name is entered', () => {
