@@ -42,9 +42,7 @@ describe('when race for dinghy class with no crew', () => {
     describe('when helm name is entered', () => {
         it('displays helm name', async () => {
             const user = userEvent.setup();
-    
             customRender(<SignUp race={raceCometA}/>, model, controller);
-        
             const inputHelm = await screen.findByLabelText(/helm/i);
             await act(async () => {
                 await user.type(inputHelm, 'Chris Marshall');
@@ -56,9 +54,7 @@ describe('when race for dinghy class with no crew', () => {
     describe('when sail number is entered', () => {
         it('displays sail number', async () => {
             const user = userEvent.setup();
-    
             customRender(<SignUp race={raceCometA}/>, model, controller);
-        
             const inputSailNumber = await screen.findByLabelText(/sail/i);
             await act(async () => {
                 await user.type(inputSailNumber, 'g6754i');
@@ -67,17 +63,19 @@ describe('when race for dinghy class with no crew', () => {
         });
     });
 
-    it('does not request entry of dinghy class', () => {
-        customRender(<SignUp race={raceCometA}/>, model, controller);
-        
+    it('does not request entry of dinghy class', async () => {
+        await act(async () => {
+            customRender(<SignUp race={raceCometA}/>, model, controller);
+        });
         const inputDinghyClass = screen.queryByLabelText(/class/i);
         
         expect(inputDinghyClass).not.toBeInTheDocument();
     });
 
-    it('does not request entry of crew', () => {
-        customRender(<SignUp race={raceCometA}/>, model, controller);
-        
+    it('does not request entry of crew', async () => {
+        await act(async () => {
+            customRender(<SignUp race={raceCometA}/>, model, controller);
+        });
         const inputCrew = screen.queryByLabelText(/crew/i);
         
         expect(inputCrew).not.toBeInTheDocument();
@@ -86,9 +84,7 @@ describe('when race for dinghy class with no crew', () => {
     describe('when helm and dinghy exist', () => {
 		it('displays sign-up button', async () => {
             const user = userEvent.setup();
-    
             customRender(<SignUp race={raceCometA}/>, model, controller);
-        
             const inputHelm = await screen.findByLabelText(/helm/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
             await act(async () => {
@@ -106,9 +102,7 @@ describe('when race for dinghy class with no crew', () => {
                     return Promise.resolve({'success': true});
                 });
                 const user = userEvent.setup();
-    
                 customRender(<SignUp race={raceCometA}/>, model, controller);
-            
                 const inputHelm = await screen.findByLabelText(/helm/i);
                 const inputSailNumber = await screen.findByLabelText(/sail/i);
                 await act(async () => {
@@ -130,9 +124,7 @@ describe('when race for dinghy class with no crew', () => {
                         return Promise.resolve({'success': false, 'message': 'Entry not created'});
                     });
                     const user = userEvent.setup();
-
                     customRender(<SignUp race={raceCometA}/>, model, controller);
-
                     const inputHelm = await screen.findByLabelText(/helm/i);
                     const inputSailNumber = await screen.findByLabelText(/sail/i);
                     await act(async () => {
@@ -156,9 +148,7 @@ describe('when race for dinghy class with no crew', () => {
 	describe('when helm does not exist', () => {
         it('displays create helm & sign-up button', async () => {
             const user = userEvent.setup();
-
             customRender(<SignUp race={raceCometA}/>, model, controller);
-
             const inputHelm = await screen.findByLabelText(/helm/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
             await act(async () => {
@@ -179,9 +169,7 @@ describe('when race for dinghy class with no crew', () => {
                     return Promise.resolve({'success': true});
                 });
                 const user = userEvent.setup();
-
                 customRender(<SignUp race={raceCometA}/>, model, controller);
-    
                 const inputHelm = await screen.findByLabelText(/helm/i);
                 const inputSailNumber = await screen.findByLabelText(/sail/i);
                 await act(async () => {
@@ -203,9 +191,7 @@ describe('when race for dinghy class with no crew', () => {
                         return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                     });
                     const user = userEvent.setup();
-
                     customRender(<SignUp race={raceCometA}/>, model, controller);
-
                     const inputHelm = await screen.findByLabelText(/helm/i);
                     const inputSailNumber = await screen.findByLabelText(/sail/i);
                     await act(async () => {
@@ -234,9 +220,7 @@ describe('when race for dinghy class with no crew', () => {
                         return Promise.resolve({'success': false, 'message': 'Entry not created'});
                     });
                     const user = userEvent.setup();
-
                     customRender(<SignUp race={raceCometA}/>, model, controller);
-
                     const inputHelm = await screen.findByLabelText(/helm/i);
                     const inputSailNumber = await screen.findByLabelText(/sail/i);
                     await act(async () => {
@@ -260,9 +244,7 @@ describe('when race for dinghy class with no crew', () => {
 	describe('when dinghy does not exist', () => {
         it('displays create dinghy and sign-up button', async () => {
             const user = userEvent.setup();
-
             customRender(<SignUp race={raceCometA}/>, model, controller);
-
             const inputHelm = await screen.findByLabelText(/helm/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
             await act(async () => {
@@ -283,9 +265,7 @@ describe('when race for dinghy class with no crew', () => {
                     return Promise.resolve({'success': true});
                 });
                 const user = userEvent.setup();
-
                 customRender(<SignUp race={raceCometA}/>, model, controller);
-
                 const inputHelm = await screen.findByLabelText(/helm/i);
                 const inputSailNumber = await screen.findByLabelText(/sail/i);
                 await act(async () => {
@@ -308,9 +288,7 @@ describe('when race for dinghy class with no crew', () => {
                         return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                     });
                     const user = userEvent.setup();
-
                     customRender(<SignUp race={raceCometA}/>, model, controller);
-
                     const inputHelm = await screen.findByLabelText(/helm/i);
                     const inputSailNumber = await screen.findByLabelText(/sail/i);
                     await act(async () => {
@@ -339,9 +317,7 @@ describe('when race for dinghy class with no crew', () => {
                         return Promise.resolve({'success': false, 'message': 'Entry not created'});
                     });
                     const user = userEvent.setup();
-
                     customRender(<SignUp race={raceCometA}/>, model, controller);
-
                     const inputHelm = await screen.findByLabelText(/helm/i);
                     const inputSailNumber = await screen.findByLabelText(/sail/i);
                     await act(async () => {
@@ -365,9 +341,7 @@ describe('when race for dinghy class with no crew', () => {
 	describe('when neither helm nor dinghy exist', () => {
         it('displays create helm & dinghy & sign-up button', async () => {
             const user = userEvent.setup();
-
             customRender(<SignUp race={raceCometA}/>, model, controller);
-
             const inputHelm = await screen.findByLabelText(/helm/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
             await act(async () => {
@@ -391,9 +365,7 @@ describe('when race for dinghy class with no crew', () => {
                     return Promise.resolve({'success': true});
                 });
                 const user = userEvent.setup();
-
                 customRender(<SignUp race={raceCometA}/>, model, controller);
-
                 const inputHelm = await screen.findByLabelText(/helm/i);
                 const inputSailNumber = await screen.findByLabelText(/sail/i);
                 await act(async () => {
@@ -419,9 +391,7 @@ describe('when race for dinghy class with no crew', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-    
                     customRender(<SignUp race={raceCometA}/>, model, controller);
-    
                     const inputHelm = await screen.findByLabelText(/helm/i);
                     const inputSailNumber = await screen.findByLabelText(/sail/i);
                     await act(async () => {
@@ -451,9 +421,7 @@ describe('when race for dinghy class with no crew', () => {
                         return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                     });
                     const user = userEvent.setup();
-
                     customRender(<SignUp race={raceCometA}/>, model, controller);
-
                     const inputHelm = await screen.findByLabelText(/helm/i);
                     const inputSailNumber = await screen.findByLabelText(/sail/i);
                     await act(async () => {
@@ -483,9 +451,7 @@ describe('when race for dinghy class with no crew', () => {
                         return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                     });
                     const user = userEvent.setup();
-
                     customRender(<SignUp race={raceCometA}/>, model, controller);
-
                     const inputHelm = await screen.findByLabelText(/helm/i);
                     const inputSailNumber = await screen.findByLabelText(/sail/i);
                     await act(async () => {
@@ -514,9 +480,7 @@ describe('when race for dinghy class with no crew', () => {
             return Promise.resolve({'success': true});
         });
         const user = userEvent.setup();
-
         customRender(<SignUp race={raceCometA}/>, model, controller);
-
         const inputHelm = await screen.findByLabelText(/helm/i);
         const inputSailNumber = await screen.findByLabelText(/sail/i);
         await act(async () => {
@@ -540,9 +504,7 @@ describe('when race for dinghy class with no crew', () => {
     
     it('displays entries for race', async () => {
         jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesCometA})});
-
         customRender(<SignUp race={raceCometA}/>, model, controller);
-
         const competitor1 = await screen.findByRole('cell', {'name': /Jill Myer/i});
         const dinghyClass = await screen.findAllByRole('cell', {'name': /Comet/i});
         const dinghy1 = await screen.findByRole('cell', {'name': /826/i});
