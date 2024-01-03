@@ -55,11 +55,11 @@ describe('when race for dinghy class with no crew', () => {
     
             customRender(<SignUp race={raceCometA}/>, model, controller);
         
-            const inputSail = await screen.findByLabelText(/sail/i);
+            const inputSailNumber = await screen.findByLabelText(/sail/i);
             await act(async () => {
-                await user.type(inputSail, 'g6754i');
+                await user.type(inputSailNumber, 'g6754i');
             });
-            expect(inputSail).toHaveValue('g6754i');
+            expect(inputSailNumber).toHaveValue('g6754i');
         });
     });
 
@@ -86,12 +86,12 @@ describe('when race for dinghy class with no crew', () => {
             customRender(<SignUp race={raceCometA}/>, model, controller);
         
             const inputHelm = await screen.findByLabelText(/helm/i);
-            const inputSail = await screen.findByLabelText(/sail/i);
+            const inputSailNumber = await screen.findByLabelText(/sail/i);
             await act(async () => {
                 await user.type(inputHelm, 'Jill Myer');
             });
             await act(async () => {
-                await user.type(inputSail, '826');
+                await user.type(inputSailNumber, '826');
             });
             expect(screen.getByRole('button', {'name': /sign-up/i}));
         });
@@ -106,12 +106,12 @@ describe('when race for dinghy class with no crew', () => {
                 customRender(<SignUp race={raceCometA}/>, model, controller);
             
                 const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSail = await screen.findByLabelText(/sail/i);
+                const inputSailNumber = await screen.findByLabelText(/sail/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Jill Myer');
                 });
                 await act(async () => {
-                    await user.type(inputSail, '826');
+                    await user.type(inputSailNumber, '826');
                 });
                 const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
                 await act(async () => {
@@ -130,18 +130,20 @@ describe('when race for dinghy class with no crew', () => {
                     customRender(<SignUp race={raceCometA}/>, model, controller);
 
                     const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSail = await screen.findByLabelText(/sail/i);
+                    const inputSailNumber = await screen.findByLabelText(/sail/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Jill Myer');
                     });
                     await act(async () => {
-                        await user.type(inputSail, '826');
+                        await user.type(inputSailNumber, '826');
                     });
                     const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
                     await act(async () => {
                         await user.click(buttonCreate);
                     });
                     expect(screen.getByText('Entry not created')).toBeInTheDocument();
+                    expect(inputHelm).toHaveValue('Jill Myer');
+                    expect(inputSailNumber).toHaveValue('826');
                 });
             });	
         });
@@ -154,12 +156,12 @@ describe('when race for dinghy class with no crew', () => {
             customRender(<SignUp race={raceCometA}/>, model, controller);
 
             const inputHelm = await screen.findByLabelText(/helm/i);
-            const inputSail = await screen.findByLabelText(/sail/i);
+            const inputSailNumber = await screen.findByLabelText(/sail/i);
             await act(async () => {
                 await user.type(inputHelm, 'Not There');
             });
             await act(async () => {
-                await user.type(inputSail, '826');
+                await user.type(inputSailNumber, '826');
             });
             expect(screen.getByRole('button', {'name': /add helm & sign-up/i}));
         });
@@ -177,12 +179,12 @@ describe('when race for dinghy class with no crew', () => {
                 customRender(<SignUp race={raceCometA}/>, model, controller);
     
                 const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSail = await screen.findByLabelText(/sail/i);
+                const inputSailNumber = await screen.findByLabelText(/sail/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Not There');
                 });
                 await act(async () => {
-                    await user.type(inputSail, '826');
+                    await user.type(inputSailNumber, '826');
                 });
                 const createButton = screen.getByRole('button', {'name': /add helm & sign-up/i});
                 await act(async () => {
@@ -201,12 +203,12 @@ describe('when race for dinghy class with no crew', () => {
                     customRender(<SignUp race={raceCometA}/>, model, controller);
 
                     const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSail = await screen.findByLabelText(/sail/i);
+                    const inputSailNumber = await screen.findByLabelText(/sail/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
                     await act(async () => {
-                        await user.type(inputSail, '826');
+                        await user.type(inputSailNumber, '826');
                     });
                     const createButton = screen.getByRole('button', {'name': /add helm & sign-up/i});
                     await act(async () => {
@@ -214,6 +216,8 @@ describe('when race for dinghy class with no crew', () => {
                     });
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                     expect(screen.getByText('Competitor not created')).toBeInTheDocument();
+                    expect(inputHelm).toHaveValue('Not There');
+                    expect(inputSailNumber).toHaveValue('826');
                 });
             });
 			
@@ -230,18 +234,20 @@ describe('when race for dinghy class with no crew', () => {
                     customRender(<SignUp race={raceCometA}/>, model, controller);
 
                     const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSail = await screen.findByLabelText(/sail/i);
+                    const inputSailNumber = await screen.findByLabelText(/sail/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
                     await act(async () => {
-                        await user.type(inputSail, '826');
+                        await user.type(inputSailNumber, '826');
                     });
                     const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
                     await act(async () => {
                         await user.click(buttonCreate);
                     });
                     expect(screen.getByText('Entry not created')).toBeInTheDocument();
+                    expect(inputHelm).toHaveValue('Not There');
+                    expect(inputSailNumber).toHaveValue('826');
                 });
             });
         });
@@ -254,12 +260,12 @@ describe('when race for dinghy class with no crew', () => {
             customRender(<SignUp race={raceCometA}/>, model, controller);
 
             const inputHelm = await screen.findByLabelText(/helm/i);
-            const inputSail = await screen.findByLabelText(/sail/i);
+            const inputSailNumber = await screen.findByLabelText(/sail/i);
             await act(async () => {
                 await user.type(inputHelm, 'Jill Myer');
             });
             await act(async () => {
-                await user.type(inputSail, 'g6754i');
+                await user.type(inputSailNumber, 'g6754i');
             });
             expect(screen.getByRole('button', {'name': /add dinghy & sign-up/i}));
         });
@@ -277,12 +283,12 @@ describe('when race for dinghy class with no crew', () => {
                 customRender(<SignUp race={raceCometA}/>, model, controller);
 
                 const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSail = await screen.findByLabelText(/sail/i);
+                const inputSailNumber = await screen.findByLabelText(/sail/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Jill Myer');
                 });
                 await act(async () => {
-                    await user.type(inputSail, 'g6754i');
+                    await user.type(inputSailNumber, 'g6754i');
                 });
                 const createButton = screen.getByRole('button', {'name': /add dinghy & sign-up/i});
                 await act(async () => {
@@ -302,12 +308,12 @@ describe('when race for dinghy class with no crew', () => {
                     customRender(<SignUp race={raceCometA}/>, model, controller);
 
                     const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSail = await screen.findByLabelText(/sail/i);
+                    const inputSailNumber = await screen.findByLabelText(/sail/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Jill Myer');
                     });
                     await act(async () => {
-                        await user.type(inputSail, 'g6754i');
+                        await user.type(inputSailNumber, 'g6754i');
                     });
                     const createButton = screen.getByRole('button', {'name': /add dinghy & sign-up/i});
                     await act(async () => {
@@ -315,6 +321,8 @@ describe('when race for dinghy class with no crew', () => {
                     });
                     expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                     expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
+                    expect(inputHelm).toHaveValue('Jill Myer');
+                    expect(inputSailNumber).toHaveValue('g6754i');
                 });
             });
 			
@@ -331,18 +339,20 @@ describe('when race for dinghy class with no crew', () => {
                     customRender(<SignUp race={raceCometA}/>, model, controller);
 
                     const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSail = await screen.findByLabelText(/sail/i);
+                    const inputSailNumber = await screen.findByLabelText(/sail/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Jill Myer');
                     });
                     await act(async () => {
-                        await user.type(inputSail, 'g6754i');
+                        await user.type(inputSailNumber, 'g6754i');
                     });
                     const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
                     await act(async () => {
                         await user.click(buttonCreate);
                     });
                     expect(screen.getByText('Entry not created')).toBeInTheDocument();
+                    expect(inputHelm).toHaveValue('Jill Myer');
+                    expect(inputSailNumber).toHaveValue('g6754i');
                 });
             });
         });			
@@ -355,12 +365,12 @@ describe('when race for dinghy class with no crew', () => {
             customRender(<SignUp race={raceCometA}/>, model, controller);
 
             const inputHelm = await screen.findByLabelText(/helm/i);
-            const inputSail = await screen.findByLabelText(/sail/i);
+            const inputSailNumber = await screen.findByLabelText(/sail/i);
             await act(async () => {
                 await user.type(inputHelm, 'Not There');
             });
             await act(async () => {
-                await user.type(inputSail, 'xyz');
+                await user.type(inputSailNumber, 'xyz');
             });
             expect(screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i}));
         });
@@ -381,12 +391,12 @@ describe('when race for dinghy class with no crew', () => {
                 customRender(<SignUp race={raceCometA}/>, model, controller);
 
                 const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSail = await screen.findByLabelText(/sail/i);
+                const inputSailNumber = await screen.findByLabelText(/sail/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Not There');
                 });
                 await act(async () => {
-                    await user.type(inputSail, 'g6754i');
+                    await user.type(inputSailNumber, 'g6754i');
                 });
                 const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
                 await act(async () => {
@@ -409,12 +419,12 @@ describe('when race for dinghy class with no crew', () => {
                     customRender(<SignUp race={raceCometA}/>, model, controller);
     
                     const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSail = await screen.findByLabelText(/sail/i);
+                    const inputSailNumber = await screen.findByLabelText(/sail/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
                     await act(async () => {
-                        await user.type(inputSail, 'g6754i');
+                        await user.type(inputSailNumber, 'g6754i');
                     });
                     const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
                     await act(async () => {
@@ -423,6 +433,8 @@ describe('when race for dinghy class with no crew', () => {
                     expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                     expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                     expect(screen.getByText('Competitor not created')).toBeInTheDocument();
+                    expect(inputHelm).toHaveValue('Not There');
+                    expect(inputSailNumber).toHaveValue('g6754i');
                 });
             });
 				
@@ -439,12 +451,12 @@ describe('when race for dinghy class with no crew', () => {
                     customRender(<SignUp race={raceCometA}/>, model, controller);
 
                     const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSail = await screen.findByLabelText(/sail/i);
+                    const inputSailNumber = await screen.findByLabelText(/sail/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
                     await act(async () => {
-                        await user.type(inputSail, 'g6754i');
+                        await user.type(inputSailNumber, 'g6754i');
                     });
                     const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
                     await act(async () => {
@@ -453,6 +465,8 @@ describe('when race for dinghy class with no crew', () => {
                     expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                     expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                     expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
+                    expect(inputHelm).toHaveValue('Not There');
+                    expect(inputSailNumber).toHaveValue('g6754i');
                 });
             });
 				
@@ -469,12 +483,12 @@ describe('when race for dinghy class with no crew', () => {
                     customRender(<SignUp race={raceCometA}/>, model, controller);
 
                     const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSail = await screen.findByLabelText(/sail/i);
+                    const inputSailNumber = await screen.findByLabelText(/sail/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
                     await act(async () => {
-                        await user.type(inputSail, 'g6754i');
+                        await user.type(inputSailNumber, 'g6754i');
                     });
                     const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
                     await act(async () => {
@@ -484,6 +498,8 @@ describe('when race for dinghy class with no crew', () => {
                     expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                     expect(screen.getByText(/Competitor not created/i)).toBeInTheDocument();
                     expect(screen.getByText(/Dinghy not created/i)).toBeInTheDocument();
+                    expect(inputHelm).toHaveValue('Not There');
+                    expect(inputSailNumber).toHaveValue('g6754i');
                 });
             });				
         });
