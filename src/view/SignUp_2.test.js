@@ -574,13 +574,48 @@ describe('when race for dinghy class with crew', () => {
     });
     
     describe('when helm and dinghy and crew exist', () => {
-		it('displays sign-up button', () => {
-
+		it('displays sign-up button', async () => {
+            const user = userEvent.setup();
+            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+            const inputHelm = await screen.findByLabelText(/helm/i);
+            const inputSailNumber = await screen.findByLabelText(/sail/i);
+            const inputCrew = await screen.findByLabelText(/crew/i);
+            await act(async () => {
+                await user.type(inputHelm, 'Chris Marshall');
+            });
+            await act(async () => {
+                await user.type(inputSailNumber, '1234');
+            });
+            await act(async () => {
+                await user.type(inputCrew, 'Low Screw');
+            });
+            expect(screen.getByRole('button', {'name': /sign-up/i}));
         });
 			
 		describe('when create button clicked', () => {
 			it('creates entry with values entered into form and dinghy class set per race', async () => {
-
+                const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                    return Promise.resolve({'success': true});
+                });
+                const user = userEvent.setup();
+                customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                const inputHelm = await screen.findByLabelText(/helm/i);
+                const inputSailNumber = await screen.findByLabelText(/sail/i);
+                const inputCrew = await screen.findByLabelText(/crew/i);
+                await act(async () => {
+                    await user.type(inputHelm, 'Chris Marshall');
+                });
+                await act(async () => {
+                    await user.type(inputSailNumber, '1234');
+                });
+                await act(async () => {
+                    await user.type(inputCrew, 'Lou Screw');
+                });
+                const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
+                await act(async () => {
+                    await user.click(buttonCreate);
+                });
+                expect(onSignupToRaceSpy).toHaveBeenCalledWith(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
             });
 		
 			describe('when entry not created', () => {
@@ -823,11 +858,17 @@ describe('when race for dinghy class with crew', () => {
         });      
     });
 
-    it('clears form on success', async () => {});
+    it('clears form on success', async () => {
+
+    });
     
-    it('displays failure message on failure and entered values remain on form', async () => {});
+    it('displays failure message on failure and entered values remain on form', async () => {
+
+    });
     
-    it('displays entries for race', async () => {});
+    it('displays entries for race', async () => {
+
+    });
 });
 
 describe('when race is a handicap', () => {
