@@ -366,8 +366,34 @@ describe('when race for dinghy class with no crew', () => {
         });
 		
 		describe('when create button clicked', () => {
-            it('creates helm and dinghy and then creates entry with values entered into form', () => {
+            it('creates helm and dinghy and then creates entry with values entered into form', async () => {
+                const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                    return Promise.resolve({'success': true});
+                });
+                jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    return Promise.resolve({'success': true});
+                });
+                jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                    return Promise.resolve({'success': true});
+                });
+                const user = userEvent.setup();
 
+                customRender(<SignUp race={raceCometA}/>, model, controller);
+
+                const inputHelm = await screen.findByLabelText(/helm/i);
+                const inputSail = await screen.findByLabelText(/sail/i);
+                await act(async () => {
+                    await user.type(inputHelm, 'Not There');
+                });
+                await act(async () => {
+                    await user.type(inputSail, 'g6754i');
+                });
+                const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
+                await act(async () => {
+                    await user.click(createButton);
+                });
+                expect(signupToRaceSpy).toHaveBeenCalledWith(raceCometA, {'name': 'Not There', 'url': ''},
+                    {'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
             });
 			
 			describe('when helm not created', () => {
