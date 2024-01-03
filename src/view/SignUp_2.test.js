@@ -505,9 +505,9 @@ describe('when race for dinghy class with no crew', () => {
     it('displays entries for race', async () => {
         jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesCometA})});
         customRender(<SignUp race={raceCometA}/>, model, controller);
-        const competitor1 = await screen.findByRole('cell', {'name': /Jill Myer/i});
-        const dinghyClass = await screen.findAllByRole('cell', {'name': /Comet/i});
-        const dinghy1 = await screen.findByRole('cell', {'name': /826/i});
+        expect(await screen.findByRole('cell', {'name': /Jill Myer/i})).toBeInTheDocument();
+        expect((await screen.findAllByRole('cell', {'name': /Comet/i}))[0]).toBeInTheDocument();
+        expect(await screen.findByRole('cell', {'name': /826/i})).toBeInTheDocument();
     });
 });
 
