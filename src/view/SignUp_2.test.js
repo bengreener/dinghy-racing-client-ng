@@ -93,7 +93,7 @@ describe('when race for dinghy class with no crew', () => {
             await act(async () => {
                 await user.type(inputSailNumber, '826');
             });
-            expect(screen.getByRole('button', {'name': /sign-up/i}));
+            expect(screen.getByRole('button', {'name': /^sign-up(?!.)/i}));
         });
 		
 		describe('when create button clicked', () => {
@@ -587,9 +587,9 @@ describe('when race for dinghy class with crew', () => {
                 await user.type(inputSailNumber, '1234');
             });
             await act(async () => {
-                await user.type(inputCrew, 'Low Screw');
+                await user.type(inputCrew, 'Lou Screw');
             });
-            expect(screen.getByRole('button', {'name': /sign-up/i}));
+            expect(screen.getByRole('button', {'name': /^sign-up(?!.)/i}));
         });
 			
 		describe('when create button clicked', () => {
@@ -1169,7 +1169,7 @@ describe('when race for dinghy class with crew', () => {
                         await user.type(inputHelm, 'Not There');
                     });
                     await act(async () => {
-                        await user.type(inputSailNumber, '1234');
+                        await user.type(inputSailNumber, 'xyz');
                     });
                     await act(async () => {
                         await user.type(inputCrew, 'Lou Screw');
@@ -1180,7 +1180,7 @@ describe('when race for dinghy class with crew', () => {
                     });
                     expect(screen.getByText('Entry not created')).toBeInTheDocument();
                     expect(inputHelm).toHaveValue('Not There');
-                    expect(inputSailNumber).toHaveValue('1234');
+                    expect(inputSailNumber).toHaveValue('xyz');
                     expect(inputCrew).toHaveValue(('Lou Screw'));
                 });
             });
@@ -1367,8 +1367,35 @@ describe('when race for dinghy class with crew', () => {
 			});
 			
             describe('when entry not created', () => {
-				it('displays failure message and entered values remain on form', () => {
-
+				it('displays failure message and entered values remain on form', async () => {
+                    jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        return Promise.resolve({'success': true});
+                    });
+                    jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        return Promise.resolve({'success': false, 'message': 'Entry not created'});
+                    });
+                    const user = userEvent.setup();
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    const inputHelm = await screen.findByLabelText(/helm/i);
+                    const inputSailNumber = await screen.findByLabelText(/sail/i);
+                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    await act(async () => {
+                        await user.type(inputHelm, 'Not There');
+                    });
+                    await act(async () => {
+                        await user.type(inputSailNumber, '1234');
+                    });
+                    await act(async () => {
+                        await user.type(inputCrew, 'Pop Off');
+                    });
+                    const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
+                    await act(async () => {
+                        await user.click(buttonCreate);
+                    });
+                    expect(screen.getByText('Entry not created')).toBeInTheDocument();
+                    expect(inputHelm).toHaveValue('Not There');
+                    expect(inputSailNumber).toHaveValue('1234');
+                    expect(inputCrew).toHaveValue(('Pop Off'));
                 });
             });
         });
