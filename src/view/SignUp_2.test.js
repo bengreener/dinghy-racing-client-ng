@@ -1011,7 +1011,37 @@ describe('when race for dinghy class with crew', () => {
         });
 		
 		describe('when create button clicked', () => {
-			it('creates helm and dinghy and then creates entry with values entered into form', () => {});
+			it('creates helm and dinghy and then creates entry with values entered into form', async () => {
+                const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                    return Promise.resolve({'success': true});
+                });
+                jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    return Promise.resolve({'success': true});
+                });
+                jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                    return Promise.resolve({'success': true});
+                });
+                const user = userEvent.setup();
+                customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                const inputHelm = await screen.findByLabelText(/helm/i);
+                const inputSailNumber = await screen.findByLabelText(/sail/i);
+                const inputCrew = await screen.findByLabelText(/crew/i);
+                await act(async () => {
+                    await user.type(inputHelm, 'Not There');
+                });
+                await act(async () => {
+                    await user.type(inputSailNumber, 'xyz');
+                });
+                await act(async () => {
+                    await user.type(inputCrew, 'Lou Screw');
+                });
+                const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
+                await act(async () => {
+                    await user.click(createButton);
+                });
+                expect(signupToRaceSpy).toHaveBeenCalledWith(raceScorpionA, {'name': 'Not There', 'url': ''},
+                    {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, competitorLouScrew);
+            });
 			
 			describe('when helm not created', () => {
 				it('displays failure message and entered values remain on form', () => {});
