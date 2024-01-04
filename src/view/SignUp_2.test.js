@@ -1846,8 +1846,44 @@ describe('when race for dinghy class with crew', () => {
             });
 			
             describe('when neither dinghy nor crew created', () => {
-				it('displays failure messages and entered values remain on form', () => {
-
+				it('displays failure messages and entered values remain on form', async () => {
+                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                        if (competitor.name === 'Pop Off') {
+                            return Promise.resolve({'success': false, 'message': 'Competitor not created'});
+                        }
+                        else {
+                            return Promise.resolve({'success': true});
+                        }
+                    });
+                    const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
+                    });
+                    const user = userEvent.setup();
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    const inputHelm = await screen.findByLabelText(/helm/i);
+                    const inputSailNumber = await screen.findByLabelText(/sail/i);
+                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    await act(async () => {
+                        await user.type(inputHelm, 'Not There');
+                    });
+                    await act(async () => {
+                        await user.type(inputSailNumber, 'g6754i');
+                    });
+                    await act(async () => {
+                        await user.type(inputCrew, 'Pop Off');
+                    });
+                    const createButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & sign-up/i});
+                    await act(async () => {
+                        await user.click(createButton);
+                    });
+                    expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
+                    expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
+                    expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
+                    expect(screen.getByText(/Competitor not created/i)).toBeInTheDocument();
+                    expect(screen.getByText(/Dinghy not created/i)).toBeInTheDocument();
+                    expect(inputHelm).toHaveValue('Not There');
+                    expect(inputSailNumber).toHaveValue('g6754i');
+                    expect(inputCrew).toHaveValue('Pop Off');
                 });
 			});
 			
