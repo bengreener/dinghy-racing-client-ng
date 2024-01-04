@@ -957,7 +957,36 @@ describe('when race for dinghy class with crew', () => {
             });
 			
 			describe('when entry not created', () => {
-				it('displays failure message and entered values remain on form', () => {});
+				it('displays failure message and entered values remain on form', async () => {
+                    jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        return Promise.resolve({'success': true});
+                    });
+                    jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        return Promise.resolve({'success': false, 'message': 'Entry not created'});
+                    });
+                    const user = userEvent.setup();
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    const inputHelm = await screen.findByLabelText(/helm/i);
+                    const inputSailNumber = await screen.findByLabelText(/sail/i);
+                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    await act(async () => {
+                        await user.type(inputHelm, 'Chris Marshall');
+                    });
+                    await act(async () => {
+                        await user.type(inputSailNumber, '1234');
+                    });
+                    await act(async () => {
+                        await user.type(inputCrew, 'Not There');
+                    });
+                    const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
+                    await act(async () => {
+                        await user.click(buttonCreate);
+                    });
+                    expect(screen.getByText('Entry not created')).toBeInTheDocument();
+                    expect(inputHelm).toHaveValue('Chris Marshall');
+                    expect(inputSailNumber).toHaveValue('1234');
+                    expect(inputCrew).toHaveValue(('Not There'));
+                });
             });
         });
     });
