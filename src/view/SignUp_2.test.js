@@ -1962,7 +1962,13 @@ describe('when race is a handicap', () => {
 
     describe('when helm name is entered then ', () => {
         it('displays helm name', async () => {
-
+            const user = userEvent.setup();
+            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+            const inputHelm = await screen.findByLabelText(/helm/i);
+            await act(async () => {
+                await user.type(inputHelm, 'Chris Marshall');
+            });
+            expect(inputHelm).toHaveValue('Chris Marshall');
         });
     });
 
