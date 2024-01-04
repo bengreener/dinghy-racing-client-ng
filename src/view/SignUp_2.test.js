@@ -1976,23 +1976,47 @@ describe('when race is a handicap', () => {
         it('displays sail number', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceHandicapA}/>, model, controller);
+
             const inputSailNumber = await screen.findByLabelText(/sail/i);
+
             await act(async () => {
                 await user.type(inputSailNumber, '1234');
             });
+
             expect(inputSailNumber).toHaveValue('1234');
         });
     });
 
     describe('when dinghy class is entered', () => {
-        it('displays dinghy class', () => {
+        it('displays dinghy class', async () => {
+            const user = userEvent.setup();
+            customRender(<SignUp race={raceHandicapA}/>, model, controller);
 
+            const inputDinghyClass = screen.getByLabelText(/class/i);
+            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
+            await act(async () => {
+                await user.selectOptions(inputDinghyClass, 'Scorpion');
+            });
+            expect(inputDinghyClass).toHaveValue('Scorpion');
         });
     });
 
     describe('when dinghy class has a crew', () => {
         describe('when crew name is entered', () => {
-            it('displays crew name', () => {
+            it('displays crew name', async () => {
+                const user = userEvent.setup();
+                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+
+                const inputDinghyClass = screen.getByLabelText(/class/i);
+                await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
+                await act(async () => {
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
+                });
+                const inputCrew = await screen.findByLabelText(/crew/i);
+                await act(async () => {
+                    await user.type(inputCrew, 'Lou Screw');
+                    expect(inputCrew).toHaveValue('Lou Screw');
+                });
             });
         });
     });
