@@ -1973,8 +1973,14 @@ describe('when race is a handicap', () => {
     });
 
     describe('when sail number is entered', () => {
-        it('displays sail number', () => {
-
+        it('displays sail number', async () => {
+            const user = userEvent.setup();
+            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+            const inputSailNumber = await screen.findByLabelText(/sail/i);
+            await act(async () => {
+                await user.type(inputSailNumber, '1234');
+            });
+            expect(inputSailNumber).toHaveValue('1234');
         });
     });
 
