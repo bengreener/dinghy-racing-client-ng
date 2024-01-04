@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 import SignUp from './SignUp';
-import { httpRootURL, wsRootURL, competitorsCollection, competitorChrisMarshall, raceScorpionA, raceHandicapA, dinghies, dinghy1234, dinghy6745, dinghy826,
+import { httpRootURL, wsRootURL, competitorsCollection, competitorChrisMarshall, raceScorpionA, raceNoClass, dinghies, dinghy1234, dinghy6745, dinghy826,
     dinghyClasses, dinghyClassScorpion, dinghyClassComet, competitorSarahPascal, entriesScorpionA, competitorLouScrew, raceCometA } from '../model/__mocks__/test-data';
 
 jest.mock('../model/dinghy-racing-model');
@@ -49,7 +49,7 @@ describe('when race has a specified dinghyClass', () => {
 describe('when race is a handicap race ', () => {
     it('requests helm name and dinghy class and sail number', async () => {
         await act(async () => {
-            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+            customRender(<SignUp race={raceNoClass}/>, model, controller);
         });
 
         const inputHelm = screen.getByLabelText(/helm/i);
@@ -62,7 +62,7 @@ describe('when race is a handicap race ', () => {
     describe('when dinghy selected is a dinghy class that has crew', () => {
         it('provides option to select crew', async () => {
             const user = userEvent.setup();
-            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+            customRender(<SignUp race={raceNoClass}/>, model, controller);
 
             const inputHelm = await screen.findByLabelText(/helm/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
@@ -81,7 +81,7 @@ describe('when race is a handicap race ', () => {
     describe('when dinghy selected is a dinghy class that does not have crew', () => {
         it('does not show option to select crew', async () => {
             const user = userEvent.setup();
-            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+            customRender(<SignUp race={raceNoClass}/>, model, controller);
 
             const inputHelm = await screen.findByLabelText(/helm/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
@@ -179,7 +179,7 @@ describe('when sail number is entered then', () => {
 it('when dinghy class is entered then displays dinghy class', async () => {
     const user = userEvent.setup();
 
-    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+    customRender(<SignUp race={raceNoClass}/>, model, controller);
 
     const inputDinghyClass = await screen.findByLabelText(/class/i);
     await screen.findAllByRole('option');
@@ -219,7 +219,7 @@ describe('when create button is clicked', () => {
                 return Promise.resolve({'success': true});
             });
         
-            customRender(<SignUp race={raceHandicapA} />, model, controller);
+            customRender(<SignUp race={raceNoClass} />, model, controller);
             
             const inputHelm = await screen.findByLabelText(/helm/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
@@ -238,7 +238,7 @@ describe('when create button is clicked', () => {
                 await user.click(screen.getByRole('button', {'name': 'Sign-up'}));
             });
             
-            expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
+            expect(signupToRaceSpy).toHaveBeenCalledWith(raceNoClass, competitorChrisMarshall, dinghy1234, competitorLouScrew);
         });
     });
     it('clears form on success', async () => {
@@ -247,7 +247,7 @@ describe('when create button is clicked', () => {
             return Promise.resolve({'success': true});
         });
     
-        customRender(<SignUp race={raceHandicapA} />, model, controller);
+        customRender(<SignUp race={raceNoClass} />, model, controller);
         
         const inputHelm = await screen.findByLabelText(/helm/i);
         const inputSailNumber = await screen.findByLabelText(/sail/i);
@@ -287,7 +287,7 @@ describe('when create button is clicked', () => {
             });
             const user = userEvent.setup();
     
-            customRender(<SignUp race={raceHandicapA} />, model, controller);
+            customRender(<SignUp race={raceNoClass} />, model, controller);
             const inputHelm = await screen.findByLabelText(/helm/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
             const inputDinghyClass = await screen.findByLabelText(/class/i);
@@ -303,7 +303,7 @@ describe('when create button is clicked', () => {
             })
 
             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber':'999', 'dinghyClass': dinghyClassScorpion, 'url': ''});
-            expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, competitorChrisMarshall, {'sailNumber':'999', 'dinghyClass': dinghyClassScorpion, 'url': ''}, competitorLouScrew);
+            expect(signupToRaceSpy).toHaveBeenCalledWith(raceNoClass, competitorChrisMarshall, {'sailNumber':'999', 'dinghyClass': dinghyClassScorpion, 'url': ''}, competitorLouScrew);
         });
     });
     describe('when helm does not exist', () => {
@@ -316,7 +316,7 @@ describe('when create button is clicked', () => {
             });
             const user = userEvent.setup();
     
-            customRender(<SignUp race={raceHandicapA} />, model, controller);
+            customRender(<SignUp race={raceNoClass} />, model, controller);
             const inputHelm = await screen.findByLabelText(/helm/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
             const inputDinghyClass = await screen.findByLabelText(/class/i);
@@ -332,7 +332,7 @@ describe('when create button is clicked', () => {
             });            
 
             expect(createCompetitorSpy).toHaveBeenCalledWith({'name':'Bill Wilkins', 'url': ''});
-            expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, {'name': 'Bill Wilkins', 'url': ''}, {...dinghy1234}, competitorChrisMarshall);
+            expect(signupToRaceSpy).toHaveBeenCalledWith(raceNoClass, {'name': 'Bill Wilkins', 'url': ''}, {...dinghy1234}, competitorChrisMarshall);
         })
     });
     describe('when neither helm or dinghy exists', () => {
@@ -348,7 +348,7 @@ describe('when create button is clicked', () => {
             });
             const user = userEvent.setup();
     
-            customRender(<SignUp race={raceHandicapA} />, model, controller);
+            customRender(<SignUp race={raceNoClass} />, model, controller);
             const inputHelm = await screen.findByLabelText(/helm/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
             const inputDinghyClass = await screen.findByLabelText(/class/i);
@@ -363,7 +363,7 @@ describe('when create button is clicked', () => {
 
             expect(createCompetitorSpy).toHaveBeenCalledWith({'name':'Bill Wilkins', 'url': ''});
             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber':'999', 'dinghyClass': dinghyClassComet, 'url': ''});
-            expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, {'name': 'Bill Wilkins', 'url': ''}, {'sailNumber':'999', 'dinghyClass': dinghyClassComet, 'url': ''});
+            expect(signupToRaceSpy).toHaveBeenCalledWith(raceNoClass, {'name': 'Bill Wilkins', 'url': ''}, {'sailNumber':'999', 'dinghyClass': dinghyClassComet, 'url': ''});
         })
     });
     describe('when crew does not exist', () => {
@@ -376,7 +376,7 @@ describe('when create button is clicked', () => {
                 return Promise.resolve({'success': true});
             });
         
-            customRender(<SignUp race={raceHandicapA} />, model, controller);
+            customRender(<SignUp race={raceNoClass} />, model, controller);
             
             const inputHelm = await screen.findByLabelText(/helm/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
@@ -396,7 +396,7 @@ describe('when create button is clicked', () => {
             });
 
             expect(createCompetitorSpy).toHaveBeenCalledWith({'name':'Bill Wilkins', 'url': ''});
-            expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, competitorChrisMarshall, dinghy1234, {'name': 'Bill Wilkins', 'url': ''});
+            expect(signupToRaceSpy).toHaveBeenCalledWith(raceNoClass, competitorChrisMarshall, dinghy1234, {'name': 'Bill Wilkins', 'url': ''});
         });
     });
     describe('when neither helm nor crew exists', () => {
@@ -409,7 +409,7 @@ describe('when create button is clicked', () => {
                 return Promise.resolve({'success': true});
             });
         
-            customRender(<SignUp race={raceHandicapA} />, model, controller);
+            customRender(<SignUp race={raceNoClass} />, model, controller);
             
             const inputHelm = await screen.findByLabelText(/helm/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
@@ -430,7 +430,7 @@ describe('when create button is clicked', () => {
 
             expect(createCompetitorSpy).toHaveBeenCalledWith({'name':'Asmee Varma', 'url': ''});
             expect(createCompetitorSpy).toHaveBeenCalledWith({'name':'Bill Wilkins', 'url': ''});
-            expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, {'name': 'Asmee Varma', 'url': ''}, {...dinghy1234}, {'name': 'Bill Wilkins', 'url': ''});
+            expect(signupToRaceSpy).toHaveBeenCalledWith(raceNoClass, {'name': 'Asmee Varma', 'url': ''}, {...dinghy1234}, {'name': 'Bill Wilkins', 'url': ''});
         });
     });
     describe('when neither crew or dinghy exists', () => {
@@ -446,7 +446,7 @@ describe('when create button is clicked', () => {
                 return Promise.resolve({'success': true});
             });
         
-            customRender(<SignUp race={raceHandicapA} />, model, controller);
+            customRender(<SignUp race={raceNoClass} />, model, controller);
             
             const inputHelm = await screen.findByLabelText(/helm/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
@@ -467,7 +467,7 @@ describe('when create button is clicked', () => {
 
             expect(createCompetitorSpy).toHaveBeenCalledWith({'name':'Bill Wilkins', 'url': ''});
             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber':'6754', 'dinghyClass': dinghyClassScorpion, 'url': ''});
-            expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, competitorChrisMarshall, {'sailNumber':'6754', 'dinghyClass': dinghyClassScorpion, 'url': ''}, 
+            expect(signupToRaceSpy).toHaveBeenCalledWith(raceNoClass, competitorChrisMarshall, {'sailNumber':'6754', 'dinghyClass': dinghyClassScorpion, 'url': ''}, 
                 {'name': 'Bill Wilkins', 'url': ''});
         });
     });
@@ -484,7 +484,7 @@ describe('when create button is clicked', () => {
                 return Promise.resolve({'success': true});
             });
         
-            customRender(<SignUp race={raceHandicapA} />, model, controller);
+            customRender(<SignUp race={raceNoClass} />, model, controller);
             
             const inputHelm = await screen.findByLabelText(/helm/i);
             const inputSailNumber = await screen.findByLabelText(/sail/i);
@@ -506,7 +506,7 @@ describe('when create button is clicked', () => {
             expect(createCompetitorSpy).toHaveBeenCalledWith({'name':'Asmee Varma', 'url': ''});
             expect(createCompetitorSpy).toHaveBeenCalledWith({'name':'Bill Wilkins', 'url': ''});
             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber':'6754', 'dinghyClass': dinghyClassScorpion, 'url': ''});
-            expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, {'name': 'Asmee Varma', 'url': ''}, {'sailNumber':'6754', 'dinghyClass': dinghyClassScorpion, 
+            expect(signupToRaceSpy).toHaveBeenCalledWith(raceNoClass, {'name': 'Asmee Varma', 'url': ''}, {'sailNumber':'6754', 'dinghyClass': dinghyClassScorpion, 
                 'url': ''}, {'name': 'Bill Wilkins', 'url': ''});
         });
     });
@@ -516,7 +516,7 @@ describe('when create button is clicked', () => {
         });
         const user = userEvent.setup();
 
-        customRender(<SignUp race={raceHandicapA} />, model, controller);
+        customRender(<SignUp race={raceNoClass} />, model, controller);
         
         const inputHelm = await screen.findByLabelText(/helm/i);
         const inputSailNumber = await screen.findByLabelText(/sail/i);
