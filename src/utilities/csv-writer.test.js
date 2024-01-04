@@ -1,5 +1,5 @@
 import { downloadRaceEntriesCSV, functionsForTestingOnly } from './csv-writer';
-import  { raceScorpionA, raceCometA, raceNoClass, entriesScorpionA, entriesCometA, entriesNoClass } from '../model/__mocks__/test-data';
+import  { raceScorpionA, raceCometA, raceHandicapA, entriesScorpionA, entriesCometA, entriesHandicapA } from '../model/__mocks__/test-data';
 
 // Testing requires coding of createObjectURL that would probably invalidate test
 it('writes race entry data to a file', async () => {
@@ -43,13 +43,13 @@ describe('when race is for dinghy class without crew', () => {
 
 describe('when race is a handicap race', () => {
     it('converts race entry data to an array of comma seperated value data with one row per entry in race', () => {
-        const entriesNoClass_with_laps = entriesNoClass;
-        entriesNoClass_with_laps[0].laps = [{'number': 1, 'time': 1000}, {'number': 2, 'time': 1100}, {'number': 3, 'time': 1200}];
-        entriesNoClass_with_laps[1].laps = [{'number': 1, 'time': 1010}, {'number': 2, 'time': 1110}, {'number': 3, 'time': 1210}];
-        const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceNoClass, entriesNoClass_with_laps);
+        const entriesHandicapA_with_laps = entriesHandicapA;
+        entriesHandicapA_with_laps[0].laps = [{'number': 1, 'time': 1000}, {'number': 2, 'time': 1100}, {'number': 3, 'time': 1200}];
+        entriesHandicapA_with_laps[1].laps = [{'number': 1, 'time': 1010}, {'number': 2, 'time': 1110}, {'number': 3, 'time': 1210}];
+        const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceHandicapA, entriesHandicapA_with_laps);
         expect(data).toEqual([
-            'No Class,2023-02-14T18:26:00.000Z,,Chris Marshall,Lou Screw,Scorpion,3,3300\n',
-            'No Class,2023-02-14T18:26:00.000Z,,Jill Myer,,Comet,3,3330\n'
+            'Handicap A,2023-02-14T18:26:00.000Z,,Chris Marshall,Lou Screw,Scorpion,3,3300\n',
+            'Handicap A,2023-02-14T18:26:00.000Z,,Jill Myer,,Comet,3,3330\n'
         ]);
     });
 });

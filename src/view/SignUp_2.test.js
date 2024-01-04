@@ -8,7 +8,7 @@ import { httpRootURL, wsRootURL,
     competitorsCollection, competitorChrisMarshall, competitorSarahPascal, competitorLouScrew, competitorJillMyer,
     dinghyClasses, dinghyClassScorpion, dinghyClassComet,
     dinghies, dinghy1234, dinghy6745, dinghy826,
-    raceScorpionA, raceNoClass, raceCometA,
+    raceScorpionA, raceHandicapA, raceCometA,
     entriesScorpionA, entriesCometA} from '../model/__mocks__/test-data';
 
 jest.mock('../model/dinghy-racing-model');
@@ -1948,9 +1948,9 @@ describe('when race for dinghy class with crew', () => {
 describe('when race is a handicap', () => {
     it('renders', async () => {
         await act(async () => {
-            customRender(<SignUp race={raceNoClass}/>, model, controller);
+            customRender(<SignUp race={raceHandicapA}/>, model, controller);
         });
-        const raceTitle = screen.getByRole('heading', {'name': /No Class/i});
+        const raceTitle = screen.getByRole('heading', {'name': /Handicap A/i});
         const inputHelm = screen.getByLabelText(/helm/i);
         const inputSailNumber = screen.getByLabelText(/sail/i);
         const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
