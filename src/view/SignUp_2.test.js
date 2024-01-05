@@ -2165,7 +2165,7 @@ describe('when race is a handicap', () => {
                     await act(async () => {
                         await user.click(createButton);
                     });
-                    expect(signupToRaceSpy).toHaveBeenCalledWith(raceCometA, {'name': 'Not There', 'url': ''}, dinghy826);
+                    expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, {'name': 'Not There', 'url': ''}, dinghy826);
                 });
 				
 				describe('when helm not created', () => {
