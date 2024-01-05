@@ -2139,8 +2139,33 @@ describe('when race is a handicap', () => {
             });
 		
 			describe('when create button clicked', () => {
-				it('creates helm and then creates entry with values entered into form', () => {
-
+				it('creates helm and then creates entry with values entered into form', async () => {
+                    const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        return Promise.resolve({'success': true});
+                    });
+                    jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        return Promise.resolve({'success': true});
+                    });
+                    const user = userEvent.setup();
+                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    const inputDinghyClass = screen.getByLabelText(/class/i);
+                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
+                    await act(async () => {
+                        await user.selectOptions(inputDinghyClass, 'Comet');
+                    });
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    await act(async () => {
+                        await user.type(inputHelm, 'Not There');
+                    });
+                    await act(async () => {
+                        await user.type(inputSailNumber, '826');
+                    });
+                    const createButton = screen.getByRole('button', {'name': /add helm & sign-up/i});
+                    await act(async () => {
+                        await user.click(createButton);
+                    });
+                    expect(signupToRaceSpy).toHaveBeenCalledWith(raceCometA, {'name': 'Not There', 'url': ''}, dinghy826);
                 });
 				
 				describe('when helm not created', () => {
