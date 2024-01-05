@@ -3410,8 +3410,56 @@ describe('when race is a handicap', () => {
 				});
 
 				describe('when crew not created', () => {
-					it('displays failure message and entered values remain on form', () => {
-
+					it('displays failure message and entered values remain on form', async () => {
+                        // SignUp does not refresh competitor list so button label will not change
+                        // const updatedCompetitorsCollection = [...competitorsCollection, {'name':'Pop Off', 'url': 'http://localhost:8081/dinghyracing/api/competitors/999'}];
+                        // jest.spyOn(model, 'getCompetitors').mockImplementation(() => {
+                        //     console.log(`getCompetitors.mockImplementation`);
+                        //     return Promise.resolve({'success': true, 'domainObject': updatedCompetitorsCollection
+                        // })})
+                        //     .mockImplementationOnce(() => {
+                        //         console.log(`getCompetitors.mockImplementationOnce`);
+                        //         return Promise.resolve({'success': true, 'domainObject': competitorsCollection})
+                        //     });
+                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                            if (competitor.name === 'Pop Off') {
+                                return Promise.resolve({'success': false, 'message': 'Competitor not created'});
+                            }
+                            else {
+                                return Promise.resolve({'success': true});
+                            }
+                        });
+                        const user = userEvent.setup();
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
+                        await act(async () => {
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
+                        });
+                        const inputHelm = await screen.findByLabelText(/helm/i);
+                        const inputSailNumber = await screen.findByLabelText(/sail/i);
+                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        await act(async () => {
+                            await user.type(inputHelm, 'Not There');
+                        });
+                        await act(async () => {
+                            await user.type(inputSailNumber, '1234');
+                        });
+                        await act(async () => {
+                            await user.type(inputCrew, 'Pop Off');
+                        });
+                        const createButton = screen.getByRole('button', {'name': /add helm & crew & sign-up/i});
+                        await act(async () => {
+                            await user.click(createButton);
+                        });
+                        expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
+                        expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
+                        expect(screen.getAllByText('Competitor not created')).toHaveLength(1);
+                        expect(inputHelm).toHaveValue('Not There');
+                        expect(inputSailNumber).toHaveValue('1234');
+                        expect(inputCrew).toHaveValue('Pop Off');
+                        // SignUp does not refresh competitor list so button label will not change
+                        // expect(await screen.findByRole('button', {'name': /add helm & sign-up/i})).toBeInTheDocument();
                     });
                 });
 
