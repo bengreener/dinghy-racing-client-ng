@@ -2012,7 +2012,7 @@ describe('when race is a handicap', () => {
                 await act(async () => {
                     await user.selectOptions(inputDinghyClass, 'Scorpion');
                 });
-                const inputCrew = await screen.findByLabelText(/crew/i);
+                const inputCrew = screen.getByLabelText(/crew/i);
                 await act(async () => {
                     await user.type(inputCrew, 'Lou Screw');
                     expect(inputCrew).toHaveValue('Lou Screw');
@@ -2022,7 +2022,17 @@ describe('when race is a handicap', () => {
     });
 
     describe('when dinghy class does not have crew', () => {
-        it('does not request entry of crew', () => {
+        it('does not request entry of crew', async () => {
+            const user = userEvent.setup();
+                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+
+                const inputDinghyClass = screen.getByLabelText(/class/i);
+                await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
+                await act(async () => {
+                    await user.selectOptions(inputDinghyClass, 'Comet');
+                });
+                const inputCrew = screen.queryByLabelText(/crew/i);
+                expect(inputCrew).not.toBeInTheDocument();
         });
     });
     
