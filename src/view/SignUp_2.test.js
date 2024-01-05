@@ -2169,8 +2169,33 @@ describe('when race is a handicap', () => {
                 });
 				
 				describe('when helm not created', () => {
-					it('displays failure message and entered values remain on form', () => {
-
+					it('displays failure message and entered values remain on form', async () => {
+                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            return Promise.resolve({'success': false, 'message': 'Competitor not created'});
+                        });
+                        const user = userEvent.setup();
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
+                        await act(async () => {
+                            await user.selectOptions(inputDinghyClass, 'Comet');
+                        });
+                        const inputHelm = await screen.findByLabelText(/helm/i);
+                        const inputSailNumber = await screen.findByLabelText(/sail/i);
+                        await act(async () => {
+                            await user.type(inputHelm, 'Not There');
+                        });
+                        await act(async () => {
+                            await user.type(inputSailNumber, '826');
+                        });
+                        const createButton = screen.getByRole('button', {'name': /add helm & sign-up/i});
+                        await act(async () => {
+                            await user.click(createButton);
+                        });
+                        expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
+                        expect(screen.getByText('Competitor not created')).toBeInTheDocument();
+                        expect(inputHelm).toHaveValue('Not There');
+                        expect(inputSailNumber).toHaveValue('826');
                     });
 				});
 				describe('when entry not created', () => {
