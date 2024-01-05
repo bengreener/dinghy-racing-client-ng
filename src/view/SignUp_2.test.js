@@ -2071,8 +2071,8 @@ describe('when race is a handicap', () => {
                     await act(async () => {
                         await user.selectOptions(inputDinghyClass, 'Comet');
                     });
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Jill Myer');
                     });
@@ -2087,8 +2087,32 @@ describe('when race is a handicap', () => {
                 });
 			
 				describe('when entry not created', () => {
-					it('displays failure message and entered values remain on form', () => {
-
+					it('displays failure message and entered values remain on form', async () => {
+                        const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                            return Promise.resolve({'success': false, 'message': 'Entry not created'});
+                        });
+                        const user = userEvent.setup();
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
+                        await act(async () => {
+                            await user.selectOptions(inputDinghyClass, 'Comet');
+                        });
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        await act(async () => {
+                            await user.type(inputHelm, 'Jill Myer');
+                        });
+                        await act(async () => {
+                            await user.type(inputSailNumber, '826');
+                        });
+                        const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
+                        await act(async () => {
+                            await user.click(buttonCreate);
+                        });
+                        expect(screen.getByText('Entry not created')).toBeInTheDocument();
+                        expect(inputHelm).toHaveValue('Jill Myer');
+                        expect(inputSailNumber).toHaveValue('826');
                     })
                 });
             });
