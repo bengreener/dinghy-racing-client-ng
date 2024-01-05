@@ -3605,8 +3605,42 @@ describe('when race is a handicap', () => {
                 });
 				
 				describe('when dinghy not created', () => {
-					it('displays failure message and entered values remain on form', () => {
-
+					it('displays failure message and entered values remain on form', async () => {
+                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            return Promise.resolve({'success': true});
+                        });
+                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
+                        });
+                        const user = userEvent.setup();
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
+                        await act(async () => {
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
+                        });
+                        const inputHelm = await screen.findByLabelText(/helm/i);
+                        const inputSailNumber = await screen.findByLabelText(/sail/i);
+                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        await act(async () => {
+                            await user.type(inputHelm, 'Chris Marshall');
+                        });
+                        await act(async () => {
+                            await user.type(inputSailNumber, 'g6754i');
+                        });
+                        await act(async () => {
+                            await user.type(inputCrew, 'Pop Off');
+                        });
+                        const createButton = screen.getByRole('button', {'name': /add crew & dinghy & sign-up/i});
+                        await act(async () => {
+                            await user.click(createButton);
+                        });
+                        expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
+                        expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
+                        expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
+                        expect(inputHelm).toHaveValue('Chris Marshall');
+                        expect(inputSailNumber).toHaveValue('g6754i');
+                        expect(inputCrew).toHaveValue('Pop Off');
                     });
 				});
 
