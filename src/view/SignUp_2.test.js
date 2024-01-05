@@ -2517,8 +2517,27 @@ describe('when race is a handicap', () => {
 
 	describe('when dinghy class with crew selected', () => {	
 		describe('when helm and dinghy and crew exist', () => {
-			it('displays sign-up button', () => {
-
+			it('displays sign-up button', async () => {
+                const user = userEvent.setup();
+                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                const inputDinghyClass = screen.getByLabelText(/class/i);
+                await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
+                await act(async () => {
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
+                });
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
+                const inputCrew = screen.getByLabelText(/crew/i);
+                await act(async () => {
+                    await user.type(inputHelm, 'Chris Marshall');
+                });
+                await act(async () => {
+                    await user.type(inputSailNumber, '1234');
+                });
+                await act(async () => {
+                    await user.type(inputCrew, 'Lou Screw');
+                });
+                expect(screen.getByRole('button', {'name': /^sign-up(?!.)/i}));
             });
 				
 			describe('when create button clicked', () => {
