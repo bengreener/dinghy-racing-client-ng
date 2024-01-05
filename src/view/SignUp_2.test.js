@@ -2993,8 +2993,38 @@ describe('when race is a handicap', () => {
                         dinghy1234, {'name': 'Pop Off', 'url': ''});
                 });
 				describe('when crew not created', () => {
-					it('displays failure message and entered values remain on form', () => {
-
+					it('displays failure message and entered values remain on form', async () => {
+                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            return Promise.resolve({'success': false, 'message': 'Competitor not created'});
+                        });
+                        const user = userEvent.setup();
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
+                        await act(async () => {
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
+                        });
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
+                        await act(async () => {
+                            await user.type(inputHelm, 'Chris Marshall');
+                        });
+                        await act(async () => {
+                            await user.type(inputSailNumber, '1234');
+                        });
+                        await act(async () => {
+                            await user.type(inputCrew, 'Pop Off');
+                        });
+                        const createButton = screen.getByRole('button', {'name': /add crew & sign-up/i});
+                        await act(async () => {
+                            await user.click(createButton);
+                        });
+                        expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
+                        expect(screen.getByText('Competitor not created')).toBeInTheDocument();
+                        expect(inputHelm).toHaveValue('Chris Marshall');
+                        expect(inputSailNumber).toHaveValue('1234');
+                        expect(inputCrew).toHaveValue('Pop Off');
                     });
 				});
 				describe('when entry not created', () => {
