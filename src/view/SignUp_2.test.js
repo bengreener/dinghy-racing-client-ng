@@ -471,7 +471,38 @@ describe('when race for dinghy class with no crew', () => {
                     expect(inputHelm).toHaveValue('Not There');
                     expect(inputSailNumber).toHaveValue('g6754i');
                 });
-            });				
+            });
+
+            describe('when entry not created', () => {
+                it('displays failure message and entered values remain on form', async () => {
+                    jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        return Promise.resolve({'success': true});
+                    });
+                    jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        return Promise.resolve({'success': true});
+                    });
+                    jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        return Promise.resolve({'success': false, 'message': 'Entry not created'});
+                    });
+                    const user = userEvent.setup();
+                    customRender(<SignUp race={raceCometA}/>, model, controller);
+                    const inputHelm = await screen.findByLabelText(/helm/i);
+                    const inputSailNumber = await screen.findByLabelText(/sail/i);
+                    await act(async () => {
+                        await user.type(inputHelm, 'Not There');
+                    });
+                    await act(async () => {
+                        await user.type(inputSailNumber, 'g6754i');
+                    });
+                    const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
+                    await act(async () => {
+                        await user.click(buttonCreate);
+                    });
+                    expect(screen.getByText('Entry not created')).toBeInTheDocument();
+                    expect(inputHelm).toHaveValue('Not There');
+                    expect(inputSailNumber).toHaveValue('g6754i');
+                });
+            });
         });
     });
     
@@ -620,8 +651,8 @@ describe('when race for dinghy class with crew', () => {
 		
 			describe('when entry not created', () => {
 				it('displays failure message and entered values remain on form', async () => {
-                    const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
-                        return Promise.resolve({'success': false, 'messgae': 'Entry not created'});
+                    jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        return Promise.resolve({'success': false, 'message': 'Entry not created'});
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
@@ -641,7 +672,10 @@ describe('when race for dinghy class with crew', () => {
                     await act(async () => {
                         await user.click(buttonCreate);
                     });
-                    expect(onSignupToRaceSpy).toHaveBeenCalledWith(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
+                    expect(screen.getByText('Entry not created')).toBeInTheDocument();
+                    expect(inputHelm).toHaveValue('Chris Marshall');
+                    expect(inputSailNumber).toHaveValue('1234');
+                    expect(inputCrew).toHaveValue('Lou Screw');
                 });
             });
         });
@@ -2572,8 +2606,38 @@ describe('when race is a handicap', () => {
                 });
 			
 				describe('when entry not created', () => {
-					it('displays failure message and entered values remain on form', () => {
-
+					it('displays failure message and entered values remain on form', async () => {
+                        const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                            return Promise.resolve({'success': false, 'message': 'Entry not created'});
+                        });
+                        const user = userEvent.setup();
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
+                        await act(async () => {
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
+                        });
+                        const inputHelm = await screen.findByLabelText(/helm/i);
+                        const inputSailNumber = await screen.findByLabelText(/sail/i);
+                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        await act(async () => {
+                            await user.type(inputHelm, 'Chris Marshall');
+                        });
+                        await act(async () => {
+                            await user.type(inputSailNumber, '1234');
+                        });
+                        await act(async () => {
+                            await user.type(inputCrew, 'Lou Screw');
+                        });
+                        const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
+                        await act(async () => {
+                            await user.click(buttonCreate);
+                        });
+                        expect(screen.getByText('Entry not created')).toBeInTheDocument();
+                        expect(inputHelm).toHaveValue('Chris Marshall');
+                        expect(inputDinghyClass).toHaveValue('Scorpion');
+                        expect(inputSailNumber).toHaveValue('1234');
+                        expect(inputCrew).toHaveValue('Lou Screw');
                     });
                 });
             });
