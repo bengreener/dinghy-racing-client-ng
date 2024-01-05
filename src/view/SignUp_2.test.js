@@ -165,7 +165,7 @@ describe('when race for dinghy class with no crew', () => {
                 const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
-                jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
                 const user = userEvent.setup();
@@ -182,6 +182,7 @@ describe('when race for dinghy class with no crew', () => {
                 await act(async () => {
                     await user.click(createButton);
                 });
+                expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                 expect(signupToRaceSpy).toHaveBeenCalledWith(raceCometA, {'name': 'Not There', 'url': ''}, dinghy826);
             })
 			
@@ -261,7 +262,7 @@ describe('when race for dinghy class with no crew', () => {
                 const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
-                jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
                 const user = userEvent.setup();
@@ -278,6 +279,7 @@ describe('when race for dinghy class with no crew', () => {
                 await act(async () => {
                     await user.click(createButton);
                 });
+                expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url':''});
                 expect(signupToRaceSpy).toHaveBeenCalledWith(raceCometA, competitorJillMyer,
                     {'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
             });
@@ -358,10 +360,10 @@ describe('when race for dinghy class with no crew', () => {
                 const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
-                jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
-                jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
                 const user = userEvent.setup();
@@ -378,6 +380,8 @@ describe('when race for dinghy class with no crew', () => {
                 await act(async () => {
                     await user.click(createButton);
                 });
+                expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
+                expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url':''});
                 expect(signupToRaceSpy).toHaveBeenCalledWith(raceCometA, {'name': 'Not There', 'url': ''},
                     {'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
             });
@@ -705,7 +709,7 @@ describe('when race for dinghy class with crew', () => {
                 const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
-                jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
                 const user = userEvent.setup();
@@ -726,6 +730,7 @@ describe('when race for dinghy class with crew', () => {
                 await act(async () => {
                     await user.click(createButton);
                 });
+                expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                 expect(signupToRaceSpy).toHaveBeenCalledWith(raceScorpionA, {'name': 'Not There', 'url': ''}, dinghy1234, competitorLouScrew);
             });
 			
@@ -819,7 +824,7 @@ describe('when race for dinghy class with crew', () => {
                 const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
-                jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
                 const user = userEvent.setup();
@@ -840,6 +845,7 @@ describe('when race for dinghy class with crew', () => {
                 await act(async () => {
                     await user.click(createButton);
                 });
+                expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                 expect(signupToRaceSpy).toHaveBeenCalledWith(raceScorpionA, competitorChrisMarshall,
                     {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, competitorLouScrew);
             });
@@ -934,7 +940,7 @@ describe('when race for dinghy class with crew', () => {
                 const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
-                jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
                 const user = userEvent.setup();
@@ -949,14 +955,15 @@ describe('when race for dinghy class with crew', () => {
                     await user.type(inputSailNumber, '1234');
                 });
                 await act(async () => {
-                    await user.type(inputCrew, 'Not There');
+                    await user.type(inputCrew, 'Pop Off');
                 });
                 const createButton = screen.getByRole('button', {'name': /add crew & sign-up/i});
                 await act(async () => {
                     await user.click(createButton);
                 });
+                expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url':''});
                 expect(signupToRaceSpy).toHaveBeenCalledWith(raceScorpionA, competitorChrisMarshall,
-                    dinghy1234, {'name': 'Not There', 'url': ''});
+                    dinghy1234, {'name': 'Pop Off', 'url': ''});
             });
 			
 			describe('when crew not created', () => {
@@ -1049,10 +1056,10 @@ describe('when race for dinghy class with crew', () => {
                 const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
-                jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
-                jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
                 const user = userEvent.setup();
@@ -1073,6 +1080,8 @@ describe('when race for dinghy class with crew', () => {
                 await act(async () => {
                     await user.click(createButton);
                 });
+                expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
+                expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                 expect(signupToRaceSpy).toHaveBeenCalledWith(raceScorpionA, {'name': 'Not There', 'url': ''},
                     {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, competitorLouScrew);
             });
@@ -1245,7 +1254,7 @@ describe('when race for dinghy class with crew', () => {
                 const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
-                jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
                 const user = userEvent.setup();
@@ -1266,6 +1275,8 @@ describe('when race for dinghy class with crew', () => {
                 await act(async () => {
                     await user.click(createButton);
                 });
+                expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
+                expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url':''});
                 expect(signupToRaceSpy).toHaveBeenCalledWith(raceScorpionA, {'name': 'Not There', 'url': ''},
                     dinghy1234, {'name': 'Pop Off', 'url': ''});
             });
@@ -1459,10 +1470,10 @@ describe('when race for dinghy class with crew', () => {
                 const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
-                jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
-                jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
                 const user = userEvent.setup();
@@ -1483,6 +1494,8 @@ describe('when race for dinghy class with crew', () => {
                 await act(async () => {
                     await user.click(createButton);
                 });
+                expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url':''});
+                expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                 expect(signupToRaceSpy).toHaveBeenCalledWith(raceScorpionA, competitorChrisMarshall,
                     {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, {'name': 'Pop Off', 'url': ''});
             });
@@ -1655,10 +1668,10 @@ describe('when race for dinghy class with crew', () => {
                 const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
-                jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
-                jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
                     return Promise.resolve({'success': true});
                 });
                 const user = userEvent.setup();
@@ -1679,6 +1692,9 @@ describe('when race for dinghy class with crew', () => {
                 await act(async () => {
                     await user.click(createButton);
                 });
+                expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
+                expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url':''});
+                expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                 expect(signupToRaceSpy).toHaveBeenCalledWith(raceScorpionA, {'name': 'Not There', 'url': ''},
                     {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, {'name': 'Pop Off', 'url': ''});
             });
@@ -2034,29 +2050,9 @@ describe('when race is a handicap', () => {
             expect(inputDinghyClass).toHaveValue('Scorpion');
         });
     });
-
-    describe('when dinghy class has a crew', () => {
-        describe('when crew name is entered', () => {
-            it('displays crew name', async () => {
-                const user = userEvent.setup();
-                customRender(<SignUp race={raceHandicapA}/>, model, controller);
-
-                const inputDinghyClass = screen.getByLabelText(/class/i);
-                await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                await act(async () => {
-                    await user.selectOptions(inputDinghyClass, 'Scorpion');
-                });
-                const inputCrew = screen.getByLabelText(/crew/i);
-                await act(async () => {
-                    await user.type(inputCrew, 'Lou Screw');
-                    expect(inputCrew).toHaveValue('Lou Screw');
-                });
-            });
-        });
-    });
-
-    describe('when dinghy class does not have crew', () => {
-        it('does not request entry of crew', async () => {
+    
+    describe('when dinghy class with no crew selected', () => {
+		it('does not request entry of crew', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceHandicapA}/>, model, controller);
 
@@ -2068,10 +2064,8 @@ describe('when race is a handicap', () => {
             const inputCrew = screen.queryByLabelText(/crew/i);
             expect(inputCrew).not.toBeInTheDocument();
         });
-    });
-    
-    describe('when dinghy class with no crew selected', () => {
-		describe('when helm and dinghy exist', () => {
+        
+        describe('when helm and dinghy exist', () => {
 			it('displays sign-up button', async () => {
                 const user = userEvent.setup();
                 customRender(<SignUp race={raceHandicapA}/>, model, controller);
@@ -2178,7 +2172,7 @@ describe('when race is a handicap', () => {
                     const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -2200,6 +2194,7 @@ describe('when race is a handicap', () => {
                     await act(async () => {
                         await user.click(createButton);
                     });
+                    expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                     expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, {'name': 'Not There', 'url': ''}, dinghy826);
                 });
 				
@@ -2293,7 +2288,7 @@ describe('when race is a handicap', () => {
                     const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                    const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -2315,6 +2310,7 @@ describe('when race is a handicap', () => {
                     await act(async () => {
                         await user.click(createButton);
                     });
+                    expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url':''});
                     expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, competitorJillMyer,
                         {'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                 });
@@ -2384,6 +2380,7 @@ describe('when race is a handicap', () => {
                 });
 			});	
         });
+
 		describe('when neither helm nor dinghy exist', () => {
 			it('displays create helm & dinghy & sign-up button', async () => {
                 const user = userEvent.setup();
@@ -2409,10 +2406,10 @@ describe('when race is a handicap', () => {
                     const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                    const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -2434,6 +2431,8 @@ describe('when race is a handicap', () => {
                     await act(async () => {
                         await user.click(createButton);
                     });
+                    expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
+                    expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url':''});
                     expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, {'name': 'Not There', 'url': ''},
                         {'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                 });
@@ -2473,6 +2472,7 @@ describe('when race is a handicap', () => {
                         expect(inputSailNumber).toHaveValue('g6754i');
                     });
 				});
+
 				describe('when dinghy not created', () => {
 					it('displays failure message and entered values remain on form', async () => {
                         const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -2508,6 +2508,7 @@ describe('when race is a handicap', () => {
                         expect(inputSailNumber).toHaveValue('g6754i');
                     });
                 });
+
 				describe('when neither helm nor dinghy created', () => {
 					it('displays failure message and entered values remain on form', async () => {
                         const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -2546,11 +2547,28 @@ describe('when race is a handicap', () => {
                 });
             });
         });
-	
     });
 
 	describe('when dinghy class with crew selected', () => {	
-		describe('when helm and dinghy and crew exist', () => {
+		describe('when crew name is entered', () => {
+            it('displays crew name', async () => {
+                const user = userEvent.setup();
+                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+
+                const inputDinghyClass = screen.getByLabelText(/class/i);
+                await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
+                await act(async () => {
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
+                });
+                const inputCrew = screen.getByLabelText(/crew/i);
+                await act(async () => {
+                    await user.type(inputCrew, 'Lou Screw');
+                    expect(inputCrew).toHaveValue('Lou Screw');
+                });
+            });
+        });
+
+        describe('when helm and dinghy and crew exist', () => {
 			it('displays sign-up button', async () => {
                 const user = userEvent.setup();
                 customRender(<SignUp race={raceHandicapA}/>, model, controller);
@@ -2672,7 +2690,7 @@ describe('when race is a handicap', () => {
                     const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -2698,6 +2716,7 @@ describe('when race is a handicap', () => {
                     await act(async () => {
                         await user.click(createButton);
                     });
+                    expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                     expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, {'name': 'Not There', 'url': ''}, dinghy1234, competitorLouScrew);
                 });
 				
@@ -2777,6 +2796,7 @@ describe('when race is a handicap', () => {
                 });
             });
         });
+
 		describe('when dinghy does not exist', () => {
 			it('displays create dinghy and sign-up button', async () => {
                 const user = userEvent.setup();
@@ -2806,7 +2826,7 @@ describe('when race is a handicap', () => {
                     const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                    const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -2832,10 +2852,10 @@ describe('when race is a handicap', () => {
                     await act(async () => {
                         await user.click(createButton);
                     });
+                    expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                     expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, competitorChrisMarshall,
                         {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, competitorLouScrew);
                 });
-				
 				describe('when dinghy not created', () => {
 					it('displays failure message and entered values remain on form', async () => {
                         const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
@@ -2912,14 +2932,65 @@ describe('when race is a handicap', () => {
                 });
             });
         });
-		describe('when crew does not exist', () => {
-			it('displays create crew and sign-up button', () => {
 
+		describe('when crew does not exist', () => {
+			it('displays create crew and sign-up button', async () => {
+                const user = userEvent.setup();
+                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                const inputDinghyClass = screen.getByLabelText(/class/i);
+                await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
+                await act(async () => {
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
+                });
+                const inputHelm = await screen.findByLabelText(/helm/i);
+                const inputSailNumber = await screen.findByLabelText(/sail/i);
+                const inputCrew = await screen.findByLabelText(/crew/i);
+                await act(async () => {
+                    await user.type(inputHelm, 'Chris Marshall');
+                });
+                await act(async () => {
+                    await user.type(inputSailNumber, '1234');
+                });
+                await act(async () => {
+                    await user.type(inputCrew, 'Pop Off');
+                })
+                expect(screen.getByRole('button', {'name': /add crew & sign-up/i}));
             });
 			
 			describe('when create button clicked', () => {
-				it('creates crew and then creates entry with values entered into form', () => {
-
+				it('creates crew and then creates entry with values entered into form', async () => {
+                    const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        return Promise.resolve({'success': true});
+                    });
+                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        return Promise.resolve({'success': true});
+                    });
+                    const user = userEvent.setup();
+                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    const inputDinghyClass = screen.getByLabelText(/class/i);
+                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
+                    await act(async () => {
+                        await user.selectOptions(inputDinghyClass, 'Scorpion');
+                    });
+                    const inputHelm = await screen.findByLabelText(/helm/i);
+                    const inputSailNumber = await screen.findByLabelText(/sail/i);
+                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    await act(async () => {
+                        await user.type(inputHelm, 'Chris Marshall');
+                    });
+                    await act(async () => {
+                        await user.type(inputSailNumber, '1234');
+                    });
+                    await act(async () => {
+                        await user.type(inputCrew, 'Pop Off');
+                    });
+                    const createButton = screen.getByRole('button', {'name': /add crew & sign-up/i});
+                    await act(async () => {
+                        await user.click(createButton);
+                    });
+                    expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
+                    expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, competitorChrisMarshall,
+                        dinghy1234, {'name': 'Pop Off', 'url': ''});
                 });
 				describe('when crew not created', () => {
 					it('displays failure message and entered values remain on form', () => {
@@ -2933,6 +3004,7 @@ describe('when race is a handicap', () => {
                 });
             });
         });
+
 		describe('when neither helm nor dinghy exist', () => {
 			it('displays create helm & dinghy & sign-up button', () => {
             
@@ -2967,6 +3039,7 @@ describe('when race is a handicap', () => {
                 });
             });
         });
+
 		describe('when neither helm nor crew exist', () => {
 			it('displays create helm & crew & sign-up button', () => {
 
