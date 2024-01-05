@@ -2284,13 +2284,65 @@ describe('when race is a handicap', () => {
                         {'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                 });
 				describe('when dinghy not created', () => {
-					it('displays failure message and entered values remain on form', () => {
-
+					it('displays failure message and entered values remain on form', async () => {
+                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
+                        });
+                        const user = userEvent.setup();
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
+                        await act(async () => {
+                            await user.selectOptions(inputDinghyClass, 'Comet');
+                        });
+                        const inputHelm = await screen.findByLabelText(/helm/i);
+                        const inputSailNumber = await screen.findByLabelText(/sail/i);
+                        await act(async () => {
+                            await user.type(inputHelm, 'Jill Myer');
+                        });
+                        await act(async () => {
+                            await user.type(inputSailNumber, 'g6754i');
+                        });
+                        const createButton = screen.getByRole('button', {'name': /add dinghy & sign-up/i});
+                        await act(async () => {
+                            await user.click(createButton);
+                        });
+                        expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
+                        expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
+                        expect(inputHelm).toHaveValue('Jill Myer');
+                        expect(inputSailNumber).toHaveValue('g6754i');
                     });
 				});
 				describe('when entry not created', () => {
-					it('displays failure message and entered values remain on form', () => {
-
+					it('displays failure message and entered values remain on form', async () => {
+                        jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            return Promise.resolve({'success': true});
+                        });
+                        jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                            return Promise.resolve({'success': false, 'message': 'Entry not created'});
+                        });
+                        const user = userEvent.setup();
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
+                        await act(async () => {
+                            await user.selectOptions(inputDinghyClass, 'Comet');
+                        });
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        await act(async () => {
+                            await user.type(inputHelm, 'Jill Myer');
+                        });
+                        await act(async () => {
+                            await user.type(inputSailNumber, 'g6754i');
+                        });
+                        const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
+                        await act(async () => {
+                            await user.click(buttonCreate);
+                        });
+                        expect(screen.getByText('Entry not created')).toBeInTheDocument();
+                        expect(inputHelm).toHaveValue('Jill Myer');
+                        expect(inputSailNumber).toHaveValue('g6754i');
                     });
                 });
 			});	
