@@ -2060,7 +2060,30 @@ describe('when race is a handicap', () => {
 			
 			describe('when create button clicked', () => {
 				it('creates entry with values entered into form and dinghy class set per race', async () => {
-
+                    const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        return Promise.resolve({'success': true});
+                    });
+                    const user = userEvent.setup();
+                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+    
+                    const inputDinghyClass = screen.getByLabelText(/class/i);
+                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
+                    await act(async () => {
+                        await user.selectOptions(inputDinghyClass, 'Comet');
+                    });
+                    const inputHelm = await screen.findByLabelText(/helm/i);
+                    const inputSailNumber = await screen.findByLabelText(/sail/i);
+                    await act(async () => {
+                        await user.type(inputHelm, 'Jill Myer');
+                    });
+                    await act(async () => {
+                        await user.type(inputSailNumber, '826');
+                    });
+                    const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
+                    await act(async () => {
+                        await user.click(buttonCreate);
+                    });
+                    expect(onSignupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, competitorJillMyer, dinghy826);
                 });
 			
 				describe('when entry not created', () => {
