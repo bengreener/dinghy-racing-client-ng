@@ -9,7 +9,7 @@ import { httpRootURL, wsRootURL,
     dinghyClasses, dinghyClassScorpion, dinghyClassComet,
     dinghies, dinghy1234, dinghy6745, dinghy826,
     raceScorpionA, raceHandicapA, raceCometA,
-    entriesScorpionA, entriesCometA} from '../model/__mocks__/test-data';
+    entriesScorpionA, entriesCometA, entriesHandicapA} from '../model/__mocks__/test-data';
 
 jest.mock('../model/dinghy-racing-model');
 jest.mock('../controller/dinghy-racing-controller');
@@ -4215,10 +4215,50 @@ describe('when race is a handicap', () => {
     });
 
     it('clears form on success', async () => {
-
+        const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+            return Promise.resolve({'success': true});
+        });
+        const user = userEvent.setup();
+        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+        const inputDinghyClass = screen.getByLabelText(/class/i);
+        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
+        await act(async () => {
+            await user.selectOptions(inputDinghyClass, 'Scorpion');
+        });
+        const inputHelm = await screen.findByLabelText(/helm/i);
+        const inputSailNumber = await screen.findByLabelText(/sail/i);
+        const inputCrew = await screen.findByLabelText(/crew/i);
+        await act(async () => {
+            await user.type(inputHelm, 'Chris Marshall');
+        });
+        await act(async () => {
+            await user.type(inputSailNumber, '1234');
+        });
+        await act(async () => {
+            await user.type(inputCrew, 'Lou Screw');
+        });
+        const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
+        await act(async () => {
+            await user.click(buttonCreate);
+        });
+        const raceTitle = screen.getByRole('heading', {'name': /handicap a/i});
+        const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
+        expect(raceTitle).toBeInTheDocument();
+        expect(inputHelm).toHaveValue('');
+        expect(inputSailNumber).toHaveValue('');
+        expect(inputCrew).toHaveValue('');
+        expect(btnCreate).toBeInTheDocument();
     });
     
     it('displays entries for race', async () => {
-
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesHandicapA})});
+        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+        expect(await screen.findByRole('cell', {'name': /Chris Marshall/i})).toBeInTheDocument();
+        expect((await screen.findAllByRole('cell', {'name': /Scorpion/i}))[0]).toBeInTheDocument();
+        expect(await screen.findByRole('cell', {'name': /1234/i})).toBeInTheDocument();
+        expect(await screen.findByRole('cell', {'name': /Lou Screw/i})).toBeInTheDocument();
+        expect(await screen.findByRole('cell', {'name': /Jill Myer/i})).toBeInTheDocument();
+        expect((await screen.findAllByRole('cell', {'name': /Comet/i}))[0]).toBeInTheDocument();
+        expect(await screen.findByRole('cell', {'name': /826/i})).toBeInTheDocument();
     });
 });
