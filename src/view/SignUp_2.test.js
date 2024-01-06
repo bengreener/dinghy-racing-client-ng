@@ -2013,7 +2013,34 @@ describe('when race for dinghy class with crew', () => {
     });
 
     it('clears form on success', async () => {
-
+        const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+            return Promise.resolve({'success': true});
+        });
+        const user = userEvent.setup();
+        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+        const inputHelm = await screen.findByLabelText(/helm/i);
+        const inputSailNumber = await screen.findByLabelText(/sail/i);
+        const inputCrew = await screen.findByLabelText(/crew/i);
+        await act(async () => {
+            await user.type(inputHelm, 'Chris Marshall');
+        });
+        await act(async () => {
+            await user.type(inputSailNumber, '1234');
+        });
+        await act(async () => {
+            await user.type(inputCrew, 'Lou Screw');
+        });
+        const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
+        await act(async () => {
+            await user.click(buttonCreate);
+        });
+        const raceTitle = screen.getByRole('heading', {'name': /scorpion a/i});
+        const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
+        expect(raceTitle).toBeInTheDocument();
+        expect(inputHelm).toHaveValue('');
+        expect(inputSailNumber).toHaveValue('');
+        expect(inputCrew).toHaveValue('');
+        expect(btnCreate).toBeInTheDocument();
     });
     
     it('displays failure message on failure and entered values remain on form', async () => {
