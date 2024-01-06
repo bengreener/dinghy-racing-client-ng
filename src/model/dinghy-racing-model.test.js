@@ -6,11 +6,11 @@ import { httpRootURL, wsRootURL, competitorsCollectionHAL,
     dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghyClassCometHAL, dinghy1234HAL, raceScorpion_AHAL, 
     dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet,
     dinghies, dinghiesScorpion, dinghy1234, dinghy6745, dinghy826,
-    races, racesCollectionHAL, raceScorpionA, raceNoClassHAL, raceGraduateA, raceCometA, raceGraduate_AHAL,
+    races, racesCollectionHAL, raceScorpionA, raceHandicapAHAL, raceGraduateA, raceCometA, raceGraduate_AHAL,
     competitorsCollection, competitorChrisMarshall, competitorChrisMarshallHAL, competitorLouScrew, 
-    entriesScorpionAHAL, entriesCometAHAL, entryChrisMarshallDinghy1234HAL, entriesNoClassHAL,
-    entriesScorpionA, entriesCometA, entriesNoClass,
-    competitorSarahPascal, raceNoClass, entryChrisMarshallScorpionA1234, competitorOwainDavies, competitorJillMyer } from './__mocks__/test-data';
+    entriesScorpionAHAL, entriesCometAHAL, entryChrisMarshallDinghy1234HAL, entriesHandicapAHAL,
+    entriesScorpionA, entriesCometA, entriesHandicapA,
+    competitorSarahPascal, raceHandicapA, entryChrisMarshallScorpionA1234, competitorOwainDavies, competitorJillMyer } from './__mocks__/test-data';
 
 global.fetch = jest.fn();
 // jest.mock('@stomp/stompjs');
@@ -1279,11 +1279,11 @@ describe('when searching for entries by race', () => {
             return Promise.resolve({
                 ok: true,
                 status: 200, 
-                json: () => Promise.resolve(entriesNoClassHAL)
+                json: () => Promise.resolve(entriesHandicapAHAL)
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceNoClass})});
+        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceHandicapA})});
         jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/20/helm') {
                 return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
@@ -1318,10 +1318,10 @@ describe('when searching for entries by race', () => {
             return Promise.resolve({'success': false, 'message': 'Error 404 Not Found'});
         });
         jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
-        const promise = dinghyRacingModel.getEntriesByRace(raceNoClass);
+        const promise = dinghyRacingModel.getEntriesByRace(raceHandicapA);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, 'domainObject': entriesNoClass});
+        expect(result).toEqual({'success': true, 'domainObject': entriesHandicapA});
     });
     it('returns a promise that resolves to a result indicating failure when race is not found', async () => {
         fetch.mockImplementationOnce(() => {
@@ -1368,15 +1368,15 @@ describe('when a race is requested', () => {
             return Promise.resolve({
                 ok: true,
                 status: 200, 
-                json: () => Promise.resolve(raceNoClassHAL)
+                json: () => Promise.resolve(raceHandicapAHAL)
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'})});
-        const promise = dinghyRacingModel.getRace(raceNoClass.url);
+        const promise = dinghyRacingModel.getRace(raceHandicapA.url);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, 'domainObject': raceNoClass});
+        expect(result).toEqual({'success': true, 'domainObject': raceHandicapA});
     });
     it('returns a promise that resolves to a result indicating failure when race is not found', async () => {
         fetch.mockImplementationOnce(() => {

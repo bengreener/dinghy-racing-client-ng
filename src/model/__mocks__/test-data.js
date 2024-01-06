@@ -87,9 +87,9 @@ const raceGraduate_ADinghyClassHAL = { 'name' : 'Graduate', '_links' : { 'self' 
 const raceGraduate_ASignedUpHAL = { '_embedded' : { 'dinghies' : [ ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/races/7/signedUp' } } };
 
 const raceCometAHAL = { 'name' : 'Comet A', 'plannedStartTime' : '2021-10-14T10:30:00', 'actualStartTime': null, 'duration': 'PT45M', 'plannedLaps': 4, 'lapForecast': 4.0, 'leadEntry': null, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/races/17' }, 'race' : { 'href' : 'http://localhost:8081/dinghyracing/api/races/17' }, 'signedUp' : { 'href' : 'http://localhost:8081/dinghyracing/api/races/17/signedUp' }, 'dinghyClass' : { 'href' : 'http://localhost:8081/dinghyracing/api/races/17/dinghyClass' } } };
-const raceNoClassHAL = {'name': 'No Class', 'plannedStartTime':'2023-02-14T18:26:00', 'actualStartTime': null, 'duration': 'PT45M', 'plannedLaps': 5, 'lapForecast': 5.0, 'leadEntry': { 'lastLapTime': 'PT0S', 'sumOfLapTimes': 'PT0S', 'averageLapTime': 'PT0S'}, '_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races/8'},'race':{'href':'http://localhost:8081/dinghyracing/api/races/8'},'signedUp':{'href':'http://localhost:8081/dinghyracing/api/races/8/signedUp'},'dinghyClass':{'href':'http://localhost:8081/dinghyracing/api/races/8/dinghyClass'}}};
+const raceHandicapAHAL = {'name': 'Handicap A', 'plannedStartTime':'2023-02-14T18:26:00', 'actualStartTime': null, 'duration': 'PT45M', 'plannedLaps': 5, 'lapForecast': 5.0, 'leadEntry': { 'lastLapTime': 'PT0S', 'sumOfLapTimes': 'PT0S', 'averageLapTime': 'PT0S'}, '_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races/8'},'race':{'href':'http://localhost:8081/dinghyracing/api/races/8'},'signedUp':{'href':'http://localhost:8081/dinghyracing/api/races/8/signedUp'},'dinghyClass':{'href':'http://localhost:8081/dinghyracing/api/races/8/dinghyClass'}}};
 
-const racesCollectionHAL = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL, raceCometAHAL, raceNoClassHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':20,'totalElements':3,'totalPages':1,'number':0}};
+const racesCollectionHAL = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL, raceCometAHAL, raceHandicapAHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':20,'totalElements':3,'totalPages':1,'number':0}};
 
 const raceSchemaJSON = { 'title' : 'Race', 'properties' : { 'duration' : { 'title' : 'Duration', 'readOnly' : false, 'type' : 'string', 'format' : 'date-time' }, 'signedUp' : { 'title' : 'Signed up', 'readOnly' : false, 'description' : 'ToMany', 'type' : 'string', 'format' : 'uri' }, 'dinghyClass' : { 'title' : 'Dinghy class', 'readOnly' : false, 'description' : 'ToOne', 'type' : 'string', 'format' : 'uri' }, 'actualStartTime' : { 'title' : 'Actual start time', 'readOnly' : false, 'type' : 'string', 'format' : 'date-time' }, 'plannedStartTime' : { 'title' : 'Planned start time', 'readOnly' : false, 'type' : 'string', 'format' : 'date-time' }, 'name' : { 'title' : 'Name', 'readOnly' : false, 'description' : 'identifier', 'type' : 'string' }, 'plannedLaps' : { 'title' : 'Planned laps', 'readOnly' : false, 'type' : 'integer' } }, 'definitions' : { }, 'type' : 'object', '$schema' : 'http://json-schema.org/draft-04/schema#' };
 const raceSchemaALPS = { 'alps' : { 'version' : '1.0', 'descriptor' : [ { 'id' : 'race-representation', 'href' : 'http://localhost:8081/dinghyracing/api/profile/races', 'descriptor' : [ { 'name' : 'name', 'type' : 'SEMANTIC', 'doc' : { 'format' : 'TEXT', 'value' : 'identifier' } }, { 'name' : 'plannedStartTime', 'type' : 'SEMANTIC' }, { 'name' : 'actualStartTime', 'type' : 'SEMANTIC' }, { 'name' : 'duration', 'type' : 'SEMANTIC' }, { 'name' : 'plannedLaps', 'type' : 'SEMANTIC' }, { 'name' : 'signedUp', 'type' : 'SAFE', 'doc' : { 'format' : 'TEXT', 'value' : 'ToMany' }, 'rt' : 'http://localhost:8081/dinghyracing/api/profile/entries#entry-representation' }, { 'name' : 'dinghyClass', 'type' : 'SAFE', 'doc' : { 'format' : 'TEXT', 'value' : 'ToOne' }, 'rt' : 'http://localhost:8081/dinghyracing/api/profile/dinghyClasses#dinghyClass-representation' } ] }, { 'id' : 'get-races', 'name' : 'races', 'type' : 'SAFE', 'descriptor' : [ { 'name' : 'page', 'type' : 'SEMANTIC', 'doc' : { 'format' : 'TEXT', 'value' : 'The page to return.' } }, { 'name' : 'size', 'type' : 'SEMANTIC', 'doc' : { 'format' : 'TEXT', 'value' : 'The size of the page to return.' } }, { 'name' : 'sort', 'type' : 'SEMANTIC', 'doc' : { 'format' : 'TEXT', 'value' : 'The sorting criteria to use to calculate the content of the page.' } } ], 'rt' : '#race-representation' }, { 'id' : 'create-races', 'name' : 'races', 'type' : 'UNSAFE', 'descriptor' : [ ], 'rt' : '#race-representation' }, { 'id' : 'update-race', 'name' : 'race', 'type' : 'IDEMPOTENT', 'descriptor' : [ ], 'rt' : '#race-representation' }, { 'id' : 'patch-race', 'name' : 'race', 'type' : 'UNSAFE', 'descriptor' : [ ], 'rt' : '#race-representation' }, { 'id' : 'delete-race', 'name' : 'race', 'type' : 'IDEMPOTENT', 'descriptor' : [ ], 'rt' : '#race-representation' }, { 'id' : 'get-race', 'name' : 'race', 'type' : 'SAFE', 'descriptor' : [ ], 'rt' : '#race-representation' }, { 'name' : 'findByNameAndPlannedStartTime', 'type' : 'SAFE', 'descriptor' : [ { 'name' : 'name', 'type' : 'SEMANTIC' }, { 'name' : 'time', 'type' : 'SEMANTIC' } ] }, { 'name' : 'findByPlannedStartTimeGreaterThanEqual', 'type' : 'SAFE', 'descriptor' : [ { 'name' : 'time', 'type' : 'SEMANTIC' } ] } ] } };
@@ -151,7 +151,7 @@ const entriesCometAHAL = { '_embedded' : { 'entries' : [
 		'race':{'href':'http://localhost:8081/dinghyracing/api/entries/19/race'} }
 	}
 ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/races/17/signedUp' } } };
-const entriesNoClassHAL = { '_embedded' : { 'entries' : [
+const entriesHandicapAHAL = { '_embedded' : { 'entries' : [
 	{ '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20' }, 
 		'entry' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20' }, 
 		'helm' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/helm' }, 
@@ -198,8 +198,8 @@ const dinghies = [dinghy1234, dinghy2726, dinghy6745, dinghy2928, dinghy826];
 const raceScorpionA = { 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00Z'), 'actualStartTime': new Date('2021-10-14T14:10:00Z'), 'dinghyClass': dinghyClassScorpion, 'duration': 2700000, 'plannedLaps': 5, 'lapForecast': 5.0, 'lastLapTime': 0, 'averageLapTime': 0, 'clock': null, 'url': 'http://localhost:8081/dinghyracing/api/races/4' };
 const raceGraduateA = { 'name': 'Graduate A', 'plannedStartTime' : new Date('2021-10-14T10:30:00Z'), 'actualStartTime': null, 'dinghyClass': dinghyClassGraduate, 'duration': 2700000, 'plannedLaps': 4, 'lapForecast': 4.0, 'lastLapTime': null, 'averageLapTime': null, 'clock': null, 'url': 'http://localhost:8081/dinghyracing/api/races/7' };
 const raceCometA = { 'name': 'Comet A', 'plannedStartTime' : new Date('2021-10-14T10:30:00Z'), 'actualStartTime': null, 'dinghyClass': dinghyClassComet, 'duration': 2700000, 'plannedLaps': 4, 'lapForecast': 4.0, 'lastLapTime': null, 'averageLapTime': null, 'clock': null, 'url': 'http://localhost:8081/dinghyracing/api/races/17' };
-const raceNoClass = { 'name': 'No Class', 'plannedStartTime': new Date('2023-02-14T18:26:00Z'), 'actualStartTime': null, 'dinghyClass': null, 'duration': 2700000, 'plannedLaps': 5, 'lapForecast': 5.0, 'lastLapTime': 0, 'averageLapTime': 0, 'clock': null, 'url': 'http://localhost:8081/dinghyracing/api/races/8' };
-const races = [raceScorpionA, raceGraduateA, raceCometA, raceNoClass];
+const raceHandicapA = { 'name': 'Handicap A', 'plannedStartTime': new Date('2023-02-14T18:26:00Z'), 'actualStartTime': null, 'dinghyClass': null, 'duration': 2700000, 'plannedLaps': 5, 'lapForecast': 5.0, 'lastLapTime': 0, 'averageLapTime': 0, 'clock': null, 'url': 'http://localhost:8081/dinghyracing/api/races/8' };
+const races = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA];
 
 const entriesScorpionA = [
 	{'helm': competitorChrisMarshall, 'crew': competitorLouScrew, 'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
@@ -209,9 +209,9 @@ const entriesGraduateA = [{'helm': competitorJillMyer, 'crew': null, 'race': rac
 const entriesCometA = [
 	{'helm': competitorJillMyer, 'crew': null, 'race': raceCometA, 'dinghy': dinghy826, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/19'}
 ];
-const entriesNoClass = [
-	{'helm': competitorChrisMarshall, 'crew': competitorLouScrew, 'race': raceNoClass, 'dinghy': dinghy1234, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/20'}, 
-	{'helm': competitorJillMyer, 'crew': null, 'race': raceNoClass, 'dinghy': dinghy826, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/21'}
+const entriesHandicapA = [
+	{'helm': competitorChrisMarshall, 'crew': competitorLouScrew, 'race': raceHandicapA, 'dinghy': dinghy1234, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/20'}, 
+	{'helm': competitorJillMyer, 'crew': null, 'race': raceHandicapA, 'dinghy': dinghy826, 'laps': [], 'url': 'http://localhost:8081/dinghyracing/api/entries/21'}
 ];
 const entryChrisMarshallScorpionA1234 = {
 	'helm': competitorChrisMarshall, 'crew': null, 
@@ -238,10 +238,10 @@ export {
 	racesCollectionHAL, 
 	raceScorpion_AHAL, raceScorpion_ADinghyClassHAL, raceScorpion_ASignedUpHAL, 
 	raceGraduate_AHAL, raceGraduate_ADinghyClassHAL, raceGraduate_ASignedUpHAL,
-	raceNoClassHAL,
+	raceHandicapAHAL,
 	raceSchemaJSON, raceSchemaALPS,
 	
-	entriesHAL, entriesScorpionAHAL, entryChrisMarshallDinghy1234HAL, entriesCometAHAL, entriesNoClassHAL,
+	entriesHAL, entriesScorpionAHAL, entryChrisMarshallDinghy1234HAL, entriesCometAHAL, entriesHandicapAHAL,
 
 	competitorsCollection, competitorChrisMarshall, competitorSarahPascal, competitorJillMyer, competitorLouScrew, 
 	competitorOwainDavies, competitorLiuBao, 
@@ -250,7 +250,7 @@ export {
 
 	dinghies, dinghiesScorpion, dinghy1234, dinghy2726, dinghy6745, dinghy2928, dinghy826,
 
-	races, raceScorpionA, raceGraduateA, raceCometA, raceNoClass,
+	races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA,
 
-	entriesScorpionA, entriesGraduateA, entriesCometA, entriesNoClass, entryChrisMarshallScorpionA1234
+	entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA, entryChrisMarshallScorpionA1234
 }
