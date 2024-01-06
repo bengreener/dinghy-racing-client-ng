@@ -5,9 +5,9 @@ import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 import SignUp from './SignUp';
 import { httpRootURL, wsRootURL, 
-    competitorsCollection, competitorChrisMarshall, competitorSarahPascal, competitorLouScrew, competitorJillMyer,
+    competitorsCollection, competitorChrisMarshall, competitorLouScrew, competitorJillMyer,
     dinghyClasses, dinghyClassScorpion, dinghyClassComet,
-    dinghies, dinghy1234, dinghy6745, dinghy826,
+    dinghies, dinghy1234, dinghy826,
     raceScorpionA, raceHandicapA, raceCometA,
     entriesScorpionA, entriesCometA, entriesHandicapA} from '../model/__mocks__/test-data';
 
@@ -43,7 +43,7 @@ describe('when race for dinghy class with no crew', () => {
         it('displays helm name', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceCometA}/>, model, controller);
-            const inputHelm = await screen.findByLabelText(/helm/i);
+            const inputHelm = screen.getByLabelText(/helm/i);
             await act(async () => {
                 await user.type(inputHelm, 'Chris Marshall');
             });
@@ -55,7 +55,7 @@ describe('when race for dinghy class with no crew', () => {
         it('displays sail number', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceCometA}/>, model, controller);
-            const inputSailNumber = await screen.findByLabelText(/sail/i);
+            const inputSailNumber = screen.getByLabelText(/sail/i);
             await act(async () => {
                 await user.type(inputSailNumber, 'g6754i');
             });
@@ -68,7 +68,6 @@ describe('when race for dinghy class with no crew', () => {
             customRender(<SignUp race={raceCometA}/>, model, controller);
         });
         const inputDinghyClass = screen.queryByLabelText(/class/i);
-        
         expect(inputDinghyClass).not.toBeInTheDocument();
     });
 
@@ -77,7 +76,6 @@ describe('when race for dinghy class with no crew', () => {
             customRender(<SignUp race={raceCometA}/>, model, controller);
         });
         const inputCrew = screen.queryByLabelText(/crew/i);
-        
         expect(inputCrew).not.toBeInTheDocument();
     });
 
@@ -85,8 +83,8 @@ describe('when race for dinghy class with no crew', () => {
 		it('displays sign-up button', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceCometA}/>, model, controller);
-            const inputHelm = await screen.findByLabelText(/helm/i);
-            const inputSailNumber = await screen.findByLabelText(/sail/i);
+            const inputHelm = screen.getByLabelText(/helm/i);
+            const inputSailNumber = screen.getByLabelText(/sail/i);
             await act(async () => {
                 await user.type(inputHelm, 'Jill Myer');
             });
@@ -103,8 +101,8 @@ describe('when race for dinghy class with no crew', () => {
                 });
                 const user = userEvent.setup();
                 customRender(<SignUp race={raceCometA}/>, model, controller);
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Jill Myer');
                 });
@@ -125,8 +123,8 @@ describe('when race for dinghy class with no crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceCometA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Jill Myer');
                     });
@@ -149,8 +147,8 @@ describe('when race for dinghy class with no crew', () => {
         it('displays create helm & sign-up button', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceCometA}/>, model, controller);
-            const inputHelm = await screen.findByLabelText(/helm/i);
-            const inputSailNumber = await screen.findByLabelText(/sail/i);
+            const inputHelm = screen.getByLabelText(/helm/i);
+            const inputSailNumber = screen.getByLabelText(/sail/i);
             await act(async () => {
                 await user.type(inputHelm, 'Not There');
             });
@@ -170,8 +168,8 @@ describe('when race for dinghy class with no crew', () => {
                 });
                 const user = userEvent.setup();
                 customRender(<SignUp race={raceCometA}/>, model, controller);
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Not There');
                 });
@@ -193,8 +191,8 @@ describe('when race for dinghy class with no crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceCometA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -222,8 +220,8 @@ describe('when race for dinghy class with no crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceCometA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -246,8 +244,8 @@ describe('when race for dinghy class with no crew', () => {
         it('displays create dinghy and sign-up button', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceCometA}/>, model, controller);
-            const inputHelm = await screen.findByLabelText(/helm/i);
-            const inputSailNumber = await screen.findByLabelText(/sail/i);
+            const inputHelm = screen.getByLabelText(/helm/i);
+            const inputSailNumber = screen.getByLabelText(/sail/i);
             await act(async () => {
                 await user.type(inputHelm, 'Jill Myer');
             });
@@ -267,8 +265,8 @@ describe('when race for dinghy class with no crew', () => {
                 });
                 const user = userEvent.setup();
                 customRender(<SignUp race={raceCometA}/>, model, controller);
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Jill Myer');
                 });
@@ -291,8 +289,8 @@ describe('when race for dinghy class with no crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceCometA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Jill Myer');
                     });
@@ -320,8 +318,8 @@ describe('when race for dinghy class with no crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceCometA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Jill Myer');
                     });
@@ -344,8 +342,8 @@ describe('when race for dinghy class with no crew', () => {
         it('displays create helm & dinghy & sign-up button', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceCometA}/>, model, controller);
-            const inputHelm = await screen.findByLabelText(/helm/i);
-            const inputSailNumber = await screen.findByLabelText(/sail/i);
+            const inputHelm = screen.getByLabelText(/helm/i);
+            const inputSailNumber = screen.getByLabelText(/sail/i);
             await act(async () => {
                 await user.type(inputHelm, 'Not There');
             });
@@ -368,8 +366,8 @@ describe('when race for dinghy class with no crew', () => {
                 });
                 const user = userEvent.setup();
                 customRender(<SignUp race={raceCometA}/>, model, controller);
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Not There');
                 });
@@ -396,8 +394,8 @@ describe('when race for dinghy class with no crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceCometA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -426,8 +424,8 @@ describe('when race for dinghy class with no crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceCometA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -456,8 +454,8 @@ describe('when race for dinghy class with no crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceCometA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -490,8 +488,8 @@ describe('when race for dinghy class with no crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceCometA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -516,8 +514,8 @@ describe('when race for dinghy class with no crew', () => {
         });
         const user = userEvent.setup();
         customRender(<SignUp race={raceCometA}/>, model, controller);
-        const inputHelm = await screen.findByLabelText(/helm/i);
-        const inputSailNumber = await screen.findByLabelText(/sail/i);
+        const inputHelm = screen.getByLabelText(/helm/i);
+        const inputSailNumber = screen.getByLabelText(/sail/i);
         await act(async () => {
             await user.type(inputHelm, 'Jill Myer');
         });
@@ -567,7 +565,7 @@ describe('when race for dinghy class with crew', () => {
         it('displays helm name', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceScorpionA}/>, model, controller);
-            const inputHelm = await screen.findByLabelText(/helm/i);
+            const inputHelm = screen.getByLabelText(/helm/i);
             await act(async () => {
                 await user.type(inputHelm, 'Chris Marshall');
             });
@@ -579,7 +577,7 @@ describe('when race for dinghy class with crew', () => {
         it('displays sail number', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceScorpionA}/>, model, controller);
-            const inputSailNumber = await screen.findByLabelText(/sail/i);
+            const inputSailNumber = screen.getByLabelText(/sail/i);
             await act(async () => {
                 await user.type(inputSailNumber, 'g6754i');
             });
@@ -592,7 +590,6 @@ describe('when race for dinghy class with crew', () => {
             customRender(<SignUp race={raceScorpionA}/>, model, controller);
         });
         const inputDinghyClass = screen.queryByLabelText(/class/i);
-
         expect(inputDinghyClass).not.toBeInTheDocument();
     });
 
@@ -600,7 +597,7 @@ describe('when race for dinghy class with crew', () => {
         it('displays crew name', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceScorpionA}/>, model, controller);
-            const inputCrew = await screen.findByLabelText(/crew/i);
+            const inputCrew = screen.getByLabelText(/crew/i);
             await act(async () => {
                 await user.type(inputCrew, 'Lou Screw');
             });
@@ -612,9 +609,9 @@ describe('when race for dinghy class with crew', () => {
 		it('displays sign-up button', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceScorpionA}/>, model, controller);
-            const inputHelm = await screen.findByLabelText(/helm/i);
-            const inputSailNumber = await screen.findByLabelText(/sail/i);
-            const inputCrew = await screen.findByLabelText(/crew/i);
+            const inputHelm = screen.getByLabelText(/helm/i);
+            const inputSailNumber = screen.getByLabelText(/sail/i);
+            const inputCrew = screen.getByLabelText(/crew/i);
             await act(async () => {
                 await user.type(inputHelm, 'Chris Marshall');
             });
@@ -634,9 +631,9 @@ describe('when race for dinghy class with crew', () => {
                 });
                 const user = userEvent.setup();
                 customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
-                const inputCrew = await screen.findByLabelText(/crew/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
+                const inputCrew = screen.getByLabelText(/crew/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Chris Marshall');
                 });
@@ -660,9 +657,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Chris Marshall');
                     });
@@ -689,9 +686,9 @@ describe('when race for dinghy class with crew', () => {
         it('displays create helm & sign-up button', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceScorpionA}/>, model, controller);
-            const inputHelm = await screen.findByLabelText(/helm/i);
-            const inputSailNumber = await screen.findByLabelText(/sail/i);
-            const inputCrew = await screen.findByLabelText(/crew/i);
+            const inputHelm = screen.getByLabelText(/helm/i);
+            const inputSailNumber = screen.getByLabelText(/sail/i);
+            const inputCrew = screen.getByLabelText(/crew/i);
             await act(async () => {
                 await user.type(inputHelm, 'Not There');
             });
@@ -714,9 +711,9 @@ describe('when race for dinghy class with crew', () => {
                 });
                 const user = userEvent.setup();
                 customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
-                const inputCrew = await screen.findByLabelText(/crew/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
+                const inputCrew = screen.getByLabelText(/crew/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Not There');
                 });
@@ -741,9 +738,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -775,9 +772,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -804,9 +801,9 @@ describe('when race for dinghy class with crew', () => {
 		it('displays create dinghy and sign-up button', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceScorpionA}/>, model, controller);
-            const inputHelm = await screen.findByLabelText(/helm/i);
-            const inputSailNumber = await screen.findByLabelText(/sail/i);
-            const inputCrew = await screen.findByLabelText(/crew/i);
+            const inputHelm = screen.getByLabelText(/helm/i);
+            const inputSailNumber = screen.getByLabelText(/sail/i);
+            const inputCrew = screen.getByLabelText(/crew/i);
             await act(async () => {
                 await user.type(inputHelm, 'Chris Marshall');
             });
@@ -829,9 +826,9 @@ describe('when race for dinghy class with crew', () => {
                 });
                 const user = userEvent.setup();
                 customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
-                const inputCrew = await screen.findByLabelText(/crew/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
+                const inputCrew = screen.getByLabelText(/crew/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Chris Marshall');
                 });
@@ -857,9 +854,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Chris Marshall');
                     });
@@ -891,9 +888,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Chris Marshall');
                     });
@@ -920,9 +917,9 @@ describe('when race for dinghy class with crew', () => {
 		it('displays create crew and sign-up button', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceScorpionA}/>, model, controller);
-            const inputHelm = await screen.findByLabelText(/helm/i);
-            const inputSailNumber = await screen.findByLabelText(/sail/i);
-            const inputCrew = await screen.findByLabelText(/crew/i);
+            const inputHelm = screen.getByLabelText(/helm/i);
+            const inputSailNumber = screen.getByLabelText(/sail/i);
+            const inputCrew = screen.getByLabelText(/crew/i);
             await act(async () => {
                 await user.type(inputHelm, 'Chris Marshall');
             });
@@ -945,9 +942,9 @@ describe('when race for dinghy class with crew', () => {
                 });
                 const user = userEvent.setup();
                 customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
-                const inputCrew = await screen.findByLabelText(/crew/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
+                const inputCrew = screen.getByLabelText(/crew/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Chris Marshall');
                 });
@@ -973,9 +970,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Chris Marshall');
                     });
@@ -1007,9 +1004,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Chris Marshall');
                     });
@@ -1036,9 +1033,9 @@ describe('when race for dinghy class with crew', () => {
 		it('displays create helm and dinghy and sign-up button', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceScorpionA}/>, model, controller);
-            const inputHelm = await screen.findByLabelText(/helm/i);
-            const inputSailNumber = await screen.findByLabelText(/sail/i);
-            const inputCrew = await screen.findByLabelText(/crew/i);
+            const inputHelm = screen.getByLabelText(/helm/i);
+            const inputSailNumber = screen.getByLabelText(/sail/i);
+            const inputCrew = screen.getByLabelText(/crew/i);
             await act(async () => {
                 await user.type(inputHelm, 'Not There');
             });
@@ -1064,9 +1061,9 @@ describe('when race for dinghy class with crew', () => {
                 });
                 const user = userEvent.setup();
                 customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
-                const inputCrew = await screen.findByLabelText(/crew/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
+                const inputCrew = screen.getByLabelText(/crew/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Not There');
                 });
@@ -1096,9 +1093,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -1131,9 +1128,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -1166,9 +1163,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -1205,9 +1202,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -1234,9 +1231,9 @@ describe('when race for dinghy class with crew', () => {
 		it('displays create helm & crew & sign-up button', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceScorpionA}/>, model, controller);
-            const inputHelm = await screen.findByLabelText(/helm/i);
-            const inputSailNumber = await screen.findByLabelText(/sail/i);
-            const inputCrew = await screen.findByLabelText(/crew/i);
+            const inputHelm = screen.getByLabelText(/helm/i);
+            const inputSailNumber = screen.getByLabelText(/sail/i);
+            const inputCrew = screen.getByLabelText(/crew/i);
             await act(async () => {
                 await user.type(inputHelm, 'Not There');
             });
@@ -1259,9 +1256,9 @@ describe('when race for dinghy class with crew', () => {
                 });
                 const user = userEvent.setup();
                 customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
-                const inputCrew = await screen.findByLabelText(/crew/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
+                const inputCrew = screen.getByLabelText(/crew/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Not There');
                 });
@@ -1303,9 +1300,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -1352,9 +1349,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -1386,9 +1383,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -1421,9 +1418,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -1450,9 +1447,9 @@ describe('when race for dinghy class with crew', () => {
 		it('displays create dinghy and crew and sign-up button', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceScorpionA}/>, model, controller);
-            const inputHelm = await screen.findByLabelText(/helm/i);
-            const inputSailNumber = await screen.findByLabelText(/sail/i);
-            const inputCrew = await screen.findByLabelText(/crew/i);
+            const inputHelm = screen.getByLabelText(/helm/i);
+            const inputSailNumber = screen.getByLabelText(/sail/i);
+            const inputCrew = screen.getByLabelText(/crew/i);
             await act(async () => {
                 await user.type(inputHelm, 'Chris Marshall');
             });
@@ -1478,9 +1475,9 @@ describe('when race for dinghy class with crew', () => {
                 });
                 const user = userEvent.setup();
                 customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
-                const inputCrew = await screen.findByLabelText(/crew/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
+                const inputCrew = screen.getByLabelText(/crew/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Chris Marshall');
                 });
@@ -1510,9 +1507,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Chris Marshall');
                     });
@@ -1545,9 +1542,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Chris Marshall');
                     });
@@ -1580,9 +1577,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Chris Marshall');
                     });
@@ -1619,9 +1616,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Chris Marshall');
                     });
@@ -1648,9 +1645,9 @@ describe('when race for dinghy class with crew', () => {
         it('displays create helm and dinghy and crew and sign-up button', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceScorpionA}/>, model, controller);
-            const inputHelm = await screen.findByLabelText(/helm/i);
-            const inputSailNumber = await screen.findByLabelText(/sail/i);
-            const inputCrew = await screen.findByLabelText(/crew/i);
+            const inputHelm = screen.getByLabelText(/helm/i);
+            const inputSailNumber = screen.getByLabelText(/sail/i);
+            const inputCrew = screen.getByLabelText(/crew/i);
             await act(async () => {
                 await user.type(inputHelm, 'Not There');
             });
@@ -1676,9 +1673,9 @@ describe('when race for dinghy class with crew', () => {
                 });
                 const user = userEvent.setup();
                 customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
-                const inputCrew = await screen.findByLabelText(/crew/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
+                const inputCrew = screen.getByLabelText(/crew/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Not There');
                 });
@@ -1714,9 +1711,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -1750,9 +1747,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -1791,9 +1788,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -1832,9 +1829,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -1869,9 +1866,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -1910,9 +1907,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -1947,9 +1944,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -1987,9 +1984,9 @@ describe('when race for dinghy class with crew', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -2018,9 +2015,9 @@ describe('when race for dinghy class with crew', () => {
         });
         const user = userEvent.setup();
         customRender(<SignUp race={raceScorpionA}/>, model, controller);
-        const inputHelm = await screen.findByLabelText(/helm/i);
-        const inputSailNumber = await screen.findByLabelText(/sail/i);
-        const inputCrew = await screen.findByLabelText(/crew/i);
+        const inputHelm = screen.getByLabelText(/helm/i);
+        const inputSailNumber = screen.getByLabelText(/sail/i);
+        const inputCrew = screen.getByLabelText(/crew/i);
         await act(async () => {
             await user.type(inputHelm, 'Chris Marshall');
         });
@@ -2076,7 +2073,7 @@ describe('when race is a handicap', () => {
         it('displays helm name', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceHandicapA}/>, model, controller);
-            const inputHelm = await screen.findByLabelText(/helm/i);
+            const inputHelm = screen.getByLabelText(/helm/i);
             await act(async () => {
                 await user.type(inputHelm, 'Chris Marshall');
             });
@@ -2088,13 +2085,10 @@ describe('when race is a handicap', () => {
         it('displays sail number', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceHandicapA}/>, model, controller);
-
-            const inputSailNumber = await screen.findByLabelText(/sail/i);
-
+            const inputSailNumber = screen.getByLabelText(/sail/i);
             await act(async () => {
                 await user.type(inputSailNumber, '1234');
             });
-
             expect(inputSailNumber).toHaveValue('1234');
         });
     });
@@ -2103,7 +2097,6 @@ describe('when race is a handicap', () => {
         it('displays dinghy class', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceHandicapA}/>, model, controller);
-
             const inputDinghyClass = screen.getByLabelText(/class/i);
             await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
             await act(async () => {
@@ -2117,7 +2110,6 @@ describe('when race is a handicap', () => {
 		it('does not request entry of crew', async () => {
             const user = userEvent.setup();
             customRender(<SignUp race={raceHandicapA}/>, model, controller);
-
             const inputDinghyClass = screen.getByLabelText(/class/i);
             await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
             await act(async () => {
@@ -2131,14 +2123,13 @@ describe('when race is a handicap', () => {
 			it('displays sign-up button', async () => {
                 const user = userEvent.setup();
                 customRender(<SignUp race={raceHandicapA}/>, model, controller);
-
                 const inputDinghyClass = screen.getByLabelText(/class/i);
                 await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                 await act(async () => {
                     await user.selectOptions(inputDinghyClass, 'Comet');
                 });
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Jill Myer');
                 });
@@ -2155,7 +2146,6 @@ describe('when race is a handicap', () => {
                     });
                     const user = userEvent.setup();
                     customRender(<SignUp race={raceHandicapA}/>, model, controller);
-    
                     const inputDinghyClass = screen.getByLabelText(/class/i);
                     await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                     await act(async () => {
@@ -2272,8 +2262,8 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Comet');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Not There');
                         });
@@ -2305,8 +2295,8 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Comet');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Not There');
                         });
@@ -2376,6 +2366,7 @@ describe('when race is a handicap', () => {
                     expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, competitorJillMyer,
                         {'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                 });
+
 				describe('when dinghy not created', () => {
 					it('displays failure message and entered values remain on form', async () => {
                         const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
@@ -2388,8 +2379,8 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Comet');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Jill Myer');
                         });
@@ -2407,6 +2398,7 @@ describe('when race is a handicap', () => {
                         expect(inputSailNumber).toHaveValue('g6754i');
                     });
 				});
+
 				describe('when entry not created', () => {
 					it('displays failure message and entered values remain on form', async () => {
                         jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
@@ -2514,8 +2506,8 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Comet');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Not There');
                         });
@@ -2550,8 +2542,8 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Comet');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Not There');
                         });
@@ -2616,7 +2608,6 @@ describe('when race is a handicap', () => {
             it('displays crew name', async () => {
                 const user = userEvent.setup();
                 customRender(<SignUp race={raceHandicapA}/>, model, controller);
-
                 const inputDinghyClass = screen.getByLabelText(/class/i);
                 await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                 await act(async () => {
@@ -2653,7 +2644,7 @@ describe('when race is a handicap', () => {
                 });
                 expect(screen.getByRole('button', {'name': /^sign-up(?!.)/i}));
             });
-				
+
 			describe('when create button clicked', () => {
 				it('creates entry with values entered into form and dinghy class set per race', async () => {
                     const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -2666,9 +2657,9 @@ describe('when race is a handicap', () => {
                     await act(async () => {
                         await user.selectOptions(inputDinghyClass, 'Scorpion');
                     });
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Chris Marshall');
                     });
@@ -2697,9 +2688,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Chris Marshall');
                         });
@@ -2732,9 +2723,9 @@ describe('when race is a handicap', () => {
                 await act(async () => {
                     await user.selectOptions(inputDinghyClass, 'Scorpion');
                 });
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
-                const inputCrew = await screen.findByLabelText(/crew/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
+                const inputCrew = screen.getByLabelText(/crew/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Not There');
                 });
@@ -2762,9 +2753,9 @@ describe('when race is a handicap', () => {
                     await act(async () => {
                         await user.selectOptions(inputDinghyClass, 'Scorpion');
                     });
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -2794,9 +2785,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Not There');
                         });
@@ -2833,9 +2824,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Not There');
                         });
@@ -2868,9 +2859,9 @@ describe('when race is a handicap', () => {
                 await act(async () => {
                     await user.selectOptions(inputDinghyClass, 'Scorpion');
                 });
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
-                const inputCrew = await screen.findByLabelText(/crew/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
+                const inputCrew = screen.getByLabelText(/crew/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Chris Marshall');
                 });
@@ -2898,9 +2889,9 @@ describe('when race is a handicap', () => {
                     await act(async () => {
                         await user.selectOptions(inputDinghyClass, 'Scorpion');
                     });
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Chris Marshall');
                     });
@@ -2930,9 +2921,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Chris Marshall');
                         });
@@ -2969,9 +2960,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Chris Marshall');
                         });
@@ -3004,9 +2995,9 @@ describe('when race is a handicap', () => {
                 await act(async () => {
                     await user.selectOptions(inputDinghyClass, 'Scorpion');
                 });
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
-                const inputCrew = await screen.findByLabelText(/crew/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
+                const inputCrew = screen.getByLabelText(/crew/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Chris Marshall');
                 });
@@ -3034,9 +3025,9 @@ describe('when race is a handicap', () => {
                     await act(async () => {
                         await user.selectOptions(inputDinghyClass, 'Scorpion');
                     });
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Chris Marshall');
                     });
@@ -3054,6 +3045,7 @@ describe('when race is a handicap', () => {
                     expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, competitorChrisMarshall,
                         dinghy1234, {'name': 'Pop Off', 'url': ''});
                 });
+
 				describe('when crew not created', () => {
 					it('displays failure message and entered values remain on form', async () => {
                         const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -3089,6 +3081,7 @@ describe('when race is a handicap', () => {
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
 				});
+
 				describe('when entry not created', () => {
 					it('displays failure message and entered values remain on form', async () => {
                         jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -3104,9 +3097,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Chris Marshall');
                         });
@@ -3138,9 +3131,9 @@ describe('when race is a handicap', () => {
                 await act(async () => {
                     await user.selectOptions(inputDinghyClass, 'Scorpion');
                 });
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
-                const inputCrew = await screen.findByLabelText(/crew/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
+                const inputCrew = screen.getByLabelText(/crew/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Not There');
                 });
@@ -3248,9 +3241,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Not There');
                         });
@@ -3313,6 +3306,7 @@ describe('when race is a handicap', () => {
                         expect(inputCrew).toHaveValue('Lou Screw');
                     });
                 });
+
 				describe('when entry not created', () => {
 					it('displays failure message and entered values remain on form', async () => {
                         jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -3331,9 +3325,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Not There');
                         });
@@ -3365,9 +3359,9 @@ describe('when race is a handicap', () => {
                 await act(async () => {
                     await user.selectOptions(inputDinghyClass, 'Scorpion');
                 });
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
-                const inputCrew = await screen.findByLabelText(/crew/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
+                const inputCrew = screen.getByLabelText(/crew/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Not There');
                 });
@@ -3395,9 +3389,9 @@ describe('when race is a handicap', () => {
                     await act(async () => {
                         await user.selectOptions(inputDinghyClass, 'Scorpion');
                     });
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -3444,9 +3438,9 @@ describe('when race is a handicap', () => {
                     await act(async () => {
                         await user.selectOptions(inputDinghyClass, 'Scorpion');
                     });
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -3498,9 +3492,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Not There');
                         });
@@ -3537,9 +3531,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Not There');
                         });
@@ -3577,9 +3571,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Not There');
                         });
@@ -3611,9 +3605,9 @@ describe('when race is a handicap', () => {
                 await act(async () => {
                     await user.selectOptions(inputDinghyClass, 'Scorpion');
                 });
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
-                const inputCrew = await screen.findByLabelText(/crew/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
+                const inputCrew = screen.getByLabelText(/crew/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Chris Marshall');
                 });
@@ -3644,9 +3638,9 @@ describe('when race is a handicap', () => {
                     await act(async () => {
                         await user.selectOptions(inputDinghyClass, 'Scorpion');
                     });
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Chris Marshall');
                     });
@@ -3681,9 +3675,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Chris Marshall');
                         });
@@ -3721,9 +3715,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Chris Marshall');
                         });
@@ -3761,9 +3755,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Chris Marshall');
                         });
@@ -3805,9 +3799,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Chris Marshall');
                         });
@@ -3839,9 +3833,9 @@ describe('when race is a handicap', () => {
                 await act(async () => {
                     await user.selectOptions(inputDinghyClass, 'Scorpion');
                 });
-                const inputHelm = await screen.findByLabelText(/helm/i);
-                const inputSailNumber = await screen.findByLabelText(/sail/i);
-                const inputCrew = await screen.findByLabelText(/crew/i);
+                const inputHelm = screen.getByLabelText(/helm/i);
+                const inputSailNumber = screen.getByLabelText(/sail/i);
+                const inputCrew = screen.getByLabelText(/crew/i);
                 await act(async () => {
                     await user.type(inputHelm, 'Not There');
                 });
@@ -3872,9 +3866,9 @@ describe('when race is a handicap', () => {
                     await act(async () => {
                         await user.selectOptions(inputDinghyClass, 'Scorpion');
                     });
-                    const inputHelm = await screen.findByLabelText(/helm/i);
-                    const inputSailNumber = await screen.findByLabelText(/sail/i);
-                    const inputCrew = await screen.findByLabelText(/crew/i);
+                    const inputHelm = screen.getByLabelText(/helm/i);
+                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.type(inputHelm, 'Not There');
                     });
@@ -3915,9 +3909,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Not There');
                         });
@@ -3956,9 +3950,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Not There');
                         });
@@ -4002,9 +3996,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Not There');
                         });
@@ -4048,9 +4042,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Not There');
                         });
@@ -4090,9 +4084,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Not There');
                         });
@@ -4136,9 +4130,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Not There');
                         });
@@ -4178,9 +4172,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Not There');
                         });
@@ -4223,9 +4217,9 @@ describe('when race is a handicap', () => {
                         await act(async () => {
                             await user.selectOptions(inputDinghyClass, 'Scorpion');
                         });
-                        const inputHelm = await screen.findByLabelText(/helm/i);
-                        const inputSailNumber = await screen.findByLabelText(/sail/i);
-                        const inputCrew = await screen.findByLabelText(/crew/i);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        const inputCrew = screen.getByLabelText(/crew/i);
                         await act(async () => {
                             await user.type(inputHelm, 'Not There');
                         });
@@ -4260,9 +4254,9 @@ describe('when race is a handicap', () => {
         await act(async () => {
             await user.selectOptions(inputDinghyClass, 'Scorpion');
         });
-        const inputHelm = await screen.findByLabelText(/helm/i);
-        const inputSailNumber = await screen.findByLabelText(/sail/i);
-        const inputCrew = await screen.findByLabelText(/crew/i);
+        const inputHelm = screen.getByLabelText(/helm/i);
+        const inputSailNumber = screen.getByLabelText(/sail/i);
+        const inputCrew = screen.getByLabelText(/crew/i);
         await act(async () => {
             await user.type(inputHelm, 'Chris Marshall');
         });
