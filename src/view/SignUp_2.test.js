@@ -2043,12 +2043,17 @@ describe('when race for dinghy class with crew', () => {
         expect(btnCreate).toBeInTheDocument();
     });
     
-    it('displays failure message on failure and entered values remain on form', async () => {
-
-    });
-    
     it('displays entries for race', async () => {
-
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+        expect(await screen.findByRole('cell', {'name': /Chris Marshall/i})).toBeInTheDocument();
+        expect((await screen.findAllByRole('cell', {'name': /Scorpion/i}))[0]).toBeInTheDocument();
+        expect(await screen.findByRole('cell', {'name': /1234/i})).toBeInTheDocument();
+        expect(await screen.findByRole('cell', {'name': /Lou Screw/i})).toBeInTheDocument();
+        expect(await screen.findByRole('cell', {'name': /Sarah Pascal/i})).toBeInTheDocument();
+        expect((await screen.findAllByRole('cell', {'name': /Scorpion/i}))[1]).toBeInTheDocument();
+        expect(await screen.findByRole('cell', {'name': /6745/i})).toBeInTheDocument();
+        expect(await screen.findByRole('cell', {'name': /Owain Davies/i})).toBeInTheDocument();
     });
 });
 
@@ -4211,10 +4216,6 @@ describe('when race is a handicap', () => {
 
     it('clears form on success', async () => {
 
-    });
-    
-    it('displays failure message on failure and entered values remain on form', async () => {
-        
     });
     
     it('displays entries for race', async () => {
