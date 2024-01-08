@@ -1,4 +1,4 @@
-const nextEntityIndex = 21;
+const nextEntityIndex = 22;
 
 const httpRootURL = 'http://localhost:8081/dinghyracing/api';
 const wsRootURL = 'ws://localhost:8081/dinghyracing';
