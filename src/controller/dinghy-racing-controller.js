@@ -11,6 +11,7 @@ class DinghyRacingController {
         this.createDinghyClass = this.createDinghyClass.bind(this);
         this.createRace = this.createRace.bind(this);
         this.addLap = this.addLap.bind(this);
+        this.postponeRace = this.postponeRace.bind(this);
     }
 
     /**
