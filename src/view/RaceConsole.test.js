@@ -264,7 +264,7 @@ describe('when a error is received', () => {
         const errorMessage = screen.getByText(/Unable to load races/i);
         expect(errorMessage).toBeInTheDocument();
     });
-    it('clears eror message when a successful response is received', async () => {
+    it('clears error message when a successful response is received', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
         jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})})
