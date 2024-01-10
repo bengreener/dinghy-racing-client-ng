@@ -13,24 +13,28 @@ jest.mock('@stomp/stompjs');
 
 describe('when rendered', () => {
     it('displays race name', () => {
+        HTMLDialogElement.prototype.close = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
         expect(screen.getByText(/scorpion a/i)).toBeInTheDocument();
     });    
     it('displays number of laps', () => {
+        HTMLDialogElement.prototype.close = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
         expect(screen.getByLabelText(/laps(?!.)/i)).toHaveValue('5');
     });
     it('displays initial race duration', () => {
+        HTMLDialogElement.prototype.close = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
         expect(screen.getByLabelText(/duration/i)).toHaveValue('00:45:00');
     });
     it('displays remaining race duration', () => {
+        HTMLDialogElement.prototype.close = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         const clock = new Clock();
@@ -40,33 +44,45 @@ describe('when rendered', () => {
         expect(screen.getByLabelText(/remaining/i)).toHaveValue('00:44:30');
     });
     it('displays estimate for number of laps that will be completed', () => {
+        HTMLDialogElement.prototype.close = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
         expect(screen.getByLabelText(/estimate/i)).toHaveValue('5.00');
     });
     it('displays the last lap time for the lead entry', () => {
+        HTMLDialogElement.prototype.close = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
         expect(screen.getByLabelText(/last/i)).toHaveValue('00:00:00');
     });
     it('displays the average lap time for the lead entry', () => {
+        HTMLDialogElement.prototype.close = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
         expect(screen.getByLabelText(/average/i)).toHaveValue('00:00:00');
     });
     it('displays download results button', () => {
+        HTMLDialogElement.prototype.close = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
         expect(screen.getByText(/download results/i)).toBeInTheDocument();
     });
+    it('displays postpone race button', () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
+        expect(screen.getByText(/postpone start/i)).toBeInTheDocument();  
+    })
 });
 
 describe('when race has not yet started', () => {
     it('displays countdown to start of race', () => {
+        HTMLDialogElement.prototype.close = jest.fn();
         const startTime = new Date(Date.now() + 60000);
         const clock = new Clock(startTime);
         jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => -60000);
@@ -83,6 +99,7 @@ describe('when race has not yet started', () => {
 
 describe('when a race has started', () => {
     it('updates the remaining time field to show the time remaining', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -125,6 +142,7 @@ describe('when a race has started', () => {
 });
 
 it('updates values when a new race is selected', async () => {
+    HTMLDialogElement.prototype.close = jest.fn();
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
@@ -151,6 +169,7 @@ it('updates values when a new race is selected', async () => {
 
 describe('when download results button clicked', () => {
     it('calls controller download results function', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -161,6 +180,7 @@ describe('when download results button clicked', () => {
         expect(downloadFunctionSpy).toBeCalledTimes(1);
     });
     it('displays the error message if the request to download is unsuccessful', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -172,4 +192,22 @@ describe('when download results button clicked', () => {
         
         expect(screen.getByText(/oops/i)).toBeInTheDocument();
     })
+});
+
+describe('when postpone race button clicked', () => {
+    it('displays postpone race dialog', async () => {
+        HTMLDialogElement.prototype.showModal = jest.fn();
+        HTMLDialogElement.prototype.close = jest.fn();
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
+        await act(async () => {
+            await user.click(screen.getByRole('button', {'name': /postpone start/i}));
+        });
+        expect(screen.getByRole('dialog', {'hidden': true})).toBeInTheDocument();
+        expect(screen.getByRole('spinbutton', {'name': /delay/i, 'hidden': true})).toBeInTheDocument();
+        expect(screen.getByRole('button', {'name': /cancel/i, 'hidden': true})).toBeInTheDocument();
+        expect(screen.getByRole('button', {'name': 'Postpone', 'hidden': true})).toBeInTheDocument();
+    });
 });

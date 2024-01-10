@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState, useRef, useCallback } from 'rea
 import Clock from '../model/domain-classes/clock';
 import ModelContext from './ModelContext';
 import ControllerContext from './ControllerContext';
+import PostponeRaceForm from './PostponeRaceForm';
+import ModalDialog from './ModalDialog';
 
 function RaceHeaderView({ race }) {
     const model = useContext(ModelContext);
@@ -10,6 +12,7 @@ function RaceHeaderView({ race }) {
     const [elapsedTime, setElapsedTime] = useState(race.clock.getElapsedTime());
     const [message, setMessage] = useState('');
     const previousRace = useRef(); // enables removal of tickHandler from previous race when rendered with new race 
+    const [showPostponeRace, setShowPostponeRace] = useState(false);
 
     const handleEntryUpdate = useCallback(() => {
         model.getRace(race.url).then(result => {
@@ -29,6 +32,10 @@ function RaceHeaderView({ race }) {
             }
         });
     }, [controller, race]);
+
+    const handleRacePostponeClick = useCallback(() => {
+        setShowPostponeRace(true);
+    }, [race]);
 
     useEffect(() => {
         model.getEntriesByRace(race).then(result => {
@@ -53,6 +60,10 @@ function RaceHeaderView({ race }) {
         previousRace.current = race;
     }, [race]);
 
+    const closePostponeRaceFormDialog = useCallback(() => {
+        setShowPostponeRace(false);
+    }, [race]);
+
     race.clock.start();
 
     return (
@@ -70,8 +81,12 @@ function RaceHeaderView({ race }) {
             <output id={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.lastLapTime)}</output>
             <label htmlFor={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Average lap time</label>
             <output id={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.averageLapTime)}</output>
+            <button id="race-postpone-button" onClick={handleRacePostponeClick}>Postpone Start</button>
             <button id="race-result-download-button" onClick={handleRaceResultDownloadClick}>Download Results</button>
             <p id="race-header-message" className={!message ? "hidden" : ""}>{message}</p>
+            <ModalDialog show={showPostponeRace} onClose={() => setShowPostponeRace(false)}>
+                <PostponeRaceForm race={race} onPostpone={controller.postponeRace} closeParentDialog={closePostponeRaceFormDialog} />
+            </ModalDialog>
         </div>
     );
 }
