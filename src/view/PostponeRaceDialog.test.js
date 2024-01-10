@@ -45,7 +45,7 @@ describe('when postpone button clicked', () => {
         HTMLDialogElement.prototype.close = jest.fn();
         const postponeCallback = jest.fn((race, duration) => {});
         const user = userEvent.setup();
-        render(<PostponeRaceDialog race={raceScorpionA} onPostpone={postponeCallback} />);
+        render(<PostponeRaceDialog race={raceScorpionA} onPostpone={postponeCallback} onClose={jest.fn()} />);
         const postponeButtton = screen.getByRole('button', {'name': /postpone/i, 'hidden': true});
         await user.click(postponeButtton);
         expect(postponeCallback).toBeCalledTimes(1);
@@ -55,7 +55,7 @@ describe('when postpone button clicked', () => {
         HTMLDialogElement.prototype.close = mockClose;
         const postponeCallback = jest.fn((race, duration) => {});
         const user = userEvent.setup();
-        render(<PostponeRaceDialog race={raceScorpionA} onPostpone={postponeCallback} />);
+        render(<PostponeRaceDialog race={raceScorpionA} onPostpone={postponeCallback} onClose={jest.fn()} />);
         const postponeButtton = screen.getByRole('button', {'name': /postpone/i, 'hidden': true});
         await user.click(postponeButtton);
         expect(mockClose).toBeCalledTimes(1);
