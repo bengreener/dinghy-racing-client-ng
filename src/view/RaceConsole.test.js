@@ -6,6 +6,9 @@ import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 
 jest.mock('../model/dinghy-racing-model');
+jest.mock('../controller/dinghy-racing-controller');
+
+HTMLDialogElement.prototype.close = jest.fn();
 
 it('renders', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -49,12 +52,12 @@ it('notifies user if races cannot be retrieved', async () => {
 it('enables a race to be selected', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const controller = new DinghyRacingController(model);
     jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
     jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
 
-    customRender(<RaceConsole />, model);
-    
+    customRender(<RaceConsole />, model, controller);
     const selectRace = await screen.findByLabelText(/Race/i);
     await screen.findAllByRole('option');
     await act(async () => {
@@ -67,11 +70,12 @@ it('enables a race to be selected', async () => {
 it('enables more than one race to be selected', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const controller = new DinghyRacingController(model);
     jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
     jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
 
-    customRender(<RaceConsole />, model);
+    customRender(<RaceConsole />, model, controller);
     const selectRace = await screen.findByLabelText(/Race/i);
     await screen.findAllByRole('option');
     await act(async () => {
