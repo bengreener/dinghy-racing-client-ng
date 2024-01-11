@@ -4,6 +4,7 @@ class DinghyRacingModel {
     httpRootURL;
     wsRootURL;
     stompClient;
+    raceUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
     entryUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
 
     /**
@@ -61,6 +62,7 @@ class DinghyRacingModel {
      * @returns {DinghyRacingModel} 
      */
     constructor(httpRootURL, wsRootURL) {
+        this.handleRaceUpdate = this.handleRaceUpdate.bind(this);
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
         if (!httpRootURL) {
             throw new Error('An HTTP root URL is required when creating an instance of DinghyRacingModel');
@@ -77,9 +79,35 @@ class DinghyRacingModel {
             console.error(frame);
         };
         this.stompClient.onConnect = (frame) => {
+            this.stompClient.subscribe('/topic/updateRace', this.handleRaceUpdate);
             this.stompClient.subscribe('/topic/updateEntry', this.handleEntryUpdate);
         };
         this.stompClient.activate();
+    }
+
+    /**
+     * Register a callback for when a race idenified by key is updated
+     * @param {*} key
+     * @param {*} callback
+     */
+    registerRaceUpdateCallback(key, callback) {
+        // console.log(`DinghyRacingModel.registerRaceUpdateCallback`);
+        if (this.raceUpdateCallbacks.has(key)) {
+            this.raceUpdateCallbacks.get(key).push(callback);
+        }
+        else {
+            this.raceUpdateCallbacks.set(key, [callback]);
+        }
+    }
+
+    handleRaceUpdate(message) {
+        // console.log(`DinghyRacingModel.handleRaceUpdate`);
+        // console.log(message);
+        // console.log(this.raceUpdateCallbacks);
+        // console.log(this.raceUpdateCallbacks.has(message.body));
+        if (this.raceUpdateCallbacks.has(message.body)) {
+            this.raceUpdateCallbacks.get(message.body).forEach(cb => cb());
+        }
     }
 
     /**
@@ -97,6 +125,8 @@ class DinghyRacingModel {
     }
 
     handleEntryUpdate(message) {
+        // console.log(`DinghyRacingModel.handleEntryUpdate`);
+        // console.log(message);
         if (this.entryUpdateCallbacks.has(message.body)) {
             this.entryUpdateCallbacks.get(message.body).forEach(cb => cb());
         }

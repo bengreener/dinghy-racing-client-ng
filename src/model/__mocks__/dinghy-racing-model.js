@@ -4,6 +4,7 @@ class DinghyRacingModel {
     httpRootURL;
     wsRootURL;
     stompClient;
+    raceUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
     entryUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
 
     /**
@@ -54,6 +55,7 @@ class DinghyRacingModel {
     }
 
     constructor(httpRootURL, wsRootURL) {
+        this.handleRaceUpdate = this.handleRaceUpdate.bind(this);
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
         if (!httpRootURL) {
             throw new Error('An HTTP root URL is required when creating an instance of DinghyRacingModel');
@@ -63,6 +65,12 @@ class DinghyRacingModel {
         }
         this.httpRootURL = httpRootURL;
         this.wsRootURL = wsRootURL;
+    }
+
+    registerRaceUpdateCallback(key, callback) {
+    }
+
+    handleRaceUpdate(message) {
     }
 
     registerEntryUpdateCallback(key, callback) {

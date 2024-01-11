@@ -1796,6 +1796,19 @@ describe('when a websocket message callback has been set for entry update', () =
     });
 });
 
+describe('when a websocket message callback has been set for race update', () => {
+    it('calls the callback', done => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback);
+        // create delay to give time for stomp mock to trigger callback
+        setTimeout(() => {
+            expect(callback).toBeCalled();
+            done();
+        }, 1);
+    });
+});
+
 // Can this test can be affected by BST, or other time zones (yes, if timezone changes test data (races) will need to be adjusted to reflect the change in the timezone (currently set up for British Summer Time))
 it('returns a collection of races that start between the specified times', async () => {
     fetch.mockImplementation((resource) => {
