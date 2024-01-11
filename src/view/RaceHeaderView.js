@@ -33,9 +33,9 @@ function RaceHeaderView({ race }) {
         });
     }, [controller, race]);
 
-    const handleRacePostponeClick = useCallback(() => {
+    function handleRacePostponeClick() {
         setShowPostponeRace(true);
-    }, [race]);
+    };
 
     useEffect(() => {
         model.getEntriesByRace(race).then(result => {
@@ -60,9 +60,9 @@ function RaceHeaderView({ race }) {
         previousRace.current = race;
     }, [race]);
 
-    const closePostponeRaceFormDialog = useCallback(() => {
+    function closePostponeRaceFormDialog() {
         setShowPostponeRace(false);
-    }, [race]);
+    };
 
     race.clock.start();
 
