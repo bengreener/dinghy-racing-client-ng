@@ -70,10 +70,16 @@ class DinghyRacingModel {
     registerRaceUpdateCallback(key, callback) {
     }
 
+    unregisterRaceUpdateCallback(key, callback) {
+    }
+
     handleRaceUpdate(message) {
     }
 
     registerEntryUpdateCallback(key, callback) {
+    }
+
+    unregisterEntryUpdateCallback(key, callback) {
     }
 
     handleEntryUpdate(message) {
