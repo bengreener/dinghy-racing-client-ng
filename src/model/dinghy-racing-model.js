@@ -99,6 +99,17 @@ class DinghyRacingModel {
         }
     }
 
+    /**
+     * Unregister a callback for when a race idenified by key is updated
+     * @param {*} key
+     * @param {Function} callback
+     */
+    unregisterRaceUpdateCallback(key, callback) {
+        if (this.raceUpdateCallbacks.has(key)) {
+            this.raceUpdateCallbacks.get(key).delete(callback);
+        }
+    }
+
     handleRaceUpdate(message) {
         if (this.raceUpdateCallbacks.has(message.body)) {
             this.raceUpdateCallbacks.get(message.body).forEach(cb => cb());
@@ -116,6 +127,17 @@ class DinghyRacingModel {
         }
         else {
             this.entryUpdateCallbacks.set(key, new Set([callback]));
+        }
+    }
+
+    /**
+     * Unregister a callback for when an entry idenified by key is updated
+     * @param {*} key
+     * @param {Function} callback
+     */
+    unregisterEntryUpdateCallback(key, callback) {
+        if (this.entryUpdateCallbacks.has(key)) {
+            this.entryUpdateCallbacks.get(key).delete(callback);
         }
     }
 
