@@ -1807,6 +1807,21 @@ describe('when a websocket message callback has been set for race update', () =>
             done();
         }, 1);
     });
+    it('does not set another reference to the same callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback);
+        dinghyRacingModel.registerRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback);
+        expect(dinghyRacingModel.raceUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/races/4')).toHaveLength(1);
+    });
+    it('sets a functionally equivalent but different callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback1 = jest.fn();
+        const callback2 = jest.fn();
+        dinghyRacingModel.registerRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback1);
+        dinghyRacingModel.registerRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback2);
+        expect(dinghyRacingModel.raceUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/races/4')).toHaveLength(2);
+    });
 });
 
 // Can this test can be affected by BST, or other time zones (yes, if timezone changes test data (races) will need to be adjusted to reflect the change in the timezone (currently set up for British Summer Time))

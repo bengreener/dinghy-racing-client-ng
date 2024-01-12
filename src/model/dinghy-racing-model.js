@@ -91,9 +91,10 @@ class DinghyRacingModel {
      * @param {*} callback
      */
     registerRaceUpdateCallback(key, callback) {
-        // console.log(`DinghyRacingModel.registerRaceUpdateCallback`);
         if (this.raceUpdateCallbacks.has(key)) {
-            this.raceUpdateCallbacks.get(key).push(callback);
+            if (!this.raceUpdateCallbacks.get(key).includes(callback)) {
+                this.raceUpdateCallbacks.get(key).push(callback);
+            }
         }
         else {
             this.raceUpdateCallbacks.set(key, [callback]);
@@ -101,10 +102,6 @@ class DinghyRacingModel {
     }
 
     handleRaceUpdate(message) {
-        // console.log(`DinghyRacingModel.handleRaceUpdate`);
-        // console.log(message);
-        // console.log(this.raceUpdateCallbacks);
-        // console.log(this.raceUpdateCallbacks.has(message.body));
         if (this.raceUpdateCallbacks.has(message.body)) {
             this.raceUpdateCallbacks.get(message.body).forEach(cb => cb());
         }
