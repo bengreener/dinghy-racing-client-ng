@@ -88,16 +88,14 @@ class DinghyRacingModel {
     /**
      * Register a callback for when a race idenified by key is updated
      * @param {*} key
-     * @param {*} callback
+     * @param {Function} callback
      */
     registerRaceUpdateCallback(key, callback) {
         if (this.raceUpdateCallbacks.has(key)) {
-            if (!this.raceUpdateCallbacks.get(key).includes(callback)) {
-                this.raceUpdateCallbacks.get(key).push(callback);
-            }
+            this.raceUpdateCallbacks.get(key).add(callback);
         }
         else {
-            this.raceUpdateCallbacks.set(key, [callback]);
+            this.raceUpdateCallbacks.set(key, new Set([callback]));
         }
     }
 
@@ -110,22 +108,18 @@ class DinghyRacingModel {
     /**
      * Register a callback for when an entry idenified by key is updated 
      * @param {*} key 
-     * @param {*} callback 
+     * @param {Function} callback 
      */
     registerEntryUpdateCallback(key, callback) {
         if (this.entryUpdateCallbacks.has(key)) {
-            if (!this.entryUpdateCallbacks.get(key).includes(callback)) {
-                this.entryUpdateCallbacks.get(key).push(callback);
-            };
+            this.entryUpdateCallbacks.get(key).add(callback);
         }
         else {
-            this.entryUpdateCallbacks.set(key, [callback]);
+            this.entryUpdateCallbacks.set(key, new Set([callback]));
         }
     }
 
     handleEntryUpdate(message) {
-        // console.log(`DinghyRacingModel.handleEntryUpdate`);
-        // console.log(message);
         if (this.entryUpdateCallbacks.has(message.body)) {
             this.entryUpdateCallbacks.get(message.body).forEach(cb => cb());
         }

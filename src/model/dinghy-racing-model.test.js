@@ -1799,7 +1799,7 @@ describe('when a websocket message callback has been set for entry update', () =
         const callback = jest.fn();
         dinghyRacingModel.registerEntryUpdateCallback('http://localhost:8081/dinghyracing/api/entries/10', callback);
         dinghyRacingModel.registerEntryUpdateCallback('http://localhost:8081/dinghyracing/api/entries/10', callback);
-        expect(dinghyRacingModel.entryUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/entries/10')).toHaveLength(1);
+        expect(dinghyRacingModel.entryUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/entries/10').size).toBe(1);
     });
     it('sets a functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -1807,7 +1807,7 @@ describe('when a websocket message callback has been set for entry update', () =
         const callback2 = jest.fn();
         dinghyRacingModel.registerEntryUpdateCallback('http://localhost:8081/dinghyracing/api/entries/10', callback1);
         dinghyRacingModel.registerEntryUpdateCallback('http://localhost:8081/dinghyracing/api/entries/10', callback2);
-        expect(dinghyRacingModel.entryUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/entries/10')).toHaveLength(2);
+        expect(dinghyRacingModel.entryUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/entries/10').size).toBe(2);
     });
 });
 
@@ -1827,7 +1827,7 @@ describe('when a websocket message callback has been set for race update', () =>
         const callback = jest.fn();
         dinghyRacingModel.registerRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback);
         dinghyRacingModel.registerRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback);
-        expect(dinghyRacingModel.raceUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/races/4')).toHaveLength(1);
+        expect(dinghyRacingModel.raceUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/races/4').size).toBe(1);
     });
     it('sets a functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -1835,7 +1835,7 @@ describe('when a websocket message callback has been set for race update', () =>
         const callback2 = jest.fn();
         dinghyRacingModel.registerRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback1);
         dinghyRacingModel.registerRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback2);
-        expect(dinghyRacingModel.raceUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/races/4')).toHaveLength(2);
+        expect(dinghyRacingModel.raceUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/races/4').size).toBe(2);
     });
 });
 
