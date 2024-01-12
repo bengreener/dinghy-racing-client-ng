@@ -114,7 +114,9 @@ class DinghyRacingModel {
      */
     registerEntryUpdateCallback(key, callback) {
         if (this.entryUpdateCallbacks.has(key)) {
-            this.entryUpdateCallbacks.get(key).push(callback);
+            if (!this.entryUpdateCallbacks.get(key).includes(callback)) {
+                this.entryUpdateCallbacks.get(key).push(callback);
+            };
         }
         else {
             this.entryUpdateCallbacks.set(key, [callback]);
