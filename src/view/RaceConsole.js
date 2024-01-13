@@ -36,9 +36,8 @@ function RaceConsole() {
                     options.push(<option key={race.name + race.plannedStartTime.toISOString()}>{race.name}</option>);
                     optionsRaceNames.push(race.name);
                 });
-                const newSelection = selectedRaces.filter(selectedRaceName => optionsRaceNames.includes(selectedRaceName)); // update selected races to align with available options (remove any no longer available)
                 setRaceMap(map);
-                setSelectedRaces(newSelection);
+                setSelectedRaces(s => s.filter(selectedRaceName => optionsRaceNames.includes(selectedRaceName))); // remove any previously selected races that are no longer available from race selectedRaces  
                 setRaceOptions(options);
             }
         });
