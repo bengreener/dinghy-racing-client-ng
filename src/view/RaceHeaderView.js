@@ -81,7 +81,7 @@ function RaceHeaderView({ race }) {
             <output id={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.lastLapTime)}</output>
             <label htmlFor={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Average lap time</label>
             <output id={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.averageLapTime)}</output>
-            <button id="race-postpone-button" onClick={handleRacePostponeClick}>Postpone Start</button>
+            {race.clock.getElapsedTime() < 0 ? <button id="race-postpone-button" onClick={handleRacePostponeClick}>Postpone Start</button> : null}
             <button id="race-result-download-button" onClick={handleRaceResultDownloadClick}>Download Results</button>
             <p id="race-header-message" className={!message ? "hidden" : ""}>{message}</p>
             <ModalDialog show={showPostponeRace} onClose={() => setShowPostponeRace(false)}>

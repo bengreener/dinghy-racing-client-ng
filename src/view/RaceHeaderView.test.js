@@ -7,7 +7,6 @@ import DinghyRacingController from '../controller/dinghy-racing-controller';
 import { httpRootURL, wsRootURL, raceScorpionA, raceGraduateA, entriesScorpionA, entriesGraduateA } from '../model/__mocks__/test-data';
 import Clock from '../model/domain-classes/clock';
 
-// May be a good idea to mock out Clock? Would still need to test responses to tick events?
 jest.mock('../model/dinghy-racing-model');
 jest.mock('@stomp/stompjs');
 
@@ -73,10 +72,11 @@ describe('when rendered', () => {
     });
     it('displays postpone race button', () => {
         HTMLDialogElement.prototype.close = jest.fn();
+        // const raceScorpionA_copy = {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))};
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
-        expect(screen.getByText(/postpone start/i)).toBeInTheDocument();  
+        customRender(<RaceHeaderView race={{...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))}} />, model, controller);
+        expect(screen.getByRole('button', {name: /postpone start/i})).toBeInTheDocument();
     })
 });
 
@@ -138,6 +138,13 @@ describe('when a race has started', () => {
         //     expect(clockSpy).toHav
         // })
         // screen.debug();
+    });
+    it('no longer shows option to postpone race', () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(), 'clock': new Clock(new Date())} } />, model, controller);
+        expect(screen.queryByText(/postpone start/i)).not.toBeInTheDocument();
     });
 });
 
@@ -201,7 +208,7 @@ describe('when postpone race button clicked', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))} } />, model, controller);
         await act(async () => {
             await user.click(screen.getByRole('button', {'name': /postpone start/i}));
         });
