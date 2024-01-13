@@ -25,7 +25,7 @@ export class Client {
     connectHeaders = null;
     _disconnectHeaders = null;
 
-    _stompHandler = null; // dummy using a Map with destination/ topic will be key. Callcack will be added to array for that key
+    _stompHandler = null; // dummy using a Map with destination/ topic will be key. Callback will be added to array for that key
     _interval = null;
 
   /**
@@ -119,12 +119,21 @@ export class Client {
     this._connect();
   }
 
-  // fake responses via WebSocket via timed loop to call 
+  // fake responses via WebSocket via timed loop to call
+  // if interest registered for each topic trigger each callback
   _connect() {
     this.onConnect();
     this._interval = setInterval(() => {
         if (this._stompHandler) {
-            this._stompHandler.forEach(value => value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/entries/10'})));
+            // this._stompHandler.forEach(value => value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/entries/10'})));
+            this._stompHandler.forEach((value, key) => {
+              if (key === '/topic/updateRace') {
+                value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/races/4'}));
+              }
+              if (key === '/topic/updateEntry') {
+                value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/entries/10'}));
+              }
+            });
         }
     }, 1);
   }

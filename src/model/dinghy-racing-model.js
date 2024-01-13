@@ -4,6 +4,7 @@ class DinghyRacingModel {
     httpRootURL;
     wsRootURL;
     stompClient;
+    raceUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
     entryUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
 
     /**
@@ -61,6 +62,7 @@ class DinghyRacingModel {
      * @returns {DinghyRacingModel} 
      */
     constructor(httpRootURL, wsRootURL) {
+        this.handleRaceUpdate = this.handleRaceUpdate.bind(this);
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
         if (!httpRootURL) {
             throw new Error('An HTTP root URL is required when creating an instance of DinghyRacingModel');
@@ -77,22 +79,65 @@ class DinghyRacingModel {
             console.error(frame);
         };
         this.stompClient.onConnect = (frame) => {
+            this.stompClient.subscribe('/topic/updateRace', this.handleRaceUpdate);
             this.stompClient.subscribe('/topic/updateEntry', this.handleEntryUpdate);
         };
         this.stompClient.activate();
     }
 
     /**
+     * Register a callback for when a race idenified by key is updated
+     * @param {*} key
+     * @param {Function} callback
+     */
+    registerRaceUpdateCallback(key, callback) {
+        if (this.raceUpdateCallbacks.has(key)) {
+            this.raceUpdateCallbacks.get(key).add(callback);
+        }
+        else {
+            this.raceUpdateCallbacks.set(key, new Set([callback]));
+        }
+    }
+
+    /**
+     * Unregister a callback for when a race idenified by key is updated
+     * @param {*} key
+     * @param {Function} callback
+     */
+    unregisterRaceUpdateCallback(key, callback) {
+        if (this.raceUpdateCallbacks.has(key)) {
+            this.raceUpdateCallbacks.get(key).delete(callback);
+        }
+    }
+
+    handleRaceUpdate(message) {
+        if (this.raceUpdateCallbacks.has(message.body)) {
+            this.raceUpdateCallbacks.get(message.body).forEach(cb => cb());
+        }
+    }
+
+    /**
      * Register a callback for when an entry idenified by key is updated 
      * @param {*} key 
-     * @param {*} callback 
+     * @param {Function} callback 
      */
     registerEntryUpdateCallback(key, callback) {
         if (this.entryUpdateCallbacks.has(key)) {
-            this.entryUpdateCallbacks.get(key).push(callback);
+            this.entryUpdateCallbacks.get(key).add(callback);
         }
         else {
-            this.entryUpdateCallbacks.set(key, [callback]);
+            this.entryUpdateCallbacks.set(key, new Set([callback]));
+        }
+    }
+
+    /**
+     * Unregister a callback for when an entry idenified by key is updated
+     * @param {*} key
+     * @param {Function} callback
+     */
+    unregisterEntryUpdateCallback(key, callback) {
+        if (this.entryUpdateCallbacks.has(key)) {
+            this.entryUpdateCallbacks.get(key).delete(callback);
         }
     }
 

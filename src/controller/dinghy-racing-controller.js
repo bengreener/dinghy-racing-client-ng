@@ -11,6 +11,7 @@ class DinghyRacingController {
         this.createDinghyClass = this.createDinghyClass.bind(this);
         this.createRace = this.createRace.bind(this);
         this.addLap = this.addLap.bind(this);
+        this.postponeRace = this.postponeRace.bind(this);
     }
 
     /**
@@ -155,7 +156,7 @@ class DinghyRacingController {
 
     /**
      * Start a race
-     * @param {Race} Race to start
+     * @param {Race} race to start
      * @return {Promise<Result>}
      */
     startRace(race) {
@@ -168,7 +169,7 @@ class DinghyRacingController {
 
     /**
      * Download a file containing the results for race
-     * @param {Race} Race to donwload results for
+     * @param {Race} race to donwload results for
      * @return {Promise<Result>}
      */
     async downloadRaceResults(race) {
@@ -183,6 +184,29 @@ class DinghyRacingController {
         else {
             return Promise.resolve(result);
         }
+    }
+
+    /**
+     * Postponse a race
+     * @param {race} race to postpone
+     * @param {Number} duration, in milliseconds, by which to delay the race
+     */
+    async postponeRace(race, duration) {
+        // check valid race (a URL is sufficient, otherwise a name and start time is required)
+        if (!race.url && (!race.name || race.name === '' || !race.plannedStartTime)) {
+            return Promise.resolve({'success': false, 'message': 'Please provide details of the race.'});
+        }
+        if (!race.url) {
+            const result = await this.model.getRaceByNameAndPlannedStartTime(race.name, race.plannedStartTime);
+            if (result.success) {
+                race.url = result.domainObject.url;
+            }
+            else {
+                return Promise.resolve(result);
+            }
+        }
+        const newTime = new Date(race.plannedStartTime.valueOf() + duration);
+        return this.model.update(race.url, {'plannedStartTime': newTime});
     }
 }
 
