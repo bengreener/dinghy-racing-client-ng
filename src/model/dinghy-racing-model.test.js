@@ -502,271 +502,238 @@ it('returns a collection of races that start at or after the specified time', as
 });
 
 describe('when signing up to a race', () => {
-    // these tests can return a false positive if the logic makes a call to fetch but passes invalid argument as fetch mock does not check input
-    it('if helm exists and URL provided and dinghy exist and URL provided and crew not provided then creates race entry', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: true,
-                status: 200, 
-                json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
-            });
+    it('if race exists and URL provided and helm exists and URL provided and dinghy exist and URL provided and crew exists and URL provided then creates race entry', async () => {
+        fetch.mockImplementationOnce((resource, options) => {
+            const raceMatch = {'race': raceScorpionA.url, 'helm': competitorChrisMarshall.url, 'dinghy': dinghy1234.url, 'crew': competitorLouScrew.url};
+            if ((resource === 'http://localhost:8081/dinghyracing/api/entries') && (options.body === JSON.stringify(raceMatch))) {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                });
+            };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        // spy on related model functions to head off calls to fetch and return required results
-        const getCompetitorByNameSpy = jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall}));
-        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        const getDinghyBySailNumberAndDinghyClassSpy = jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
-        const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234);
-        const result = await promise;
-        expect(getCompetitorByNameSpy).not.toBeCalled();
-        expect(getDinghyClassByNameSpy).not.toBeCalled();
-        expect(getDinghyBySailNumberAndDinghyClassSpy).not.toBeCalled();
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
-    });
-    it('if helm exists but URL not provided and dinghy exists and URL provided and crew not provided then creates race entry', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: true,
-                status: 200, 
-                json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        // spy on related model functions to head off calls to fetch and return required results
-        const getCompetitorByNameSpy = jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall}));
-        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        const getDinghyBySailNumberAndDinghyClassSpy = jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
-        const competitorChrisMarshall = {'name':'Chris Marshall'};
-        const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234);
-        const result = await promise;
-        expect(getCompetitorByNameSpy).toBeCalled();
-        expect(getDinghyClassByNameSpy).not.toBeCalled();
-        expect(getDinghyBySailNumberAndDinghyClassSpy).not.toBeCalled();
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
-    });
-    it('if helm exists and URL provided and dinghy exists but dinghy URL not provided but dinghy class url provided and crew not provided then creates race entry', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: true,
-                status: 200, 
-                json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        // spy on related model functions to head off calls to fetch and return required results
-        const getCompetitorByNameSpy = jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall}));
-        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        const getDinghyBySailNumberAndDinghyClassSpy = jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
-        const dinghy1234 = {'sailNumber':'1234','dinghyClass':{'name':'Scorpion','url':'http://localhost:8081/dinghyracing/api/dinghyclasses/1'}};
-        const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234);
-        const result = await promise;
-        expect(getCompetitorByNameSpy).not.toBeCalled();
-        expect(getDinghyClassByNameSpy).not.toBeCalled();
-        expect(getDinghyBySailNumberAndDinghyClassSpy).toBeCalled();
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
-    });
-    it('if helm exists and URL provided and dinghy exists but dinghy URL not provided and dinghy class url not provided and crew not provided then creates race entry', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: true,
-                status: 200, 
-                json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        // spy on related model functions to head off calls to fetch and return required results
-        const getCompetitorByNameSpy = jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall}));
-        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        const getDinghyBySailNumberAndDinghyClassSpy = jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
-        const dinghy1234 = {'sailNumber':'1234','dinghyClass':{'name':'Scorpion'}};
-        const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234);
-        const result = await promise;
-        expect(getCompetitorByNameSpy).not.toBeCalled();
-        expect(getDinghyClassByNameSpy).toBeCalled();
-        expect(getDinghyBySailNumberAndDinghyClassSpy).toBeCalled();
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
-    });
-    it('if helm exists but URL not provided and dinghy exists but URL not provided but dinghy class url provided and crew not provided then creates race entry', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: true,
-                status: 200, 
-                json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        // spy on related model functions to head off calls to fetch and return required results
-        const getCompetitorByNameSpy = jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall}));
-        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        const getDinghyBySailNumberAndDinghyClassSpy = jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
-        const competitorChrisMarshall = {'name':'Chris Marshall'};
-        const dinghy1234 = {'sailNumber':'1234','dinghyClass':{'name':'Scorpion','url':'http://localhost:8081/dinghyracing/api/dinghyclasses/1'}};
-        const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234);
-        const result = await promise;
-        expect(getCompetitorByNameSpy).toBeCalled();
-        expect(getDinghyClassByNameSpy).not.toBeCalled();
-        expect(getDinghyBySailNumberAndDinghyClassSpy).toBeCalled();
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
-    });
-    it('if helm exists but URL not provided and dinghy exists but URL not provided and dinghy class url not provided then and crew not provided creates race entry', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: true,
-                status: 200, 
-                json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        // spy on related model functions to head off calls to fetch and return required results
-        const getCompetitorByNameSpy = jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall}));
-        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        const getDinghyBySailNumberAndDinghyClassSpy = jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
-        const competitorChrisMarshall = {'name':'Chris Marshall'};
-        const dinghy1234 = {'sailNumber':'1234','dinghyClass':{'name':'Scorpion'}};
-        const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234);
-        const result = await promise;
-        expect(getCompetitorByNameSpy).toBeCalled();
-        expect(getDinghyClassByNameSpy).toBeCalled();
-        expect(getDinghyBySailNumberAndDinghyClassSpy).toBeCalled();
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
-    });
-    it('if helm does not exist does not create entry and provides message indicating cause of failure', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: true,
-                status: 200, 
-                json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        // spy on related model functions to head off calls to fetch and return required results
-        const getCompetitorByNameSpy = jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation(() => Promise.resolve({'success': false, 'message': 'HTTP Error: 404 Message: Resource not found'}));
-        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        const getDinghyBySailNumberAndDinghyClassSpy = jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
-        const competitorChrisMarshall = {'name':'Chris Marshall'};
-        const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234);
-        const result = await promise;
-        expect(getCompetitorByNameSpy).toBeCalled();
-        expect(getDinghyClassByNameSpy).not.toBeCalled();
-        expect(getDinghyBySailNumberAndDinghyClassSpy).not.toBeCalled();
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Resource not found'});
-    });
-    it('if dinghy does not exist does not create entry and provides message indicating cause of failure', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: true,
-                status: 200, 
-                json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        // spy on related model functions to head off calls to fetch and return required results
-        const getCompetitorByNameSpy = jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall}));
-        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        const getDinghyBySailNumberAndDinghyClassSpy = jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': false, 'message': 'HTTP Error: 404 Message: Resource not found'}));
-        const dinghy1234 = {'sailNumber':'1234','dinghyClass':{'name':'Scorpion'}};
-        const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234);
-        const result = await promise;
-        expect(getCompetitorByNameSpy).not.toBeCalled();
-        expect(getDinghyClassByNameSpy).toBeCalled();
-        expect(getDinghyBySailNumberAndDinghyClassSpy).toBeCalled();
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Resource not found'});
-    });
-    it('if neither helm or dinghy exist does not create entry and provides message indicating cause of failure', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: true,
-                status: 200, 
-                json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        // spy on related model functions to head off calls to fetch and return required results
-        const getCompetitorByNameSpy = jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation(() => Promise.resolve({'success': false, 'message': 'HTTP Error: 404 Message: Resource not found'}));
-        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        const getDinghyBySailNumberAndDinghyClassSpy = jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': false, 'message': 'HTTP Error: 404 Message: Resource not found'}));
-        const competitorChrisMarshall = {'name':'Chris Marshall'};
-        const dinghy1234 = {'sailNumber':'1234','dinghyClass':{'name':'Scorpion'}};
-        const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234);
-        const result = await promise;
-        expect(getCompetitorByNameSpy).toBeCalled();
-        expect(getDinghyClassByNameSpy).toBeCalled();
-        expect(getDinghyBySailNumberAndDinghyClassSpy).toBeCalled();
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Resource not found\nHTTP Error: 404 Message: Resource not found'});
-    });
-    it('if helm exists and URL provided and dinghy exist and URL provided and crew exists and URL provided then creates race entry', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: true,
-                status: 200, 
-                json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        // spy on related model functions to head off calls to fetch and return required results
-        const getCompetitorByNameSpy = jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': competitorLouScrew})).mockImplementationOnce(() => Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall}));
-        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        const getDinghyBySailNumberAndDinghyClassSpy = jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
         const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
         const result = await promise;
-        expect(getCompetitorByNameSpy).not.toBeCalled();
-        expect(getDinghyClassByNameSpy).not.toBeCalled();
-        expect(getDinghyBySailNumberAndDinghyClassSpy).not.toBeCalled();
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});
     });
-    it('if helm exists and URL provided and dinghy exist and URL provided and crew exists and URL not provided then creates race entry', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: true,
-                status: 200, 
-                json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
-            });
+    it('if race exists and URL provided helm exists and URL provided and dinghy exist and URL provided and crew not provided then creates race entry', async () => {
+        fetch.mockImplementationOnce((resource, options) => {
+            const raceMatch = {'race': raceScorpionA.url, 'helm': competitorChrisMarshall.url, 'dinghy': dinghy1234.url};
+            if ((resource === 'http://localhost:8081/dinghyracing/api/entries') && (options.body === JSON.stringify(raceMatch))) {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                });
+            };
         });
-        const competitorLouScrewNoURL = {...competitorLouScrew, 'url': ''};
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        // spy on related model functions to head off calls to fetch and return required results
-        const getCompetitorByNameSpy = jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': competitorLouScrew}));
-        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        const getDinghyBySailNumberAndDinghyClassSpy = jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
-        const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrewNoURL);
+        const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234);
         const result = await promise;
-        expect(getCompetitorByNameSpy).toBeCalledTimes(1);
-        expect(getDinghyClassByNameSpy).not.toBeCalled();
-        expect(getDinghyBySailNumberAndDinghyClassSpy).not.toBeCalled();
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});
     });
-    it('if helm exists and URL provided and dinghy exist and URL provided and crew does not exist does not create entry and provides message indicating cause of failure', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: true,
-                status: 200, 
-                json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
-            });
+    it('if race exists and name and planned start time provided and helm exists and name provided and dinghy exists and sail number and class provided and crew exists and name provided then creates race entry', async () => {
+        const race = {...raceScorpionA, 'url': ''};
+        const helm = {...competitorChrisMarshall, 'url': null};
+        const dinghy = {...dinghy1234, 'url': ''};
+        const crew = {...competitorLouScrew, 'url': null};
+        fetch.mockImplementationOnce((resource, options) => {
+            const raceMatch = {'race': raceScorpionA.url, 'helm': competitorChrisMarshall.url, 'dinghy': dinghy1234.url, 'crew': competitorLouScrew.url};
+            if ((resource === 'http://localhost:8081/dinghyracing/api/entries') && (options.body === JSON.stringify(raceMatch))) {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                });
+            };
         });
-        const competitorLouScrewNoURL = {...competitorLouScrew, 'url': ''};
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        // spy on related model functions to head off calls to fetch and return required results
-        const getCompetitorByNameSpy = jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation(() => Promise.resolve({'success': false, 'message': 'HTTP Error: 404 Message: Resource not found'}));
-        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        const getDinghyBySailNumberAndDinghyClassSpy = jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
-        const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrewNoURL);
+        jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': raceScorpionA}));
+        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+            if (name === 'Chris Marshall') {
+                return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
+            }
+            else if (name === 'Lou Screw') {
+                return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
+            }
+            else {
+                return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
+        jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
+        const promise = dinghyRacingModel.createEntry(race, helm, dinghy, crew);
         const result = await promise;
-        expect(getCompetitorByNameSpy).toBeCalledTimes(1);
-        expect(getDinghyClassByNameSpy).not.toBeCalled();
-        expect(getDinghyBySailNumberAndDinghyClassSpy).not.toBeCalled();
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Resource not found'});
+        expect(result).toEqual({'success': true});
+    });
+    it('if race exists and name and planned start time provided and helm exists and name provided and dinghy exists and sail number and class provided and crew not provided then creates race entry', async () => {
+        const race = {...raceScorpionA, 'url': null};
+        const helm = {...competitorChrisMarshall, 'url': ''};
+        const dinghy = {...dinghy1234, 'url': null};
+        fetch.mockImplementationOnce((resource, options) => {
+            const raceMatch = {'race': raceScorpionA.url, 'helm': competitorChrisMarshall.url, 'dinghy': dinghy1234.url};
+            if ((resource === 'http://localhost:8081/dinghyracing/api/entries') && (options.body === JSON.stringify(raceMatch))) {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                });
+            };
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': raceScorpionA}));
+        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+            if (name === 'Chris Marshall') {
+                return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall})
+            }
+            else {
+                return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
+        jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
+        const promise = dinghyRacingModel.createEntry(race, helm, dinghy);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true});
+    });
+    it('race does not exist helm exists and URL provided dinghy exists and sail number and class provided crew exists and URL provided then does not create entry and provides message indicating cause of failure', async () => {
+        const race = {...raceScorpionA, 'name': 'Race Nope', 'url': null};
+        const helm = {...competitorChrisMarshall, 'url': null};
+        const dinghy = {...dinghy1234, 'url': ''};
+        const crew = {...competitorLouScrew, 'url': null};
+        fetch.mockImplementationOnce((resource, options) => {
+            const raceMatch = {'race': raceScorpionA.url, 'helm': competitorChrisMarshall.url, 'dinghy': dinghy1234.url, 'crew': competitorLouScrew.url};
+            if ((resource === 'http://localhost:8081/dinghyracing/api/entries') && (options.body === JSON.stringify(raceMatch))) {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                });
+            };
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': false, 'message': 'Race not found'}));
+        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+            if (name === 'Chris Marshall') {
+                return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
+            }
+            else if (name === 'Lou Screw') {
+                return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
+            }
+            else {
+                return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
+        jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
+        const promise = dinghyRacingModel.createEntry(race, helm, dinghy, crew);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Race not found'}); 
+    });
+    it('race exists url provided helm does not exist dinghy exists url provided crew exists and name provided', async () => {
+        const race = {...raceScorpionA};
+        const helm = {...competitorChrisMarshall, 'name': 'Lucy Liu', 'url': ''};
+        const dinghy = {...dinghy1234};
+        const crew = {...competitorLouScrew, 'url': ''};
+        fetch.mockImplementationOnce((resource, options) => {
+            const raceMatch = {'race': raceScorpionA.url, 'helm': competitorChrisMarshall.url, 'dinghy': dinghy1234.url, 'crew': competitorLouScrew.url};
+            if ((resource === 'http://localhost:8081/dinghyracing/api/entries') && (options.body === JSON.stringify(raceMatch))) {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                });
+            };
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+            if (name === 'Lucy Liu') {
+                return Promise.resolve({'success': false, 'message': 'Competitor not found'});
+            }
+            else if (name === 'Lou Screw') {
+                return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
+            }
+            else {
+                return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
+        const promise = dinghyRacingModel.createEntry(race, helm, dinghy, crew);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Competitor not found'});
+    });
+    it('race exists and name provided helm exists and name provided dinghy does not exists crew exists and name provided', async () => {
+        const race = {...raceScorpionA, 'url': ''};
+        const helm = {...competitorChrisMarshall, 'url': ''};
+        const dinghy = {...dinghy1234, 'sailNumber': 'xyz', 'url': null};
+        const crew = {...competitorLouScrew, 'url': null};
+        fetch.mockImplementationOnce((resource, options) => {
+            const raceMatch = {'race': raceScorpionA.url, 'helm': competitorChrisMarshall.url, 'dinghy': dinghy1234.url, 'crew': competitorLouScrew.url};
+            if ((resource === 'http://localhost:8081/dinghyracing/api/entries') && (options.body === JSON.stringify(raceMatch))) {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                });
+            };
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': raceScorpionA}));
+        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+            if (name === 'Chris Marshall') {
+                return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
+            }
+            else if (name === 'Lou Screw') {
+                return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
+            }
+            else {
+                return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
+        jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': false, 'message': 'Dinghy does not exist'}));
+        const promise = dinghyRacingModel.createEntry(race, helm, dinghy, crew);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Dinghy does not exist'});
+    });
+    it('race exists url provided helm exists url provided, dinghy exists sail number and class provided crew does not exist', async () => {
+        const race = {...raceScorpionA};
+        const helm = {...competitorChrisMarshall};
+        const dinghy = {...dinghy1234, 'url': ''};
+        const crew = {...competitorLouScrew, 'name': 'Lucy Liu', 'url': null};
+        fetch.mockImplementationOnce((resource, options) => {
+            const raceMatch = {'race': raceScorpionA.url, 'helm': competitorChrisMarshall.url, 'dinghy': dinghy1234.url, 'crew': competitorLouScrew.url};
+            if ((resource === 'http://localhost:8081/dinghyracing/api/entries') && (options.body === JSON.stringify(raceMatch))) {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                });
+            };
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+            if (name === 'Lou Screw') {
+                return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
+            }
+            else {
+                return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
+        const promise = dinghyRacingModel.createEntry(race, helm, dinghy, crew);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Competitor not found: Lucy Liu'});
     });
 });
 

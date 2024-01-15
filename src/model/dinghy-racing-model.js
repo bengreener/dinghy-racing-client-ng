@@ -249,6 +249,13 @@ class DinghyRacingModel {
         // assuming if a URL supplied resource exists in REST service
         let promises = [];
         let results = [];
+        // need race url
+        if (!race.url) {
+            promises.push(this.getRaceByNameAndPlannedStartTime(race.name, race.plannedStartTime));
+        }
+        else {
+            promises.push(Promise.resolve({'success': true, 'domainObject': race}));
+        }
         // need helm url
         if (!helm.url) {
             // lookup helm
@@ -292,11 +299,11 @@ class DinghyRacingModel {
         // if fetch was not required use helm or dinghy passed as parameters
         results = await Promise.all(promises);
         // if successful return success result
-        if (results[0].success && results[1].success && results[2].success) {
+        if (results[0].success && results[1].success && results[2].success && results[3].success) {
             if (crew) {
-                return this.create('entries', {'race': race.url, 'helm': results[0].domainObject.url, 'dinghy': results[1].domainObject.url, 'crew': results[2].domainObject.url});    
+                return this.create('entries', {'race': results[0].domainObject.url, 'helm': results[1].domainObject.url, 'dinghy': results[2].domainObject.url, 'crew': results[3].domainObject.url});
             }
-            return this.create('entries', {'race': race.url, 'helm': results[0].domainObject.url, 'dinghy': results[1].domainObject.url});
+            return this.create('entries', {'race': results[0].domainObject.url, 'helm': results[1].domainObject.url, 'dinghy': results[2].domainObject.url});
         }
         else {
             // combine failure messages and return failure
