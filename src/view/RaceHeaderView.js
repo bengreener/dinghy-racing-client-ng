@@ -73,8 +73,12 @@ function RaceHeaderView({ race }) {
             <output id={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{race.plannedLaps}</output>
             <label htmlFor={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()}>Duration</label>
             <output id={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(race.duration)}</output>
-            <label htmlFor={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>{(elapsedTime < 0) ? 'Countdown' : 'Remaining'}</label>
-            <output id={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>{(elapsedTime < 0) ? Clock.formatDuration(elapsedTime) : Clock.formatDuration(race.duration - elapsedTime)}</output>
+            <label htmlFor={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>{
+                (elapsedTime < 0) ? 'Countdown' : 'Remaining'
+            }</label>
+            <output id={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>{
+                (elapsedTime < 0) ? Clock.formatDuration(-elapsedTime) : Clock.formatDuration(race.duration - elapsedTime)
+            }</output>
             <label htmlFor={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>Laps estimate</label>
             <output id={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{Number(updatedRace.lapForecast).toFixed(2)}</output>
             <label htmlFor={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Last lap time</label>
