@@ -24,8 +24,14 @@ it('displays menu buttons', () => {
   render(<App controller={dinghyRacingController} />);
   const btnCreateDinghyClass = screen.getByRole('button', {name: /create dinghy class\b/i});
   const btnCreateRace = screen.getByRole('button', {name: /create race\b/i});
+  const btnUpcomingRaces = screen.getByRole('button', {name: /upcoming races\b/i});
+  const btnRaceConsole = screen.getByRole('button', {name: /race console\b/i});
+  const btnLogout = screen.getByRole('button', {name: /logout\b/i});
   expect(btnCreateDinghyClass).toBeInTheDocument();
   expect(btnCreateRace).toBeInTheDocument();
+  expect(btnUpcomingRaces).toBeInTheDocument();
+  expect(btnRaceConsole).toBeInTheDocument();
+  expect(btnLogout).toBeInTheDocument();
 });
 
 describe('when create dinghy class button clicked', () => {
@@ -92,5 +98,30 @@ describe('when race console button is clicked', ()  => {
     await act(async () => {
       await user.click(btnRaceConsole);
     });
+  });
+});
+
+it('enables user to logout', async () => {
+  // jsdom does not implement navigation so replace Window.location with a trackable mock for this test
+  const holdOldWindowLocation = {...window.location};
+  Object.defineProperty(window, 'location', {
+    value: new URL(window.location.href),
+    configurable: true,
+  });
+  const user = userEvent.setup();
+  const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+  const dinghyRacingController = new DinghyRacingController(model);
+
+  render(<App model={model} controller={dinghyRacingController} />);
+  const btnLogout = screen.getByRole('button', { 'name': /logout/i});
+  await act(async () => {
+    await user.click(btnLogout);
+  });
+  expect(global.window.location.href).toMatch(/logout/i);
+
+  // revert to old Window.location implmentation
+  Object.defineProperty(window, 'location', {
+    value: {...holdOldWindowLocation},
+    configurable: true,
   });
 });
