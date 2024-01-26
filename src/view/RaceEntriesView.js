@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
 import RaceEntryView from './RaceEntryView';
 import { sortArray } from '../utilities/array-utilities';
@@ -12,9 +12,12 @@ function RaceEntriesView({ races }) {
     const [sortOrder, setSortOrder] = useState('default');
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies an entry has been updated
 
-    const updateEntries = useCallback(() => {
+    // const updateEntries = useCallback(() => {
+    //     setRacesUpdateRequestAt(Date.now());
+    // });
+    function updateEntries() {
         setRacesUpdateRequestAt(Date.now());
-    });
+    };
 
     // get entries
     useEffect(() => {
@@ -22,28 +25,28 @@ function RaceEntriesView({ races }) {
         const entriesMap = new Map();
         // build promises
         const promises = races.map(race => {
-            if (!ignoreFetch && !race || (!race.name && !race.url)) {
+            if (!race || (!race.name && !race.url)) {
                 return Promise.resolve({'success': true, 'domainObject': []});
             }
-            else if (!ignoreFetch) {
-                return model.getEntriesByRace(race);
-            }
+            return model.getEntriesByRace(race);
         });
-        Promise.all(promises).then(results => {
-            results.forEach(result => {
-                if (!ignoreFetch && !result.success) {
-                    setMessage('Unable to load entries\n' + result.message);
-                }
-                else if (!ignoreFetch) {
-                    result.domainObject.forEach(entry => {
-                        entriesMap.set(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name, entry);
-                    });
+        if (!ignoreFetch) {
+            Promise.all(promises).then(results => {
+                results.forEach(result => {
+                    if (!result.success) {
+                        setMessage('Unable to load entries\n' + result.message);
+                    }
+                    else {
+                        result.domainObject.forEach(entry => {
+                            entriesMap.set(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name, entry);
+                        });
+                    }
+                });
+                if (!ignoreFetch) {
+                    setEntriesMap(entriesMap);
                 }
             });
-            if (!ignoreFetch) {
-                setEntriesMap(entriesMap);
-            }
-        });
+        };
 
         return () => {
             ignoreFetch = true;

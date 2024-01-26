@@ -133,8 +133,9 @@ class DinghyRacingController {
     /**
      * Sign up to a race
      * @param {Race} race Race to sign up to
-     * @param {competitor} helm Competitor signing up to helm dinghy
+     * @param {Competitor} helm Competitor signing up to helm dinghy
      * @param {Dinghy} dinghy Dinghy to be sailed in race
+     * @param {Competitor} crew 
      * @returns {Promise<Result>}
      */
     signupToRace(race, helm, dinghy, crew = null) {

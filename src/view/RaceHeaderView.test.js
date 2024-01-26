@@ -81,7 +81,7 @@ describe('when rendered', () => {
 });
 
 describe('when race has not yet started', () => {
-    it('displays countdown to start of race', () => {
+    it('displays countdown to start of race as a positive value', () => {
         HTMLDialogElement.prototype.close = jest.fn();
         const startTime = new Date(Date.now() + 60000);
         const clock = new Clock(startTime);
@@ -93,7 +93,7 @@ describe('when race has not yet started', () => {
         customRender(<RaceHeaderView key={raceScorpionA.name+startTime.toISOString()} race={ {...raceScorpionA, 'plannedStartTime': startTime.toISOString(),'clock': clock} } />, model, controller);
         
         const outputRemaining = screen.getByLabelText(/countdown/i);
-        expect(outputRemaining).toHaveValue('-00:01:00');
+        expect(outputRemaining).toHaveValue('00:01:00');
     });
 });
 
