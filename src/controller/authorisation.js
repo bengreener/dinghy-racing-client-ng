@@ -14,7 +14,7 @@ class Authorisation {
      */
     async getRoles() {
         // check session id
-        const cookieSessionId = getCookieValue('JSESSIONID');;
+        const cookieSessionId = getCookieValue('JSESSIONID');
         let json;
         // new session get roles for logged in principal
         if (cookieSessionId && (this.sessionId !== cookieSessionId)) {
@@ -32,17 +32,17 @@ class Authorisation {
                 this.roles = [];
             }
             finally {
-                return this.roles;
+                return Promise.resolve(this.roles);
             }
         }
         // exisiting session
         else if (cookieSessionId && this.sessionId === cookieSessionId) {
-            return this.roles;
+            return Promise.resolve(this.roles);
         }
         // no session so no principal assigned roles
         else {
             this.roles = [];
-            return this.roles;
+            return Promise.resolve(this.roles);
         }
     }
 }
