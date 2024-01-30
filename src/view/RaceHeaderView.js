@@ -1,15 +1,18 @@
 import React, { useContext, useEffect, useState, useRef, useCallback } from 'react';
 import Clock from '../model/domain-classes/clock';
-import ControllerContext from './ControllerContext';
 import ModelContext from './ModelContext';
+import ControllerContext from './ControllerContext';
+import PostponeRaceForm from './PostponeRaceForm';
+import ModalDialog from './ModalDialog';
 
 function RaceHeaderView({ race }) {
     const model = useContext(ModelContext);
     const controller = useContext(ControllerContext);
     const [updatedRace, setUpdatedRace] = useState(race);
-    const [remainingTime, setRemainingTime] = useState();    
+    const [elapsedTime, setElapsedTime] = useState(race.clock.getElapsedTime());
     const [message, setMessage] = useState('');
     const previousRace = useRef(); // enables removal of tickHandler from previous race when rendered with new race 
+    const [showPostponeRace, setShowPostponeRace] = useState(false);
 
     const handleEntryUpdate = useCallback(() => {
         model.getRace(race.url).then(result => {
@@ -21,6 +24,18 @@ function RaceHeaderView({ race }) {
             }
         });
     }, [model, race]);
+
+    const handleRaceResultDownloadClick = useCallback(() => {
+        controller.downloadRaceResults(race).then(result => {
+            if (!result.success) {
+                setMessage('Unable to download results\n' + result.message);
+            }
+        });
+    }, [controller, race]);
+
+    function handleRacePostponeClick() {
+        setShowPostponeRace(true);
+    };
 
     useEffect(() => {
         model.getEntriesByRace(race).then(result => {
@@ -36,44 +51,46 @@ function RaceHeaderView({ race }) {
     }, [model, race, handleEntryUpdate]);
 
     useEffect(() => {
-        setRemainingTime(race.duration - race.clock.getElapsedTime());
-        // previousRace.current.removeTickHandler is before adding new handler as otherwise if app is run in strict mode extra render will cause previously added handler to be removed
         if (previousRace.current && previousRace.current.clock) {
             previousRace.current.clock.removeTickHandler();
         }
         race.clock.addTickHandler(() => {
-            setRemainingTime(race.duration - race.clock.getElapsedTime());
+            setElapsedTime(race.clock.getElapsedTime());
         });
         previousRace.current = race;
     }, [race]);
 
-    function handleStartRaceClick() {
-        controller.startRace(race);
-        race.clock.start();
-    }
+    function closePostponeRaceFormDialog() {
+        setShowPostponeRace(false);
+    };
 
-    function handleStopRaceClick() {
-        race.clock.stop();
-    }
+    race.clock.start();
 
     return (
         <div>
-        <label>{race.name}</label>
-        <label htmlFor={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>Laps</label>
-        <output id={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{race.plannedLaps}</output>
-        <label htmlFor={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()}>Duration</label>
-        <output id={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(race.duration)}</output>
-        <label htmlFor={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>Remaining</label>
-        <output id={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(remainingTime)}</output>
-        <label htmlFor={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>Laps estimate</label>
-        <output id={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{updatedRace.lapForecast}</output>
-        <label htmlFor={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Last lap time</label>
-        <output id={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.lastLapTime)}</output>
-        <label htmlFor={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Average lap time</label>
-        <output id={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.averageLapTime)}</output>
-        <button id="race-start-button" onClick={handleStartRaceClick}>Start Race</button>
-        <button id="race-stop-button" onClick={handleStopRaceClick}>Stop Race</button>
-        <p id="race-header-message" className={!message ? "hidden" : ""}>{message}</p>
+            <label>{race.name}</label>
+            <label htmlFor={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>Laps</label>
+            <output id={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{race.plannedLaps}</output>
+            <label htmlFor={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()}>Duration</label>
+            <output id={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(race.duration)}</output>
+            <label htmlFor={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>{
+                (elapsedTime < 0) ? 'Countdown' : 'Remaining'
+            }</label>
+            <output id={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>{
+                (elapsedTime < 0) ? Clock.formatDuration(-elapsedTime) : Clock.formatDuration(race.duration - elapsedTime)
+            }</output>
+            <label htmlFor={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>Laps estimate</label>
+            <output id={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{Number(updatedRace.lapForecast).toFixed(2)}</output>
+            <label htmlFor={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Last lap time</label>
+            <output id={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.lastLapTime)}</output>
+            <label htmlFor={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Average lap time</label>
+            <output id={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.averageLapTime)}</output>
+            {race.clock.getElapsedTime() < 0 ? <button id="race-postpone-button" onClick={handleRacePostponeClick}>Postpone Start</button> : null}
+            <button id="race-result-download-button" onClick={handleRaceResultDownloadClick}>Download Results</button>
+            <p id="race-header-message" className={!message ? "hidden" : ""}>{message}</p>
+            <ModalDialog show={showPostponeRace} onClose={() => setShowPostponeRace(false)}>
+                <PostponeRaceForm race={race} onPostpone={controller.postponeRace} closeParentDialog={closePostponeRaceFormDialog} />
+            </ModalDialog>
         </div>
     );
 }

@@ -34,7 +34,18 @@ it('displays the available dinghyClasses and handicap option', async () => {
     
     const options = await screen.findAllByRole('option');
     const optionsAvailable = options.map(element => {return {'text': element.text, 'value': element.value}});
-    expect(optionsAvailable).toEqual([{'text': '', 'value': ''}, {'text': 'Graduate', 'value': 'Graduate'}, {'text': 'Scorpion', 'value': 'Scorpion'}]);
+    expect(optionsAvailable).toEqual([{'text': '', 'value': ''}, {'text': 'Comet', 'value': 'Comet'}, {'text': 'Graduate', 'value': 'Graduate'}, {'text': 'Scorpion', 'value': 'Scorpion'}]);
+})
+
+it('provides a default option of 5 for the number of laps for the race', async () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
+    await act(async () => {
+        customRender(<CreateRace />, model);
+    });
+    
+    const inputLaps = screen.getByLabelText(/laps/i);
+    expect(inputLaps).toHaveValue(5);
 })
 
 it('accepts the name for a race', async () => {
@@ -139,6 +150,7 @@ it('calls the function passed in to onCreate prop', async () => {
 });
 
 it('calls the function passed in to onCreate prop with new race as parameter', async () => {
+    
     const user = userEvent.setup();
     const fnOnCreate = jest.fn((race) => {return Promise.resolve({'success': true})});
     

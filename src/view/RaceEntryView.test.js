@@ -16,7 +16,7 @@ it('displays lap times', async () => {
     const entry = {...entryChrisMarshallScorpionA1234, laps: [{'number': 1, 'time': 1234}]};
     const tableBody = document.createElement('tbody');
     render(<RaceEntryView entry={entry} />, {container: document.body.appendChild(tableBody)});
-    expect(screen.getByText(1234)).toBeInTheDocument();
+    expect(screen.getByText('00:00:01')).toBeInTheDocument();
 });
 
 it('calls addLap callback with entry', async () => {

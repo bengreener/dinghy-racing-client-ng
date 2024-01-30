@@ -3,17 +3,17 @@ import userEvent from '@testing-library/user-event';
 import LapView from './LapView';
 
 describe('when editable is false', () => {
-    it('displays value', () => {
+    it('displays value in time format', () => {
         const container = document.createElement('tr');
-        render(<LapView value={1234} />, {'container': document.body.appendChild(container)});
-        screen.getByText('1234');
+        render(<LapView value={1015897} />, {'container': document.body.appendChild(container)});
+        screen.getByText('00:16:55');
     });
     it('does not call value passed to keyup', async () => {
         const keyupMock = jest.fn();
         const user = userEvent.setup(); 
         const container = document.createElement('tr');
-        render(<LapView value={1234} editable={false} keyup={keyupMock} />, {'container': document.body.appendChild(container)});
-        screen.getByText('1234').focus();
+        render(<LapView value={895689} editable={false} keyup={keyupMock} />, {'container': document.body.appendChild(container)});
+        screen.getByText('00:14:55').focus();
         await user.keyboard('{Enter}');
         expect(keyupMock).not.toBeCalled();
     });
@@ -22,8 +22,8 @@ describe('when editable is false', () => {
         const focusoutMock = jest.fn();
         const user = userEvent.setup(); 
         const container = document.createElement('tr');
-        render(<LapView value={1234} editable={false} keyup={keyupMock} focusout={focusoutMock} />, {'container': document.body.appendChild(container)});
-        const cell = screen.getByText('1234');
+        render(<LapView value={312568} editable={false} keyup={keyupMock} focusout={focusoutMock} />, {'container': document.body.appendChild(container)});
+        const cell = screen.getByText('00:05:12');
         cell.focus();
         cell.blur();
         expect(focusoutMock).not.toBeCalled();

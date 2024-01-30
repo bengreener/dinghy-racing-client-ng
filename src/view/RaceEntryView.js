@@ -64,7 +64,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
 
     return (
         <tr className="race-entry-view" onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}>
-            <td>{entry.dinghy.dinghyClass.name + ' ' + entry.dinghy.sailNumber + ' ' + entry.competitor.name}</td>
+            <td>{entry.dinghy.dinghyClass.name + ' ' + entry.dinghy.sailNumber + ' ' + entry.helm.name}</td>
             {lapsView}
         </tr>
     )

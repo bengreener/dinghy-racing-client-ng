@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
 import RaceEntryView from './RaceEntryView';
 import { sortArray } from '../utilities/array-utilities';
@@ -10,37 +10,49 @@ function RaceEntriesView({ races }) {
     const [entriesMap, setEntriesMap] = useState(new Map());
     const [message, setMessage] = useState('');
     const [sortOrder, setSortOrder] = useState('default');
+    const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies an entry has been updated
 
-    const updateEntries = useCallback(() => {
+    // const updateEntries = useCallback(() => {
+    //     setRacesUpdateRequestAt(Date.now());
+    // });
+    function updateEntries() {
+        setRacesUpdateRequestAt(Date.now());
+    };
+
+    // get entries
+    useEffect(() => {
+        let ignoreFetch = false; // set to true if RaceEntriewView rerendered before fetch completes to avoid using out of date result
         const entriesMap = new Map();
         // build promises
         const promises = races.map(race => {
             if (!race || (!race.name && !race.url)) {
                 return Promise.resolve({'success': true, 'domainObject': []});
             }
-            else {
-                return model.getEntriesByRace(race);
-            }
+            return model.getEntriesByRace(race);
         });
-        Promise.all(promises).then(results => {
-            results.forEach(result => {
-                if (!result.success) {
-                    setMessage('Unable to load entries\n' + result.message);
-                }
-                else {
-                    result.domainObject.forEach(entry => {
-                        entriesMap.set(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name, entry);
-                    });
+        if (!ignoreFetch) {
+            Promise.all(promises).then(results => {
+                results.forEach(result => {
+                    if (!result.success) {
+                        setMessage('Unable to load entries\n' + result.message);
+                    }
+                    else {
+                        result.domainObject.forEach(entry => {
+                            entriesMap.set(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name, entry);
+                        });
+                    }
+                });
+                if (!ignoreFetch) {
+                    setEntriesMap(entriesMap);
                 }
             });
-            setEntriesMap(entriesMap);
-        });
-    }, [model, races]);
+        };
 
-    // get entries
-    useEffect(() => {
-        updateEntries();
-    }, [model, races, updateEntries]);
+        return () => {
+            ignoreFetch = true;
+            setMessage(''); // clear any previous message
+        }
+    }, [model, races, racesUpdateRequestAt]);
 
     // return array of entries sorted according to selected sort order
     function sorted() {
@@ -90,7 +102,9 @@ function RaceEntriesView({ races }) {
         if (!result.success) {
             setMessage(result.message);
         }
-        updateEntries();
+        else {
+            updateEntries();
+        }
     }
 
     async function removeLap(entry) {
@@ -98,7 +112,9 @@ function RaceEntriesView({ races }) {
         if (!result.success) {
             setMessage(result.message);
         }
-        updateEntries();
+        else {
+            updateEntries();
+        }
     }
 
     async function updateLap(entry, value) {
@@ -106,7 +122,9 @@ function RaceEntriesView({ races }) {
         if (!result.success) {
             setMessage(result.message);
         }
-        updateEntries();
+        else {
+            updateEntries();
+        }
     }
 
     function calculateLapTime(elapsedTime, laps) {
@@ -118,20 +136,20 @@ function RaceEntriesView({ races }) {
 
     return (
         <div className="race-entries-view">
-        <p id="race-entries-message" className={!message ? "hidden" : ""}>{message}</p>
-        <div>
-        <button onClick={() => setSortOrder('default')}>Default</button>
-        <button onClick={() => setSortOrder('lastThree')}>By last 3</button>
-        <button onClick={() => setSortOrder('classLastThree')}>By class & last 3</button>
-        <button onClick={() => setSortOrder('lapTimes')}>By lap time</button>
-        </div>
-        <div className="scrollable">
-        <table id="race-entries-table">
-            <tbody>
-            {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.competitor.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap}/>)}
-            </tbody>
-        </table>
-        </div>
+            <p id="race-entries-message" className={!message ? "hidden" : ""}>{message}</p>
+            <div>
+                <button onClick={() => setSortOrder('default')}>Default</button>
+                <button onClick={() => setSortOrder('lastThree')}>By last 3</button>
+                <button onClick={() => setSortOrder('classLastThree')}>By class & last 3</button>
+                <button onClick={() => setSortOrder('lapTimes')}>By lap times</button>
+            </div>
+            <div className="scrollable">
+                <table id="race-entries-table">
+                    <tbody>
+                    {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap}/>)}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

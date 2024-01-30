@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import Clock from '../model/domain-classes/clock';
 
 function LapView({value, editable = false, keyup, focusout}) {
     const textInputRef = useRef(null);
@@ -11,7 +12,7 @@ function LapView({value, editable = false, keyup, focusout}) {
     });
 
     return (
-        editable ? <td>{inner}</td> : <td>{value}</td>  
+        editable ? <td>{inner}</td> : <td>{Clock.formatDuration(value)}</td>
     );
 }
 

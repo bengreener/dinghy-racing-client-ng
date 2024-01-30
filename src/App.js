@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import CreateDinghyClass from './view/CreateDinghyClass';
 import CreateRace from './view/CreateRace';
 import ErrorBoundary from './view/ErrorBoundary';
@@ -7,20 +7,31 @@ import ControllerContext from './view/ControllerContext';
 import ViewUpcomingRaces from './view/ViewUpcomingRaces';
 import SignUp from './view/SignUp';
 import RaceConsole from './view/RaceConsole';
+import Authorisation from './controller/authorisation';
 
 function App({model, controller}) {
   const [displayPort, setDisplayPort] = React.useState();
+  const [roles, setRoles] = React.useState([]);
+  
+  useEffect(() => {
+    const authorisation = new Authorisation();
+    authorisation.getRoles().then(newRoles => {
+      if (newRoles.toString() !== roles.toString()) {
+        setRoles(newRoles);
+      }
+    });
+  });
 
   function showCreateDinghyClassForm() {
-    setDisplayPort(<CreateDinghyClass onCreate={controller.createDinghyClass} />);
+    setDisplayPort(<CreateDinghyClass key={Date.now()} onCreate={controller.createDinghyClass} />);
   }
 
   function showCreateRaceForm() {
-    setDisplayPort(<CreateRace onCreate={controller.createRace} />);
+    setDisplayPort(<CreateRace key={Date.now()} onCreate={controller.createRace} />);
   }
 
   function showUpcomingRaces() {
-    setDisplayPort(<ViewUpcomingRaces showSignUpForm={showSignUpForm}/>);
+    setDisplayPort(<ViewUpcomingRaces key={Date.now()} showSignUpForm={showSignUpForm}/>);
   }
 
   function showSignUpForm(race) {
@@ -28,7 +39,7 @@ function App({model, controller}) {
   }
 
   function showRaceConsole() {
-    setDisplayPort(<RaceConsole />);
+    setDisplayPort(<RaceConsole key={Date.now()}/>);
   }
 
   return (
@@ -40,10 +51,20 @@ function App({model, controller}) {
             <h1 className='display-4'>Dinghy Racing</h1>
         </header>
         <div className='list-group'>
-          <button key={0} type='button' className='list-group-item list-group-item-action' onClick={showCreateDinghyClassForm}>Create Dinghy Class</button>
-          <button key={1} type='button' className='list-group-item list-group-item-action' onClick={showCreateRaceForm}>Create Race</button>
+          {roles.includes('ROLE_RACE_SCHEDULER') ? 
+            <button key={0} type='button' className='list-group-item list-group-item-action' onClick={showCreateDinghyClassForm}>Create Dinghy Class</button> 
+            : null
+          }
+          {roles.includes('ROLE_RACE_SCHEDULER') ? 
+            <button key={1} type='button' className='list-group-item list-group-item-action' onClick={showCreateRaceForm}>Create Race</button> 
+            : null
+          }
           <button key={2} type='button' className='list-group-item list-group-item-action' onClick={showUpcomingRaces}>Upcoming Races</button>
-          <button key={3} type='button' className='list-group-item list-group-item-action' onClick={showRaceConsole}>Race Console</button>
+          {roles.includes('ROLE_RACE_OFFICER') ? 
+            <button key={3} type='button' className='list-group-item list-group-item-action' onClick={showRaceConsole}>Race Console</button>
+            : null
+          }
+          <button key={4} type='button' className='list-group-item list-group-item-action' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
         </div>
         <div className="display-port">
           <ErrorBoundary>

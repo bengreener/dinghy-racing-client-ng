@@ -5,7 +5,7 @@ import ModelContext from './ModelContext';
 
 function CreateRace({ onCreate }) {
     const model = useContext(ModelContext);
-    const [race, setRace] = React.useState({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000});
+    const [race, setRace] = React.useState({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000, 'plannedLaps': 5});
     const [result, setResult] = React.useState({'message': ''});
     const [dinghyClassMap, setDinghyClassMap] = React.useState(new Map());
     const [dinghyClassOptions, setDinghyClassOptions] = React.useState([]);
@@ -82,7 +82,7 @@ function CreateRace({ onCreate }) {
             <label htmlFor="race-duration-input">Duration</label>
             <input id="race-duration-input" name="duration" type="number" onChange={handleChange} value={race.duration / 60000} />
             <label htmlFor="race-laps-input">Laps</label>
-            <input id="race-laps-input" name="plannedLaps" type="number" onChange={handleChange} value={race.plannedLaps ? race.plannedLaps : ''} />
+            <input id="race-laps-input" name="plannedLaps" type="number" min="1" onChange={handleChange} value={race.plannedLaps ? race.plannedLaps : ''} />
             <label htmlFor="race-class-select">Race Class</label>
             <select id="race-class-select" name="dinghyClass" multiple={false} onChange={handleChange} value={race.dinghyClass ? race.dinghyClass.name : ''} >{dinghyClassOptions}</select>
             <output id="race-message-output" />

@@ -4,6 +4,7 @@ class DinghyRacingModel {
     httpRootURL;
     wsRootURL;
     stompClient;
+    raceUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
     entryUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
 
     /**
@@ -43,7 +44,7 @@ class DinghyRacingModel {
      * Provide a blank entry template
      */
     static entryTemplate() {
-        return {'race': DinghyRacingModel.raceTemplate(), 'competitor': DinghyRacingModel.competitorTemplate(), 'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'url': ''};
+        return {'race': DinghyRacingModel.raceTemplate(), 'helm': DinghyRacingModel.competitorTemplate(), 'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'url': ''};
     }
 
     /**
@@ -54,6 +55,7 @@ class DinghyRacingModel {
     }
 
     constructor(httpRootURL, wsRootURL) {
+        this.handleRaceUpdate = this.handleRaceUpdate.bind(this);
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
         if (!httpRootURL) {
             throw new Error('An HTTP root URL is required when creating an instance of DinghyRacingModel');
@@ -65,7 +67,31 @@ class DinghyRacingModel {
         this.wsRootURL = wsRootURL;
     }
 
+    registerRaceUpdateCallback(key, callback) {
+        if (this.raceUpdateCallbacks.has(key)) {
+            this.raceUpdateCallbacks.get(key).add(callback);
+        }
+        else {
+            this.raceUpdateCallbacks.set(key, new Set([callback]));
+        }
+    }
+
+    unregisterRaceUpdateCallback(key, callback) {
+        if (this.raceUpdateCallbacks.has(key)) {
+            this.raceUpdateCallbacks.get(key).delete(callback);
+        }
+    }
+
+    handleRaceUpdate(message) {
+        if (this.raceUpdateCallbacks.has(message.body)) {
+            this.raceUpdateCallbacks.get(message.body).forEach(cb => cb());
+        }
+    }
+
     registerEntryUpdateCallback(key, callback) {
+    }
+
+    unregisterEntryUpdateCallback(key, callback) {
     }
 
     handleEntryUpdate(message) {
@@ -95,7 +121,7 @@ class DinghyRacingModel {
         return null;
     }
 
-    async createEntry(race, competitor, dinghy) {
+    async createEntry(race, helm, dinghy) {
         return null;
     }
 
@@ -144,6 +170,10 @@ class DinghyRacingModel {
     }
 
     async getRacesOnOrAfterTime(startTime) {
+        return null;
+    }
+
+    async getRacesBetweenTimes(startTime, endTime) {
         return null;
     }
 

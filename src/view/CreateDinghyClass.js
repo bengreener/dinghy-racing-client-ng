@@ -25,7 +25,12 @@ function CreateDinghyClass({ onCreate }) {
     }
 
     function handleChange({target}) {
-        setDinghyClass({...dinghyClass, [target.name]: target.value});
+        if (target.name === 'crewSize') {
+            setDinghyClass({...dinghyClass, [target.name]: Number(target.value)});
+        }
+        else {
+            setDinghyClass({...dinghyClass, [target.name]: target.value});    
+        }
     }
 
     function showMessage(message) {
@@ -37,6 +42,8 @@ function CreateDinghyClass({ onCreate }) {
         <form action="" method="get">
             <label htmlFor="dinghy-class-input">Class Name</label>
             <input id="dinghy-class-input" name="name" type="text" onChange={handleChange} value={dinghyClass.name} />
+            <label htmlFor="crew-size-input">Crew Size</label>
+            <input id="crew-size-input" name="crewSize" type="number" min="1" onChange={handleChange} value={dinghyClass.crewSize} />
             <output id="dinghy-class-message-output" />
             <button id="dinghy-class-create-button" type="button" onClick={handleCreate}>Create</button>
         </form>
