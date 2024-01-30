@@ -1,6 +1,6 @@
 {
   "name": "dinghy-racing-client-ng",
-  "version": "2024.1.2.dev",
+  "version": "2024.1.2",
   "private": true,
   "dependencies": {
     "@stomp/stompjs": "^7.0.0",
