@@ -1,52 +1,30 @@
-import { getCookieValue } from '../utilities/dom-utilities';
+// import { getCookieValue } from '../utilities/dom-utilities';
 
 class Authorisation {
-    sessionId = '';
-    roles = [];
-
-    constructor() {
-        this.getRoles = this.getRoles.bind(this);
-    }
 
     /**
      * Get roles assigned to current user/ principal
      * @returns {Promise<Array<String>>} roles assigned to current user/ principal
      */
     async getRoles() {
-        // check session id
-        const cookieSessionId = getCookieValue('JSESSIONID');
         let json;
-        // new session get roles for logged in principal
-        if (cookieSessionId && (this.sessionId !== cookieSessionId)) {
-            this.sessionId = cookieSessionId;
-            // get roles for current principal
-            const resource = window.location.origin + '/authentication/roles';
-            let response;
-            try {
-                response = await fetch(resource, {method: 'GET', headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}, cache: 'no-store'});
-                json = await response.json();
-                this.roles = json.roles ? json.roles : [];
-            }
-            catch (error) {
-                console.error(`Failed to fetch roles: ${error.message}`);
-                this.roles = [];
-            }
-            finally {
-                return Promise.resolve(this.roles);
-            }
+        let roles;
+
+        const resource = window.location.origin + '/authentication/roles';
+        let response;
+        try {
+            response = await fetch(resource, {method: 'GET', headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}, cache: 'no-store'});
+            json = await response.json();
+            roles = json.roles ? json.roles : [];
         }
-        // exisiting session
-        else if (cookieSessionId && this.sessionId === cookieSessionId) {
-            return Promise.resolve(this.roles);
+        catch (error) {
+            console.error(`Failed to fetch roles: ${error.message}`);
+            roles = [];
         }
-        // no session so no principal assigned roles
-        else {
-            this.roles = [];
-            return Promise.resolve(this.roles);
+        finally {
+            return Promise.resolve(roles);
         }
     }
 }
-
-// const authorisation = new Authorisation();
 
 export default Authorisation;
