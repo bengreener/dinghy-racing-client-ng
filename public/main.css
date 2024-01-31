@@ -33,6 +33,14 @@ button:active {
 button:hover {
     background-color: #0096E0;
 }
+button.embedded {
+	border-radius: 0pt;
+    padding: 0pt;
+    margin: 0px;
+    border: 0pt;
+    cursor: pointer;
+    background-color: inherit;
+}
 input {
     border-radius: 25pt;
     padding: 5pt;
