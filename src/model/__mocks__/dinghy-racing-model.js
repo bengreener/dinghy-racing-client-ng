@@ -89,12 +89,24 @@ class DinghyRacingModel {
     }
 
     registerEntryUpdateCallback(key, callback) {
+        if (this.entryUpdateCallbacks.has(key)) {
+            this.entryUpdateCallbacks.get(key).add(callback);
+        }
+        else {
+            this.entryUpdateCallbacks.set(key, new Set([callback]));
+        }
     }
 
     unregisterEntryUpdateCallback(key, callback) {
+        if (this.entryUpdateCallbacks.has(key)) {
+            this.entryUpdateCallbacks.get(key).delete(callback);
+        }
     }
 
     handleEntryUpdate(message) {
+        if (this.entryUpdateCallbacks.has(message.body)) {
+            this.entryUpdateCallbacks.get(message.body).forEach(cb => cb());
+        }
     }
 
     async addLap(entry, time) {
