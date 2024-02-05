@@ -4,6 +4,15 @@ import LapView from './LapView';
 function RaceEntryView({entry, addLap, removeLap, updateLap}) {
     const [editMode, setEditMode] = useState(false);
 
+    // gesture tracking variables
+    let start = {};
+	let end = {};
+	let tracking = false;
+    let touchTimeoutId = null;
+	const thresholdTime = 500;
+	const thresholdDistance = 10;
+    const longTouchTimeout = 500; 
+
     const handleLastLapCellKeyUp = useCallback((event) => {
         if (event.key === 'Enter') {
             if (updateLap) {
@@ -43,6 +52,69 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
         event.preventDefault();
     }
 
+    function gestureStart(event) {
+        tracking = true;
+        /* could use e.timeStamp but apparently it's 'whack' in Fx/Android */
+        start.t = new Date().getTime();
+        start.x = event.clientX;
+        start.y = event.clientY;
+        touchTimeoutId = setTimeout(() => {
+            if (!editMode) {
+                setEditMode(true);
+                tracking = false;
+            }
+        }, longTouchTimeout);
+	};
+
+	function gestureMove(event) {
+		if (tracking) {
+			event.preventDefault();
+            if (touchTimeoutId) {
+                clearTimeout(touchTimeoutId);
+                touchTimeoutId = null;
+            }
+            end.x = event.clientX;
+			end.y = event.clientY;
+		}
+	}
+
+	function gestureEnd(event) {
+        if (tracking) {
+            if (touchTimeoutId) {
+                clearTimeout(touchTimeoutId);
+                touchTimeoutId = null;
+            }
+            tracking = false;
+            var now = new Date().getTime();
+            var deltaTime = now - start.t;
+            var deltaX = end.x - start.x;
+            var deltaY = end.y - start.y;
+            /* work out what the movement was */
+            if (deltaTime > thresholdTime) {
+                /* gesture too slow */
+                return;
+            } else {
+                if ((deltaX > thresholdDistance)&&(Math.abs(deltaY) < thresholdDistance)) {
+                    // o.innerHTML = 'swipe right';
+                } else if ((-deltaX > thresholdDistance)&&(Math.abs(deltaY) < thresholdDistance)) {
+                    removeLap(entry);
+                } else if ((deltaY > thresholdDistance)&&(Math.abs(deltaX) < thresholdDistance)) {
+                    // o.innerHTML = 'swipe down';
+                } else if ((-deltaY > thresholdDistance)&&(Math.abs(deltaX) < thresholdDistance)) {
+                    // o.innerHTML = 'swipe up';
+                }
+            }
+        }
+	}
+
+    function gestureCancel(event) {
+        if (touchTimeoutId) {
+            clearTimeout(touchTimeoutId);
+            touchTimeoutId = null;
+        }
+        tracking = false;
+    }
+
     const lapsView = [];
 
     for (let i = 0; i < entry.laps.length; i++) {
@@ -63,7 +135,9 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
     }
 
     return (
-        <tr className="race-entry-view" onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}>
+        <tr className="race-entry-view" onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}
+            onPointerDown={gestureStart} onPointerMove={gestureMove} onPointerUp={gestureEnd} onPointerOut={gestureEnd}
+            onPointerLeave={gestureEnd} onPointerCancel={gestureCancel} >
             <td>{entry.dinghy.dinghyClass.name + ' ' + entry.dinghy.sailNumber + ' ' + entry.helm.name}</td>
             {lapsView}
         </tr>
