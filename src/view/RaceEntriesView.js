@@ -127,7 +127,7 @@ function RaceEntriesView({ races }) {
     }
 
     return (
-        <div className="race-entries-view">
+        <div className="race-entries-view" >
             <p id="race-entries-message" className={!message ? "hidden" : ""}>{message}</p>
             <div>
                 <button onClick={() => setSortOrder('default')}>Default</button>
@@ -136,7 +136,7 @@ function RaceEntriesView({ races }) {
                 <button onClick={() => setSortOrder('lapTimes')}>By lap times</button>
             </div>
             <div className="scrollable">
-                <table id="race-entries-table">
+                <table id="race-entries-table" style={{touchAction: 'pinch-zoom pan-y'}}>
                     <tbody>
                     {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap}/>)}
                     </tbody>
