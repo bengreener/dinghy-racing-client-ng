@@ -45,7 +45,7 @@ class DinghyRacingModel {
      */
     static entryTemplate() {
         return {'race': DinghyRacingModel.raceTemplate(), 'helm': DinghyRacingModel.competitorTemplate(), 'crew': null, 
-        'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'url': ''};
+        'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'sumOfLapTimes': 0, 'url': ''};
     }
 
     /**
