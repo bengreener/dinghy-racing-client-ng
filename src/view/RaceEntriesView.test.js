@@ -386,9 +386,9 @@ describe('when updating a lap time', () => {
         const updateLapSpy = jest.spyOn(controller, 'updateLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
-        });        
-        const entry = await screen.findByText(/scorpion 1234/i);
-        const lastCell = entry.parentElement.lastChild;
+        });
+        const entryRow = screen.getByText(/scorpion 1234/i).parentElement;
+        const lastCell = entryRow.children[entryRow.children.length - 2];
         // render updated components
         await act(async () => {
             await user.pointer({target: lastCell, keys: '[MouseRight]'});
@@ -414,9 +414,8 @@ describe('when updating a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
-        const entry = await screen.findByText(/scorpion 1234/i);
-        screen.findByRole('cell', {'name': 7});
-        const lastCell = entry.parentElement.lastChild;
+        const entryRow = screen.getByText(/scorpion 1234/i).parentElement;
+        const lastCell = entryRow.children[entryRow.children.length - 2];
         // render updated components
         await act(async () => {
             await user.pointer({target: lastCell, keys: '[MouseRight]'});
@@ -443,10 +442,8 @@ describe('when updating a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
-               
-        const entry = await screen.findByText(/scorpion 1234/i);
-        screen.findByRole('cell', {'name': 7});
-        const lastCell = entry.parentElement.lastChild;
+        const entryRow = screen.getByText(/scorpion 1234/i).parentElement;
+        const lastCell = entryRow.children[entryRow.children.length - 2];
         await act(async () => {
             await user.pointer({target: lastCell, keys: '[MouseRight]'});
         });
@@ -471,10 +468,8 @@ describe('when updating a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
-               
-        const entry = await screen.findByText(/scorpion 1234/i);
-        screen.findByRole('cell', {'name': 7});
-        const lastCell = entry.parentElement.lastChild;
+        const entryRow = screen.getByText(/scorpion 1234/i).parentElement;
+        const lastCell = entryRow.children[entryRow.children.length - 2];
         await act(async () => {
             await user.pointer({target: lastCell, keys: '[MouseRight]'});
         });

@@ -122,7 +122,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
         let lapView;
         if (i === (entry.laps.length - 1)) {
             if (editMode) {
-                lapView = <LapView key={lap.number} value={lap.time} editable={true} keyup={handleLastLapCellKeyUp} focusout={handleLastLapCellFocusOut} />    
+                lapView = <LapView key={lap.number} value={lap.time} editable={true} keyup={handleLastLapCellKeyUp} focusout={handleLastLapCellFocusOut} />
             }
             else {
                 lapView = <LapView key={lap.number} value={lap.time} editable={false} />
@@ -140,6 +140,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
             onPointerLeave={gestureEnd} onPointerCancel={gestureCancel} >
             <td>{entry.dinghy.dinghyClass.name + ' ' + entry.dinghy.sailNumber + ' ' + entry.helm.name}</td>
             {lapsView}
+            <LapView key='sumOfLapTimes' value={entry.sumOfLapTimes} editable={false} />
         </tr>
     )
 }
