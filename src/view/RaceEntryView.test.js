@@ -58,11 +58,12 @@ it('calls removeLap callback with entry', async () => {
 
 it('when secondary mouse button is clicked accepts a new lap time input in the last field of the row', async () => {
     const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-    const entry = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}]};
+    const entry = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}], 
+        'sumOfLapTimes': 6000};
     const tableBody = document.createElement('tbody');
     render(<RaceEntryView entry={entry} />, {container: document.body.appendChild(tableBody)});
-    const entryCell = screen.getByText(/scorpion 1234/i);
-    const lastCell = entryCell.parentElement.lastChild;
+    const entryRow = screen.getByText(/scorpion 1234/i).parentElement;
+    const lastCell = entryRow.children[entryRow.children.length - 2];
     await act(async () => {
         await user.pointer({target: lastCell, keys: '[MouseRight]'});
     });
@@ -111,8 +112,8 @@ describe('when editing a lap time', () => {
         const tableBody = document.createElement('tbody');
         const updateLapCallback = jest.fn((entry, value) => {});
         render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />, {container: document.body.appendChild(tableBody)});
-        const entryCell = screen.getByText(/scorpion 1234/i);
-        const lastCell = entryCell.parentElement.lastChild;
+        const entryRow = screen.getByText(/scorpion 1234/i).parentElement;
+        const lastCell = entryRow.children[entryRow.children.length - 2];
         await act(async () => {
             await user.pointer({target: lastCell, keys: '[MouseRight]'});
         });
@@ -148,8 +149,8 @@ describe('when user taps and holds on row', () => {
         const tableBody = document.createElement('tbody');
         render(<RaceEntryView entry={entry} />, {container: document.body.appendChild(tableBody)});
         const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i);
-        const entryCell = screen.getByText(/scorpion 1234/i);
-        const lastCell = entryCell.parentElement.lastChild;
+        const entryRow = screen.getByText(/scorpion 1234/i).parentElement;
+        const lastCell = entryRow.children[entryRow.children.length - 2];
         await act(async () => {
             await user.pointer({target: SMScorp1234entry, keys: '[TouchA>]'});
         });
