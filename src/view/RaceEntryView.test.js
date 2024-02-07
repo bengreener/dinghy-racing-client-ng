@@ -182,3 +182,22 @@ describe('when user swipes left on row', () => {
         expect(removeLapCallback).toBeCalledWith(entry);
     });
 });
+
+describe('when entry is on last lap', () => {
+    it('sets a class of onLastLap', () => {
+        const entryOnLastLap = {...entryChrisMarshallScorpionA1234, 'onLastLap': true};
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entryOnLastLap} />, {container: document.body.appendChild(tableBody)});
+        const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;
+        expect(SMScorp1234entry.getAttribute('class')).toMatch(/on-last-lap/i);
+    });
+});
+
+describe('when entry is on last lap', () => {
+    it('sets a class of onLastLap', () => {
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />, {container: document.body.appendChild(tableBody)});
+        const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;
+        expect(SMScorp1234entry.getAttribute('class')).not.toMatch(/on-last-lap/i);
+    });
+});

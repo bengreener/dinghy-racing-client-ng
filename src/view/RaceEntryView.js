@@ -3,6 +3,7 @@ import LapView from './LapView';
 
 function RaceEntryView({entry, addLap, removeLap, updateLap}) {
     const [editMode, setEditMode] = useState(false);
+    const classes = entry.onLastLap ? 'race-entry-view on-last-lap' : 'race-entry-view';
 
     // gesture tracking variables
     let start = {};
@@ -135,7 +136,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
     }
 
     return (
-        <tr className="race-entry-view" onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}
+        <tr className={classes} onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}
             onPointerDown={gestureStart} onPointerMove={gestureMove} onPointerUp={gestureEnd} onPointerOut={gestureEnd}
             onPointerLeave={gestureEnd} onPointerCancel={gestureCancel} >
             <td>{entry.dinghy.dinghyClass.name + ' ' + entry.dinghy.sailNumber + ' ' + entry.helm.name}</td>
