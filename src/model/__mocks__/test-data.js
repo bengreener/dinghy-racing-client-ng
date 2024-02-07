@@ -173,9 +173,7 @@ const entriesHandicapAHAL = { '_embedded' : { 'entries' : [
 		'race' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/race' }, 
 		'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/dinghy' } }
 	} 
-] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/races/8/signedUp' } }
-
-};
+] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/races/8/signedUp' } }};
 const entryChrisMarshallDinghy1234HAL = {'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/entries/10'},'entry':{'href':'http://localhost:8081/dinghyracing/api/entries/10'},'dinghy':{'href':'http://localhost:8081/dinghyracing/api/entries/10/dinghy'},'helm':{'href':'http://localhost:8081/dinghyracing/api/entries/10/helm'}, 'crew':{'href':'http://localhost:8081/dinghyracing/api/entries/10/crew'}}}; 
 
 const competitorChrisMarshall = {'name':'Chris Marshall','url':'http://localhost:8081/dinghyracing/api/competitors/8'};
