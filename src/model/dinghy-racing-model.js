@@ -41,11 +41,11 @@ class DinghyRacingModel {
     }
 
     /**
-     * Provide a blank entry template
+     * Provide a blank entry template.
      */
     static entryTemplate() {
         return {'race': DinghyRacingModel.raceTemplate(), 'helm': DinghyRacingModel.competitorTemplate(), 'crew': null, 
-        'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'sumOfLapTimes': 0, 'url': ''};
+        'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'url': ''};
     }
 
     /**
