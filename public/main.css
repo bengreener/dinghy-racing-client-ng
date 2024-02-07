@@ -63,6 +63,9 @@ td, th {
     padding: 0.5em;
     text-align: left;
 }
+td.total {
+	border: 2px solid black;
+}
 .container-fluid {
 	display: grid;
 	grid-template-columns: 15vw 85vw;

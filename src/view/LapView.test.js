@@ -28,6 +28,13 @@ describe('when editable is false', () => {
         cell.blur();
         expect(focusoutMock).not.toBeCalled();
     });
+    describe('when cell contains a total', () => {
+        it('has class total', () => {
+            const container = document.createElement('tr');
+            render(<LapView value={1015897} total={true} />, {'container': document.body.appendChild(container)});
+            expect(screen.getByText('00:16:55').getAttribute('class')).toMatch(/total/i);
+        });
+    });
 });
 
 describe('when editable is true', () => {
@@ -64,5 +71,12 @@ describe('when editable is true', () => {
         cell.focus();
         cell.blur();
         expect(focusoutMock).toBeCalled();
+    });
+    describe('when cell contains a total', () => {
+        it('has class total', () => {
+            const container = document.createElement('tr');
+            render(<LapView value={1015897} total={true} />, {'container': document.body.appendChild(container)});
+            expect(screen.getByText('00:16:55').getAttribute('class')).toMatch(/total/i);
+        });
     });
 });

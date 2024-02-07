@@ -141,7 +141,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
             onPointerLeave={gestureEnd} onPointerCancel={gestureCancel} >
             <th scope='row'>{entry.dinghy.dinghyClass.name + ' ' + entry.dinghy.sailNumber + ' ' + entry.helm.name}</th>
             {lapsView}
-            <LapView key='sumOfLapTimes' value={entry.sumOfLapTimes} editable={false} />
+            <LapView key='sumOfLapTimes' value={entry.sumOfLapTimes} total={true} editable={false} />
         </tr>
     )
 }
