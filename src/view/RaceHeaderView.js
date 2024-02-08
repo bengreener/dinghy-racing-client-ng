@@ -37,6 +37,10 @@ function RaceHeaderView({ race }) {
         setShowPostponeRace(true);
     };
 
+    function handleRaceStartClick() {
+        controller.startRace(race);
+    }
+
     useEffect(() => {
         let ignoreFetch = false; // set to true if RaceEntriewView rerendered before fetch completes to avoid using out of date result
         let entries = []; // entries for race that have an update callback set. Used to clear up on rerender/ disposal
@@ -96,6 +100,7 @@ function RaceHeaderView({ race }) {
             <label htmlFor={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Average lap time</label>
             <output id={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.averageLapTime)}</output>
             {race.clock.getElapsedTime() < 0 ? <button id="race-postpone-button" onClick={handleRacePostponeClick}>Postpone Start</button> : null}
+            {race.clock.getElapsedTime() < 0 ? <button id="race-start-button" onClick={handleRaceStartClick}>Start Now</button> : null}
             <button id="race-result-download-button" onClick={handleRaceResultDownloadClick}>Download Results</button>
             <p id="race-header-message" className={!message ? "hidden" : ""}>{message}</p>
             <ModalDialog show={showPostponeRace} onClose={() => setShowPostponeRace(false)}>

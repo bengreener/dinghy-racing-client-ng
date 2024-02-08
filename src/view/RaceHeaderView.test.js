@@ -77,7 +77,15 @@ describe('when rendered', () => {
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={{...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))}} />, model, controller);
         expect(screen.getByRole('button', {name: /postpone start/i})).toBeInTheDocument();
-    })
+    });
+    it('displays start race button', () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        // const raceScorpionA_copy = {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))};
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        customRender(<RaceHeaderView race={{...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))}} />, model, controller);
+        expect(screen.getByRole('button', {name: /start now/i})).toBeInTheDocument();
+    });
 });
 
 describe('when race has not yet started', () => {
@@ -113,8 +121,8 @@ describe('when a race has started', () => {
         const outputRemaining = screen.getByLabelText(/remaining/i);
         expect(outputRemaining).toHaveValue('00:44:54');
     });
-    // Have not figured out to test a value has not changed after a period of time. Can revisit when need ti to do something other than stopping clock 
-    it('stops the selected race', async () => {
+    // Have not figured out to test a value has not changed after a period of time. Can revisit when need to to do something other than stopping clock 
+    xit('stops the selected race', async () => {
         // const user = userEvent.setup();
         // const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         // const controller = new DinghyRacingController(model);
@@ -145,6 +153,13 @@ describe('when a race has started', () => {
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(), 'clock': new Clock(new Date())} } />, model, controller);
         expect(screen.queryByText(/postpone start/i)).not.toBeInTheDocument();
+    });
+    it('no longer shows option to start race', () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(), 'clock': new Clock(new Date())} } />, model, controller);
+        expect(screen.queryByText(/start now/i)).not.toBeInTheDocument();
     });
 });
 
@@ -216,5 +231,20 @@ describe('when postpone race button clicked', () => {
         expect(screen.getByRole('spinbutton', {'name': /delay/i, 'hidden': true})).toBeInTheDocument();
         expect(screen.getByRole('button', {'name': /cancel/i, 'hidden': true})).toBeInTheDocument();
         expect(screen.getByRole('button', {'name': 'Postpone', 'hidden': true})).toBeInTheDocument();
+    });
+});
+
+describe('when start now button clicked', () => {
+    it('starts race', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const startRaceSpy = jest.spyOn(controller, 'startRace');
+
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))}} />, model, controller);
+        const startRaceButton = screen.getByRole('button', {'name': /start now/i});
+        await user.click(startRaceButton);
+        expect(startRaceSpy).toHaveBeenCalled();
     });
 });
