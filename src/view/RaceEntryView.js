@@ -21,6 +21,9 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
                 setEditMode(false);
             }
         }
+        if (event.key === 'Escape') {
+            setEditMode(false);
+        }
     }, [entry, updateLap]);
 
     const handleLastLapCellFocusOut = useCallback((event) => {
