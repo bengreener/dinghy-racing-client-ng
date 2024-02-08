@@ -710,7 +710,8 @@ class DinghyRacingModel {
             result = {'success': true, 'domainObject': race};
         }
         if (result.success) {
-            return this.update(result.domainObject.url, {'actualStartTime': startTime});
+            // return this.update(result.domainObject.url, {'actualStartTime': startTime});
+            return this.update(result.domainObject.url, {'plannedStartTime': startTime});
         }
         else { 
             return result;
