@@ -36,18 +36,18 @@ class Clock {
     start() {
         if (!this._ticker) {
             // synchronise to system clock so tick is every time system clock seconds change
-            setTimeout(() => {
-                // set tick every second
-                this._ticker = setInterval(() => {
+            // using setInterval would create timing creep; interval is always > 1000 by a 'random factor'
+            // this approach results in an average interval of ~1000 milliseconds
+            const setNextTick = (recursiveCallback) => {
+                this._ticker = setTimeout(() => {
                     if (this._tickHandler) {
                         this._tickHandler();
                     };
-                }, 1000);
-                // call tick handler to mark new second
-                if (this._tickHandler) {
-                    this._tickHandler();
-                };
-            }, 1000 - Date.now() % 1000);
+                    recursiveCallback(recursiveCallback);
+                }, 1000 - Date.now() % 1000);
+            }
+
+            setNextTick(setNextTick);
         }
     }
 
@@ -58,7 +58,8 @@ class Clock {
     stop() {
         // if clock started then stop it else do nothing
         if (this._ticker) {
-            clearInterval(this._ticker);
+            clearTimeout(this._ticker);
+            this._ticker = null;
         }
     }
     
