@@ -6,14 +6,14 @@ describe('when editable is false', () => {
     it('displays value in time format', () => {
         const container = document.createElement('tr');
         render(<LapView value={1015897} />, {'container': document.body.appendChild(container)});
-        screen.getByText('00:16:56');
+        screen.getByText('16:56');
     });
     it('does not call value passed to keyup', async () => {
         const keyupMock = jest.fn();
         const user = userEvent.setup(); 
         const container = document.createElement('tr');
         render(<LapView value={895689} editable={false} keyup={keyupMock} />, {'container': document.body.appendChild(container)});
-        screen.getByText('00:14:56').focus();
+        screen.getByText('14:56').focus();
         await user.keyboard('{Enter}');
         expect(keyupMock).not.toBeCalled();
     });
@@ -23,7 +23,7 @@ describe('when editable is false', () => {
         const user = userEvent.setup(); 
         const container = document.createElement('tr');
         render(<LapView value={312568} editable={false} keyup={keyupMock} focusout={focusoutMock} />, {'container': document.body.appendChild(container)});
-        const cell = screen.getByText('00:05:13');
+        const cell = screen.getByText('05:13');
         cell.focus();
         cell.blur();
         expect(focusoutMock).not.toBeCalled();
@@ -32,7 +32,7 @@ describe('when editable is false', () => {
         it('has class total', () => {
             const container = document.createElement('tr');
             render(<LapView value={1015897} total={true} />, {'container': document.body.appendChild(container)});
-            expect(screen.getByText('00:16:56').getAttribute('class')).toMatch(/total/i);
+            expect(screen.getByText('16:56').getAttribute('class')).toMatch(/total/i);
         });
     });
 });
@@ -76,7 +76,7 @@ describe('when editable is true', () => {
         it('has class total', () => {
             const container = document.createElement('tr');
             render(<LapView value={1015897} total={true} />, {'container': document.body.appendChild(container)});
-            expect(screen.getByText('00:16:56').getAttribute('class')).toMatch(/total/i);
+            expect(screen.getByText('16:56').getAttribute('class')).toMatch(/total/i);
         });
     });
 });

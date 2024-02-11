@@ -6,19 +6,32 @@ class Clock {
     
     /**
      * Formats a duration in milliseconds into a string; format hh:mm:ss
+     * If fractional seconds is false will round to the nearest second when formatting for display to avoid issues when a countdown traverses from positive to negative; (resolves dispaly of 1, 0, -0, 1 (over 4 seconds) to 1, 0, -1 (over 3 seconds))
+     * Also, compensates for fact that second ticks tend to occur slightly after the second due to processing delays
+     * Would be an issue if formatting actual times as second element would be rounded up so time displayed may not be correct
      * @param {Number} duration Duration in milliseconds
+     * @param {boolean} fractionalSeconds true to display fractional seconds to 3 decimal places
      * @returns {String}
      */
-    static formatDuration(duration) {
-        const d = Math.round(Math.abs(duration) / 1000) * 1000;
+    static formatDuration(duration, fractionalSeconds = false) {
+        let d = Math.abs(duration);
         const hours = Math.floor(d / 3600000);
-        const minutes = Math.floor((d % 3600000) / 60000);
-        // const seconds = Math.round((d % 60000) / 1000);
-        const seconds = Math.floor((d % 60000) / 1000);
-        const formatHours = hours < 10 ? '0' + hours : hours;
-        const formatMinutes = minutes < 10 ? '0' + minutes : minutes;
-        const formatSeconds = seconds < 10 ? '0' + seconds : seconds;
-        return ((duration < 0 ? '-' : '') + formatHours + ':' + formatMinutes + ':' + formatSeconds);
+
+        let formatOptions = {
+            timeZone: 'UTC',
+            minute: '2-digit',
+            second: '2-digit',
+        };
+
+        if (hours > 0) formatOptions = {...formatOptions, hour: '2-digit'};
+        if (fractionalSeconds)  {
+            formatOptions = {...formatOptions, fractionalSecondDigits: 3};
+        }
+        else {
+            d = Math.round(d / 1000) * 1000;
+        }
+        const timeFormat = new Intl.DateTimeFormat('en-GB', formatOptions);
+        return (duration < 0 ? '-' : '') + timeFormat.format(d);
     }
 
     /**

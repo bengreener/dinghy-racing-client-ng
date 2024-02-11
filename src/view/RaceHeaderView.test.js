@@ -41,7 +41,7 @@ describe('when rendered', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
-        expect(screen.getByLabelText(/duration/i)).toHaveValue('00:45:00');
+        expect(screen.getByLabelText(/duration/i)).toHaveValue('45:00');
     });
     it('displays remaining race duration', () => {
         HTMLDialogElement.prototype.close = jest.fn();
@@ -51,7 +51,7 @@ describe('when rendered', () => {
         jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 30000);
 
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-        expect(screen.getByLabelText(/remaining/i)).toHaveValue('00:44:30');
+        expect(screen.getByLabelText(/remaining/i)).toHaveValue('44:30');
     });
     it('displays estimate for number of laps that will be completed', () => {
         HTMLDialogElement.prototype.close = jest.fn();
@@ -65,14 +65,14 @@ describe('when rendered', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
-        expect(screen.getByLabelText(/last/i)).toHaveValue('00:00:00');
+        expect(screen.getByLabelText(/last/i)).toHaveValue('00:00');
     });
     it('displays the average lap time for the lead entry', () => {
         HTMLDialogElement.prototype.close = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
-        expect(screen.getByLabelText(/average/i)).toHaveValue('00:00:00');
+        expect(screen.getByLabelText(/average/i)).toHaveValue('00:00');
     });
     it('displays download results button', () => {
         HTMLDialogElement.prototype.close = jest.fn();
@@ -112,7 +112,7 @@ describe('when race has not yet started', () => {
         customRender(<RaceHeaderView key={raceScorpionA.name+startTime.toISOString()} race={ {...raceScorpionA, 'plannedStartTime': startTime.toISOString(),'clock': clock} } />, model, controller);
         
         const outputRemaining = screen.getByLabelText(/countdown/i);
-        expect(outputRemaining).toHaveValue('00:01:00');
+        expect(outputRemaining).toHaveValue('01:00');
     });
 });
 
@@ -130,7 +130,7 @@ describe('when a race has started', () => {
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
 
         const outputRemaining = screen.getByLabelText(/remaining/i);
-        expect(outputRemaining).toHaveValue('00:44:54');
+        expect(outputRemaining).toHaveValue('44:54');
     });
     // Have not figured out to test a value has not changed after a period of time. Can revisit when need to to do something other than stopping clock 
     xit('stops the selected race', async () => {
@@ -195,8 +195,8 @@ it('updates values when a new race is selected', async () => {
     
     expect(screen.getByText(/graduate a/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/laps(?!.)/i)).toHaveValue('4');
-    expect(screen.getByLabelText(/duration/i)).toHaveValue('00:22:30');
-    expect(screen.getByLabelText(/remaining/i)).toHaveValue('00:22:25');
+    expect(screen.getByLabelText(/duration/i)).toHaveValue('22:30');
+    expect(screen.getByLabelText(/remaining/i)).toHaveValue('22:25');
     expect(screen.getByLabelText(/estimate/i)).toHaveValue('4.00');
 });
 

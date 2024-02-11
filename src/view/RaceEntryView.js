@@ -13,7 +13,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
 	const thresholdTime = 500;
 	const thresholdDistance = 10;
     const longTouchTimeout = 500; 
-
+// console.log(entry);
     const handleLastLapCellKeyUp = useCallback((event) => {
         if (event.key === 'Enter') {
             if (updateLap) {
