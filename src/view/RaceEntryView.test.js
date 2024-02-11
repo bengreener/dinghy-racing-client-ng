@@ -184,7 +184,7 @@ describe('when user swipes left on row', () => {
 });
 
 describe('when entry is on last lap', () => {
-    it('sets a class of onLastLap', () => {
+    it('sets a class of on-last-lap', () => {
         const entryOnLastLap = {...entryChrisMarshallScorpionA1234, 'onLastLap': true};
         const tableBody = document.createElement('tbody');
         render(<RaceEntryView entry={entryOnLastLap} />, {container: document.body.appendChild(tableBody)});
@@ -194,7 +194,7 @@ describe('when entry is on last lap', () => {
 });
 
 describe('when entry is on last lap', () => {
-    it('sets a class of onLastLap', () => {
+    it('sets a class of on-last-lap', () => {
         const tableBody = document.createElement('tbody');
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />, {container: document.body.appendChild(tableBody)});
         const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;

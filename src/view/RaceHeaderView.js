@@ -14,6 +14,43 @@ function RaceHeaderView({ race }) {
     const previousRace = useRef(); // enables removal of tickHandler from previous race when rendered with new race 
     const [showPostponeRace, setShowPostponeRace] = useState(false);
 
+    let warningFlagClass = 'warning-flag-lowered';
+    let bluePeterClass = 'blue-peter-lowered';
+
+    // 11 minutes before race prepare to raise warning (class) flag
+    // 10 minutes before race raise warning (class) flag
+    // 1 minute before race prepare to lower warning (class) flag
+    // At start of race race lower warning (class) flag
+    if (elapsedTime >= -660000 && elapsedTime < -600000) {
+        warningFlagClass = 'warning-flag-prepare-raise';
+    }
+    else if (elapsedTime >= -600000 && elapsedTime < -60000) {
+        warningFlagClass = 'warning-flag-raised';
+    }
+    else if (elapsedTime >= -60000 && elapsedTime < 0) {
+        warningFlagClass = 'warning-flag-prepare-lower';
+    }
+    else {
+        warningFlagClass = 'warning-flag-lowered';
+    }
+
+    // 6 minutes before race prepare to raise Blue Peter flag
+    // 5 minutes before race raise Blue Peter flag
+    // 1 minute before race prepare to lower Blue Peter flag
+    // At start of race race lower Blue Peter flag
+    if (elapsedTime >= -360000 && elapsedTime < -300000) {
+        bluePeterClass = 'blue-peter-prepare-raise';
+    }
+    else if (elapsedTime >= -300000 && elapsedTime < -60000) {
+        bluePeterClass = 'blue-peter-raised';
+    }
+    else if (elapsedTime >= -60000 && elapsedTime < 0) {
+        bluePeterClass = 'blue-peter-prepare-lower';
+    }
+    else {
+        bluePeterClass = 'blue-peter-lowered';
+    }
+
     const handleEntryUpdate = useCallback(() => {
         model.getRace(race.url).then(result => {
             if (!result.success) {
@@ -87,6 +124,8 @@ function RaceHeaderView({ race }) {
             <output id={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{race.plannedLaps}</output>
             <label htmlFor={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()}>Duration</label>
             <output id={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(race.duration)}</output>
+            {<p className={warningFlagClass} style={{display: 'inline'}}>WF</p>}
+            {<p className={bluePeterClass} style={{display: 'inline'}}>BP</p>}
             <label htmlFor={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>{
                 (elapsedTime < 0) ? 'Countdown' : 'Remaining'
             }</label>

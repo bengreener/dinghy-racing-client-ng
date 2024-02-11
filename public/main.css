@@ -107,3 +107,41 @@ header {
 .on-last-lap {
 	background-color: yellow;
 }
+.warning-flag-prepare-raise {
+	padding: 5pt;
+	margin: 0;
+	background: linear-gradient(to top right, white, cornflowerblue);
+}
+.warning-flag-raised {
+	padding: 5pt;
+	margin: 0;
+	background-color: cornflowerblue;
+}
+.warning-flag-prepare-lower {
+	padding: 5pt;
+	margin: 0;
+	background: linear-gradient(to bottom left, white, cornflowerblue);
+}
+.warning-flag-lowered {
+	padding: 5pt;
+	margin: 0;
+}
+.blue-peter-prepare-raise {
+	padding: 5pt;
+	margin: 0;
+	background: linear-gradient(to top right, white, blue);
+}
+.blue-peter-raised {
+	padding: 5pt;
+	margin: 0;
+	background-color: blue;
+}
+.blue-peter-prepare-lower {
+	padding: 5pt;
+	margin: 0;
+	background: linear-gradient(to bottom left, white, blue);
+}
+.blue-peter-lowered {
+	padding: 5pt;
+	margin: 0;
+}

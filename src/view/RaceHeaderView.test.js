@@ -248,3 +248,186 @@ describe('when start now button clicked', () => {
         expect(startRaceSpy).toHaveBeenCalled();
     });
 });
+
+describe('when more than 11 minutes before race', () => {
+    it('warning flag indicator does not have class of warning-flag-prepare-raise', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = new Clock();
+        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => -660001);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
+        expect(screen.getByText('WF').getAttribute('class')).not.toMatch(/warning-flag-prepare-raise/);
+    });
+    it('does not have class of blue-peter-prepare-raise', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = new Clock();
+        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => -660001);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
+        expect(screen.getByText('WF').getAttribute('class')).not.toMatch(/blue-peter-prepare-raise/);
+    });
+    it('warning flag indicator does not have class of warning-flag-raised', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = new Clock();
+        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => -660001);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
+        expect(screen.getByText('WF').getAttribute('class')).not.toMatch(/warning-flag-raised/);
+    });
+    it('does not have class of blue-peter-raised', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = new Clock();
+        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => -660001);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
+        expect(screen.getByText('WF').getAttribute('class')).not.toMatch(/blue-peter-raised/);
+    });
+});
+
+describe('when 11 minutes before race starts', () => {
+    it('warning flag indicator has a class of warning-flag-prepare-raise', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = new Clock();
+        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => -660000);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
+        expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-prepare-raise/);
+    });
+});
+
+describe('when 10 minutes before race starts', () => {
+    it('warning flag indicator has a class of warning-flag-raised', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = new Clock();
+        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => -600000);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
+        expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-raised/);
+    });
+    it('warning flag indicator does not have class of warning-flag-prepare-raise', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = new Clock();
+        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => -600000);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
+        expect(screen.getByText('WF').getAttribute('class')).not.toMatch(/warning-flag-prepare-raise/);
+    });
+});
+
+describe('when 6 minutes before race starts', () => {
+    it('blue peter flag indicator has a class of blue-peter-prepare-raise', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = new Clock();
+        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => -360000);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
+        expect(screen.getByText('BP').getAttribute('class')).toMatch(/blue-peter-prepare-raise/);
+    });
+});
+
+describe('when 5 minutes before race starts', () => {
+    it('blue peter flag indicator has a class of blue-peter-raised', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = new Clock();
+        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => -300000);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
+        expect(screen.getByText('BP').getAttribute('class')).toMatch(/blue-peter-raised/);
+    });
+    it('blue peter flag indicator does not have a class of blue-peter-prepare-raise', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = new Clock();
+        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => -300000);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
+        expect(screen.getByText('BP').getAttribute('class')).not.toMatch(/blue-peter-prepare-raise/);
+    });
+});
+
+describe('when 1 minutes before race starts', () => {
+    it('warning flag indicator has a class of warning-flag-prepare-lower', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = new Clock();
+        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => -60000);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
+        expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-prepare-lower/);
+    });
+    it('blue peter indicator has a class of blue-peter-prepare-lower', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = new Clock();
+        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => -60000);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
+        expect(screen.getByText('BP').getAttribute('class')).toMatch(/blue-peter-prepare-lower/);
+    });
+    it('warning flag indicator does not have class of warning-flag-raised', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = new Clock();
+        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => -60000);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
+        expect(screen.getByText('WF').getAttribute('class')).not.toMatch(/warning-flag-raised/);
+    });
+    it('blue peter indicator does not have a class of blue-peter-raised', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = new Clock();
+        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => -60000);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
+        expect(screen.getByText('BP').getAttribute('class')).not.toMatch(/blue-peter-raised/);
+    });
+});
+
+describe('when 0 minutes before race starts', () => {
+    it('warning flag indicator has a class of warning-flag-lowered', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = new Clock();
+        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 0);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
+        expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-lowered/);
+    });
+    it('blue peter indicator has a class of blue-peter-lowered', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = new Clock();
+        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 0);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
+        expect(screen.getByText('BP').getAttribute('class')).toMatch(/blue-peter-lowered/);
+    });
+    it('warning flag indicator does not have a class of warning-flag-prepare-lower', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = new Clock();
+        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 0);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
+        expect(screen.getByText('WF').getAttribute('class')).not.toMatch(/warning-flag-prepare-lower/);
+    });
+    it('blue peter indicator does not have a class of blue-peter-prepare-lower', async () => {
+        HTMLDialogElement.prototype.close = jest.fn();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = new Clock();
+        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 0);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
+        expect(screen.getByText('BP').getAttribute('class')).not.toMatch(/blue-peter-prepare-lower/);
+    });
+});
