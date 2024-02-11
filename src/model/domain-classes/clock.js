@@ -10,7 +10,7 @@ class Clock {
      * @returns {String}
      */
     static formatDuration(duration) {
-        const d = Math.abs(duration);
+        const d = Math.round(Math.abs(duration) / 1000) * 1000;
         const hours = Math.floor(d / 3600000);
         const minutes = Math.floor((d % 3600000) / 60000);
         // const seconds = Math.round((d % 60000) / 1000);
