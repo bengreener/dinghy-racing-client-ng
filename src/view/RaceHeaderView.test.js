@@ -457,7 +457,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:11:01');
+            await screen.findByText('11:01');
             expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-lowered/);
         });
         it('prepare audio warning is not present', async () => {
@@ -470,7 +470,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:11:01');
+            await screen.findByText('11:01');
             expect(screen.queryByTestId('prepare-sound-warning-audio')).not.toBeInTheDocument();
         });
         it('act audio warning is not present', async () => {
@@ -483,7 +483,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:11:01');
+            await screen.findByText('11:01');
             expect(screen.queryByTestId('act-sound-warning-audio')).not.toBeInTheDocument();
         });
     });
@@ -498,7 +498,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:11:00');
+            await screen.findByText('11:00');
             expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-prepare-raise/);
         });
         it('prepare audio warning is present', async () => {
@@ -511,7 +511,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:11:00');
+            await screen.findByText('11:00');
             expect(screen.queryByTestId('prepare-sound-warning-audio')).toBeInTheDocument();
         });
     });
@@ -527,7 +527,7 @@ describe('when race header displayed', () => {
                 // jest.advanceTimersToNextTimer();
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:10:00');
+            await screen.findByText('10:00');
             expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-raised/);
         });
         it('act audio warning is present', async () => {
@@ -540,7 +540,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:10:00');
+            await screen.findByText('10:00');
             expect(screen.queryByTestId('act-sound-warning-audio')).toBeInTheDocument();
         });
     });
@@ -555,7 +555,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:06:00');
+            await screen.findByText('06:00');
             expect(screen.getByText('BP').getAttribute('class')).toMatch(/blue-peter-prepare-raise/);
         });
         it('prepare audio warning is present', async () => {
@@ -568,7 +568,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:06:00');
+            await screen.findByText('06:00');
             expect(screen.queryByTestId('prepare-sound-warning-audio')).toBeInTheDocument();
         });
     });
@@ -583,7 +583,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:05:00');
+            await screen.findByText('05:00');
             expect(screen.getByText('BP').getAttribute('class')).toMatch(/blue-peter-raised/);
         });
         it('act audio warning is present', async () => {
@@ -611,7 +611,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:01:00');
+            await screen.findByText('01:00');
             expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-prepare-lower/);
         });
         it('blue peter flag indicator has a class of blue-peter-prepare-lower', async () => {
@@ -624,7 +624,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:01:00');
+            await screen.findByText('01:00');
             expect(screen.getByText('BP').getAttribute('class')).toMatch(/blue-peter-prepare-lower/);
         });
         it('prepare audio warning is present', async () => {
