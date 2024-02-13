@@ -235,7 +235,7 @@ describe('when a race is unselected', () => {
             await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
         });
         
-        const graduateEntries = await screen.findAllByRole('rowheader', {'name': /Graduate/i});
+        const graduateEntries = await screen.findAllByRole('cell', {'name': /Graduate/i});
         graduateEntries.forEach(entry => expect(entry).toBeInTheDocument());
         await act(async () => {
             await user.deselectOptions(selectRace, ['Graduate A']);

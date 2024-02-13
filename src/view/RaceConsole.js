@@ -4,7 +4,6 @@ import ModelContext from './ModelContext';
 import RaceEntriesView from './RaceEntriesView';
 import RaceHeaderView from './RaceHeaderView';
 import Clock from '../model/domain-classes/clock';
-import RaceHeaderContainer from './RaceHeaderContainer';
 
 function RaceConsole() {
     const model = useContext(ModelContext);
@@ -87,12 +86,10 @@ function RaceConsole() {
                 <input id="race-select-session-end" name="sessionEndTime" type="datetime-local" onChange={handleSelectSessionEndChange} value={sessionEnd} />
             </div>
             <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
-            <RaceHeaderContainer>
-                {selectedRaces.map(selectedRace => {
-                    const race = raceMap.get(selectedRace);
-                    return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} />
-                })}
-            </RaceHeaderContainer>
+            {selectedRaces.map(selectedRace => {
+                const race = raceMap.get(selectedRace);
+                return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} />
+            })}
             <RaceEntriesView races={selectedRaces.map(selectedRace => raceMap.get(selectedRace))} />
         </div>
     );

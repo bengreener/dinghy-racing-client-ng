@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
 import RaceEntryView from './RaceEntryView';
 import { sortArray } from '../utilities/array-utilities';
@@ -12,9 +12,12 @@ function RaceEntriesView({ races }) {
     const [sortOrder, setSortOrder] = useState('default');
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies an entry has been updated
 
-    const updateEntries = useCallback(() => {
+    // const updateEntries = useCallback(() => {
+    //     setRacesUpdateRequestAt(Date.now());
+    // });
+    function updateEntries() {
         setRacesUpdateRequestAt(Date.now());
-    }, []);
+    };
 
     // get entries
     useEffect(() => {
@@ -36,7 +39,6 @@ function RaceEntriesView({ races }) {
                     else {
                         result.domainObject.forEach(entry => {
                             entriesMap.set(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name, entry);
-                            model.registerEntryUpdateCallback(entry.url, updateEntries);
                         });
                     }
                 });
@@ -45,15 +47,12 @@ function RaceEntriesView({ races }) {
                 }
             });
         };
-        // cleanup before effect runs and before form close
+
         return () => {
-            entriesMap.forEach(entry => {
-                model.unregisterEntryUpdateCallback(entry.url, updateEntries);
-            });
             ignoreFetch = true;
             setMessage(''); // clear any previous message
         }
-    }, [model, races, updateEntries, racesUpdateRequestAt]);
+    }, [model, races, racesUpdateRequestAt]);
 
     // return array of entries sorted according to selected sort order
     function sorted() {
@@ -103,6 +102,9 @@ function RaceEntriesView({ races }) {
         if (!result.success) {
             setMessage(result.message);
         }
+        else {
+            updateEntries();
+        }
     }
 
     async function removeLap(entry) {
@@ -110,12 +112,18 @@ function RaceEntriesView({ races }) {
         if (!result.success) {
             setMessage(result.message);
         }
+        else {
+            updateEntries();
+        }
     }
 
     async function updateLap(entry, value) {
         const result = await controller.updateLap(entry, value);
         if (!result.success) {
             setMessage(result.message);
+        }
+        else {
+            updateEntries();
         }
     }
 
@@ -127,7 +135,7 @@ function RaceEntriesView({ races }) {
     }
 
     return (
-        <div className="race-entries-view" >
+        <div className="race-entries-view">
             <p id="race-entries-message" className={!message ? "hidden" : ""}>{message}</p>
             <div>
                 <button onClick={() => setSortOrder('default')}>Default</button>
@@ -136,7 +144,7 @@ function RaceEntriesView({ races }) {
                 <button onClick={() => setSortOrder('lapTimes')}>By lap times</button>
             </div>
             <div className="scrollable">
-                <table id="race-entries-table" style={{touchAction: 'pinch-zoom pan-y'}}>
+                <table id="race-entries-table">
                     <tbody>
                     {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap}/>)}
                     </tbody>

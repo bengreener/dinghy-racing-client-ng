@@ -44,8 +44,7 @@ class DinghyRacingModel {
      * Provide a blank entry template
      */
     static entryTemplate() {
-        return {'race': DinghyRacingModel.raceTemplate(), 'helm': DinghyRacingModel.competitorTemplate(), 'crew': null, 
-        'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'url': ''};
+        return {'race': DinghyRacingModel.raceTemplate(), 'helm': DinghyRacingModel.competitorTemplate(), 'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'url': ''};
     }
 
     /**
@@ -90,24 +89,12 @@ class DinghyRacingModel {
     }
 
     registerEntryUpdateCallback(key, callback) {
-        if (this.entryUpdateCallbacks.has(key)) {
-            this.entryUpdateCallbacks.get(key).add(callback);
-        }
-        else {
-            this.entryUpdateCallbacks.set(key, new Set([callback]));
-        }
     }
 
     unregisterEntryUpdateCallback(key, callback) {
-        if (this.entryUpdateCallbacks.has(key)) {
-            this.entryUpdateCallbacks.get(key).delete(callback);
-        }
     }
 
     handleEntryUpdate(message) {
-        if (this.entryUpdateCallbacks.has(message.body)) {
-            this.entryUpdateCallbacks.get(message.body).forEach(cb => cb());
-        }
     }
 
     async addLap(entry, time) {
