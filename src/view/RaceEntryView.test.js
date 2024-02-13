@@ -26,7 +26,7 @@ it('displays lap times', async () => {
     const entry = {...entryChrisMarshallScorpionA1234, laps: [{'number': 1, 'time': 1234}]};
     const tableBody = document.createElement('tbody');
     render(<RaceEntryView entry={entry} />, {container: document.body.appendChild(tableBody)});
-    expect(screen.getByText('00:00:01')).toBeInTheDocument();
+    expect(screen.getByText('00:01')).toBeInTheDocument();
 });
 
 it('calls addLap callback with entry', async () => {
@@ -108,7 +108,11 @@ describe('when editing a lap time', () => {
     });
     it('updates lap with new time supplied', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}]};
+        const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
+            {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, 
+            {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, 
+            {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
+        ]};
         const tableBody = document.createElement('tbody');
         const updateLapCallback = jest.fn((entry, value) => {});
         render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />, {container: document.body.appendChild(tableBody)});

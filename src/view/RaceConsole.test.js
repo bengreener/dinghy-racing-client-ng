@@ -100,7 +100,7 @@ describe('when a race is selected', () => {
             await user.selectOptions(selectRace, 'Scorpion A');
         });
         const outputDuration = screen.getByLabelText(/duration/i)
-        expect(outputDuration).toHaveValue('00:45:00');
+        expect(outputDuration).toHaveValue('45:00');
     });
     it('displays the entries for the selected race', async () => {
         const user = userEvent.setup();
@@ -150,8 +150,8 @@ describe('when more than one race is selected', () => {
         
         const outputDuration = await screen.findAllByLabelText(/duration/i);
         expect(outputDuration).toHaveLength(2);
-        expect(outputDuration[0]).toHaveValue('00:45:00');
-        expect(outputDuration[1]).toHaveValue('00:45:00');
+        expect(outputDuration[0]).toHaveValue('45:00');
+        expect(outputDuration[1]).toHaveValue('45:00');
     });
     it('displays the entries for the selected race', async () => {
         const user = userEvent.setup();

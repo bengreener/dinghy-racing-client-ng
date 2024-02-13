@@ -41,7 +41,7 @@ describe('when rendered', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
-        expect(screen.getByLabelText(/duration/i)).toHaveValue('00:45:00');
+        expect(screen.getByLabelText(/duration/i)).toHaveValue('45:00');
     });
     it('displays remaining race duration', () => {
         HTMLDialogElement.prototype.close = jest.fn();
@@ -51,7 +51,7 @@ describe('when rendered', () => {
         jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 30000);
 
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-        expect(screen.getByLabelText(/remaining/i)).toHaveValue('00:44:30');
+        expect(screen.getByLabelText(/remaining/i)).toHaveValue('44:30');
     });
     it('displays estimate for number of laps that will be completed', () => {
         HTMLDialogElement.prototype.close = jest.fn();
@@ -65,14 +65,14 @@ describe('when rendered', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
-        expect(screen.getByLabelText(/last/i)).toHaveValue('00:00:00');
+        expect(screen.getByLabelText(/last/i)).toHaveValue('00:00');
     });
     it('displays the average lap time for the lead entry', () => {
         HTMLDialogElement.prototype.close = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
-        expect(screen.getByLabelText(/average/i)).toHaveValue('00:00:00');
+        expect(screen.getByLabelText(/average/i)).toHaveValue('00:00');
     });
     it('displays download results button', () => {
         HTMLDialogElement.prototype.close = jest.fn();
@@ -112,7 +112,7 @@ describe('when race has not yet started', () => {
         customRender(<RaceHeaderView key={raceScorpionA.name+startTime.toISOString()} race={ {...raceScorpionA, 'plannedStartTime': startTime.toISOString(),'clock': clock} } />, model, controller);
         
         const outputRemaining = screen.getByLabelText(/countdown/i);
-        expect(outputRemaining).toHaveValue('00:01:00');
+        expect(outputRemaining).toHaveValue('01:00');
     });
 });
 
@@ -130,7 +130,7 @@ describe('when a race has started', () => {
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
 
         const outputRemaining = screen.getByLabelText(/remaining/i);
-        expect(outputRemaining).toHaveValue('00:44:54');
+        expect(outputRemaining).toHaveValue('44:54');
     });
     // Have not figured out to test a value has not changed after a period of time. Can revisit when need to to do something other than stopping clock 
     xit('stops the selected race', async () => {
@@ -195,8 +195,8 @@ it('updates values when a new race is selected', async () => {
     
     expect(screen.getByText(/graduate a/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/laps(?!.)/i)).toHaveValue('4');
-    expect(screen.getByLabelText(/duration/i)).toHaveValue('00:22:30');
-    expect(screen.getByLabelText(/remaining/i)).toHaveValue('00:22:25');
+    expect(screen.getByLabelText(/duration/i)).toHaveValue('22:30');
+    expect(screen.getByLabelText(/remaining/i)).toHaveValue('22:25');
     expect(screen.getByLabelText(/estimate/i)).toHaveValue('4.00');
 });
 
@@ -457,7 +457,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:11:01');
+            await screen.findByText('11:01');
             expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-lowered/);
         });
         it('prepare audio warning is not present', async () => {
@@ -470,7 +470,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:11:01');
+            await screen.findByText('11:01');
             expect(screen.queryByTestId('prepare-sound-warning-audio')).not.toBeInTheDocument();
         });
         it('act audio warning is not present', async () => {
@@ -483,7 +483,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:11:01');
+            await screen.findByText('11:01');
             expect(screen.queryByTestId('act-sound-warning-audio')).not.toBeInTheDocument();
         });
     });
@@ -498,7 +498,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:11:00');
+            await screen.findByText('11:00');
             expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-prepare-raise/);
         });
         it('prepare audio warning is present', async () => {
@@ -511,7 +511,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:11:00');
+            await screen.findByText('11:00');
             expect(screen.queryByTestId('prepare-sound-warning-audio')).toBeInTheDocument();
         });
     });
@@ -527,7 +527,7 @@ describe('when race header displayed', () => {
                 // jest.advanceTimersToNextTimer();
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:10:00');
+            await screen.findByText('10:00');
             expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-raised/);
         });
         it('act audio warning is present', async () => {
@@ -540,7 +540,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:10:00');
+            await screen.findByText('10:00');
             expect(screen.queryByTestId('act-sound-warning-audio')).toBeInTheDocument();
         });
     });
@@ -555,7 +555,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:06:00');
+            await screen.findByText('06:00');
             expect(screen.getByText('BP').getAttribute('class')).toMatch(/blue-peter-prepare-raise/);
         });
         it('prepare audio warning is present', async () => {
@@ -568,7 +568,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:06:00');
+            await screen.findByText('06:00');
             expect(screen.queryByTestId('prepare-sound-warning-audio')).toBeInTheDocument();
         });
     });
@@ -583,7 +583,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:05:00');
+            await screen.findByText('05:00');
             expect(screen.getByText('BP').getAttribute('class')).toMatch(/blue-peter-raised/);
         });
         it('act audio warning is present', async () => {
@@ -611,7 +611,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:01:00');
+            await screen.findByText('01:00');
             expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-prepare-lower/);
         });
         it('blue peter flag indicator has a class of blue-peter-prepare-lower', async () => {
@@ -624,7 +624,7 @@ describe('when race header displayed', () => {
             act(() => {
                 jest.advanceTimersByTime(1000);
             });
-            await screen.findByText('00:01:00');
+            await screen.findByText('01:00');
             expect(screen.getByText('BP').getAttribute('class')).toMatch(/blue-peter-prepare-lower/);
         });
         it('prepare audio warning is present', async () => {
