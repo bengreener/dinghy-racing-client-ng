@@ -229,7 +229,7 @@ describe('when adding a lap time', () => {
         await act(async () => {
             model.handleEntryUpdate({'body': entriesScorpionA[0].url});
         });
-        expect(await screen.findByRole('cell', {'name': '00:05:12'})).toBeInTheDocument();
+        expect(await screen.findByRole('cell', {'name': '00:05:13'})).toBeInTheDocument();
     });
     it('displays a message if there is a problem adding the lap time', async () => {
         const entriesScorpionAPost = [{'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},{'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
@@ -312,7 +312,7 @@ describe('when removing a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
         const entry = await screen.findByText(/scorpion 1234/i);
-        const cell = await screen.findByRole('cell', {'name': '00:05:12'});
+        const cell = await screen.findByRole('cell', {'name': '00:05:13'});
         expect(cell).toBeInTheDocument();
         await act(async ()=> {
             await user.keyboard('{Control>}');
@@ -427,7 +427,7 @@ describe('when updating a lap time', () => {
             await user.keyboard('{Enter}');
             model.handleEntryUpdate({'body': entriesScorpionA[0].url});
         });
-        expect(await screen.findByRole('cell', {'name': '00:00:15'})).toBeInTheDocument();
+        expect(await screen.findByRole('cell', {'name': '00:00:16'})).toBeInTheDocument();
     });
     it('displays a message if there is a problem updating the lap time', async () => {
         const entriesScorpionAPre = [{'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7}], 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},{'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
