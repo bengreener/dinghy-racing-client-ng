@@ -1365,6 +1365,81 @@ describe('when searching for entries by race', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true, 'domainObject': entriesHandicapA_OnLastLap});
     });
+    it('returns a promise that resolves to a result indicating success and containing the entries when entries are found and some entries have finished the race', async () => {
+        const entriesHandicapAHAL_finishedRace = { '_embedded' : { 'entries' : [
+            { 'averageLapTime': 'PT0S', 'lastLapTime': 'PT0S', 'sumOfLapTimes': 'PT0S' , 'onLastLap': false, 'finishedRace': true,
+                '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20' }, 
+                'entry' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20' }, 
+                'helm' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/helm' }, 
+                'crew' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/crew' }, 
+                'laps' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/laps' }, 
+                'race' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/race' }, 
+                'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/dinghy' } } 
+            }, 
+            { 'averageLapTime': 'PT0S', 'lastLapTime': 'PT0S', 'sumOfLapTimes': 'PT0S', 'onLastLap': true, 'finishedRace': false,
+                '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21' }, 
+                'entry' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21' }, 
+                'helm' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/helm' }, 
+                'crew' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/crew' }, 
+                'laps' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/laps' }, 
+                'race' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/race' }, 
+                'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/dinghy' } }
+            } 
+        ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/races/8/signedUp' } }};
+
+        const entriesHandicapA_OnLastLap = [
+            {'helm': competitorChrisMarshall, 'crew': competitorLouScrew, 'race': raceHandicapA, 'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': true, 'url': 'http://localhost:8081/dinghyracing/api/entries/20'}, 
+            {'helm': competitorJillMyer, 'crew': null, 'race': raceHandicapA, 'dinghy': dinghy826, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': true, 'finishedRace': false, 'url': 'http://localhost:8081/dinghyracing/api/entries/21'}
+        ];
+
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: true,
+                status: 200, 
+                json: () => Promise.resolve(entriesHandicapAHAL_finishedRace)
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceHandicapA})});
+        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/20/helm') {
+                return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
+            };
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/20/crew') {
+                return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
+            };
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/21/helm') {
+                return Promise.resolve({'success': true, 'domainObject': competitorJillMyer});
+            };
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/21/crew') {
+                return Promise.resolve({'success': false, 'message': 'Error 404 Not Found'});
+            };
+            return Promise.resolve({'success': false, 'message': 'Unable to identify competitor.'});
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/20/dinghy') {
+                return Promise.resolve({'success': true, 'domainObject': dinghy1234});
+            };
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/21/dinghy') {
+                return Promise.resolve({'success': true, 'domainObject': dinghy826});
+            };
+            return Promise.resolve({'success': false, 'message': 'Unable to identify dinghy.'});
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass') {
+                return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion});
+            }
+            if (url === 'http://localhost:8081/dinghyracing/api/dinghies/18/dinghyClass') {
+                return Promise.resolve({'success': true, 'domainObject': dinghyClassComet});
+            }
+            return Promise.resolve({'success': false, 'message': 'Error 404 Not Found'});
+        });
+        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
+        const promise = dinghyRacingModel.getEntriesByRace(raceHandicapA);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': entriesHandicapA_OnLastLap});
+    });
     it('returns a promise that resolves to a result indicating failure when race is not found', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
