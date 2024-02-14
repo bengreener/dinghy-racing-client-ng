@@ -1150,7 +1150,7 @@ it('provides a blank template for a race', () => {
 it('provides a blank template for a race entry', () => {
     const entry = DinghyRacingModel.entryTemplate();
 
-    expect(entry).toEqual({'race': DinghyRacingModel.raceTemplate(), 'helm': DinghyRacingModel.competitorTemplate(), 'crew': null, 'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'url': ''});
+    expect(entry).toEqual({'race': DinghyRacingModel.raceTemplate(), 'helm': DinghyRacingModel.competitorTemplate(), 'crew': null, 'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'url': ''});
 });
 
 it('provides a blank template for a lap', () => {
@@ -1292,7 +1292,7 @@ describe('when searching for entries by race', () => {
     });
     it('returns a promise that resolves to a result indicating success and containing the entries when entries are found and some entries are on the last lap', async () => {
         const entriesHandicapAHAL_onLastLap = { '_embedded' : { 'entries' : [
-            { 'averageLapTime': 'PT0S', 'lastLapTime': 'PT0S', 'sumOfLapTimes': 'PT0S' , 'onLastLap': true, 
+            { 'averageLapTime': 'PT0S', 'lastLapTime': 'PT0S', 'sumOfLapTimes': 'PT0S' , 'onLastLap': true, 'finishedRace': false,
                 '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20' }, 
                 'entry' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20' }, 
                 'helm' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/helm' }, 
@@ -1301,7 +1301,7 @@ describe('when searching for entries by race', () => {
                 'race' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/race' }, 
                 'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/dinghy' } } 
             }, 
-            { 'averageLapTime': 'PT0S', 'lastLapTime': 'PT0S', 'sumOfLapTimes': 'PT0S', 'onLastLap': false, 
+            { 'averageLapTime': 'PT0S', 'lastLapTime': 'PT0S', 'sumOfLapTimes': 'PT0S', 'onLastLap': false, 'finishedRace': false,
                 '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21' }, 
                 'entry' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21' }, 
                 'helm' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/helm' }, 
@@ -1313,8 +1313,8 @@ describe('when searching for entries by race', () => {
         ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/races/8/signedUp' } }};
 
         const entriesHandicapA_OnLastLap = [
-            {'helm': competitorChrisMarshall, 'crew': competitorLouScrew, 'race': raceHandicapA, 'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': true, 'url': 'http://localhost:8081/dinghyracing/api/entries/20'}, 
-            {'helm': competitorJillMyer, 'crew': null, 'race': raceHandicapA, 'dinghy': dinghy826, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'url': 'http://localhost:8081/dinghyracing/api/entries/21'}
+            {'helm': competitorChrisMarshall, 'crew': competitorLouScrew, 'race': raceHandicapA, 'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': true, 'finishedRace': false, 'url': 'http://localhost:8081/dinghyracing/api/entries/20'}, 
+            {'helm': competitorJillMyer, 'crew': null, 'race': raceHandicapA, 'dinghy': dinghy826, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'url': 'http://localhost:8081/dinghyracing/api/entries/21'}
         ];
 
         fetch.mockImplementationOnce(() => {
