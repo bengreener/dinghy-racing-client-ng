@@ -8,5 +8,6 @@
  * @property {Array<Lap>} laps The laps for this entry in the race
  * @property {integer} sumOfLapTimes
  * @property {boolean} onLastLap
+ * @property {boolean} finishedRace
  * @property {string} url The URL to the remote resource
  */
