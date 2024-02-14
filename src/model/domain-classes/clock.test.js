@@ -3,11 +3,11 @@ import Clock from './clock';
 describe('when provided with a start time', () => {
     it('returns the time to elapse to reach start time when start time is ahead of now', () => {
         const clock = new Clock(new Date(Date.now() + 10000));
-        expect(clock.getElapsedTime()).toBe(-10000);
+        expect(Math.round(clock.getElapsedTime())).toBe(-10000);
     });
     it('returns the amount of time elapsed sins the start time when start time is in the past', () => {
         const clock = new Clock(new Date(Date.now() - 999));
-        expect(clock.getElapsedTime()).toBe(999);
+        expect(Math.round(clock.getElapsedTime())).toBe(999);
     });
 });
 
@@ -18,7 +18,7 @@ describe('when started without providing a start time', () => {
         // sleep thread and then check time is as expected
         setTimeout(() => {
             const elapsed = clock.getElapsedTime();
-        expect(elapsed).toBe(1000);    
+        expect(Math.round(elapsed)).toBe(1000);    
         }, 1000);
     });    
 });
@@ -33,7 +33,7 @@ describe('when clock already started and start instruction given', () => {
             clock.start();
             const elapsed = clock.getElapsedTime();
             expect(clock._startTime).toBe(startTime);
-            expect(elapsed).toBe(1000);    
+            expect(Math.round(elapsed)).toBe(1000);    
         }, 1000);
     });
 });
@@ -45,7 +45,6 @@ it('stops', () => {
         clock.stop();
         const elapsed = clock.getElapsedTime();
     }, 1000);
-    // const elapsed = clock.getElapsedTime();
     setTimeout(() => {
         expect(clock.getElapsedTime()).toBe(elapsed);
     }, 10);
@@ -58,7 +57,7 @@ it('resets', () => {
         clock.stop();
     }, 1000);
     clock.reset();
-    expect(clock.getElapsedTime()).toBe(0);
+    expect(Math.round(clock.getElapsedTime())).toBe(0);
 });
 
 it('calls handler on tick', () => {

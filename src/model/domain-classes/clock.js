@@ -1,6 +1,7 @@
 class Clock {
-    _startTime;
-    // _elapsedTime = 0;
+    _startTime
+    _performanceTimerStartTime; // when the race is due to start based on the value of performance.now() when clock was initialised
+    _dateNowPerformanceNowDiff; // difference between Date.now() and performance.now() on clock initialisation
     _tickHandler;
     _ticker;
     
@@ -35,16 +36,19 @@ class Clock {
     }
 
     /**
-     * Create a new instance of Clock 
+     * Create a new instance of Clock
      * @param {Date} startTime The start time for the clock. Defaults to the time of instantiation.
      */
     constructor(startTime = new Date()) {
         this._startTime = startTime.valueOf();
+        this._dateNowPerformanceNowDiff = Date.now() - performance.now();
+        this._performanceTimerStartTime =  this._startTime - this._dateNowPerformanceNowDiff;
     }
 
     /**
      * Start clock ticking
      * This does not affect elapsed time which is calculated from the start time given when clock was instantiated or reset
+     * Aligned to system clock rather than performance timer as variation should be minimal and adjusting to performance timer would incur a (slight) overhead
      */
     start() {
         if (!this._ticker) {
@@ -59,7 +63,6 @@ class Clock {
                     recursiveCallback(recursiveCallback);
                 }, 1000 - Date.now() % 1000);
             }
-
             setNextTick(setNextTick);
         }
     }
@@ -87,10 +90,23 @@ class Clock {
     
     /**
      * Get time elapsed since start time
+     * This is based on performance timer to ensure monotonically increasing values returned.
+     * There are known issues with the performance timer on some combinations of OS and browser relating to the timer suspending during sleep:
+     * Chromium: https://issues.chromium.org/issues/40765101
+     * Firefox: https://bugzilla.mozilla.org/show_bug.cgi?id=1709767
+     * Safari/ Webkit: https://bugs.webkit.org/show_bug.cgi?id=225610
      * @returns {number} The number of milliseconds elapsed since timer started, adjusted for any periods during which timer was stopped. Can be negative if start time not yet reached.
      */
     getElapsedTime() {
-        return Date.now() - this._startTime;
+        const pNow = performance.now();
+        const dNow = Date.now();
+        // adjust if performance timer falls behind system clock; intended to autocorrect any error caused by sleeping of clock used for performance timer
+        if (pNow + this._dateNowPerformanceNowDiff < dNow - 2) {
+            console.error(`Performance timer and Date timer variance exceeded tolerance. Performance timer constants reset. Variance was: ${pNow + this._dateNowPerformanceNowDiff - dNow} milliseconds`);
+            this._dateNowPerformanceNowDiff = dNow - pNow;
+            this._performanceTimerStartTime =  this._startTime - this._dateNowPerformanceNowDiff;
+        }
+        return pNow - this._performanceTimerStartTime;
     }
     
     /**
