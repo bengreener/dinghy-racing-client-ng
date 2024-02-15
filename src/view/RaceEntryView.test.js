@@ -188,7 +188,7 @@ describe('when user swipes left on row', () => {
 });
 
 describe('when entry is on last lap', () => {
-    it('sets a class of on-last-lap', () => {
+    it('has a class of on-last-lap', () => {
         const entryOnLastLap = {...entryChrisMarshallScorpionA1234, 'onLastLap': true};
         const tableBody = document.createElement('tbody');
         render(<RaceEntryView entry={entryOnLastLap} />, {container: document.body.appendChild(tableBody)});
@@ -197,11 +197,42 @@ describe('when entry is on last lap', () => {
     });
 });
 
-describe('when entry is on last lap', () => {
-    it('sets a class of on-last-lap', () => {
+describe('when entry is not on last lap', () => {
+    it('does not have a class of on-last-lap', () => {
         const tableBody = document.createElement('tbody');
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />, {container: document.body.appendChild(tableBody)});
         const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;
         expect(SMScorp1234entry.getAttribute('class')).not.toMatch(/on-last-lap/i);
+    });
+});
+
+describe('when entry has finished race', () => {
+    it('has a class of finished-race', () => {
+        const entryOnLastLap = {...entryChrisMarshallScorpionA1234, 'finishedRace': true};
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entryOnLastLap} />, {container: document.body.appendChild(tableBody)});
+        const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;
+        expect(SMScorp1234entry.getAttribute('class')).toMatch(/finished-race/i);
+    });
+    it('does not allow additional laps to be added', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const entryOnLastLap = {...entryChrisMarshallScorpionA1234, 'finishedRace': true};
+        const addLapCallback = jest.fn((e) => {entry.laps.push({'number': 1, 'time': 1234})});
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entryOnLastLap} />, {container: document.body.appendChild(tableBody)});
+        const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;
+        await act(async () => {
+            await user.click(SMScorp1234entry);
+        });
+        expect(addLapCallback).not.toBeCalled();
+    });
+});
+
+describe('when entry has not finished race', () => {
+    it('does not have a class of finished-race', () => {
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />, {container: document.body.appendChild(tableBody)});
+        const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;
+        expect(SMScorp1234entry.getAttribute('class')).not.toMatch(/finished-race/i);
     });
 });

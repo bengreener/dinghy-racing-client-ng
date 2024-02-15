@@ -3,7 +3,8 @@ import LapView from './LapView';
 
 function RaceEntryView({entry, addLap, removeLap, updateLap}) {
     const [editMode, setEditMode] = useState(false);
-    const classes = entry.onLastLap ? 'race-entry-view on-last-lap' : 'race-entry-view';
+    const lapsView = [];
+    let classes = 'race-entry-view';
 
     // gesture tracking variables
     let start = {};
@@ -37,7 +38,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
                 }    
             }
             else if (event.button === 0) {
-                if (addLap) {
+                if (!entry.finishedRace && addLap) {
                     addLap(entry);
                 }
             }
@@ -118,8 +119,6 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
         tracking = false;
     }
 
-    const lapsView = [];
-
     for (let i = 0; i < entry.laps.length; i++) {
         const lap = entry.laps[i];
         let lapView;
@@ -135,6 +134,13 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
             lapView = <LapView key={lap.number} value={lap.time} editable={false} />
         }
         lapsView.push(lapView);
+    }
+
+    if (entry.finishedRace) {
+        classes = 'race-entry-view finished-race';
+    }
+    else if (entry.onLastLap) {
+        classes = 'race-entry-view on-last-lap';
     }
 
     return (

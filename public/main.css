@@ -105,7 +105,10 @@ header {
 	cursor: auto;
 }
 .on-last-lap {
-	background-color: yellow;
+	background-color: #FFEE75;
+}
+.finished-race {
+	background-color: palegreen;
 }
 .warning-flag-prepare-raise {
 	padding: 5pt;
