@@ -41,11 +41,11 @@ class DinghyRacingModel {
     }
 
     /**
-     * Provide a blank entry template
+     * Provide a blank entry template.
      */
     static entryTemplate() {
         return {'race': DinghyRacingModel.raceTemplate(), 'helm': DinghyRacingModel.competitorTemplate(), 'crew': null, 
-        'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'url': ''};
+        'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'url': ''};
     }
 
     /**
@@ -553,7 +553,7 @@ class DinghyRacingModel {
             }
             entries.push({...DinghyRacingModel.entryTemplate(), 'race': raceResult.domainObject, 'helm': helmResults[i].domainObject, 
                 'dinghy': dinghyResults[i].domainObject, 'laps': lapsResults[i].domainObject,  'crew': crewResults[i].domainObject, 
-                'url': entryCollectionHAL[i]._links.self.href});
+                'sumOfLapTimes': this.convertISO8601DurationToMilliseconds(entryCollectionHAL[i].sumOfLapTimes), 'onLastLap': entryCollectionHAL[i].onLastLap, 'finishedRace': entryCollectionHAL[i].finishedRace, 'url': entryCollectionHAL[i]._links.self.href});
         };
         return Promise.resolve({'success': true, 'domainObject': entries});
     }
@@ -710,7 +710,8 @@ class DinghyRacingModel {
             result = {'success': true, 'domainObject': race};
         }
         if (result.success) {
-            return this.update(result.domainObject.url, {'actualStartTime': startTime});
+            // return this.update(result.domainObject.url, {'actualStartTime': startTime});
+            return this.update(result.domainObject.url, {'plannedStartTime': startTime});
         }
         else { 
             return result;
