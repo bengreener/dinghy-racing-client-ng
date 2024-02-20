@@ -67,7 +67,7 @@ function App({model, controller}) {
           <button key={4} type='button' className='list-group-item list-group-item-action' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
         </div>
         <div className="display-port">
-          <ErrorBoundary>
+          <ErrorBoundary key={Date.now()}>
             {displayPort}
           </ErrorBoundary>
         </div>
