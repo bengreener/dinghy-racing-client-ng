@@ -10,6 +10,8 @@ jest.mock('../model/dinghy-racing-model');
 
 // some of the updates display after tests may no longer be required as update route via web sockets is driven from server (2 tests lap times following entry update notification & clears error message after successful update)?
 
+const entryRowLastCellLapTimeCellOffset = 3;
+
 afterEach(() => {
     jest.resetAllMocks();
 })
@@ -421,7 +423,7 @@ describe('when updating a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
         const entryRow = screen.getByText(/scorpion 1234/i).parentElement;
-        const lastCell = entryRow.children[entryRow.children.length - 2];
+        const lastCell = entryRow.children[entryRow.children.length - entryRowLastCellLapTimeCellOffset];
         // render updated components
         await act(async () => {
             await user.pointer({target: lastCell, keys: '[MouseRight]'});
@@ -454,7 +456,7 @@ describe('when updating a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
         const entryRow = screen.getByText(/scorpion 1234/i).parentElement;
-        const lastCell = entryRow.children[entryRow.children.length - 2];
+        const lastCell = entryRow.children[entryRow.children.length - entryRowLastCellLapTimeCellOffset];
         // render updated components
         await act(async () => {
             await user.pointer({target: lastCell, keys: '[MouseRight]'});
@@ -488,7 +490,7 @@ describe('when updating a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
         const entryRow = screen.getByText(/scorpion 1234/i).parentElement;
-        const lastCell = entryRow.children[entryRow.children.length - 2];
+        const lastCell = entryRow.children[entryRow.children.length - entryRowLastCellLapTimeCellOffset];
         await act(async () => {
             await user.pointer({target: lastCell, keys: '[MouseRight]'});
         });
@@ -519,7 +521,7 @@ describe('when updating a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
         const entryRow = screen.getByText(/scorpion 1234/i).parentElement;
-        const lastCell = entryRow.children[entryRow.children.length - 2];
+        const lastCell = entryRow.children[entryRow.children.length - entryRowLastCellLapTimeCellOffset];
         await act(async () => {
             await user.pointer({target: lastCell, keys: '[MouseRight]'});
         });

@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import LapView from './LapView';
+import ScoringAbbreviation from './ScoringAbbreviation';
 
 function RaceEntryView({entry, addLap, removeLap, updateLap}) {
     const [editMode, setEditMode] = useState(false);
@@ -150,6 +151,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
             <th scope='row'>{entry.dinghy.dinghyClass.name + ' ' + entry.dinghy.sailNumber + ' ' + entry.helm.name}</th>
             {lapsView}
             <LapView key='sumOfLapTimes' value={entry.sumOfLapTimes} total={true} editable={false} />
+            <ScoringAbbreviation />
         </tr>
     )
 }
