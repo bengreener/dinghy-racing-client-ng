@@ -687,4 +687,61 @@ describe('when race is postponed', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Please provide details of the race.'});
     });
-})
+});
+
+describe('when setting a scoring abbreviation for an entry', () => {
+    it('returns a promise that resolves to a result indicating success when operation is successful', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        const expectedResponse = {...entryChrisMarshallScorpionA1234, 'scoringAttribute': 'DNS'};
+        jest.spyOn(dinghyRacingModel, 'update').mockImplementationOnce((entry) => {return Promise.resolve({'success': true, 'domainObject': expectedResponse})});
+        const promise = dinghyRacingController.setScoringAbbreviation(entryChrisMarshallScorpionA1234, 'DNS');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': expectedResponse});
+    });
+    it('returns a promise that resolves to a result indicating failure when operation is unsuccessful and provides a message explaining the cause of failure', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        jest.spyOn(dinghyRacingModel, 'update').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
+        const promise = dinghyRacingController.setScoringAbbreviation(entryChrisMarshallScorpionA1234, 'DNS');
+        const result = await promise;
+        expect(result).toEqual({'success': false, 'message': 'Something went wrong'});
+    });
+    it('returns a promise that resolves to a result indicating failure when entry is null or undefined and provides a message explaining the cause of failure', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        jest.spyOn(dinghyRacingModel, 'update').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
+        const promise = dinghyRacingController.setScoringAbbreviation(null, 'DNS');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'A valid entry is required to set a scoring abbreviation.'});
+    });
+    it('returns a promise that resolves to a result indicating failure when scoring abbreviation is null or undefined and provides a message explaining the cause of failure', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        jest.spyOn(dinghyRacingModel, 'update').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
+        const promise = dinghyRacingController.setScoringAbbreviation(entryChrisMarshallScorpionA1234);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Scoring abbreviation must be 3 characters long.'});
+    });
+    it('returns a promise that resolves to a result indicating failure when scoring abbreviation is less than 3 characters and provides a message explaining the cause of failure', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        jest.spyOn(dinghyRacingModel, 'update').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
+        const promise = dinghyRacingController.setScoringAbbreviation(entryChrisMarshallScorpionA1234, 'DN');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Scoring abbreviation must be 3 characters long.'});
+    });
+    it('returns a promise that resolves to a result indicating failure when scoring abbreviation is more than 3 characters and provides a message explaining the cause of failure', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        jest.spyOn(dinghyRacingModel, 'update').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
+        const promise = dinghyRacingController.setScoringAbbreviation(entryChrisMarshallScorpionA1234, 'DNSF');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Scoring abbreviation must be 3 characters long.'});
+    });
+});

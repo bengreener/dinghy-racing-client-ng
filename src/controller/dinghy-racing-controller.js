@@ -74,6 +74,21 @@ class DinghyRacingController {
     }
 
     /**
+     * Set a scoring abbreviation for an entry
+     * @param {Entry} entry
+     * @param {String} scoringAbbreviation
+     */
+    setScoringAbbreviation(entry, scoringAbbreviation) {
+        if (!entry || !entry.url) {
+            return Promise.resolve({'success': false, 'message': 'A valid entry is required to set a scoring abbreviation.'});
+        }
+        if (!scoringAbbreviation || scoringAbbreviation.length != 3) {
+            return Promise.resolve({'success': false, 'message': 'Scoring abbreviation must be 3 characters long.'});
+        }
+        return this.model.update(entry.uri, scoringAbbreviation.toUpperCase());
+    }
+
+    /**
      * Add a new competitor
      * @param {Competitor} 
      * @returns {Promise<Result>}
