@@ -553,7 +553,8 @@ class DinghyRacingModel {
             }
             entries.push({...DinghyRacingModel.entryTemplate(), 'race': raceResult.domainObject, 'helm': helmResults[i].domainObject, 
                 'dinghy': dinghyResults[i].domainObject, 'laps': lapsResults[i].domainObject,  'crew': crewResults[i].domainObject, 
-                'sumOfLapTimes': this.convertISO8601DurationToMilliseconds(entryCollectionHAL[i].sumOfLapTimes), 'onLastLap': entryCollectionHAL[i].onLastLap, 'finishedRace': entryCollectionHAL[i].finishedRace, 'url': entryCollectionHAL[i]._links.self.href});
+                'sumOfLapTimes': this.convertISO8601DurationToMilliseconds(entryCollectionHAL[i].sumOfLapTimes), 'onLastLap': entryCollectionHAL[i].onLastLap, 
+                'finishedRace': entryCollectionHAL[i].finishedRace, 'scoringAbbreviation': entryCollectionHAL[i].scoringAbbreviation, 'url': entryCollectionHAL[i]._links.self.href});
         };
         return Promise.resolve({'success': true, 'domainObject': entries});
     }
