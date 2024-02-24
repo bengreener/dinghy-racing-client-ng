@@ -238,3 +238,15 @@ describe('when entry has not finished race', () => {
         expect(SMScorp1234entry.getAttribute('class')).not.toMatch(/finished-race/i);
     });
 });
+
+describe('when a scoring abbreviation is selected', () => {
+    it('calls setScoringAbbreviation callback provided as prop', async () => {
+        const setScoringAbbreviationSpy = jest.fn();
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} setScoringAbbreviation={setScoringAbbreviationSpy}/>, {container: document.body.appendChild(tableBody)});
+        const selectSA = screen.getByRole('combobox');
+        await user.selectOptions(selectSA, 'DNS');
+        expect(setScoringAbbreviationSpy).toHaveBeenCalledWith(entryChrisMarshallScorpionA1234, 'DNS');
+    });
+});

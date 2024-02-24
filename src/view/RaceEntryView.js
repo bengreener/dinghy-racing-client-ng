@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import LapView from './LapView';
 import ScoringAbbreviation from './ScoringAbbreviation';
 
-function RaceEntryView({entry, addLap, removeLap, updateLap}) {
+function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation}) {
     const [editMode, setEditMode] = useState(false);
     const lapsView = [];
     let classes = 'race-entry-view';
@@ -120,6 +120,12 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
         tracking = false;
     }
 
+    function handleScoringAbbreviationSelection(event) {
+        if (setScoringAbbreviation) {
+            setScoringAbbreviation(entry, event.target.value);
+        }
+    }
+
     for (let i = 0; i < entry.laps.length; i++) {
         const lap = entry.laps[i];
         let lapView;
@@ -151,7 +157,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
             <th scope='row'>{entry.dinghy.dinghyClass.name + ' ' + entry.dinghy.sailNumber + ' ' + entry.helm.name}</th>
             {lapsView}
             <LapView key='sumOfLapTimes' value={entry.sumOfLapTimes} total={true} editable={false} />
-            <ScoringAbbreviation />
+            <ScoringAbbreviation onChange={handleScoringAbbreviationSelection} />
         </tr>
     )
 }
