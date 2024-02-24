@@ -119,6 +119,13 @@ function RaceEntriesView({ races }) {
         }
     }
 
+    async function setScoringAbbreviation(entry, value) {
+        const result = await controller.setScoringAbbreviation(entry, value);
+        if (!result.success) {
+            setMessage(result.message);
+        }
+    }
+
     function calculateLapTime(elapsedTime, laps) {
         const lapTimes = laps.reduce((accumulator, initialValue) => {
             return accumulator + initialValue.time;
@@ -138,7 +145,7 @@ function RaceEntriesView({ races }) {
             <div className="scrollable">
                 <table id="race-entries-table" style={{touchAction: 'pinch-zoom pan-y'}}>
                     <tbody>
-                    {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap}/>)}
+                    {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} />)}
                     </tbody>
                 </table>
             </div>

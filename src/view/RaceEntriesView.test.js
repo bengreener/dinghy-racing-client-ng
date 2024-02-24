@@ -546,3 +546,54 @@ describe('when updating a lap time', () => {
         expect(screen.queryByText(/oops/i)).not.toBeInTheDocument();
     });
 });
+
+describe('when setting a scoring abbreviation', () => {
+    it('call controller setScoringAbbreviation', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const setScoringAbbreviationSpy = jest.spyOn(controller, 'setScoringAbbreviation').mockImplementation((entry, scoringAbbreviation) => {return Promise.resolve({'success': true})});
+        await act(async () => {
+            customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
+        });
+        const selectSA = screen.getAllByRole('combobox')[0];
+        await user.selectOptions(selectSA, 'DNS');
+        expect(setScoringAbbreviationSpy).toBeCalledWith(entryChrisMarshallScorpionA1234, 'DNS');
+    });
+    it('displays a message if there is a problem updating the lap time', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const setScoringAbbreviationSpy = jest.spyOn(controller, 'setScoringAbbreviation').mockImplementation((entry, scoringAbbreviation) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
+        await act(async () => {
+            customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
+        });
+        const selectSA = screen.getAllByRole('combobox')[0];
+        await act(async () => {
+            await user.selectOptions(selectSA, 'DNS');
+        });
+        expect(await screen.findByText(/oops/i)).toBeInTheDocument();
+    });
+    it('clears error message on success', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+        const controller = new DinghyRacingController(model);
+        const setScoringAbbreviationSpy = jest.spyOn(controller, 'setScoringAbbreviation').mockImplementation((entry, scoringAbbreviation) => {return Promise.resolve({'success': true})}).mockImplementationOnce((entry, scoringAbbreviation) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
+        await act(async () => {
+            customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
+        });
+        // after render perform update
+        const selectSA = screen.getAllByRole('combobox')[0];
+        await act(async () => {
+            await user.selectOptions(selectSA, 'DNS');
+        });
+        expect(await screen.findByText(/oops/i)).toBeInTheDocument();
+        // after render perform update
+        await act(async () => {
+            await user.selectOptions(selectSA, 'DNS');
+            model.handleEntryUpdate({'body': entriesScorpionA[0].url});
+        });
+        expect(screen.queryByText(/oops/i)).not.toBeInTheDocument();
+    });
+})
