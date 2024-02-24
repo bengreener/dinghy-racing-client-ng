@@ -1,4 +1,8 @@
-function ScoringAbbreviation() {
+/**
+ * Get a scoring abbreviation from a list of scoring abbreviations
+ * @param {eventHandler} onChange
+ */
+function ScoringAbbreviation({onChange}) {
 
     function handleOnClick(event) {
         event.stopPropagation();
@@ -35,7 +39,7 @@ function ScoringAbbreviation() {
     return (
         <td>
             <select onClick={handleOnClick} onAuxClick={handleAuxClick} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} 
-                onPointerUp={handlePointerUp} onPointerOut={handlePointerOut} onPointerLeave={handlePointerLeave} onPointerCancel={handleCancel} >
+                onPointerUp={handlePointerUp} onPointerOut={handlePointerOut} onPointerLeave={handlePointerLeave} onPointerCancel={handleCancel} onChange={onChange} >
                 <option></option>
                 <option>DNS</option>
             </select>
