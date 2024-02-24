@@ -85,7 +85,7 @@ class DinghyRacingController {
         if (!scoringAbbreviation || scoringAbbreviation.length !== 3) {
             return Promise.resolve({'success': false, 'message': 'Scoring abbreviation must be 3 characters long.'});
         }
-        return this.model.update(entry.uri, scoringAbbreviation.toUpperCase());
+        return this.model.update(entry.url, {'scoringAbbreviation': scoringAbbreviation.toUpperCase()});
     }
 
     /**
