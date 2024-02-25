@@ -1,16 +1,13 @@
-import { useState } from 'react';
-
 /**
  * Get a scoring abbreviation from a list of scoring abbreviations
  * @param {Object} props
  * @param {string} props.value to set as displayed value
  * @param {eventHandler} props.onChange
  */
-function ScoringAbbreviation({value, onChange}) {
-    const [scoringAbbreviation, setScoringAbbreviation] = useState(() => value ? value : '');
+function ScoringAbbreviation({value = '', onChange}) {
+    const sc = value ? value : ''; // replace nulls with empty string to avoid `value` prop on `select` should not be null warning.
 
     function handleChange(event) {
-        // setScoringAbbreviation(event.target.value);
         onChange(event);
     }
 
@@ -48,7 +45,7 @@ function ScoringAbbreviation({value, onChange}) {
 
     return (
         <td>
-            <select value={scoringAbbreviation} onClick={handleOnClick} onAuxClick={handleAuxClick} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove}
+            <select value={sc} onClick={handleOnClick} onAuxClick={handleAuxClick} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp} onPointerOut={handlePointerOut} onPointerLeave={handlePointerLeave} onPointerCancel={handleCancel} onChange={handleChange} >
                 <option></option>
                 <option>DNS</option>
