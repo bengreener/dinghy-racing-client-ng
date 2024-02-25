@@ -143,7 +143,10 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         lapsView.push(lapView);
     }
 
-    if (entry.finishedRace) {
+    if (entry.scoringAbbreviation === 'DNS') {
+        classes = 'race-entry-view did-not-start';
+    }
+    else if (entry.finishedRace) {
         classes = 'race-entry-view finished-race';
     }
     else if (entry.onLastLap) {
@@ -157,7 +160,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
             <th scope='row'>{entry.dinghy.dinghyClass.name + ' ' + entry.dinghy.sailNumber + ' ' + entry.helm.name}</th>
             {lapsView}
             <LapView key='sumOfLapTimes' value={entry.sumOfLapTimes} total={true} editable={false} />
-            <ScoringAbbreviation onChange={handleScoringAbbreviationSelection} />
+            <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
         </tr>
     )
 }
