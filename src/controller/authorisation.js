@@ -1,5 +1,3 @@
-// import { getCookieValue } from '../utilities/dom-utilities';
-
 class Authorisation {
 
     /**
@@ -19,8 +17,7 @@ class Authorisation {
         }
         catch (error) {
             console.error(`Failed to fetch roles: ${error.message}`);
-            // roles = [];
-            roles = ['ROLE_RACE_SCHEDULER', 'ROLE_RACE_OFFICER', 'ROLE_COMPETITOR'];
+            roles = [];
         }
         finally {
             return Promise.resolve(roles);
