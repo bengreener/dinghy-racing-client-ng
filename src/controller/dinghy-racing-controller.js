@@ -27,6 +27,9 @@ class DinghyRacingController {
         if (entry.finishedRace) {
             return Promise.resolve({'success': false, 'message': 'Cannot add a lap to an entry that has finished the race.'});
         }
+        if (entry.scoringAbbreviation === 'DNS') {
+            return Promise.resolve({'success': false, 'message': 'Cannot add a lap to an entry that did not start the race.'});
+        }
         // time can't be null and must be number
         if (isNaN(time)) {
             return Promise.resolve({'success': false, 'message': 'Time must be a number; in milliseconds.'});   
