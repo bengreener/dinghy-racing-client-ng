@@ -745,3 +745,16 @@ describe('when setting a scoring abbreviation for an entry', () => {
         expect(result).toEqual({'success': false, 'message': 'Scoring abbreviation must be 3 characters long.'});
     });
 });
+
+describe('when an entry has finished the race', () => {
+    it('does not allow a new lap to be recorded for the entry', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        const entryChrisMarshallScorpionA1234Finished = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), 'number': 1, 'time': 1000}], 'finishedRace': true};
+        jest.spyOn(dinghyRacingModel, 'addLap').mockImplementationOnce((entry) => {return Promise.resolve({'success': true, 'domainObject': entryChrisMarshallScorpionA1234Finished})});
+        const promise = dinghyRacingController.addLap(entryChrisMarshallScorpionA1234Finished, 1000);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Cannot add a lap to an entry that has finished the race.'});
+    })
+})
