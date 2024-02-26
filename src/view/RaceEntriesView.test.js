@@ -160,12 +160,14 @@ describe('when sorting entries', () => {
         expect(orderedEntries).toEqual(['Graduate 2928 Jill Myer', 'Scorpion 1234 Chris Marshall', 'Scorpion 6745 Sarah Pascal']);
     });
     it('sorts by the total recorded lap times of dinghies in ascending order', async () => {
-        const entriesScorpionA = [{'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
-            {'number': 1, 'time': 2}, {'number': 2, 'time': 2}
-        ], 'sumOfLapTimes': 4, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'},
-        {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [
-            {'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}
-        ], 'sumOfLapTimes': 3, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'}];
+        const entriesScorpionA = [
+            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
+                {'number': 1, 'time': 2}, {'number': 2, 'time': 2}
+            ], 'sumOfLapTimes': 4, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'},
+            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [
+                {'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}
+            ], 'sumOfLapTimes': 3, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'}
+        ];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
@@ -182,6 +184,29 @@ describe('when sorting entries', () => {
 
         expect(orderedEntries).toEqual(['Scorpion 1234 Chris Marshall', 'Scorpion 6745 Sarah Pascal']);
     });
+    describe('when sorting entries that include an entry that did not start', () => {
+        it('sorts by the total recorded lap times of dinghies in ascending order except for DNS entry which is placed last', async () => {
+            const entriesScorpionA = [
+                {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
+                    {'number': 1, 'time': 2}, {'number': 2, 'time': 2}
+                ], 'sumOfLapTimes': 4, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'},
+                {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'scoringAbbreviation': 'DNS', 'url': 'http://localhost:8081/dinghyracing/api/entries/10'}];
+            const user = userEvent.setup();
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+            await act(async () => {
+                customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
+            });
+            const sortByLapTimeButton = screen.getByRole('button', {'name': /by lap time/i});
+            await act(async () => {
+                await user.click(sortByLapTimeButton);
+            });
+            const cells = await screen.findAllByText(/\w+ (\d+) [\w ]+/i);
+            const orderedEntries = cells.map(cell => cell.textContent);
+
+            expect(orderedEntries).toEqual(['Scorpion 6745 Sarah Pascal', 'Scorpion 1234 Chris Marshall']);
+        });
+    })
 });
 
 describe('when adding a lap time', () => {
