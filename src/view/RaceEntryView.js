@@ -39,7 +39,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
                 }    
             }
             else if (event.button === 0) {
-                if (!entry.finishedRace && addLap) {
+                if (addLap) {
                     addLap(entry);
                 }
             }

@@ -216,18 +216,6 @@ describe('when entry has finished race', () => {
         const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;
         expect(SMScorp1234entry.getAttribute('class')).toMatch(/finished-race/i);
     });
-    it('does not allow additional laps to be added', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entryOnLastLap = {...entryChrisMarshallScorpionA1234, 'finishedRace': true};
-        const addLapCallback = jest.fn((e) => {entry.laps.push({'number': 1, 'time': 1234})});
-        const tableBody = document.createElement('tbody');
-        render(<RaceEntryView entry={entryOnLastLap} />, {container: document.body.appendChild(tableBody)});
-        const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;
-        await act(async () => {
-            await user.click(SMScorp1234entry);
-        });
-        expect(addLapCallback).not.toBeCalled();
-    });
 });
 
 describe('when entry has not finished race', () => {
