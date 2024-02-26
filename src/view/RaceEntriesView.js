@@ -79,11 +79,7 @@ function RaceEntriesView({ races }) {
             // sort by the sum of all recorded lap times
             case 'lapTimes':
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
-                    const totalTime = entry.laps.reduce((accumulator, initialValue) => {
-                        const sum =  accumulator + initialValue.time;
-                        return sum;
-                    }, 0);
-                    return totalTime;
+                    return entry.sumOfLapTimes;
                 });
                 break;
             default:

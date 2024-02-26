@@ -162,10 +162,10 @@ describe('when sorting entries', () => {
     it('sorts by the total recorded lap times of dinghies in ascending order', async () => {
         const entriesScorpionA = [{'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
             {'number': 1, 'time': 2}, {'number': 2, 'time': 2}
-        ], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'},
+        ], 'sumOfLapTimes': 4, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'},
         {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [
             {'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}
-        ], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'}];
+        ], 'sumOfLapTimes': 3, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'}];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
