@@ -104,6 +104,9 @@ header {
 	text-decoration: underline;
 	cursor: auto;
 }
+.did-not-start {
+	background-color: lightgrey;
+}
 .on-last-lap {
 	background-color: #FFEE75;
 }

@@ -79,11 +79,8 @@ function RaceEntriesView({ races }) {
             // sort by the sum of all recorded lap times
             case 'lapTimes':
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
-                    const totalTime = entry.laps.reduce((accumulator, initialValue) => {
-                        const sum =  accumulator + initialValue.time;
-                        return sum;
-                    }, 0);
-                    return totalTime;
+                    const weighting = entry.scoringAbbreviation === 'DNS' ? Date.now() : 0;
+                    return entry.sumOfLapTimes + weighting;
                 });
                 break;
             default:
@@ -119,6 +116,13 @@ function RaceEntriesView({ races }) {
         }
     }
 
+    async function setScoringAbbreviation(entry, value) {
+        const result = await controller.setScoringAbbreviation(entry, value);
+        if (!result.success) {
+            setMessage(result.message);
+        }
+    }
+
     function calculateLapTime(elapsedTime, laps) {
         const lapTimes = laps.reduce((accumulator, initialValue) => {
             return accumulator + initialValue.time;
@@ -138,7 +142,7 @@ function RaceEntriesView({ races }) {
             <div className="scrollable">
                 <table id="race-entries-table" style={{touchAction: 'pinch-zoom pan-y'}}>
                     <tbody>
-                    {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap}/>)}
+                    {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} />)}
                     </tbody>
                 </table>
             </div>
