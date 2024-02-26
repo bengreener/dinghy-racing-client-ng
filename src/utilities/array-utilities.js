@@ -1,5 +1,5 @@
 /**
- * Sort an array in ascending order based on value returned by getValueFunction
+ * Sort an array in ascending order, smallest to largest, based on value returned by getValueFunction
  * @param {Array} array Array to sort
  * @param {Function} getValueFunction Function that returns the value to sort by
  * @returns {Array}
