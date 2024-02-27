@@ -771,3 +771,16 @@ describe('when an entry did not start the race', () => {
         expect(result).toEqual({'success': false, 'message': 'Cannot add a lap to an entry that did not start the race.'});
     })
 });
+
+describe('when an entry has retired from the race', () => {
+    it('does not allow a new lap to be recorded for the entry', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        const entryChrisMarshallScorpionA1234RET = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'RET'};
+        jest.spyOn(dinghyRacingModel, 'addLap').mockImplementationOnce((entry) => {return Promise.resolve({'success': true, 'domainObject': entryChrisMarshallScorpionA1234RET})});
+        const promise = dinghyRacingController.addLap(entryChrisMarshallScorpionA1234RET, 1000);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Cannot add a lap to an entry that has retired from the race.'});
+    })
+});
