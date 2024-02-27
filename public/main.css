@@ -110,6 +110,9 @@ header {
 .retired {
 	background-color: gainsboro;
 }
+.disqualified {
+	background-color: grey;
+}
 .on-last-lap {
 	background-color: #FFEE75;
 }

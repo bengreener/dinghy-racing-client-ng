@@ -264,4 +264,13 @@ describe('when a scoring abbreviation is selected', () => {
             expect(SMScorp1234entry.getAttribute('class')).toMatch(/retired/i);
         });
     });
+    describe('when entry disqualified', () => {
+        it('has a class of disqualified', () => {
+            const entryRET = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DSQ'};
+            const tableBody = document.createElement('tbody');
+            render(<RaceEntryView entry={entryRET} />, {container: document.body.appendChild(tableBody)});
+            const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;
+            expect(SMScorp1234entry.getAttribute('class')).toMatch(/disqualified/i);
+        });
+    });
 });
