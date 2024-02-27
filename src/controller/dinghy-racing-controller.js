@@ -30,6 +30,9 @@ class DinghyRacingController {
         if (entry.scoringAbbreviation === 'DNS') {
             return Promise.resolve({'success': false, 'message': 'Cannot add a lap to an entry that did not start the race.'});
         }
+        if (entry.scoringAbbreviation === 'DSQ') {
+            return Promise.resolve({'success': false, 'message': 'Cannot add a lap to an entry that has been disqualified from the race.'});
+        }
         if (entry.scoringAbbreviation === 'RET') {
             return Promise.resolve({'success': false, 'message': 'Cannot add a lap to an entry that has retired from the race.'});
         }
