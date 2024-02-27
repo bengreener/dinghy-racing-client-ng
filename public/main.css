@@ -107,6 +107,9 @@ header {
 .did-not-start {
 	background-color: lightgrey;
 }
+.retired {
+	background-color: gainsboro;
+}
 .on-last-lap {
 	background-color: #FFEE75;
 }

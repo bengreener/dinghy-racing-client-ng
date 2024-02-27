@@ -227,6 +227,15 @@ describe('when entry has not finished race', () => {
     });
 });
 
+describe('when a scoring abbreviation is not selected', () => {
+    it('only has a class of race-entry-view', () => {
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />, {container: document.body.appendChild(tableBody)});
+        const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;
+        expect(SMScorp1234entry.getAttribute('class')).toMatch(/^race-entry-view$/i);
+    });
+});
+
 describe('when a scoring abbreviation is selected', () => {
     it('calls setScoringAbbreviation callback provided as prop', async () => {
         const setScoringAbbreviationSpy = jest.fn();
@@ -236,5 +245,23 @@ describe('when a scoring abbreviation is selected', () => {
         const selectSA = screen.getByRole('combobox');
         await user.selectOptions(selectSA, 'DNS');
         expect(setScoringAbbreviationSpy).toHaveBeenCalledWith(entryChrisMarshallScorpionA1234, 'DNS');
+    });
+    describe('when entry did not start the race', () => {
+        it('has a class of did-not-start', () => {
+            const entryDNS = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DNS'};
+            const tableBody = document.createElement('tbody');
+            render(<RaceEntryView entry={entryDNS} />, {container: document.body.appendChild(tableBody)});
+            const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;
+            expect(SMScorp1234entry.getAttribute('class')).toMatch(/did-not-start/i);
+        });
+    });
+    describe('when entry retired', () => {
+        it('has a class of retired', () => {
+            const entryRET = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'RET'};
+            const tableBody = document.createElement('tbody');
+            render(<RaceEntryView entry={entryRET} />, {container: document.body.appendChild(tableBody)});
+            const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;
+            expect(SMScorp1234entry.getAttribute('class')).toMatch(/retired/i);
+        });
     });
 });

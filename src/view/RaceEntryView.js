@@ -146,11 +146,14 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     if (entry.scoringAbbreviation === 'DNS') {
         classes = 'race-entry-view did-not-start';
     }
-    else if (entry.finishedRace) {
-        classes = 'race-entry-view finished-race';
+    else if (entry.scoringAbbreviation === 'RET') {
+        classes = 'race-entry-view retired';
     }
     else if (entry.onLastLap) {
         classes = 'race-entry-view on-last-lap';
+    }
+    else if (entry.finishedRace) {
+        classes = 'race-entry-view finished-race';
     }
 
     return (
