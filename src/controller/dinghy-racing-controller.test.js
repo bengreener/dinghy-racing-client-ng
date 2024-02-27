@@ -690,16 +690,45 @@ describe('when race is postponed', () => {
 });
 
 describe('when setting a scoring abbreviation for an entry', () => {
-    it('returns a promise that resolves to a result indicating success when operation is successful', async () => {
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
-        const expectedResponse = {...entryChrisMarshallScorpionA1234, 'scoringAttribute': 'DNS'};
-        jest.spyOn(dinghyRacingModel, 'update').mockImplementationOnce((entry) => {return Promise.resolve({'success': true, 'domainObject': expectedResponse})});
-        const promise = dinghyRacingController.setScoringAbbreviation(entryChrisMarshallScorpionA1234, 'DNS');
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, 'domainObject': expectedResponse});
+    describe('when a 3 character value is passed for scoring abbreviation', () => {
+        it('returns a promise that resolves to a result indicating success when operation is successful', async () => {
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+            const expectedResponse = {...entryChrisMarshallScorpionA1234, 'scoringAttribute': 'DNS'};
+            jest.spyOn(dinghyRacingModel, 'update').mockImplementationOnce((entry) => {return Promise.resolve({'success': true, 'domainObject': expectedResponse})});
+            const promise = dinghyRacingController.setScoringAbbreviation(entryChrisMarshallScorpionA1234, 'DNS');
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, 'domainObject': expectedResponse});
+        });
     });
+    describe('when an empty string is passed for scoring abbreviation', () => {
+        it('calls model update with a null value for scoring abbreviation and returns a promise that resolves to a result indicating success when operation is successful', async () => {
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+            const expectedResponse = {...entryChrisMarshallScorpionA1234, 'scoringAttribute': ''};
+            const updateSpy = jest.spyOn(dinghyRacingModel, 'update').mockImplementationOnce((resource, object) => {return Promise.resolve({'success': true, 'domainObject': expectedResponse})});
+            const promise = dinghyRacingController.setScoringAbbreviation(entryChrisMarshallScorpionA1234, '');
+            const result = await promise;
+            expect(updateSpy).toHaveBeenCalledWith(entryChrisMarshallScorpionA1234.url, {'scoringAbbreviation': null});
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, 'domainObject': expectedResponse});
+        });
+    });
+    describe('when null is passed for scoring abbreviation', () => {
+        it('calls model update with null value for scoring abbreviation and returns a promise that resolves to a result indicating success when operation is successful', async () => {
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+            const expectedResponse = {...entryChrisMarshallScorpionA1234, 'scoringAttribute': null};
+            const updateSpy = jest.spyOn(dinghyRacingModel, 'update').mockImplementationOnce((resource, object) => {return Promise.resolve({'success': true, 'domainObject': expectedResponse})});
+            const promise = dinghyRacingController.setScoringAbbreviation(entryChrisMarshallScorpionA1234, '');
+            const result = await promise;
+            expect(updateSpy).toHaveBeenCalledWith(entryChrisMarshallScorpionA1234.url, {'scoringAbbreviation': null});
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, 'domainObject': expectedResponse});
+        });
+    });
+
     it('returns a promise that resolves to a result indicating failure when operation is unsuccessful and provides a message explaining the cause of failure', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
@@ -716,15 +745,6 @@ describe('when setting a scoring abbreviation for an entry', () => {
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'A valid entry is required to set a scoring abbreviation.'});
-    });
-    it('returns a promise that resolves to a result indicating failure when scoring abbreviation is null or undefined and provides a message explaining the cause of failure', async () => {
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
-        jest.spyOn(dinghyRacingModel, 'update').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
-        const promise = dinghyRacingController.setScoringAbbreviation(entryChrisMarshallScorpionA1234);
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'Scoring abbreviation must be 3 characters long.'});
     });
     it('returns a promise that resolves to a result indicating failure when scoring abbreviation is less than 3 characters and provides a message explaining the cause of failure', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
