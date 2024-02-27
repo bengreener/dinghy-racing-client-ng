@@ -81,7 +81,7 @@ function RaceEntriesView({ races }) {
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
                     const weighIf = ['DNS', 'DSQ', 'RET'];
                     const weighting = weighIf.includes(entry.scoringAbbreviation) ? Date.now() : 0;
-                    return entry.sumOfLapTimes + weighting;
+                    return entry.race.plannedStartTime.getTime() + entry.sumOfLapTimes + weighting;
                 });
                 break;
             default:
