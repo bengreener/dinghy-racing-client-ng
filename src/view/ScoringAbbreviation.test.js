@@ -13,6 +13,7 @@ it('displays options for scoring abbreviations', () => {
     render(<ScoringAbbreviation />, {container: document.body.appendChild(tableRow)});
     expect(screen.getByRole('option', {name: ''})).toBeInTheDocument();
     expect(screen.getByRole('option', {name: /DNS/})).toBeInTheDocument();
+    expect(screen.getByRole('option', {name: /RET/})).toBeInTheDocument();
 });
 
 describe('selection is changed', () => {
