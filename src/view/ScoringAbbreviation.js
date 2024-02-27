@@ -49,6 +49,7 @@ function ScoringAbbreviation({value = '', onChange}) {
                 onPointerUp={handlePointerUp} onPointerOut={handlePointerOut} onPointerLeave={handlePointerLeave} onPointerCancel={handleCancel} onChange={handleChange} >
                 <option></option>
                 <option>DNS</option>
+                <option>DSQ</option>
                 <option>RET</option>
             </select>
         </td>

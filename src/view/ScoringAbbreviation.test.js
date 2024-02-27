@@ -14,6 +14,7 @@ it('displays options for scoring abbreviations', () => {
     expect(screen.getByRole('option', {name: ''})).toBeInTheDocument();
     expect(screen.getByRole('option', {name: /DNS/})).toBeInTheDocument();
     expect(screen.getByRole('option', {name: /RET/})).toBeInTheDocument();
+    expect(screen.getByRole('option', {name: /DSQ/})).toBeInTheDocument();
 });
 
 describe('selection is changed', () => {
