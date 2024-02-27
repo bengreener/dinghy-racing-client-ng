@@ -79,7 +79,8 @@ function RaceEntriesView({ races }) {
             // sort by the sum of all recorded lap times
             case 'lapTimes':
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
-                    const weighting = entry.scoringAbbreviation === 'DNS' ? Date.now() : 0;
+                    const weighIf = ['DNS', 'RET'];
+                    const weighting = weighIf.includes(entry.scoringAbbreviation) ? Date.now() : 0;
                     return entry.sumOfLapTimes + weighting;
                 });
                 break;
