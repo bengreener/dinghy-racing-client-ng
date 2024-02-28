@@ -1,7 +1,8 @@
 import React, { useCallback, useState } from 'react';
 import LapView from './LapView';
+import ScoringAbbreviation from './ScoringAbbreviation';
 
-function RaceEntryView({entry, addLap, removeLap, updateLap}) {
+function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation}) {
     const [editMode, setEditMode] = useState(false);
     const lapsView = [];
     let classes = 'race-entry-view';
@@ -38,7 +39,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
                 }    
             }
             else if (event.button === 0) {
-                if (!entry.finishedRace && addLap) {
+                if (addLap) {
                     addLap(entry);
                 }
             }
@@ -119,6 +120,12 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
         tracking = false;
     }
 
+    function handleScoringAbbreviationSelection(event) {
+        if (setScoringAbbreviation) {
+            setScoringAbbreviation(entry, event.target.value);
+        }
+    }
+
     for (let i = 0; i < entry.laps.length; i++) {
         const lap = entry.laps[i];
         let lapView;
@@ -136,11 +143,20 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
         lapsView.push(lapView);
     }
 
-    if (entry.finishedRace) {
-        classes = 'race-entry-view finished-race';
+    if (entry.scoringAbbreviation === 'DNS') {
+        classes = 'race-entry-view did-not-start';
+    }
+    else if (entry.scoringAbbreviation === 'DSQ') {
+        classes = 'race-entry-view disqualified';
+    }
+    else if (entry.scoringAbbreviation === 'RET') {
+        classes = 'race-entry-view retired';
     }
     else if (entry.onLastLap) {
         classes = 'race-entry-view on-last-lap';
+    }
+    else if (entry.finishedRace) {
+        classes = 'race-entry-view finished-race';
     }
 
     return (
@@ -150,6 +166,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap}) {
             <th scope='row'>{entry.dinghy.dinghyClass.name + ' ' + entry.dinghy.sailNumber + ' ' + entry.helm.name}</th>
             {lapsView}
             <LapView key='sumOfLapTimes' value={entry.sumOfLapTimes} total={true} editable={false} />
+            <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
         </tr>
     )
 }

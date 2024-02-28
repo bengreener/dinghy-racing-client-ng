@@ -1,5 +1,3 @@
-// import { getCookieValue } from '../utilities/dom-utilities';
-
 class Authorisation {
 
     /**

@@ -24,6 +24,18 @@ class DinghyRacingController {
         if (!entry || !entry.url) {
             return Promise.resolve({'success': false, 'message': 'A valid entry is required to add a lap time.'});
         }
+        if (entry.finishedRace) {
+            return Promise.resolve({'success': false, 'message': 'Cannot add a lap to an entry that has finished the race.'});
+        }
+        if (entry.scoringAbbreviation === 'DNS') {
+            return Promise.resolve({'success': false, 'message': 'Cannot add a lap to an entry that did not start the race.'});
+        }
+        if (entry.scoringAbbreviation === 'DSQ') {
+            return Promise.resolve({'success': false, 'message': 'Cannot add a lap to an entry that has been disqualified from the race.'});
+        }
+        if (entry.scoringAbbreviation === 'RET') {
+            return Promise.resolve({'success': false, 'message': 'Cannot add a lap to an entry that has retired from the race.'});
+        }
         // time can't be null and must be number
         if (isNaN(time)) {
             return Promise.resolve({'success': false, 'message': 'Time must be a number; in milliseconds.'});   
@@ -71,6 +83,28 @@ class DinghyRacingController {
             return Promise.resolve({'success': false, 'message': 'Time must be greater than zero.'});   
         }
         return this.model.updateLap(entry, time);
+    }
+
+    /**
+     * Set a scoring abbreviation for an entry.
+     * If an empty string, undefined, or null is passed for scoringAbbeviation scoring abbreviation for entry will be cleared; set to null.
+     * @param {Entry} entry
+     * @param {String} scoringAbbreviation three character string, empty string, or null
+     */
+    setScoringAbbreviation(entry, scoringAbbreviation) {
+        let sa = null;
+        if (!entry || !entry.url) {
+            return Promise.resolve({'success': false, 'message': 'A valid entry is required to set a scoring abbreviation.'});
+        }
+        if (scoringAbbreviation) {
+            if (scoringAbbreviation.length !== 3) {
+                return Promise.resolve({'success': false, 'message': 'Scoring abbreviation must be 3 characters long.'});
+            }
+            else {
+                sa = scoringAbbreviation.toUpperCase();
+            }
+        }
+        return this.model.update(entry.url, {'scoringAbbreviation': sa});
     }
 
     /**

@@ -104,6 +104,15 @@ header {
 	text-decoration: underline;
 	cursor: auto;
 }
+.did-not-start {
+	background-color: lightgrey;
+}
+.retired {
+	background-color: gainsboro;
+}
+.disqualified {
+	background-color: grey;
+}
 .on-last-lap {
 	background-color: #FFEE75;
 }

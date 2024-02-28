@@ -35,9 +35,8 @@ function convertRaceEntriesToCSVArray(race, entries) {
         }
         record += entry.dinghy.dinghyClass.name + ',';
         record += entry.laps.length + ',';
-        record += entry.laps.reduce((accumulator, currentValue) => {
-            return {'time': accumulator.time + currentValue.time};
-        }, {'time': 0}).time + '\n';
+        record += entry.sumOfLapTimes + ',';
+        record += (entry.scoringAbbreviation ? entry.scoringAbbreviation : '') + '\n';
         return record;
     });
 };

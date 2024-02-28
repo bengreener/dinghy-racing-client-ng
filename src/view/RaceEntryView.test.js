@@ -4,6 +4,8 @@ import RaceEntryView from './RaceEntryView';
 import { entryChrisMarshallScorpionA1234 } from '../model/__mocks__/test-data';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 
+const entryRowLastCellLapTimeCellOffset = 3;
+
 beforeEach(() => {
     jest.useFakeTimers();
     jest.spyOn(global, 'setTimeout');
@@ -63,7 +65,7 @@ it('when secondary mouse button is clicked accepts a new lap time input in the l
     const tableBody = document.createElement('tbody');
     render(<RaceEntryView entry={entry} />, {container: document.body.appendChild(tableBody)});
     const entryRow = screen.getByText(/scorpion 1234/i).parentElement;
-    const lastCell = entryRow.children[entryRow.children.length - 2];
+    const lastCell = entryRow.children[entryRow.children.length - entryRowLastCellLapTimeCellOffset];
     await act(async () => {
         await user.pointer({target: lastCell, keys: '[MouseRight]'});
     });
@@ -117,7 +119,7 @@ describe('when editing a lap time', () => {
         const updateLapCallback = jest.fn((entry, value) => {});
         render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />, {container: document.body.appendChild(tableBody)});
         const entryRow = screen.getByText(/scorpion 1234/i).parentElement;
-        const lastCell = entryRow.children[entryRow.children.length - 2];
+        const lastCell = entryRow.children[entryRow.children.length - entryRowLastCellLapTimeCellOffset];
         await act(async () => {
             await user.pointer({target: lastCell, keys: '[MouseRight]'});
         });
@@ -154,7 +156,7 @@ describe('when user taps and holds on row', () => {
         render(<RaceEntryView entry={entry} />, {container: document.body.appendChild(tableBody)});
         const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i);
         const entryRow = screen.getByText(/scorpion 1234/i).parentElement;
-        const lastCell = entryRow.children[entryRow.children.length - 2];
+        const lastCell = entryRow.children[entryRow.children.length - entryRowLastCellLapTimeCellOffset];
         await act(async () => {
             await user.pointer({target: SMScorp1234entry, keys: '[TouchA>]'});
         });
@@ -214,18 +216,6 @@ describe('when entry has finished race', () => {
         const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;
         expect(SMScorp1234entry.getAttribute('class')).toMatch(/finished-race/i);
     });
-    it('does not allow additional laps to be added', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entryOnLastLap = {...entryChrisMarshallScorpionA1234, 'finishedRace': true};
-        const addLapCallback = jest.fn((e) => {entry.laps.push({'number': 1, 'time': 1234})});
-        const tableBody = document.createElement('tbody');
-        render(<RaceEntryView entry={entryOnLastLap} />, {container: document.body.appendChild(tableBody)});
-        const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;
-        await act(async () => {
-            await user.click(SMScorp1234entry);
-        });
-        expect(addLapCallback).not.toBeCalled();
-    });
 });
 
 describe('when entry has not finished race', () => {
@@ -234,5 +224,53 @@ describe('when entry has not finished race', () => {
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />, {container: document.body.appendChild(tableBody)});
         const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;
         expect(SMScorp1234entry.getAttribute('class')).not.toMatch(/finished-race/i);
+    });
+});
+
+describe('when a scoring abbreviation is not selected', () => {
+    it('only has a class of race-entry-view', () => {
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />, {container: document.body.appendChild(tableBody)});
+        const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;
+        expect(SMScorp1234entry.getAttribute('class')).toMatch(/^race-entry-view$/i);
+    });
+});
+
+describe('when a scoring abbreviation is selected', () => {
+    it('calls setScoringAbbreviation callback provided as prop', async () => {
+        const setScoringAbbreviationSpy = jest.fn();
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} setScoringAbbreviation={setScoringAbbreviationSpy}/>, {container: document.body.appendChild(tableBody)});
+        const selectSA = screen.getByRole('combobox');
+        await user.selectOptions(selectSA, 'DNS');
+        expect(setScoringAbbreviationSpy).toHaveBeenCalledWith(entryChrisMarshallScorpionA1234, 'DNS');
+    });
+    describe('when entry did not start the race', () => {
+        it('has a class of did-not-start', () => {
+            const entryDNS = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DNS'};
+            const tableBody = document.createElement('tbody');
+            render(<RaceEntryView entry={entryDNS} />, {container: document.body.appendChild(tableBody)});
+            const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;
+            expect(SMScorp1234entry.getAttribute('class')).toMatch(/did-not-start/i);
+        });
+    });
+    describe('when entry retired', () => {
+        it('has a class of retired', () => {
+            const entryRET = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'RET'};
+            const tableBody = document.createElement('tbody');
+            render(<RaceEntryView entry={entryRET} />, {container: document.body.appendChild(tableBody)});
+            const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;
+            expect(SMScorp1234entry.getAttribute('class')).toMatch(/retired/i);
+        });
+    });
+    describe('when entry disqualified', () => {
+        it('has a class of disqualified', () => {
+            const entryRET = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DSQ'};
+            const tableBody = document.createElement('tbody');
+            render(<RaceEntryView entry={entryRET} />, {container: document.body.appendChild(tableBody)});
+            const SMScorp1234entry = screen.getByText(/scorpion 1234 chris marshall/i).parentElement;
+            expect(SMScorp1234entry.getAttribute('class')).toMatch(/disqualified/i);
+        });
     });
 });
