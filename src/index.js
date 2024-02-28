@@ -3,12 +3,11 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import DinghyRacingModel from './model/dinghy-racing-model';
 import DinghyRacingController from './controller/dinghy-racing-controller'; 
+import getDinghyRacingProperties from './dinghy-racing-properties';
 
-const response = await fetch("properties.json");
-const properties = await response.json();
+const propertiesResource = window.location.origin + '/dinghyracingproperties/connectionurls';
+const properties = await getDinghyRacingProperties(propertiesResource);
 const root = ReactDOM.createRoot(document.getElementById('root'));
-// const model = new DinghyRacingModel('http://localhost:8081/dinghyracing/api', 'ws://localhost:8081/dinghyracingws');
-// const model = new DinghyRacingModel('http://bginfosys.com:8080/dinghyracing/api', 'ws://bginfosys.com:8080/dinghyracingws');
 const model = new DinghyRacingModel(properties.httpRootURL, properties.wsRootURL);
 const controller = new DinghyRacingController(model);
 
