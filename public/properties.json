@@ -1,4 +1,0 @@
-{
-	"httpRootURL": "http://localhost:8081/dinghyracing/api",
-	"wsRootURL": "ws://localhost:8081/dinghyracingws"
-}

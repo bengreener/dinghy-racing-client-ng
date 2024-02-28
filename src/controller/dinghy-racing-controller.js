@@ -86,18 +86,25 @@ class DinghyRacingController {
     }
 
     /**
-     * Set a scoring abbreviation for an entry
+     * Set a scoring abbreviation for an entry.
+     * If an empty string, undefined, or null is passed for scoringAbbeviation scoring abbreviation for entry will be cleared; set to null.
      * @param {Entry} entry
-     * @param {String} scoringAbbreviation
+     * @param {String} scoringAbbreviation three character string, empty string, or null
      */
     setScoringAbbreviation(entry, scoringAbbreviation) {
+        let sa = null;
         if (!entry || !entry.url) {
             return Promise.resolve({'success': false, 'message': 'A valid entry is required to set a scoring abbreviation.'});
         }
-        if (!scoringAbbreviation || scoringAbbreviation.length !== 3) {
-            return Promise.resolve({'success': false, 'message': 'Scoring abbreviation must be 3 characters long.'});
+        if (scoringAbbreviation) {
+            if (scoringAbbreviation.length !== 3) {
+                return Promise.resolve({'success': false, 'message': 'Scoring abbreviation must be 3 characters long.'});
+            }
+            else {
+                sa = scoringAbbreviation.toUpperCase();
+            }
         }
-        return this.model.update(entry.url, {'scoringAbbreviation': scoringAbbreviation.toUpperCase()});
+        return this.model.update(entry.url, {'scoringAbbreviation': sa});
     }
 
     /**
