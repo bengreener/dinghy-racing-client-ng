@@ -8,7 +8,7 @@ class Authorisation {
         let json;
         let roles;
 
-        const resource = window.location.origin + '/authentication/roles';
+        const resource = window.location.origin + window.location.pathname + 'authentication/roles';
         let response;
         try {
             response = await fetch(resource, {method: 'GET', headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}, cache: 'no-store'});
