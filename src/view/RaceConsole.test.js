@@ -291,7 +291,7 @@ it('provides option to select start time for first race', async () => {
     expect(selectSessionStart).toBeInTheDocument();
 });
 
-it('provides option to select start time for first race', async () => {
+it('provides option to select end time for first race', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
     jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
