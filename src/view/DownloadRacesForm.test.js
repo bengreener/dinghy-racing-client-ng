@@ -73,7 +73,7 @@ it('accepts a change to the get races in window start time', async () => {
 
 it('calls model get races between times with values set for start and end of window', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const getRacesBetweenTimesSpy = jest.spyOn(model, 'getRacesBetweenTimes');//.mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    const getRacesBetweenTimesSpy = jest.spyOn(model, 'getRacesBetweenTimes');
     await act(async () => {
         await customRender(<DownloadRacesForm />, model);
     })
@@ -85,7 +85,7 @@ describe('when start time for races window chnages', () => {
     it('calls model get races between times with new time set for start and end of window', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const getRacesBetweenTimesSpy = jest.spyOn(model, 'getRacesBetweenTimes');//.mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        const getRacesBetweenTimesSpy = jest.spyOn(model, 'getRacesBetweenTimes');
         
         await act(async () => {
             await customRender(<DownloadRacesForm />, model);
@@ -105,7 +105,7 @@ describe('when end time for races window chnages', () => {
     it('calls model get races between times with start time and new time set for end of window', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const getRacesBetweenTimesSpy = jest.spyOn(model, 'getRacesBetweenTimes');//.mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        const getRacesBetweenTimesSpy = jest.spyOn(model, 'getRacesBetweenTimes');
         
         await act(async () => {
             await customRender(<DownloadRacesForm />, model);
@@ -147,4 +147,22 @@ describe('when an error is received', () => {
         });
         expect(screen.queryByText(/oops!/i)).not.toBeInTheDocument();
     });
+});
+
+it('displays races that start within the time window specified', async () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const getRacesBetweenTimesSpy = jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    await act(async () => {
+        await customRender(<DownloadRacesForm />, model);
+    });
+
+    expect(screen.getByText(/scorpion a/i)).toBeInTheDocument();
+    // expect(screen.getByText(/14\/10\/2021 10:30/i)).toBeInTheDocument();
+    expect(screen.getByText(new Intl.DateTimeFormat(navigator.language, {
+        dateStyle: 'medium',
+        timeStyle: 'medium',
+        hour12: false
+    }).format(new Date('2021-10-14T10:30:00Z')))).toBeInTheDocument();
+    expect(screen.getByText(/^comet$/i)).toBeInTheDocument();
+    expect(screen.getByText(/handicap a/i)).toBeInTheDocument();
 });

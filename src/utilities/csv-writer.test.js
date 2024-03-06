@@ -41,7 +41,7 @@ describe('when race is for dinghy class without crew', () => {
         entriesCometA_with_laps[0].laps = [{'number': 1, 'time': 1000}, {'number': 2, 'time': 1100}, {'number': 3, 'time': 1200}];
         entriesCometA_with_laps[0].sumOfLapTimes =  3300;
         const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceCometA, entriesCometA_with_laps);
-        expect(data).toEqual(['Comet A,2021-10-14T10:30:00.000Z,Comet,Jill Myer,Comet,3,3300,\n']);
+        expect(data).toEqual(['Comet A,2021-10-14T10:40:00.000Z,Comet,Jill Myer,Comet,3,3300,\n']);
     });
 });
 

@@ -41,6 +41,18 @@ function DownloadRacesForm() {
         <div>
             <h1>Download Races</h1>
             <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
+            {races.map(race => {return (
+                <div key={race.name+race.plannedStartTime.toISOString()} >
+                    <label>{race.name}</label>
+                    <label>{race.dinghyClass ? race.dinghyClass.name : ''}</label>
+                    <label htmlFor={'race-start-' + race.name.replace(/ /g, '-').toLowerCase()} >Start Time</label>
+                    <output id={'race-start-' + race.name.replace(/ /g, '-').toLowerCase()}>{new Intl.DateTimeFormat(navigator.language, {
+                        dateStyle: 'medium',
+                        timeStyle: 'medium',
+                        hour12: false
+                    }).format(race.plannedStartTime)}</output>
+                </div>
+            )})}
             <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
         </div>
     );

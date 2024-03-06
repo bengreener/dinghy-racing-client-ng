@@ -169,8 +169,6 @@ function RaceHeaderView({ race }) {
         setShowPostponeRace(false);
     };
 
-    
-
     return (
         <div>
             <label>{race.name}</label>
