@@ -131,4 +131,20 @@ describe('when an error is received', () => {
         
         expect(screen.getByText(/oops!/i)).toBeInTheDocument();
     });
+    it('clears error message when a successful response is received', async () => {
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
+        let render;
+
+        await act(async () => {
+            render = await customRender(<DownloadRacesForm key={Date.now()} />, model);
+        })
+        
+        expect(screen.getByText(/oops!/i)).toBeInTheDocument();
+
+        await act(async () => {
+            render.rerender(<DownloadRacesForm key={Date.now()} />, model);
+        });
+        expect(screen.queryByText(/oops!/i)).not.toBeInTheDocument();
+    });
 });
