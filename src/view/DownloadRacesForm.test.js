@@ -1,13 +1,21 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { customRender } from '../test-utilities/custom-renders';
+import { httpRootURL, wsRootURL, races } from '../model/__mocks__/test-data';
+import DinghyRacingModel from '../model/dinghy-racing-model';
 import DownloadRacesForm from './DownloadRacesForm';
 
+jest.mock('../model/dinghy-racing-model');
+
 it('renders', () => {
-    render(<DownloadRacesForm />);
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+
+    customRender(<DownloadRacesForm />, model);
 });
 
 it('provides option to select start time and end time for session', async () => {
-    render(<DownloadRacesForm />);
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    customRender(<DownloadRacesForm />, model);
 
     const selectSessionStart = screen.getByLabelText(/session start/i);
     const selectSessionEnd = screen.getByLabelText(/session end/i);
@@ -16,18 +24,20 @@ it('provides option to select start time and end time for session', async () => 
 });
 
 it('sets start and end time to defaults', () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const expectedStartTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000).toISOString().substring(0, 16);
     const expectedEndTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000).toISOString().substring(0, 16);
 
-    render(<DownloadRacesForm />);
+    customRender(<DownloadRacesForm />, model);
     expect(screen.getByLabelText(/session start/i)).toHaveValue(expectedStartTime);
     expect(screen.getByLabelText(/session end/i)).toHaveValue(expectedEndTime);
 });
 
 it('accepts a change to the get races in window start time', async () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const user = userEvent.setup();
 
-    render(<DownloadRacesForm />);
+    customRender(<DownloadRacesForm />, model);
 
     const sessionStartInput = screen.getByLabelText(/session start/i);
     await act(async () => {
@@ -37,10 +47,11 @@ it('accepts a change to the get races in window start time', async () => {
     expect(sessionStartInput).toHaveValue('2020-02-12T12:10');
 });
 
-it('accepts a change to the get races in window end time', async () => {
+it('accepts a change to the get races in window start time', async () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const user = userEvent.setup();
 
-    render(<DownloadRacesForm />);
+    customRender(<DownloadRacesForm />, model);
 
     const sessionEndInput = screen.getByLabelText(/session end/i);
     await act(async () => {
@@ -49,3 +60,13 @@ it('accepts a change to the get races in window end time', async () => {
     });
     expect(sessionEndInput).toHaveValue('2075-02-12T12:10');
 });
+
+it('calls model get races between times with values set for start and end of window', async () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const getRacesBetweenTimesSpy = jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    await act(async () => {
+        await customRender(<DownloadRacesForm />, model);
+    })
+    
+    expect(getRacesBetweenTimesSpy).toBeCalledWith(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000), new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000))
+})
