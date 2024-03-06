@@ -12,6 +12,10 @@ function DownloadRacesForm() {
     const [races, setRaces] = useState([]);
     // const [message, setMessage] = useState(''); // feedback to user
 
+    function handlesessionStartInputChange(date) {
+        setSessionStart(date);
+    }
+
     useEffect(() => {
         let ignoreFetch = false; // set to true if RaceConsole rerendered before fetch completes to avoid using out of date result
         model.getRacesBetweenTimes(sessionStart, sessionEnd).then(result => {
@@ -32,7 +36,7 @@ function DownloadRacesForm() {
     return (
         <div>
             <h1>Download Races</h1>
-            <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} />
+            <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} />
             {/* <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p> */}
         </div>
     );
