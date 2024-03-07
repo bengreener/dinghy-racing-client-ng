@@ -1,4 +1,4 @@
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, getByText } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
 import DinghyRacingController from './controller/dinghy-racing-controller';
@@ -31,11 +31,13 @@ it('displays menu buttons', async () => {
   const btnCreateRace = screen.getByRole('button', {name: /create race\b/i});
   const btnUpcomingRaces = screen.getByRole('button', {name: /upcoming races\b/i});
   const btnRaceConsole = screen.getByRole('button', {name: /race console\b/i});
+  const btnDownloadRaces = screen.getByRole('button', {name: /download races\b/i});
   const btnLogout = screen.getByRole('button', {name: /logout\b/i});
   expect(btnCreateDinghyClass).toBeInTheDocument();
   expect(btnCreateRace).toBeInTheDocument();
   expect(btnUpcomingRaces).toBeInTheDocument();
   expect(btnRaceConsole).toBeInTheDocument();
+  expect(btnDownloadRaces).toBeInTheDocument();
   expect(btnLogout).toBeInTheDocument();
 });
 
@@ -138,6 +140,24 @@ describe('when race console button is clicked', ()  => {
     });
   });
 });
+
+describe('when download races console button is clicked', ()  => {
+  it('displays download races form', async () => {
+    const user = userEvent.setup();
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    const dinghyRacingController = new DinghyRacingController(model);
+
+    render(<App model={model} controller={dinghyRacingController} />);
+    const btnDownloadRaces = await screen.findByRole('button', {name: /download races\b/i});
+    await act(async () => {
+      await user.click(btnDownloadRaces);
+    });
+    expect(await screen.findByRole('heading', {name: /download races/i})).toBeInTheDocument();
+  });
+});
+
 
 it('enables user to logout', async () => {
   // jsdom does not implement navigation so replace Window.location with a trackable mock for this test

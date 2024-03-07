@@ -74,13 +74,6 @@ describe('when rendered', () => {
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
         expect(screen.getByLabelText(/average/i)).toHaveValue('00:00');
     });
-    it('displays download results button', () => {
-        HTMLDialogElement.prototype.close = jest.fn();
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
-        expect(screen.getByText(/download results/i)).toBeInTheDocument();
-    });
     it('displays postpone race button', () => {
         HTMLDialogElement.prototype.close = jest.fn();
         // const raceScorpionA_copy = {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))};
@@ -198,33 +191,6 @@ it('updates values when a new race is selected', async () => {
     expect(screen.getByLabelText(/duration/i)).toHaveValue('22:30');
     expect(screen.getByLabelText(/remaining/i)).toHaveValue('22:25');
     expect(screen.getByLabelText(/estimate/i)).toHaveValue('4.00');
-});
-
-describe('when download results button clicked', () => {
-    it('calls controller download results function', async () => {
-        HTMLDialogElement.prototype.close = jest.fn();
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});;
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        const downloadFunctionSpy = jest.spyOn(controller, 'downloadRaceResults').mockImplementation(() => {return Promise.resolve({'success': true})});
-        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
-        await user.click(screen.getByText(/download results/i));
-
-        expect(downloadFunctionSpy).toBeCalledTimes(1);
-    });
-    it('displays the error message if the request to download is unsuccessful', async () => {
-        HTMLDialogElement.prototype.close = jest.fn();
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});;
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        const downloadFunctionSpy = jest.spyOn(controller, 'downloadRaceResults').mockImplementation(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
-        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
-        await act(async () => {
-            await user.click(screen.getByText(/download results/i));
-        });
-        
-        expect(screen.getByText(/oops/i)).toBeInTheDocument();
-    })
 });
 
 describe('when postpone race button clicked', () => {
