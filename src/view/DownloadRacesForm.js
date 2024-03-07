@@ -41,6 +41,7 @@ function DownloadRacesForm() {
         <div>
             <h1>Download Races</h1>
             <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
+            <p id="download-races-message" className={!message ? "hidden" : ""}>{message}</p>
             {races.map(race => {return (
                 <div key={race.name+race.plannedStartTime.toISOString()} >
                     <label>{race.name}</label>
@@ -53,7 +54,6 @@ function DownloadRacesForm() {
                     }).format(race.plannedStartTime)}</output>
                 </div>
             )})}
-            <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
         </div>
     );
 }
