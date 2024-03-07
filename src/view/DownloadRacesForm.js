@@ -1,5 +1,6 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useCallback, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
+import ControllerContext from './ControllerContext';
 import SelectSession from './SelectSession';
 
 /**
@@ -7,10 +8,19 @@ import SelectSession from './SelectSession';
  */
 function DownloadRacesForm() {
     const model = useContext(ModelContext);
+    const controller = useContext(ControllerContext);
     const [sessionStart, setSessionStart] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000));
     const [sessionEnd, setSessionEnd] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000));
     const [races, setRaces] = useState([]);
     const [message, setMessage] = useState(''); // feedback to user
+
+    const handleRaceResultDownloadClick = useCallback((race) => {
+        controller.downloadRaceResults(race).then(result => {
+            if (!result.success) {
+                setMessage('Unable to download results\n' + result.message);
+            }
+        });
+    }, [controller]);
 
     function handlesessionStartInputChange(date) {
         setSessionStart(date);
@@ -52,6 +62,7 @@ function DownloadRacesForm() {
                         timeStyle: 'medium',
                         hour12: false
                     }).format(race.plannedStartTime)}</output>
+                    <button id="race-result-download-button" onClick={() => handleRaceResultDownloadClick(race)}>Download Results</button>
                 </div>
             )})}
         </div>

@@ -1,8 +1,9 @@
 import { act, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { customRender } from '../test-utilities/custom-renders';
-import { httpRootURL, wsRootURL, races } from '../model/__mocks__/test-data';
+import { httpRootURL, wsRootURL, races, raceScorpionA } from '../model/__mocks__/test-data';
 import DinghyRacingModel from '../model/dinghy-racing-model';
+import DinghyRacingController from '../controller/dinghy-racing-controller';
 import DownloadRacesForm from './DownloadRacesForm';
 
 jest.mock('../model/dinghy-racing-model');
@@ -165,4 +166,37 @@ it('displays races that start within the time window specified', async () => {
     }).format(new Date('2021-10-14T10:30:00Z')))).toBeInTheDocument();
     expect(screen.getByText(/^comet$/i)).toBeInTheDocument();
     expect(screen.getByText(/handicap a/i)).toBeInTheDocument();
+});
+
+describe('when download results button clicked', () => {
+    it('calls controller download results function', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': [raceScorpionA]})});
+        const downloadFunctionSpy = jest.spyOn(controller, 'downloadRaceResults').mockImplementation(() => {return Promise.resolve({'success': true})});
+        await act(async () => {
+            await customRender(<DownloadRacesForm />, model, controller);
+        });
+
+        await user.click(screen.getByText(/download results/i));
+
+        expect(downloadFunctionSpy).toBeCalledTimes(1);
+    });
+    it('displays the error message if the request to download is unsuccessful', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': [raceScorpionA]})});
+        jest.spyOn(controller, 'downloadRaceResults').mockImplementation(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
+        await act(async () => {
+            await customRender(<DownloadRacesForm />, model, controller);
+        });
+
+        await act(async () => {
+            await user.click(screen.getByText(/download results/i));
+        });
+
+        expect(screen.getByText(/oops/i)).toBeInTheDocument();
+    })
 });
