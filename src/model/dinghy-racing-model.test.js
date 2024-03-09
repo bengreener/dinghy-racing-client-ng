@@ -11,6 +11,24 @@ import { httpRootURL, wsRootURL, competitorsCollectionHAL,
     entriesScorpionAHAL, entriesCometAHAL, entryChrisMarshallDinghy1234HAL, entriesHandicapAHAL,
     entriesScorpionA, entriesCometA, entriesHandicapA,
     competitorSarahPascal, raceHandicapA, entryChrisMarshallScorpionA1234, competitorOwainDavies, competitorJillMyer } from './__mocks__/test-data';
+import {
+    findByRaceGraduate_AHAL_bigData, signedUpGraduateAHAL_bigData,
+    competitorCarmenWhiting, competitorAjDavis, competitorIvanPlatt, competitorNellPowell, competitorGraceRees, competitorArranAshley, competitorMacySmall,
+    competitorDestinyBourne, competitorDominicBarnett, competitorAlaraTaylor, competitorKieraDaniels, competitorAmariBarber, competitorHazelWheeler, competitorLucasMillward,
+    competitorLouiseBarron, competitorAlastairKhatun, competitorSamsonMcGowan, competitorCalebParkinson, competitorInayaRegan, competitorLeiaHaynes, competitorNatanNewman,
+    competitorJamesonSharpe, competitorElifPugh, competitorWilfredMead, competitorFrankySheppard, competitorLeniTyler, competitorMahnoorHope, competitorAnthonyDillon,
+    competitorZackaryLindsay, competitorKhalilRushton, competitorNoelHills, competitorDanielLittle, competitorAizaAustin, competitorWilliamMorrison, competitorAugustKhan,
+    competitorYuvrajSheppard, competitorMaximFlynn, competitorCezarWhelan, competitorBaileyPreston, competitorNadiaBarrow, competitorZimalGrainger, competitorRuqayyahWhittle,
+    competitorJaysonGraves, competitorBellaBourne, competitorCobieBaldwin, competitorIrisSandhu, competitorEsmeHyde, competitorDakotaMoss, competitorLeoEaton, competitorDarcyEmery,
+    competitorDiegoHoughton, competitorShelbyMiller, competitorMaceyVaughan, competitorLaineyAbbott, competitorPaddyLowe, competitorBaaniManning, competitorSarahPritchard,
+    competitorLucienHoare, competitorSerenDuffy, competitorBiancaSwan,
+
+    dinghy1, dinghy290, dinghy2009, dinghy2097, dinghy2373, dinghy2471, dinghy2482, dinghy2725, dinghy2849, dinghy2862, dinghy2889, dinghy2910, dinghy2912, dinghy2928,
+    dinghy2931, dinghy2938, dinghy2969, dinghy2970, dinghy2971, dinghy2973, dinghy2985, dinghy2987, dinghy3006, dinghy3009, dinghy3014, dinghy3015, dinghy3020, dinghy3021,
+    dinghy3022, dinghy3088,
+
+    entriesGraduateA_bigData
+} from './__mocks__/test-data-more-data';
 
 global.fetch = jest.fn();
 // jest.mock('@stomp/stompjs');
@@ -1535,6 +1553,321 @@ describe('when searching for entries by race', () => {
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Cannot retrieve race entries without URL for race.'});
+    });
+    describe('when there are more than 20 entries (default Spring page size) for a race', () => {
+        it(' returns all the entries', async () => {
+            fetch.mockImplementationOnce((resource) => {
+                if (resource === 'http://localhost:8081/dinghyracing/api/entries/search/findByRace?race=http://localhost:8081/dinghyracing/api/races/7') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200,
+                        json: () => Promise.resolve(findByRaceGraduate_AHAL_bigData)
+                    });
+                }
+                else if (resource === 'http://localhost:8081/dinghyracing/api/races/7/signedUp') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200,
+                        json: () => Promise.resolve(signedUpGraduateAHAL_bigData)
+                    });
+                }
+                else {
+                    return Promise.resolve({
+                        ok: false,
+                        status: 404,
+                        json: () => {throw new SyntaxError('Unexpected end of JSON input')}
+                    });
+                }
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceGraduateA})});
+            jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1430/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorCarmenWhiting});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1431/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorAjDavis});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1432/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorIvanPlatt});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1433/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorNellPowell});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1434/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorGraceRees});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1435/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorArranAshley});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1436/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorMacySmall});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1437/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorDestinyBourne});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1438/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorDominicBarnett});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1439/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorAlaraTaylor});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1440/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorKieraDaniels});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1441/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorAmariBarber});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1442/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorHazelWheeler});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1443/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorLucasMillward});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1444/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorLouiseBarron});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1445/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorAlastairKhatun});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1446/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorSamsonMcGowan});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1447/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorCalebParkinson});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1448/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorInayaRegan});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1449/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorLeiaHaynes});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1450/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorNatanNewman});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1451/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorJamesonSharpe});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1452/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorElifPugh});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1453/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorWilfredMead});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1454/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorFrankySheppard});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1455/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorLeniTyler});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1456/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorMahnoorHope});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1457/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorAnthonyDillon});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1458/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorZackaryLindsay});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1459/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorKhalilRushton});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1430/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorNoelHills});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1431/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorDanielLittle});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1432/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorAizaAustin});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1433/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorWilliamMorrison});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1434/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorAugustKhan});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1435/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorYuvrajSheppard});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1436/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorMaximFlynn});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1437/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorCezarWhelan});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1438/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorBaileyPreston});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1439/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorNadiaBarrow});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1440/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorZimalGrainger});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1441/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorRuqayyahWhittle});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1442/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorJaysonGraves});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1443/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorBellaBourne});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1444/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorCobieBaldwin});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1445/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorIrisSandhu});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1446/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorEsmeHyde});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1447/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorDakotaMoss});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1448/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorLeoEaton});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1449/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorDarcyEmery});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1450/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorDiegoHoughton});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1451/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorShelbyMiller});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1452/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorMaceyVaughan});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1453/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorLaineyAbbott});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1454/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorPaddyLowe});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1455/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorBaaniManning});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1456/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorSarahPritchard});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1457/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorLucienHoare});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1458/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorSerenDuffy});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1459/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorBiancaSwan});
+                }
+                else {
+                    return Promise.resolve({'success': false, 'message': 'Unable to identify competitor.'});
+                }
+            });
+            jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation((url) => {
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1430/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy1});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1431/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy290});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1432/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2009});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1433/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2097});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1434/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2373});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1435/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2471});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1436/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2482});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1437/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2725});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1438/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2849});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1439/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2862});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1440/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2889});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1441/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2910});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1442/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2912});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1443/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2928});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1444/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2931});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1445/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2938});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1446/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2969});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1447/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2970});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1448/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2971});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1449/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2973});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1450/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2985});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1451/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy2987});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1452/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy3006});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1453/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy3009});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1454/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy3014});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1455/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy3015});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1456/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy3020});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1457/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy3021});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1458/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy3022});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1459/dinghy') {
+                    return Promise.resolve({'success': true, 'domainObject': dinghy3088});
+                }
+                else {
+                    return Promise.resolve({'success': false, 'message': 'Unable to identify dinghy.'});
+                }
+            });
+            jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassGraduate})});
+            jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
+            const promise = dinghyRacingModel.getEntriesByRace(raceGraduateA);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({success: true, domainModel: entriesGraduateA_bigData});
+        });
     });
 });
 
