@@ -502,7 +502,7 @@ class DinghyRacingModel {
             return Promise.resolve({'success': false, 'message': 'Cannot retrieve race entries without URL for race.'});
         }
         // get entries
-        const resource = this.httpRootURL + '/entries/search/findByRace?race=' + race.url;
+        const resource = race.url + '/signedUp';
         const result = await this.read(resource);
         if (!result.success) {
             return Promise.resolve(result);

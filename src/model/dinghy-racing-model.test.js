@@ -1866,7 +1866,7 @@ describe('when searching for entries by race', () => {
             const promise = dinghyRacingModel.getEntriesByRace(raceGraduateA);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({success: true, domainModel: entriesGraduateA_bigData});
+            expect(result).toEqual({success: true, domainObject: entriesGraduateA_bigData});
         });
     });
 });
