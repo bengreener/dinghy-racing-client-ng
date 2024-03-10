@@ -8,6 +8,7 @@ import ViewUpcomingRaces from './view/ViewUpcomingRaces';
 import SignUp from './view/SignUp';
 import RaceConsole from './view/RaceConsole';
 import Authorisation from './controller/authorisation';
+import DownloadRacesForm from './view/DownloadRacesForm';
 
 function App({model, controller}) {
   const [displayPort, setDisplayPort] = React.useState();
@@ -42,6 +43,10 @@ function App({model, controller}) {
     setDisplayPort(<RaceConsole key={Date.now()}/>);
   }
 
+  function showDownloadRaces() {
+    setDisplayPort(<DownloadRacesForm key={Date.now()}/>);
+  }
+
   return (
     <ModelContext.Provider value={model}>
     <ControllerContext.Provider value={controller}>
@@ -64,14 +69,17 @@ function App({model, controller}) {
             <button key={3} type='button' className='list-group-item list-group-item-action' onClick={showRaceConsole}>Race Console</button>
             : null
           }
-          <button key={4} type='button' className='list-group-item list-group-item-action' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
+          {roles.includes('ROLE_RACE_OFFICER') ? 
+            <button key={4} type='button' className='list-group-item list-group-item-action' onClick={showDownloadRaces}>Download Races</button>
+            : null
+          }
+          <button key={5} type='button' className='list-group-item list-group-item-action' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
         </div>
         <div className="display-port">
           <ErrorBoundary key={Date.now()}>
             {displayPort}
           </ErrorBoundary>
         </div>
-        <footer style={{backgroundImage: 'url("./images/home-footer-image.jpg")',}} />
       </div>
     </ErrorBoundary>
     </ControllerContext.Provider>

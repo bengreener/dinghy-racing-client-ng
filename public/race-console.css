@@ -8,9 +8,6 @@
     flex-direction: column;
     overflow: hidden;
 }
-.scrollable {
-	overflow: auto;
-}
 .select-race {
     display: flex;
     align-items: top;

@@ -65,14 +65,6 @@ function RaceHeaderView({ race }) {
         });
     }, [model, race]);
 
-    const handleRaceResultDownloadClick = useCallback(() => {
-        controller.downloadRaceResults(race).then(result => {
-            if (!result.success) {
-                setMessage('Unable to download results\n' + result.message);
-            }
-        });
-    }, [controller, race]);
-
     function handleRacePostponeClick() {
         setShowPostponeRace(true);
     };
@@ -169,8 +161,6 @@ function RaceHeaderView({ race }) {
         setShowPostponeRace(false);
     };
 
-    
-
     return (
         <div>
             <label>{race.name}</label>
@@ -194,7 +184,6 @@ function RaceHeaderView({ race }) {
             <output id={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.averageLapTime)}</output>
             {elapsedTime < 0 ? <button id="race-postpone-button" onClick={handleRacePostponeClick}>Postpone Start</button> : null}
             {elapsedTime < 0 ? <button id="race-start-button" onClick={handleRaceStartClick}>Start Now</button> : null}
-            <button id="race-result-download-button" onClick={handleRaceResultDownloadClick}>Download Results</button>
             <p id="race-header-message" className={!message ? "hidden" : ""}>{message}</p>
             {prepareWFSoundWarning || prepareBPSoundWarning ? <audio data-testid='prepare-sound-warning-audio' autoPlay={true} src='./sounds/prepare_alert.mp3' /> : null}
             {actWFSoundWarning || actBPSoundWarning ? <audio data-testid='act-sound-warning-audio' autoPlay={true} src='./sounds/act_alert.mp3' /> : null}
