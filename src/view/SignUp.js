@@ -280,9 +280,10 @@ function SignUp({ race }) {
     }
 
     return (
-        <form action="" method="get">
+        <form className="sign-up-form" action="" method="get">
             <h1>{race.name}</h1>
             <datalist id="competitor-datalist">{competitorOptions}</datalist>
+            <div>
             <label htmlFor="helm-input">Helm's Name</label>
             <input id="helm-input" name="helm" list="competitor-datalist" onChange={handleChange} value={helmName} />
             {crewInput()}
@@ -292,8 +293,11 @@ function SignUp({ race }) {
             <input id="sail-number-input" name="sailNumber" list="dinghy-datalist" onChange={handleChange} value={sailNumber} />
             <output id="entry-message-output" />
             <button id="entry-create-button" type="button" onClick={handleCreate} >{getButtonText()}</button>
+            </div>
             <h3>Signed-up</h3>
-            {entriesTable}
+            <div className="scrollable">
+                {entriesTable}
+            </div>
         </form>
     )
 }
