@@ -80,7 +80,6 @@ function App({model, controller}) {
             {displayPort}
           </ErrorBoundary>
         </div>
-        <footer style={{backgroundImage: 'url("./images/home-footer-image.jpg")',}} />
       </div>
     </ErrorBoundary>
     </ControllerContext.Provider>

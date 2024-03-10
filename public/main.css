@@ -6,19 +6,12 @@
 body {
 	margin: 0px;	
 }
-footer {
-	grid-area: footer;
-	background-size: contain;
-}
 h3 {
 	margin-top: 5px;
 	margin-bottom: 5px;
 	margin-left: 5px;
 
 }
-/* div {
-	outline: 1px solid CadetBlue;
-} */
 button {
 	border-radius: 25pt;
     padding: 10pt;
@@ -69,10 +62,9 @@ td.total {
 .container-fluid {
 	display: grid;
 	grid-template-columns: 15vw 85vw;
-	grid-template-rows: 15vh 75vh 10vh;
+	grid-template-rows: 15vh 85vh;
 	grid-template-areas: 	'header header'
-							'menu main'
-							'footer footer';
+							'menu main';
 }
 header {
 	grid-area: header;
