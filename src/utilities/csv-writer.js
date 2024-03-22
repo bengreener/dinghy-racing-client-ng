@@ -23,25 +23,26 @@ function downloadRaceEntriesCSV(race, entries) {
     });
 };
 
-function createHeader() {
-    return 'HelmName, CrewName, SailNo, Class, Elapsed, Laps, Code';
+function createHeader(race) {
+    if (!race.dinghyClass || race.dinghyClass.crewSize > 1) {
+        return 'HelmName, CrewName, SailNo, Class, Elapsed, Laps, Code\n';
+    }
+    return 'HelmName, SailNo, Class, Elapsed, Laps, Code\n';
 }
 
 function convertRaceEntriesToCSVArray(race, entries) {
     let data = [];
-    data.push(createHeader());
+    data.push(createHeader(race));
     data = data.concat(entries.map(entry => {
         let record = '';
-        record += race.name + ',';
-        record += race.plannedStartTime.toISOString() + ',';
-        record += race.dinghyClass ? race.dinghyClass.name + ',' : ',';
         record += entry.helm.name + ',';
         if (!race.dinghyClass || race.dinghyClass.crewSize > 1) {
             record += entry.crew ? entry.crew.name + ',' : ',';
         }
+        record += entry.dinghy.sailNumber + ',';
         record += entry.dinghy.dinghyClass.name + ',';
-        record += entry.laps.length + ',';
         record += Math.round(entry.sumOfLapTimes / 1000) + ',';
+        record += entry.laps.length + ',';
         record += (entry.scoringAbbreviation ? entry.scoringAbbreviation : '') + '\n';
         return record;
     }));
