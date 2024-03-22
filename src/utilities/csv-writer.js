@@ -23,8 +23,14 @@ function downloadRaceEntriesCSV(race, entries) {
     });
 };
 
+function createHeader() {
+    return 'HelmName, CrewName, SailNo, Class, Elapsed, Laps, Code';
+}
+
 function convertRaceEntriesToCSVArray(race, entries) {
-    return entries.map(entry => {
+    let data = [];
+    data.push(createHeader());
+    data = data.concat(entries.map(entry => {
         let record = '';
         record += race.name + ',';
         record += race.plannedStartTime.toISOString() + ',';
@@ -35,10 +41,11 @@ function convertRaceEntriesToCSVArray(race, entries) {
         }
         record += entry.dinghy.dinghyClass.name + ',';
         record += entry.laps.length + ',';
-        record += entry.sumOfLapTimes + ',';
+        record += Math.round(entry.sumOfLapTimes / 1000) + ',';
         record += (entry.scoringAbbreviation ? entry.scoringAbbreviation : '') + '\n';
         return record;
-    });
+    }));
+    return data;
 };
 
 // Functions exposed through this object should only be used in tests that confirm they perform as expected
