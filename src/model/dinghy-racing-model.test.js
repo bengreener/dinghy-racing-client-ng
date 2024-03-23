@@ -447,6 +447,123 @@ describe('when retrieving a list of dinghy classes', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true, 'domainObject': dinghyClasses});
     });
+    describe('when there are more dinghy classes available than fit on a single page', () => {
+        describe('when page and size are not supplied', () => {
+            it('retrieves and returns complete list of dinghy classes', async () => {
+                const dinghyClassCollectionHAL_p0 = {
+                    '_embedded' : { 'dinghyClasses' : [ dinghyClassScorpionHAL, dinghyClassGraduateHAL ] }, '_links' : {
+                        'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses' }, 'profile' : { 'href' : 'http://localhost:8081/dinghyracing/api/profile/dinghyclasses' } }, 
+                             'page' : { 'size' : 2, 'totalElements' : 3, 'totalPages' : 2, 'number' : 0 
+                        } 
+                };
+                fetch.mockImplementation(() => {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghyClassCollectionHAL)
+                    });
+                }).mockImplementationOnce(() => {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghyClassCollectionHAL_p0)
+                    });
+                });
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const promise = dinghyRacingModel.getDinghyClasses();
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({'success': true, 'domainObject': dinghyClasses});
+            });
+        });
+        describe('when page number supplied', () => {
+            it('returns only a single page of data', async () => {
+                const dinghyClassCollectionHAL_p0 = {
+                    '_embedded' : { 'dinghyClasses' : [ dinghyClassScorpionHAL, dinghyClassGraduateHAL ] }, '_links' : {
+                        'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses' }, 'profile' : { 'href' : 'http://localhost:8081/dinghyracing/api/profile/dinghyclasses' } }, 
+                             'page' : { 'size' : 2, 'totalElements' : 3, 'totalPages' : 2, 'number' : 0 
+                        } 
+                };
+                const dinghyClasses_p0 = [dinghyClassScorpion, dinghyClassGraduate];
+                fetch.mockImplementation(() => {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghyClassCollectionHAL)
+                    });
+                }).mockImplementationOnce(() => {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghyClassCollectionHAL_p0)
+                    });
+                });
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const promise = dinghyRacingModel.getDinghyClasses(1);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({'success': true, 'domainObject': dinghyClasses_p0});
+            });
+        });
+        describe('when size supplied', () => {
+            it('returns only a single page of data', async () => {
+                const dinghyClassCollectionHAL_p0 = {
+                    '_embedded' : { 'dinghyClasses' : [ dinghyClassScorpionHAL, dinghyClassGraduateHAL ] }, '_links' : {
+                        'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses' }, 'profile' : { 'href' : 'http://localhost:8081/dinghyracing/api/profile/dinghyclasses' } }, 
+                             'page' : { 'size' : 2, 'totalElements' : 3, 'totalPages' : 2, 'number' : 0 
+                        } 
+                };
+                const dinghyClasses_p0 = [dinghyClassScorpion, dinghyClassGraduate];
+                fetch.mockImplementation(() => {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghyClassCollectionHAL)
+                    });
+                }).mockImplementationOnce(() => {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghyClassCollectionHAL_p0)
+                    });
+                });
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const promise = dinghyRacingModel.getDinghyClasses(null, 2);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({'success': true, 'domainObject': dinghyClasses_p0});
+            });
+        });
+        describe('when page and size supplied', () => {
+            it('returns only a single page of data', async () => {
+                const dinghyClassCollectionHAL_p0 = {
+                    '_embedded' : { 'dinghyClasses' : [ dinghyClassScorpionHAL, dinghyClassGraduateHAL ] }, '_links' : {
+                        'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses' }, 'profile' : { 'href' : 'http://localhost:8081/dinghyracing/api/profile/dinghyclasses' } }, 
+                             'page' : { 'size' : 2, 'totalElements' : 3, 'totalPages' : 2, 'number' : 0 
+                        } 
+                };
+                const dinghyClasses_p0 = [dinghyClassScorpion, dinghyClassGraduate];
+                fetch.mockImplementation(() => {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghyClassCollectionHAL)
+                    });
+                }).mockImplementationOnce(() => {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghyClassCollectionHAL_p0)
+                    });
+                });
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const promise = dinghyRacingModel.getDinghyClasses(0, 2);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({'success': true, 'domainObject': dinghyClasses_p0});
+            });
+        });
+    });
     it('returns a promise that resolves to a result indicating failure when list of dinghy classes is not found and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({

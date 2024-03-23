@@ -472,15 +472,29 @@ class DinghyRacingModel {
     }
 
     /**
-     * Get dinghy classes
+     * Get dinghy classes in ascending order by class name
+     * If page and/ or size are not provided will return all dinghy classes
+     * @param {integer} page number to return (0 indexed)
+     * @param {integer} size number of elements to return per page
      * @return {Promise<Result>>} If successful Result.domainObject will be an Array<DinghyClass>
      */
-    async getDinghyClasses() {
-        const resource = this.httpRootURL + '/dinghyClasses?sort=name,asc';
+    async getDinghyClasses(page, size) {
+        let resource = this.httpRootURL + '/dinghyClasses?';
+        if (page) {
+            resource += 'page=' + page + '&';
+        }
+        if (size) {
+            resource += 'size=' + size + '&';
+        }
+        resource += 'sort=name,asc';
 
         const result = await this.read(resource);
         if (result.success) {
-            const collection = result.domainObject._embedded.dinghyClasses;
+            let collection = result.domainObject._embedded.dinghyClasses;
+            // check for additional dinghy classes
+            if (page == null && size == null && result.domainObject.page.totalElements > result.domainObject.page.size) {
+                return this.getDinghyClasses(0, result.domainObject.page.totalElements);
+            }
             const dinghyClassCollection = collection.map(dinghyClass => {return {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClass.name, 
                 'crewSize': dinghyClass.crewSize, 'url': dinghyClass._links.self.href}});
             return Promise.resolve({'success': true, 'domainObject': dinghyClassCollection});
