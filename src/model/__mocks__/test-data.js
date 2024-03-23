@@ -25,7 +25,7 @@ const dinghyClassNotSetHAL = {'name':'','crewSize':0,'_links':{'self':{'href':''
 const dinghyClassCollectionHAL = {
 	'_embedded' : { 'dinghyClasses' : [ dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghyClassCometHAL ] }, '_links' : {
 		'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses' }, 'profile' : { 'href' : 'http://localhost:8081/dinghyracing/api/profile/dinghyclasses' } }, 
-		 	'page' : { 'size' : 20, 'totalElements' : 2, 'totalPages' : 1, 'number' : 0 
+		 	'page' : { 'size' : 20, 'totalElements' : 3, 'totalPages' : 1, 'number' : 0 
 		} 
 };
 const dinghyClassSchemaJSON = {
