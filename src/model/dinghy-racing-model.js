@@ -677,30 +677,7 @@ class DinghyRacingModel {
     async getRacesOnOrAfterTime(startTime) {
         const resource = this.httpRootURL + '/races/search/findByPlannedStartTimeGreaterThanEqual?time=' + startTime.toISOString();
 
-        const result = await this.read(resource);
-        if (result.success) {
-            const racesHAL = result.domainObject._embedded.races;
-            const dinghyClassURLs = racesHAL.map(race => race._links.dinghyClass.href);
-            const dinghyClassResults = await Promise.all(dinghyClassURLs.map(url => this.read(url)));
-            
-            const races = [];
-            for (let i = 0; i < racesHAL.length; i++  ) {
-                const dinghyClass = dinghyClassResults[i].success ? {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassResults[i].domainObject.name, 
-                    'crewSize': dinghyClassResults[i].domainObject.crewSize, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
-                // assume time received has been stored in UTC
-                races.push({...DinghyRacingModel.raceTemplate(), 'name': racesHAL[i].name, 'plannedStartTime': new Date(racesHAL[i].plannedStartTime + 'Z'), 
-                    'actualStartTime': racesHAL[i].actualStartTime ? new Date(racesHAL[i].actualStartTime + 'Z') : null, 
-                    'dinghyClass': dinghyClass, 'duration': this.convertISO8601DurationToMilliseconds(racesHAL[i].duration), 'plannedLaps': racesHAL[i].plannedLaps, 
-                    'lapForecast': racesHAL[i].lapForecast, 
-                    'lastLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.lastLapTime) : null, 
-                    'averageLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.averageLapTime) : null, 
-                    'url': racesHAL[i]._links.self.href});
-            };
-            return Promise.resolve({'success': true, 'domainObject': races});
-        }
-        else {
-            return Promise.resolve(result);
-        }
+        return this.getRacesFromURL(resource);
     }
 
     /**
@@ -712,7 +689,16 @@ class DinghyRacingModel {
     async getRacesBetweenTimes(startTime, endTime) {
         const resource = this.httpRootURL + '/races/search/findByPlannedStartTimeBetween?startTime=' + startTime.toISOString() + '&endTime=' + endTime.toISOString();
 
-        const result = await this.read(resource);
+        return this.getRacesFromURL(resource);
+    }
+
+    /**
+     * Get races from the specified resource location
+     * @param {string} url to use to retrieve a collection of races
+     * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
+     */
+    async getRacesFromURL(url) {
+        const result = await this.read(url);
         if (result.success) {
             const racesHAL = result.domainObject._embedded.races;
             const dinghyClassURLs = racesHAL.map(race => race._links.dinghyClass.href);
