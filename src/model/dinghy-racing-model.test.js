@@ -3341,3 +3341,300 @@ it('returns a collection of races that start between the specified times', async
     expect(promise).toBeInstanceOf(Promise);
     expect(result).toEqual({'success': true, 'domainObject': races});
 });
+
+describe('when retrieving a list of races that start between the specified times', () => {
+    // Can this test can be affected by BST, or other time zones (yes, if timezone changes test data (races) will need to be adjusted to reflect the change in the timezone (currently set up for British Summer Time))
+    it('returns a collection of races that start between the specified times', async () => {
+        fetch.mockImplementation((resource) => {
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(racesCollectionHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/4/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassScorpionHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/7/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassGraduateHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/17/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassCometHAL)
+                });
+            }
+            else {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404
+                });
+            }
+        });
+    
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.getRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'));
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': races});
+    });
+    describe('when there are more races than fit on a single page', () => {
+        describe('when page and size are not supplied', () => {
+            it('returns a success result containing all the races that start at or after the specified time', async () => {
+                const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
+                fetch.mockImplementation((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&page=0&size=4') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(racesCollectionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/4/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassScorpionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/7/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassGraduateHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/17/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassCometHAL)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404
+                        });
+                    }
+                }).mockImplementationOnce((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(racesCollectionHAL_p0)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404
+                        });
+                    }
+                });
+        
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const promise = dinghyRacingModel.getRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'));
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({'success': true, 'domainObject': races});
+            });
+        });
+        describe('when page number supplied', () => {
+            it('returns only a single page of data', async () => {
+                const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
+                const races_p0 = [raceScorpionA, raceGraduateA];
+                fetch.mockImplementation((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(racesCollectionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/4/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassScorpionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/7/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassGraduateHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/17/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassCometHAL)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404
+                        });
+                    }
+                }).mockImplementationOnce((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&page=0') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(racesCollectionHAL_p0)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404
+                        });
+                    }
+                });
+        
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const promise = dinghyRacingModel.getRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), 0);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({'success': true, 'domainObject': races_p0});
+            });
+        });
+        describe('when size is supplied', () => {
+            it('returns only a single page of data', async () => {
+                const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
+                const races_p0 = [raceScorpionA, raceGraduateA];
+                fetch.mockImplementation((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(racesCollectionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/4/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassScorpionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/7/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassGraduateHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/17/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassCometHAL)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404
+                        });
+                    }
+                }).mockImplementationOnce((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&size=2') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(racesCollectionHAL_p0)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404
+                        });
+                    }
+                });
+        
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const promise = dinghyRacingModel.getRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), null, 2);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({'success': true, 'domainObject': races_p0});
+            });
+        });
+        describe('when page and size supplied', () => {
+            it('returns only a single page of data', async () => {
+                const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
+                const races_p0 = [raceScorpionA, raceGraduateA];
+                fetch.mockImplementation((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(racesCollectionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/4/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassScorpionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/7/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassGraduateHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/17/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassCometHAL)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404
+                        });
+                    }
+                }).mockImplementationOnce((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&page=0&size=2') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(racesCollectionHAL_p0)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404
+                        });
+                    }
+                });
+        
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const promise = dinghyRacingModel.getRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), 0, 2);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({'success': true, 'domainObject': races_p0});
+            });
+        });
+    });
+});
