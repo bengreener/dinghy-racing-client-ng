@@ -672,12 +672,14 @@ class DinghyRacingModel {
     /**
      * Get races scheduled to start after the specified time
      * @param {Date} startTime The start time of the race
+     * @param {integer} [page] number to return (0 indexed)
+     * @param {integer} [size] number of elements to return per page
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
-    async getRacesOnOrAfterTime(startTime) {
+    async getRacesOnOrAfterTime(startTime, page, size) {
         const resource = this.httpRootURL + '/races/search/findByPlannedStartTimeGreaterThanEqual?time=' + startTime.toISOString();
 
-        return this.getRacesFromURL(resource);
+        return this.getRacesFromURL(resource, page, size);
     }
 
     /**
@@ -694,12 +696,39 @@ class DinghyRacingModel {
 
     /**
      * Get races from the specified resource location
-     * @param {string} url to use to retrieve a collection of races
+     * @param {String} url to use to retrieve a collection of races
+     * @param {integer} [page] number to return (0 indexed)
+     * @param {integer} [size] number of elements to return per page
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
-    async getRacesFromURL(url) {
+    async getRacesFromURL(url, page, size) {
+        const hasPage = Number.isInteger(page);
+        const hasSize = Number.isInteger(size);
+        const hasParams = /\?/.test(url);
+        if ((hasPage || hasSize) && !hasParams) {
+            url += '?';
+        }
+        if (hasPage) {
+            if (hasParams) {
+                url += '&page=' + page;
+            }
+            else {
+                url += 'page=' + page;
+            }
+        }
+        if (hasSize) {
+            if (hasParams || hasPage) {
+                url += '&size=' + size;
+            }
+            else {
+                url += 'size=' + size;
+            }
+        }
         const result = await this.read(url);
         if (result.success) {
+            if (!hasPage && !hasSize && result.domainObject.page.totalElements > result.domainObject.page.size) {
+                return this.getRacesFromURL(url, 0, result.domainObject.page.totalElements);
+            }
             const racesHAL = result.domainObject._embedded.races;
             const dinghyClassURLs = racesHAL.map(race => race._links.dinghyClass.href);
             const dinghyClassResults = await Promise.all(dinghyClassURLs.map(url => this.read(url)));
