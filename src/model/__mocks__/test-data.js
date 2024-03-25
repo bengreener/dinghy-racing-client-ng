@@ -16,7 +16,7 @@ const competitorsCollectionHAL = {'_embedded':{'competitors':[
 	competitorChrisMarshallHAL, competitorSarahPascalHAL, competitorJillMyerHAL, competitorLouScrewHAL, competitorOwainDaviesHAL, competitorLiuBaoHAL
 ]},'_links':{
 	'self':{'href':'http://localhost:8081/dinghyracing/api/competitors'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/competitors'}
-},'page':{'size':20,'totalElements':5,'totalPages':1,'number':0}};
+},'page':{'size':20,'totalElements':6,'totalPages':1,'number':0}};
 
 const dinghyClassScorpionHAL = { 'name' : 'Scorpion', 'crewSize' : 2, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses/1' }, 'dinghyClass' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses/1' } } };
 const dinghyClassGraduateHAL = { 'name' : 'Graduate', 'crewSize' : 2, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses/5' }, 'dinghyClass' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses/5' } } };

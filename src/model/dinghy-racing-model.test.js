@@ -8,7 +8,8 @@ import { httpRootURL, wsRootURL, competitorsCollectionHAL,
     dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet,
     dinghies, dinghiesScorpion, dinghy1234, dinghy2726, dinghy6745, dinghy826,
     races, racesCollectionHAL, raceScorpionA, raceHandicapAHAL, raceGraduateA, raceCometA, raceGraduate_AHAL,
-    competitorsCollection, competitorChrisMarshall, competitorChrisMarshallHAL, competitorLouScrew, 
+    competitorChrisMarshallHAL, competitorSarahPascalHAL, competitorJillMyerHAL, 
+    competitorsCollection, competitorChrisMarshall, competitorLouScrew, 
     entriesScorpionAHAL, entriesCometAHAL, entryChrisMarshallDinghy1234HAL, entriesHandicapAHAL,
     entriesScorpionA, entriesCometA, entriesHandicapA,
     competitorSarahPascal, raceHandicapA, entryChrisMarshallScorpionA1234, competitorOwainDavies, competitorJillMyer } from './__mocks__/test-data';
@@ -1124,21 +1125,213 @@ describe('when signing up to a race', () => {
     });
 });
 
-it('returns a collection of competitors', async () => {
-    fetch.mockImplementationOnce(() => {
-        return Promise.resolve({
-            ok: true,
-            status: 200,
-            json: () => Promise.resolve(competitorsCollectionHAL)
-        })
-    })
-   
-    const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const promise = dinghyRacingModel.getCompetitors();
-    const result = await promise;
-    expect(promise).toBeInstanceOf(Promise);
-    expect(result).toEqual({'success': true, 'domainObject': competitorsCollection});
+describe('when retrieving a list of cmpetitors', () => {
+    it('returns a collection of competitors', async () => {
+        fetch.mockImplementation((resource) => {
+            if (resource === 'http://localhost:8081/dinghyracing/api/competitors?sort=name,asc') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve(competitorsCollectionHAL)
+                });
+            }
+            else {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404
+                });
+            }
+        });
+       
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.getCompetitors();
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': competitorsCollection});
+    });
+    describe('when there are more competitors than will fit on a single page', () => {
+        describe('when page and size are not supplied', () => {
+            it('returns a success result containing all the competitors', async () => {
+                const competitorsCollectionHAL_p0 = {'_embedded':{'competitors':[
+                    competitorChrisMarshallHAL, competitorSarahPascalHAL, competitorJillMyerHAL
+                ]},'_links':{
+                    'self':{'href':'http://localhost:8081/dinghyracing/api/competitors'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/competitors'}
+                },'page':{'size':3,'totalElements':6,'totalPages':1,'number':0}};
+                fetch.mockImplementation((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/competitors?sort=name,asc&page=0&size=6') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200,
+                            json: () => Promise.resolve(competitorsCollectionHAL)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404
+                        });
+                    }
+                }).mockImplementationOnce((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/competitors?sort=name,asc') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200,
+                            json: () => Promise.resolve(competitorsCollectionHAL_p0)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404
+                        });
+                    }
+                });
+               
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const promise = dinghyRacingModel.getCompetitors();
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({'success': true, 'domainObject': competitorsCollection});
+            });
+        });
+        describe('when page number supplied', () => {
+            it('returns only a single page of competitors', async () => {
+                const competitorsCollectionHAL_p0 = {'_embedded':{'competitors':[
+                    competitorChrisMarshallHAL, competitorSarahPascalHAL, competitorJillMyerHAL
+                ]},'_links':{
+                    'self':{'href':'http://localhost:8081/dinghyracing/api/competitors'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/competitors'}
+                },'page':{'size':3,'totalElements':6,'totalPages':1,'number':0}};
+                const competitorsCollection_p0 = [competitorChrisMarshall, competitorSarahPascal, competitorJillMyer];
+                fetch.mockImplementation((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/competitors?sort=name,asc&page=0&size=6') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200,
+                            json: () => Promise.resolve(competitorsCollectionHAL)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404
+                        });
+                    }
+                }).mockImplementationOnce((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/competitors?sort=name,asc&page=0') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200,
+                            json: () => Promise.resolve(competitorsCollectionHAL_p0)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404
+                        });
+                    }
+                });
+               
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const promise = dinghyRacingModel.getCompetitors(0);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({'success': true, 'domainObject': competitorsCollection_p0});
+            });
+        });
+        describe('when size is supplied', () => {
+            it('returns only a single page of competitors', async () => {
+                const competitorsCollectionHAL_p0 = {'_embedded':{'competitors':[
+                    competitorChrisMarshallHAL, competitorSarahPascalHAL, competitorJillMyerHAL
+                ]},'_links':{
+                    'self':{'href':'http://localhost:8081/dinghyracing/api/competitors'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/competitors'}
+                },'page':{'size':3,'totalElements':6,'totalPages':1,'number':0}};
+                const competitorsCollection_p0 = [competitorChrisMarshall, competitorSarahPascal, competitorJillMyer];
+                fetch.mockImplementation((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/competitors?sort=name,asc&page=0&size=6') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200,
+                            json: () => Promise.resolve(competitorsCollectionHAL)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404
+                        });
+                    }
+                }).mockImplementationOnce((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/competitors?sort=name,asc&size=3') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200,
+                            json: () => Promise.resolve(competitorsCollectionHAL_p0)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404
+                        });
+                    }
+                });
+               
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const promise = dinghyRacingModel.getCompetitors(null, 3);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({'success': true, 'domainObject': competitorsCollection_p0});
+            });
+        });
+        describe('when page and size supplied', () => {
+            it('returns only a single page of competitors', async () => {
+                const competitorsCollectionHAL_p0 = {'_embedded':{'competitors':[
+                    competitorChrisMarshallHAL, competitorSarahPascalHAL, competitorJillMyerHAL
+                ]},'_links':{
+                    'self':{'href':'http://localhost:8081/dinghyracing/api/competitors'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/competitors'}
+                },'page':{'size':3,'totalElements':6,'totalPages':1,'number':0}};
+                const competitorsCollection_p0 = [competitorChrisMarshall, competitorSarahPascal, competitorJillMyer];
+                fetch.mockImplementation((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/competitors?sort=name,asc&page=0&size=6') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200,
+                            json: () => Promise.resolve(competitorsCollectionHAL)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404
+                        });
+                    }
+                }).mockImplementationOnce((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/competitors?sort=name,asc&page=0&size=3') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200,
+                            json: () => Promise.resolve(competitorsCollectionHAL_p0)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404
+                        });
+                    }
+                });
+               
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const promise = dinghyRacingModel.getCompetitors(0, 3);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({'success': true, 'domainObject': competitorsCollection_p0});
+            });
+        });
+    });
 });
+
 
 describe('when searching for a competitor by name', () => {
     it('returns a promise that resolves to a result indicating success and containing the competitor when competitor is found and http status 200', async () => {

@@ -365,13 +365,26 @@ class DinghyRacingModel {
 
     /**
      * Get a collection of competitors, sorted by name in ascending order
+     * @param {integer} [page] number to return (0 indexed)
+     * @param {integer} [size] number of elements to return per page
      * @returns {Promise<Result>} If successful Result.domainObject will be an Array<Competitor>
      */
-    async getCompetitors() {
-        const resource = this.httpRootURL + '/competitors?sort=name,asc';
+    async getCompetitors(page, size) {
+        const hasPage = Number.isInteger(page);
+        const hasSize = Number.isInteger(size);
+        let resource = this.httpRootURL + '/competitors?sort=name,asc';
 
+        if (hasPage) {
+            resource += '&page=' + page;
+        }
+        if (hasSize) {
+            resource += '&size=' + size;
+        }
         const result = await this.read(resource);
         if (result.success) {
+            if (!hasPage && !hasSize && result.domainObject.page.totalElements > result.domainObject.page.size) {
+                return this.getCompetitors(0, result.domainObject.page.totalElements);
+            }
             const collection = result.domainObject._embedded.competitors;
             const competitorCollection = collection.map(competitor => {return {...DinghyRacingModel.competitorTemplate(), 'name': competitor.name, 'url': competitor._links.self.href}});
             return Promise.resolve({'success': true, 'domainObject': competitorCollection});
