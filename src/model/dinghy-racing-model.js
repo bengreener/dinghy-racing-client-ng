@@ -407,8 +407,10 @@ class DinghyRacingModel {
     /**
      * Get dinghies. If a dinghy class is provided only dinghies with that class will be returned
      * @param {dinghyClass} [dinghyClass] The dinghy class to filter by
+     * @param {integer} [page] number to return (0 indexed)
+     * @param {integer} [size] number of elements to return per page
      */
-    async getDinghies(dinghyClass) {
+    async getDinghies(dinghyClass, page, size) {
         let resource;
         if (!dinghyClass) {
             resource = this.httpRootURL + '/dinghies';
@@ -416,8 +418,28 @@ class DinghyRacingModel {
         else {
             resource = this.httpRootURL + '/dinghies/search/findByDinghyClass?dinghyClass=' + dinghyClass.url;
         }
+        if (Number.isInteger(page) || Number.isInteger(size)) {
+            if (!dinghyClass) {
+                resource += '?';
+            }
+            else {
+                resource += '&';
+            }
+        }
+        if (Number.isInteger(page)) {
+            resource += 'page=' + page;
+        }
+        if (Number.isInteger(size)) {
+            if (Number.isInteger(page)) {
+                resource += '&';
+            }
+            resource += 'size=' + size;
+        }
         const result = await this.read(resource);
         if (result.success) {
+            if (!Number.isInteger(page) && !Number.isInteger(size) && result.domainObject.page.totalElements > result.domainObject.page.size) {
+                return this.getDinghies(dinghyClass, 0, result.domainObject.page.totalElements);
+            }
             const dinghiesHAL = result.domainObject._embedded.dinghies;
             const dinghyClassURLs = dinghiesHAL.map(race => race._links.dinghyClass.href);
             const dinghyClassResults = await Promise.all(dinghyClassURLs.map(url => this.read(url)));
@@ -492,16 +514,16 @@ class DinghyRacingModel {
     /**
      * Get dinghy classes in ascending order by class name
      * If page and/ or size are not provided will return all dinghy classes
-     * @param {integer} page number to return (0 indexed)
-     * @param {integer} size number of elements to return per page
+     * @param {integer} [page] number to return (0 indexed)
+     * @param {integer} [size] number of elements to return per page
      * @return {Promise<Result>>} If successful Result.domainObject will be an Array<DinghyClass>
      */
     async getDinghyClasses(page, size) {
         let resource = this.httpRootURL + '/dinghyClasses?';
-        if (page) {
+        if (Number.isInteger(page)) {
             resource += 'page=' + page + '&';
         }
-        if (size) {
+        if (Number.isInteger(size)) {
             resource += 'size=' + size + '&';
         }
         resource += 'sort=name,asc';
@@ -510,7 +532,7 @@ class DinghyRacingModel {
         if (result.success) {
             let collection = result.domainObject._embedded.dinghyClasses;
             // check for additional dinghy classes
-            if (page == null && size == null && result.domainObject.page.totalElements > result.domainObject.page.size) {
+            if (!Number.isInteger(page) && !Number.isInteger(size) && result.domainObject.page.totalElements > result.domainObject.page.size) {
                 return this.getDinghyClasses(0, result.domainObject.page.totalElements);
             }
             const dinghyClassCollection = collection.map(dinghyClass => {return {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClass.name, 

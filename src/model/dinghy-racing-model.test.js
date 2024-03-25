@@ -3,9 +3,10 @@ import DinghyRacingModel from './dinghy-racing-model';
 // import Clock from './domain-classes/clock';
 import { httpRootURL, wsRootURL, competitorsCollectionHAL, 
     dinghiesCollectionHAL, dinghiesScorpionCollectionHAL, 
-    dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghyClassCometHAL, dinghy1234HAL, raceScorpion_AHAL, 
+    dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghyClassCometHAL, dinghy1234HAL, dinghy2726HAL, dinghy6745HAL,
+    raceScorpion_AHAL, 
     dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet,
-    dinghies, dinghiesScorpion, dinghy1234, dinghy6745, dinghy826,
+    dinghies, dinghiesScorpion, dinghy1234, dinghy2726, dinghy6745, dinghy826,
     races, racesCollectionHAL, raceScorpionA, raceHandicapAHAL, raceGraduateA, raceCometA, raceGraduate_AHAL,
     competitorsCollection, competitorChrisMarshall, competitorChrisMarshallHAL, competitorLouScrew, 
     entriesScorpionAHAL, entriesCometAHAL, entryChrisMarshallDinghy1234HAL, entriesHandicapAHAL,
@@ -1149,98 +1150,629 @@ describe('when creating a new dinghy', () => {
 });
 
 describe('when retrieving a list of dinghies', () => {
-    it('when no dinghy class is supplied it returns a success result containing all dinghies', async () => {
-        fetch.mockImplementation((resource) => {
-            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(dinghiesCollectionHAL)
-                });
-            }
-            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(dinghiesScorpionCollectionHAL)
-                });
-            }
-            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(dinghyClassScorpionHAL)
-                });
-            }
-            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/7/dinghyClass') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(dinghyClassGraduateHAL)
-                });
-            }
-            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/18/dinghyClass') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(dinghyClassCometHAL)
-                });
-            }
-            else {
-                return Promise.resolve({
-                    ok: false,
-                    status: 404
-                });
-            }
+    describe('when no dinghy class is supplied', () => {
+        it('returns a success result containing all dinghies', async () => {
+            fetch.mockImplementation((resource) => {
+                if (resource === 'http://localhost:8081/dinghyracing/api/dinghies') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghiesCollectionHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghiesScorpionCollectionHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghyClassScorpionHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/7/dinghyClass') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghyClassGraduateHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/18/dinghyClass') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghyClassCometHAL)
+                    });
+                }
+                else {
+                    return Promise.resolve({
+                        ok: false,
+                        status: 404
+                    });
+                }
+            });
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = model.getDinghies();
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, 'domainObject': dinghies});
         });
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = model.getDinghies();
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, 'domainObject': dinghies});
+        describe('when there are more dinghies than fit on a single page', () => {
+            describe('when page and size are not supplied', () => {
+                it('returns a success result containing all dinghies', async () => {
+                    const dinghiesCollectionHAL_p0 = { '_embedded' : { 'dinghies' : [ 
+                        dinghy1234HAL, dinghy2726HAL, dinghy6745HAL
+                    ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies' }, 'profile' : { 'href' : 'http://localhost:8081/dinghyracing/api/profile/dinghies' }, 'search' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/search' } }, 'page' : { 'size' : 3, 'totalElements' : 5, 'totalPages' : 2, 'number' : 0 } };
+                    fetch.mockImplementation((resource) => {
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?page=0&size=5') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghiesCollectionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassScorpionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/7/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassGraduateHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/18/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassCometHAL)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404
+                        });
+                    }
+                }).mockImplementationOnce((resource) => {
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghiesCollectionHAL_p0)
+                            });
+                        }
+                        else {
+                            return Promise.resolve({
+                                ok: false,
+                                status: 404
+                            });
+                        }
+                    });
+                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+                    const promise = model.getDinghies();
+                    const result = await promise;
+                    expect(promise).toBeInstanceOf(Promise);
+                    expect(result).toEqual({'success': true, 'domainObject': dinghies});
+                });
+            });
+            describe('when page number supplied', () => {
+                it('returns only a single page of data', async () => {
+                    const dinghiesCollectionHAL_p0 = { '_embedded' : { 'dinghies' : [ 
+                        dinghy1234HAL, dinghy2726HAL, dinghy6745HAL
+                    ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies' }, 'profile' : { 'href' : 'http://localhost:8081/dinghyracing/api/profile/dinghies' }, 'search' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/search' } }, 'page' : { 'size' : 3, 'totalElements' : 5, 'totalPages' : 2, 'number' : 0 } };
+                    const dinghies_p0 = [dinghy1234, dinghy2726, dinghy6745];
+                    fetch.mockImplementation((resource) => {
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?page=0&size=5') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghiesCollectionHAL)
+                        });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassScorpionHAL)
+                            });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/7/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassGraduateHAL)
+                            });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/18/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassCometHAL)
+                            });
+                        }
+                        else {
+                            return Promise.resolve({
+                                ok: false,
+                                status: 404
+                            });
+                        }
+                    }).mockImplementationOnce((resource) => {
+                            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?page=0') {
+                                return Promise.resolve({
+                                    ok: true,
+                                    status: 200, 
+                                    json: () => Promise.resolve(dinghiesCollectionHAL_p0)
+                                });
+                            }
+                            else {
+                                return Promise.resolve({
+                                    ok: false,
+                                    status: 404
+                                });
+                            }
+                        });
+                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+                    const promise = model.getDinghies(null, 0);
+                    const result = await promise;
+                    expect(promise).toBeInstanceOf(Promise);
+                    expect(result).toEqual({'success': true, 'domainObject': dinghies_p0});
+                });
+            });
+            describe('when size supplied', () => {
+                it('returns only a single page of data', async () => {
+                    const dinghiesCollectionHAL_p0 = { '_embedded' : { 'dinghies' : [ 
+                        dinghy1234HAL, dinghy2726HAL, dinghy6745HAL
+                    ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies' }, 'profile' : { 'href' : 'http://localhost:8081/dinghyracing/api/profile/dinghies' }, 'search' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/search' } }, 'page' : { 'size' : 3, 'totalElements' : 5, 'totalPages' : 2, 'number' : 0 } };
+                    const dinghies_p0 = [dinghy1234, dinghy2726, dinghy6745];
+                    fetch.mockImplementation((resource) => {
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?page=0&size=5') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghiesCollectionHAL)
+                        });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassScorpionHAL)
+                            });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/7/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassGraduateHAL)
+                            });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/18/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassCometHAL)
+                            });
+                        }
+                        else {
+                            return Promise.resolve({
+                                ok: false,
+                                status: 404
+                            });
+                        }
+                    }).mockImplementationOnce((resource) => {
+                            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?size=3') {
+                                return Promise.resolve({
+                                    ok: true,
+                                    status: 200, 
+                                    json: () => Promise.resolve(dinghiesCollectionHAL_p0)
+                                });
+                            }
+                            else {
+                                return Promise.resolve({
+                                    ok: false,
+                                    status: 404
+                                });
+                            }
+                        });
+                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+                    const promise = model.getDinghies(null, null, 3);
+                    const result = await promise;
+                    expect(promise).toBeInstanceOf(Promise);
+                    expect(result).toEqual({'success': true, 'domainObject': dinghies_p0});
+                });
+            });
+            describe('when page and size supplied', () => {
+                it('returns only a single page of data', async () => {
+                    const dinghiesCollectionHAL_p0 = { '_embedded' : { 'dinghies' : [ 
+                        dinghy1234HAL, dinghy2726HAL, dinghy6745HAL
+                    ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies' }, 'profile' : { 'href' : 'http://localhost:8081/dinghyracing/api/profile/dinghies' }, 'search' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/search' } }, 'page' : { 'size' : 3, 'totalElements' : 5, 'totalPages' : 2, 'number' : 0 } };
+                    const dinghies_p0 = [dinghy1234, dinghy2726, dinghy6745];
+                    fetch.mockImplementation((resource) => {
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?page=0&size=5') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghiesCollectionHAL)
+                        });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassScorpionHAL)
+                            });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/7/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassGraduateHAL)
+                            });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/18/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassCometHAL)
+                            });
+                        }
+                        else {
+                            return Promise.resolve({
+                                ok: false,
+                                status: 404
+                            });
+                        }
+                    }).mockImplementationOnce((resource) => {
+                            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?page=0&size=3') {
+                                return Promise.resolve({
+                                    ok: true,
+                                    status: 200, 
+                                    json: () => Promise.resolve(dinghiesCollectionHAL_p0)
+                                });
+                            }
+                            else {
+                                return Promise.resolve({
+                                    ok: false,
+                                    status: 404
+                                });
+                            }
+                        });
+                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+                    const promise = model.getDinghies(null, 0, 3);
+                    const result = await promise;
+                    expect(promise).toBeInstanceOf(Promise);
+                    expect(result).toEqual({'success': true, 'domainObject': dinghies_p0});
+                });
+            });
+        });
     });
-    it('when a dinghy class is supplied it only returns a success result containing only dinghies for that dinghy class', async () => {
-        fetch.mockImplementation((resource) => {
-            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(dinghiesCollectionHAL)
-                });
-            }
-            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(dinghiesScorpionCollectionHAL)
-                });
-            }
-            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(dinghyClassScorpionHAL)
-                });
-            }
-            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(dinghyClassGraduateHAL)
-                });
-            }
-            else {
-                return Promise.resolve({
-                    ok: false,
-                    status: 404
-                });
-            }
+    describe('when a dinghy class is supplied', () => {
+        it('returns a success result containing only dinghies for that dinghy class', async () => {
+            fetch.mockImplementation((resource) => {
+                if (resource === 'http://localhost:8081/dinghyracing/api/dinghies') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghiesCollectionHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghiesScorpionCollectionHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghyClassScorpionHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/7/dinghyClass') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghyClassGraduateHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/18/dinghyClass') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghyClassCometHAL)
+                    });
+                }
+                else {
+                    return Promise.resolve({
+                        ok: false,
+                        status: 404
+                    });
+                }
+            });
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = model.getDinghies(dinghyClassScorpion);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, 'domainObject': dinghiesScorpion});
         });
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = model.getDinghies(dinghyClassScorpion);
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, 'domainObject': dinghiesScorpion});
+        describe('when there are more dinghies available than fit on a single page', () => {
+            describe('when page and size are not supplied', () => {
+                it('returns a success result containing all dinghies for that dinghy class', async () => {
+                    const dinghiesScorpionCollectionHAL_p0 = { '_embedded' : { 'dinghies' : [ 
+                        { 'sailNumber' : '1234', '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2' }, 'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2' }, 'dinghyClass' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' } } } 
+                    ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1&page=0&size=20' } }, 'page' : { 'size' : 1, 'totalElements' : 2, 'totalPages' : 2, 'number' : 0 } };
+                    fetch.mockImplementation((resource) => {
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghiesCollectionHAL)
+                            });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1&page=0&size=2') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghiesScorpionCollectionHAL)
+                            });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassScorpionHAL)
+                            });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/7/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassGraduateHAL)
+                            });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/18/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassCometHAL)
+                            });
+                        }
+                        else {
+                            return Promise.resolve({
+                                ok: false,
+                                status: 404
+                            });
+                        }
+                    }).mockImplementationOnce((resource) => {
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghiesCollectionHAL)
+                            });
+                        }
+                        else if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghiesScorpionCollectionHAL_p0)
+                            });
+                        }
+                        else {
+                            return Promise.resolve({
+                                ok: false,
+                                status: 404
+                            });
+                        }
+                    });
+                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+                    const promise = model.getDinghies(dinghyClassScorpion);
+                    const result = await promise;
+                    expect(promise).toBeInstanceOf(Promise);
+                    expect(result).toEqual({'success': true, 'domainObject': dinghiesScorpion});
+                });
+            });
+            describe('when page number supplied', () => {
+                it('returns only a single page of data', async () => {
+                    const dinghiesScorpionCollectionHAL_p0 = { '_embedded' : { 'dinghies' : [ 
+                        { 'sailNumber' : '1234', '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2' }, 'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2' }, 'dinghyClass' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' } } } 
+                    ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1&page=0&size=20' } }, 'page' : { 'size' : 1, 'totalElements' : 2, 'totalPages' : 2, 'number' : 0 } };
+                    const dinghiesScorpion_p0 = [dinghy1234];
+                    fetch.mockImplementation((resource) => {
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?page=0&size=5') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghiesCollectionHAL)
+                        });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassScorpionHAL)
+                            });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/7/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassGraduateHAL)
+                            });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/18/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassCometHAL)
+                            });
+                        }
+                        else {
+                            return Promise.resolve({
+                                ok: false,
+                                status: 404
+                            });
+                        }
+                    }).mockImplementationOnce((resource) => {
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1&page=0') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghiesScorpionCollectionHAL_p0)
+                            });
+                        }
+                        else {
+                            return Promise.resolve({
+                                ok: false,
+                                status: 404
+                            });
+                        }
+                    });
+                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+                    const promise = model.getDinghies(dinghyClassScorpion, 0);
+                    const result = await promise;
+                    expect(promise).toBeInstanceOf(Promise);
+                    expect(result).toEqual({'success': true, 'domainObject': dinghiesScorpion_p0});
+                });
+            });
+            describe('when size sipplied', () => {
+                it('returns only a single page of data', async () => {
+                    const dinghiesScorpionCollectionHAL_p0 = { '_embedded' : { 'dinghies' : [ 
+                        { 'sailNumber' : '1234', '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2' }, 'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2' }, 'dinghyClass' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' } } } 
+                    ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1&page=0&size=20' } }, 'page' : { 'size' : 1, 'totalElements' : 2, 'totalPages' : 2, 'number' : 0 } };
+                    const dinghiesScorpion_p0 = [dinghy1234];
+                    fetch.mockImplementation((resource) => {
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?page=0&size=5') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghiesCollectionHAL)
+                        });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassScorpionHAL)
+                            });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/7/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassGraduateHAL)
+                            });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/18/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassCometHAL)
+                            });
+                        }
+                        else {
+                            return Promise.resolve({
+                                ok: false,
+                                status: 404
+                            });
+                        }
+                    }).mockImplementationOnce((resource) => {
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1&size=1') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghiesScorpionCollectionHAL_p0)
+                            });
+                        }
+                        else {
+                            return Promise.resolve({
+                                ok: false,
+                                status: 404
+                            });
+                        }
+                    });
+                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+                    const promise = model.getDinghies(dinghyClassScorpion, null, 1);
+                    const result = await promise;
+                    expect(promise).toBeInstanceOf(Promise);
+                    expect(result).toEqual({'success': true, 'domainObject': dinghiesScorpion_p0});
+                });
+            });
+            describe('when page and size supplied', () => {
+                it('returns only a single page of data', async () => {
+                    const dinghiesScorpionCollectionHAL_p0 = { '_embedded' : { 'dinghies' : [ 
+                        { 'sailNumber' : '1234', '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2' }, 'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2' }, 'dinghyClass' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' } } } 
+                    ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1&page=0&size=20' } }, 'page' : { 'size' : 1, 'totalElements' : 2, 'totalPages' : 2, 'number' : 0 } };
+                    const dinghiesScorpion_p0 = [dinghy1234];
+                    fetch.mockImplementation((resource) => {
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?page=0&size=5') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghiesCollectionHAL)
+                        });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassScorpionHAL)
+                            });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass' || resource === 'http://localhost:8081/dinghyracing/api/dinghies/7/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassGraduateHAL)
+                            });
+                        }
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/18/dinghyClass') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghyClassCometHAL)
+                            });
+                        }
+                        else {
+                            return Promise.resolve({
+                                ok: false,
+                                status: 404
+                            });
+                        }
+                    }).mockImplementationOnce((resource) => {
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1&page=0&size=1') {
+                            return Promise.resolve({
+                                ok: true,
+                                status: 200, 
+                                json: () => Promise.resolve(dinghiesScorpionCollectionHAL_p0)
+                            });
+                        }
+                        else {
+                            return Promise.resolve({
+                                ok: false,
+                                status: 404
+                            });
+                        }
+                    });
+                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+                    const promise = model.getDinghies(dinghyClassScorpion, 0, 1);
+                    const result = await promise;
+                    expect(promise).toBeInstanceOf(Promise);
+                    expect(result).toEqual({'success': true, 'domainObject': dinghiesScorpion_p0});
+                });
+            });
+        });
     });
     it('when no dinghies are found for the supplied dinghy class it returns a failed result containing a message explaining the cause of the failure', async () =>{
         fetch.mockImplementation((resource) => {
