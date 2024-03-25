@@ -672,48 +672,65 @@ class DinghyRacingModel {
     /**
      * Get races scheduled to start after the specified time
      * @param {Date} startTime The start time of the race
+     * @param {integer} [page] number to return (0 indexed)
+     * @param {integer} [size] number of elements to return per page
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
-    async getRacesOnOrAfterTime(startTime) {
+    async getRacesOnOrAfterTime(startTime, page, size) {
         const resource = this.httpRootURL + '/races/search/findByPlannedStartTimeGreaterThanEqual?time=' + startTime.toISOString();
 
-        const result = await this.read(resource);
-        if (result.success) {
-            const racesHAL = result.domainObject._embedded.races;
-            const dinghyClassURLs = racesHAL.map(race => race._links.dinghyClass.href);
-            const dinghyClassResults = await Promise.all(dinghyClassURLs.map(url => this.read(url)));
-            
-            const races = [];
-            for (let i = 0; i < racesHAL.length; i++  ) {
-                const dinghyClass = dinghyClassResults[i].success ? {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassResults[i].domainObject.name, 
-                    'crewSize': dinghyClassResults[i].domainObject.crewSize, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
-                // assume time received has been stored in UTC
-                races.push({...DinghyRacingModel.raceTemplate(), 'name': racesHAL[i].name, 'plannedStartTime': new Date(racesHAL[i].plannedStartTime + 'Z'), 
-                    'actualStartTime': racesHAL[i].actualStartTime ? new Date(racesHAL[i].actualStartTime + 'Z') : null, 
-                    'dinghyClass': dinghyClass, 'duration': this.convertISO8601DurationToMilliseconds(racesHAL[i].duration), 'plannedLaps': racesHAL[i].plannedLaps, 
-                    'lapForecast': racesHAL[i].lapForecast, 
-                    'lastLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.lastLapTime) : null, 
-                    'averageLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.averageLapTime) : null, 
-                    'url': racesHAL[i]._links.self.href});
-            };
-            return Promise.resolve({'success': true, 'domainObject': races});
-        }
-        else {
-            return Promise.resolve(result);
-        }
+        return this.getRacesFromURL(resource, page, size);
     }
 
     /**
      * Get races scheduled to start between the specified times
      * @param {Date} startTime The start time of the first race
      * @param {Date} endTime The start time of the last race
+     * @param {integer} [page] number to return (0 indexed)
+     * @param {integer} [size] number of elements to return per page
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
-    async getRacesBetweenTimes(startTime, endTime) {
+    async getRacesBetweenTimes(startTime, endTime, page, size) {
         const resource = this.httpRootURL + '/races/search/findByPlannedStartTimeBetween?startTime=' + startTime.toISOString() + '&endTime=' + endTime.toISOString();
 
-        const result = await this.read(resource);
+        return this.getRacesFromURL(resource, page, size);
+    }
+
+    /**
+     * Get races from the specified resource location
+     * @param {String} url to use to retrieve a collection of races
+     * @param {integer} [page] number to return (0 indexed)
+     * @param {integer} [size] number of elements to return per page
+     * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
+     */
+    async getRacesFromURL(url, page, size) {
+        const hasPage = Number.isInteger(page);
+        const hasSize = Number.isInteger(size);
+        const hasParams = /\?/.test(url);
+        if ((hasPage || hasSize) && !hasParams) {
+            url += '?';
+        }
+        if (hasPage) {
+            if (hasParams) {
+                url += '&page=' + page;
+            }
+            else {
+                url += 'page=' + page;
+            }
+        }
+        if (hasSize) {
+            if (hasParams || hasPage) {
+                url += '&size=' + size;
+            }
+            else {
+                url += 'size=' + size;
+            }
+        }
+        const result = await this.read(url);
         if (result.success) {
+            if (!hasPage && !hasSize && result.domainObject.page.totalElements > result.domainObject.page.size) {
+                return this.getRacesFromURL(url, 0, result.domainObject.page.totalElements);
+            }
             const racesHAL = result.domainObject._embedded.races;
             const dinghyClassURLs = racesHAL.map(race => race._links.dinghyClass.href);
             const dinghyClassResults = await Promise.all(dinghyClassURLs.map(url => this.read(url)));
