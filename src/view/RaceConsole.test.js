@@ -1,5 +1,6 @@
-import { customRender } from '../test-utilities/custom-renders';import userEvent from '@testing-library/user-event';
-import { act, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { customRender } from '../test-utilities/custom-renders';
+import userEvent from '@testing-library/user-event';
+import { act, screen } from '@testing-library/react';
 import RaceConsole from './RaceConsole';
 import { httpRootURL, wsRootURL, races, entriesScorpionA, entriesGraduateA } from '../model/__mocks__/test-data';
 import DinghyRacingModel from '../model/dinghy-racing-model';
