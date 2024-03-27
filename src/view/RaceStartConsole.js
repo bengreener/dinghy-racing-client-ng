@@ -33,11 +33,6 @@ function RaceStartConsole () {
     // }, [model, sessionStart, sessionEnd, racesUpdateRequestAt]);
 }, [model, sessionStart, sessionEnd]);
 
-    function handleRaceSelect(event) {
-        const options = [...event.target.selectedOptions]; // convert from HTMLCollection to Array; trying to go direct to value results in event.target.selectedOptions.value is not iterable error
-        setSelectedRaces(options.map(option => option.value));
-    }
-
     function handlesessionStartInputChange(date) {
         setSessionStart(date);
     }
@@ -49,7 +44,6 @@ function RaceStartConsole () {
     return (
         <div className="race-console">
             <div className="select-race">
-                <label htmlFor="race-select">Select Session</label>
                 <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
             <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
             </div>
