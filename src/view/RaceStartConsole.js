@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
 import SelectSession from './SelectSession';
 import Clock from '../model/domain-classes/clock';
+import SortOrder from '../model/dinghy-racing-model';
 
 function RaceStartConsole () {
     const model = useContext(ModelContext);
@@ -11,8 +12,8 @@ function RaceStartConsole () {
     const [sessionEnd, setSessionEnd] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000));
 
     useEffect(() => {
-        let ignoreFetch = false; // set to true if RaceConsole rerendered before fetch completes to avoid using out of date result
-        model.getRacesBetweenTimes(new Date(sessionStart), new Date(sessionEnd)).then(result => {
+        let ignoreFetch = false; // set to true if RaceStartConsole rerendered before fetch completes to avoid using out of date result
+        model.getRacesBetweenTimes(new Date(sessionStart), new Date(sessionEnd), null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING}).then(result => {
             if (!ignoreFetch && !result.success) {
                 setMessage('Unable to load races\n' + result.message);
             }
