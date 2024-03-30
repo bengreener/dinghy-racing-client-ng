@@ -31,6 +31,7 @@ import {
 
     entriesGraduateA_bigData
 } from './__mocks__/test-data-more-data';
+import { SortOrder } from './dinghy-racing-model';
 
 global.fetch = jest.fn();
 // jest.mock('@stomp/stompjs');
@@ -1331,7 +1332,6 @@ describe('when retrieving a list of cmpetitors', () => {
         });
     });
 });
-
 
 describe('when searching for a competitor by name', () => {
     it('returns a promise that resolves to a result indicating success and containing the competitor when competitor is found and http status 200', async () => {
@@ -3489,52 +3489,6 @@ describe('when a websocket message callback has been set for race update', () =>
     });
 });
 
-// Can this test can be affected by BST, or other time zones (yes, if timezone changes test data (races) will need to be adjusted to reflect the change in the timezone (currently set up for British Summer Time))
-it('returns a collection of races that start between the specified times', async () => {
-    fetch.mockImplementation((resource) => {
-        if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
-            return Promise.resolve({
-                ok: true,
-                status: 200, 
-                json: () => Promise.resolve(racesCollectionHAL)
-            });
-        }
-        if (resource === 'http://localhost:8081/dinghyracing/api/races/4/dinghyClass') {
-            return Promise.resolve({
-                ok: true,
-                status: 200, 
-                json: () => Promise.resolve(dinghyClassScorpionHAL)
-            });
-        }
-        if (resource === 'http://localhost:8081/dinghyracing/api/races/7/dinghyClass') {
-            return Promise.resolve({
-                ok: true,
-                status: 200, 
-                json: () => Promise.resolve(dinghyClassGraduateHAL)
-            });
-        }
-        if (resource === 'http://localhost:8081/dinghyracing/api/races/17/dinghyClass') {
-            return Promise.resolve({
-                ok: true,
-                status: 200, 
-                json: () => Promise.resolve(dinghyClassCometHAL)
-            });
-        }
-        else {
-            return Promise.resolve({
-                ok: false,
-                status: 404
-            });
-        }
-    });
-
-    const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const promise = dinghyRacingModel.getRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'));
-    const result = await promise;
-    expect(promise).toBeInstanceOf(Promise);
-    expect(result).toEqual({'success': true, 'domainObject': races});
-});
-
 describe('when retrieving a list of races that start between the specified times', () => {
     // Can this test can be affected by BST, or other time zones (yes, if timezone changes test data (races) will need to be adjusted to reflect the change in the timezone (currently set up for British Summer Time))
     it('returns a collection of races that start between the specified times', async () => {
@@ -3828,6 +3782,53 @@ describe('when retrieving a list of races that start between the specified times
                 expect(promise).toBeInstanceOf(Promise);
                 expect(result).toEqual({'success': true, 'domainObject': races_p0});
             });
+        });
+    });
+    describe('when sort criteria are provided', () => {
+        it('requests a sorted collection from server', async () => {
+            // checking request is correctly structured
+            // not checking a sorted collection is returned as that is the responsibility of the server
+            fetch.mockImplementation((resource) => {
+                if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&sort=plannedStartTime,ASC') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(racesCollectionHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/races/4/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassScorpionHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/7/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassGraduateHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/17/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassCometHAL)
+                });
+            }
+                else {
+                    return Promise.resolve({
+                        ok: false,
+                        status: 404
+                    });
+                }
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.getRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, 'domainObject': races});
         });
     });
 });

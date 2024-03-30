@@ -701,12 +701,13 @@ class DinghyRacingModel {
      * @param {Date} endTime The start time of the last race
      * @param {integer} [page] number to return (0 indexed)
      * @param {integer} [size] number of elements to return per page
+     * @param {SortParameters} [sortParameters] and order for sorting the requested races
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
-    async getRacesBetweenTimes(startTime, endTime, page, size) {
+    async getRacesBetweenTimes(startTime, endTime, page, size, sortParameters) {
         const resource = this.httpRootURL + '/races/search/findByPlannedStartTimeBetween?startTime=' + startTime.toISOString() + '&endTime=' + endTime.toISOString();
 
-        return this.getRacesFromURL(resource, page, size);
+        return this.getRacesFromURL(resource, page, size, sortParameters);
     }
 
     /**
@@ -714,13 +715,15 @@ class DinghyRacingModel {
      * @param {String} url to use to retrieve a collection of races
      * @param {integer} [page] number to return (0 indexed)
      * @param {integer} [size] number of elements to return per page
+     * @param {SortParameters} [sortParameters] and order for sorting the requested races
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
-    async getRacesFromURL(url, page, size) {
+    async getRacesFromURL(url, page, size, sortParameters) {
         const hasPage = Number.isInteger(page);
         const hasSize = Number.isInteger(size);
+        const hasSort = !(sortParameters == null);
         const hasParams = /\?/.test(url);
-        if ((hasPage || hasSize) && !hasParams) {
+        if ((hasPage || hasSize || hasSort) && !hasParams) {
             url += '?';
         }
         if (hasPage) {
@@ -739,6 +742,15 @@ class DinghyRacingModel {
                 url += 'size=' + size;
             }
         }
+        if (hasSort) {
+            if (hasParams || hasPage || hasSize) {
+                url += '&sort=' + sortParameters.by + ',' + (sortParameters.order || 'ASC');
+            }
+            else {
+                url += 'sort=' + sortParameters.by + ',' + (sortParameters.order || 'ASC');
+            }
+        }
+
         const result = await this.read(url);
         if (result.success) {
             if (!hasPage && !hasSize && result.domainObject.page.totalElements > result.domainObject.page.size) {
@@ -936,4 +948,19 @@ class DinghyRacingModel {
     }
 }
 
+/**
+ * @typedef SortParameters
+ * @property {string} by name of the property to sort the collection by
+ * @property {string} order sort order for collection; 'ASC' or 'DESC'
+ */
+
+/**
+ * Class providng enumeration of SortOrder options for SortObject type
+ */
+class SortOrder {
+    static ASCENDING = 'ASC';
+    static DESCENDING = 'DESC';
+}
+
 export default DinghyRacingModel;
+export { SortOrder };
