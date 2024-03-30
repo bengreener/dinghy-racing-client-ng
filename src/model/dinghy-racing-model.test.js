@@ -1,6 +1,4 @@
-import DinghyRacingModel from './dinghy-racing-model';
-// import { Client } from '@stomp/stompjs';
-// import Clock from './domain-classes/clock';
+import DinghyRacingModel, { SortOrder }  from './dinghy-racing-model';
 import { httpRootURL, wsRootURL, competitorsCollectionHAL, 
     dinghiesCollectionHAL, dinghiesScorpionCollectionHAL, 
     dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghyClassCometHAL, dinghy1234HAL, dinghy2726HAL, dinghy6745HAL,
@@ -31,10 +29,8 @@ import {
 
     entriesGraduateA_bigData
 } from './__mocks__/test-data-more-data';
-import { SortOrder } from './dinghy-racing-model';
 
 global.fetch = jest.fn();
-// jest.mock('@stomp/stompjs');
 
 beforeEach(() => {
     fetch.mockClear();
