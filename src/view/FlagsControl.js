@@ -7,9 +7,12 @@ import React from 'react';
  * @returns {HTMLDivElement}
  */
 function FlagsControl({races = []}) {
+    const flags = [...races];
+    flags.splice(0, 0, {name: 'Blue Peter'});
+
     return (
         <div>
-            {races.map(race => <p key={race.name}>{race.name}</p>)}
+            {flags.map(race => <p key={race.name}>{race.name}</p>)}
         </div>
     );
 }

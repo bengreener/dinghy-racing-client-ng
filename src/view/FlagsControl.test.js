@@ -7,9 +7,10 @@ it('renders', () => {
 });
 
 describe('when array of races supplied', () => {
-    it('displays race names', () => {
+    it('displays race names and blue peter', () => {
         render(<FlagsControl races={races}/>);
         expect(screen.getByText(/scorpion a/i)).toBeInTheDocument();
+        expect(screen.getByText(/blue peter/i)).toBeInTheDocument();
         expect(screen.getByText(/graduate a/i)).toBeInTheDocument();
         expect(screen.getByText(/handicap a/i)).toBeInTheDocument();
         expect(screen.getByText(/comet a/i)).toBeInTheDocument();
