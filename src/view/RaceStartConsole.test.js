@@ -45,4 +45,20 @@ it('defaults session end to 18:00 of today', async () => {
 
     const selectSessionEnd = screen.getByLabelText(/session end/i);
     expect(selectSessionEnd).toHaveValue(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000).toISOString().substring(0, 16));
-})
+});
+
+it('displays race names and blue peter', async () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+
+    await act(async () => {
+        customRender(<RaceStartConsole />, model);
+    });
+
+    expect(screen.getByText(/scorpion a/i)).toBeInTheDocument();
+    expect(screen.getByText(/blue peter/i)).toBeInTheDocument();
+    expect(screen.getByText(/graduate a/i)).toBeInTheDocument();
+    expect(screen.getByText(/handicap a/i)).toBeInTheDocument();
+    expect(screen.getByText(/comet a/i)).toBeInTheDocument();
+});
