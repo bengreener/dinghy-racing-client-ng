@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Clock from '../model/domain-classes/clock';
 
 /**
@@ -16,7 +16,7 @@ function FlagControl({ name, clock, flagStateChangeTimings }) {
         const elapsedTime = clock.getElapsedTime();
         let finalState = FlagState.LOWERED;
         flagStateChangeTimings.forEach(flagStateChange => {
-            if (elapsedTime > flagStateChange.startTimeOffset) {
+            if (elapsedTime >= flagStateChange.startTimeOffset) {
                 finalState = flagStateChange.state;
             }
         });
@@ -24,8 +24,18 @@ function FlagControl({ name, clock, flagStateChangeTimings }) {
     }
 
     useEffect(() => {
+        clock.start();
+    }, [clock]);
+
+    useEffect(() => {
         calculateState();
     }, []);
+
+    useEffect(() => {
+        clock.addTickHandler(() => {
+            calculateState();
+        });
+    }, [clock]);
 
     return (
         <div>
