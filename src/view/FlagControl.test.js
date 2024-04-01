@@ -48,11 +48,25 @@ it('displays the time to the next flag state change', () => {
 });
 
 describe('when clock ticks', () => {
+    it('updates time to next flag state change', async () => {
+		const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
+            const clock = new Clock(startTime + 60000);
+        
+            const stateSequence = [{startTimeOffset: -600000, state: FlagState.RAISED}, {startTimeOffset: 0, state: FlagState.LOWERED}];
+        
+            render(<FlagControl name={'Flag A'} clock={clock} flagStateChangeTimings={stateSequence} />);
+        
+            expect(screen.getByLabelText(/change in/i)).toHaveValue('01:00');
+            act(() => {
+                jest.advanceTimersByTime(1000);
+            });
+            await screen.findByText(/00:59/i);
+            expect(screen.getByLabelText(/change in/i)).toHaveValue('00:59');
+	});
     describe('when a flag state change is triggered', () => {
         it('updates the displayed flag state to the new flag state', async () => {
             const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
             const clock = new Clock(startTime + 1000);
-            // jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 0).mockImplementationOnce(() => -60000);
         
             const stateSequence = [{startTimeOffset: -600000, state: FlagState.RAISED}, {startTimeOffset: 0, state: FlagState.LOWERED}];
         
