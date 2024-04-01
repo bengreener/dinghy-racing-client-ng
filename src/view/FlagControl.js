@@ -33,6 +33,8 @@ function FlagControl({ name, clock, flagStateChangeTimings }) {
             <output id='flag-name-output'>{name}</output>
             <label htmlFor={'current-state-output'}>State</label>
             <output id='current-state-output'>{currentState === FlagState.LOWERED ? 'Lowered' : 'Raised' }</output>
+            <label htmlFor={'change-in-output'}>Change In</label>
+            <output id='change-in-output'>{Clock.formatDuration(-clock.getElapsedTime())}</output>
         </div>
     )
 }
