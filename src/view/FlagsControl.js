@@ -12,7 +12,9 @@ import { FlagState } from './FlagControl';
  */
 function FlagsControl({races = []}) {
     const flags = [...races];
-    flags.splice(1, 0, {name: 'Blue Peter', plannedStartTime: new Date(flags[0].plannedStartTime + 300000)});
+    if (races.length > 0) {
+        flags.splice(1, 0, {name: 'Blue Peter', plannedStartTime: new Date(flags[0].plannedStartTime.valueOf() + 300000)});
+    }
 
     const flagStateChanges = new Map(flags.map(flag => [
         flag.name, [ {startTimeOffset: -600000, state: FlagState.RAISED}, {startTimeOffset: 0, state: FlagState.LOWERED} ]

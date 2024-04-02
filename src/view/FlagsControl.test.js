@@ -13,8 +13,10 @@ afterAll(() => {
     jest.useRealTimers();
 });
 
-it('renders', () => {
-    render(<FlagsControl races={races} />);
+describe('when no races provided', () => {
+    it('renders', () => {
+        render(<FlagsControl />);
+    });
 });
 
 describe('when array of races supplied', () => {
@@ -34,7 +36,6 @@ describe('when array of races supplied', () => {
         const races = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA];
         render(<FlagsControl races={races}/>);
 
-screen.debug();
         expect(screen.getAllByText(/raised/i)).toHaveLength(3);
         expect(screen.getAllByText(/lowered/i)).toHaveLength(2);
     });
