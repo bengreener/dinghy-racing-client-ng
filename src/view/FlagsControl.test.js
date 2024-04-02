@@ -39,4 +39,16 @@ describe('when array of races supplied', () => {
         expect(screen.getAllByText(/raised/i)).toHaveLength(3);
         expect(screen.getAllByText(/lowered/i)).toHaveLength(2);
     });
+    it('displays time to next flag state change for each flag', () => {
+        const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "actualStartTime": null, "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
+        const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "actualStartTime": null, "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
+        const raceCometA = { "name": "Comet A", "plannedStartTime" : new Date("2021-10-14T14:20:00Z"), "actualStartTime": null, "dinghyClass": dinghyClassComet, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/17" };
+        const raceHandicapA = { "name": "Handicap A", "plannedStartTime": new Date("2021-10-14T14:25:00Z"), "actualStartTime": null, "dinghyClass": null, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/8" };
+        const races = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA];
+        render(<FlagsControl races={races}/>);
+
+        expect(screen.getAllByText(/05:00/i)).toHaveLength(2);
+        expect(screen.getAllByText(/10:00/i)).toHaveLength(2);
+        expect(screen.getByText(/20:00/i)).toBeInTheDocument();
+    });
 });
