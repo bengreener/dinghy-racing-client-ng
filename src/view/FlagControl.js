@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import Clock from '../model/domain-classes/clock';
 
 /**
@@ -10,12 +10,7 @@ import Clock from '../model/domain-classes/clock';
  * @returns {HTMLDivElement}
  */
 function FlagControl({ name, clock, flagStateChangeTimings }) {
-    const [flagState, setFlagState] = useState(FlagState.LOWERED);
-    const [flagStateChangeIn, setFlagStateChangeIn] = useState(calculateChangeIn());
-    // const [flagStateChangeIn, setFlagStateChangeIn] = useState(clock.getElapsedTime());
-
-
-    function calculateFlagState() {
+    const calculateFlagState = useCallback(() => {
         const elapsedTime = clock.getElapsedTime();
         let finalState = FlagState.LOWERED;
         flagStateChangeTimings.forEach(flagStateChange => {
@@ -23,10 +18,10 @@ function FlagControl({ name, clock, flagStateChangeTimings }) {
                 finalState = flagStateChange.state;
             }
         });
-        setFlagState(finalState);
-    }
+        return finalState;
+    }, [clock, flagStateChangeTimings]);
 
-    function calculateChangeIn() {
+    const calculateChangeIn = useCallback(() => {
         const elapsedTime = clock.getElapsedTime();
         for (let i = 0; i < flagStateChangeTimings.length; i++) {
             if (elapsedTime < flagStateChangeTimings[i].startTimeOffset) {
@@ -34,23 +29,26 @@ function FlagControl({ name, clock, flagStateChangeTimings }) {
             }
         }
         return 0;
-    }
+    }, [clock, flagStateChangeTimings]);
+
+    const [flagState, setFlagState] = useState(calculateFlagState());
+    const [flagStateChangeIn, setFlagStateChangeIn] = useState(calculateChangeIn());
+    const previousClock = useRef(); // ebnable removal of tick handler from previous clock when rendered with new clock
 
     useEffect(() => {
         clock.start();
     }, [clock]);
 
     useEffect(() => {
-        calculateFlagState();
-    }, []);
-
-    useEffect(() => {
+        if (previousClock.current) {
+            previousClock.current.removeTickHandler();
+        }
+        previousClock.current = clock;
         clock.addTickHandler(() => {
-            setFlagStateChangeIn(clock.getElapsedTime());
-            calculateFlagState();
+            setFlagState(calculateFlagState());
             setFlagStateChangeIn(calculateChangeIn());
         });
-    }, [clock]);
+    }, [clock, calculateFlagState, calculateChangeIn]);
 
     return (
         <div>
