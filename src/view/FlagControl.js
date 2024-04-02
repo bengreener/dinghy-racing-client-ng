@@ -11,7 +11,8 @@ import Clock from '../model/domain-classes/clock';
  */
 function FlagControl({ name, clock, flagStateChangeTimings }) {
     const [flagState, setFlagState] = useState(FlagState.LOWERED);
-    const [flagStateChangeIn, setFlagStateChangeIn] = useState(clock.getElapsedTime());
+    const [flagStateChangeIn, setFlagStateChangeIn] = useState(calculateChangeIn());
+    // const [flagStateChangeIn, setFlagStateChangeIn] = useState(clock.getElapsedTime());
 
 
     function calculateFlagState() {
@@ -23,6 +24,16 @@ function FlagControl({ name, clock, flagStateChangeTimings }) {
             }
         });
         setFlagState(finalState);
+    }
+
+    function calculateChangeIn() {
+        const elapsedTime = clock.getElapsedTime();
+        for (let i = 0; i < flagStateChangeTimings.length; i++) {
+            if (elapsedTime < flagStateChangeTimings[i].startTimeOffset) {
+                return elapsedTime - flagStateChangeTimings[i].startTimeOffset;
+            }
+        }
+        return 0;
     }
 
     useEffect(() => {
@@ -37,6 +48,7 @@ function FlagControl({ name, clock, flagStateChangeTimings }) {
         clock.addTickHandler(() => {
             setFlagStateChangeIn(clock.getElapsedTime());
             calculateFlagState();
+            setFlagStateChangeIn(calculateChangeIn());
         });
     }, [clock]);
 
@@ -47,7 +59,7 @@ function FlagControl({ name, clock, flagStateChangeTimings }) {
             <label htmlFor={'current-state-output'}>State</label>
             <output id='current-state-output'>{flagState === FlagState.LOWERED ? 'Lowered' : 'Raised' }</output>
             <label htmlFor={'change-in-output'}>Change In</label>
-            <output id='change-in-output'>{Clock.formatDuration(-clock.getElapsedTime())}</output>
+            <output id='change-in-output'>{Clock.formatDuration(-flagStateChangeIn)}</output>
         </div>
     )
 }
