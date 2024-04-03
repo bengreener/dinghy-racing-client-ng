@@ -49,7 +49,7 @@ function RaceConsole() {
         }
     }, [model, sessionStart, sessionEnd, racesUpdateRequestAt]);
 
-    // register on update callbacks for races 
+    // register on update callbacks for races
     useEffect(() => {
         const races = Array.from(raceMap.values());
         races.forEach(race => {

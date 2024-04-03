@@ -3,16 +3,20 @@ import userEvent from '@testing-library/user-event';
 import App from './App';
 import DinghyRacingController from './controller/dinghy-racing-controller';
 import DinghyRacingModel from './model/dinghy-racing-model';
-import { httpRootURL, wsRootURL, dinghyClasses, races, entriesScorpionA } from './model/__mocks__/test-data';
+import { httpRootURL, wsRootURL, dinghyClasses, races, entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA } from './model/__mocks__/test-data';
 import Authorisation from './controller/authorisation';
 
 jest.mock('./controller/dinghy-racing-controller');
 jest.mock('./model/dinghy-racing-model');
 jest.mock('./controller/authorisation');
 
+HTMLDialogElement.prototype.close = jest.fn();
+
 beforeEach(() => {
   jest.clearAllMocks();
   jest.restoreAllMocks();
+  // jest.spyOn(console, 'error')
+  // console.error.mockImplementation(() => null);
 });
 
 it('renders banner', async () => {
@@ -157,7 +161,20 @@ describe('when race start console button is clicked', ()  => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-    jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+      if (race.name === 'Scorpion A') {
+        return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})
+      }
+      if (race.name === 'Graduate A') {
+        return Promise.resolve({'success': true, 'domainObject': entriesGraduateA})
+      }
+      if (race.name === 'Comet A') {
+        return Promise.resolve({'success': true, 'domainObject': entriesCometA})
+      }
+      if (race.name === 'Handicap A') {
+        return Promise.resolve({'success': true, 'domainObject': entriesHandicapA})
+      }
+    });
     const dinghyRacingController = new DinghyRacingController(model);
 
     render(<App model={model} controller={dinghyRacingController} />);

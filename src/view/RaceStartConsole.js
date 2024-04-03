@@ -4,6 +4,8 @@ import SelectSession from './SelectSession';
 import Clock from '../model/domain-classes/clock';
 import SortOrder from '../model/dinghy-racing-model';
 import FlagsControl from './FlagsControl';
+import RaceHeaderContainer from './RaceHeaderContainer';
+import RaceHeaderView from './RaceHeaderView';
 
 function RaceStartConsole () {
     const model = useContext(ModelContext);
@@ -42,12 +44,17 @@ function RaceStartConsole () {
     }
 
     return (
-        <div className="race-console">
+        <div className="race-start-console">
             <div className="select-race">
                 <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
-                <FlagsControl races={raceArray} />
-            <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
             </div>
+            <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
+            <FlagsControl races={raceArray} />
+            <RaceHeaderContainer>
+                {raceArray.map(race => {
+                    return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} />
+                })}
+            </RaceHeaderContainer>
         </div>
     );
 };
