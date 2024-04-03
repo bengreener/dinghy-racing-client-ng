@@ -19,10 +19,17 @@ afterAll(() => {
 describe('when no races provided', () => {
     it('renders', () => {
         render(<FlagsControl />);
+
+        expect(screen.getByText(/flag indicators/i));
     });
 });
 
 describe('when array of races supplied', () => {
+    it('displays title', () => {
+        render(<FlagsControl races={races} />);
+
+        expect(screen.getByText(/flag indicators/i));
+    });
     it('displays race names and blue peter', () => {
         render(<FlagsControl races={races} />);
         expect(screen.getByText(/scorpion a/i)).toBeInTheDocument();
