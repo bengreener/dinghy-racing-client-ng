@@ -37,6 +37,7 @@ it('displays menu buttons', async () => {
   expect(btnCreateDinghyClass).toBeInTheDocument();
   expect(btnCreateRace).toBeInTheDocument();
   expect(btnUpcomingRaces).toBeInTheDocument();
+  expect(btnRaceStartConsole).toBeInTheDocument();
   expect(btnRaceConsole).toBeInTheDocument();
   expect(btnDownloadRaces).toBeInTheDocument();
   expect(btnLogout).toBeInTheDocument();
