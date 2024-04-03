@@ -11,7 +11,7 @@ import { FlagState } from './FlagControl';
  * @returns {HTMLDivElement}
  */
 function FlagsControl({races = []}) {
-    const flags = races.map(race => {return { name: race.name, clock: new Clock(race.plannedStartTime), flagStateChangeTimings: [ {startTimeOffset: -600000, state: FlagState.RAISED}, {startTimeOffset: 0, state: FlagState.LOWERED} ] }});
+    const flags = races.map(race => {return { name: race.name + ' Warning', clock: new Clock(race.plannedStartTime), flagStateChangeTimings: [ {startTimeOffset: -600000, state: FlagState.RAISED}, {startTimeOffset: 0, state: FlagState.LOWERED} ] }});
 
     if (races.length > 0) {
         const firstRaceStart = races[0].plannedStartTime;
