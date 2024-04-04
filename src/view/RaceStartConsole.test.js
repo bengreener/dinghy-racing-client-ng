@@ -11,12 +11,12 @@ jest.mock('../controller/dinghy-racing-controller');
 
 HTMLDialogElement.prototype.close = jest.fn();
 
-beforeAll(() => {
+beforeEach(() => {
     jest.useFakeTimers().setSystemTime(new Date("2021-10-14T14:05:00Z"));
     jest.spyOn(global, 'setTimeout');
 });
 
-afterAll(() => {
+afterEach(() => {
     jest.runOnlyPendingTimers();
     jest.useRealTimers();
 });
@@ -174,7 +174,7 @@ it('displays race headers for races in session', async () => {
 
 describe('when clock ticks', () => {
     // unclear why this is not working. Timesout waiting for findAllByText. Equivalent test works in FlagControl.test.js
-    xit('updates time to next flag state change', async () => {
+    it('updates time to next flag state change', async () => {
         const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "actualStartTime": null, "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
         const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "actualStartTime": null, "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
         const races = [raceScorpionA, raceGraduateA];
@@ -187,24 +187,16 @@ describe('when clock ticks', () => {
             customRender(<RaceStartConsole />, model, controller);
         });
 
-        // expect(screen.getByText(/05:00/i)).toBeInTheDocument();
-        // screen.debug();
         await act(async () => {
             jest.advanceTimersByTime(1000);
-            // await screen.findByText(/04:59/i);
         });
 
-        // expect(setTimeoutSpy).toBeCalled();
-        expect(await screen.findAllByText(/04:59/i)).toHaveLength(2);
-        expect(await screen.findAllByText(/09:59/i)).toHaveLength(2);
-        expect(await screen.findAllByText(/19:59/i)).toBeInTheDocument();
+        const flagIndicators = (screen.getByRole('heading', {name: 'Flag Indicators'})).parentNode;
+        expect(await within(flagIndicators).findAllByText(/04:59/i)).toHaveLength(1);
+        expect(await within(flagIndicators).findAllByText(/09:59/i)).toHaveLength(2);
 	});
     describe('when a flag state change is triggered', () => {
-        // unclear why this is not working. Test completes by displayed values are not updated. Equivalent test works in FlagControl.test.js
-        // setTimeout is called
-        // callback function is set correctly
-        // advancing timers does not appear to result in function passed to setTimeout being called :-/
-        xit('updates the displayed flag state to the new flag state', async () => {
+        it('updates the displayed flag state to the new flag state', async () => {
             const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "actualStartTime": null, "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
             const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "actualStartTime": null, "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
             const races = [raceScorpionA, raceGraduateA];
@@ -217,16 +209,9 @@ describe('when clock ticks', () => {
                 customRender(<RaceStartConsole />, model, controller);
             });
 
-            // console.log(`Time in test: ${Date()}`);
             act(() => {
                 jest.advanceTimersByTime(300000);
-                // jest.runAllTimers();
             });
-            // console.log(`Time in test: ${Date()}`);
-
-            // console.log(setTimeoutSpy.mock.lastCall);
-            // console.log(setTimeoutSpy.mock.lastCall[0].toString());
-            // expect(setTimeoutSpy).toBeCalled();
 
             expect(await screen.findAllByText(/raised/i)).toHaveLength(2);
             expect(await screen.findAllByText(/lowered/i)).toHaveLength(1);
