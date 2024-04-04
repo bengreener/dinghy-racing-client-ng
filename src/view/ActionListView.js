@@ -11,6 +11,15 @@ function ActionListView() {
     return (
         <div>
             <h1>Action List</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Action</th>
+                        <th>Countdown</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
     )
 }
