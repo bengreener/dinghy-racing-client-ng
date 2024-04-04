@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Clock from '../model/domain-classes/clock';
 
 /**
@@ -8,6 +8,17 @@ import Clock from '../model/domain-classes/clock';
  * @returns {HTMLDivElement}
  */
 function ActionListView({ actions }) {
+    const [clock, setClock] = useState(new Clock(Date.now()));
+    const [time, setTime] = useState(new Date());
+
+    function handleTick() {
+        setTime(new Date());
+    };
+
+    useEffect(() => {
+        clock.addTickHandler(handleTick);
+        clock.start();
+    }, []);
 
     let formatOptions = {
         timeZone: 'UTC',
@@ -17,8 +28,10 @@ function ActionListView({ actions }) {
     };
     const timeFormat = new Intl.DateTimeFormat('en-GB', formatOptions);
 
-    const actionRows = actions.map(action =>
-        <tr key={action.time}>
+    const actionRows = actions.map(action => {
+        const countdown = Math.max(action.time.valueOf() - time, 0);
+
+        return (<tr key={action.time}>
             <td key='time'>
                 {timeFormat.format(action.time)}
             </td>
@@ -26,10 +39,10 @@ function ActionListView({ actions }) {
                 {action.description}
             </td>
             <td key='countdown'>
-                {Clock.formatDuration(Math.abs(Date.now() - action.time.valueOf()))}
+                {Clock.formatDuration(countdown)}
             </td>
-        </tr>
-    );
+        </tr>)
+    });
 
     return (
         <div>
@@ -47,7 +60,7 @@ function ActionListView({ actions }) {
                 </tbody>
             </table>
         </div>
-    )
+    );
 }
 
 export default ActionListView;
