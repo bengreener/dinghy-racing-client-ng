@@ -1,4 +1,5 @@
 import React from 'react';
+import Clock from '../model/domain-classes/clock';
 
 /**
  * Provide a list, withing timings, of the actions that need to be completed to start the races
@@ -6,7 +7,29 @@ import React from 'react';
  * @param {Array<Action>} actions to display
  * @returns {HTMLDivElement}
  */
-function ActionListView() {
+function ActionListView({ actions }) {
+
+    let formatOptions = {
+        timeZone: 'UTC',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+    };
+    const timeFormat = new Intl.DateTimeFormat('en-GB', formatOptions);
+
+    const actionRows = actions.map(action =>
+        <tr key={action.time}>
+            <td key='time'>
+                {timeFormat.format(action.time)}
+            </td>
+            <td key='action'>
+                {action.description}
+            </td>
+            <td key='countdown'>
+                {Clock.formatDuration(Math.abs(Date.now() - action.time.valueOf()))}
+            </td>
+        </tr>
+    );
 
     return (
         <div>
@@ -19,6 +42,9 @@ function ActionListView() {
                         <th>Countdown</th>
                     </tr>
                 </thead>
+                <tbody>
+                    {actionRows}
+                </tbody>
             </table>
         </div>
     )
