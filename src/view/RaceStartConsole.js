@@ -73,9 +73,7 @@ function RaceStartConsole () {
 
     return (
         <div className="race-start-console">
-            <div className="select-race">
-                <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
-            </div>
+            <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
             <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
             <CollapsableContainer heading={'Flags'} >
                 <FlagsControl races={raceArray} />
