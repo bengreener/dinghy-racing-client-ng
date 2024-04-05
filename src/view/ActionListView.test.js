@@ -1,6 +1,14 @@
 import { act, render, screen, within } from '@testing-library/react';
 import ActionListView from './ActionListView';
 
+const formatOptions = {
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+};
+const timeFormat = new Intl.DateTimeFormat('utc', formatOptions);
+
 beforeEach(() => {
     jest.useFakeTimers();
     jest.spyOn(global, 'setTimeout')
@@ -33,7 +41,6 @@ it('displays actions', () => {
         minute: '2-digit',
         hour12: false
     };
-    const timeFormat = new Intl.DateTimeFormat('en-GB', formatOptions);
 
     const now = Date.now();
     const actions = [
@@ -58,14 +65,6 @@ it('displays actions', () => {
 });
 
 it('updates action countdowns every second', async () => {
-    let formatOptions = {
-        timeZone: 'UTC',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-    };
-    const timeFormat = new Intl.DateTimeFormat('en-GB', formatOptions);
-
     const now = Date.now();
     const actions = [
         {time: new Date(now), description: 'Action 1'},
@@ -84,4 +83,4 @@ it('updates action countdowns every second', async () => {
     expect(await within(actionRows[1]).findByText(/00:00/i)).toBeInTheDocument();
     expect(await within(actionRows[2]).findByText(/04:59/i)).toBeInTheDocument();
     expect(await within(actionRows[3]).findByText(/09:59/i)).toBeInTheDocument();
-})
+});

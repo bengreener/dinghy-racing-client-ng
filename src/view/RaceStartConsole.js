@@ -6,6 +6,8 @@ import SortOrder from '../model/dinghy-racing-model';
 import FlagsControl from './FlagsControl';
 import RaceHeaderContainer from './RaceHeaderContainer';
 import RaceHeaderView from './RaceHeaderView';
+import ActionListView from './ActionListView';
+import { sortArray } from '../utilities/array-utilities';
 
 function RaceStartConsole () {
     const model = useContext(ModelContext);
@@ -43,6 +45,31 @@ function RaceStartConsole () {
         setSessionEnd(date);
     }
 
+    // create race start actions list
+    const actionsMap = new Map();
+    let actions = [];
+    raceArray.forEach(race => {
+        // raise warning flag
+        actions.push({time: new Date(race.plannedStartTime.valueOf() - 600000), description: 'Raise warning flag for ' + race.name});
+        // lower warning flag
+        actions.push({time: race.plannedStartTime, description: 'Lower warning flag for ' + race.name});
+    })
+    if (raceArray.length > 0) {
+        // raise blue peter
+        actions.push({time: new Date(raceArray[0].plannedStartTime.valueOf() - 300000), description: 'Raise blue peter'});
+        // lower blue peter
+        actions.push({time: raceArray[raceArray.length - 1].plannedStartTime, description: 'Lower blue peter'});
+    }
+    actions.forEach(action => {
+        if (actionsMap.has(action.time.valueOf())) {
+            const oldAction = actionsMap.get(action.time.valueOf());
+            actionsMap.set(action.time.valueOf(), {...oldAction, description: oldAction.description + '\n' + action.description});
+        }
+        else {
+            actionsMap.set(action.time.valueOf(), action);
+        }
+    });
+
     return (
         <div className="race-start-console">
             <div className="select-race">
@@ -55,6 +82,7 @@ function RaceStartConsole () {
                     return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} />
                 })}
             </RaceHeaderContainer>
+            <ActionListView actions={sortArray(Array.from(actionsMap.values()), (action) => action.time)} />
         </div>
     );
 };

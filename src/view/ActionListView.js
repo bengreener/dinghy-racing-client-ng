@@ -8,7 +8,7 @@ import Clock from '../model/domain-classes/clock';
  * @returns {HTMLDivElement}
  */
 function ActionListView({ actions }) {
-    const [clock, setClock] = useState(new Clock(Date.now()));
+    const [clock] = useState(new Clock(Date.now()));
     const [time, setTime] = useState(new Date());
 
     function handleTick() {
@@ -18,19 +18,19 @@ function ActionListView({ actions }) {
     useEffect(() => {
         clock.addTickHandler(handleTick);
         clock.start();
-    }, []);
+    }, [clock]);
 
+    const resolvedOptions = Intl.DateTimeFormat().resolvedOptions();
     let formatOptions = {
-        timeZone: 'UTC',
+        timeZone: resolvedOptions.timeZone,
         hour: '2-digit',
         minute: '2-digit',
         hour12: false
     };
-    const timeFormat = new Intl.DateTimeFormat('en-GB', formatOptions);
+    const timeFormat = new Intl.DateTimeFormat(resolvedOptions.locale, formatOptions);
 
     const actionRows = actions.map(action => {
         const countdown = Math.max(action.time.valueOf() - time, 0);
-
         return (<tr key={action.time}>
             <td key='time'>
                 {timeFormat.format(action.time)}

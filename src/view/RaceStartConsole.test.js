@@ -11,6 +11,14 @@ jest.mock('../controller/dinghy-racing-controller');
 
 HTMLDialogElement.prototype.close = jest.fn();
 
+const formatOptions = {
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+};
+const timeFormat = new Intl.DateTimeFormat('utc', formatOptions);
+
 beforeEach(() => {
     jest.useFakeTimers().setSystemTime(new Date("2021-10-14T14:05:00Z"));
     jest.spyOn(global, 'setTimeout');
@@ -172,6 +180,36 @@ it('displays race headers for races in session', async () => {
     expect(within(raceD).getByRole('button', {name: /start now/i})).toBeInTheDocument();
 });
 
+it('displays actions to start races in session', async () => {
+    const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "actualStartTime": null, "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
+    const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "actualStartTime": null, "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
+    const races = [raceScorpionA, raceGraduateA];
+
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const controller = new DinghyRacingController(model);
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+
+    await act(async () => {
+        customRender(<RaceStartConsole />, model, controller);
+    });
+
+    const actionRows = screen.getAllByRole('row');
+    expect(actionRows).toHaveLength(5);
+    expect(within(actionRows[1]).getByText(timeFormat.format(new Date('2021-10-14T14:00:00Z')))).toBeInTheDocument();
+    expect(within(actionRows[1]).getByText(/raise warning flag for scorpion a/i)).toBeInTheDocument();
+    expect(within(actionRows[1]).getByText(/00:00/i)).toBeInTheDocument();
+    expect(within(actionRows[2]).getByText(timeFormat.format(new Date('2021-10-14T14:05:00Z')))).toBeInTheDocument();
+    expect(within(actionRows[2]).getByText(/raise blue peter/i)).toBeInTheDocument();
+    expect(within(actionRows[2]).getByText(/raise warning flag for graduate a/i)).toBeInTheDocument();
+    expect(within(actionRows[2]).getByText(/00:00/i)).toBeInTheDocument();
+    expect(within(actionRows[3]).getByText(timeFormat.format(new Date('2021-10-14T14:10:00Z')))).toBeInTheDocument();
+    expect(within(actionRows[3]).getByText(/lower warning flag for scorpion a/i)).toBeInTheDocument();
+    expect(within(actionRows[3]).getByText(/05:00/i)).toBeInTheDocument();
+    expect(within(actionRows[4]).getByText(timeFormat.format(new Date('2021-10-14T14:15:00Z')))).toBeInTheDocument();
+    expect(within(actionRows[4]).getByText(/lower warning flag for graduate a/i)).toBeInTheDocument();
+    expect(within(actionRows[4]).getByText(/10:00/i)).toBeInTheDocument();
+});
+
 describe('when clock ticks', () => {
     // unclear why this is not working. Timesout waiting for findAllByText. Equivalent test works in FlagControl.test.js
     it('updates time to next flag state change', async () => {
@@ -216,5 +254,38 @@ describe('when clock ticks', () => {
             expect(await screen.findAllByText(/raised/i)).toHaveLength(2);
             expect(await screen.findAllByText(/lowered/i)).toHaveLength(1);
         });
+    });
+    it('updates countdown for actions', async () => {
+        const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "actualStartTime": null, "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
+        const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "actualStartTime": null, "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
+        const races = [raceScorpionA, raceGraduateA];
+
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+
+        await act(async () => {
+            customRender(<RaceStartConsole />, model, controller);
+        });
+
+        act(() => {
+            jest.advanceTimersByTime(1000);
+        });
+
+        const actionRows = screen.getAllByRole('row');
+        expect(actionRows).toHaveLength(5);
+        expect(within(actionRows[1]).getByText(timeFormat.format(new Date('2021-10-14T14:00:00Z')))).toBeInTheDocument();
+        expect(within(actionRows[1]).getByText(/raise warning flag for scorpion a/i)).toBeInTheDocument();
+        expect(within(actionRows[1]).getByText(/00:00/i)).toBeInTheDocument();
+        expect(within(actionRows[2]).getByText(timeFormat.format(new Date('2021-10-14T14:05:00Z')))).toBeInTheDocument();
+        expect(within(actionRows[2]).getByText(/raise blue peter/i)).toBeInTheDocument();
+        expect(within(actionRows[2]).getByText(/raise warning flag for graduate a/i)).toBeInTheDocument();
+        expect(within(actionRows[2]).getByText(/00:00/i)).toBeInTheDocument();
+        expect(within(actionRows[3]).getByText(timeFormat.format(new Date('2021-10-14T14:10:00Z')))).toBeInTheDocument();
+        expect(within(actionRows[3]).getByText(/lower warning flag for scorpion a/i)).toBeInTheDocument();
+        expect(within(actionRows[3]).getByText(/04:59/i)).toBeInTheDocument();
+        expect(within(actionRows[4]).getByText(timeFormat.format(new Date('2021-10-14T14:15:00Z')))).toBeInTheDocument();
+        expect(within(actionRows[4]).getByText(/lower warning flag for graduate a/i)).toBeInTheDocument();
+        expect(within(actionRows[4]).getByText(/09:59/i)).toBeInTheDocument();
     });
 });
