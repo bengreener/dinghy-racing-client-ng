@@ -86,6 +86,23 @@ describe('when rendered', () => {
     });
 });
 
+describe('when showInRaceData is false', () => {
+    it('does not display additional elements', () => {
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))} } showInRaceData={false} />, model, controller);
+        expect(screen.getByText(/scorpion a/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/laps(?!.)/i)).toHaveValue('5');
+        expect(screen.getByLabelText(/duration/i)).toHaveValue('45:00');
+        expect(screen.queryByLabelText(/remaining/i)).not.toBeInTheDocument();
+        expect(screen.queryByLabelText(/estimate/i)).not.toBeInTheDocument();
+        expect(screen.queryByLabelText(/last/i)).not.toBeInTheDocument();
+        expect(screen.queryByLabelText(/average/i)).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: /postpone start/i})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: /start now/i})).toBeInTheDocument();
+    });
+});
+
 describe('when race has not yet started', () => {
     it('displays countdown to start of race as a positive value', () => {
         const startTime = new Date(Date.now() + 60000);
