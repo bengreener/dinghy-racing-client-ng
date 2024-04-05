@@ -79,7 +79,7 @@ function RaceStartConsole () {
             </CollapsableContainer>
             <CollapsableContainer heading={'Race Headers'}>
                 {raceArray.map(race => {
-                    return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} />
+                    return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} showInRaceData={false} />
                 })}
             </CollapsableContainer>
             <ActionListView actions={sortArray(Array.from(actionsMap.values()), (action) => action.time)} />

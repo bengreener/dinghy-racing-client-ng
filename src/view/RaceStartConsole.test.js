@@ -154,7 +154,6 @@ it('displays race headers for races in session', async () => {
     expect(within(raceA).getByRole('button', {name: /postpone/i})).toBeInTheDocument();
     expect(within(raceA).getByRole('button', {name: /start now/i})).toBeInTheDocument();
 
-
     expect(within(raceHeaders).getByText(/graduate a/i)).toBeInTheDocument();
     const raceB = within(raceHeaders).getByText(/graduate a/i).parentNode;
     expect(within(raceB).getByLabelText(/laps$/i)).toHaveValue('4');
@@ -178,6 +177,27 @@ it('displays race headers for races in session', async () => {
     expect(within(raceD).getByLabelText(/countdown/i)).toHaveValue('20:00');
     expect(within(raceD).getByRole('button', {name: /postpone/i})).toBeInTheDocument();
     expect(within(raceD).getByRole('button', {name: /start now/i})).toBeInTheDocument();
+});
+
+it('does not displays in race data in race headers', async () => {
+    const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "actualStartTime": null, "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
+    const races = [raceScorpionA];
+
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const controller = new DinghyRacingController(model);
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+
+    await act(async () => {
+        customRender(<RaceStartConsole />, model, controller);
+    });
+
+    const raceHeaders = (screen.getByRole('heading', {name: /race headers/i})).parentNode;
+    expect(within(raceHeaders).getByText(/scorpion a/i)).toBeInTheDocument();
+    const raceA = within(raceHeaders).getByText(/scorpion a/i).parentNode;
+    expect(within(raceA).queryByLabelText(/remaining/i)).not.toBeInTheDocument();
+    expect(within(raceA).queryByLabelText(/estimate/i)).not.toBeInTheDocument();
+    expect(within(raceA).queryByLabelText(/last/i)).not.toBeInTheDocument();
+    expect(within(raceA).queryByLabelText(/average/i)).not.toBeInTheDocument();
 });
 
 it('displays actions to start races in session', async () => {

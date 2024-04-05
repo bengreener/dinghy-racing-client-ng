@@ -94,7 +94,7 @@ describe('when showInRaceData is false', () => {
         expect(screen.getByText(/scorpion a/i)).toBeInTheDocument();
         expect(screen.getByLabelText(/laps(?!.)/i)).toHaveValue('5');
         expect(screen.getByLabelText(/duration/i)).toHaveValue('45:00');
-        expect(screen.queryByLabelText(/remaining/i)).not.toBeInTheDocument();
+        expect(screen.queryByLabelText(/countdown/i)).toHaveValue('00:10');
         expect(screen.queryByLabelText(/estimate/i)).not.toBeInTheDocument();
         expect(screen.queryByLabelText(/last/i)).not.toBeInTheDocument();
         expect(screen.queryByLabelText(/average/i)).not.toBeInTheDocument();
