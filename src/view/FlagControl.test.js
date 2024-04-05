@@ -96,5 +96,36 @@ describe('when clock ticks', () => {
             await screen.findByText(/lowered/i);
             expect(screen.getByLabelText(/state/i)).toHaveValue('Lowered');
         });
+        it('triggers audio act warning', async () => {
+            const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
+            const clock = new Clock(startTime + 1000);
+        
+            const stateSequence = [{startTimeOffset: -600000, state: FlagState.RAISED}, {startTimeOffset: 0, state: FlagState.LOWERED}];
+        
+            render(<FlagControl name={'Flag A'} clock={clock} flagStateChangeTimings={stateSequence} />);
+            
+        
+            expect(await screen.queryByTestId('act-sound-warning-audio')).not.toBeInTheDocument();
+            act(() => {
+                jest.advanceTimersByTime(1000);
+            });
+            expect(await screen.findByTestId('act-sound-warning-audio')).toBeInTheDocument();
+        })
+        describe('when ticks to 1 minute before flag state change', () => {
+            it('triggers audio prepare warning', async () => {
+                const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
+                const clock = new Clock(startTime + 60001);
+            
+                const stateSequence = [{startTimeOffset: -600000, state: FlagState.RAISED}, {startTimeOffset: 0, state: FlagState.LOWERED}];
+            
+                render(<FlagControl name={'Flag A'} clock={clock} flagStateChangeTimings={stateSequence} />);
+                
+                expect(screen.queryByTestId('prepare-sound-warning-audio')).not.toBeInTheDocument();
+                act(() => {
+                    jest.advanceTimersByTime(1000);
+                });
+                expect(await screen.findByTestId('prepare-sound-warning-audio')).toBeInTheDocument();
+             });
+        });
     });
 });

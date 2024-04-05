@@ -28,12 +28,27 @@ function FlagControl({ name, clock, flagStateChangeTimings }) {
                 return elapsedTime - flagStateChangeTimings[i].startTimeOffset;
             }
         }
-        return 0;
+        return elapsedTime - flagStateChangeTimings[flagStateChangeTimings.length - 1].startTimeOffset;
+    }, [clock, flagStateChangeTimings]);
+
+    const calculateAudio = useCallback(() => {
+        const elapsedTime = clock.getElapsedTime();
+        for (let i = 0; i < flagStateChangeTimings.length; i++) {
+            const timeToChange = elapsedTime - flagStateChangeTimings[i].startTimeOffset;
+            if (timeToChange >= -60000 && timeToChange < -59000) {
+                return 'prepare';
+            }
+            else if (timeToChange >= -0 && timeToChange < 1000) {
+                return 'act';
+            }
+        }
+        return 'none';
     }, [clock, flagStateChangeTimings]);
 
     const [flagState, setFlagState] = useState(calculateFlagState());
     const [flagStateChangeIn, setFlagStateChangeIn] = useState(calculateChangeIn());
-    const previousClock = useRef(); // ebnable removal of tick handler from previous clock when rendered with new clock
+    const [audio, setAudio] = useState(calculateAudio());
+    const previousClock = useRef(); // enable removal of tick handler from previous clock when rendered with new clock
 
     useEffect(() => {
         clock.start();
@@ -47,8 +62,9 @@ function FlagControl({ name, clock, flagStateChangeTimings }) {
         clock.addTickHandler(() => {
             setFlagState(calculateFlagState());
             setFlagStateChangeIn(calculateChangeIn());
+            setAudio(calculateAudio());
         });
-    }, [clock, calculateFlagState, calculateChangeIn]);
+    }, [clock, calculateFlagState, calculateChangeIn, calculateAudio]);
 
     return (
         <div>
@@ -57,7 +73,9 @@ function FlagControl({ name, clock, flagStateChangeTimings }) {
             <label htmlFor={'current-state-output'}>State</label>
             <output id='current-state-output'>{flagState === FlagState.LOWERED ? 'Lowered' : 'Raised' }</output>
             <label htmlFor={'change-in-output'}>Change In</label>
-            <output id='change-in-output'>{Clock.formatDuration(-flagStateChangeIn)}</output>
+            <output id='change-in-output'>{Clock.formatDuration(Math.max(-flagStateChangeIn, 0))}</output>
+            {audio === 'prepare' ? <audio data-testid='prepare-sound-warning-audio' autoPlay={true} src='./sounds/prepare_alert.mp3' /> : null}
+            {audio === 'act' ? <audio data-testid='act-sound-warning-audio' autoPlay={true} src='./sounds/act_alert.mp3' /> : null}
         </div>
     )
 }
