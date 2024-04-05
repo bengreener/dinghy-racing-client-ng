@@ -21,7 +21,6 @@ function FlagsControl({races = []}) {
 
     return (
         <div>
-            <h1>Flag Indicators</h1>
             {flags.map(flag => { return <FlagControl key={flag.name} name={flag.name} clock={flag.clock} flagStateChangeTimings={flag.flagStateChangeTimings} /> })}
         </div>
     );
