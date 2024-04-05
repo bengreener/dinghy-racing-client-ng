@@ -69,9 +69,24 @@ header {
 	grid-area: header;
 	background-size: contain;
 }
+.action-list-view {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
 .display-port {
 	grid-area: main;
 	overflow: hidden;
+}
+.race-entries-view {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.race-start-console {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
 }
 .sign-up-form {
     height: 100%;

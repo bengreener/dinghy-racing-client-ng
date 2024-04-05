@@ -45,20 +45,22 @@ function ActionListView({ actions }) {
     });
 
     return (
-        <div>
+        <div className="action-list-view">
             <h1>Action List</h1>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>Action</th>
-                        <th>Countdown</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {actionRows}
-                </tbody>
-            </table>
+            <div className="scrollable">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Action</th>
+                            <th>Countdown</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {actionRows}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }
