@@ -13,46 +13,6 @@ function RaceHeaderView({ race }) {
     const [message, setMessage] = useState('');
     const previousRace = useRef(); // enables removal of tickHandler from previous race when rendered with new race 
     const [showPostponeRace, setShowPostponeRace] = useState(false);
-    const [warningFlagClass, setWarningFlagClass] = useState(() => {
-        // 11 minutes before race prepare to raise warning (class) flag
-        // 10 minutes before race raise warning (class) flag
-        // 1 minute before race prepare to lower warning (class) flag
-        // At start of race race lower warning (class) flag
-        if (elapsedTime >= -660000 && elapsedTime < -600000) {
-            return 'warning-flag-prepare-raise';
-        }
-        else if (elapsedTime >= -600000 && elapsedTime < -60000) {
-            return 'warning-flag-raised';
-        }
-        else if (elapsedTime >= -60000 && elapsedTime < 0) {
-            return 'warning-flag-prepare-lower';
-        }
-        else {
-            return 'warning-flag-lowered';
-        }
-    });
-    const [bluePeterClass, setBluePeterClass] = useState(() => {
-        // 6 minutes before race prepare to raise Blue Peter flag
-        // 5 minutes before race raise Blue Peter flag
-        // 1 minute before race prepare to lower Blue Peter flag
-        // At start of race race lower Blue Peter flag
-        if (elapsedTime >= -360000 && elapsedTime < -300000) {
-            return 'blue-peter-prepare-raise';
-        }
-        else if (elapsedTime >= -300000 && elapsedTime < -60000) {
-            return 'blue-peter-raised';
-        }
-        else if (elapsedTime >= -60000 && elapsedTime < 0) {
-            return 'blue-peter-prepare-lower';
-        }
-        else {
-            return 'blue-peter-lowered';
-        }
-    });
-    const [prepareWFSoundWarning, setPrepareWFSoundWarning] = useState(false);
-    const [prepareBPSoundWarning, setPrepareBPSoundWarning] = useState(false);
-    const [actWFSoundWarning, setActWFSoundWarning] = useState(false);
-    const [actBPSoundWarning, setActBPSoundWarning] = useState(false);
 
     const handleEntryUpdate = useCallback(() => {
         model.getRace(race.url).then(result => {
@@ -107,55 +67,9 @@ function RaceHeaderView({ race }) {
         race.clock.addTickHandler(() => {
             const currentElapsedTime = race.clock.getElapsedTime(); // ensure state calculated on current time uses the same value
             setElapsedTime(currentElapsedTime); // takes effect next render so can't be used to drive caluclations of other state updates based on time in this handler
-            // 11 minutes before race prepare to raise warning (class) flag
-            // 10 minutes before race raise warning (class) flag
-            // 1 minute before race prepare to lower warning (class) flag
-            // At start of race race lower warning (class) flag
-            if (currentElapsedTime >= -660000 && currentElapsedTime < -659000) {
-                warningFlagClass !== 'warning-flag-prepare-raise' ? setPrepareWFSoundWarning(true) : setPrepareWFSoundWarning(false);
-                setWarningFlagClass('warning-flag-prepare-raise');
-            }
-            else if (currentElapsedTime >= -600000 && currentElapsedTime < -599000) {
-                // warningFlagClass !== 'warning-flag-raised' ? setActSoundWarning(true) : setActSoundWarning(false);
-                if (warningFlagClass !== 'warning-flag-raised') {
-                    setActWFSoundWarning(true);
-                }
-                else {
-                    setActWFSoundWarning(false);
-                }
-                setWarningFlagClass('warning-flag-raised');
-            }
-            else if (currentElapsedTime >= -60000 && currentElapsedTime < -59000) {
-                warningFlagClass !== 'warning-flag-prepare-lower' ? setPrepareWFSoundWarning(true) : setPrepareWFSoundWarning(false);
-                setWarningFlagClass('warning-flag-prepare-lower');
-            }
-            else if (currentElapsedTime < -660000 || currentElapsedTime >= 0) {
-                warningFlagClass !== 'warning-flag-lowered' ? setActWFSoundWarning(true) : setActWFSoundWarning(false);
-                setWarningFlagClass('warning-flag-lowered');
-            }
-            // 6 minutes before race prepare to raise Blue Peter flag
-            // 5 minutes before race raise Blue Peter flag
-            // 1 minute before race prepare to lower Blue Peter flag
-            // At start of race race lower Blue Peter flag
-            if (currentElapsedTime >= -360000 && currentElapsedTime < -359000) {
-                bluePeterClass !== 'blue-peter-prepare-raise' ? setPrepareBPSoundWarning(true) : setPrepareBPSoundWarning(false);
-                setBluePeterClass('blue-peter-prepare-raise');
-            }
-            else if (currentElapsedTime >= -300000 && currentElapsedTime < -299000) {
-                bluePeterClass !== 'blue-peter-raised' ? setActBPSoundWarning(true) : setActBPSoundWarning(false);
-                setBluePeterClass('blue-peter-raised');
-            }
-            else if (currentElapsedTime >= -60000 && currentElapsedTime < -59000) {
-                bluePeterClass !== 'blue-peter-prepare-lower' ? setPrepareBPSoundWarning(true) : setPrepareBPSoundWarning(false);
-                setBluePeterClass('blue-peter-prepare-lower');
-            }
-            else if (currentElapsedTime < -360000 || currentElapsedTime >= 0) {
-                bluePeterClass !== 'blue-peter-lowered' ? setActBPSoundWarning(true) : setActBPSoundWarning(false);
-                setBluePeterClass('blue-peter-lowered');
-            }
         });
         previousRace.current = race;
-    }, [race, bluePeterClass, warningFlagClass]);
+    }, [race]);
 
     function closePostponeRaceFormDialog() {
         setShowPostponeRace(false);
@@ -168,8 +82,6 @@ function RaceHeaderView({ race }) {
             <output id={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{race.plannedLaps}</output>
             <label htmlFor={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()}>Duration</label>
             <output id={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(race.duration)}</output>
-            {<p className={warningFlagClass} style={{display: 'inline'}}>WF</p>}
-            {<p className={bluePeterClass} style={{display: 'inline'}}>BP</p>}
             <label htmlFor={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>{
                 (elapsedTime < 0) ? 'Countdown' : 'Remaining'
             }</label>
@@ -185,8 +97,6 @@ function RaceHeaderView({ race }) {
             {elapsedTime < 0 ? <button id="race-postpone-button" onClick={handleRacePostponeClick}>Postpone Start</button> : null}
             {elapsedTime < 0 ? <button id="race-start-button" onClick={handleRaceStartClick}>Start Now</button> : null}
             <p id="race-header-message" className={!message ? "hidden" : ""}>{message}</p>
-            {prepareWFSoundWarning || prepareBPSoundWarning ? <audio data-testid='prepare-sound-warning-audio' autoPlay={true} src='./sounds/prepare_alert.mp3' /> : null}
-            {actWFSoundWarning || actBPSoundWarning ? <audio data-testid='act-sound-warning-audio' autoPlay={true} src='./sounds/act_alert.mp3' /> : null}
             <ModalDialog show={showPostponeRace} onClose={() => setShowPostponeRace(false)}>
                 <PostponeRaceForm race={race} onPostpone={controller.postponeRace} closeParentDialog={closePostponeRaceFormDialog} />
             </ModalDialog>
