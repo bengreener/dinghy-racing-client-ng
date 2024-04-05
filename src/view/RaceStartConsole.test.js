@@ -42,7 +42,7 @@ it('renders', async () => {
     expect(selectSessionStart).toBeInTheDocument();
     const selectSessionEnd = screen.getByLabelText(/session end/i);
     expect(selectSessionEnd).toBeInTheDocument();
-    expect(screen.getByRole('heading', {name: /flag indicators/i})).toBeInTheDocument();
+    expect(screen.getByRole('heading', {name: /flags/i})).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: /race headers/i})).toBeInTheDocument();
 });
 
@@ -81,7 +81,7 @@ it('displays race names and blue peter', async () => {
         customRender(<RaceStartConsole />, model, controller);
     });
 
-    const flagIndicators = (screen.getByRole('heading', {name: 'Flag Indicators'})).parentNode;
+    const flagIndicators = (screen.getByRole('heading', {name: 'Flags'})).parentNode;
     expect(within(flagIndicators).getByText(/scorpion a/i)).toBeInTheDocument();
     expect(within(flagIndicators).getByText(/blue peter/i)).toBeInTheDocument();
     expect(within(flagIndicators).getByText(/graduate a/i)).toBeInTheDocument();
@@ -104,7 +104,7 @@ it('displays initial state for each flag', async () => {
         customRender(<RaceStartConsole />, model, controller);
     });
 
-    const flagIndicators = (screen.getByRole('heading', {name: 'Flag Indicators'})).parentNode;
+    const flagIndicators = (screen.getByRole('heading', {name: 'Flags'})).parentNode;
     expect(within(flagIndicators).getAllByText(/raised/i)).toHaveLength(3);
     expect(within(flagIndicators).getAllByText(/lowered/i)).toHaveLength(2);
 });
@@ -124,7 +124,7 @@ it('displays time to next flag state change for each flag', async () => {
         customRender(<RaceStartConsole />, model, controller);
     });
 
-    const flagIndicators = (screen.getByRole('heading', {name: 'Flag Indicators'})).parentNode;
+    const flagIndicators = (screen.getByRole('heading', {name: 'Flags'})).parentNode;
     expect(within(flagIndicators).getAllByText(/05:00/i)).toHaveLength(2);
     expect(within(flagIndicators).getAllByText(/10:00/i)).toHaveLength(2);
     expect(within(flagIndicators).getByText(/20:00/i)).toBeInTheDocument();
@@ -229,7 +229,7 @@ describe('when clock ticks', () => {
             jest.advanceTimersByTime(1000);
         });
 
-        const flagIndicators = (screen.getByRole('heading', {name: 'Flag Indicators'})).parentNode;
+        const flagIndicators = (screen.getByRole('heading', {name: 'Flags'})).parentNode;
         expect(await within(flagIndicators).findAllByText(/04:59/i)).toHaveLength(1);
         expect(await within(flagIndicators).findAllByText(/09:59/i)).toHaveLength(2);
 	});

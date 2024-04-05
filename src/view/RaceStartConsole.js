@@ -8,6 +8,7 @@ import RaceHeaderContainer from './RaceHeaderContainer';
 import RaceHeaderView from './RaceHeaderView';
 import ActionListView from './ActionListView';
 import { sortArray } from '../utilities/array-utilities';
+import CollapsableContainer from './CollapsableContainer';
 
 function RaceStartConsole () {
     const model = useContext(ModelContext);
@@ -76,7 +77,9 @@ function RaceStartConsole () {
                 <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
             </div>
             <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
-            <FlagsControl races={raceArray} />
+            <CollapsableContainer heading={'Flags'} >
+                <FlagsControl races={raceArray} />
+            </CollapsableContainer>
             <RaceHeaderContainer>
                 {raceArray.map(race => {
                     return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} />
