@@ -4,7 +4,6 @@ import SelectSession from './SelectSession';
 import Clock from '../model/domain-classes/clock';
 import SortOrder from '../model/dinghy-racing-model';
 import FlagsControl from './FlagsControl';
-import RaceHeaderContainer from './RaceHeaderContainer';
 import RaceHeaderView from './RaceHeaderView';
 import ActionListView from './ActionListView';
 import { sortArray } from '../utilities/array-utilities';
@@ -78,11 +77,11 @@ function RaceStartConsole () {
             <CollapsableContainer heading={'Flags'} >
                 <FlagsControl races={raceArray} />
             </CollapsableContainer>
-            <RaceHeaderContainer>
+            <CollapsableContainer heading={'Race Headers'}>
                 {raceArray.map(race => {
                     return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} />
                 })}
-            </RaceHeaderContainer>
+            </CollapsableContainer>
             <ActionListView actions={sortArray(Array.from(actionsMap.values()), (action) => action.time)} />
         </div>
     );

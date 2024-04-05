@@ -4,7 +4,7 @@ import ModelContext from './ModelContext';
 import RaceEntriesView from './RaceEntriesView';
 import RaceHeaderView from './RaceHeaderView';
 import Clock from '../model/domain-classes/clock';
-import RaceHeaderContainer from './RaceHeaderContainer';
+import CollapsableContainer from './CollapsableContainer';
 import SelectSession from './SelectSession';
 
 function RaceConsole() {
@@ -84,12 +84,12 @@ function RaceConsole() {
                 <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
             </div>
             <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
-            <RaceHeaderContainer>
+            <CollapsableContainer heading={'Race Headers'}>
                 {selectedRaces.map(selectedRace => {
                     const race = raceMap.get(selectedRace);
                     return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} />
                 })}
-            </RaceHeaderContainer>
+            </CollapsableContainer>
             <RaceEntriesView races={selectedRaces.map(selectedRace => raceMap.get(selectedRace))} />
         </div>
     );
