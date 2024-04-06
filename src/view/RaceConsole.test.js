@@ -328,7 +328,6 @@ describe('when races within session are changed', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
         jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races_copy})});
-        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races_copy})});
         await act(async () => {        
             customRender(<RaceConsole />, model);
         });

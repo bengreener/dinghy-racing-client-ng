@@ -2,9 +2,9 @@ import { customRender } from '../test-utilities/custom-renders';
 import { act, screen, within } from '@testing-library/react';
 import RaceStartConsole from './RaceStartConsole';
 import DinghyRacingModel from '../model/dinghy-racing-model';
+import DinghyRacingController from '../controller/dinghy-racing-controller';
 import { httpRootURL, wsRootURL, races, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet } from '../model/__mocks__/test-data';
 
-import DinghyRacingController from '../controller/dinghy-racing-controller';
 
 jest.mock('../model/dinghy-racing-model');
 jest.mock('../controller/dinghy-racing-controller');
@@ -309,3 +309,54 @@ describe('when clock ticks', () => {
         expect(within(actionRows[4]).getByText(/09:59/i)).toBeInTheDocument();
     });
 });
+
+it('registers an interest in race updates for races in session', async () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const controller = new DinghyRacingController(model);
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    const registerRaceUpdateCallbackSpy = jest.spyOn(model, 'registerRaceUpdateCallback');
+
+    customRender(<RaceStartConsole />, model, controller);
+    await screen.findAllByText(/scorpion a/i);
+
+    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/races/4', expect.any(Function));
+    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(2, 'http://localhost:8081/dinghyracing/api/races/7', expect.any(Function));
+    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(3, 'http://localhost:8081/dinghyracing/api/races/17', expect.any(Function));
+    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(4, 'http://localhost:8081/dinghyracing/api/races/8', expect.any(Function));
+});
+
+describe('when races within session are changed', () => {
+    it('updates recorded details', async () => {
+        const races_copy = [...races];
+        races_copy[0] = {...races[0]};
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races_copy})});
+        await act(async () => {
+            customRender(<RaceStartConsole />, model, controller);
+        });
+        expect(screen.getByText('Scorpion A')).toBeInTheDocument();
+        races_copy[0].name = 'Popeye Special';
+        await act(async () => {
+            jest.advanceTimersByTime(1000); // advance time so RaceStartConsole nows it needs to rerender
+            model.handleRaceUpdate({'body': races_copy[0].url});
+        });
+        expect(screen.getByText('Popeye Special')).toBeInTheDocument();
+    });
+    it('removes a race that has had start time changed so it falls outside session time window', async () => {
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        await act(async () => {
+            customRender(<RaceStartConsole />, model, controller);
+        });
+        expect(screen.getByText('Handicap A')).toBeInTheDocument();
+        const url = races[races.length -1].url;
+        races.pop();
+        await act(async () => {
+            jest.advanceTimersByTime(1000); // advance time so RaceStartConsole nows it needs to rerender
+            model.handleRaceUpdate({'body': url});
+        });
+        expect(screen.queryByText('Handicap A')).not.toBeInTheDocument();
+    });
+})

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
 import SelectSession from './SelectSession';
 import Clock from '../model/domain-classes/clock';
@@ -9,12 +9,21 @@ import ActionListView from './ActionListView';
 import { sortArray } from '../utilities/array-utilities';
 import CollapsableContainer from './CollapsableContainer';
 
+/**
+ * Provide Race Officer with information needed to successfully start races in a session
+ * @returns {HTMLDivElement}
+ */
 function RaceStartConsole () {
     const model = useContext(ModelContext);
     const [raceArray, setRaceArray] = useState([]);
     const [message, setMessage] = useState(''); // feedback to user
     const [sessionStart, setSessionStart] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000));
     const [sessionEnd, setSessionEnd] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000));
+    const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
+
+    const handleRaceUpdate = useCallback(() => {
+        setRacesUpdateRequestAt(Date.now());
+    }, []);
 
     useEffect(() => {
         let ignoreFetch = false; // set to true if RaceStartConsole rerendered before fetch completes to avoid using out of date result
@@ -34,8 +43,20 @@ function RaceStartConsole () {
             ignoreFetch = true;
             setMessage('');
         }
-    // }, [model, sessionStart, sessionEnd, racesUpdateRequestAt]);
-}, [model, sessionStart, sessionEnd]);
+    }, [model, sessionStart, sessionEnd, racesUpdateRequestAt]);
+
+    // register on update callbacks for races
+    useEffect(() => {
+        raceArray.forEach(race => {
+            model.registerRaceUpdateCallback(race.url, handleRaceUpdate);
+        });
+        // cleanup before effect runs and before form close
+        return () => {
+            raceArray.forEach(race => {
+                model.unregisterRaceUpdateCallback(race.url, handleRaceUpdate);
+            });
+        }
+    }, [model, raceArray, handleRaceUpdate])
 
     function handlesessionStartInputChange(date) {
         setSessionStart(date);
