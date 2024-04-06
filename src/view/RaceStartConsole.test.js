@@ -43,7 +43,7 @@ it('renders', async () => {
     const selectSessionEnd = screen.getByLabelText(/session end/i);
     expect(selectSessionEnd).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: /flags/i})).toBeInTheDocument();
-    expect(screen.getByRole('heading', {name: /race headers/i})).toBeInTheDocument();
+    expect(screen.getByRole('heading', {name: /races/i})).toBeInTheDocument();
 });
 
 it('defaults session start to 8:00 today', async () => {
@@ -145,7 +145,7 @@ it('displays race headers for races in session', async () => {
         customRender(<RaceStartConsole />, model, controller);
     });
 
-    const raceHeaders = (screen.getByRole('heading', {name: /race headers/i})).parentNode;
+    const raceHeaders = (screen.getByRole('heading', {name: /races/i})).parentNode;
     expect(within(raceHeaders).getByText(/scorpion a/i)).toBeInTheDocument();
     const raceA = within(raceHeaders).getByText(/scorpion a/i).parentNode;
     expect(within(raceA).getByLabelText(/laps$/i)).toHaveValue('5');
@@ -191,7 +191,7 @@ it('does not displays in race data in race headers', async () => {
         customRender(<RaceStartConsole />, model, controller);
     });
 
-    const raceHeaders = (screen.getByRole('heading', {name: /race headers/i})).parentNode;
+    const raceHeaders = (screen.getByRole('heading', {name: /races/i})).parentNode;
     expect(within(raceHeaders).getByText(/scorpion a/i)).toBeInTheDocument();
     const raceA = within(raceHeaders).getByText(/scorpion a/i).parentNode;
     expect(within(raceA).queryByLabelText(/remaining/i)).not.toBeInTheDocument();
