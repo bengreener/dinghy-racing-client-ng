@@ -84,7 +84,7 @@ function RaceConsole() {
                 <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
             </div>
             <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
-            <CollapsableContainer heading={'Race Headers'}>
+            <CollapsableContainer heading={'Races'}>
                 {selectedRaces.map(selectedRace => {
                     const race = raceMap.get(selectedRace);
                     return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} />
