@@ -10,10 +10,10 @@ function RaceEntriesView({ races }) {
     const [entriesMap, setEntriesMap] = useState(new Map());
     const [message, setMessage] = useState('');
     const [sortOrder, setSortOrder] = useState('default');
-    const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies an entry has been updated
+    const [entriesUpdateRequestAt, setEntriesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies an entry has been updated
 
     const updateEntries = useCallback(() => {
-        setRacesUpdateRequestAt(Date.now());
+        setEntriesUpdateRequestAt(Date.now());
     }, []);
 
     // get entries
@@ -53,7 +53,7 @@ function RaceEntriesView({ races }) {
             ignoreFetch = true;
             setMessage(''); // clear any previous message
         }
-    }, [model, races, updateEntries, racesUpdateRequestAt]);
+    }, [model, races, updateEntries, entriesUpdateRequestAt]);
 
     // return array of entries sorted according to selected sort order
     function sorted() {
