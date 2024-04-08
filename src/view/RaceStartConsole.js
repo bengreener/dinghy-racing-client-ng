@@ -95,12 +95,10 @@ function RaceStartConsole () {
         <div className="race-start-console">
             <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
             <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
-            {/* <CollapsableContainer heading={'Flags'} > */}
             <div>
                 <h1>Flags</h1>
                 <FlagsControl races={raceArray} />
             </div>
-            {/* </CollapsableContainer> */}
             <CollapsableContainer heading={'Races'}>
                 {raceArray.map(race => {
                     return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} showInRaceData={false} />
