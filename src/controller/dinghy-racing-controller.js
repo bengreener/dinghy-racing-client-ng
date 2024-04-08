@@ -1,3 +1,4 @@
+import StartSequence from '../model/start-sequence';
 import { downloadRaceEntriesCSV } from '../utilities/csv-writer'
 class DinghyRacingController {
     
@@ -187,6 +188,23 @@ class DinghyRacingController {
             return Promise.resolve({'success': false, 'message': 'Please provide details for the crew.'});
         }
         return this.model.createEntry(race, helm, dinghy, crew);
+    }
+
+    /**
+     * Update the start sequence state of a race
+     * @param {Race} race to start
+     * @param {StartSequence} stage of the starting sequence reached
+     * @return {Promise<Result>}
+     */
+    updateStartSequence(race, stage) {
+        // check valid race (a URL is sufficient, otherwise a name and start time is required)
+        if (!race.url && (!race.name || race.name === '' || !race.plannedStartTime)) {
+            return Promise.resolve({'success': false, 'message': 'Please provide details of the race.'});
+        }
+        if (!stage || !Object.keys(StartSequence).includes(stage.toUpperCase())) {
+            return Promise.resolve({'success': false, 'message': 'Please provide a valid start sequence stage.'});
+        }
+        return this.model.updateStartSequence(race, stage);
     }
 
     /**
