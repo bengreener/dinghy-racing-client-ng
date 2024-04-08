@@ -87,7 +87,7 @@ class DinghyRacingModel {
 
     /**
      * Register a callback for when a race idenified by key is updated
-     * @param {*} key
+     * @param {string} key URI of the race for which the update callback is being registered
      * @param {Function} callback
      */
     registerRaceUpdateCallback(key, callback) {
@@ -101,7 +101,7 @@ class DinghyRacingModel {
 
     /**
      * Unregister a callback for when a race idenified by key is updated
-     * @param {*} key
+     * @param {string} key URI of the race for which the update callback is being unregistered
      * @param {Function} callback
      */
     unregisterRaceUpdateCallback(key, callback) {
@@ -110,6 +110,10 @@ class DinghyRacingModel {
         }
     }
 
+    /**
+     * Handle a websocket update via the Stomp client
+     * @param {string} message URI of race that has been updated
+     */
     handleRaceUpdate(message) {
         if (this.raceUpdateCallbacks.has(message.body)) {
             this.raceUpdateCallbacks.get(message.body).forEach(cb => cb());
@@ -117,8 +121,8 @@ class DinghyRacingModel {
     }
 
     /**
-     * Register a callback for when an entry idenified by key is updated 
-     * @param {*} key 
+     * Register a callback for when an entry identified by key is updated
+     * @param {string} key URI of the entry for which the update callback is being registered
      * @param {Function} callback 
      */
     registerEntryUpdateCallback(key, callback) {
@@ -132,7 +136,7 @@ class DinghyRacingModel {
 
     /**
      * Unregister a callback for when an entry idenified by key is updated
-     * @param {*} key
+     * @param {string} key URI of the entry for which the update callback is being unregistered
      * @param {Function} callback
      */
     unregisterEntryUpdateCallback(key, callback) {
@@ -141,6 +145,10 @@ class DinghyRacingModel {
         }
     }
 
+    /**
+     * Handle a websocket update via the Stomp client
+     * @param {string} message URI of entry that has been updated
+     */
     handleEntryUpdate(message) {
         if (this.entryUpdateCallbacks.has(message.body)) {
             this.entryUpdateCallbacks.get(message.body).forEach(cb => cb());
