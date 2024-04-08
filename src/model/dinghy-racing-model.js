@@ -804,6 +804,27 @@ class DinghyRacingModel {
     }
 
     /**
+     * Update the start sequence for a race
+     * @param {Race} race to update
+     * @param {StartSequence} stage of the starting sequence reached
+     */
+    async updateStartSequence(race, stage) {
+        let result;
+        if (!race.url) {
+            result = await this.getRaceByNameAndPlannedStartTime(race.name, race.plannedStartTime);
+        }
+        else {
+            result = {'success': true, 'domainObject': race};
+        }
+        if (result.success) {
+            return this.update(result.domainObject.url, {'startSequence': stage});
+        }
+        else {
+            return result;
+        }
+    }
+
+    /**
      * Start a race
      * @param {Race} race
      * @param {Date} startTime
