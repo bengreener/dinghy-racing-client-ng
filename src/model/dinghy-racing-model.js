@@ -679,6 +679,7 @@ class DinghyRacingModel {
                     'plannedLaps': result.domainObject.plannedLaps, 'lapForecast': result.domainObject.lapForecast, 
                     'lastLapTime': result.domainObject.leadEntry ? this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.lastLapTime) : null, 
                     'averageLapTime': result.domainObject.leadEntry ? this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.averageLapTime) : null, 
+                    'startSequenceState': StartSequence.from(result.domainObject.startSequenceState),
                     'url': result.domainObject._links.self.href
                 }});
             }
@@ -780,6 +781,7 @@ class DinghyRacingModel {
                     'lapForecast': racesHAL[i].lapForecast, 
                     'lastLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.lastLapTime) : null, 
                     'averageLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.averageLapTime) : null, 
+                    'startSequenceState': StartSequence.from(racesHAL[i].startSequenceState),
                     'url': racesHAL[i]._links.self.href});
             };
             return Promise.resolve({'success': true, 'domainObject': races});
