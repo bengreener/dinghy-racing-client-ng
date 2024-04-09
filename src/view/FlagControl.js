@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import Clock from '../model/domain-classes/clock';
+import FlagState from '../model/flag-state';
 
 /**
  * Indicates the current state of a flag
@@ -86,13 +87,4 @@ function FlagControl({ name, clock, flagStateChangeTimings }) {
  * @property {FlagState} state of flag to be set at this time 
  */
 
-/**
- * Class providng enumeration of Flag State options
- */
-class FlagState {
-    static RAISED = 'raised';
-    static LOWERED = 'lowered';
-}
-
 export default FlagControl;
-export { FlagState };

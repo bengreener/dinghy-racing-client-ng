@@ -1,5 +1,6 @@
 import { act, render, screen } from '@testing-library/react';
-import FlagControl, { FlagState } from './FlagControl';
+import FlagControl from './FlagControl';
+import FlagState from '../model/flag-state';
 import Clock from '../model/domain-classes/clock';
 
 beforeEach(() => {

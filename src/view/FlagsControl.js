@@ -1,7 +1,7 @@
 import React from 'react';
 import FlagControl from './FlagControl';
 import Clock from '../model/domain-classes/clock';
-import { FlagState } from './FlagControl';
+import FlagState from '../model/flag-state';
 
 
 /**
