@@ -134,9 +134,10 @@ describe('when upcoming races button clicked', () => {
     await act(async () => {
       await user.click(btnViewUpcomingRaces);
     });
+    const timeCheck = new Date('2021-10-14T10:30:00Z').toLocaleString();
     expect(await screen.findByText('Scorpion A')).toBeInTheDocument();
     expect(await screen.findByText('Graduate')).toBeInTheDocument();
-    expect(await screen.findByText('14/02/2023, 18:26:00')).toBeInTheDocument();
+    expect(await screen.findByText(timeCheck)).toBeInTheDocument();
   })
 });
 

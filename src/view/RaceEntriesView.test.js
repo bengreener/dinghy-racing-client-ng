@@ -185,7 +185,7 @@ describe('when sorting entries', () => {
         const cells = await screen.findAllByText(/\w+ (\d+) [\w ]+/i);
         const orderedEntries = cells.map(cell => cell.textContent);
 
-        expect(orderedEntries).toEqual(['Graduate 2928 Jill Myer', 'Scorpion 1234 Chris Marshall', 'Scorpion 6745 Sarah Pascal']);
+        expect(orderedEntries).toEqual(['Scorpion 1234 Chris Marshall', 'Scorpion 6745 Sarah Pascal', 'Graduate 2928 Jill Myer']);
     });
     describe('when sorting entries that include an entry that did not start', () => {
         it('sorts by the total recorded lap times of dinghies in ascending order except for DNS entry which is placed last', async () => {

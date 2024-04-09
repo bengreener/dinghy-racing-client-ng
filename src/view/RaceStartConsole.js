@@ -25,6 +25,7 @@ function RaceStartConsole () {
         setRacesUpdateRequestAt(Date.now());
     }, []);
 
+    // get races for selected session
     useEffect(() => {
         let ignoreFetch = false; // set to true if RaceStartConsole rerendered before fetch completes to avoid using out of date result
         model.getRacesBetweenTimes(new Date(sessionStart), new Date(sessionEnd), null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING}).then(result => {
@@ -74,7 +75,7 @@ function RaceStartConsole () {
         actions.push({time: new Date(race.plannedStartTime.valueOf() - 600000), description: 'Raise warning flag for ' + race.name});
         // lower warning flag
         actions.push({time: race.plannedStartTime, description: 'Lower warning flag for ' + race.name});
-    })
+    });
     if (raceArray.length > 0) {
         // raise blue peter
         actions.push({time: new Date(raceArray[0].plannedStartTime.valueOf() - 300000), description: 'Raise blue peter'});

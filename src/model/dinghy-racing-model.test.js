@@ -594,7 +594,7 @@ describe('when retrieving a list of races that start at or after a specified tim
     // Can this test can be affected by BST, or other time zones (yes, if timezone changes test data (races) will need to be adjusted to reflect the change in the timezone (currently set up for British Summer Time))
     it('returns the races that start at or after the specified time', async () => {
         fetch.mockImplementation((resource) => {
-            if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z') {
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeGreaterThanEqual?time=2021-10-14T10:00:00.000Z') {
                 return Promise.resolve({
                     ok: true,
                     status: 200, 
@@ -631,7 +631,7 @@ describe('when retrieving a list of races that start at or after a specified tim
         });
 
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.getRacesOnOrAfterTime(new Date('2022-10-10T10:00:00.000Z'));
+        const promise = dinghyRacingModel.getRacesOnOrAfterTime(new Date('2021-10-14T10:00:00.000Z'));
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true, 'domainObject': races});
