@@ -30,6 +30,7 @@ import {
     entriesGraduateA_bigData
 } from './__mocks__/test-data-more-data';
 import StartSignals from './domain-classes/start-signals';
+import FlagState from './domain-classes/flag-state';
 
 global.fetch = jest.fn();
 
@@ -3283,7 +3284,7 @@ describe('when starting a race', () => {
     });
 });
 
-describe('when updateing the start sequence state for a race', () => {
+describe('when updating the start sequence state for a race', () => {
     describe('when a url is provided for race', () => {
         it('returns a promise that resolves to a success response when race is successfully started', async () => {
             fetch.mockImplementationOnce(() => {
@@ -4011,5 +4012,78 @@ describe('when retrieving a list of races that start between the specified times
             expect(promise).toBeInstanceOf(Promise);
             expect(result).toEqual({'success': true, 'domainObject': races});
         });
+    });
+});
+
+describe('when a StartSequence is requested', () => {
+    it('returns a promise that resolves to a success containing a StartSequence for the races between the start and end times', async () => {
+        jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
+
+        fetch.mockImplementation((resource) => {
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&sort=plannedStartTime,ASC') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve(racesCollectionHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/4/dinghyClass') {
+            return Promise.resolve({
+                ok: true,
+                status: 200,
+                json: () => Promise.resolve(dinghyClassScorpionHAL)
+            });
+        }
+        if (resource === 'http://localhost:8081/dinghyracing/api/races/7/dinghyClass') {
+            return Promise.resolve({
+                ok: true,
+                status: 200,
+                json: () => Promise.resolve(dinghyClassGraduateHAL)
+            });
+        }
+        if (resource === 'http://localhost:8081/dinghyracing/api/races/17/dinghyClass') {
+            return Promise.resolve({
+                ok: true,
+                status: 200,
+                json: () => Promise.resolve(dinghyClassCometHAL)
+            });
+        }
+            else {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404
+                });
+            }
+        });
+
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.getStartSequence(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'));
+        const result = await promise;
+        const flags = result.domainObject.calculateFlags();
+
+        expect(promise).toBeInstanceOf(Promise);
+        expect(flags.length).toBe(5);
+        expect(flags[0]).toEqual({ name: 'Scorpion A Warning', state: FlagState.LOWERED, timeToChange: -600000 });
+        expect(flags[1]).toEqual({ name: 'Blue Peter', state: FlagState.LOWERED, timeToChange: -900000 });
+        expect(flags[2]).toEqual({ name: 'Graduate A Warning', state: FlagState.LOWERED, timeToChange: -900000 });
+        expect(flags[3]).toEqual({ name: 'Comet A Warning', state: FlagState.LOWERED, timeToChange: -1200000 });
+        expect(flags[4]).toEqual({ name: 'Handicap A Warning', state: FlagState.LOWERED, timeToChange: -1500000 });
+
+        jest.runOnlyPendingTimers();
+        jest.useRealTimers();
+    });
+    it('returns a promise that resolves to a result indicating failure and providing a message indicating cause when a problem is encountered', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 404,
+                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.getStartSequence(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'));
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'});
     });
 });

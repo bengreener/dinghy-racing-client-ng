@@ -1,5 +1,6 @@
 import { Client } from '@stomp/stompjs';
 import StartSignals from './domain-classes/start-signals';
+import StartSequence from './domain-classes/start-sequence';
 
 class DinghyRacingModel {
     httpRootURL;
@@ -821,6 +822,24 @@ class DinghyRacingModel {
         }
         else {
             return result;
+        }
+    }
+
+    /**
+     * Get a start sequence for staring a races during a session
+     * @param {Date} startTime The start time of the first race
+     * @param {Date} endTime The start time of the last race
+     * @returns {Promise<Result>} If successful result domainObject will be StartSequence
+     */
+    async getStartSequence(startTime, endTime) {
+        const result = await this.getRacesBetweenTimes(startTime, endTime, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
+
+        if (result.success) {
+            const startSequence = new StartSequence(result.domainObject);
+            return Promise.resolve({success: true, domainObject: startSequence});
+        }
+        else {
+            return Promise.resolve(result);
         }
     }
 
