@@ -1,5 +1,6 @@
 import Clock from './clock';
 import FlagState from './flag-state';
+import Action from './action'
 
 /**
  * Class to handle the start sequence for a race session
@@ -69,6 +70,30 @@ class StartSequence {
         });
         timeToChange = Math.min(timeToChange, 0);
         return {finalState: finalState, timeToChange: timeToChange};
+    }
+
+    /**
+     * returns an array of the actions required to complete the start sequence
+     * It should not be assumed that the array is in a specific order
+     * @returns {Array<Action>}
+     */
+    getActions() {
+        // create race start actions list
+        let actions = [];
+        this._races.forEach(race => {
+            // raise warning flag
+            actions.push({time: new Date(race.plannedStartTime.valueOf() - 600000), description: 'Raise warning flag for ' + race.name});
+            // lower warning flag
+            actions.push({time: race.plannedStartTime, description: 'Lower warning flag for ' + race.name});
+        });
+        if (this._races.length > 0) {
+            // raise blue peter
+            actions.push({time: new Date(this._races[0].plannedStartTime.valueOf() - 300000), description: 'Raise blue peter'});
+            // lower blue peter
+            actions.push({time: this._races[this._races.length - 1].plannedStartTime, description: 'Lower blue peter'});
+        }
+
+        return actions;
     }
 
     /**

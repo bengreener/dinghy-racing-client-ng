@@ -17,7 +17,6 @@ describe('when there are 2 races', () => {
     describe('when 10 minutes 1 second before start of first race', () => {
         it('all flags are lowered and show correct time to change', () => {
             jest.setSystemTime(new Date('2021-10-14T10:19:59Z'));
-            // jest.setSystemTime(new Date('2021-10-14T10:24:59Z'));
         
             const startSequence = new StartSequence(races);
             const flags = startSequence.calculateFlags();
@@ -95,4 +94,21 @@ describe('when there are 2 races', () => {
             expect(tickCallbackSpy).toHaveBeenCalled();
         });
     });
-})
+
+    it('returns list of actions fo the 2 races', () => {
+        jest.setSystemTime(new Date('2021-10-14T10:19:59Z'));
+    
+        const expectedActions = [
+            { time: new Date('2021-10-14T10:20:00Z'), description: 'Raise warning flag for Scorpion A' },
+            { time: new Date('2021-10-14T10:30:00Z'), description: 'Lower warning flag for Scorpion A' },
+            { time: new Date('2021-10-14T10:25:00Z'), description: 'Raise warning flag for Graduate A' },
+            { time: new Date('2021-10-14T10:35:00Z'), description: 'Lower warning flag for Graduate A' },
+            { time: new Date('2021-10-14T10:25:00Z'), description: 'Raise blue peter' },
+            { time: new Date('2021-10-14T10:35:00Z'), description: 'Lower blue peter' }
+        ];
+        const startSequence = new StartSequence(races);
+        const actions = startSequence.getActions();
+
+        expect(actions).toEqual(expectedActions);
+    });
+});
