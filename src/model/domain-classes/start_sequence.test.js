@@ -84,4 +84,15 @@ describe('when there are 2 races', () => {
             expect(flags[2]).toEqual({ name: 'Graduate A Warning', state: FlagState.LOWERED, timeToChange: 0 });
         });
     });
+
+    describe('when time passes', () => {
+        it('calls tick event callback', () => {
+            const tickCallbackSpy = jest.fn();
+            const startSequence = new StartSequence(races);
+            startSequence.addTickHandler(tickCallbackSpy);
+
+            jest.advanceTimersByTime(1000);
+            expect(tickCallbackSpy).toHaveBeenCalled();
+        });
+    });
 })

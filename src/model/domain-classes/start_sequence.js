@@ -12,13 +12,17 @@ class StartSequence {
 
     /**
      * Create an instance of StartSequence
-     * @param {Array[<Race>]} races to start
+     * @param {Array<Race>} races to start
      */
     constructor(races) {
         this._races = races;
-        if (races) {
+        if (races.length > 0) {
             this._clock = new Clock(races[0].plannedStartTime); // countdown to start of first race
         }
+        else {
+            this._clock = new Clock(new Date());
+        }
+        this._clock.start();
     }
 
     /**
@@ -65,6 +69,21 @@ class StartSequence {
         });
         timeToChange = Math.min(timeToChange, 0);
         return {finalState: finalState, timeToChange: timeToChange};
+    }
+
+    /**
+     * Add a function to handle tick events
+     * @param {callback} callback
+     */
+    addTickHandler(callback) {
+        this._clock.addTickHandler(callback);
+    }
+
+    /**
+     * Remove the function handling tick events
+     */
+    removeTickHandler() {
+        this._clock.removeTickHandler();
     }
 }
 
