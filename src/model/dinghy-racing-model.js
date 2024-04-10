@@ -808,7 +808,7 @@ class DinghyRacingModel {
      * @param {Race} race to update
      * @param {StartSignals} stage of the starting sequence reached
      */
-    async updateStartSequence(race, stage) {
+    async updateRaceStartSequenceState(race, stage) {
         let result;
         if (!race.url) {
             result = await this.getRaceByNameAndPlannedStartTime(race.name, race.plannedStartTime);
