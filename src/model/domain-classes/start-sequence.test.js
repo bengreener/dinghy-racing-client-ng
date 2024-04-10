@@ -111,4 +111,11 @@ describe('when there are 2 races', () => {
 
         expect(actions).toEqual(expectedActions);
     });
+
+    it('returns the races included in the race session', () => {
+        const startSequence = new StartSequence(races);
+        const returnedRaces = startSequence.getRaces();
+
+        expect(returnedRaces).toEqual([ raceScorpionA, raceGraduateA ]);
+    });
 });

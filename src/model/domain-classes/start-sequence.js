@@ -17,6 +17,9 @@ class StartSequence {
      */
     constructor(races) {
         this._races = races;
+        this._races.forEach(race => {
+            race.clock = new Clock(race.plannedStartTime);
+        });
         if (races.length > 0) {
             this._clock = new Clock(races[0].plannedStartTime); // countdown to start of first race
         }
@@ -73,7 +76,7 @@ class StartSequence {
     }
 
     /**
-     * returns an array of the actions required to complete the start sequence
+     * Returns an array of the actions required to complete the start sequence
      * It should not be assumed that the array is in a specific order
      * @returns {Array<Action>}
      */
@@ -94,6 +97,14 @@ class StartSequence {
         }
 
         return actions;
+    }
+
+    /**
+     * Return an array of the races included in this start sequence
+     * @returns {Array<Race>}
+     */
+    getRaces() {
+        return this._races;
     }
 
     /**
