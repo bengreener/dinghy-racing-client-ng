@@ -1,4 +1,4 @@
-import StartSequence from '../model/start-sequence';
+import StartSequence from '../model/domain-classes/start-signals';
 import { downloadRaceEntriesCSV } from '../utilities/csv-writer'
 class DinghyRacingController {
     

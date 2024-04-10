@@ -3,11 +3,12 @@ import ModelContext from './ModelContext';
 import SelectSession from './SelectSession';
 import Clock from '../model/domain-classes/clock';
 import SortOrder from '../model/dinghy-racing-model';
-import FlagsControl from './FlagsControl';
 import RaceHeaderView from './RaceHeaderView';
 import ActionListView from './ActionListView';
 import { sortArray } from '../utilities/array-utilities';
 import CollapsableContainer from './CollapsableContainer';
+import StartSequence from '../model/domain-classes/start-sequence';
+import FlagControl from './FlagControl';
 
 /**
  * Provide Race Officer with information needed to successfully start races in a session
@@ -20,10 +21,17 @@ function RaceStartConsole () {
     const [sessionStart, setSessionStart] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000));
     const [sessionEnd, setSessionEnd] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000));
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
+    // const [startSequence, setStartSequence] = useState(new StartSequence(raceArray));
+    const [startSequence, setStartSequence] = useState(new StartSequence([]));
+    const [startSequenceTickTime, setStartSequenceTickTime] = useState(new Date());
 
     const handleRaceUpdate = useCallback(() => {
         setRacesUpdateRequestAt(Date.now());
     }, []);
+    
+    function handleStartSequenceTick() {
+        setStartSequenceTickTime(new Date());
+    };
 
     // get races for selected session
     useEffect(() => {
@@ -37,6 +45,8 @@ function RaceStartConsole () {
                     race.clock = new Clock(race.plannedStartTime);
                 });
                 setRaceArray(result.domainObject);
+                startSequence.removeTickHandler();
+                setStartSequence(new StartSequence(result.domainObject));
             }
         });
 
@@ -45,6 +55,10 @@ function RaceStartConsole () {
             setMessage('');
         }
     }, [model, sessionStart, sessionEnd, racesUpdateRequestAt]);
+
+    useEffect(() => {
+        startSequence.addTickHandler(handleStartSequenceTick);
+    }, [startSequence]);
 
     // register on update callbacks for races
     useEffect(() => {
@@ -98,7 +112,7 @@ function RaceStartConsole () {
             <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
             <div>
                 <h1>Flags</h1>
-                <FlagsControl races={raceArray} />
+                {startSequence.calculateFlags().map(flag => { return <FlagControl key={flag.name} flag={flag} /> })}
             </div>
             <CollapsableContainer heading={'Races'}>
                 {raceArray.map(race => {

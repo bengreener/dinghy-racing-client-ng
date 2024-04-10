@@ -1,7 +1,7 @@
 import DinghyRacingController from './dinghy-racing-controller.js';
 import DinghyRacingModel from '../model/dinghy-racing-model.js';
 import { httpRootURL, wsRootURL, competitorChrisMarshall, dinghyClassScorpion, dinghy1234, raceScorpionA, entryChrisMarshallScorpionA1234, entriesScorpionA, competitorLouScrew } from '../model/__mocks__/test-data.js';
-import StartSequence from '../model/start-sequence.js';
+import StartSignals from '../model/domain-classes/start-signals.js';
 
 jest.mock('../model/dinghy-racing-model');
 
@@ -423,7 +423,7 @@ describe('when updating the start sequence state for a race', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         jest.spyOn(dinghyRacingModel, 'updateStartSequence').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
-        const promise = dinghyRacingController.updateStartSequence(raceScorpionA, StartSequence.WARNINGSIGNAL);
+        const promise = dinghyRacingController.updateStartSequence(raceScorpionA, StartSignals.WARNINGSIGNAL);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});
@@ -432,7 +432,7 @@ describe('when updating the start sequence state for a race', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         jest.spyOn(dinghyRacingModel, 'updateStartSequence').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
-        const promise = dinghyRacingController.updateStartSequence(raceScorpionA, StartSequence.ONEMINUTE);
+        const promise = dinghyRacingController.updateStartSequence(raceScorpionA, StartSignals.ONEMINUTE);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Something went wrong'});
@@ -441,7 +441,7 @@ describe('when updating the start sequence state for a race', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         jest.spyOn(dinghyRacingModel, 'updateStartSequence').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
-        const promise = dinghyRacingController.updateStartSequence({'name': null}, StartSequence.ONEMINUTE);
+        const promise = dinghyRacingController.updateStartSequence({'name': null}, StartSignals.ONEMINUTE);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Please provide details of the race.'});
@@ -450,7 +450,7 @@ describe('when updating the start sequence state for a race', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         jest.spyOn(dinghyRacingModel, 'updateStartSequence').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
-        const promise = dinghyRacingController.updateStartSequence({'name': ''}, StartSequence.PREPARATORYSIGNAL);
+        const promise = dinghyRacingController.updateStartSequence({'name': ''}, StartSignals.PREPARATORYSIGNAL);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Please provide details of the race.'});
@@ -459,7 +459,7 @@ describe('when updating the start sequence state for a race', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         jest.spyOn(dinghyRacingModel, 'updateStartSequence').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
-        const promise = dinghyRacingController.updateStartSequence({'name': 'Test Race', 'plannedStartTime': null}, StartSequence.STARTINGSIGNAL);
+        const promise = dinghyRacingController.updateStartSequence({'name': 'Test Race', 'plannedStartTime': null}, StartSignals.STARTINGSIGNAL);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Please provide details of the race.'});
@@ -468,7 +468,7 @@ describe('when updating the start sequence state for a race', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         jest.spyOn(dinghyRacingModel, 'updateStartSequence').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
-        const promise = dinghyRacingController.updateStartSequence({'name': '', 'plannedStartTime': null, 'url': 'http://localhost:8081/dinghyracing/api/races/4'}, StartSequence.ONEMINUTE);
+        const promise = dinghyRacingController.updateStartSequence({'name': '', 'plannedStartTime': null, 'url': 'http://localhost:8081/dinghyracing/api/races/4'}, StartSignals.ONEMINUTE);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});

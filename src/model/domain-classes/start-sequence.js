@@ -1,5 +1,5 @@
 import Clock from './clock';
-import FlagState from '../flag-state';
+import FlagState from './flag-state';
 
 /**
  * Class to handle the start sequence for a race session

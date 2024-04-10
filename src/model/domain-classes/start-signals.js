@@ -1,7 +1,7 @@
 /**
  * Class providng enumeration of start sequence options
  */
-class StartSequence {
+class StartSignals {
     static WARNINGSIGNAL = 'WARNINGSIGNAL';
     static PREPARATORYSIGNAL = 'PREPARATORYSIGNAL';
     static ONEMINUTE = 'ONEMINUTE';
@@ -15,16 +15,16 @@ class StartSequence {
         const lowerStage = stage?.toUpperCase();
         switch (lowerStage) {
             case 'WARNINGSIGNAL':
-                return StartSequence.WARNINGSIGNAL;
+                return StartSignals.WARNINGSIGNAL;
             case 'PREPARATORYSIGNAL':
-                return StartSequence.PREPARATORYSIGNAL;
+                return StartSignals.PREPARATORYSIGNAL;
             case 'ONEMINUTE':
-                return StartSequence.ONEMINUTE;
+                return StartSignals.ONEMINUTE;
             case 'STARTINGSIGNAL':
-                return StartSequence.STARTINGSIGNAL;
+                return StartSignals.STARTINGSIGNAL;
         }
         return null;
     }
 }
 
-export default StartSequence;
+export default StartSignals;

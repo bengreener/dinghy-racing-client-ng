@@ -1,6 +1,6 @@
-import StartSequence from './start_sequence';
+import StartSequence from './start-sequence';
 import { raceScorpionA, raceGraduateA } from '../__mocks__/test-data';
-import FlagState from '../flag-state';
+import FlagState from './flag-state';
 
 beforeEach(() => {
     jest.useFakeTimers();
@@ -12,7 +12,7 @@ afterEach(() => {
 });
 
 describe('when there are 2 races', () => {
-    const races = [ raceScorpionA, raceGraduateA];
+    const races = [ raceScorpionA, raceGraduateA ];
 
     describe('when 10 minutes 1 second before start of first race', () => {
         it('all flags are lowered and show correct time to change', () => {

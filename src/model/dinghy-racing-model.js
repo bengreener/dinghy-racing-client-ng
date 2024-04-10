@@ -1,5 +1,5 @@
 import { Client } from '@stomp/stompjs';
-import StartSequence from './start-sequence';
+import StartSignals from './domain-classes/start-signals';
 
 class DinghyRacingModel {
     httpRootURL;
@@ -679,7 +679,7 @@ class DinghyRacingModel {
                     'plannedLaps': result.domainObject.plannedLaps, 'lapForecast': result.domainObject.lapForecast, 
                     'lastLapTime': result.domainObject.leadEntry ? this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.lastLapTime) : null, 
                     'averageLapTime': result.domainObject.leadEntry ? this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.averageLapTime) : null, 
-                    'startSequenceState': StartSequence.from(result.domainObject.startSequenceState),
+                    'startSequenceState': StartSignals.from(result.domainObject.startSequenceState),
                     'url': result.domainObject._links.self.href
                 }});
             }
@@ -781,7 +781,7 @@ class DinghyRacingModel {
                     'lapForecast': racesHAL[i].lapForecast, 
                     'lastLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.lastLapTime) : null, 
                     'averageLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.averageLapTime) : null, 
-                    'startSequenceState': StartSequence.from(racesHAL[i].startSequenceState),
+                    'startSequenceState': StartSignals.from(racesHAL[i].startSequenceState),
                     'url': racesHAL[i]._links.self.href});
             };
             return Promise.resolve({'success': true, 'domainObject': races});
@@ -806,7 +806,7 @@ class DinghyRacingModel {
     /**
      * Update the start sequence for a race
      * @param {Race} race to update
-     * @param {StartSequence} stage of the starting sequence reached
+     * @param {StartSignals} stage of the starting sequence reached
      */
     async updateStartSequence(race, stage) {
         let result;
