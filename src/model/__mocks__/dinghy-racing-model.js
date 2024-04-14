@@ -198,6 +198,10 @@ class DinghyRacingModel {
         return null;
     }
 
+    async getStartSequence(startTime, endTime) {
+        return null;
+    }
+
     async startRace(race, startTime) {
         return null;
     }

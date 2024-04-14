@@ -176,6 +176,7 @@ describe('when race start console button is clicked', ()  => {
         return Promise.resolve({'success': true, 'domainObject': entriesHandicapA})
       }
     });
+    jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({success: false, message: 'Set to fail'})});
     const dinghyRacingController = new DinghyRacingController(model);
 
     render(<App model={model} controller={dinghyRacingController} />);

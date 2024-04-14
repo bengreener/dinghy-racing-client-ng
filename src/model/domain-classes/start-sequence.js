@@ -1,6 +1,5 @@
 import Clock from './clock';
 import FlagState from './flag-state';
-import Action from './action'
 
 /**
  * Class to handle the start sequence for a race session

@@ -1,13 +1,10 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import ModelContext from './ModelContext';
 import SelectSession from './SelectSession';
-import Clock from '../model/domain-classes/clock';
-import SortOrder from '../model/dinghy-racing-model';
 import RaceHeaderView from './RaceHeaderView';
 import ActionListView from './ActionListView';
 import { sortArray } from '../utilities/array-utilities';
 import CollapsableContainer from './CollapsableContainer';
-import StartSequence from '../model/domain-classes/start-sequence';
 import FlagControl from './FlagControl';
 
 /**
@@ -16,37 +13,39 @@ import FlagControl from './FlagControl';
  */
 function RaceStartConsole () {
     const model = useContext(ModelContext);
-    const [raceArray, setRaceArray] = useState([]);
+    const [races, setRaces] = useState([]);
+    const [flags, setFlags] = useState([]);
+    const [actions, setActions] = useState([]);
     const [message, setMessage] = useState(''); // feedback to user
     const [sessionStart, setSessionStart] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000));
     const [sessionEnd, setSessionEnd] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000));
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
-    // const [startSequence, setStartSequence] = useState(new StartSequence(raceArray));
-    const [startSequence, setStartSequence] = useState(new StartSequence([]));
-    const [startSequenceTickTime, setStartSequenceTickTime] = useState(new Date());
+    const startSequence = useRef(null);
 
     const handleRaceUpdate = useCallback(() => {
         setRacesUpdateRequestAt(Date.now());
     }, []);
-    
+
     function handleStartSequenceTick() {
-        setStartSequenceTickTime(new Date());
+        setFlags(startSequence.current.calculateFlags());
     };
 
     // get races for selected session
     useEffect(() => {
         let ignoreFetch = false; // set to true if RaceStartConsole rerendered before fetch completes to avoid using out of date result
-        model.getRacesBetweenTimes(new Date(sessionStart), new Date(sessionEnd), null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING}).then(result => {
+        model.getStartSequence(new Date(sessionStart), new Date(sessionEnd)).then(result => {
             if (!ignoreFetch && !result.success) {
-                setMessage('Unable to load races\n' + result.message);
+                setMessage('Unable to load start sequence\n' + result.message);
             }
             else if (!ignoreFetch) {
-                result.domainObject.forEach(race => {
-                    race.clock = new Clock(race.plannedStartTime);
-                });
-                setRaceArray(result.domainObject);
-                startSequence.removeTickHandler();
-                setStartSequence(new StartSequence(result.domainObject));
+                setRaces(result.domainObject.getRaces());
+                setFlags(result.domainObject.calculateFlags());
+                setActions(result.domainObject.getActions());
+                if (startSequence.current) {
+                    startSequence.current.removeTickHandler();
+                }
+                startSequence.current = result.domainObject;
+                startSequence.current.addTickHandler(handleStartSequenceTick);
             }
         });
 
@@ -56,22 +55,18 @@ function RaceStartConsole () {
         }
     }, [model, sessionStart, sessionEnd, racesUpdateRequestAt]);
 
-    useEffect(() => {
-        startSequence.addTickHandler(handleStartSequenceTick);
-    }, [startSequence]);
-
     // register on update callbacks for races
     useEffect(() => {
-        raceArray.forEach(race => {
+        races.forEach(race => {
             model.registerRaceUpdateCallback(race.url, handleRaceUpdate);
         });
         // cleanup before effect runs and before form close
         return () => {
-            raceArray.forEach(race => {
+            races.forEach(race => {
                 model.unregisterRaceUpdateCallback(race.url, handleRaceUpdate);
             });
         }
-    }, [model, raceArray, handleRaceUpdate])
+    }, [model, races, handleRaceUpdate])
 
     function handlesessionStartInputChange(date) {
         setSessionStart(date);
@@ -83,19 +78,6 @@ function RaceStartConsole () {
 
     // create race start actions list
     const actionsMap = new Map();
-    let actions = [];
-    raceArray.forEach(race => {
-        // raise warning flag
-        actions.push({time: new Date(race.plannedStartTime.valueOf() - 600000), description: 'Raise warning flag for ' + race.name});
-        // lower warning flag
-        actions.push({time: race.plannedStartTime, description: 'Lower warning flag for ' + race.name});
-    });
-    if (raceArray.length > 0) {
-        // raise blue peter
-        actions.push({time: new Date(raceArray[0].plannedStartTime.valueOf() - 300000), description: 'Raise blue peter'});
-        // lower blue peter
-        actions.push({time: raceArray[raceArray.length - 1].plannedStartTime, description: 'Lower blue peter'});
-    }
     actions.forEach(action => {
         if (actionsMap.has(action.time.valueOf())) {
             const oldAction = actionsMap.get(action.time.valueOf());
@@ -112,10 +94,10 @@ function RaceStartConsole () {
             <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
             <div>
                 <h1>Flags</h1>
-                {startSequence.calculateFlags().map(flag => { return <FlagControl key={flag.name} flag={flag} /> })}
+                {flags.map(flag => { return <FlagControl key={flag.name} flag={flag} /> })}
             </div>
             <CollapsableContainer heading={'Races'}>
-                {raceArray.map(race => {
+                {races.map(race => {
                     return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} showInRaceData={false} />
                 })}
             </CollapsableContainer>

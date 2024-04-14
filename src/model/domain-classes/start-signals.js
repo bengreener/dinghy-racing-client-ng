@@ -22,8 +22,9 @@ class StartSignals {
                 return StartSignals.ONEMINUTE;
             case 'STARTINGSIGNAL':
                 return StartSignals.STARTINGSIGNAL;
+            default:
+                return null;
         }
-        return null;
     }
 }
 

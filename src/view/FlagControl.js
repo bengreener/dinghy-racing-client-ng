@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React from 'react';
 import Clock from '../model/domain-classes/clock';
 import FlagState from '../model/domain-classes/flag-state';
 
