@@ -1,5 +1,6 @@
 import Clock from './clock';
 import FlagState from './flag-state';
+import StartSignals from './start-signals';
 
 /**
  * Class to handle the start sequence for a race session
@@ -8,14 +9,22 @@ import FlagState from './flag-state';
 class StartSequence {
 
     _races = [];
+    _model;
     _clock;
+    _tickHandlers = new Map();
+    _flags = [];
 
     /**
      * Create an instance of StartSequence
      * @param {Array<Race>} races to start
+     * @param {DinghyRacingModel} model to use to update underlying data
      */
-    constructor(races) {
+    constructor(races, model) {
+        this._handleTick = this._handleTick.bind(this);
+        this._calculateFlags = this._calculateFlags.bind(this);
+
         this._races = races;
+        this._model = model;
         this._races.forEach(race => {
             race.clock = new Clock(race.plannedStartTime);
         });
@@ -25,21 +34,66 @@ class StartSequence {
         else {
             this._clock = new Clock(new Date());
         }
+        this._calculateFlags();
+        this._clock.addTickHandler(this._handleTick);
         this._clock.start();
     }
 
+    _handleTick() {
+        this._calculateRaceStates();
+        this._calculateFlags();
+        // call any external tick handlers set against this StartSequence
+        this._tickHandlers.forEach((value) => {
+            value();
+        });
+    }
+
+    _calculateRaceStates() {
+        this._races.forEach(race => {
+            const startTimeOffset = race.plannedStartTime.valueOf() - this._races[0].plannedStartTime.valueOf(); // factor in gap between races
+            const newStartSequenceState = this._calculateRaceState(this._clock.getElapsedTime(), startTimeOffset);
+            if (newStartSequenceState !== race.startSequenceState) {
+                race.startSequenceState = newStartSequenceState;
+                this._model.updateRaceStartSequenceState(race, newStartSequenceState);
+            }
+        })
+    }
+
     /**
-     * Calculate the flags required to start the races and their current state
-     * @returns {Array<Flag>}
+     * Calculate the current start signal state for the race 
      */
-    calculateFlags() {
+    _calculateRaceState(elapsedTime, startTimeOffset) {
+        let startSignal;
+
+        if (elapsedTime >= 0 + startTimeOffset) {
+            startSignal = StartSignals.STARTINGSIGNAL;
+        }
+        else if (elapsedTime >= -60000 + startTimeOffset) {
+            startSignal = StartSignals.ONEMINUTE;
+        }
+        else if (elapsedTime >= -300000 + startTimeOffset) {
+            startSignal = StartSignals.PREPARATORYSIGNAL;
+        }
+        else if (elapsedTime >= -600000 + startTimeOffset) {
+            startSignal = StartSignals.WARNINGSIGNAL;
+        }
+        else {
+            startSignal = null;
+        }
+        return startSignal;
+    }
+
+    /**
+     * Calculate the current state of the flags used to start the races
+     */
+    _calculateFlags() {
         // race warning flags
         const flags = this._races.map(race => {
             const raceOffset = race.plannedStartTime.valueOf() - this._races[0].plannedStartTime.valueOf(); // factor in gap between races
             
             let flagStateChangeTimings = [ {startTimeOffset: -600000 + raceOffset, state: FlagState.RAISED}, {startTimeOffset: 0 + raceOffset, state: FlagState.LOWERED} ];
             
-            const flagState = this.calulateFlagState(this._clock.getElapsedTime(), flagStateChangeTimings);
+            const flagState = this._calulateFlagState(this._clock.getElapsedTime(), flagStateChangeTimings);
             return {name: race.name + ' Warning', state: flagState.finalState, timeToChange: flagState.timeToChange};
         });
 
@@ -48,15 +102,15 @@ class StartSequence {
             const firstRaceStart = this._races[0].plannedStartTime;
             const lastRaceStart = this._races[this._races.length -1].plannedStartTime;
             const flagStateChangeTimings = [{startTimeOffset: -300000, state: FlagState.RAISED}, {startTimeOffset: lastRaceStart.valueOf() - firstRaceStart.valueOf(), state: FlagState.LOWERED}];
-            const flagState = this.calulateFlagState(this._clock.getElapsedTime(), flagStateChangeTimings);
+            const flagState = this._calulateFlagState(this._clock.getElapsedTime(), flagStateChangeTimings);
 
             flags.splice(1, 0, {name: 'Blue Peter', state: flagState.finalState, timeToChange: flagState.timeToChange});
         }
 
-        return flags;
+        this._flags = flags;
     }
 
-    calulateFlagState(elapsedTime, flagStateChangeTimings) {
+    _calulateFlagState(elapsedTime, flagStateChangeTimings) {
         let finalState = FlagState.LOWERED;
         let timeToChange = elapsedTime - flagStateChangeTimings[flagStateChangeTimings.length - 1].startTimeOffset;
 
@@ -99,6 +153,14 @@ class StartSequence {
     }
 
     /**
+     * Get the current state of the flags used to start the races
+     * @returns {Array<Flag>}
+     */
+    getFlags() {
+        return this._flags;
+    }
+
+    /**
      * Return an array of the races included in this start sequence
      * @returns {Array<Race>}
      */
@@ -111,14 +173,14 @@ class StartSequence {
      * @param {callback} callback
      */
     addTickHandler(callback) {
-        this._clock.addTickHandler(callback);
+        this._tickHandlers.set(callback, callback);
     }
 
     /**
      * Remove the function handling tick events
      */
-    removeTickHandler() {
-        this._clock.removeTickHandler();
+    removeTickHandler(callback) {
+        this._tickHandlers.delete(callback);
     }
 }
 

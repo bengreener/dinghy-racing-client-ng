@@ -66,6 +66,7 @@ class DinghyRacingModel {
     constructor(httpRootURL, wsRootURL) {
         this.handleRaceUpdate = this.handleRaceUpdate.bind(this);
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
+        this.getStartSequence = this.getStartSequence.bind(this);
         if (!httpRootURL) {
             throw new Error('An HTTP root URL is required when creating an instance of DinghyRacingModel');
         }
@@ -818,7 +819,7 @@ class DinghyRacingModel {
             result = {'success': true, 'domainObject': race};
         }
         if (result.success) {
-            return this.update(result.domainObject.url, {'startSequence': stage});
+            return this.update(result.domainObject.url, {'startSequenceState': stage});
         }
         else {
             return result;
@@ -835,7 +836,7 @@ class DinghyRacingModel {
         const result = await this.getRacesBetweenTimes(startTime, endTime, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
 
         if (result.success) {
-            const startSequence = new StartSequence(result.domainObject);
+            const startSequence = new StartSequence(result.domainObject, this);
             return Promise.resolve({success: true, domainObject: startSequence});
         }
         else {

@@ -58,6 +58,7 @@ class DinghyRacingModel {
     constructor(httpRootURL, wsRootURL) {
         this.handleRaceUpdate = this.handleRaceUpdate.bind(this);
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
+        this.getStartSequence = this.getStartSequence.bind(this);
         if (!httpRootURL) {
             throw new Error('An HTTP root URL is required when creating an instance of DinghyRacingModel');
         }

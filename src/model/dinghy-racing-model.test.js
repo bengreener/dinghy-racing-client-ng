@@ -4059,7 +4059,7 @@ describe('when a StartSequence is requested', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const promise = dinghyRacingModel.getStartSequence(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'));
         const result = await promise;
-        const flags = result.domainObject.calculateFlags();
+        const flags = result.domainObject.getFlags();
 
         expect(promise).toBeInstanceOf(Promise);
         expect(flags.length).toBe(5);

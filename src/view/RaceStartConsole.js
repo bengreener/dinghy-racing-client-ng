@@ -26,9 +26,9 @@ function RaceStartConsole () {
         setRacesUpdateRequestAt(Date.now());
     }, []);
 
-    function handleStartSequenceTick() {
-        setFlags(startSequence.current.calculateFlags());
-    };
+    const handleStartSequenceTick = useCallback(() => {
+        setFlags(startSequence.current.getFlags());
+    }, []);
 
     // get races for selected session
     useEffect(() => {
@@ -39,10 +39,10 @@ function RaceStartConsole () {
             }
             else if (!ignoreFetch) {
                 setRaces(result.domainObject.getRaces());
-                setFlags(result.domainObject.calculateFlags());
+                setFlags(result.domainObject.getFlags());
                 setActions(result.domainObject.getActions());
                 if (startSequence.current) {
-                    startSequence.current.removeTickHandler();
+                    startSequence.current.removeTickHandler(handleStartSequenceTick);
                 }
                 startSequence.current = result.domainObject;
                 startSequence.current.addTickHandler(handleStartSequenceTick);
@@ -53,7 +53,7 @@ function RaceStartConsole () {
             ignoreFetch = true;
             setMessage('');
         }
-    }, [model, sessionStart, sessionEnd, racesUpdateRequestAt]);
+    }, [model, sessionStart, sessionEnd, racesUpdateRequestAt, handleStartSequenceTick]);
 
     // register on update callbacks for races
     useEffect(() => {
