@@ -22,6 +22,7 @@ class StartSequence {
     constructor(races, model) {
         this._handleTick = this._handleTick.bind(this);
         this._calculateFlags = this._calculateFlags.bind(this);
+        this.dispose = this.dispose.bind(this);
 
         this._races = races;
         this._model = model;
@@ -181,6 +182,14 @@ class StartSequence {
      */
     removeTickHandler(callback) {
         this._tickHandlers.delete(callback);
+    }
+
+    /**
+     * Clean up resources used by StartSequence to allow garbage collection
+     */
+    dispose() {
+        this._clock.stop();
+        this._clock.removeTickHandler();
     }
 }
 

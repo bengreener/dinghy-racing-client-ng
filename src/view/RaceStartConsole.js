@@ -43,6 +43,7 @@ function RaceStartConsole () {
                 setActions(result.domainObject.getActions());
                 if (startSequence.current) {
                     startSequence.current.removeTickHandler(handleStartSequenceTick);
+                    startSequence.current.dispose();
                 }
                 startSequence.current = result.domainObject;
                 startSequence.current.addTickHandler(handleStartSequenceTick);
@@ -51,6 +52,10 @@ function RaceStartConsole () {
 
         return () => {
             ignoreFetch = true;
+            if (startSequence.current) {
+                startSequence.current.removeTickHandler(handleStartSequenceTick);
+                startSequence.current.dispose();
+            }
             setMessage('');
         }
     }, [model, sessionStart, sessionEnd, racesUpdateRequestAt, handleStartSequenceTick]);
