@@ -23,6 +23,7 @@ class StartSequence {
     _flags = [];
     _raceStartSequences = [];
     _prepareForRaceStartStateChange = false;
+    _raceStartStateChange = false;
 
     _tickHandlers = new Map();
     _prepareForRaceStartStateChangeHandlers = new Map();
@@ -37,8 +38,21 @@ class StartSequence {
         this._handleTick = this._handleTick.bind(this);
         this._signalPrepareForRaceStartStateChange = this._signalPrepareForRaceStartStateChange.bind(this);
         this._signalRaceStartStateChange = this._signalRaceStartStateChange.bind(this);
+        this.getPrepareForRaceStartStateChange = this.getPrepareForRaceStartStateChange.bind(this);
+        this.getRaceStartStateChange = this.getRaceStartStateChange.bind(this);
+        this._calculateRaceStates = this._calculateRaceStates.bind(this);
         this._calculateFlags = this._calculateFlags.bind(this);
+        this._getNextStateChangeForFlag = this._getNextStateChangeForFlag.bind(this);
+        this.getFlags = this.getFlags.bind(this);
+        this.getActions = this.getActions.bind(this);
+        this.getRaces = this.getRaces.bind(this);
+        this.addTickHandler = this.addTickHandler.bind(this);
+        this.removeTickHandler = this.removeTickHandler.bind(this);
         this.dispose = this.dispose.bind(this);
+        this.addPrepareForRaceStartStateChangeHandler = this.addPrepareForRaceStartStateChangeHandler.bind(this);
+        this.removePrepareForRaceStartStateChangeHandler= this.removePrepareForRaceStartStateChangeHandler.bind(this);
+        this.addRaceStartStateChangeHandler = this.addRaceStartStateChangeHandler.bind(this);
+        this.removeRaceStartStateChangeHandler = this.removeRaceStartStateChangeHandler.bind(this);
 
         this._races = races;
         this._model = model;
@@ -100,9 +114,12 @@ class StartSequence {
      */
     _calculateRaceStates(currentStatus) {
         this._prepareForRaceStartStateChange = false;
+        this._raceStartStateChange = false;
         currentStatus.forEach(status => {
             if (status.race.startSequenceState !== status.status.startSequenceState) {
+                
                 status.race.startSequenceState = status.status.startSequenceState;
+                this._raceStartStateChange = true;
                 this._signalRaceStartStateChange();
                 this._model.updateRaceStartSequenceState(status.race, status.status.startSequenceState);
             }
@@ -229,6 +246,10 @@ class StartSequence {
 
     getPrepareForRaceStartStateChange() {
         return this._prepareForRaceStartStateChange;
+    }
+
+    getRaceStartStateChange() {
+        return this._raceStartStateChange;
     }
 
     /**
