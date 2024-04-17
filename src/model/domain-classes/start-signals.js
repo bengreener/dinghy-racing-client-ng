@@ -2,6 +2,7 @@
  * Class providng enumeration of start sequence options
  */
 class StartSignals {
+    static NONE = 'NONE';
     static WARNINGSIGNAL = 'WARNINGSIGNAL';
     static PREPARATORYSIGNAL = 'PREPARATORYSIGNAL';
     static ONEMINUTE = 'ONEMINUTE';
@@ -23,7 +24,7 @@ class StartSignals {
             case 'STARTINGSIGNAL':
                 return StartSignals.STARTINGSIGNAL;
             default:
-                return null;
+                return StartSignals.NONE;
         }
     }
 }

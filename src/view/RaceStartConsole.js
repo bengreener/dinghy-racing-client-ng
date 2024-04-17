@@ -30,7 +30,7 @@ function RaceStartConsole () {
         setFlags(startSequence.current.getFlags());
     }, []);
 
-    // get races for selected session
+    // get start sequence for selected session
     useEffect(() => {
         let ignoreFetch = false; // set to true if RaceStartConsole rerendered before fetch completes to avoid using out of date result
         model.getStartSequence(new Date(sessionStart), new Date(sessionEnd)).then(result => {

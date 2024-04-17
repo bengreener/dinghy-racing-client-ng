@@ -119,8 +119,8 @@ describe('when there are 2 races', () => {
             { time: new Date('2021-10-14T10:30:00Z'), description: 'Lower warning flag for Scorpion A' },
             { time: new Date('2021-10-14T10:25:00Z'), description: 'Raise warning flag for Graduate A' },
             { time: new Date('2021-10-14T10:35:00Z'), description: 'Lower warning flag for Graduate A' },
-            { time: new Date('2021-10-14T10:25:00Z'), description: 'Raise blue peter' },
-            { time: new Date('2021-10-14T10:35:00Z'), description: 'Lower blue peter' }
+            { time: new Date('2021-10-14T10:25:00Z'), description: 'Raise Blue Peter' },
+            { time: new Date('2021-10-14T10:35:00Z'), description: 'Lower Blue Peter' }
         ];
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const startSequence = new StartSequence(races, model);

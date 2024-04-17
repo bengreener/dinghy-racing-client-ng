@@ -39,7 +39,7 @@ class DinghyRacingModel {
      */
     static raceTemplate() {
         return {'name': '', 'plannedStartTime': null, 'actualStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'plannedLaps': null, 'lapForecast': null, 
-            'lastLapTime': null, 'averageLapTime': null, 'clock': null, 'startSequenceState': null, 'url': ''};
+            'lastLapTime': null, 'averageLapTime': null, 'clock': null, 'startSequenceState': StartSignals.NONE, 'url': ''};
     }
 
     /**
