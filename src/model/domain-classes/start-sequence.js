@@ -117,8 +117,6 @@ class StartSequence {
         this._raceStartStateChange = false;
         currentStatus.forEach(status => {
             if (status.race.startSequenceState !== status.status.startSequenceState) {
-                
-                status.race.startSequenceState = status.status.startSequenceState;
                 this._raceStartStateChange = true;
                 this._signalRaceStartStateChange();
                 this._model.updateRaceStartSequenceState(status.race, status.status.startSequenceState);
