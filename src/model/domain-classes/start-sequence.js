@@ -21,6 +21,8 @@ class StartSequence {
     _model;
     _clock;
     _tickHandlers = new Map();
+    _prepareForRaceStartStateChange = new Map();
+    _raceStartStateChange = new Map();
     _flags = [];
     _raceStartSequences = [];
 
@@ -31,6 +33,8 @@ class StartSequence {
      */
     constructor(races, model) {
         this._handleTick = this._handleTick.bind(this);
+        this._signalPrepareForRaceStartStateChange = this._signalPrepareForRaceStartStateChange.bind(this);
+        this._signalRaceStartStateChange = this._signalRaceStartStateChange.bind(this);
         this._calculateFlags = this._calculateFlags.bind(this);
         this.dispose = this.dispose.bind(this);
 
@@ -75,19 +79,33 @@ class StartSequence {
         });
     }
 
+    _signalPrepareForRaceStartStateChange() {
+        this._prepareForRaceStartStateChange.forEach((value) => {
+            value();
+        });
+    }
+
+    _signalRaceStartStateChange() {
+        this._raceStartStateChange.forEach((value) => {
+            value();
+        });
+    }
+
     /**
      * 
      * @param {Array<>} currentStatus 
      */
     _calculateRaceStates(currentStatus) {
         currentStatus.forEach(status => {
-            // if (status[0].startSequenceState !== status[1].startSequenceState) {
-            //     status[0].startSequenceState = status[1].startSequenceState;
-            //     this._model.updateRaceStartSequenceState(status[0], status[1].startSequenceState);
-            // }
             if (status.race.startSequenceState !== status.status.startSequenceState) {
                 status.race.startSequenceState = status.status.startSequenceState;
+                this._signalRaceStartStateChange();
                 this._model.updateRaceStartSequenceState(status.race, status.status.startSequenceState);
+            }
+            const now = this._clock.getTime();
+
+            if (now.valueOf() >= status.status.time.valueOf() + status.status.duration - 60000 && now.valueOf() < status.status.time.valueOf() + status.status.duration - 59000) {
+                this._signalPrepareForRaceStartStateChange();
             }
         })
     }
@@ -220,6 +238,36 @@ class StartSequence {
     }
 
     /**
+     * Add a function to handle PrepareForRaceStartStateChange events
+     * @param {callback} callback
+     */
+    addPrepareForRaceStartStateChangeHandler(callback) {
+        this._prepareForRaceStartStateChange.set(callback, callback);
+    }
+
+    /**
+     * Remove the function handling PrepareForRaceStartStateChange events
+     */
+    removePrepareForRaceStartStateChangeHandler(callback) {
+        this._prepareForRaceStartStateChange.delete(callback);
+    }
+
+    /**
+     * Add a function to handle PrepareForRaceStartStateChange events
+     * @param {callback} callback
+     */
+    addRaceStartStateChangeHandler(callback) {
+        this._raceStartStateChange.set(callback, callback);
+    }
+
+    /**
+     * Remove the function handling PrepareForRaceStartStateChange events
+     */
+    removeRaceStartStateChangeHandler(callback) {
+        this._raceStartStateChange.delete(callback);
+    }
+
+    /**
      * Clean up resources used by StartSequence to allow garbage collection
      */
     dispose() {
@@ -244,11 +292,21 @@ class RaceStartSequence {
                 }
                 return {...flag, state: FlagState.LOWERED}
             });
-            this.startingStates.push(new StartingState(StartSignals.NONE, new Date(), flags));
+            const now = new Date();
+            this.startingStates.push(new StartingState(StartSignals.NONE, now, race.plannedStartTime.valueOf() - now.valueOf() + raceStartSequenceTemplate.startingStateTemplates[0].startTimeOffset, flags));
         }
         // build up start sequence from template
-        raceStartSequenceTemplate.startingStateTemplates.forEach(sst => {
-            this.startingStates.push(new StartingState(sst.startSequenceState, new Date(race.plannedStartTime.valueOf() + sst.startTimeOffset), sst.flags.map(templateFlag => {
+        raceStartSequenceTemplate.startingStateTemplates.forEach((sst, index, array) => {
+            // calculate duration of this state
+            let duration;
+            if (index < array.length - 1) {
+                duration = array[index + 1].startTimeOffset - sst.startTimeOffset;
+            }
+            else  {
+                // last state has no duration
+                duration = Infinity
+            }
+            this.startingStates.push(new StartingState(sst.startSequenceState, new Date(race.plannedStartTime.valueOf() + sst.startTimeOffset), duration, sst.flags.map(templateFlag => {
                     // update name of warning flags to differentiate between races
                     const flag = {...templateFlag};
                     if (flag.name === 'Warning') {
@@ -315,11 +373,13 @@ class RaceStartSequence {
 class StartingState {
     startSequenceState; // starting signal state for the race
     time; // the time at which this starting state is reached
+    duration; // the length of time between the start of this state and the next
     flags; // the state of all flags used to start the race at this stage of the starting sequence
     
-    constructor(startSequenceState, time, flags) {
+    constructor(startSequenceState, time, duration, flags) {
         this.startSequenceState = startSequenceState;
         this.time = time;
+        this.duration = duration;
         this.flags = flags;
     }
 }

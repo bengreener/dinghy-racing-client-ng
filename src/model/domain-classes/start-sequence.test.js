@@ -109,6 +109,30 @@ describe('when there are 2 races', () => {
             jest.advanceTimersByTime(1000);
             expect(updateRaceStartSequenceStateSpy).toHaveBeenCalled();
         });
+        describe('when 1 minute before a race start state change', () => {
+            it('calls prepare for race start state change callback', () => {
+                jest.setSystemTime(new Date('2021-10-14T10:23:59Z'));
+                const prepareForRaceStartStateChangeCallbackSpy = jest.fn();
+                const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const startSequence = new StartSequence(races, model);
+                startSequence.addPrepareForRaceStartStateChangeHandler(prepareForRaceStartStateChangeCallbackSpy);
+    
+                jest.advanceTimersByTime(1000);
+                expect(prepareForRaceStartStateChangeCallbackSpy).toHaveBeenCalled();
+            })
+        });
+        describe('when a race start state change', () => {
+            it('calls race start state change callback', () => {
+                jest.setSystemTime(new Date('2021-10-14T10:24:59Z'));
+                const raceStartStateChangeCallbackSpy = jest.fn();
+                const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const startSequence = new StartSequence(races, model);
+                startSequence.addRaceStartStateChangeHandler(raceStartStateChangeCallbackSpy);
+    
+                jest.advanceTimersByTime(1000);
+                expect(raceStartStateChangeCallbackSpy).toHaveBeenCalled();
+            })
+        })
     });
 
     it('returns list of actions for the 2 races', () => {
