@@ -20,11 +20,13 @@ class StartSequence {
     _races = [];
     _model;
     _clock;
-    _tickHandlers = new Map();
-    _prepareForRaceStartStateChange = new Map();
-    _raceStartStateChange = new Map();
     _flags = [];
     _raceStartSequences = [];
+    _prepareForRaceStartStateChange = false;
+
+    _tickHandlers = new Map();
+    _prepareForRaceStartStateChangeHandlers = new Map();
+    _raceStartStateChangeHandlers = new Map();
 
     /**
      * Create an instance of StartSequence
@@ -60,6 +62,7 @@ class StartSequence {
         this._raceStartSequences.forEach(ss => {
             currentStatus.push({race: ss.race, status: ss.getStartingStateAtTime(time)});
         });
+        this._calculateRaceStates(currentStatus);
         this._calculateFlags(currentStatus, time);
     }
 
@@ -80,13 +83,13 @@ class StartSequence {
     }
 
     _signalPrepareForRaceStartStateChange() {
-        this._prepareForRaceStartStateChange.forEach((value) => {
+        this._prepareForRaceStartStateChangeHandlers.forEach((value) => {
             value();
         });
     }
 
     _signalRaceStartStateChange() {
-        this._raceStartStateChange.forEach((value) => {
+        this._raceStartStateChangeHandlers.forEach((value) => {
             value();
         });
     }
@@ -96,6 +99,7 @@ class StartSequence {
      * @param {Array<>} currentStatus 
      */
     _calculateRaceStates(currentStatus) {
+        this._prepareForRaceStartStateChange = false;
         currentStatus.forEach(status => {
             if (status.race.startSequenceState !== status.status.startSequenceState) {
                 status.race.startSequenceState = status.status.startSequenceState;
@@ -105,6 +109,7 @@ class StartSequence {
             const now = this._clock.getTime();
 
             if (now.valueOf() >= status.status.time.valueOf() + status.status.duration - 60000 && now.valueOf() < status.status.time.valueOf() + status.status.duration - 59000) {
+                this._prepareForRaceStartStateChange = true;
                 this._signalPrepareForRaceStartStateChange();
             }
         })
@@ -222,6 +227,10 @@ class StartSequence {
         return this._races;
     }
 
+    getPrepareForRaceStartStateChange() {
+        return this._prepareForRaceStartStateChange;
+    }
+
     /**
      * Add a function to handle tick events
      * @param {callback} callback
@@ -242,14 +251,14 @@ class StartSequence {
      * @param {callback} callback
      */
     addPrepareForRaceStartStateChangeHandler(callback) {
-        this._prepareForRaceStartStateChange.set(callback, callback);
+        this._prepareForRaceStartStateChangeHandlers.set(callback, callback);
     }
 
     /**
      * Remove the function handling PrepareForRaceStartStateChange events
      */
     removePrepareForRaceStartStateChangeHandler(callback) {
-        this._prepareForRaceStartStateChange.delete(callback);
+        this._prepareForRaceStartStateChangeHandlers.delete(callback);
     }
 
     /**
@@ -257,14 +266,14 @@ class StartSequence {
      * @param {callback} callback
      */
     addRaceStartStateChangeHandler(callback) {
-        this._raceStartStateChange.set(callback, callback);
+        this._raceStartStateChangeHandlers.set(callback, callback);
     }
 
     /**
      * Remove the function handling PrepareForRaceStartStateChange events
      */
     removeRaceStartStateChangeHandler(callback) {
-        this._raceStartStateChange.delete(callback);
+        this._raceStartStateChangeHandlers.delete(callback);
     }
 
     /**
