@@ -20,6 +20,7 @@ function RaceStartConsole () {
     const [sessionStart, setSessionStart] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000));
     const [sessionEnd, setSessionEnd] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000));
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
+    const [audio, setAudio] = useState('none');
     const startSequence = useRef(null);
 
     const handleRaceUpdate = useCallback(() => {
@@ -41,6 +42,12 @@ function RaceStartConsole () {
                 setRaces(result.domainObject.getRaces());
                 setFlags(result.domainObject.getFlags());
                 setActions(result.domainObject.getActions());
+                if (result.domainObject.getPrepareForRaceStartStateChange()) {
+                    setAudio('prepare');
+                }
+                else {
+                    setAudio('none');
+                }
                 if (startSequence.current) {
                     startSequence.current.removeTickHandler(handleStartSequenceTick);
                     startSequence.current.dispose();
@@ -107,6 +114,7 @@ function RaceStartConsole () {
                 })}
             </CollapsableContainer>
             <ActionListView actions={sortArray(Array.from(actionsMap.values()), (action) => action.time)} />
+            {audio === 'prepare' ? <audio data-testid='prepare-sound-warning-audio' autoPlay={true} src='./sounds/prepare_alert.mp3' /> : null}
         </div>
     );
 };

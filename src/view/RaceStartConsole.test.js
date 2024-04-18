@@ -21,7 +21,7 @@ const formatOptions = {
 const timeFormat = new Intl.DateTimeFormat('utc', formatOptions);
 
 beforeEach(() => {
-    jest.useFakeTimers().setSystemTime(new Date("2021-10-14T14:05:00Z"));
+    jest.useFakeTimers().setSystemTime(new Date('2021-10-14T14:05:00Z'));
     jest.spyOn(global, 'setTimeout');
 });
 
@@ -360,3 +360,49 @@ describe('when races within session are changed', () => {
         expect(screen.queryByText('Handicap A')).not.toBeInTheDocument();
     });
 })
+
+describe('when 6 minutes 1 second before start of first race', () => {
+    it('prepare for race start state change audio is not present in document', async () => {
+        jest.setSystemTime(new Date('2021-10-14T10:23:59Z'));
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {
+            return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})
+        });
+        await act(async () => {
+            customRender(<RaceStartConsole />, model, controller);
+        });
+        const audio = screen.queryByTestId('prepare-sound-warning-audio');
+        expect(audio).not.toBeInTheDocument();
+    });
+});
+describe('when 6 minutes before start of first race', () => {
+    it('prepare for race start state change audio is present in document', async () => {
+        jest.setSystemTime(new Date('2021-10-14T10:24:00Z'));
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {
+            return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})
+        });
+        await act(async () => {
+            customRender(<RaceStartConsole />, model, controller);
+        });
+        const audio = screen.queryByTestId('prepare-sound-warning-audio');
+        expect(audio).toBeInTheDocument();
+    });
+});
+describe('when 5 minutes 59 second before start of first race', () => {
+    it('prepare for race start state change audio is not present in document', async () => {
+        jest.setSystemTime(new Date('2021-10-14T10:24:01Z'));
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {
+            return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})
+        });
+        await act(async () => {
+            customRender(<RaceStartConsole />, model, controller);
+        });
+        const audio = screen.queryByTestId('prepare-sound-warning-audio');
+        expect(audio).not.toBeInTheDocument();
+    });
+});
