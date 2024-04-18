@@ -42,9 +42,17 @@ function RaceStartConsole () {
                 setRaces(result.domainObject.getRaces());
                 setFlags(result.domainObject.getFlags());
                 setActions(result.domainObject.getActions());
-                if (result.domainObject.getPrepareForRaceStartStateChange()) {
+                if (result.domainObject.getRaceStartStateChange()) {
+                    setAudio('act');
+                }
+                else if (result.domainObject.getPrepareForRaceStartStateChange()) {
                     setAudio('prepare');
                 }
+                // if (result.domainObject.getPrepareForRaceStartStateChange()) {
+                //     console.log(`result.domainObject.getRaceStartStateChange()=${result.domainObject.getRaceStartStateChange()}`);
+                //     console.log(`result.domainObject.getPrepareForRaceStartStateChange()=${result.domainObject.getPrepareForRaceStartStateChange()}`);
+                //     setAudio('prepare');
+                // }
                 else {
                     setAudio('none');
                 }
@@ -115,6 +123,7 @@ function RaceStartConsole () {
             </CollapsableContainer>
             <ActionListView actions={sortArray(Array.from(actionsMap.values()), (action) => action.time)} />
             {audio === 'prepare' ? <audio data-testid='prepare-sound-warning-audio' autoPlay={true} src='./sounds/prepare_alert.mp3' /> : null}
+            {audio === 'act' ? <audio data-testid='act-sound-warning-audio' autoPlay={true} src='./sounds/act_alert.mp3' /> : null}
         </div>
     );
 };
