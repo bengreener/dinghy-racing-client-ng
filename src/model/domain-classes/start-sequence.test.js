@@ -138,6 +138,7 @@ describe('when time passes', () => {
         const tickCallbackSpy = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const startSequence = new StartSequence(races, model);
+        startSequence.startClock();
         startSequence.addTickHandler(tickCallbackSpy);
 
         jest.advanceTimersByTime(1000);
@@ -149,6 +150,7 @@ describe('when time passes', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
         const startSequence = new StartSequence(races, model);
+        startSequence.startClock();
 
         jest.advanceTimersByTime(1000);
         expect(updateRaceStartSequenceStateSpy).toHaveBeenCalled();
@@ -159,6 +161,7 @@ describe('when time passes', () => {
             const prepareForRaceStartStateChangeCallbackSpy = jest.fn();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const startSequence = new StartSequence(races, model);
+            startSequence.startClock();
             startSequence.addPrepareForRaceStartStateChangeHandler(prepareForRaceStartStateChangeCallbackSpy);
 
             jest.advanceTimersByTime(1000);
@@ -168,6 +171,7 @@ describe('when time passes', () => {
             jest.setSystemTime(new Date('2021-10-14T10:23:59Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const startSequence = new StartSequence(races, model);
+            startSequence.startClock();
 
             jest.advanceTimersByTime(1000);
             expect(startSequence.getPrepareForRaceStartStateChange()).toBeTruthy();
@@ -177,6 +181,7 @@ describe('when time passes', () => {
             jest.setSystemTime(new Date('2021-10-14T10:23:59Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const startSequence = new StartSequence(races, model);
+            startSequence.startClock();
 
             jest.advanceTimersByTime(1000);
             expect(startSequence.getRaceStartStateChange()).toBeFalsy();
@@ -189,6 +194,7 @@ describe('when time passes', () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const startSequence = new StartSequence(races, model);
             startSequence.addRaceStartStateChangeHandler(raceStartStateChangeCallbackSpy);
+            startSequence.startClock();
 
             jest.advanceTimersByTime(1000);
             expect(raceStartStateChangeCallbackSpy).toHaveBeenCalled();
@@ -197,6 +203,7 @@ describe('when time passes', () => {
             jest.setSystemTime(new Date('2021-10-14T10:24:59Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const startSequence = new StartSequence(races, model);
+            startSequence.startClock();
 
             jest.advanceTimersByTime(1000);
             expect(startSequence.getRaceStartStateChange()).toBeTruthy();
@@ -205,6 +212,7 @@ describe('when time passes', () => {
             jest.setSystemTime(new Date('2021-10-14T10:24:59Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const startSequence = new StartSequence(races, model);
+            startSequence.startClock();
 
             jest.advanceTimersByTime(1000);
             expect(startSequence.getPrepareForRaceStartStateChange()).toBeFalsy();

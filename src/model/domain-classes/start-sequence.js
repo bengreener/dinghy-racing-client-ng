@@ -66,7 +66,6 @@ class StartSequence {
             this._clock = new Clock(new Date());
         }
         this._clock.addTickHandler(this._handleTick);
-        this._clock.start();
 
         this._raceStartSequences = races.map(race => {
             return new RaceStartSequence(race, raceStartSequenceTemplate);
@@ -293,6 +292,14 @@ class StartSequence {
      */
     removeRaceStartStateChangeHandler(callback) {
         this._raceStartStateChangeHandlers.delete(callback);
+    }
+
+    /**
+     * Start clock
+     * Starting clock automatically was causing issues when useEffect in referencing componenet was cancelled before asynch feth returned
+     */
+    startClock() {
+        this._clock.start();
     }
 
     /**

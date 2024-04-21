@@ -57,6 +57,7 @@ function RaceStartConsole () {
                 }
                 startSequence.current = result.domainObject;
                 startSequence.current.addTickHandler(handleStartSequenceTick);
+                startSequence.current.startClock();
             }
         });
 
