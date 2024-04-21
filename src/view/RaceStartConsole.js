@@ -48,11 +48,6 @@ function RaceStartConsole () {
                 else if (result.domainObject.getPrepareForRaceStartStateChange()) {
                     setAudio('prepare');
                 }
-                // if (result.domainObject.getPrepareForRaceStartStateChange()) {
-                //     console.log(`result.domainObject.getRaceStartStateChange()=${result.domainObject.getRaceStartStateChange()}`);
-                //     console.log(`result.domainObject.getPrepareForRaceStartStateChange()=${result.domainObject.getPrepareForRaceStartStateChange()}`);
-                //     setAudio('prepare');
-                // }
                 else {
                     setAudio('none');
                 }
@@ -70,6 +65,7 @@ function RaceStartConsole () {
             if (startSequence.current) {
                 startSequence.current.removeTickHandler(handleStartSequenceTick);
                 startSequence.current.dispose();
+                startSequence.current = null;
             }
             setMessage('');
         }

@@ -2,8 +2,9 @@ import StartSequence from './start-sequence';
 import { httpRootURL, wsRootURL, raceScorpionA, raceGraduateA } from '../__mocks__/test-data';
 import FlagState from './flag-state';
 import DinghyRacingModel from '../dinghy-racing-model';
+import StartSignals from './start-signals';
 
-beforeEach(() => {
+beforeEach(() => {success: true
     jest.useFakeTimers();
 })
 
@@ -15,8 +16,7 @@ afterEach(() => {
 const races = [ raceScorpionA, raceGraduateA ];
 
 describe('when 11 minutes before start of first race', () => {
-    it('provides an indicator to prepare for a race start state change', () => {
-        // const races = [ {...raceScorpionA}, {...raceGraduateA} ];
+    it('provides an indicator to prepare for a race start state change', async () => {
         jest.setSystemTime(new Date('2021-10-14T10:19:00Z'));
     
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -29,7 +29,6 @@ describe('when 11 minutes before start of first race', () => {
 
 describe('when 10 minutes 1 second before start of first race', () => {
     it('all flags are lowered and show correct time to change', () => {
-        // const races = [ {...raceScorpionA}, {...raceGraduateA} ];
         jest.setSystemTime(new Date('2021-10-14T10:19:59Z'));
     
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -120,7 +119,6 @@ describe('when 0 minutes before start of first race', () => {
 
 describe('when 0 minutes before start of last race', () => {
     it('all flags lowered and show correct time to change', () => {
-        // const races = [ {...raceScorpionA}, {...raceGraduateA} ];
         jest.setSystemTime(new Date('2021-10-14T10:35:00Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const startSequence = new StartSequence(races, model);
@@ -157,7 +155,6 @@ describe('when time passes', () => {
     });
     describe('when 1 minute before a race start state change', () => {
         it('calls prepare for race start state change callback', () => {
-            // const races = [ {...raceScorpionA}, {...raceGraduateA} ];
             jest.setSystemTime(new Date('2021-10-14T10:23:59Z'));
             const prepareForRaceStartStateChangeCallbackSpy = jest.fn();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -166,11 +163,27 @@ describe('when time passes', () => {
 
             jest.advanceTimersByTime(1000);
             expect(prepareForRaceStartStateChangeCallbackSpy).toHaveBeenCalled();
-        })
+        });
+        it('prepare for race state start change flag is true', async () => {
+            jest.setSystemTime(new Date('2021-10-14T10:23:59Z'));
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const startSequence = new StartSequence(races, model);
+
+            jest.advanceTimersByTime(1000);
+            expect(startSequence.getPrepareForRaceStartStateChange()).toBeTruthy();
+        });
+        it('race state start change flag is false', async () => {
+            const races = [{...raceScorpionA, startSequenceState: StartSignals.WARNINGSIGNAL}, {...raceGraduateA}];
+            jest.setSystemTime(new Date('2021-10-14T10:23:59Z'));
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const startSequence = new StartSequence(races, model);
+
+            jest.advanceTimersByTime(1000);
+            expect(startSequence.getRaceStartStateChange()).toBeFalsy();
+        });
     });
     describe('when a race start state change', () => {
         it('calls race start state change callback', () => {
-            // const races = [ {...raceScorpionA}, {...raceGraduateA} ];
             jest.setSystemTime(new Date('2021-10-14T10:24:59Z'));
             const raceStartStateChangeCallbackSpy = jest.fn();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -179,7 +192,23 @@ describe('when time passes', () => {
 
             jest.advanceTimersByTime(1000);
             expect(raceStartStateChangeCallbackSpy).toHaveBeenCalled();
-        })
+        });
+        it('race state start change flag is true', async () => {
+            jest.setSystemTime(new Date('2021-10-14T10:24:59Z'));
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const startSequence = new StartSequence(races, model);
+
+            jest.advanceTimersByTime(1000);
+            expect(startSequence.getRaceStartStateChange()).toBeTruthy();
+        });
+        it('prepare for race state start change flag is false', async () => {
+            jest.setSystemTime(new Date('2021-10-14T10:24:59Z'));
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const startSequence = new StartSequence(races, model);
+
+            jest.advanceTimersByTime(1000);
+            expect(startSequence.getPrepareForRaceStartStateChange()).toBeFalsy();
+        });
     })
 });
 

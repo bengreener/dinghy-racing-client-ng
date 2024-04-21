@@ -82,10 +82,10 @@ class StartSequence {
 
     _handleTick() {
         const time = this._clock.getTime();
-        // get current status fro each race
+        // get current status for each race
         let currentStatus = [];
-        this._raceStartSequences.forEach(ss => {
-            currentStatus.push({race: ss.race, status: ss.getStartingStateAtTime(time)});
+        this._raceStartSequences.forEach(raceStartSequence => {
+            currentStatus.push({race: raceStartSequence.race, status: raceStartSequence.getStartingStateAtTime(time)});
         });
 
         this._calculateRaceStates(currentStatus);
