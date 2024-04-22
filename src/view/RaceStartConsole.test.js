@@ -309,6 +309,80 @@ describe('when clock ticks', () => {
         expect(within(actionRows[4]).getByText(/lower warning flag for graduate a/i)).toBeInTheDocument();
         expect(within(actionRows[4]).getByText(/09:59/i)).toBeInTheDocument();
     });
+    describe('when ticks to 1 minute before a race start state change', () => {
+        it('prepare for race start state change audio is present in document', async () => {
+            const races = [{...raceScorpionA, startSequenceState: StartSignals.WARNINGSIGNAL}, raceGraduateA];
+            jest.setSystemTime(new Date('2021-10-14T10:23:59Z'));
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const controller = new DinghyRacingController(model);
+            jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {
+                return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})
+            });
+            await act(async () => {
+                customRender(<RaceStartConsole />, model, controller);
+            });
+            act(() => {
+                jest.advanceTimersByTime(1000);
+            });
+            const audio = screen.queryByTestId('prepare-sound-warning-audio');
+            expect(audio).toBeInTheDocument();
+        });
+    });
+    describe('when ticks to 59 seconds before a race start state change', () => {
+        it('prepare for race start state change audio is not present in document', async () => {
+            const races = [{...raceScorpionA, startSequenceState: StartSignals.WARNINGSIGNAL}, raceGraduateA];
+            jest.setSystemTime(new Date('2021-10-14T10:24:00Z'));
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const controller = new DinghyRacingController(model);
+            jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {
+                return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})
+            });
+            await act(async () => {
+                customRender(<RaceStartConsole />, model, controller);
+            });
+            act(() => {
+                jest.advanceTimersByTime(1000);
+            });
+            const audio = screen.queryByTestId('prepare-sound-warning-audio');
+            expect(audio).not.toBeInTheDocument();
+        });
+    });
+    describe('when ticks to time for a race start state change', () => {
+        it('race start state change audio is present in document', async () => {
+            const races = [{...raceScorpionA, startSequenceState: StartSignals.WARNINGSIGNAL}, {...raceGraduateA, startSequenceState: StartSignals.NONE}];
+            jest.setSystemTime(new Date('2021-10-14T10:24:59Z'));
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const controller = new DinghyRacingController(model);
+            jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {
+                return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})
+            });
+            await act(async () => {
+                customRender(<RaceStartConsole />, model, controller);
+            });act(() => {
+                jest.advanceTimersByTime(1000);
+            });
+            const audio = screen.queryByTestId('act-sound-warning-audio');
+            expect(audio).toBeInTheDocument();
+        });
+    })
+    describe('when ticks to 1 second after a race start state change', () => {
+        it('race start state change audio is not present in document', async () => {
+            const races = [{...raceScorpionA, startSequenceState: StartSignals.PREPARATORYSIGNAL}, {...raceGraduateA, startSequenceState: StartSignals.WARNINGSIGNAL}];
+            jest.setSystemTime(new Date('2021-10-14T10:25:00Z'));
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const controller = new DinghyRacingController(model);
+            jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {
+                return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})
+            });
+            await act(async () => {
+                customRender(<RaceStartConsole />, model, controller);
+            });act(() => {
+                jest.advanceTimersByTime(1000);
+            });
+            const audio = screen.queryByTestId('act-sound-warning-audio');
+            expect(audio).not.toBeInTheDocument();
+        });
+    })
 });
 
 it('registers an interest in race updates for races in session', async () => {
@@ -378,6 +452,7 @@ describe('when 6 minutes 1 second before start of first race', () => {
         expect(audio).not.toBeInTheDocument();
     });
 });
+
 describe('when 6 minutes before start of first race', () => {
     it('prepare for race start state change audio is present in document', async () => {
         const races = [{...raceScorpionA, startSequenceState: StartSignals.WARNINGSIGNAL}, raceGraduateA];
@@ -394,6 +469,7 @@ describe('when 6 minutes before start of first race', () => {
         expect(audio).toBeInTheDocument();
     });
 });
+
 describe('when 5 minutes 59 second before start of first race', () => {
     it('prepare for race start state change audio is not present in document', async () => {
         const races = [{...raceScorpionA, startSequenceState: StartSignals.WARNINGSIGNAL}, raceGraduateA];
@@ -427,6 +503,7 @@ describe('when 1 second before start of first race', () => {
         expect(audio).not.toBeInTheDocument();
     });
 });
+
 describe('when start of first race', () => {
     it('race start state change audio is present in document', async () => {
         const races = [{...raceScorpionA, startSequenceState: StartSignals.PREPARATORYSIGNAL}, {...raceGraduateA, startSequenceState: StartSignals.WARNINGSIGNAL}];
@@ -442,6 +519,7 @@ describe('when start of first race', () => {
         expect(audio).toBeInTheDocument();
     });
 });
+
 describe('when 1 second after start of first race', () => {
     it('prepare for race start state change audio is not present in document', async () => {
         const races = [{...raceScorpionA, startSequenceState: StartSignals.STARTINGSIGNAL}, {...raceGraduateA, startSequenceState: StartSignals.PREPARATORYSIGNAL}];

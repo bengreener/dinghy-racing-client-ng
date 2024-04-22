@@ -29,6 +29,15 @@ function RaceStartConsole () {
 
     const handleStartSequenceTick = useCallback(() => {
         setFlags(startSequence.current.getFlags());
+        if (startSequence.current.getRaceStartStateChange()) {
+            setAudio('act');
+        }
+        else if (startSequence.current.getPrepareForRaceStartStateChange()) {
+            setAudio('prepare');
+        }
+        else {
+            setAudio('none');
+        }
     }, []);
 
     // get start sequence for selected session
@@ -39,25 +48,21 @@ function RaceStartConsole () {
                 setMessage('Unable to load start sequence\n' + result.message);
             }
             else if (!ignoreFetch) {
-                setRaces(result.domainObject.getRaces());
-                setFlags(result.domainObject.getFlags());
-                setActions(result.domainObject.getActions());
-                if (result.domainObject.getRaceStartStateChange()) {
+                startSequence.current = result.domainObject;
+                startSequence.current.addTickHandler(handleStartSequenceTick);
+                startSequence.current.startClock();
+                setRaces(startSequence.current.getRaces());
+                setFlags(startSequence.current.getFlags());
+                setActions(startSequence.current.getActions());
+                if (startSequence.current.getRaceStartStateChange()) {
                     setAudio('act');
                 }
-                else if (result.domainObject.getPrepareForRaceStartStateChange()) {
+                else if (startSequence.current.getPrepareForRaceStartStateChange()) {
                     setAudio('prepare');
                 }
                 else {
                     setAudio('none');
                 }
-                if (startSequence.current) {
-                    startSequence.current.removeTickHandler(handleStartSequenceTick);
-                    startSequence.current.dispose();
-                }
-                startSequence.current = result.domainObject;
-                startSequence.current.addTickHandler(handleStartSequenceTick);
-                startSequence.current.startClock();
             }
         });
 
