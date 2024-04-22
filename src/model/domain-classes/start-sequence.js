@@ -22,8 +22,7 @@ class StartSequence {
     _clock;
     _flags = [];
     _raceStartSequences = [];
-    _prepareForRaceStartStateChange = false;
-    _raceStartStateChange = false;
+    _currentStatus = [];
 
     _tickHandlers = new Map();
     _prepareForRaceStartStateChangeHandlers = new Map();
@@ -70,25 +69,16 @@ class StartSequence {
         this._raceStartSequences = races.map(race => {
             return new RaceStartSequence(race, raceStartSequenceTemplate);
         });
-        const currentStatus = [];
         const time = this._clock.getTime();
-        this._raceStartSequences.forEach(ss => {
-            currentStatus.push({race: ss.race, status: ss.getStartingStateAtTime(time)});
-        });
-        this._calculateRaceStates(currentStatus);
-        this._calculateFlags(currentStatus, time);
+        this._calculateRaceStates(time);
+        this._calculateFlags(this._currentStatus, time);
     }
 
     _handleTick() {
         const time = this._clock.getTime();
-        // get current status for each race
-        let currentStatus = [];
-        this._raceStartSequences.forEach(raceStartSequence => {
-            currentStatus.push({race: raceStartSequence.race, status: raceStartSequence.getStartingStateAtTime(time)});
-        });
-
-        this._calculateRaceStates(currentStatus);
-        this._calculateFlags(currentStatus, time);
+        // get current start status for each race
+        this._calculateRaceStates(time);
+        this._calculateFlags(this._currentStatus, time);
         // call any external tick handlers set against this StartSequence
         this._tickHandlers.forEach((value) => {
             value();
@@ -108,29 +98,31 @@ class StartSequence {
     }
 
     /**
-     * 
-     * @param {Array<>} currentStatus 
+     * Calculate the current state of the starting sequence and update remote model if race start sequence state has changed
+     * @param {Date} time to get current race start states for
      */
-    _calculateRaceStates(currentStatus) {
-        this._prepareForRaceStartStateChange = false;
-        this._raceStartStateChange = false;
-        currentStatus.forEach(status => {
+    _calculateRaceStates(time) {
+        const currentStatus = [];
+        this._raceStartSequences.forEach(raceStartSequence => {
+            currentStatus.push({race: raceStartSequence.race, status: raceStartSequence.getStartingStateAtTime(time)});
+        });
+        this._currentStatus = currentStatus;
+        // don't use getRaceStartStaeChange() as need to know the race that changed state to update model
+        this._currentStatus.forEach(status => {
             if (status.race.startSequenceState !== status.status.startSequenceState) {
-                this._raceStartStateChange = true;
                 this._signalRaceStartStateChange();
                 this._model.updateRaceStartSequenceState(status.race, status.status.startSequenceState);
             }
-            const now = this._clock.getTime();
-
-            if (now.valueOf() >= status.status.time.valueOf() + status.status.duration - 60000 && now.valueOf() < status.status.time.valueOf() + status.status.duration - 59000) {
-                this._prepareForRaceStartStateChange = true;
-                this._signalPrepareForRaceStartStateChange();
-            }
-        })
+        });
+        if (this.getPrepareForRaceStartStateChange()) {
+            this._signalPrepareForRaceStartStateChange();
+        }
     }
 
     /**
      * Calculate the current state of the flags used to start the races
+     * @param {Array<{race: {Race}, status: {StartingState}}>} currentStatus
+     * @param {Date} time to get flags for
      */
     _calculateFlags(currentStatus, time) {
         // get flags from all races
@@ -170,6 +162,12 @@ class StartSequence {
         this._flags = consolidatedFlags;
     }
     
+    /**
+     * Get a flag that represents that next state for the supplied flag
+     * @param {Flag} flag to get next state for
+     * @param {Date} time current time
+     * @returns {Flag}
+     */
     _getNextStateChangeForFlag(flag, time) {
         let futureStates = [];
         const futureFlagsMap = new Map();
@@ -241,12 +239,34 @@ class StartSequence {
         return this._races;
     }
 
+    /**
+     * Identify if a race state start change is pending
+     * @returns {boolean}
+     */
     getPrepareForRaceStartStateChange() {
-        return this._prepareForRaceStartStateChange;
+        let prepareForRaceStartStateChange = false;
+        this._currentStatus.forEach(status => {
+            const now = this._clock.getTime();
+
+            if (now.valueOf() >= status.status.time.valueOf() + status.status.duration - 60000 && now.valueOf() < status.status.time.valueOf() + status.status.duration - 59000) {
+                prepareForRaceStartStateChange = true;
+            }
+        });
+        return prepareForRaceStartStateChange;
     }
 
+    /**
+     * Identify if a race state start change has just occurred
+     * @returns {boolean}
+     */
     getRaceStartStateChange() {
-        return this._raceStartStateChange;
+        let raceStartStateChange = false;
+        this._currentStatus.forEach(status => {
+            if (status.race.startSequenceState !== status.status.startSequenceState) {
+                raceStartStateChange = true;
+            }
+        });
+        return raceStartStateChange;
     }
 
     /**
