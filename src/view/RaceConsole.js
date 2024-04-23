@@ -4,17 +4,17 @@ import ModelContext from './ModelContext';
 import RaceEntriesView from './RaceEntriesView';
 import RaceHeaderView from './RaceHeaderView';
 import Clock from '../model/domain-classes/clock';
-import RaceHeaderContainer from './RaceHeaderContainer';
+import CollapsableContainer from './CollapsableContainer';
+import SelectSession from './SelectSession';
 
 function RaceConsole() {
     const model = useContext(ModelContext);
-    const now = new Date();
     const [selectedRaces, setSelectedRaces] = useState([]); // selection of race names made by user
     const [raceOptions, setRaceOptions] = useState([]); // list of names of races names for selection
     const [raceMap, setRaceMap] = useState(new Map()); // map of race names to races
     const [message, setMessage] = useState(''); // feedback to user
-    const [sessionStart, setSessionStart] = useState(new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 30).toISOString().substring(0, 16));
-    const [sessionEnd, setSessionEnd] = useState(new Date(now.getFullYear(), now.getMonth(), now.getDate(), 18).toISOString().substring(0, 16));
+    const [sessionStart, setSessionStart] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000));
+    const [sessionEnd, setSessionEnd] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000));
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
 
     const handleRaceUpdate = useCallback(() => {
@@ -49,7 +49,7 @@ function RaceConsole() {
         }
     }, [model, sessionStart, sessionEnd, racesUpdateRequestAt]);
 
-    // register on update callbacks for races 
+    // register on update callbacks for races
     useEffect(() => {
         const races = Array.from(raceMap.values());
         races.forEach(race => {
@@ -68,12 +68,12 @@ function RaceConsole() {
         setSelectedRaces(options.map(option => option.value));
     }
 
-    function handleSelectSessionStartChange({target}) {
-        setSessionStart(target.value);
+    function handlesessionStartInputChange(date) {
+        setSessionStart(date);
     }
 
-    function handleSelectSessionEndChange({target}) {
-        setSessionEnd(target.value);
+    function handlesessionEndInputChange(date) {
+        setSessionEnd(date);
     }
 
     return (
@@ -81,18 +81,15 @@ function RaceConsole() {
             <div className="select-race">
                 <label htmlFor="race-select">Select Race</label>
                 <select id="race-select" name="race" multiple={true} onChange={handleRaceSelect} value={selectedRaces}>{raceOptions}</select>
-                <label htmlFor="race-select-session-start">Session Start</label>
-                <input id="race-select-session-start" name="sessionStartTime" type="datetime-local" onChange={handleSelectSessionStartChange} value={sessionStart} />
-                <label htmlFor="race-select-session-end">Session End</label>
-                <input id="race-select-session-end" name="sessionEndTime" type="datetime-local" onChange={handleSelectSessionEndChange} value={sessionEnd} />
+                <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
             </div>
             <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
-            <RaceHeaderContainer>
+            <CollapsableContainer heading={'Races'}>
                 {selectedRaces.map(selectedRace => {
                     const race = raceMap.get(selectedRace);
                     return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} />
                 })}
-            </RaceHeaderContainer>
+            </CollapsableContainer>
             <RaceEntriesView races={selectedRaces.map(selectedRace => raceMap.get(selectedRace))} />
         </div>
     );

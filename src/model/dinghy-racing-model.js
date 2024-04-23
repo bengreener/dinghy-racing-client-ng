@@ -1,4 +1,6 @@
 import { Client } from '@stomp/stompjs';
+import StartSignals from './domain-classes/start-signals';
+import StartSequence from './domain-classes/start-sequence';
 
 class DinghyRacingModel {
     httpRootURL;
@@ -37,7 +39,7 @@ class DinghyRacingModel {
      */
     static raceTemplate() {
         return {'name': '', 'plannedStartTime': null, 'actualStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'plannedLaps': null, 'lapForecast': null, 
-            'lastLapTime': null, 'averageLapTime': null, 'clock': null, 'url': ''};
+            'lastLapTime': null, 'averageLapTime': null, 'clock': null, 'startSequenceState': StartSignals.NONE, 'url': ''};
     }
 
     /**
@@ -64,6 +66,7 @@ class DinghyRacingModel {
     constructor(httpRootURL, wsRootURL) {
         this.handleRaceUpdate = this.handleRaceUpdate.bind(this);
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
+        this.getStartSequence = this.getStartSequence.bind(this);
         if (!httpRootURL) {
             throw new Error('An HTTP root URL is required when creating an instance of DinghyRacingModel');
         }
@@ -87,7 +90,7 @@ class DinghyRacingModel {
 
     /**
      * Register a callback for when a race idenified by key is updated
-     * @param {*} key
+     * @param {string} key URI of the race for which the update callback is being registered
      * @param {Function} callback
      */
     registerRaceUpdateCallback(key, callback) {
@@ -101,7 +104,7 @@ class DinghyRacingModel {
 
     /**
      * Unregister a callback for when a race idenified by key is updated
-     * @param {*} key
+     * @param {string} key URI of the race for which the update callback is being unregistered
      * @param {Function} callback
      */
     unregisterRaceUpdateCallback(key, callback) {
@@ -110,6 +113,10 @@ class DinghyRacingModel {
         }
     }
 
+    /**
+     * Handle a websocket update via the Stomp client
+     * @param {string} message URI of race that has been updated
+     */
     handleRaceUpdate(message) {
         if (this.raceUpdateCallbacks.has(message.body)) {
             this.raceUpdateCallbacks.get(message.body).forEach(cb => cb());
@@ -117,8 +124,8 @@ class DinghyRacingModel {
     }
 
     /**
-     * Register a callback for when an entry idenified by key is updated 
-     * @param {*} key 
+     * Register a callback for when an entry identified by key is updated
+     * @param {string} key URI of the entry for which the update callback is being registered
      * @param {Function} callback 
      */
     registerEntryUpdateCallback(key, callback) {
@@ -132,7 +139,7 @@ class DinghyRacingModel {
 
     /**
      * Unregister a callback for when an entry idenified by key is updated
-     * @param {*} key
+     * @param {string} key URI of the entry for which the update callback is being unregistered
      * @param {Function} callback
      */
     unregisterEntryUpdateCallback(key, callback) {
@@ -141,6 +148,10 @@ class DinghyRacingModel {
         }
     }
 
+    /**
+     * Handle a websocket update via the Stomp client
+     * @param {string} message URI of entry that has been updated
+     */
     handleEntryUpdate(message) {
         if (this.entryUpdateCallbacks.has(message.body)) {
             this.entryUpdateCallbacks.get(message.body).forEach(cb => cb());
@@ -364,6 +375,37 @@ class DinghyRacingModel {
     }
 
     /**
+     * Get a collection of competitors, sorted by name in ascending order
+     * @param {integer} [page] number to return (0 indexed)
+     * @param {integer} [size] number of elements to return per page
+     * @returns {Promise<Result>} If successful Result.domainObject will be an Array<Competitor>
+     */
+    async getCompetitors(page, size) {
+        const hasPage = Number.isInteger(page);
+        const hasSize = Number.isInteger(size);
+        let resource = this.httpRootURL + '/competitors?sort=name,asc';
+
+        if (hasPage) {
+            resource += '&page=' + page;
+        }
+        if (hasSize) {
+            resource += '&size=' + size;
+        }
+        const result = await this.read(resource);
+        if (result.success) {
+            if (!hasPage && !hasSize && result.domainObject.page.totalElements > result.domainObject.page.size) {
+                return this.getCompetitors(0, result.domainObject.page.totalElements);
+            }
+            const collection = result.domainObject._embedded.competitors;
+            const competitorCollection = collection.map(competitor => {return {...DinghyRacingModel.competitorTemplate(), 'name': competitor.name, 'url': competitor._links.self.href}});
+            return Promise.resolve({'success': true, 'domainObject': competitorCollection});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+    
+    /**
      * Get dinghy
      * @param {String} url Address of the remote resource
      * @returns {Promise<Result>}
@@ -389,8 +431,10 @@ class DinghyRacingModel {
     /**
      * Get dinghies. If a dinghy class is provided only dinghies with that class will be returned
      * @param {dinghyClass} [dinghyClass] The dinghy class to filter by
+     * @param {integer} [page] number to return (0 indexed)
+     * @param {integer} [size] number of elements to return per page
      */
-    async getDinghies(dinghyClass) {
+    async getDinghies(dinghyClass, page, size) {
         let resource;
         if (!dinghyClass) {
             resource = this.httpRootURL + '/dinghies';
@@ -398,8 +442,28 @@ class DinghyRacingModel {
         else {
             resource = this.httpRootURL + '/dinghies/search/findByDinghyClass?dinghyClass=' + dinghyClass.url;
         }
+        if (Number.isInteger(page) || Number.isInteger(size)) {
+            if (!dinghyClass) {
+                resource += '?';
+            }
+            else {
+                resource += '&';
+            }
+        }
+        if (Number.isInteger(page)) {
+            resource += 'page=' + page;
+        }
+        if (Number.isInteger(size)) {
+            if (Number.isInteger(page)) {
+                resource += '&';
+            }
+            resource += 'size=' + size;
+        }
         const result = await this.read(resource);
         if (result.success) {
+            if (!Number.isInteger(page) && !Number.isInteger(size) && result.domainObject.page.totalElements > result.domainObject.page.size) {
+                return this.getDinghies(dinghyClass, 0, result.domainObject.page.totalElements);
+            }
             const dinghiesHAL = result.domainObject._embedded.dinghies;
             const dinghyClassURLs = dinghiesHAL.map(race => race._links.dinghyClass.href);
             const dinghyClassResults = await Promise.all(dinghyClassURLs.map(url => this.read(url)));
@@ -472,15 +536,29 @@ class DinghyRacingModel {
     }
 
     /**
-     * Get dinghy classes
+     * Get dinghy classes in ascending order by class name
+     * If page and/ or size are not provided will return all dinghy classes
+     * @param {integer} [page] number to return (0 indexed)
+     * @param {integer} [size] number of elements to return per page
      * @return {Promise<Result>>} If successful Result.domainObject will be an Array<DinghyClass>
      */
-    async getDinghyClasses() {
-        const resource = this.httpRootURL + '/dinghyClasses?sort=name,asc';
+    async getDinghyClasses(page, size) {
+        let resource = this.httpRootURL + '/dinghyClasses?';
+        if (Number.isInteger(page)) {
+            resource += 'page=' + page + '&';
+        }
+        if (Number.isInteger(size)) {
+            resource += 'size=' + size + '&';
+        }
+        resource += 'sort=name,asc';
 
         const result = await this.read(resource);
         if (result.success) {
-            const collection = result.domainObject._embedded.dinghyClasses;
+            let collection = result.domainObject._embedded.dinghyClasses;
+            // check for additional dinghy classes
+            if (!Number.isInteger(page) && !Number.isInteger(size) && result.domainObject.page.totalElements > result.domainObject.page.size) {
+                return this.getDinghyClasses(0, result.domainObject.page.totalElements);
+            }
             const dinghyClassCollection = collection.map(dinghyClass => {return {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClass.name, 
                 'crewSize': dinghyClass.crewSize, 'url': dinghyClass._links.self.href}});
             return Promise.resolve({'success': true, 'domainObject': dinghyClassCollection});
@@ -603,6 +681,7 @@ class DinghyRacingModel {
                     'plannedLaps': result.domainObject.plannedLaps, 'lapForecast': result.domainObject.lapForecast, 
                     'lastLapTime': result.domainObject.leadEntry ? this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.lastLapTime) : null, 
                     'averageLapTime': result.domainObject.leadEntry ? this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.averageLapTime) : null, 
+                    'startSequenceState': StartSignals.from(result.domainObject.startSequenceState),
                     'url': result.domainObject._links.self.href
                 }});
             }
@@ -618,48 +697,77 @@ class DinghyRacingModel {
     /**
      * Get races scheduled to start after the specified time
      * @param {Date} startTime The start time of the race
+     * @param {integer} [page] number to return (0 indexed)
+     * @param {integer} [size] number of elements to return per page
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
-    async getRacesOnOrAfterTime(startTime) {
+    async getRacesOnOrAfterTime(startTime, page, size) {
         const resource = this.httpRootURL + '/races/search/findByPlannedStartTimeGreaterThanEqual?time=' + startTime.toISOString();
 
-        const result = await this.read(resource);
-        if (result.success) {
-            const racesHAL = result.domainObject._embedded.races;
-            const dinghyClassURLs = racesHAL.map(race => race._links.dinghyClass.href);
-            const dinghyClassResults = await Promise.all(dinghyClassURLs.map(url => this.read(url)));
-            
-            const races = [];
-            for (let i = 0; i < racesHAL.length; i++  ) {
-                const dinghyClass = dinghyClassResults[i].success ? {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassResults[i].domainObject.name, 
-                    'crewSize': dinghyClassResults[i].domainObject.crewSize, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
-                // assume time received has been stored in UTC
-                races.push({...DinghyRacingModel.raceTemplate(), 'name': racesHAL[i].name, 'plannedStartTime': new Date(racesHAL[i].plannedStartTime + 'Z'), 
-                    'actualStartTime': racesHAL[i].actualStartTime ? new Date(racesHAL[i].actualStartTime + 'Z') : null, 
-                    'dinghyClass': dinghyClass, 'duration': this.convertISO8601DurationToMilliseconds(racesHAL[i].duration), 'plannedLaps': racesHAL[i].plannedLaps, 
-                    'lapForecast': racesHAL[i].lapForecast, 
-                    'lastLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.lastLapTime) : null, 
-                    'averageLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.averageLapTime) : null, 
-                    'url': racesHAL[i]._links.self.href});
-            };
-            return Promise.resolve({'success': true, 'domainObject': races});
-        }
-        else {
-            return Promise.resolve(result);
-        }
+        return this.getRacesFromURL(resource, page, size);
     }
 
     /**
      * Get races scheduled to start between the specified times
      * @param {Date} startTime The start time of the first race
      * @param {Date} endTime The start time of the last race
+     * @param {integer} [page] number to return (0 indexed)
+     * @param {integer} [size] number of elements to return per page
+     * @param {SortParameters} [sortParameters] and order for sorting the requested races
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
-    async getRacesBetweenTimes(startTime, endTime) {
+    async getRacesBetweenTimes(startTime, endTime, page, size, sortParameters) {
         const resource = this.httpRootURL + '/races/search/findByPlannedStartTimeBetween?startTime=' + startTime.toISOString() + '&endTime=' + endTime.toISOString();
 
-        const result = await this.read(resource);
+        return this.getRacesFromURL(resource, page, size, sortParameters);
+    }
+
+    /**
+     * Get races from the specified resource location
+     * @param {String} url to use to retrieve a collection of races
+     * @param {integer} [page] number to return (0 indexed)
+     * @param {integer} [size] number of elements to return per page
+     * @param {SortParameters} [sortParameters] and order for sorting the requested races
+     * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
+     */
+    async getRacesFromURL(url, page, size, sortParameters) {
+        const hasPage = Number.isInteger(page);
+        const hasSize = Number.isInteger(size);
+        const hasSort = !(sortParameters == null);
+        const hasParams = /\?/.test(url);
+        if ((hasPage || hasSize || hasSort) && !hasParams) {
+            url += '?';
+        }
+        if (hasPage) {
+            if (hasParams) {
+                url += '&page=' + page;
+            }
+            else {
+                url += 'page=' + page;
+            }
+        }
+        if (hasSize) {
+            if (hasParams || hasPage) {
+                url += '&size=' + size;
+            }
+            else {
+                url += 'size=' + size;
+            }
+        }
+        if (hasSort) {
+            if (hasParams || hasPage || hasSize) {
+                url += '&sort=' + sortParameters.by + ',' + (sortParameters.order || 'ASC');
+            }
+            else {
+                url += 'sort=' + sortParameters.by + ',' + (sortParameters.order || 'ASC');
+            }
+        }
+
+        const result = await this.read(url);
         if (result.success) {
+            if (!hasPage && !hasSize && result.domainObject.page.totalElements > result.domainObject.page.size) {
+                return this.getRacesFromURL(url, 0, result.domainObject.page.totalElements);
+            }
             const racesHAL = result.domainObject._embedded.races;
             const dinghyClassURLs = racesHAL.map(race => race._links.dinghyClass.href);
             const dinghyClassResults = await Promise.all(dinghyClassURLs.map(url => this.read(url)));
@@ -675,6 +783,7 @@ class DinghyRacingModel {
                     'lapForecast': racesHAL[i].lapForecast, 
                     'lastLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.lastLapTime) : null, 
                     'averageLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.averageLapTime) : null, 
+                    'startSequenceState': StartSignals.from(racesHAL[i].startSequenceState),
                     'url': racesHAL[i]._links.self.href});
             };
             return Promise.resolve({'success': true, 'domainObject': races});
@@ -697,6 +806,45 @@ class DinghyRacingModel {
     }
 
     /**
+     * Update the start sequence for a race
+     * @param {Race} race to update
+     * @param {StartSignals} stage of the starting sequence reached
+     */
+    async updateRaceStartSequenceState(race, stage) {
+        let result;
+        if (!race.url) {
+            result = await this.getRaceByNameAndPlannedStartTime(race.name, race.plannedStartTime);
+        }
+        else {
+            result = {'success': true, 'domainObject': race};
+        }
+        if (result.success) {
+            return this.update(result.domainObject.url, {'startSequenceState': stage});
+        }
+        else {
+            return result;
+        }
+    }
+
+    /**
+     * Get a start sequence for staring a races during a session
+     * @param {Date} startTime The start time of the first race
+     * @param {Date} endTime The start time of the last race
+     * @returns {Promise<Result>} If successful result domainObject will be StartSequence
+     */
+    async getStartSequence(startTime, endTime) {
+        const result = await this.getRacesBetweenTimes(startTime, endTime, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
+
+        if (result.success) {
+            const startSequence = new StartSequence(result.domainObject, this);
+            return Promise.resolve({success: true, domainObject: startSequence});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
      * Start a race
      * @param {Race} race
      * @param {Date} startTime
@@ -711,29 +859,10 @@ class DinghyRacingModel {
             result = {'success': true, 'domainObject': race};
         }
         if (result.success) {
-            // return this.update(result.domainObject.url, {'actualStartTime': startTime});
             return this.update(result.domainObject.url, {'plannedStartTime': startTime});
         }
-        else { 
-            return result;
-        }
-    }
-
-    /**
-     * Get a collection of competitors, sorted by name in ascending order
-     * @returns {Promise<Result>} If successful Result.domainObject will be an Array<Competitor>
-     */
-    async getCompetitors() {
-        const resource = this.httpRootURL + '/competitors?sort=name,asc';
-
-        const result = await this.read(resource);
-        if (result.success) {
-            const collection = result.domainObject._embedded.competitors;
-            const competitorCollection = collection.map(competitor => {return {...DinghyRacingModel.competitorTemplate(), 'name': competitor.name, 'url': competitor._links.self.href}});
-            return Promise.resolve({'success': true, 'domainObject': competitorCollection});
-        }
         else {
-            return Promise.resolve(result);
+            return result;
         }
     }
 
@@ -870,4 +999,19 @@ class DinghyRacingModel {
     }
 }
 
+/**
+ * @typedef SortParameters
+ * @property {string} by name of the property to sort the collection by
+ * @property {string} order sort order for collection; 'ASC' or 'DESC'
+ */
+
+/**
+ * Class providng enumeration of SortOrder options for SortObject type
+ */
+class SortOrder {
+    static ASCENDING = 'ASC';
+    static DESCENDING = 'DESC';
+}
+
 export default DinghyRacingModel;
+export { SortOrder };

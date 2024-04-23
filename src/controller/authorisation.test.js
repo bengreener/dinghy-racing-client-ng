@@ -24,12 +24,18 @@ it('returns array of roles', async () => {
 });
 
 describe('when error occurs', () => {
-    it('returns an empty array', async () => {
+    it('returns an empty array', async () => {// an error is expected to be thrown so mock out console logging of errors so as not to clutter up console
+        jest.spyOn(console, 'error');
+        console.error.mockImplementation(() => {});
+
         fetch.mockImplementation(() => {
             throw new TypeError('Failed to fetch roles');
         });
         const authorisation = new Authorisation();
         expect(await authorisation.getRoles()).toEqual([]);
+
+        // restore console logging for errors
+        console.error.mockRestore();
     });
 });
 

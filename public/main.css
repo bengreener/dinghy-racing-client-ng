@@ -6,11 +6,9 @@
 body {
 	margin: 0px;	
 }
-h3 {
-	margin-top: 5px;
-	margin-bottom: 5px;
-	margin-left: 5px;
-
+h1 {
+	margin-top: 0.335em;
+	margin-bottom: 0.335em;
 }
 button {
 	border-radius: 25pt;
@@ -55,6 +53,7 @@ td, th {
     border: 1px solid #999;
     padding: 0.5em;
     text-align: left;
+	white-space: pre;
 }
 td.total {
 	border: 2px solid black;
@@ -70,9 +69,24 @@ header {
 	grid-area: header;
 	background-size: contain;
 }
+.action-list-view {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
 .display-port {
 	grid-area: main;
 	overflow: hidden;
+}
+.race-entries-view {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.race-start-console {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
 }
 .sign-up-form {
     height: 100%;

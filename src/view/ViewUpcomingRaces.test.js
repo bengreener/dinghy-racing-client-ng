@@ -32,9 +32,10 @@ it('displays the details of upcoming races', async () => {
     const cells = await screen.findAllByRole('cell');
     const cellValues = cells.map(cell => cell.textContent);
 
+    const timeCheck = new Date('2021-10-14T10:30:00Z').toLocaleString();
     expect(cellValues).toContain('Scorpion A');
     expect(cellValues).toContain('Graduate');
-    expect(cellValues).toContain('14/02/2023, 18:26:00');
+    expect(cellValues).toContain(timeCheck);
 });
 
 describe('when a race is selected', () => {

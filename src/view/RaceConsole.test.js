@@ -1,5 +1,6 @@
-import { customRender } from '../test-utilities/custom-renders';import userEvent from '@testing-library/user-event';
-import { act, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { customRender } from '../test-utilities/custom-renders';
+import userEvent from '@testing-library/user-event';
+import { act, screen } from '@testing-library/react';
 import RaceConsole from './RaceConsole';
 import { httpRootURL, wsRootURL, races, entriesScorpionA, entriesGraduateA } from '../model/__mocks__/test-data';
 import DinghyRacingModel from '../model/dinghy-racing-model';
@@ -326,7 +327,6 @@ describe('when races within session are changed', () => {
         races_copy[0] = {...races[0]};
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races_copy})});
         jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races_copy})});
         await act(async () => {        
             customRender(<RaceConsole />, model);

@@ -10,6 +10,9 @@ import Clock from '../model/domain-classes/clock';
 jest.mock('../model/dinghy-racing-model');
 jest.mock('@stomp/stompjs');
 
+HTMLDialogElement.prototype.showModal = jest.fn();
+HTMLDialogElement.prototype.close = jest.fn();
+
 beforeEach(() => {
     jest.resetAllMocks();
     jest.useFakeTimers();
@@ -23,28 +26,24 @@ afterEach(() => {
 
 describe('when rendered', () => {
     it('displays race name', () => {
-        HTMLDialogElement.prototype.close = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
         expect(screen.getByText(/scorpion a/i)).toBeInTheDocument();
     });    
     it('displays number of laps', () => {
-        HTMLDialogElement.prototype.close = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
         expect(screen.getByLabelText(/laps(?!.)/i)).toHaveValue('5');
     });
     it('displays initial race duration', () => {
-        HTMLDialogElement.prototype.close = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
         expect(screen.getByLabelText(/duration/i)).toHaveValue('45:00');
     });
     it('displays remaining race duration', () => {
-        HTMLDialogElement.prototype.close = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         const clock = new Clock();
@@ -54,28 +53,24 @@ describe('when rendered', () => {
         expect(screen.getByLabelText(/remaining/i)).toHaveValue('44:30');
     });
     it('displays estimate for number of laps that will be completed', () => {
-        HTMLDialogElement.prototype.close = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
         expect(screen.getByLabelText(/estimate/i)).toHaveValue('5.00');
     });
     it('displays the last lap time for the lead entry', () => {
-        HTMLDialogElement.prototype.close = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
         expect(screen.getByLabelText(/last/i)).toHaveValue('00:00');
     });
     it('displays the average lap time for the lead entry', () => {
-        HTMLDialogElement.prototype.close = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
         expect(screen.getByLabelText(/average/i)).toHaveValue('00:00');
     });
     it('displays postpone race button', () => {
-        HTMLDialogElement.prototype.close = jest.fn();
         // const raceScorpionA_copy = {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))};
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -83,7 +78,6 @@ describe('when rendered', () => {
         expect(screen.getByRole('button', {name: /postpone start/i})).toBeInTheDocument();
     });
     it('displays start race button', () => {
-        HTMLDialogElement.prototype.close = jest.fn();
         // const raceScorpionA_copy = {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))};
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -92,9 +86,25 @@ describe('when rendered', () => {
     });
 });
 
+describe('when showInRaceData is false', () => {
+    it('does not display additional elements', () => {
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))} } showInRaceData={false} />, model, controller);
+        expect(screen.getByText(/scorpion a/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/laps(?!.)/i)).toHaveValue('5');
+        expect(screen.getByLabelText(/duration/i)).toHaveValue('45:00');
+        expect(screen.queryByLabelText(/countdown/i)).toHaveValue('00:10');
+        expect(screen.queryByLabelText(/estimate/i)).not.toBeInTheDocument();
+        expect(screen.queryByLabelText(/last/i)).not.toBeInTheDocument();
+        expect(screen.queryByLabelText(/average/i)).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: /postpone start/i})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: /start now/i})).toBeInTheDocument();
+    });
+});
+
 describe('when race has not yet started', () => {
     it('displays countdown to start of race as a positive value', () => {
-        HTMLDialogElement.prototype.close = jest.fn();
         const startTime = new Date(Date.now() + 60000);
         const clock = new Clock(startTime);
         jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => -60000);
@@ -111,8 +121,6 @@ describe('when race has not yet started', () => {
 
 describe('when a race has started', () => {
     it('updates the remaining time field to show the time remaining', async () => {
-        HTMLDialogElement.prototype.close = jest.fn();
-        // const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         jest.spyOn(controller, 'startRace');
@@ -125,41 +133,13 @@ describe('when a race has started', () => {
         const outputRemaining = screen.getByLabelText(/remaining/i);
         expect(outputRemaining).toHaveValue('44:54');
     });
-    // Have not figured out to test a value has not changed after a period of time. Can revisit when need to to do something other than stopping clock 
-    xit('stops the selected race', async () => {
-        // const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        // const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        // const controller = new DinghyRacingController(model);
-        // jest.spyOn(controller, 'startRace');
-        // const clockSpy = jest.spyOn(Clock, 'formatDuration')
-
-        // customRender(<RaceHeaderView race={ raceScorpionA } />, model, controller);
-
-        // const buttonStart = screen.getByText(/start/i);
-        // const buttonStop = screen.getByText(/stop/i);
-        // const outputRemaining = screen.getByLabelText(/remaining/i);
-        // await user.click(buttonStart);
-        // await setTimeout(() => {
-        //     user.click(buttonStop);
-        // }, 1000);
-        // await setTimeout(async () => {
-        //     expect(outputRemaining).toHaveValue('00:44:59');
-        // }, 2000);
-        // await waitFor(() => {
-
-        //     expect(clockSpy).toHav
-        // })
-        // screen.debug();
-    });
     it('no longer shows option to postpone race', () => {
-        HTMLDialogElement.prototype.close = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(), 'clock': new Clock(new Date())} } />, model, controller);
         expect(screen.queryByText(/postpone start/i)).not.toBeInTheDocument();
     });
     it('no longer shows option to start race', () => {
-        HTMLDialogElement.prototype.close = jest.fn();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(), 'clock': new Clock(new Date())} } />, model, controller);
@@ -168,7 +148,6 @@ describe('when a race has started', () => {
 });
 
 it('updates values when a new race is selected', async () => {
-    HTMLDialogElement.prototype.close = jest.fn();
     const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});;
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
@@ -195,8 +174,6 @@ it('updates values when a new race is selected', async () => {
 
 describe('when postpone race button clicked', () => {
     it('displays postpone race dialog', async () => {
-        HTMLDialogElement.prototype.showModal = jest.fn();
-        HTMLDialogElement.prototype.close = jest.fn();
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});;
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -213,7 +190,6 @@ describe('when postpone race button clicked', () => {
 
 describe('when start now button clicked', () => {
     it('starts race', async () => {
-        HTMLDialogElement.prototype.close = jest.fn();
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});;
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -223,429 +199,5 @@ describe('when start now button clicked', () => {
         const startRaceButton = screen.getByRole('button', {'name': /start now/i});
         await user.click(startRaceButton);
         expect(startRaceSpy).toHaveBeenCalled();
-    });
-});
-
-describe('when race header first displayed', () => {
-    describe('when more than 11 minutes before race', () => {
-        it('warning flag indicator does not have class of warning-flag-prepare-raise', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const clock = new Clock();
-            jest.spyOn(clock, 'getElapsedTime').mockImplementation(() => -660001);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            expect(screen.getByText('WF').getAttribute('class')).not.toMatch(/warning-flag-prepare-raise/);
-        });
-        it('does not have class of blue-peter-prepare-raise', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const clock = new Clock();
-            jest.spyOn(clock, 'getElapsedTime').mockImplementation(() => -660001);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            expect(screen.getByText('WF').getAttribute('class')).not.toMatch(/blue-peter-prepare-raise/);
-        });
-        it('warning flag indicator does not have class of warning-flag-raised', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const clock = new Clock();
-            jest.spyOn(clock, 'getElapsedTime').mockImplementation(() => -660001);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            expect(screen.getByText('WF').getAttribute('class')).not.toMatch(/warning-flag-raised/);
-        });
-        it('does not have class of blue-peter-raised', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const clock = new Clock();
-            jest.spyOn(clock, 'getElapsedTime').mockImplementation(() => -660001);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            expect(screen.getByText('WF').getAttribute('class')).not.toMatch(/blue-peter-raised/);
-        });
-    });
-    
-    describe('when 11 minutes before race starts', () => {
-        it('warning flag indicator has a class of warning-flag-prepare-raise', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const clock = new Clock();
-            const getElapsedTimeSpy = jest.spyOn(clock, 'getElapsedTime').mockImplementation(() => -660000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-prepare-raise/);
-        });
-    });
-    
-    describe('when 10 minutes before race starts', () => {
-        it('warning flag indicator has a class of warning-flag-raised', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const clock = new Clock();
-            jest.spyOn(clock, 'getElapsedTime').mockImplementation(() => -600000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-raised/);
-        });
-        it('warning flag indicator does not have class of warning-flag-prepare-raise', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const clock = new Clock();
-            jest.spyOn(clock, 'getElapsedTime').mockImplementation(() => -600000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            expect(screen.getByText('WF').getAttribute('class')).not.toMatch(/warning-flag-prepare-raise/);
-        });
-    });
-    
-    describe('when 6 minutes before race starts', () => {
-        it('blue peter flag indicator has a class of blue-peter-prepare-raise', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const clock = new Clock();
-            jest.spyOn(clock, 'getElapsedTime').mockImplementation(() => -360000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            expect(screen.getByText('BP').getAttribute('class')).toMatch(/blue-peter-prepare-raise/);
-        });
-    });
-    
-    describe('when 5 minutes before race starts', () => {
-        it('blue peter flag indicator has a class of blue-peter-raised', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const clock = new Clock();
-            jest.spyOn(clock, 'getElapsedTime').mockImplementation(() => -300000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            expect(screen.getByText('BP').getAttribute('class')).toMatch(/blue-peter-raised/);
-        });
-        it('blue peter flag indicator does not have a class of blue-peter-prepare-raise', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const clock = new Clock();
-            jest.spyOn(clock, 'getElapsedTime').mockImplementation(() => -300000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            expect(screen.getByText('BP').getAttribute('class')).not.toMatch(/blue-peter-prepare-raise/);
-        });
-    });
-    
-    describe('when 1 minutes before race starts', () => {
-        it('warning flag indicator has a class of warning-flag-prepare-lower', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const clock = new Clock();
-            jest.spyOn(clock, 'getElapsedTime').mockImplementation(() => -60000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-prepare-lower/);
-        });
-        it('blue peter indicator has a class of blue-peter-prepare-lower', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const clock = new Clock();
-            jest.spyOn(clock, 'getElapsedTime').mockImplementation(() => -60000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            expect(screen.getByText('BP').getAttribute('class')).toMatch(/blue-peter-prepare-lower/);
-        });
-        it('warning flag indicator does not have class of warning-flag-raised', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const clock = new Clock();
-            jest.spyOn(clock, 'getElapsedTime').mockImplementation(() => -60000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            expect(screen.getByText('WF').getAttribute('class')).not.toMatch(/warning-flag-raised/);
-        });
-        it('blue peter indicator does not have a class of blue-peter-raised', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const clock = new Clock();
-            jest.spyOn(clock, 'getElapsedTime').mockImplementation(() => -60000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            expect(screen.getByText('BP').getAttribute('class')).not.toMatch(/blue-peter-raised/);
-        });
-    });
-    
-    describe('when 0 minutes before race starts', () => {
-        it('warning flag indicator has a class of warning-flag-lowered', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const clock = new Clock();
-            jest.spyOn(clock, 'getElapsedTime').mockImplementation(() => 0);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-lowered/);
-        });
-        it('blue peter indicator has a class of blue-peter-lowered', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const clock = new Clock();
-            jest.spyOn(clock, 'getElapsedTime').mockImplementation(() => 0);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            expect(screen.getByText('BP').getAttribute('class')).toMatch(/blue-peter-lowered/);
-        });
-        it('warning flag indicator does not have a class of warning-flag-prepare-lower', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const clock = new Clock();
-            jest.spyOn(clock, 'getElapsedTime').mockImplementation(() => 0);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            expect(screen.getByText('WF').getAttribute('class')).not.toMatch(/warning-flag-prepare-lower/);
-        });
-        it('blue peter indicator does not have a class of blue-peter-prepare-lower', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const clock = new Clock();
-            jest.spyOn(clock, 'getElapsedTime').mockImplementation(() => 0);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            expect(screen.getByText('BP').getAttribute('class')).not.toMatch(/blue-peter-prepare-lower/);
-        });
-    });
-});
-
-describe('when race header displayed', () => {
-    describe('when clock ticks from 11 minutes and 2 seconds before race to 11 minutes and one second before race', () => {
-        it('warning flag indicator has a class of warning-flag-lowered', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
-            const clock = new Clock(startTime + 662000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            act(() => {
-                jest.advanceTimersByTime(1000);
-            });
-            await screen.findByText('11:01');
-            expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-lowered/);
-        });
-        it('prepare audio warning is not present', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
-            const clock = new Clock(startTime + 662000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            act(() => {
-                jest.advanceTimersByTime(1000);
-            });
-            await screen.findByText('11:01');
-            expect(screen.queryByTestId('prepare-sound-warning-audio')).not.toBeInTheDocument();
-        });
-        it('act audio warning is not present', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
-            const clock = new Clock(startTime + 662000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            act(() => {
-                jest.advanceTimersByTime(1000);
-            });
-            await screen.findByText('11:01');
-            expect(screen.queryByTestId('act-sound-warning-audio')).not.toBeInTheDocument();
-        });
-    });
-    describe('when clock ticks from 11 minutes and 1 second before race to 11 minutes before race', () => {
-        it('warning flag indicator has a class of warning-flag-prepare-raise', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
-            const clock = new Clock(startTime + 661000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            act(() => {
-                jest.advanceTimersByTime(1000);
-            });
-            await screen.findByText('11:00');
-            expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-prepare-raise/);
-        });
-        it('prepare audio warning is present', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
-            const clock = new Clock(startTime + 661000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            act(() => {
-                jest.advanceTimersByTime(1000);
-            });
-            await screen.findByText('11:00');
-            expect(screen.queryByTestId('prepare-sound-warning-audio')).toBeInTheDocument();
-        });
-    });
-    describe('when clock ticks from 10 minutes and 1 second before race to 10 minutes before race', () => {
-        it('warning flag indicator has a class of warning-flag-raised', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
-            const clock = new Clock(startTime + 601000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            act(() => {
-                // jest.advanceTimersToNextTimer();
-                jest.advanceTimersByTime(1000);
-            });
-            await screen.findByText('10:00');
-            expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-raised/);
-        });
-        it('act audio warning is present', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
-            const clock = new Clock(startTime + 601000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            act(() => {
-                jest.advanceTimersByTime(1000);
-            });
-            await screen.findByText('10:00');
-            expect(screen.queryByTestId('act-sound-warning-audio')).toBeInTheDocument();
-        });
-    });
-    describe('when clock ticks from 6 minutes and 1 second before race to 6 minutes before race', () => {
-        it('blue peter flag indicator has a class of blue-peter-prepare-raise', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
-            const clock = new Clock(startTime + 361000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            act(() => {
-                jest.advanceTimersByTime(1000);
-            });
-            await screen.findByText('06:00');
-            expect(screen.getByText('BP').getAttribute('class')).toMatch(/blue-peter-prepare-raise/);
-        });
-        it('prepare audio warning is present', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
-            const clock = new Clock(startTime + 361000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            act(() => {
-                jest.advanceTimersByTime(1000);
-            });
-            await screen.findByText('06:00');
-            expect(screen.queryByTestId('prepare-sound-warning-audio')).toBeInTheDocument();
-        });
-    });
-    describe('when clock ticks from 5 minutes and 1 second before race to 5 minutes before race', () => {
-        it('blue peter flag indicator has a class of blue-peter-raised', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
-            const clock = new Clock(startTime + 301000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            act(() => {
-                jest.advanceTimersByTime(1000);
-            });
-            await screen.findByText('05:00');
-            expect(screen.getByText('BP').getAttribute('class')).toMatch(/blue-peter-raised/);
-        });
-        it('act audio warning is present', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
-            const clock = new Clock(startTime + 301000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            act(() => {
-                jest.advanceTimersByTime(1000);
-            });
-            await screen.findByText(/05:00/);
-            expect(screen.queryByTestId('act-sound-warning-audio')).toBeInTheDocument();
-        });
-    });
-    describe('when clock ticks from 1 minutes and 1 second before race to 1 minutes before race', () => {
-        it('warning flag indicator has a class of warning-flag-prepare-lower', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
-            const clock = new Clock(startTime + 61000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            act(() => {
-                jest.advanceTimersByTime(1000);
-            });
-            await screen.findByText('01:00');
-            expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-prepare-lower/);
-        });
-        it('blue peter flag indicator has a class of blue-peter-prepare-lower', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
-            const clock = new Clock(startTime + 61000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            act(() => {
-                jest.advanceTimersByTime(1000);
-            });
-            await screen.findByText('01:00');
-            expect(screen.getByText('BP').getAttribute('class')).toMatch(/blue-peter-prepare-lower/);
-        });
-        it('prepare audio warning is present', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
-            const clock = new Clock(startTime + 61000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            act(() => {
-                jest.advanceTimersByTime(1000);
-            });
-            await screen.findByText(/01:00/);
-            expect(screen.queryByTestId('prepare-sound-warning-audio')).toBeInTheDocument();
-        });
-    });
-    describe('when clock ticks from 0 minutes and 1 second before race to 0 minutes before race', () => {
-        it('warning flag indicator has a class of warning-flag-lowered', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
-            const clock = new Clock(startTime + 1000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            act(() => {
-                jest.advanceTimersByTime(1000);
-            });
-            await screen.findByLabelText(/remaining/i);
-            expect(screen.getByText('WF').getAttribute('class')).toMatch(/warning-flag-lowered/);
-        });
-        it('blue peter flag indicator has a class of blue-peter-lowered', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
-            const clock = new Clock(startTime + 1000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            act(() => {
-                jest.advanceTimersByTime(1000);
-            });
-            await screen.findByLabelText(/remaining/i);
-            expect(screen.getByText('BP').getAttribute('class')).toMatch(/blue-peter-lowered/);
-        });
-        it('act audio warning is present', async () => {
-            HTMLDialogElement.prototype.close = jest.fn();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            const startTime = Math.round(Date.now() / 1000) * 1000; // calculate a start time without fractional second element to avoid issues when advancing timers
-            const clock = new Clock(startTime + 1000);
-            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-            act(() => {
-                jest.advanceTimersByTime(1000);
-            });
-            await screen.findByLabelText(/remaining/i);
-            expect(screen.queryByTestId('act-sound-warning-audio')).toBeInTheDocument();
-        });
     });
 });
