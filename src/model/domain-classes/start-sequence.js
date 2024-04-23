@@ -244,10 +244,9 @@ class StartSequence {
      * @returns {boolean}
      */
     getPrepareForRaceStartStateChange() {
+        const now = this._clock.getTime();
         let prepareForRaceStartStateChange = false;
         this._currentStatus.forEach(status => {
-            const now = this._clock.getTime();
-
             if (now.valueOf() >= status.status.time.valueOf() + status.status.duration - 60000 && now.valueOf() < status.status.time.valueOf() + status.status.duration - 59000) {
                 prepareForRaceStartStateChange = true;
             }
@@ -257,12 +256,14 @@ class StartSequence {
 
     /**
      * Identify if a race state start change has just occurred
+     * Will return true for the 1st second a race is scheduled to allow utilising components to work through race update notifications and rendering 
      * @returns {boolean}
      */
     getRaceStartStateChange() {
+        const now = this._clock.getTime();
         let raceStartStateChange = false;
         this._currentStatus.forEach(status => {
-            if (status.race.startSequenceState !== status.status.startSequenceState) {
+            if (status.race.startSequenceState !== status.status.startSequenceState || (status.race.startSequenceState !== StartSignals.NONE && now.valueOf() >= status.status.time.valueOf() && now.valueOf() < status.status.time.valueOf() + 1000)) {
                 raceStartStateChange = true;
             }
         });
