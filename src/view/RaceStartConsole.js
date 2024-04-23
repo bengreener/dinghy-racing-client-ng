@@ -114,10 +114,9 @@ function RaceStartConsole () {
         <div className="race-start-console">
             <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
             <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
-            <div>
-                <h1>Flags</h1>
+            <CollapsableContainer heading={'Flags'}>
                 {flags.map(flag => { return <FlagControl key={flag.name} flag={flag} /> })}
-            </div>
+            </CollapsableContainer>
             <CollapsableContainer heading={'Races'}>
                 {races.map(race => {
                     return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} showInRaceData={false} />
