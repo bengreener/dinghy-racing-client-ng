@@ -64,6 +64,7 @@ function RaceStartConsole () {
                     setAudio('none');
                 }
             }
+            setMessage('');
         });
 
         return () => {
@@ -73,7 +74,6 @@ function RaceStartConsole () {
                 startSequence.current.dispose();
                 startSequence.current = null;
             }
-            setMessage('');
         }
     }, [model, sessionStart, sessionEnd, racesUpdateRequestAt, handleStartSequenceTick]);
 
