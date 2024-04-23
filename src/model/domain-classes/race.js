@@ -10,5 +10,7 @@
  * @property {Number} lastLapTime The last lap time of the lead boat in the race; in milliseconds
  * @property {Number} averageLapTime The average lap time of the lead boat in the race; in milliseconds
  * @property {Clock} clock The race clock
+ * @property {StartSignals} startSequenceState The stage the race has reached in it's start sequence
  * @property {string} url The URL to the remote resource
  */
+

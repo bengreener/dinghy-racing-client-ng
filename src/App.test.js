@@ -3,16 +3,20 @@ import userEvent from '@testing-library/user-event';
 import App from './App';
 import DinghyRacingController from './controller/dinghy-racing-controller';
 import DinghyRacingModel from './model/dinghy-racing-model';
-import { httpRootURL, wsRootURL, dinghyClasses, races, entriesScorpionA } from './model/__mocks__/test-data';
+import { httpRootURL, wsRootURL, dinghyClasses, races, entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA } from './model/__mocks__/test-data';
 import Authorisation from './controller/authorisation';
 
 jest.mock('./controller/dinghy-racing-controller');
 jest.mock('./model/dinghy-racing-model');
 jest.mock('./controller/authorisation');
 
+HTMLDialogElement.prototype.close = jest.fn();
+
 beforeEach(() => {
   jest.clearAllMocks();
   jest.restoreAllMocks();
+  // jest.spyOn(console, 'error')
+  // console.error.mockImplementation(() => null);
 });
 
 it('renders banner', async () => {
@@ -30,12 +34,14 @@ it('displays menu buttons', async () => {
   const btnCreateDinghyClass = screen.getByRole('button', {name: /create dinghy class\b/i});
   const btnCreateRace = screen.getByRole('button', {name: /create race\b/i});
   const btnUpcomingRaces = screen.getByRole('button', {name: /upcoming races\b/i});
+  const btnRaceStartConsole = screen.getByRole('button', {name: /race start console\b/i});
   const btnRaceConsole = screen.getByRole('button', {name: /race console\b/i});
   const btnDownloadRaces = screen.getByRole('button', {name: /download races\b/i});
   const btnLogout = screen.getByRole('button', {name: /logout\b/i});
   expect(btnCreateDinghyClass).toBeInTheDocument();
   expect(btnCreateRace).toBeInTheDocument();
   expect(btnUpcomingRaces).toBeInTheDocument();
+  expect(btnRaceStartConsole).toBeInTheDocument();
   expect(btnRaceConsole).toBeInTheDocument();
   expect(btnDownloadRaces).toBeInTheDocument();
   expect(btnLogout).toBeInTheDocument();
@@ -71,6 +77,15 @@ describe('user roles does not include ROLE_RACE_OFFICER', () => {
     });
     const btnRaceConsole = screen.queryByRole('button', {name: /race console\b/i});
     expect(btnRaceConsole).not.toBeInTheDocument();
+  });
+  it('does not provide option to access race start console', async () => {
+    const dinghyRacingController = new DinghyRacingController(new DinghyRacingModel(httpRootURL, wsRootURL));
+    jest.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
+    await act(async () => {
+      render(<App controller={dinghyRacingController} />);
+    });
+    const btnRaceStartConsole = screen.queryByRole('button', {name: /race start console\b/i});
+    expect(btnRaceStartConsole).not.toBeInTheDocument();
   });
 });
 
@@ -119,9 +134,10 @@ describe('when upcoming races button clicked', () => {
     await act(async () => {
       await user.click(btnViewUpcomingRaces);
     });
+    const timeCheck = new Date('2021-10-14T10:30:00Z').toLocaleString();
     expect(await screen.findByText('Scorpion A')).toBeInTheDocument();
     expect(await screen.findByText('Graduate')).toBeInTheDocument();
-    expect(await screen.findByText('14/02/2023, 18:26:00')).toBeInTheDocument();
+    expect(await screen.findByText(timeCheck)).toBeInTheDocument();
   })
 });
 
@@ -137,6 +153,36 @@ describe('when race console button is clicked', ()  => {
     const btnRaceConsole = await screen.findByRole('button', {name: /race console\b/i});
     await act(async () => {
       await user.click(btnRaceConsole);
+    });
+  });
+});
+
+describe('when race start console button is clicked', ()  => {
+  it('displays race start console', async () => {
+    const user = userEvent.setup();
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+      if (race.name === 'Scorpion A') {
+        return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})
+      }
+      if (race.name === 'Graduate A') {
+        return Promise.resolve({'success': true, 'domainObject': entriesGraduateA})
+      }
+      if (race.name === 'Comet A') {
+        return Promise.resolve({'success': true, 'domainObject': entriesCometA})
+      }
+      if (race.name === 'Handicap A') {
+        return Promise.resolve({'success': true, 'domainObject': entriesHandicapA})
+      }
+    });
+    jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({success: false, message: 'Set to fail'})});
+    const dinghyRacingController = new DinghyRacingController(model);
+
+    render(<App model={model} controller={dinghyRacingController} />);
+    const btnRaceStartConsole = await screen.findByRole('button', {name: /race start console\b/i});
+    await act(async () => {
+      await user.click(btnRaceStartConsole);
     });
   });
 });
@@ -157,7 +203,6 @@ describe('when download races console button is clicked', ()  => {
     expect(await screen.findByRole('heading', {name: /download races/i})).toBeInTheDocument();
   });
 });
-
 
 it('enables user to logout', async () => {
   // jsdom does not implement navigation so replace Window.location with a trackable mock for this test

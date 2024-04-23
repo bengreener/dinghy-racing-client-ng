@@ -89,6 +89,15 @@ class Clock {
     }
     
     /**
+     * Return a time based on the start time of the clock and the elapsed time calculated by the performance timer
+     * This may differ from the time that would be rturned by new Date() or Date.now()
+     * @returns {Date}
+     */
+    getTime() {
+        return new Date(this._startTime + this.getElapsedTime());
+    }
+
+    /**
      * Get time elapsed since start time
      * This is based on performance timer to ensure monotonically increasing values returned.
      * There are known issues with the performance timer on some combinations of OS and browser relating to the timer suspending during sleep:

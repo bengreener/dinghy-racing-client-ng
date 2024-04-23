@@ -9,6 +9,7 @@ import SignUp from './view/SignUp';
 import RaceConsole from './view/RaceConsole';
 import Authorisation from './controller/authorisation';
 import DownloadRacesForm from './view/DownloadRacesForm';
+import RaceStartConsole from './view/RaceStartConsole';
 
 function App({model, controller}) {
   const [displayPort, setDisplayPort] = React.useState();
@@ -39,6 +40,10 @@ function App({model, controller}) {
     setDisplayPort(<SignUp race={race} />)
   }
 
+  function showRaceStartConsole() {
+    setDisplayPort(<RaceStartConsole key={Date.now()}/>);
+  }
+
   function showRaceConsole() {
     setDisplayPort(<RaceConsole key={Date.now()}/>);
   }
@@ -66,14 +71,18 @@ function App({model, controller}) {
           }
           <button key={2} type='button' className='list-group-item list-group-item-action' onClick={showUpcomingRaces}>Upcoming Races</button>
           {roles.includes('ROLE_RACE_OFFICER') ? 
-            <button key={3} type='button' className='list-group-item list-group-item-action' onClick={showRaceConsole}>Race Console</button>
+            <button key={3} type='button' className='list-group-item list-group-item-action' onClick={showRaceStartConsole}>Race Start Console</button>
             : null
           }
           {roles.includes('ROLE_RACE_OFFICER') ? 
-            <button key={4} type='button' className='list-group-item list-group-item-action' onClick={showDownloadRaces}>Download Races</button>
+            <button key={4} type='button' className='list-group-item list-group-item-action' onClick={showRaceConsole}>Race Console</button>
             : null
           }
-          <button key={5} type='button' className='list-group-item list-group-item-action' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
+          {roles.includes('ROLE_RACE_OFFICER') ? 
+            <button key={5} type='button' className='list-group-item list-group-item-action' onClick={showDownloadRaces}>Download Races</button>
+            : null
+          }
+          <button key={6} type='button' className='list-group-item list-group-item-action' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
         </div>
         <div className="display-port">
           <ErrorBoundary key={Date.now()}>

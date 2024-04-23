@@ -1,4 +1,6 @@
 import { Client } from '@stomp/stompjs';
+import StartSignals from './domain-classes/start-signals';
+import StartSequence from './domain-classes/start-sequence';
 
 class DinghyRacingModel {
     httpRootURL;
@@ -37,7 +39,7 @@ class DinghyRacingModel {
      */
     static raceTemplate() {
         return {'name': '', 'plannedStartTime': null, 'actualStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'plannedLaps': null, 'lapForecast': null, 
-            'lastLapTime': null, 'averageLapTime': null, 'clock': null, 'url': ''};
+            'lastLapTime': null, 'averageLapTime': null, 'clock': null, 'startSequenceState': StartSignals.NONE, 'url': ''};
     }
 
     /**
@@ -64,6 +66,7 @@ class DinghyRacingModel {
     constructor(httpRootURL, wsRootURL) {
         this.handleRaceUpdate = this.handleRaceUpdate.bind(this);
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
+        this.getStartSequence = this.getStartSequence.bind(this);
         if (!httpRootURL) {
             throw new Error('An HTTP root URL is required when creating an instance of DinghyRacingModel');
         }
@@ -87,7 +90,7 @@ class DinghyRacingModel {
 
     /**
      * Register a callback for when a race idenified by key is updated
-     * @param {*} key
+     * @param {string} key URI of the race for which the update callback is being registered
      * @param {Function} callback
      */
     registerRaceUpdateCallback(key, callback) {
@@ -101,7 +104,7 @@ class DinghyRacingModel {
 
     /**
      * Unregister a callback for when a race idenified by key is updated
-     * @param {*} key
+     * @param {string} key URI of the race for which the update callback is being unregistered
      * @param {Function} callback
      */
     unregisterRaceUpdateCallback(key, callback) {
@@ -110,6 +113,10 @@ class DinghyRacingModel {
         }
     }
 
+    /**
+     * Handle a websocket update via the Stomp client
+     * @param {string} message URI of race that has been updated
+     */
     handleRaceUpdate(message) {
         if (this.raceUpdateCallbacks.has(message.body)) {
             this.raceUpdateCallbacks.get(message.body).forEach(cb => cb());
@@ -117,8 +124,8 @@ class DinghyRacingModel {
     }
 
     /**
-     * Register a callback for when an entry idenified by key is updated 
-     * @param {*} key 
+     * Register a callback for when an entry identified by key is updated
+     * @param {string} key URI of the entry for which the update callback is being registered
      * @param {Function} callback 
      */
     registerEntryUpdateCallback(key, callback) {
@@ -132,7 +139,7 @@ class DinghyRacingModel {
 
     /**
      * Unregister a callback for when an entry idenified by key is updated
-     * @param {*} key
+     * @param {string} key URI of the entry for which the update callback is being unregistered
      * @param {Function} callback
      */
     unregisterEntryUpdateCallback(key, callback) {
@@ -141,6 +148,10 @@ class DinghyRacingModel {
         }
     }
 
+    /**
+     * Handle a websocket update via the Stomp client
+     * @param {string} message URI of entry that has been updated
+     */
     handleEntryUpdate(message) {
         if (this.entryUpdateCallbacks.has(message.body)) {
             this.entryUpdateCallbacks.get(message.body).forEach(cb => cb());
@@ -670,6 +681,7 @@ class DinghyRacingModel {
                     'plannedLaps': result.domainObject.plannedLaps, 'lapForecast': result.domainObject.lapForecast, 
                     'lastLapTime': result.domainObject.leadEntry ? this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.lastLapTime) : null, 
                     'averageLapTime': result.domainObject.leadEntry ? this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.averageLapTime) : null, 
+                    'startSequenceState': StartSignals.from(result.domainObject.startSequenceState),
                     'url': result.domainObject._links.self.href
                 }});
             }
@@ -701,12 +713,13 @@ class DinghyRacingModel {
      * @param {Date} endTime The start time of the last race
      * @param {integer} [page] number to return (0 indexed)
      * @param {integer} [size] number of elements to return per page
+     * @param {SortParameters} [sortParameters] and order for sorting the requested races
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
-    async getRacesBetweenTimes(startTime, endTime, page, size) {
+    async getRacesBetweenTimes(startTime, endTime, page, size, sortParameters) {
         const resource = this.httpRootURL + '/races/search/findByPlannedStartTimeBetween?startTime=' + startTime.toISOString() + '&endTime=' + endTime.toISOString();
 
-        return this.getRacesFromURL(resource, page, size);
+        return this.getRacesFromURL(resource, page, size, sortParameters);
     }
 
     /**
@@ -714,13 +727,15 @@ class DinghyRacingModel {
      * @param {String} url to use to retrieve a collection of races
      * @param {integer} [page] number to return (0 indexed)
      * @param {integer} [size] number of elements to return per page
+     * @param {SortParameters} [sortParameters] and order for sorting the requested races
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
-    async getRacesFromURL(url, page, size) {
+    async getRacesFromURL(url, page, size, sortParameters) {
         const hasPage = Number.isInteger(page);
         const hasSize = Number.isInteger(size);
+        const hasSort = !(sortParameters == null);
         const hasParams = /\?/.test(url);
-        if ((hasPage || hasSize) && !hasParams) {
+        if ((hasPage || hasSize || hasSort) && !hasParams) {
             url += '?';
         }
         if (hasPage) {
@@ -739,6 +754,15 @@ class DinghyRacingModel {
                 url += 'size=' + size;
             }
         }
+        if (hasSort) {
+            if (hasParams || hasPage || hasSize) {
+                url += '&sort=' + sortParameters.by + ',' + (sortParameters.order || 'ASC');
+            }
+            else {
+                url += 'sort=' + sortParameters.by + ',' + (sortParameters.order || 'ASC');
+            }
+        }
+
         const result = await this.read(url);
         if (result.success) {
             if (!hasPage && !hasSize && result.domainObject.page.totalElements > result.domainObject.page.size) {
@@ -759,6 +783,7 @@ class DinghyRacingModel {
                     'lapForecast': racesHAL[i].lapForecast, 
                     'lastLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.lastLapTime) : null, 
                     'averageLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.averageLapTime) : null, 
+                    'startSequenceState': StartSignals.from(racesHAL[i].startSequenceState),
                     'url': racesHAL[i]._links.self.href});
             };
             return Promise.resolve({'success': true, 'domainObject': races});
@@ -781,6 +806,45 @@ class DinghyRacingModel {
     }
 
     /**
+     * Update the start sequence for a race
+     * @param {Race} race to update
+     * @param {StartSignals} stage of the starting sequence reached
+     */
+    async updateRaceStartSequenceState(race, stage) {
+        let result;
+        if (!race.url) {
+            result = await this.getRaceByNameAndPlannedStartTime(race.name, race.plannedStartTime);
+        }
+        else {
+            result = {'success': true, 'domainObject': race};
+        }
+        if (result.success) {
+            return this.update(result.domainObject.url, {'startSequenceState': stage});
+        }
+        else {
+            return result;
+        }
+    }
+
+    /**
+     * Get a start sequence for staring a races during a session
+     * @param {Date} startTime The start time of the first race
+     * @param {Date} endTime The start time of the last race
+     * @returns {Promise<Result>} If successful result domainObject will be StartSequence
+     */
+    async getStartSequence(startTime, endTime) {
+        const result = await this.getRacesBetweenTimes(startTime, endTime, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
+
+        if (result.success) {
+            const startSequence = new StartSequence(result.domainObject, this);
+            return Promise.resolve({success: true, domainObject: startSequence});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
      * Start a race
      * @param {Race} race
      * @param {Date} startTime
@@ -795,10 +859,9 @@ class DinghyRacingModel {
             result = {'success': true, 'domainObject': race};
         }
         if (result.success) {
-            // return this.update(result.domainObject.url, {'actualStartTime': startTime});
             return this.update(result.domainObject.url, {'plannedStartTime': startTime});
         }
-        else { 
+        else {
             return result;
         }
     }
@@ -936,4 +999,19 @@ class DinghyRacingModel {
     }
 }
 
+/**
+ * @typedef SortParameters
+ * @property {string} by name of the property to sort the collection by
+ * @property {string} order sort order for collection; 'ASC' or 'DESC'
+ */
+
+/**
+ * Class providng enumeration of SortOrder options for SortObject type
+ */
+class SortOrder {
+    static ASCENDING = 'ASC';
+    static DESCENDING = 'DESC';
+}
+
 export default DinghyRacingModel;
+export { SortOrder };
