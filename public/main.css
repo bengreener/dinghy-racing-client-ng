@@ -52,6 +52,9 @@ input {
     border-radius: 25pt;
     padding: 5pt;
 }
+input[disabled] {
+	background-color: lightgrey;
+}
 select {
 	border-width: 2px;
 	border-radius: 25pt;
