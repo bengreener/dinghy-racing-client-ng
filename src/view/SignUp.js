@@ -253,7 +253,12 @@ function SignUp({ race }) {
     }
 
     function crewInput() {
-        let crewInput = null;
+        let crewInput = (
+            <>
+                <label htmlFor="crew-input">Crew's Name</label>
+                <input id="crew-input" name="crew" list="competitor-datalist" onChange={handleChange} value={crewName} disabled />
+            </>
+        );
         if (dinghyClassHasCrew) {
             crewInput = (
                 <>

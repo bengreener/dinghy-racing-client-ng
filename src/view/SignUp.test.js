@@ -91,8 +91,10 @@ describe('when race for dinghy class with no crew', () => {
         await act(async () => {
             customRender(<SignUp race={raceCometA}/>, model, controller);
         });
-        const inputCrew = screen.queryByLabelText(/crew/i);
-        expect(inputCrew).not.toBeInTheDocument();
+        // const inputCrew = screen.queryByLabelText(/crew/i);
+        // expect(inputCrew).not.toBeInTheDocument();
+        const inputCrew = screen.getByLabelText(/crew/i);
+        expect(inputCrew).toBeDisabled();
     });
 
     describe('when helm and dinghy exist', () => {
@@ -547,7 +549,8 @@ describe('when race for dinghy class with no crew', () => {
         expect(raceTitle).toBeInTheDocument();
         expect(inputHelm).toHaveValue('');
         expect(inputSailNumber).toHaveValue('');
-        expect(screen.queryByLabelText(/crew/i)).not.toBeInTheDocument();
+        // expect(screen.queryByLabelText(/crew/i)).not.toBeInTheDocument();
+        expect(screen.queryByLabelText(/crew/i)).toBeDisabled();
         expect(btnCreate).toBeInTheDocument();
     });
     
@@ -2132,7 +2135,8 @@ describe('when race is a handicap', () => {
                 await user.selectOptions(inputDinghyClass, 'Comet');
             });
             const inputCrew = screen.queryByLabelText(/crew/i);
-            expect(inputCrew).not.toBeInTheDocument();
+            // expect(inputCrew).not.toBeInTheDocument();
+            expect(inputCrew).toBeDisabled();
         });
         
         describe('when helm and dinghy exist', () => {
