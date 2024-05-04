@@ -305,10 +305,10 @@ function SignUp({ race }) {
             <h1>{race.name}</h1>
             <datalist id="competitor-datalist">{competitorOptions}</datalist>
             <div>
+            {dinghyClassInput(race)}
             <label htmlFor="helm-input">Helm's Name</label>
             <input id="helm-input" name="helm" list="competitor-datalist" onChange={handleChange} value={helmName} />
             {crewInput()}
-            {dinghyClassInput(race)}
             <datalist id="dinghy-datalist">{dinghyOptions}</datalist>
             <label htmlFor="sail-number-input">Sail Number</label>
             <input id="sail-number-input" name="sailNumber" list="dinghy-datalist" onChange={handleChange} value={sailNumber} />
