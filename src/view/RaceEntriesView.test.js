@@ -87,6 +87,60 @@ describe('when entries cannot be loaded for a selected race', () => {
 });
 
 describe('when sorting entries', () => {
+    it('sorts by the sailnumber', async () => {
+        const entriesScorpionA = [
+            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0,'url': 'http://localhost:8081/dinghyracing/api/entries/11'},
+            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'}
+        ];
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+            if (race.name === 'Scorpion A') {
+                return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+            }
+            else if (race.name === 'Graduate A') {
+                return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
+            }    
+        });
+        await act(async () => {
+            customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
+        });
+        const sortBySailNumber = screen.getByRole('button', {'name': /by sail number/i});
+        await act(async () => {
+            await user.click(sortBySailNumber);
+        });
+        const cells = await screen.findAllByRole('rowheader', {name: /\d+/i});
+        const orderedEntries = cells.map(cell => cell.textContent);
+        expect(orderedEntries).toEqual(['1234', '2928', '6745']);
+    });
+    it('sorts by the dinghy class and sail number', async () => {
+        const entriesScorpionA = [
+            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'},
+            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'}
+        ];
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+            if (race.name === 'Scorpion A') {
+                return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+            }
+            else if (race.name === 'Graduate A') {
+                return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
+            }    
+        });
+        await act(async () => {
+            customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
+        });
+        
+        const sortByClassAndSailNumber = screen.getByRole('button', {'name': /by class & sail number/i});
+        await act(async () => {
+            await user.click(sortByClassAndSailNumber);
+        });
+        
+        const cells = await screen.findAllByRole('rowheader', {name: /\d+/i});
+        const orderedEntries = cells.map(cell => cell.textContent);
+        expect(orderedEntries).toEqual(['2928', '1234', '6745']);
+    });
     it('sorts by the last three digits of the sail number', async () => {
         const entriesScorpionA = [
             {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0,'url': 'http://localhost:8081/dinghyracing/api/entries/11'},
@@ -112,40 +166,6 @@ describe('when sorting entries', () => {
         const cells = await screen.findAllByRole('rowheader', {name: /\d+/i});
         const orderedEntries = cells.map(cell => cell.textContent);
         expect(orderedEntries).toEqual(['1234', '6745', '2928']);
-    });
-    it('sorts back to the default order received from the REST server', async () => {
-        const entriesScorpionA = [
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'},
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'}
-        ];
-        const user = userEvent.setup();
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
-            if (race.name === 'Scorpion A') {
-                return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
-            }
-            else if (race.name === 'Graduate A') {
-                return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
-            }    
-        });
-        await act(async () => {
-            customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
-        });
-        await screen.findAllByRole('rowheader', {name: /\d+/i});
-        const sortByLastThreeButton = screen.getByRole('button', {'name': /by last 3/i});
-        const sortByDefaultButton = screen.getByRole('button', {'name': /default/i});
-        // sort into a different order
-        await act(async () => {
-            await user.click(sortByLastThreeButton);
-        });        
-        // sort back to original order
-        await act(async () => {
-            await user.click(sortByDefaultButton);
-        });
-        const cells = await screen.findAllByRole('rowheader', {name: /\d+/i});
-        const orderedEntries = cells.map(cell => cell.textContent);
-
-        expect(orderedEntries).toEqual(['6745', '1234', '2928']);
     });
     it('sorts by the dinghy class and last three digits of the sail number', async () => {
         const entriesScorpionA = [
