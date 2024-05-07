@@ -135,8 +135,8 @@ describe('when a race is selected', () => {
             await user.selectOptions(selectRace, 'Scorpion A');
         });
         
-        const entry1 = await screen.findByText(/Scorpion 1234 Chris Marshall/i);
-        const entry2 = await screen.findByText(/Scorpion 6745 Sarah Pascal/i);
+        const entry1 = await screen.findByText(/1234/i);
+        const entry2 = await screen.findByText(/6745/i);
         expect(entry1).toBeInTheDocument();
         expect(entry2).toBeInTheDocument();
     });
@@ -194,9 +194,9 @@ describe('when more than one race is selected', () => {
             await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
         });
         
-        const entry1 = await screen.findByText(/Scorpion 1234 Chris Marshall/i);
-        const entry2 = await screen.findByText(/Scorpion 6745 Sarah Pascal/i);
-        const entry3 = await screen.findByText(/Graduate 2928 Jill Myer/i)
+        const entry1 = await screen.findByText(/1234/i);
+        const entry2 = await screen.findByText(/6745/i);
+        const entry3 = await screen.findByText(/2928/i)
         expect(entry1).toBeInTheDocument();
         expect(entry2).toBeInTheDocument();
         expect(entry3).toBeInTheDocument();

@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { act, screen, waitForElementToBeRemoved, waitFor } from '@testing-library/react';
+import { act, screen, waitForElementToBeRemoved, waitFor, logRoles } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import { customRender } from '../test-utilities/custom-renders';
@@ -49,9 +49,9 @@ it('displays entries for selected races', async () => {
     await act(async () => {
         customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
     });
-    const entry1 = await screen.findByText(/Scorpion 1234 Chris Marshall/i);
-    const entry2 = await screen.findByText(/Scorpion 6745 Sarah Pascal/i);
-    const entry3 = await screen.findByText(/Graduate 2928 Jill Myer/i);
+    const entry1 = await screen.findByText(/1234/i);
+    const entry2 = await screen.findByText(/6745/i);
+    const entry3 = await screen.findByText(/2928/i);
     expect(entry1).toBeInTheDocument();
     expect(entry2).toBeInTheDocument();
     expect(entry3).toBeInTheDocument();
@@ -109,9 +109,9 @@ describe('when sorting entries', () => {
         await act(async () => {
             await user.click(sortByLastThreeButton);
         });
-        const cells = await screen.findAllByText(/\w+ (\d+) [\w ]+/i);
+        const cells = await screen.findAllByRole('rowheader', {name: /\d+/i});
         const orderedEntries = cells.map(cell => cell.textContent);
-        expect(orderedEntries).toEqual(['Scorpion 1234 Chris Marshall', 'Scorpion 6745 Sarah Pascal', 'Graduate 2928 Jill Myer']);
+        expect(orderedEntries).toEqual(['1234', '6745', '2928']);
     });
     it('sorts back to the default order received from the REST server', async () => {
         const entriesScorpionA = [
@@ -131,7 +131,7 @@ describe('when sorting entries', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
         });
-        await screen.findAllByText(/\w+ (\d+) [\w ]+/i);
+        await screen.findAllByRole('rowheader', {name: /\d+/i});
         const sortByLastThreeButton = screen.getByRole('button', {'name': /by last 3/i});
         const sortByDefaultButton = screen.getByRole('button', {'name': /default/i});
         // sort into a different order
@@ -142,10 +142,10 @@ describe('when sorting entries', () => {
         await act(async () => {
             await user.click(sortByDefaultButton);
         });
-        const cells = await screen.findAllByText(/\w+ (\d+) [\w ]+/i);
+        const cells = await screen.findAllByRole('rowheader', {name: /\d+/i});
         const orderedEntries = cells.map(cell => cell.textContent);
 
-        expect(orderedEntries).toEqual(['Scorpion 6745 Sarah Pascal', 'Scorpion 1234 Chris Marshall', 'Graduate 2928 Jill Myer']);
+        expect(orderedEntries).toEqual(['6745', '1234', '2928']);
     });
     it('sorts by the dinghy class and last three digits of the sail number', async () => {
         const entriesScorpionA = [
@@ -171,9 +171,9 @@ describe('when sorting entries', () => {
             await user.click(sortByClassAndLastThreeButton);
         });
         
-        const cells = await screen.findAllByText(/\w+ (\d+) [\w ]+/i);
+        const cells = await screen.findAllByRole('rowheader', {name: /\d+/i});
         const orderedEntries = cells.map(cell => cell.textContent);
-        expect(orderedEntries).toEqual(['Graduate 2928 Jill Myer', 'Scorpion 1234 Chris Marshall', 'Scorpion 6745 Sarah Pascal']);
+        expect(orderedEntries).toEqual(['2928', '1234', '6745']);
     });
     it('sorts by the total recorded lap times plus race start time of dinghies in ascending order', async () => {
         const entries = [
@@ -198,10 +198,10 @@ describe('when sorting entries', () => {
         await act(async () => {
             await user.click(sortByLapTimeButton);
         });
-        const cells = await screen.findAllByText(/\w+ (\d+) [\w ]+/i);
+        const cells = await screen.findAllByRole('rowheader', {name: /\d+/i});
         const orderedEntries = cells.map(cell => cell.textContent);
 
-        expect(orderedEntries).toEqual(['Scorpion 1234 Chris Marshall', 'Scorpion 6745 Sarah Pascal', 'Graduate 2928 Jill Myer']);
+        expect(orderedEntries).toEqual(['1234', '6745', '2928']);
     });
     describe('when sorting entries that include an entry that did not start', () => {
         it('sorts by the total recorded lap times of dinghies in ascending order except for DNS entry which is placed last', async () => {
@@ -218,10 +218,10 @@ describe('when sorting entries', () => {
             await act(async () => {
                 await user.click(sortByLapTimeButton);
             });
-            const cells = await screen.findAllByText(/\w+ (\d+) [\w ]+/i);
+            const cells = await screen.findAllByRole('rowheader', {name: /\d+/i});
             const orderedEntries = cells.map(cell => cell.textContent);
 
-            expect(orderedEntries).toEqual(['Scorpion 6745 Sarah Pascal', 'Scorpion 1234 Chris Marshall']);
+            expect(orderedEntries).toEqual(['6745', '1234']);
         });
     });
     describe('when sorting entries that include an entry that retired', () => {
@@ -241,10 +241,10 @@ describe('when sorting entries', () => {
             await act(async () => {
                 await user.click(sortByLapTimeButton);
             });
-            const cells = await screen.findAllByText(/\w+ (\d+) [\w ]+/i);
+            const cells = await screen.findAllByRole('rowheader', {name: /\d+/i});
             const orderedEntries = cells.map(cell => cell.textContent);
 
-            expect(orderedEntries).toEqual(['Scorpion 6745 Sarah Pascal', 'Scorpion 1234 Chris Marshall']);
+            expect(orderedEntries).toEqual(['6745', '1234']);
         });
     });
     describe('when sorting entries that include an entry that has been disqualified', () => {
@@ -264,10 +264,10 @@ describe('when sorting entries', () => {
             await act(async () => {
                 await user.click(sortByLapTimeButton);
             });
-            const cells = await screen.findAllByText(/\w+ (\d+) [\w ]+/i);
+            const cells = await screen.findAllByRole('rowheader', {name:/\d+/i});
             const orderedEntries = cells.map(cell => cell.textContent);
 
-            expect(orderedEntries).toEqual(['Scorpion 6745 Sarah Pascal', 'Scorpion 1234 Chris Marshall']);
+            expect(orderedEntries).toEqual(['6745', '1234']);
         });
     });
     describe('when sorting entries that include an entry that has finished the race', () => {
@@ -285,10 +285,10 @@ describe('when sorting entries', () => {
             await act(async () => {
                 await user.click(sortByLapTimeButton);
             });
-            const cells = await screen.findAllByText(/\w+ (\d+) [\w ]+/i);
+            const cells = await screen.findAllByRole('rowheader', {'name': /\d{4}/i});
             const orderedEntries = cells.map(cell => cell.textContent);
 
-            expect(orderedEntries).toEqual(['Scorpion 1234 Chris Marshall', 'Scorpion 6745 Sarah Pascal']);
+            expect(orderedEntries).toEqual(['1234', '6745']);
         });
     });
 });
@@ -309,7 +309,7 @@ describe('when adding a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
-        const entry = await screen.findByText(/scorpion 6745/i);
+        const entry = await screen.findByText(/6745/i);
         await act(async () => {
             await user.click(entry);
         });
@@ -327,7 +327,7 @@ describe('when adding a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
                
-        const entry = await screen.findByText(/scorpion 1234/i);
+        const entry = await screen.findByText(/1234/i);
         await act(async () => {
             await user.click(entry);
         });        
@@ -348,7 +348,7 @@ describe('when adding a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
                
-        const entry = await screen.findByText(/scorpion 1234/i);
+        const entry = await screen.findByText(/1234/i);
         await act(async () => {
             model.handleEntryUpdate({'body': entriesScorpionA[0].url});
         });
@@ -368,7 +368,7 @@ describe('when adding a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
                
-        const entry = await screen.findByText(/scorpion 1234/i);
+        const entry = await screen.findByText(/1234/i);
         await act(async () => {
             await user.click(entry);
         });
@@ -391,7 +391,7 @@ describe('when adding a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
                
-        const entry = await screen.findByText(/scorpion 1234/i);
+        const entry = await screen.findByText(/1234/i);
         await act(async () => {
             await user.click(entry);
         });
@@ -418,7 +418,7 @@ describe('when removing a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });        
-        const entry = await screen.findByText(/scorpion 1234/i);
+        const entry = await screen.findByText(/1234/i);
         await act(async () => {
             await user.keyboard('{Control>}');
             await user.click(entry);
@@ -440,7 +440,7 @@ describe('when removing a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
-        const entry = await screen.findByText(/scorpion 1234/i);
+        const entry = await screen.findByText(/1234/i);
         const cell = await screen.findAllByRole('cell', {'name': '05:13'});
         expect(cell).toHaveLength(2);
         await act(async ()=> {
@@ -471,7 +471,7 @@ describe('when removing a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
                
-        const entry = await screen.findByText(/scorpion 1234/i);
+        const entry = await screen.findByText(/1234/i);
         await act(async () => {
             await user.keyboard('{Control>}');
             await user.click(entry);
@@ -499,7 +499,7 @@ describe('when removing a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
                
-        const entry = await screen.findByText(/scorpion 1234/i);
+        const entry = await screen.findByText(/1234/i);
         await act(async () => {
             await user.keyboard('{Control>}');
             await user.click(entry);
@@ -531,7 +531,7 @@ describe('when updating a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
-        const entryRow = screen.getByText(/scorpion 1234/i).parentElement;
+        const entryRow = screen.getByText(/1234/i).parentElement;
         const lastCell = entryRow.children[entryRow.children.length - entryRowLastCellLapTimeCellOffset];
         // render updated components
         await act(async () => {
@@ -564,7 +564,7 @@ describe('when updating a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
-        const entryRow = screen.getByText(/scorpion 1234/i).parentElement;
+        const entryRow = screen.getByText(/1234/i).parentElement;
         const lastCell = entryRow.children[entryRow.children.length - entryRowLastCellLapTimeCellOffset];
         // render updated components
         await act(async () => {
@@ -598,7 +598,7 @@ describe('when updating a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
-        const entryRow = screen.getByText(/scorpion 1234/i).parentElement;
+        const entryRow = screen.getByText(/1234/i).parentElement;
         const lastCell = entryRow.children[entryRow.children.length - entryRowLastCellLapTimeCellOffset];
         await act(async () => {
             await user.pointer({target: lastCell, keys: '[MouseRight]'});
@@ -629,7 +629,7 @@ describe('when updating a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
-        const entryRow = screen.getByText(/scorpion 1234/i).parentElement;
+        const entryRow = screen.getByText(/1234/i).parentElement;
         const lastCell = entryRow.children[entryRow.children.length - entryRowLastCellLapTimeCellOffset];
         await act(async () => {
             await user.pointer({target: lastCell, keys: '[MouseRight]'});
