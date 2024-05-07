@@ -92,16 +92,29 @@ function RaceEntriesView({ races }) {
                     return [entry.dinghy.dinghyClass.name, Number(snEndDigits)];
                 });
                 break;
-            // sort by the sum of all recorded lap times
+            case 'sailNumber':
+                ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
+                    // some boats have been known to use non-numeric 'sail numbers'
+                    return isNaN(entry.dinghy.sailNumber) ? entry.dinghy.sailNumber : Number(entry.dinghy.sailNumber);
+                });
+                break;
+            case 'classSailNumber':
+                ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
+                    return [entry.dinghy.dinghyClass.name, isNaN(entry.dinghy.sailNumber) ? entry.dinghy.sailNumber : Number(entry.dinghy.sailNumber)];
+                });
+                break;
+            // sort by the sum of all recorded lap times (sub sort by class and sail number to avoid order changing based on order of returned values from server)
             case 'lapTimes':
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
                     const weighIfScoringAbbreviation = ['DNS', 'DSQ', 'RET'];
                     const weighting = (entry.finishedRace || weighIfScoringAbbreviation.includes(entry.scoringAbbreviation)) ? Date.now() : 0;
-                    return entry.race.plannedStartTime.getTime() + entry.sumOfLapTimes + weighting;
+                    return [entry.race.plannedStartTime.getTime() + entry.sumOfLapTimes + weighting, entry.dinghy.dinghyClass.name, isNaN(entry.dinghy.sailNumber) ? entry.dinghy.sailNumber : Number(entry.dinghy.sailNumber)];
                 });
                 break;
             default:
-                ordered = Array.from(entriesMap.values());
+                ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
+                    return [entry.dinghy.dinghyClass.name, Number(entry.dinghy.sailNumber)];
+                });
         }
         return ordered;
     }
@@ -151,7 +164,8 @@ function RaceEntriesView({ races }) {
         <div className="race-entries-view" >
             <p id="race-entries-message" className={!message ? "hidden" : ""}>{message}</p>
             <div>
-                <button onClick={() => setSortOrder('default')}>Default</button>
+                <button onClick={() => setSortOrder('sailNumber')}>By sail number</button>
+                <button onClick={() => setSortOrder('classSailNumber')}>By class & sail number</button>
                 <button onClick={() => setSortOrder('lastThree')}>By last 3</button>
                 <button onClick={() => setSortOrder('classLastThree')}>By class & last 3</button>
                 <button onClick={() => setSortOrder('lapTimes')}>By lap times</button>

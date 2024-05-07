@@ -179,7 +179,10 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         <tr className={classes} onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}
             onPointerDown={gestureStart} onPointerMove={gestureMove} onPointerUp={gestureEnd} onPointerOut={gestureEnd}
             onPointerLeave={gestureEnd} onPointerCancel={gestureCancel} >
-            <th scope='row'>{entry.dinghy.dinghyClass.name + ' ' + entry.dinghy.sailNumber + ' ' + entry.helm.name}</th>
+            {/* <th scope='row'>{entry.dinghy.dinghyClass.name + ' ' + entry.dinghy.sailNumber + ' ' + entry.helm.name}</th> */}
+            <th scope='row'>{entry.dinghy.dinghyClass.name}</th>
+            <th className='sail-number' scope='row'>{entry.dinghy.sailNumber}</th>
+            <th scope='row'>{entry.helm.name}</th>
             {lapsView}
             <LapView key='sumOfLapTimes' value={entry.sumOfLapTimes} total={true} editable={false} />
             <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
