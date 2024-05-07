@@ -85,9 +85,11 @@ it('when secondary mouse button is clicked accepts a new lap time input in the l
     await act(async () => {
         await user.pointer({target: lastCell, keys: '[MouseRight]'});
     });
-    await user.clear(lastCell.lastChild);
-    await user.type(lastCell.lastChild, '15678');
-    expect(lastCell.lastChild).toHaveValue(15678);
+    await act(async () => {
+        await user.clear(lastCell.lastChild);
+        await user.type(lastCell.lastChild, '00:15');
+    });
+    expect(lastCell.lastChild).toHaveValue('00:15');
 });
 
 describe('when editing a lap time', () => {
@@ -139,9 +141,9 @@ describe('when editing a lap time', () => {
         await act(async () => {
             await user.pointer({target: lastCell, keys: '[MouseRight]'});
         });
-        await user.clear(lastCell.lastChild);
-        await user.type(lastCell.lastChild, '15678');
         await act(async () => {
+            await user.clear(lastCell.lastChild);
+            await user.type(lastCell.lastChild, '15678');
             await user.keyboard('{Enter}');
         });
         expect(updateLapCallback).toBeCalledWith(entry, 15678);
@@ -179,9 +181,12 @@ describe('when user taps and holds on row', () => {
         act(() => {
             jest.advanceTimersByTime(500);
         });
-        await user.clear(lastCell.lastChild);
-        await user.type(lastCell.lastChild, '15678');
-        expect(lastCell.lastChild).toHaveValue(15678);
+        await act(async () => {
+            await user.clear(lastCell.lastChild);
+            await user.type(lastCell.lastChild, '00:15');
+        });
+        // expect(lastCell.lastChild).toHaveValue(15678);
+        expect(lastCell.lastChild).toHaveValue('00:15');
     });
 });
 

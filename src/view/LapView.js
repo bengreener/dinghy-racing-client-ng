@@ -14,11 +14,11 @@
  * limitations under the License. 
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Clock from '../model/domain-classes/clock';
 
 /**
- * 
+ * Display the value of a lap and provide the ability edit the value
  * @param {Object} props
  * @param {Number} props.value Lap time to display
  * @param {boolean} props.total The value provided represents a total, sum of, lap times
@@ -28,8 +28,15 @@ import Clock from '../model/domain-classes/clock';
  * @returns 
  */
 function LapView({value, total, editable = false, keyup, focusout}) {
+    const handleChange = useCallback(({ target }) => {
+        if (/(^\d*(?:(?=:)|$)):?((?<=:)[0-5]?\d(?:(?=:)|$))?:?((?<=:)[0-5]?\d(?=$))?$/.test(target.value)) {
+            setEditValue(target.value);
+        }
+    }, []);
+
+    const [editValue, setEditValue] = useState(Clock.formatDuration(value));
     const textInputRef = useRef(null);
-    const inner = <input ref={textInputRef} type='number' defaultValue={value} onKeyUp={keyup} onBlur={focusout}/>;
+    const inner = <input ref={textInputRef} type='text' value={editValue} onChange={handleChange} onKeyUp={keyup} onBlur={focusout}/>;
     const classes = total ? 'total' : null;
 
     useEffect(() => {
