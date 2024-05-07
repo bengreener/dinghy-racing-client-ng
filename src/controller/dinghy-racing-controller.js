@@ -17,7 +17,7 @@
 import StartSequence from '../model/domain-classes/start-signals';
 import { downloadRaceEntriesCSV } from '../utilities/csv-writer'
 class DinghyRacingController {
-    
+
     model;
 
     constructor(model) {
@@ -84,22 +84,37 @@ class DinghyRacingController {
     /**
      * Update the last lap time recorded for an entry in a race
      * @param {Entry} entry
-     * @param {Number} time The lap time duration in milliseconds
+     * @param {Number | String} time The lap time duration in milliseconds or a string in the format [hh:][mm:]ss
      * @returns {Promise<Result>}
      */
     updateLap(entry, time) {
+        let timeInMilliseconds = 0;
+        // if time is a string convert to number of milliseconds
+        if (typeof time !== 'number') {
+            if (/^(\d+:(?=[0-5]?\d:[0-5]?\d))?([0-5]?\d:(?=[0-5]?\d))?([0-5]?\d)$/.test(time)) {
+                const timeComponents = /^((?<=^)\d*(?=:[0-5]?\d:))*:?((?<=^|:)[0-5]?\d(?=:))?:?((?<=^|:)[0-5]?\d(?=$))$/.exec(time);
+                // get hours
+                timeInMilliseconds += isNaN(timeComponents[1]) ? 0 : 360000 * timeComponents[1];
+                // get minutes
+                timeInMilliseconds += isNaN(timeComponents[2]) ? 0 : 60000 * timeComponents[2];
+                // get seconds
+                timeInMilliseconds += isNaN(timeComponents[3]) ? 0 : 1000 * timeComponents[3];
+            }
+            else {
+                return Promise.resolve({'success': false, 'message': 'Time must be a number, in milliseconds, or a string value in the format [hh:][mm:]ss.'});
+            }
+        }
+        else {
+            timeInMilliseconds = time;
+        }
         if (!entry || !entry.url) {
             return Promise.resolve({'success': false, 'message': 'A valid entry is required to update a lap time.'});
         }
-        // time can't be null and must be number
-        if (isNaN(time)) {
-            return Promise.resolve({'success': false, 'message': 'Time must be a number; in milliseconds.'});   
-        }
         // time must be greater than zero
-        if (time <= 0) {
+        if (timeInMilliseconds <= 0) {
             return Promise.resolve({'success': false, 'message': 'Time must be greater than zero.'});   
         }
-        return this.model.updateLap(entry, time);
+        return this.model.updateLap(entry, timeInMilliseconds);
     }
 
     /**
