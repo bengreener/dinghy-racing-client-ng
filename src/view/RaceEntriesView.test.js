@@ -540,10 +540,10 @@ describe('when updating a lap time', () => {
         // after render perform update
         await act(async () => {
             await user.clear(lastCell.lastChild);
-            await user.type(lastCell.lastChild, '15678');
+            await user.type(lastCell.lastChild, '15:23');
             await user.keyboard('{Enter}');
         });
-        expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234Pre, 15678);
+        expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234Pre, '15:23');
     });
     it('refreshes display after lap time updated', async () => {
         const entriesScorpionAPre = [

@@ -143,10 +143,10 @@ describe('when editing a lap time', () => {
         });
         await act(async () => {
             await user.clear(lastCell.lastChild);
-            await user.type(lastCell.lastChild, '15678');
+            await user.type(lastCell.lastChild, '15:53');
             await user.keyboard('{Enter}');
         });
-        expect(updateLapCallback).toBeCalledWith(entry, 15678);
+        expect(updateLapCallback).toBeCalledWith(entry, '15:53');
     });
 });
 

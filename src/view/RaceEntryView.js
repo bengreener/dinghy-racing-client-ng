@@ -34,7 +34,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     const handleLastLapCellKeyUp = useCallback((event) => {
         if (event.key === 'Enter') {
             if (updateLap) {
-                updateLap(entry, Number(event.target.value));
+                updateLap(entry, event.target.value);
                 setEditMode(false);
             }
         }
