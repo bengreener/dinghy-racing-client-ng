@@ -19,18 +19,25 @@ import { useCallback, useState } from 'react';
 /**
  * Provide a form to get the new number of laps that will be sailed when a course is shortened
  * @param {Object} props
+ * @param {Race} props.race to update
  * @param {Number} props.minLaps The minimum number of laps that can be set; default is 1
  * @param {Number} props.maxLaps The maximum number of laps that can be set; default is 100
  * @param {Number} props.initialValue to display for new laps value; default is minLaps
+ * @param {ShortenCouraseForm~updateLaps} props.onUpdate called when update button clicked
  * @returns {HTMLFormElement}
  */
-function ShortenCourseForm({ minLaps = 1, maxLaps = 100, initialValue }) {
+function ShortenCourseForm({ race, minLaps = 1, maxLaps = 100, initialValue, onUpdate}) {
     const [laps, setLaps] = useState(initialValue ? initialValue : minLaps);
 
     const handleChange = useCallback(({ target }) => {
         if (target.value >= minLaps && target.value <= maxLaps) {
             setLaps(target.value);
         }
+    });
+
+    const handleUpdateButtonClick = useCallback((event) => {
+        event.preventDefault();
+        onUpdate(race, Number(laps));
     });
 
     return (
@@ -40,10 +47,17 @@ function ShortenCourseForm({ minLaps = 1, maxLaps = 100, initialValue }) {
                 <input id='set-laps-input' type='number' min={minLaps.toString()} max={maxLaps.toString()} value={laps} onChange={handleChange} />
             </div>
             <div>
-                <button type='button'>Update Laps</button>
+                <button type='button' onClick={handleUpdateButtonClick}>Update Laps</button>
             </div>
         </form>
     )
 }
 
 export default ShortenCourseForm;
+
+/**
+ * Action to take when ShortenCourseForm update laps button clicked
+ * @callback ShortenCouraseForm~updateLaps
+ * @param {Race} race to update
+ * @param {Number} laps to set as new number of planned laps
+ */

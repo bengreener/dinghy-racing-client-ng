@@ -62,3 +62,18 @@ it('shows initial value set for number of laps', () => {
     render(<ShortenCourseForm initialValue={3} />);
     expect(screen.getByLabelText(/set laps/i)).toHaveValue(3);
 });
+
+describe('when update laps button clicked', () => {
+    it('calls function passed to onUpdate with race and value entered for laps', async () => {
+        const onUpdateSpy = jest.fn();
+        const user = userEvent.setup();
+        render(<ShortenCourseForm race={raceScorpionA} minLaps={0} maxLaps={5} initialValue={3} onUpdate={onUpdateSpy} />);
+        const lapInput = screen.getByLabelText(/set laps/i);
+        await act(async () => {
+            await user.clear(lapInput);
+            await user.type(lapInput, '4');
+        });
+        await user.click(screen.getByRole('button', {name: /Update Laps/}));
+        expect(onUpdateSpy).toHaveBeenCalledWith(raceScorpionA, 4);
+    });
+});
