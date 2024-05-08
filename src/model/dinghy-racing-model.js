@@ -843,7 +843,28 @@ class DinghyRacingModel {
     }
 
     /**
-     * Get a start sequence for staring a races during a session
+     * Update the planned laps for a race
+     * @param {Race} race to update
+     * @param {Integer} plannedLaps of the starting sequence reached
+     */
+    async updateRacePlannedLaps(race, plannedLaps) {
+        let result;
+        if (!race.url) {
+            result = await this.getRaceByNameAndPlannedStartTime(race.name, race.plannedStartTime);
+        }
+        else {
+            result = {'success': true, 'domainObject': race};
+        }
+        if (result.success) {
+            return this.update(result.domainObject.url, {'plannedLaps': plannedLaps});
+        }
+        else {
+            return result;
+        }
+    }
+
+    /**
+     * Get a start sequence for starting races during a session
      * @param {Date} startTime The start time of the first race
      * @param {Date} endTime The start time of the last race
      * @returns {Promise<Result>} If successful result domainObject will be StartSequence

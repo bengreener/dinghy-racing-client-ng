@@ -4103,3 +4103,68 @@ describe('when a StartSequence is requested', () => {
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'});
     });
 });
+
+describe('when updating the plannedLaps for a race', () => {
+    describe('when a url is provided for race', () => {
+        it('returns a promise that resolves to a success response when race planned laps is successfully updated', async () => {
+            fetch.mockImplementationOnce(() => {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve({})
+                });
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.updateRacePlannedLaps(raceScorpionA, 4);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result.success).toBeTruthy();
+        });
+        it('returns a promise that resolves to a result indicating failure when start sequence stae is rejected by REST service', async () => {
+            fetch.mockImplementationOnce(() => {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404, 
+                    json: () => Promise.resolve({})
+                });
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.updateRacePlannedLaps(raceScorpionA, 4);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
+        });
+    });
+    describe('when a url is not provided for race', () => {
+        it('retrieves race by name and planned start time then returns a promise that resolves to a success response when race start sequence state is successfully updated', async () => {
+            fetch.mockImplementationOnce(() => {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve({})
+                });
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': {raceScorpionA}})});
+            const promise = dinghyRacingModel.updateRacePlannedLaps({ 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00Z'), plannedLaps: 5, 'dinghyClass': dinghyClassScorpion}, 4);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result.success).toBeTruthy();
+        });
+        it('returns a failure and advises reason for failure when race cannot be retrieved by name and planned start time', async () => {
+            fetch.mockImplementationOnce(() => {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve({})
+                });
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
+            const promise = dinghyRacingModel.updateRacePlannedLaps({ 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00Z'), plannedLaps: 5, 'dinghyClass': dinghyClassScorpion}, 4);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'Something went wrong'});
+        });
+    });
+});
