@@ -239,6 +239,23 @@ class DinghyRacingController {
     }
 
     /**
+     * Update the start sequence state of a race
+     * @param {Race} race to start
+     * @param {Integer} plannedLaps new value for the number of laps to be completed
+     * @return {Promise<Result>}
+     */
+    updateRacePlannedLaps(race, plannedLaps) {
+        // check valid race (a URL is sufficient, otherwise a name and start time is required)
+        if (!race.url && (!race.name || race.name === '' || !race.plannedStartTime)) {
+            return Promise.resolve({'success': false, 'message': 'Please provide details of the race.'});
+        }
+        if (!Number.isInteger(plannedLaps)) {
+            return Promise.resolve({'success': false, 'message': 'Please provide an integer value for the number of laps.'});
+        }
+        return this.model.updateRacePlannedLaps(race, plannedLaps);
+    }
+
+    /**
      * Start a race
      * @param {Race} race to start
      * @return {Promise<Result>}
