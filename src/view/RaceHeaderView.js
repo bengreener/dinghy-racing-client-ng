@@ -105,16 +105,18 @@ function RaceHeaderView({ race, showInRaceData = true }) {
             <output id={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{race.plannedLaps}</output>
             <label htmlFor={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()}>Duration</label>
             <output id={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(race.duration)}</output>
+            {showInRaceData && elapsedTime >= 0 ? <label htmlFor={'race-elapsed-time-' + race.name.replace(/ /g, '-').toLowerCase()}>Elapsed</label> : null}
+            {showInRaceData && elapsedTime >= 0 ? <output id={'race-elapsed-time-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(elapsedTime)}</output> : null}
             <label htmlFor={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>{(elapsedTime < 0) ? 'Countdown' : 'Remaining'}</label>
             <output id={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>{(elapsedTime < 0) ? Clock.formatDuration(-elapsedTime) : Clock.formatDuration(race.duration - elapsedTime)}</output>
-            {showInRaceData ? <label htmlFor={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>Laps estimate</label> : null}
-            {showInRaceData ? <output id={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{Number(updatedRace.lapForecast).toFixed(2)}</output> : null}
-            {showInRaceData ? <label htmlFor={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Last lap time</label> : null}
-            {showInRaceData ? <output id={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.lastLapTime)}</output> : null}
-            {showInRaceData ? <label htmlFor={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Average lap time</label> : null}
-            {showInRaceData ? <output id={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.averageLapTime)}</output> : null}
-            {elapsedTime < 0 ? <button id="race-postpone-button" onClick={handleRacePostponeClick}>Postpone Start</button> : null}
-            {elapsedTime < 0 ? <button id="race-start-button" onClick={handleRaceStartClick}>Start Now</button> : null}
+            {showInRaceData && updatedRace.lastLapTime > 0 ? <label htmlFor={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>Laps estimate</label> : null}
+            {showInRaceData && updatedRace.lastLapTime > 0 ? <output id={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{Number(updatedRace.lapForecast).toFixed(2)}</output> : null}
+            {showInRaceData && updatedRace.lastLapTime > 0 ? <label htmlFor={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Last lap time</label> : null}
+            {showInRaceData && updatedRace.lastLapTime > 0 ? <output id={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.lastLapTime)}</output> : null}
+            {showInRaceData && updatedRace.lastLapTime > 0 ? <label htmlFor={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Average lap time</label> : null}
+            {showInRaceData && updatedRace.lastLapTime > 0 ? <output id={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.averageLapTime)}</output> : null}
+            {elapsedTime < 0 ? <button id='race-postpone-button' onClick={handleRacePostponeClick}>Postpone Start</button> : null}
+            {elapsedTime < 0 ? <button id='race-start-button' onClick={handleRaceStartClick}>Start Now</button> : null}
             <p id="race-header-message" className={!message ? "hidden" : ""}>{message}</p>
             <ModalDialog show={showPostponeRace} onClose={() => setShowPostponeRace(false)}>
                 <PostponeRaceForm race={race} onPostpone={controller.postponeRace} closeParentDialog={closePostponeRaceFormDialog} />

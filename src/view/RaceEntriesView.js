@@ -75,9 +75,6 @@ function RaceEntriesView({ races }) {
     function sorted() {
         let ordered = [];
         switch (sortOrder) {
-            case 'default':
-                ordered = Array.from(entriesMap.values());
-                break;
             case 'lastThree':
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
                     const sn = entry.dinghy.sailNumber;
