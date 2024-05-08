@@ -14,7 +14,8 @@
  * limitations under the License. 
  */
 
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import ShortenCourseForm from './ShortenCourseForm';
 
 it('renders', () => {
@@ -22,3 +23,14 @@ it('renders', () => {
     expect(screen.getByLabelText(/set laps/i)).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /Update Laps/})).toBeInTheDocument();
 });
+
+it('does not accept an input greater than value set for maximum laps', async () => {
+    const user = userEvent.setup();
+    render(<ShortenCourseForm maxLaps={3} />);
+    const lapInput = screen.getByLabelText(/set laps/i);
+    await act(async () => {
+        await user.clear(lapInput);
+        await user.type(lapInput, '5');
+    });
+    expect(lapInput).not.toHaveValue(5);
+})
