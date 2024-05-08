@@ -17,6 +17,7 @@
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ShortenCourseForm from './ShortenCourseForm';
+import { raceScorpionA } from '../model/__mocks__/test-data';
 
 it('renders', () => {
     render(<ShortenCourseForm />);
@@ -24,9 +25,20 @@ it('renders', () => {
     expect(screen.getByRole('button', {name: /Update Laps/})).toBeInTheDocument();
 });
 
+it('displays new value typed in for laps', async () => {
+    const user = userEvent.setup();
+    render(<ShortenCourseForm minLaps={0}/>); // minLaps is set to 0 to allow user.clear to work; otherwise cleared value ('') will fail handleChange value test and value will not be updated
+    const lapInput = screen.getByLabelText(/set laps/i);
+    await act(async () => {
+        await user.clear(lapInput);
+        await user.type(lapInput, '5');
+    });
+    expect(lapInput).toHaveValue(5);
+});
+
 it('does not accept an input greater than value set for maximum laps', async () => {
     const user = userEvent.setup();
-    render(<ShortenCourseForm maxLaps={3} />);
+    render(<ShortenCourseForm minLaps={0} maxLaps={3} />);
     const lapInput = screen.getByLabelText(/set laps/i);
     await act(async () => {
         await user.clear(lapInput);
@@ -40,8 +52,8 @@ it('does not accept an input less than value set for minimum laps', async () => 
     render(<ShortenCourseForm minLaps={3} />);
     const lapInput = screen.getByLabelText(/set laps/i);
     await act(async () => {
-        await user.clear(lapInput);
-        await user.type(lapInput, '2');
+        await user.clear(lapInput); // fails as value would be 0
+        await user.type(lapInput, '2'); // results in a value of 32
     });
     expect(lapInput).not.toHaveValue(2);
 });
