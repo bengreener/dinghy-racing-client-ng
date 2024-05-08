@@ -16,7 +16,7 @@
 
 import { useCallback, useState } from 'react';
 /**
- * Provide a dialog to get the duration of a race postponement
+ * Provide a form to get the duration of a race postponement
  * Time is set in 5 minute intervals with an initial value of 30 minutes
  * @param {Object} props
  * @param {Race} props.race to postpone
