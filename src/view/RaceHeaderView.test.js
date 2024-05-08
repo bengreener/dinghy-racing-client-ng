@@ -68,23 +68,36 @@ describe('when rendered', () => {
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
         expect(screen.getByLabelText(/remaining/i)).toHaveValue('44:30');
     });
-    it('displays estimate for number of laps that will be completed', () => {
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
-        expect(screen.getByLabelText(/estimate/i)).toHaveValue('5.00');
-    });
-    it('displays the last lap time for the lead entry', () => {
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
-        expect(screen.getByLabelText(/last/i)).toHaveValue('00:00');
-    });
-    it('displays the average lap time for the lead entry', () => {
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
-        expect(screen.getByLabelText(/average/i)).toHaveValue('00:00');
+    describe('when race is in progress', () => {
+        it('displays elapsed time for race', () => {
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const controller = new DinghyRacingController(model);
+            const clock = new Clock();
+            jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 30000);
+
+            customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
+            expect(screen.getByLabelText(/elapsed/i)).toHaveValue('00:30');
+        });
+    })
+    describe('when last lap time greater than 0', () => {
+        it('displays estimate for number of laps that will be completed', () => {
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const controller = new DinghyRacingController(model);
+            customRender(<RaceHeaderView race={ {...raceScorpionA, lastLapTime: 732000, lapForecast: 3.69, 'clock': new Clock()} } />, model, controller);
+            expect(screen.getByLabelText(/estimate/i)).toHaveValue('3.69');
+        });
+        it('displays the last lap time for the lead entry', () => {
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const controller = new DinghyRacingController(model);
+            customRender(<RaceHeaderView race={ {...raceScorpionA, lastLapTime: 732000, 'clock': new Clock()} } />, model, controller);
+            expect(screen.getByLabelText(/last/i)).toHaveValue('12:12');
+        });
+        it('displays the average lap time for the lead entry', () => {
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const controller = new DinghyRacingController(model);
+            customRender(<RaceHeaderView race={ {...raceScorpionA, lastLapTime: 732000, averageLapTime: 732000, 'clock': new Clock()} } />, model, controller);
+            expect(screen.getByLabelText(/average/i)).toHaveValue('12:12');
+        });
     });
     it('displays postpone race button', () => {
         // const raceScorpionA_copy = {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))};
@@ -185,7 +198,6 @@ it('updates values when a new race is selected', async () => {
     expect(screen.getByLabelText(/laps(?!.)/i)).toHaveValue('4');
     expect(screen.getByLabelText(/duration/i)).toHaveValue('22:30');
     expect(screen.getByLabelText(/remaining/i)).toHaveValue('22:25');
-    expect(screen.getByLabelText(/estimate/i)).toHaveValue('4.00');
 });
 
 describe('when postpone race button clicked', () => {
