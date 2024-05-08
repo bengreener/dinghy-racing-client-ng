@@ -3079,6 +3079,25 @@ describe('when a race is requested', () => {
             expect(result).toEqual({'success': true, 'domainObject': raceScorpionA_warningSignal});
         });
     });
+    describe('when an entry has already sailed a lap', () => {
+        it('returns a race that includes the number of laps sailed by the lead entry', async () => {
+            const raceScorpion_lapsSailed_AHAL = {...raceScorpion_AHAL, leadEntry: {...raceScorpion_AHAL.leadEntry, lapsSailed: 3}};
+            const raceScorpion_lapsSailed = {...raceScorpionA, lapsSailed: 3};
+            fetch.mockImplementationOnce(() => {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(raceScorpion_lapsSailed_AHAL)
+                });
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
+            const promise = dinghyRacingModel.getRace(raceScorpion_lapsSailed.url);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, 'domainObject': raceScorpion_lapsSailed});
+        })
+    })
     it('returns a promise that resolves to a result indicating failure when race is not found', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
