@@ -20,12 +20,12 @@ import { useCallback, useEffect, useRef } from 'react';
  * 
  * @param {Object} props
  * @param {Boolean} props.show or hide dialog
- * @param {PostponeRaceDialog~onClose} props.onClose call this when dialog closed
+ * @param {ModalDialog~closeDialog} props.onClose call this when dialog closed
  */
  function ModalDialog({show, onClose, children}) {
     const dialog = useRef(null);
 
-    const onCancel = useCallback((event) => {
+    const handleCancel = useCallback((event) => {
         event.preventDefault();
         onClose();
     }, [onClose])
@@ -40,7 +40,7 @@ import { useCallback, useEffect, useRef } from 'react';
     });
 
     return(
-        <dialog ref={dialog} onCancel={onCancel}>
+        <dialog ref={dialog} onCancel={handleCancel}>
             {children}
         </dialog>
     )
@@ -50,5 +50,5 @@ export default ModalDialog;
 
 /**
  * Callback to trigger parent to close dialog
- * @callback PostponeRaceDialog~onClose
+ * @callback ModalDialog~closeDialog
  */
