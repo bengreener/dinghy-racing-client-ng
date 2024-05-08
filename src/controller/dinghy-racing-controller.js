@@ -29,6 +29,7 @@ class DinghyRacingController {
         this.createRace = this.createRace.bind(this);
         this.addLap = this.addLap.bind(this);
         this.postponeRace = this.postponeRace.bind(this);
+        this.updateRacePlannedLaps = this.updateRacePlannedLaps.bind(this);
     }
 
     /**
