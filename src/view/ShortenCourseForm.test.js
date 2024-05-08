@@ -44,4 +44,9 @@ it('does not accept an input less than value set for minimum laps', async () => 
         await user.type(lapInput, '2');
     });
     expect(lapInput).not.toHaveValue(2);
-})
+});
+
+it('shows initial value set for number of laps', () => {
+    render(<ShortenCourseForm initialValue={3} />);
+    expect(screen.getByLabelText(/set laps/i)).toHaveValue(3);
+});

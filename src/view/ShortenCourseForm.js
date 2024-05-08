@@ -19,12 +19,13 @@ import { useCallback, useState } from 'react';
 /**
  * Provide a form to get the new number of laps that will be sailed when a course is shortened
  * @param {Object} props
- * @param {Number} props.minLaps The minimum number of Laps that can be set; default is 1
- * @param {Number} props.maxLaps The maximum number of Laps that can be set; default is 100
+ * @param {Number} props.minLaps The minimum number of laps that can be set; default is 1
+ * @param {Number} props.maxLaps The maximum number of laps that can be set; default is 100
+ * @param {Number} props.initialValue to display for new laps value; default is minLaps
  * @returns {HTMLFormElement}
  */
-function ShortenCourseForm({ minLaps = 1, maxLaps = 100 }) {
-    const [laps, setLaps] = useState(0);
+function ShortenCourseForm({ minLaps = 1, maxLaps = 100, initialValue }) {
+    const [laps, setLaps] = useState(initialValue ? initialValue : minLaps);
 
     const handleChange = useCallback(({ target }) => {
         if (target.value >= minLaps && target.value <= maxLaps) {
