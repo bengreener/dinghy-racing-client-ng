@@ -15,6 +15,7 @@
  */
 
 import { useCallback, useState } from 'react';
+
 /**
  * Provide a form to get the duration of a race postponement
  * Time is set in 5 minute intervals with an initial value of 30 minutes
@@ -22,9 +23,16 @@ import { useCallback, useState } from 'react';
  * @param {Race} props.race to postpone
  * @param {PostponeRaceForm~postponeRace} props.onPostpone called when postpone button clicked
  * @param {ModalDialog~closeDialog} props.closeParent call this to close a dialog containing this form
+ * @returns {HTMLFormElement}
  */
- function PostponeRaceForm({race, onPostpone, closeParent = null}) {
+ function PostponeRaceForm({race, onPostpone, closeParent}) {
     const [duration, setDuration] = useState(30);
+
+    const handleChange = useCallback(({ target }) => {
+        if (target.value >= 0) {
+            setDuration(target.value);
+        }
+    });
     
     const handlePostponeButtonClick = useCallback((event) => {
         event.preventDefault();
@@ -34,17 +42,11 @@ import { useCallback, useState } from 'react';
         }
     }, [race, duration, onPostpone, closeParent]);
 
-    function handleDelayChange({target}) {
-        if (target.value >= 0) {
-            setDuration(target.value);
-        }
-    };
-
     return(
         <form action='' method='get'>
             <div>
                 <label htmlFor='delay-input'>Delay</label>
-                <input id='delay-input' type='number' name='delay' min='0' step='5' value={duration} onChange={handleDelayChange} />
+                <input id='delay-input' type='number' name='delay' min='0' step='5' value={duration} onChange={handleChange} />
             </div>
             <div>
                 {closeParent ? <button type='button' onClick={closeParent}>Cancel</button> : null}
