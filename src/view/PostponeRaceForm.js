@@ -27,12 +27,6 @@ import { useCallback, useState } from 'react';
  */
  function PostponeRaceForm({race, onPostpone, closeParent}) {
     const [duration, setDuration] = useState(30);
-
-    const handleChange = useCallback(({ target }) => {
-        if (target.value >= 0) {
-            setDuration(target.value);
-        }
-    });
     
     const handlePostponeButtonClick = useCallback((event) => {
         event.preventDefault();
@@ -41,6 +35,12 @@ import { useCallback, useState } from 'react';
             closeParent();
         }
     }, [race, duration, onPostpone, closeParent]);
+
+    function handleChange({ target }) {
+        if (target.value >= 0) {
+            setDuration(target.value);
+        }
+    };
 
     return(
         <form action='' method='get'>

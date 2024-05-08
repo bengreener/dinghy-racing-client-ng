@@ -30,12 +30,6 @@ import { useCallback, useState } from 'react';
 function ShortenCourseForm({ race, minLaps = 1, maxLaps = 100, initialValue, onUpdate, closeParent}) {
     const [laps, setLaps] = useState(initialValue ? initialValue : minLaps);
 
-    const handleChange = useCallback(({ target }) => {
-        if (target.value >= minLaps && target.value <= maxLaps) {
-            setLaps(target.value);
-        }
-    });
-
     const handleUpdateButtonClick = useCallback((event) => {
         event.preventDefault();
         onUpdate(race, Number(laps));
@@ -43,6 +37,12 @@ function ShortenCourseForm({ race, minLaps = 1, maxLaps = 100, initialValue, onU
             closeParent();
         }
     }, [race, laps, onUpdate, closeParent]);
+
+    function handleChange({ target }) {
+        if (target.value >= minLaps && target.value <= maxLaps) {
+            setLaps(target.value);
+        }
+    };
 
     return (
         <form action='' method='get'>
