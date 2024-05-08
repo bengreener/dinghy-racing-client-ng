@@ -21,18 +21,18 @@ import { useCallback, useState } from 'react';
  * @param {Object} props
  * @param {Race} props.race to postpone
  * @param {PostponeRaceForm~postponeRace} props.onPostpone called when postpone button clicked
- * @param {PostponeRaceDialog~closeParentDialog} props.closeParentDialog call this to close a dialog containing this form
+ * @param {ModalDialog~closeDialog} props.closeParent call this to close a dialog containing this form
  */
- function PostponeRaceForm({race, onPostpone, closeParentDialog = null}) {
+ function PostponeRaceForm({race, onPostpone, closeParent = null}) {
     const [duration, setDuration] = useState(30);
     
     const handlePostponeButtonClick = useCallback((event) => {
         event.preventDefault();
         onPostpone(race, duration * 60 * 1000);
-        if (closeParentDialog) {
-            closeParentDialog();
+        if (closeParent) {
+            closeParent();
         }
-    }, [race, duration, onPostpone, closeParentDialog]);
+    }, [race, duration, onPostpone, closeParent]);
 
     function handleDelayChange({target}) {
         if (target.value >= 0) {
@@ -47,7 +47,7 @@ import { useCallback, useState } from 'react';
                 <input id='delay-input' type='number' name='delay' min='0' step='5' value={duration} onChange={handleDelayChange} />
             </div>
             <div>
-                {closeParentDialog ? <button type='button' onClick={closeParentDialog}>Cancel</button> : null}
+                {closeParent ? <button type='button' onClick={closeParent}>Cancel</button> : null}
                 <button type='button' onClick={handlePostponeButtonClick}>Postpone</button>
             </div>
         </form>
@@ -60,10 +60,5 @@ export default PostponeRaceForm;
  * Action to take when PostponeRaceDialog postpone button clicked
  * @callback PostponeRaceForm~postponeRace
  * @param {Race} race to postpone
- * @param {Number} duration, in milliseconds, by which to delay the race
- */
-
-/**
- * Callback to closea containing dialog
- * @callback PostponeRaceDialog~closeParentDialog
+ * @param {Number} duration in milliseconds, by which to delay the race
  */
