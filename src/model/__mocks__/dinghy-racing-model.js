@@ -215,6 +215,10 @@ class DinghyRacingModel {
         return null;
     }
 
+    async updateRacePlannedLaps(race, plannedLaps) {
+        return null;
+    }
+
     async getStartSequence(startTime, endTime) {
         return null;
     }

@@ -20,6 +20,7 @@ import ModelContext from './ModelContext';
 import ControllerContext from './ControllerContext';
 import PostponeRaceForm from './PostponeRaceForm';
 import ModalDialog from './ModalDialog';
+import ShortenCourseForm from './ShortenCourseForm';
 
 /**
  * Present summary information ablout a race
@@ -34,8 +35,9 @@ function RaceHeaderView({ race, showInRaceData = true }) {
     const [updatedRace, setUpdatedRace] = useState(race);
     const [elapsedTime, setElapsedTime] = useState(race.clock.getElapsedTime());
     const [message, setMessage] = useState('');
-    const previousRace = useRef(); // enables removal of tickHandler from previous race when rendered with new race 
+    const previousRace = useRef(); // enables removal of tickHandler from previous race when rendered with new race
     const [showPostponeRace, setShowPostponeRace] = useState(false);
+    const [showShortenCourse, setShowShortenCourse] = useState(false);
 
     const handleEntryUpdate = useCallback(() => {
         model.getRace(race.url).then(result => {
@@ -54,6 +56,10 @@ function RaceHeaderView({ race, showInRaceData = true }) {
 
     function handleRaceStartClick() {
         controller.startRace(race);
+    }
+
+    function handleShortenCourseClick() {
+        setShowShortenCourse(true);
     }
 
     useEffect(() => {
@@ -98,6 +104,10 @@ function RaceHeaderView({ race, showInRaceData = true }) {
         setShowPostponeRace(false);
     };
 
+    function closeShortenCourseDialog() {
+        setShowShortenCourse(false);
+    };
+
     return (
         <div>
             <label>{race.name}</label>
@@ -115,11 +125,15 @@ function RaceHeaderView({ race, showInRaceData = true }) {
             {showInRaceData && updatedRace.lastLapTime > 0 ? <output id={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.lastLapTime)}</output> : null}
             {showInRaceData && updatedRace.lastLapTime > 0 ? <label htmlFor={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Average lap time</label> : null}
             {showInRaceData && updatedRace.lastLapTime > 0 ? <output id={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.averageLapTime)}</output> : null}
+            {updatedRace.lapsSailed < updatedRace.plannedLaps - 1 ? <button id='shorten-course-button' onClick={handleShortenCourseClick}>Shorten Course</button> : null}
             {elapsedTime < 0 ? <button id='race-postpone-button' onClick={handleRacePostponeClick}>Postpone Start</button> : null}
             {elapsedTime < 0 ? <button id='race-start-button' onClick={handleRaceStartClick}>Start Now</button> : null}
             <p id="race-header-message" className={!message ? "hidden" : ""}>{message}</p>
-            <ModalDialog show={showPostponeRace} onClose={() => setShowPostponeRace(false)}>
-                <PostponeRaceForm race={race} onPostpone={controller.postponeRace} closeParentDialog={closePostponeRaceFormDialog} />
+            <ModalDialog show={showPostponeRace} onClose={() => setShowPostponeRace(false)} testid={'postpone-race-dialog'} >
+                <PostponeRaceForm race={race} onPostpone={controller.postponeRace} closeParent={closePostponeRaceFormDialog} />
+            </ModalDialog>
+            <ModalDialog show={showShortenCourse} onClose={closeShortenCourseDialog} testid={'shorten-course-dialog'}>
+                <ShortenCourseForm race={race} minLaps={updatedRace.lapsSailed + 1} maxLaps={updatedRace.plannedLaps - 1} initialValue={updatedRace.plannedLaps - 1} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} />
             </ModalDialog>
         </div>
     );
