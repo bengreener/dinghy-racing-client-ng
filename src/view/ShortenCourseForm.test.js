@@ -33,4 +33,15 @@ it('does not accept an input greater than value set for maximum laps', async () 
         await user.type(lapInput, '5');
     });
     expect(lapInput).not.toHaveValue(5);
+});
+
+it('does not accept an input less than value set for minimum laps', async () => {
+    const user = userEvent.setup();
+    render(<ShortenCourseForm minLaps={3} />);
+    const lapInput = screen.getByLabelText(/set laps/i);
+    await act(async () => {
+        await user.clear(lapInput);
+        await user.type(lapInput, '2');
+    });
+    expect(lapInput).not.toHaveValue(2);
 })
