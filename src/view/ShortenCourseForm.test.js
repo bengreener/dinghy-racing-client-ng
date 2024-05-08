@@ -14,9 +14,11 @@
  * limitations under the License. 
  */
 
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import ShortenCourseForm from './ShortenCourseForm';
 
 it('renders', () => {
-        render(<ShortenCourseForm />);
-    });
+    render(<ShortenCourseForm />);
+    expect(screen.getByLabelText(/set laps/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /Update Laps/})).toBeInTheDocument();
+});

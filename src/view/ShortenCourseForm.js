@@ -14,11 +14,22 @@
  * limitations under the License. 
  */
 
+/**
+ * Provide a form to get the new number of laps that will be sailed when a course is shortened
+ * @param {Object} props
+ * @returns {HTMLFormElement}
+ */
 function ShortenCourseForm() {
 
     return (
         <form action='' method='get'>
-            
+            <div>
+                <label htmlFor='set-laps-input'>Set Laps</label>
+                <input id='set-laps-input' type='number' />
+            </div>
+            <div>
+                <button type='button'>Update Laps</button>
+            </div>
         </form>
     )
 }
