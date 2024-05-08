@@ -51,6 +51,7 @@ function ShortenCourseForm({ race, minLaps = 1, maxLaps = 100, initialValue, onU
                 <input id='set-laps-input' type='number' min={minLaps.toString()} max={maxLaps.toString()} value={laps} onChange={handleChange} />
             </div>
             <div>
+                {closeParent ? <button type='button' onClick={closeParent}>Cancel</button> : null}
                 <button type='button' onClick={handleUpdateButtonClick}>Update Laps</button>
             </div>
         </form>

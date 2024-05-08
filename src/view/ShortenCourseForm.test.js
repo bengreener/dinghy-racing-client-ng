@@ -94,4 +94,12 @@ describe('when contained in a modal dialog', () => {
             expect(closeParentSpy).toHaveBeenCalled();
         });
     });
+    it('when cancelled it closes containing dialog', async () => {
+        const closeParentSpy = jest.fn();
+        const user = userEvent.setup();
+        render(<ShortenCourseForm closeParent={closeParentSpy} />);
+        const cancelButtton = screen.getByRole('button', {'name': /cancel/i});
+        await user.click(cancelButtton);
+        expect(closeParentSpy).toBeCalledTimes(1);
+    });
 });
