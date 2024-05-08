@@ -42,7 +42,7 @@ function ShortenCourseForm({ race, minLaps = 1, maxLaps = 100, initialValue, onU
         if (closeParent) {
             closeParent();
         }
-    });
+    }, [race, laps, onUpdate, closeParent]);
 
     return (
         <form action='' method='get'>
