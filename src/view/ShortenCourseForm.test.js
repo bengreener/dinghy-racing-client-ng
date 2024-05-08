@@ -77,3 +77,21 @@ describe('when update laps button clicked', () => {
         expect(onUpdateSpy).toHaveBeenCalledWith(raceScorpionA, 4);
     });
 });
+
+describe('when contained in a modal dialog', () => {
+    describe('when update laps button clicked', () => {
+        it('closes containing dialog', async () => {
+            const onUpdateSpy = jest.fn();
+            const closeParentSpy = jest.fn();
+            const user = userEvent.setup();
+            render(<ShortenCourseForm race={raceScorpionA} minLaps={0} maxLaps={5} initialValue={3} onUpdate={onUpdateSpy} closeParent={closeParentSpy} />);
+            const lapInput = screen.getByLabelText(/set laps/i);
+            await act(async () => {
+                await user.clear(lapInput);
+                await user.type(lapInput, '4');
+            });
+            await user.click(screen.getByRole('button', {name: /Update Laps/}));
+            expect(closeParentSpy).toHaveBeenCalled();
+        });
+    });
+});

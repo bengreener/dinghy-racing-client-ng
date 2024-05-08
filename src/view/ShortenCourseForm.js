@@ -24,9 +24,10 @@ import { useCallback, useState } from 'react';
  * @param {Number} props.maxLaps The maximum number of laps that can be set; default is 100
  * @param {Number} props.initialValue to display for new laps value; default is minLaps
  * @param {ShortenCouraseForm~updateLaps} props.onUpdate called when update button clicked
+ * @param {ModalDialog~closeDialog} props.closeParent call this to close a dialog containing this form
  * @returns {HTMLFormElement}
  */
-function ShortenCourseForm({ race, minLaps = 1, maxLaps = 100, initialValue, onUpdate}) {
+function ShortenCourseForm({ race, minLaps = 1, maxLaps = 100, initialValue, onUpdate, closeParent}) {
     const [laps, setLaps] = useState(initialValue ? initialValue : minLaps);
 
     const handleChange = useCallback(({ target }) => {
@@ -38,6 +39,9 @@ function ShortenCourseForm({ race, minLaps = 1, maxLaps = 100, initialValue, onU
     const handleUpdateButtonClick = useCallback((event) => {
         event.preventDefault();
         onUpdate(race, Number(laps));
+        if (closeParent) {
+            closeParent();
+        }
     });
 
     return (
