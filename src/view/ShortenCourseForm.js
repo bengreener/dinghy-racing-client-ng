@@ -48,7 +48,7 @@ function ShortenCourseForm({ race, minLaps = 1, maxLaps = 100, initialValue, onU
         <form action='' method='get'>
             <div>
                 <label htmlFor='set-laps-input'>Set Laps</label>
-                <input id='set-laps-input' type='number' min={minLaps.toString()} max={maxLaps.toString()} value={laps} onChange={handleChange} />
+                <input id='set-laps-input' name='laps' type='number' min={minLaps.toString()} max={maxLaps.toString()} value={laps} onChange={handleChange} />
             </div>
             <div>
                 {closeParent ? <button type='button' onClick={closeParent}>Cancel</button> : null}

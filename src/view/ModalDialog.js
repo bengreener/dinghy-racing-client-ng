@@ -21,8 +21,9 @@ import { useCallback, useEffect, useRef } from 'react';
  * @param {Object} props
  * @param {Boolean} props.show or hide dialog
  * @param {ModalDialog~closeDialog} props.onClose call this when dialog closed
+ * @param {string} [props.testId] 
  */
- function ModalDialog({show, onClose, children}) {
+ function ModalDialog({show, onClose, children, testid = ''}) {
     const dialog = useRef(null);
 
     const handleCancel = useCallback((event) => {
@@ -40,7 +41,7 @@ import { useCallback, useEffect, useRef } from 'react';
     });
 
     return(
-        <dialog ref={dialog} onCancel={handleCancel}>
+        <dialog data-testid={testid} ref={dialog} onCancel={handleCancel}>
             {children}
         </dialog>
     )
