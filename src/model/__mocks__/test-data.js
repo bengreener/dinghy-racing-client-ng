@@ -268,8 +268,20 @@ const raceCometA = { 'name': 'Comet A', 'plannedStartTime' : new Date('2021-10-1
 const raceHandicapA = { 'name': 'Handicap A', 'plannedStartTime': new Date('2021-10-14T10:45:00Z'), 'actualStartTime': null, 'dinghyClass': null, 'duration': 2700000, 'plannedLaps': 5, 'lapsSailed': null, 'lapForecast': 5.0, 'lastLapTime': 0, 'averageLapTime': 0, 'clock': null, 'startSequenceState': 'NONE', 'url': 'http://localhost:8081/dinghyracing/api/races/8' };
 const races = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA];
 
+const entryChrisMarshallScorpionA1234 = {
+	'helm': competitorChrisMarshall, 'crew': null,
+	'race': raceScorpionA,
+	'dinghy': dinghy1234,
+	'crew': competitorLouScrew,
+	'laps': [],
+	'sumOfLapTimes': 0,
+	'onLastLap': false,
+	'finishedRace': false,
+	'scoringAbbreviation': null,
+	'url': 'http://localhost:8081/dinghyracing/api/entries/10'
+};
 const entriesScorpionA = [
-	{'helm': competitorChrisMarshall, 'crew': competitorLouScrew, 'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
+	entryChrisMarshallScorpionA1234,
 	{'helm': competitorSarahPascal, 'crew': competitorOwainDavies, 'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'}
 ];
 const entriesGraduateA = [
@@ -282,18 +294,6 @@ const entriesHandicapA = [
 	{'helm': competitorChrisMarshall, 'crew': competitorLouScrew, 'race': raceHandicapA, 'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/20'}, 
 	{'helm': competitorJillMyer, 'crew': null, 'race': raceHandicapA, 'dinghy': dinghy826, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/21'}
 ];
-const entryChrisMarshallScorpionA1234 = {
-	'helm': competitorChrisMarshall, 'crew': null, 
-	'race': raceScorpionA,
-	'dinghy': dinghy1234,
-	'crew': competitorLouScrew, 
-	'laps': [], 
-	'sumOfLapTimes': 0, 
-	'onLastLap': false,
-	'finishedRace': false, 
-	'scoringAbbreviation': null, 
-	'url': 'http://localhost:8081/dinghyracing/api/entries/10'
-};
 
 export {
 	httpRootURL, wsRootURL,

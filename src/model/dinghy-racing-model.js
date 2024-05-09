@@ -263,10 +263,11 @@ class DinghyRacingModel {
 
     /**
      * Create a new entry to a race
-     * Supplied helm and dinghy must exist
+     * Supplied helm, dinghy, and crew must exist
      * @param {Race} race Race to enter
      * @param {Competitor} helm Competitor entering race as the helm
      * @param {Dinghy} dinghy Dinghy to be sailed in race
+     * @param {Competitor} [crew] Competitor entering race as the crew
      * @returns {Promise<Result>}
      */
     async createEntry(race, helm, dinghy, crew = null) {
@@ -289,7 +290,7 @@ class DinghyRacingModel {
             promises.push(this.getCompetitorByName(helm.name));
         }
         else {
-            // use supplied  url
+            // use supplied url
             promises.push(Promise.resolve({'success': true, 'domainObject': helm}));
         }
         // need dinghy url
@@ -331,6 +332,86 @@ class DinghyRacingModel {
                 return this.create('entries', {'race': results[0].domainObject.url, 'helm': results[1].domainObject.url, 'dinghy': results[2].domainObject.url, 'crew': results[3].domainObject.url});
             }
             return this.create('entries', {'race': results[0].domainObject.url, 'helm': results[1].domainObject.url, 'dinghy': results[2].domainObject.url});
+        }
+        else {
+            // combine failure messages and return failure
+            let message = '';
+            results.forEach(result => {
+                if (!result.success) {
+                    if (message) {
+                        message += '\n';
+                    }
+                    message += result.message;
+                }
+            })
+            return Promise.resolve({'success': false, 'message': message});
+        }
+    }
+
+    /**
+     * Update an entry to a race
+     * Supplied entry, helm, dinghy, and crew must exist
+     * @param {Entry} entry Entry to update
+     * @param {Competitor} helm Competitor entering race as the helm
+     * @param {Dinghy} dinghy Dinghy to be sailed in race
+     * @param {Competitor} [crew] Competitor entering race as the crew
+     * @returns {Promise<Result>}
+     */
+    async updateEntry(entry, helm, dinghy, crew = null) {
+        let dinghyClass;
+
+        // check if helm, crew, and dinghy have reference to remote resource and if not fetch
+        // assuming if a URL supplied resource exists in REST service
+        let promises = [];
+        let results = [];
+        // need helm url
+        if (!helm.url) {
+            // lookup helm
+            promises.push(this.getCompetitorByName(helm.name));
+        }
+        else {
+            // use supplied url
+            promises.push(Promise.resolve({'success': true, 'domainObject': helm}));
+        }
+        // need dinghy url
+        if (!dinghy.url) {
+            // Need dinghy class url to lookup dinghy
+            if (!dinghy.dinghyClass.url) {
+                const result = await this.getDinghyClassByName(dinghy.dinghyClass.name);
+                if (result.success) {
+                    dinghyClass = result.domainObject;
+                }
+                else {
+                    return Promise.resolve(result);
+                }
+            }
+            else {
+                dinghyClass = dinghy.dinghyClass;
+            }
+            // lookup dinghy
+            promises.push(this.getDinghyBySailNumberAndDinghyClass(dinghy.sailNumber, dinghyClass));
+        }
+        else {
+            // use supplied dinghy url
+            promises.push(Promise.resolve({'success': true, 'domainObject': dinghy}));
+        }
+        // if crew supplied need crew URL
+        if (crew && !crew.url) {
+            promises.push(this.getCompetitorByName(crew.name));
+        }
+        else {
+            // deal with a null crew later
+            promises.push(Promise.resolve({'success': true, 'domainObject': crew}));
+        }
+        // check if helm and dinghy retrieved via REST
+        // if fetch was not required use helm or dinghy passed as parameters
+        results = await Promise.all(promises);
+        // if successful return success result
+        if (results[0].success && results[1].success && results[2].success) {
+            if (crew) {
+                return this.update(entry.url, {'helm': results[0].domainObject.url, 'dinghy': results[1].domainObject.url, 'crew': results[2].domainObject.url});
+            }
+            return this.update(entry.url, {'helm': results[0].domainObject.url, 'dinghy': results[1].domainObject.url, crew: null});
         }
         else {
             // combine failure messages and return failure
