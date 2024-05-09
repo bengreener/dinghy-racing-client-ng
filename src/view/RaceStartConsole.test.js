@@ -1,3 +1,19 @@
+/*
+ * Copyright 2022-2024 BG Information Systems Ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 import { customRender } from '../test-utilities/custom-renders';
 import { act, screen, within } from '@testing-library/react';
 import RaceStartConsole from './RaceStartConsole';
@@ -150,7 +166,7 @@ it('displays race headers for races in session', async () => {
     const raceHeaders = (screen.getByRole('heading', {name: /races/i})).parentNode;
     expect(within(raceHeaders).getByText(/scorpion a/i)).toBeInTheDocument();
     const raceA = within(raceHeaders).getByText(/scorpion a/i).parentNode;
-    expect(within(raceA).getByLabelText(/laps$/i)).toHaveValue('5');
+    expect(within(raceA).getByLabelText(/^laps$/i)).toHaveValue('5');
     expect(within(raceA).getByLabelText(/duration/i)).toHaveValue('45:00');
     expect(within(raceA).getByLabelText(/countdown/i)).toHaveValue('05:00');
     expect(within(raceA).getByRole('button', {name: /postpone/i})).toBeInTheDocument();
@@ -158,7 +174,7 @@ it('displays race headers for races in session', async () => {
 
     expect(within(raceHeaders).getByText(/graduate a/i)).toBeInTheDocument();
     const raceB = within(raceHeaders).getByText(/graduate a/i).parentNode;
-    expect(within(raceB).getByLabelText(/laps$/i)).toHaveValue('4');
+    expect(within(raceB).getByLabelText(/^laps$/i)).toHaveValue('4');
     expect(within(raceB).getByLabelText(/duration/i)).toHaveValue('45:00');
     expect(within(raceB).getByLabelText(/countdown/i)).toHaveValue('10:00');
     expect(within(raceB).getByRole('button', {name: /postpone/i})).toBeInTheDocument();
@@ -166,7 +182,7 @@ it('displays race headers for races in session', async () => {
 
     expect(within(raceHeaders).getByText(/comet a/i)).toBeInTheDocument();
     const raceC = within(raceHeaders).getByText(/comet a/i).parentNode;
-    expect(within(raceC).getByLabelText(/laps$/i)).toHaveValue('4');
+    expect(within(raceC).getByLabelText(/^laps$/i)).toHaveValue('4');
     expect(within(raceC).getByLabelText(/duration/i)).toHaveValue('45:00');
     expect(within(raceC).getByLabelText(/countdown/i)).toHaveValue('15:00');
     expect(within(raceC).getByRole('button', {name: /postpone/i})).toBeInTheDocument();
@@ -174,7 +190,7 @@ it('displays race headers for races in session', async () => {
 
     expect(within(raceHeaders).getByText(/handicap a/i)).toBeInTheDocument();
     const raceD = within(raceHeaders).getByText(/handicap a/i).parentNode;
-    expect(within(raceD).getByLabelText(/laps$/i)).toHaveValue('3');
+    expect(within(raceD).getByLabelText(/^laps$/i)).toHaveValue('3');
     expect(within(raceD).getByLabelText(/duration/i)).toHaveValue('35:00');
     expect(within(raceD).getByLabelText(/countdown/i)).toHaveValue('20:00');
     expect(within(raceD).getByRole('button', {name: /postpone/i})).toBeInTheDocument();

@@ -1,7 +1,23 @@
+/*
+ * Copyright 2022-2024 BG Information Systems Ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 import StartSequence from '../model/domain-classes/start-signals';
 import { downloadRaceEntriesCSV } from '../utilities/csv-writer'
 class DinghyRacingController {
-    
+
     model;
 
     constructor(model) {
@@ -13,6 +29,7 @@ class DinghyRacingController {
         this.createRace = this.createRace.bind(this);
         this.addLap = this.addLap.bind(this);
         this.postponeRace = this.postponeRace.bind(this);
+        this.updateRacePlannedLaps = this.updateRacePlannedLaps.bind(this);
     }
 
     /**
@@ -68,22 +85,37 @@ class DinghyRacingController {
     /**
      * Update the last lap time recorded for an entry in a race
      * @param {Entry} entry
-     * @param {Number} time The lap time duration in milliseconds
+     * @param {Number | String} time The lap time duration in milliseconds or a string in the format [hh:][mm:]ss
      * @returns {Promise<Result>}
      */
     updateLap(entry, time) {
+        let timeInMilliseconds = 0;
+        // if time is a string convert to number of milliseconds
+        if (typeof time !== 'number') {
+            if (/^(\d+:(?=[0-5]?\d:[0-5]?\d))?([0-5]?\d:(?=[0-5]?\d))?([0-5]?\d)$/.test(time)) {
+                const timeComponents = /^((?<=^)\d*(?=:[0-5]?\d:))*:?((?<=^|:)[0-5]?\d(?=:))?:?((?<=^|:)[0-5]?\d(?=$))$/.exec(time);
+                // get hours
+                timeInMilliseconds += isNaN(timeComponents[1]) ? 0 : 3600000 * timeComponents[1];
+                // get minutes
+                timeInMilliseconds += isNaN(timeComponents[2]) ? 0 : 60000 * timeComponents[2];
+                // get seconds
+                timeInMilliseconds += isNaN(timeComponents[3]) ? 0 : 1000 * timeComponents[3];
+            }
+            else {
+                return Promise.resolve({'success': false, 'message': 'Time must be a number, in milliseconds, or a string value in the format [hh:][mm:]ss.'});
+            }
+        }
+        else {
+            timeInMilliseconds = time;
+        }
         if (!entry || !entry.url) {
             return Promise.resolve({'success': false, 'message': 'A valid entry is required to update a lap time.'});
         }
-        // time can't be null and must be number
-        if (isNaN(time)) {
-            return Promise.resolve({'success': false, 'message': 'Time must be a number; in milliseconds.'});   
-        }
         // time must be greater than zero
-        if (time <= 0) {
+        if (timeInMilliseconds <= 0) {
             return Promise.resolve({'success': false, 'message': 'Time must be greater than zero.'});   
         }
-        return this.model.updateLap(entry, time);
+        return this.model.updateLap(entry, timeInMilliseconds);
     }
 
     /**
@@ -205,6 +237,23 @@ class DinghyRacingController {
             return Promise.resolve({'success': false, 'message': 'Please provide a valid start sequence stage.'});
         }
         return this.model.updateRaceStartSequenceState(race, stage);
+    }
+
+    /**
+     * Update the start sequence state of a race
+     * @param {Race} race to start
+     * @param {Integer} plannedLaps new value for the number of laps to be completed
+     * @return {Promise<Result>}
+     */
+    updateRacePlannedLaps(race, plannedLaps) {
+        // check valid race (a URL is sufficient, otherwise a name and start time is required)
+        if (!race.url && (!race.name || race.name === '' || !race.plannedStartTime)) {
+            return Promise.resolve({'success': false, 'message': 'Please provide details of the race.'});
+        }
+        if (!Number.isInteger(plannedLaps)) {
+            return Promise.resolve({'success': false, 'message': 'Please provide an integer value for the number of laps.'});
+        }
+        return this.model.updateRacePlannedLaps(race, plannedLaps);
     }
 
     /**

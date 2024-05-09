@@ -1,3 +1,19 @@
+/*
+ * Copyright 2022-2024 BG Information Systems Ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 import { customRender } from '../test-utilities/custom-renders';
 import userEvent from '@testing-library/user-event';
 import { act, screen } from '@testing-library/react';
@@ -119,8 +135,8 @@ describe('when a race is selected', () => {
             await user.selectOptions(selectRace, 'Scorpion A');
         });
         
-        const entry1 = await screen.findByText(/Scorpion 1234 Chris Marshall/i);
-        const entry2 = await screen.findByText(/Scorpion 6745 Sarah Pascal/i);
+        const entry1 = await screen.findByText(/1234/i);
+        const entry2 = await screen.findByText(/6745/i);
         expect(entry1).toBeInTheDocument();
         expect(entry2).toBeInTheDocument();
     });
@@ -178,9 +194,9 @@ describe('when more than one race is selected', () => {
             await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
         });
         
-        const entry1 = await screen.findByText(/Scorpion 1234 Chris Marshall/i);
-        const entry2 = await screen.findByText(/Scorpion 6745 Sarah Pascal/i);
-        const entry3 = await screen.findByText(/Graduate 2928 Jill Myer/i)
+        const entry1 = await screen.findByText(/1234/i);
+        const entry2 = await screen.findByText(/6745/i);
+        const entry3 = await screen.findByText(/2928/i)
         expect(entry1).toBeInTheDocument();
         expect(entry2).toBeInTheDocument();
         expect(entry3).toBeInTheDocument();

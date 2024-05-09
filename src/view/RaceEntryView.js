@@ -1,3 +1,19 @@
+/*
+ * Copyright 2022-2024 BG Information Systems Ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 import React, { useCallback, useState } from 'react';
 import LapView from './LapView';
 import ScoringAbbreviation from './ScoringAbbreviation';
@@ -18,7 +34,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     const handleLastLapCellKeyUp = useCallback((event) => {
         if (event.key === 'Enter') {
             if (updateLap) {
-                updateLap(entry, Number(event.target.value));
+                updateLap(entry, event.target.value);
                 setEditMode(false);
             }
         }
@@ -163,7 +179,10 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         <tr className={classes} onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}
             onPointerDown={gestureStart} onPointerMove={gestureMove} onPointerUp={gestureEnd} onPointerOut={gestureEnd}
             onPointerLeave={gestureEnd} onPointerCancel={gestureCancel} >
-            <th scope='row'>{entry.dinghy.dinghyClass.name + ' ' + entry.dinghy.sailNumber + ' ' + entry.helm.name}</th>
+            {/* <th scope='row'>{entry.dinghy.dinghyClass.name + ' ' + entry.dinghy.sailNumber + ' ' + entry.helm.name}</th> */}
+            <th scope='row'>{entry.dinghy.dinghyClass.name}</th>
+            <th className='sail-number' scope='row'>{entry.dinghy.sailNumber}</th>
+            <th scope='row'>{entry.helm.name}</th>
             {lapsView}
             <LapView key='sumOfLapTimes' value={entry.sumOfLapTimes} total={true} editable={false} />
             <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />

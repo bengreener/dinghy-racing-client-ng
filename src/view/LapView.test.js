@@ -1,4 +1,20 @@
-import { render, screen } from '@testing-library/react';
+/*
+ * Copyright 2022-2024 BG Information Systems Ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import LapView from './LapView';
 
@@ -38,26 +54,28 @@ describe('when editable is false', () => {
 });
 
 describe('when editable is true', () => {
-    it('displays numeric input showing value passed in', () => {
+    it('displays value in time format', () => {
         const container = document.createElement('tr');
         render(<LapView value={1234} editable={true}/>, {'container': document.body.appendChild(container)});
-        screen.getByRole('spinbutton', {'value': 1234});
+        screen.getByRole('textbox', {'value': '00:01'});
     });
     it('accepts a new value', async () => {
         const user = userEvent.setup();
         const container = document.createElement('tr');
         render(<LapView value={1234} editable={true}/>, {'container': document.body.appendChild(container)});
-        const input = screen.getByRole('spinbutton', {'value': 1234});
+        const input = screen.getByRole('textbox', {'value': '00:01'});
+        await act(async () => {
             await user.clear(input);
-            await user.type(input, '9876');
-        expect(input).toHaveValue(9876);
+            await user.type(input, '00:09');
+        });
+        expect(input).toHaveValue('00:09');
     }); 
     it('calls value passed to keyup', async () => {
         const keyupMock = jest.fn();
         const user = userEvent.setup(); 
         const container = document.createElement('tr');
         render(<LapView value={1234} editable={true} keyup={keyupMock} />, {'container': document.body.appendChild(container)});
-        screen.getByRole('spinbutton').focus();
+        screen.getByRole('textbox').focus();
         await user.keyboard('{Enter}');
         expect(keyupMock).toBeCalled();
     });
@@ -67,11 +85,46 @@ describe('when editable is true', () => {
         const user = userEvent.setup(); 
         const container = document.createElement('tr');
         render(<LapView value={1234} editable={true} keyup={keyupMock} focusout={focusoutMock} />, {'container': document.body.appendChild(container)});
-        const cell = screen.getByRole('spinbutton');
+        const cell = screen.getByRole('textbox');
         cell.focus();
         cell.blur();
         expect(focusoutMock).toBeCalled();
     });
+    describe('when validating entry', () => {
+        it('does not accept letters', async () => {
+            const user = userEvent.setup();
+            const container = document.createElement('tr');
+            render(<LapView value={1234} editable={true}/>, {'container': document.body.appendChild(container)});
+            const input = screen.getByRole('textbox', {'value': '00:01'});
+            await act(async () => {
+                await user.clear(input);
+                await user.type(input, '00:h');
+            });
+            expect(input).toHaveValue('00:');
+        });
+        it('does not accept 999:63', async () => {
+            const user = userEvent.setup();
+            const container = document.createElement('tr');
+            render(<LapView value={1234} editable={true}/>, {'container': document.body.appendChild(container)});
+            const input = screen.getByRole('textbox', {'value': '00:01'});
+            await act(async () => {
+                await user.clear(input);
+                await user.type(input, '999:63');
+            });
+            expect(input).toHaveValue('999:6');
+        });
+        it('does not accept 999:63', async () => {
+            const user = userEvent.setup();
+            const container = document.createElement('tr');
+            render(<LapView value={1234} editable={true}/>, {'container': document.body.appendChild(container)});
+            const input = screen.getByRole('textbox', {'value': '00:01'});
+            await act(async () => {
+                await user.clear(input);
+                await user.type(input, '999:52:78');
+            });
+            expect(input).toHaveValue('999:52:7');
+        });
+    })
     describe('when cell contains a total', () => {
         it('has class total', () => {
             const container = document.createElement('tr');

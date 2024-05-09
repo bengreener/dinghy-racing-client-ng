@@ -1,3 +1,19 @@
+/*
+ * Copyright 2022-2024 BG Information Systems Ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 import DinghyRacingModel, { SortOrder }  from './dinghy-racing-model';
 import { httpRootURL, wsRootURL, competitorsCollectionHAL, 
     dinghiesCollectionHAL, dinghiesScorpionCollectionHAL, 
@@ -269,7 +285,7 @@ describe('when creating a new race', () => {
     it('if a dinghy class URL is not supplied looks up dinghy class to get URL and returns a promise that resolves to a result indicating success when race is created with http status 200', async () => {
         fetch.mockImplementationOnce((resource, options) => {
             // check format of data passed to fetch to reduce risk of false positive
-            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","actualStartTime":null,"dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700,"plannedLaps":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"startSequenceState":"NONE","url":""}') {
+            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","actualStartTime":null,"dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700,"plannedLaps":null,"lapsSailed":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"startSequenceState":"NONE","url":""}') {
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -293,7 +309,7 @@ describe('when creating a new race', () => {
     it('if a dinghy class URL is supplied does not look up dinghy class to get URL and returns a promise that resolves to a result indicating success when race is created with http status 200', async () => {
         fetch.mockImplementationOnce((resource, options) => {
             // check format of data passed to fetch to reduce risk of false positive
-            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","actualStartTime":null,"dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700,"plannedLaps":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"startSequenceState":"NONE","url":""}') {
+            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","actualStartTime":null,"dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700,"plannedLaps":null,"lapsSailed":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"startSequenceState":"NONE","url":""}') {
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -317,7 +333,7 @@ describe('when creating a new race', () => {
     it('returns a promise that resolves to a result indicating success when race is created with http status 201', async () => {
         fetch.mockImplementationOnce((resource, options) => {// check format of data passed to fetch to reduce risk of false positive
             // check format of data passed to fetch to reduce risk of false positive
-            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","actualStartTime":null,"dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700,"plannedLaps":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"startSequenceState":"NONE","url":""}') {
+            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","actualStartTime":null,"dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700,"plannedLaps":null,"lapsSailed":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"startSequenceState":"NONE","url":""}') {
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -2303,7 +2319,7 @@ it('provides a blank template for a dinghy', () => {
 it('provides a blank template for a race', () => {
     const race = DinghyRacingModel.raceTemplate();
 
-    expect(race).toEqual({'name': '', 'plannedStartTime': null, 'actualStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'plannedLaps': null, 'lapForecast': null, 'lastLapTime': null, 'averageLapTime': null, 'startSequenceState': 'NONE', 'clock': null, 'url': ''});
+    expect(race).toEqual({'name': '', 'plannedStartTime': null, 'actualStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'plannedLaps': null, 'lapsSailed': null, 'lapForecast': null, 'lastLapTime': null, 'averageLapTime': null, 'startSequenceState': 'NONE', 'clock': null, 'url': ''});
 });
 
 it('provides a blank template for a race entry', () => {
@@ -3063,6 +3079,25 @@ describe('when a race is requested', () => {
             expect(result).toEqual({'success': true, 'domainObject': raceScorpionA_warningSignal});
         });
     });
+    describe('when an entry has already sailed a lap', () => {
+        it('returns a race that includes the number of laps sailed by the lead entry', async () => {
+            const raceScorpion_lapsSailed_AHAL = {...raceScorpion_AHAL, leadEntry: {...raceScorpion_AHAL.leadEntry, lapsSailed: 3}};
+            const raceScorpion_lapsSailed = {...raceScorpionA, lapsSailed: 3};
+            fetch.mockImplementationOnce(() => {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(raceScorpion_lapsSailed_AHAL)
+                });
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
+            const promise = dinghyRacingModel.getRace(raceScorpion_lapsSailed.url);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, 'domainObject': raceScorpion_lapsSailed});
+        })
+    })
     it('returns a promise that resolves to a result indicating failure when race is not found', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
@@ -4085,5 +4120,70 @@ describe('when a StartSequence is requested', () => {
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'});
+    });
+});
+
+describe('when updating the plannedLaps for a race', () => {
+    describe('when a url is provided for race', () => {
+        it('returns a promise that resolves to a success response when race planned laps is successfully updated', async () => {
+            fetch.mockImplementationOnce(() => {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve({})
+                });
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.updateRacePlannedLaps(raceScorpionA, 4);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result.success).toBeTruthy();
+        });
+        it('returns a promise that resolves to a result indicating failure when start sequence stae is rejected by REST service', async () => {
+            fetch.mockImplementationOnce(() => {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404, 
+                    json: () => Promise.resolve({})
+                });
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.updateRacePlannedLaps(raceScorpionA, 4);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
+        });
+    });
+    describe('when a url is not provided for race', () => {
+        it('retrieves race by name and planned start time then returns a promise that resolves to a success response when race start sequence state is successfully updated', async () => {
+            fetch.mockImplementationOnce(() => {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve({})
+                });
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': {raceScorpionA}})});
+            const promise = dinghyRacingModel.updateRacePlannedLaps({ 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00Z'), plannedLaps: 5, 'dinghyClass': dinghyClassScorpion}, 4);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result.success).toBeTruthy();
+        });
+        it('returns a failure and advises reason for failure when race cannot be retrieved by name and planned start time', async () => {
+            fetch.mockImplementationOnce(() => {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve({})
+                });
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
+            const promise = dinghyRacingModel.updateRacePlannedLaps({ 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00Z'), plannedLaps: 5, 'dinghyClass': dinghyClassScorpion}, 4);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'Something went wrong'});
+        });
     });
 });

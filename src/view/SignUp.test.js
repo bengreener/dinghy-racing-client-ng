@@ -1,3 +1,19 @@
+/*
+ * Copyright 2022-2024 BG Information Systems Ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
 import { act, screen } from '@testing-library/react';
 import { customRender } from '../test-utilities/custom-renders';
 import userEvent from '@testing-library/user-event';
@@ -75,8 +91,10 @@ describe('when race for dinghy class with no crew', () => {
         await act(async () => {
             customRender(<SignUp race={raceCometA}/>, model, controller);
         });
-        const inputCrew = screen.queryByLabelText(/crew/i);
-        expect(inputCrew).not.toBeInTheDocument();
+        // const inputCrew = screen.queryByLabelText(/crew/i);
+        // expect(inputCrew).not.toBeInTheDocument();
+        const inputCrew = screen.getByLabelText(/crew/i);
+        expect(inputCrew).toBeDisabled();
     });
 
     describe('when helm and dinghy exist', () => {
@@ -531,7 +549,8 @@ describe('when race for dinghy class with no crew', () => {
         expect(raceTitle).toBeInTheDocument();
         expect(inputHelm).toHaveValue('');
         expect(inputSailNumber).toHaveValue('');
-        expect(screen.queryByLabelText(/crew/i)).not.toBeInTheDocument();
+        // expect(screen.queryByLabelText(/crew/i)).not.toBeInTheDocument();
+        expect(screen.queryByLabelText(/crew/i)).toBeDisabled();
         expect(btnCreate).toBeInTheDocument();
     });
     
@@ -2116,7 +2135,8 @@ describe('when race is a handicap', () => {
                 await user.selectOptions(inputDinghyClass, 'Comet');
             });
             const inputCrew = screen.queryByLabelText(/crew/i);
-            expect(inputCrew).not.toBeInTheDocument();
+            // expect(inputCrew).not.toBeInTheDocument();
+            expect(inputCrew).toBeDisabled();
         });
         
         describe('when helm and dinghy exist', () => {

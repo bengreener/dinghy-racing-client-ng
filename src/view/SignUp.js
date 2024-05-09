@@ -1,5 +1,20 @@
-import React from 'react';
-import { useContext, useState } from 'react';
+/*
+ * Copyright 2022-2024 BG Information Systems Ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
+import React, { useContext, useRef, useState } from 'react';
 import ControllerContext from './ControllerContext';
 import ModelContext from './ModelContext';
 /**
@@ -24,6 +39,8 @@ function SignUp({ race }) {
     const [dinghyMap, setDinghyMap] = React.useState(new Map());
     const [dinghyOptions, setDinghyOptions] = React.useState([]);
     const [entriesTable, setEntriesTable] = React.useState([]);
+    const helmInput = useRef(null);
+    const dinghyClassSelect = useRef(null);
 
     const clear = React.useCallback(() => {
         setHelmName('');
@@ -31,7 +48,13 @@ function SignUp({ race }) {
         setSailNumber('');
         setDinghyClassName('');
         showMessage('');
-    }, []);
+        if (race.dinghyClass) {
+            helmInput.current.focus();
+        }
+        else {
+            dinghyClassSelect.current.focus();
+        }
+    }, [race.dinghyClass]);
 
     // get competitors
     React.useEffect(() => {
@@ -225,7 +248,7 @@ function SignUp({ race }) {
             dinghyClassInput = (
                 <>
                     <label htmlFor="dinghy-class-select">Dinghy Class</label>
-                    <select id="dinghy-class-select" name="dinghyClass" multiple={false} onChange={handleChange} value={dinghyClassName} >{dinghyClassOptions}</select>
+                    <select id="dinghy-class-select" ref={dinghyClassSelect} name="dinghyClass" multiple={false} onChange={handleChange} value={dinghyClassName} autoFocus >{dinghyClassOptions}</select>
                 </>
             );
         }
@@ -236,8 +259,32 @@ function SignUp({ race }) {
         return dinghyClassInput;
     }
 
-    function crewInput() {
-        let crewInput = null;
+    function buildHelmInput() {
+        if (race.dinghyClass) {
+            return (
+                <>
+                    <label htmlFor="helm-input">Helm's Name</label>
+                    <input id="helm-input" ref={helmInput} name="helm" list="competitor-datalist" onChange={handleChange} value={helmName} autoFocus />
+                </>
+            )
+        }
+        else {
+            return (
+                <>
+                    <label htmlFor="helm-input">Helm's Name</label>
+                    <input id="helm-input" ref={helmInput} name="helm" list="competitor-datalist" onChange={handleChange} value={helmName} />
+                </>
+            )
+        }
+    }
+
+    function buildCrewInput() {
+        let crewInput = (
+            <>
+                <label htmlFor="crew-input">Crew's Name</label>
+                <input id="crew-input" name="crew" list="competitor-datalist" onChange={handleChange} value={crewName} disabled />
+            </>
+        );
         if (dinghyClassHasCrew) {
             crewInput = (
                 <>
@@ -284,10 +331,11 @@ function SignUp({ race }) {
             <h1>{race.name}</h1>
             <datalist id="competitor-datalist">{competitorOptions}</datalist>
             <div>
-            <label htmlFor="helm-input">Helm's Name</label>
-            <input id="helm-input" name="helm" list="competitor-datalist" onChange={handleChange} value={helmName} />
-            {crewInput()}
             {dinghyClassInput(race)}
+            {/* <label htmlFor="helm-input">Helm's Name</label>
+            <input id="helm-input" ref={helmInput} name="helm" list="competitor-datalist" onChange={handleChange} value={helmName} /> */}
+            {buildHelmInput()}
+            {buildCrewInput()}
             <datalist id="dinghy-datalist">{dinghyOptions}</datalist>
             <label htmlFor="sail-number-input">Sail Number</label>
             <input id="sail-number-input" name="sailNumber" list="dinghy-datalist" onChange={handleChange} value={sailNumber} />
