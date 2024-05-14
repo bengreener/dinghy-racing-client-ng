@@ -160,7 +160,7 @@ function SignUp({ race }) {
                 showMessage('Unable to load race entries\n' + result.message);
             }
         });
-    }, [race, model]);
+    }, [race, model, result]);
     
     // if error display message 
     React.useEffect(() => {
