@@ -70,6 +70,13 @@ function SignUp({ race }) {
             setDinghyClassName(entry.dinghy.dinghyClass.name);
         }
         setSailNumber(entry.dinghy.sailNumber);
+        if (race.dinghyClass) {
+            helmInput.current.focus();
+        }
+        else {
+            dinghyClassSelect.current.focus();
+        }
+        showMessage('');
     }, [race]);
 
     // get competitors
@@ -210,7 +217,7 @@ function SignUp({ race }) {
         }
         if (target.name === 'dinghyClass') {
             setDinghyClassName(target.value);
-            if (dinghyClassMap.get(target.value).crewSize === 1) {
+            if (target.value !== '' && dinghyClassMap.get(target.value).crewSize === 1) {
                 setCrewName('');
             }
         }
