@@ -9237,4 +9237,28 @@ describe('when updating an existing entry', () => {
             expect(btnCreate).toBeInTheDocument();
         });
     });
+    it('has an option to cancel update that clears selected entry values to allow new entry to sign up', async () => {
+        const user = userEvent.setup();
+        await act(async () => {
+            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+        });
+        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+        await act(async () => {
+            await user.click(cellChrisMarshall);
+        });
+        await act(async () => {
+            await user.click(screen.getByRole('button', {name: /cancel/i}));
+        });
+
+        const raceTitle = await screen.findByRole('heading', {'name': /scorpion a/i});
+        const inputHelm = await screen.findByLabelText(/helm/i);
+        const inputCrew = await screen.findByLabelText(/crew/i);
+        const inputSailNumber = await screen.findByLabelText(/sail/i);
+        const btnCreate = await screen.findByRole('button', {'name': /sign-up/i});
+        expect(raceTitle).toBeInTheDocument();
+        expect(inputHelm).toHaveValue('');
+        expect(inputCrew).toHaveValue('');
+        expect(inputSailNumber).toHaveValue('');
+        expect(btnCreate).toBeInTheDocument();
+    });
 });
