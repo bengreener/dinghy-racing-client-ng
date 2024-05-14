@@ -34,11 +34,13 @@ function SignUp({ race }) {
     const [result, setResult] = useState({'message': ''});
     const [competitorMap, setCompetitorMap] = useState(new Map());
     const [competitorOptions, setCompetitorOptions] = useState([]);
-    const [dinghyClassMap, setDinghyClassMap] = React.useState(new Map());
-    const [dinghyClassOptions, setDinghyClassOptions] = React.useState([]);
-    const [dinghyMap, setDinghyMap] = React.useState(new Map());
-    const [dinghyOptions, setDinghyOptions] = React.useState([]);
-    const [entriesTable, setEntriesTable] = React.useState([]);
+    const [dinghyClassMap, setDinghyClassMap] = useState(new Map());
+    const [dinghyClassOptions, setDinghyClassOptions] = useState([]);
+    const [dinghyMap, setDinghyMap] = useState(new Map());
+    const [dinghyOptions, setDinghyOptions] = useState([]);
+    const entryMap = useRef(new Map());
+    const [entriesTable, setEntriesTable] = useState([]);
+    const [selectedEntry, setSelectedEntry] = useState(null);
     const helmInput = useRef(null);
     const dinghyClassSelect = useRef(null);
 
@@ -48,6 +50,7 @@ function SignUp({ race }) {
         setSailNumber('');
         setDinghyClassName('');
         showMessage('');
+        setSelectedEntry(null);
         if (race.dinghyClass) {
             helmInput.current.focus();
         }
@@ -126,8 +129,13 @@ function SignUp({ race }) {
     React.useEffect(() => {
         model.getEntriesByRace(race).then(result => {
             if (result.success) {
+                // populate entries map
+                const map = new Map();
+                result.domainObject.map(entry => map.set(entry.url, entry));
+                entryMap.current = map; // tried using setState but was failing tests with entryMap === null even when entriesTable populated; entriesMap is nt a visual element so useRef may be a better fit anyway
+                // build table rows
                 const rows = result.domainObject.map(entry => {
-                    return <tr key={entry.helm.name}>
+                    return <tr key={entry.helm.name} id={entry.url} onClick={handleEntryRowClick} >
                         <td key={'helm'}>{entry.helm.name}</td>
                         <td key={'sailNumber'}>{entry.dinghy.sailNumber}</td>
                         <td key={'dinghyClass'}>{entry.dinghy.dinghyClass.name}</td>
@@ -152,7 +160,7 @@ function SignUp({ race }) {
                 showMessage('Unable to load race entries\n' + result.message);
             }
         });
-    }, [race, model, result]);
+    }, [race, model]);
     
     // if error display message 
     React.useEffect(() => {
@@ -189,10 +197,13 @@ function SignUp({ race }) {
         }
         if (target.name === 'dinghyClass') {
             setDinghyClassName(target.value);
+            if (dinghyClassMap.get(target.value).crewSize === 1) {
+                setCrewName('');
+            }
         }
     }
 
-    async function handleCreate(event) {
+    async function handleEntryUpdateButtonClick(event) {
         event.preventDefault();        
         const creationPromises = [];
         // handle creation of 
@@ -230,16 +241,39 @@ function SignUp({ race }) {
             const helm = competitorMap.has(helmName) ? competitorMap.get(helmName) : {'name': helmName, 'url': ''};
             const dinghy = dinghyMap.has(sailNumber) ? dinghyMap.get(sailNumber) : {'sailNumber': sailNumber, 'dinghyClass': dinghyClassMap.get(dinghyClassName), 'url': ''};
             const crew = crewName ? (competitorMap.has(crewName) ? competitorMap.get(crewName) : {'name': crewName, 'url': ''}) : null;
-            if (crew) {
-                setResult(await controller.signupToRace(race, helm, dinghy, crew));
+            if (!selectedEntry) {
+                if (crew) {
+                    setResult(await controller.signupToRace(race, helm, dinghy, crew));
+                }
+                else {
+                    setResult(await controller.signupToRace(race, helm, dinghy));
+                }
             }
-            else {
-                setResult(await controller.signupToRace(race, helm, dinghy));
-            }
+            if (selectedEntry) {
+                if (crew) {
+                    setResult(await controller.updateEntry(selectedEntry, helm, dinghy, crew));
+                }
+                else {
+                    setResult(await controller.updateEntry(selectedEntry, helm, dinghy));
+                }
+            }            
         }
         else {
             setResult({'success': false, 'message': message});
         }
+    }
+
+    function handleEntryRowClick({ currentTarget }) {
+        const entry = entryMap.current.get(currentTarget.id);
+        setSelectedEntry(entry);
+        setHelmName(entry.helm.name);
+        if (entry.crew) {
+            setCrewName(entry.crew.name)
+        };
+        if ((!race.dinghyClass)){
+            setDinghyClassName(entry.dinghy.dinghyClass.name);
+        }
+        setSailNumber(entry.dinghy.sailNumber);
     }
 
     function dinghyClassInput(race) {
@@ -292,7 +326,7 @@ function SignUp({ race }) {
                     <input id="crew-input" name="crew" list="competitor-datalist" onChange={handleChange} value={crewName} />
                 </>
             );
-        };
+        }
         return crewInput;
     }
 
@@ -302,28 +336,54 @@ function SignUp({ race }) {
     }
 
     function getButtonText() {
-        if (!competitorMap.has(helmName) && (crewName !== '' && crewName != null && !competitorMap.has(crewName)) && !dinghyMap.has(sailNumber)) {
-            return 'Add helm & crew & dinghy & sign-up';
+        if (!selectedEntry) {
+            if (!competitorMap.has(helmName) && (crewName !== '' && crewName != null && !competitorMap.has(crewName)) && !dinghyMap.has(sailNumber)) {
+                return 'Add helm & crew & dinghy & sign-up';
+            }
+            if (!competitorMap.has(helmName) && !dinghyMap.has(sailNumber)) {
+                return 'Add helm & dinghy & sign-up';
+            }
+            if ((crewName !== '' && crewName != null && !competitorMap.has(crewName)) && !dinghyMap.has(sailNumber)) {
+                return 'Add crew & dinghy & sign-up';
+            }
+            if (!competitorMap.has(helmName) && (crewName !== '' && crewName != null && !competitorMap.has(crewName))) {
+                return 'Add helm & crew & sign-up';
+            }
+            if (!competitorMap.has(helmName)) {
+                return 'Add helm & sign-up';
+            }
+            if ((crewName !== '' && crewName != null && !competitorMap.has(crewName))) {
+                return 'Add crew & sign-up';
+            }
+            if (!dinghyMap.has(sailNumber)) {
+                return 'Add dinghy & sign-up';
+            }
+            return 'Sign-up';
         }
-        if (!competitorMap.has(helmName) && !dinghyMap.has(sailNumber)) {
-            return 'Add helm & dinghy & sign-up';
+        if (selectedEntry) {
+            if (!competitorMap.has(helmName) && (crewName !== '' && crewName != null && !competitorMap.has(crewName)) && !dinghyMap.has(sailNumber)) {
+                return 'Add helm & crew & dinghy & update';
+            }
+            if (!competitorMap.has(helmName) && !dinghyMap.has(sailNumber)) {
+                return 'Add helm & dinghy & update';
+            }
+            if ((crewName !== '' && crewName != null && !competitorMap.has(crewName)) && !dinghyMap.has(sailNumber)) {
+                return 'Add crew & dinghy & update';
+            }
+            if (!competitorMap.has(helmName) && (crewName !== '' && crewName != null && !competitorMap.has(crewName))) {
+                return 'Add helm & crew & update';
+            }
+            if (!competitorMap.has(helmName)) {
+                return 'Add helm & update';
+            }
+            if ((crewName !== '' && crewName != null && !competitorMap.has(crewName))) {
+                return 'Add crew & update';
+            }
+            if (!dinghyMap.has(sailNumber)) {
+                return 'Add dinghy & update';
+            }
+            return 'Update';
         }
-        if ((crewName !== '' && crewName != null && !competitorMap.has(crewName)) && !dinghyMap.has(sailNumber)) {
-            return 'Add crew & dinghy & sign-up';
-        }
-        if (!competitorMap.has(helmName) && (crewName !== '' && crewName != null && !competitorMap.has(crewName))) {
-            return 'Add helm & crew & sign-up';
-        }
-        if (!competitorMap.has(helmName)) {
-            return 'Add helm & sign-up';
-        }
-        if ((crewName !== '' && crewName != null && !competitorMap.has(crewName))) {
-            return 'Add crew & sign-up';
-        }
-        if (!dinghyMap.has(sailNumber)) {
-            return 'Add dinghy & sign-up';
-        }
-        return 'Sign-up';
     }
 
     return (
@@ -332,15 +392,13 @@ function SignUp({ race }) {
             <datalist id="competitor-datalist">{competitorOptions}</datalist>
             <div>
             {dinghyClassInput(race)}
-            {/* <label htmlFor="helm-input">Helm's Name</label>
-            <input id="helm-input" ref={helmInput} name="helm" list="competitor-datalist" onChange={handleChange} value={helmName} /> */}
             {buildHelmInput()}
             {buildCrewInput()}
             <datalist id="dinghy-datalist">{dinghyOptions}</datalist>
             <label htmlFor="sail-number-input">Sail Number</label>
             <input id="sail-number-input" name="sailNumber" list="dinghy-datalist" onChange={handleChange} value={sailNumber} />
             <output id="entry-message-output" />
-            <button id="entry-create-button" type="button" onClick={handleCreate} >{getButtonText()}</button>
+            <button id="entry-update-button" type="button" onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
             </div>
             <h3>Signed-up</h3>
             <div className="scrollable">

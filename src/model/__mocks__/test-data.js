@@ -287,11 +287,14 @@ const entriesScorpionA = [
 const entriesGraduateA = [
 	{'helm': competitorJillMyer, 'crew': null, 'race': raceGraduateA,'dinghy': dinghy2928, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/12'}
 ];
+const entryJillMyerCometA826 = {'helm': competitorJillMyer, 'crew': null, 'race': raceCometA, 'dinghy': dinghy826, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/19'};
 const entriesCometA = [
-	{'helm': competitorJillMyer, 'crew': null, 'race': raceCometA, 'dinghy': dinghy826, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/19'}
+	// {'helm': competitorJillMyer, 'crew': null, 'race': raceCometA, 'dinghy': dinghy826, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/19'}
+	entryJillMyerCometA826
 ];
+const entryChrisMarshallHandicapA1234 = {'helm': competitorChrisMarshall, 'crew': competitorLouScrew, 'race': raceHandicapA, 'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/20'};
 const entriesHandicapA = [
-	{'helm': competitorChrisMarshall, 'crew': competitorLouScrew, 'race': raceHandicapA, 'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/20'}, 
+	entryChrisMarshallHandicapA1234, 
 	{'helm': competitorJillMyer, 'crew': null, 'race': raceHandicapA, 'dinghy': dinghy826, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/21'}
 ];
 
@@ -326,5 +329,6 @@ export {
 
 	races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA,
 
-	entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA, entryChrisMarshallScorpionA1234
+	entryChrisMarshallHandicapA1234, entryChrisMarshallScorpionA1234, entryJillMyerCometA826,
+	entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA
 }
