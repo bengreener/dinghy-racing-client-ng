@@ -66,7 +66,7 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
             <h1>Upcoming Races</h1>
             <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
             <p id="view-upcoming-races-message" className={!message ? "hidden" : ""}>{message}</p>
-            <div>
+            <div className="scrollable">
                 <table>
                     <thead>
                         <tr>

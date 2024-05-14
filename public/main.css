@@ -115,6 +115,11 @@ header {
 	display: flex;
 	flex-direction: column;
 }
+.upcoming-races {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
 .hidden {
     display: none;
 }
