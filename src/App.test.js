@@ -143,7 +143,7 @@ describe('when upcoming races button clicked', () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const dinghyRacingController = new DinghyRacingController(model);
-    jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
 
     render(<App model={model} controller={dinghyRacingController} />);
     const btnViewUpcomingRaces = await screen.findByRole('button', {name: /upcoming races\b/i});

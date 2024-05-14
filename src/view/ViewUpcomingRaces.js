@@ -16,6 +16,7 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
+import SelectSession from './SelectSession';
 
 /**
  * Show races that are scheduled to be held
@@ -25,6 +26,8 @@ import ModelContext from './ModelContext';
  */
 function ViewUpcomingRaces({ showSignUpForm = false }) {
     const model = useContext(ModelContext);
+    const [sessionStart, setSessionStart] = useState(new Date());
+    const [sessionEnd, setSessionEnd] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000));
     const [raceMap, setRaceMap] = useState(new Map());  
     const [message, setMessage] = useState('');
 
@@ -35,7 +38,7 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
     }
 
     useEffect(() => {
-        model.getRacesOnOrAfterTime(new Date()).then(result => {
+        model.getRacesBetweenTimes(new Date(sessionStart), new Date(sessionEnd)).then(result => {
             if (result.success) {
                 let map = new Map();
                 const races = result.domainObject;
@@ -48,22 +51,34 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
                 setMessage('Unable to load races\n' + result.message);
             }
         });
-    }, [model])
+    }, [model, sessionStart, sessionEnd])
+
+    function handlesessionStartInputChange(date) {
+        setSessionStart(date);
+    }
+
+    function handlesessionEndInputChange(date) {
+        setSessionEnd(date);
+    }
 
     return (
-        <>
-        <table>
-            <thead>
-                <tr>
-                    <th>Race</th><th>Class</th><th>Start Time</th>
-                </tr>
-            </thead>
-            <tbody>
-                {Array.from(raceMap.values()).map(race => <tr key={race.url} id={race.url} onClick={handleRowClick}><td>{race.name}</td><td>{race.dinghyClass ? race.dinghyClass.name : ''}</td><td>{race.plannedStartTime.toLocaleString()}</td></tr>)}
-            </tbody>
-        </table>
-        <p id="view-upcoming-races-message" className={!message ? "hidden" : ""}>{message}</p>
-        </>
+        <div className="upcoming-races">
+            <h1>Upcoming Races</h1>
+            <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
+            <p id="view-upcoming-races-message" className={!message ? "hidden" : ""}>{message}</p>
+            <div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Race</th><th>Class</th><th>Start Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {Array.from(raceMap.values()).map(race => <tr key={race.url} id={race.url} onClick={handleRowClick}><td>{race.name}</td><td>{race.dinghyClass ? race.dinghyClass.name : ''}</td><td>{race.plannedStartTime.toLocaleString()}</td></tr>)}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     );
 }
 
