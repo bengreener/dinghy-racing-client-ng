@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import React, { useContext, useRef, useState } from 'react';
+import React, { useCallback, useContext, useRef, useState } from 'react';
 import ControllerContext from './ControllerContext';
 import ModelContext from './ModelContext';
 /**
@@ -58,6 +58,19 @@ function SignUp({ race }) {
             dinghyClassSelect.current.focus();
         }
     }, [race.dinghyClass]);
+
+    const handleEntryRowClick = useCallback(({ currentTarget }) => {
+        const entry = entryMap.current.get(currentTarget.id);
+        setSelectedEntry(entry);
+        setHelmName(entry.helm.name);
+        if (entry.crew) {
+            setCrewName(entry.crew.name)
+        };
+        if ((!race.dinghyClass)){
+            setDinghyClassName(entry.dinghy.dinghyClass.name);
+        }
+        setSailNumber(entry.dinghy.sailNumber);
+    }, [race]);
 
     // get competitors
     React.useEffect(() => {
@@ -160,7 +173,7 @@ function SignUp({ race }) {
                 showMessage('Unable to load race entries\n' + result.message);
             }
         });
-    }, [race, model, result]);
+    }, [race, model, result, handleEntryRowClick]);
     
     // if error display message 
     React.useEffect(() => {
@@ -261,19 +274,6 @@ function SignUp({ race }) {
         else {
             setResult({'success': false, 'message': message});
         }
-    }
-
-    function handleEntryRowClick({ currentTarget }) {
-        const entry = entryMap.current.get(currentTarget.id);
-        setSelectedEntry(entry);
-        setHelmName(entry.helm.name);
-        if (entry.crew) {
-            setCrewName(entry.crew.name)
-        };
-        if ((!race.dinghyClass)){
-            setDinghyClassName(entry.dinghy.dinghyClass.name);
-        }
-        setSailNumber(entry.dinghy.sailNumber);
     }
 
     function dinghyClassInput(race) {
