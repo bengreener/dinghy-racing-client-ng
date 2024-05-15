@@ -33,11 +33,19 @@ function CompetitorsConsole() {
         }
     }, [model])
 
+    function competitorRows() {
+        const rows = [];
+        competitorsMap.forEach((competitor, key) => {
+            rows.push(<tr key={key} id={key} ><td>{competitor.name}</td></tr>);
+        });
+        return rows;
+    };
+
     return (
-        <div>
+        <div className="competitors-console">
             <h1>Competitors</h1>
             <p id="competitor-console-message" className={!message ? "hidden" : ""}>{message}</p>
-            <div>
+            <div className="scrollable">
                 <table>
                     <thead>
                         <tr>
@@ -45,7 +53,7 @@ function CompetitorsConsole() {
                         </tr>
                     </thead>
                     <tbody>
-                        {competitorsMap.forEach((key, competitor) => <td key={key} id={key} >{competitor.name}</td>)}
+                        {competitorRows()}
                     </tbody>
                 </table>
             </div>

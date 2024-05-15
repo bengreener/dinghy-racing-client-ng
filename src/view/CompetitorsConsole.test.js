@@ -15,7 +15,7 @@ it('renders', async () => {
     expect(screen.getByRole('columnheader', {name: 'Competitors'}));
 });
 
-describe('there are competitors', () => {
+describe('when there are competitors', () => {
     it('displays list of competitors', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
