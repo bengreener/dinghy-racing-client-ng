@@ -142,14 +142,30 @@ class DinghyRacingController {
 
     /**
      * Add a new competitor
-     * @param {Competitor} 
+     * @param {Competitor} competitor to add
      * @returns {Promise<Result>}
      */
     createCompetitor(competitor) {
         if (!competitor || !competitor.name) {
-            return Promise.resolve({'success': false, 'message': 'A name is required for a new competitor'});
+            return Promise.resolve({'success': false, 'message': 'A name is required for a new competitor.'});
         }
         return this.model.createCompetitor(competitor);
+    }
+
+    /**
+     * Update an exisiting competitor
+     * @param {Competitor} competitor to update
+     * @param {String} name new value for competitors name
+     * @returns {Promise<Result>}
+     */
+    updateCompetitor(competitor, name) {
+        if (!competitor) {
+            return Promise.resolve({'success': false, 'message': 'An exisiting competitor to update is required.'});
+        }
+        if (!name) {
+            return Promise.resolve({'success': false, 'message': 'A new name is required for the competitor.'});
+        }
+        return this.model.updateCompetitor(competitor, name);
     }
 
     /**

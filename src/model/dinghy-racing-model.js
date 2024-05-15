@@ -233,7 +233,7 @@ class DinghyRacingModel {
     /**
      * Update an exisiting competitor
      * @param {Competitor} competitor
-     * @param {String} name update to competitors name
+     * @param {String} name new value for competitors name
      * @returns {Promise<Result>}
      */
     async updateCompetitor(competitor, name) {
