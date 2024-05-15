@@ -236,7 +236,7 @@ class DinghyRacingModel {
     }
 
     async getCompetitors() {
-        return null;
+        return Promise.resolve({success: true, domainObject: []});
     }
 
     async getCompetitorByName(name) {
