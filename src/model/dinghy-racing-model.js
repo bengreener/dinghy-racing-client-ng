@@ -231,6 +231,26 @@ class DinghyRacingModel {
     }
 
     /**
+     * Update an exisiting competitor
+     * @param {Competitor} competitor
+     * @param {String} name update to competitors name
+     * @returns {Promise<Result>}
+     */
+    async updateCompetitor(competitor, name) {
+        let competitorURL = competitor.url;
+        if (!competitor.url) {
+            const result = await this.getCompetitorByName(competitor.name);
+            if (result.success) {
+                competitorURL = result.domainObject.url;
+            }
+            else {
+                return Promise.resolve(result);
+            }
+        }
+        return this.update(competitorURL, {name: name});
+    }
+
+    /**
      * Create a new dinghy
      * @param {Dinghy} dinghy 
      * @returns {Promise<Result>}

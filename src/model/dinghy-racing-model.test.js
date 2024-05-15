@@ -1190,7 +1190,7 @@ describe('when signing up to a race', () => {
     });
 });
 
-describe('when changing an entry for a race', () => {
+describe('when updating an entry for a race', () => {
     it('if entry exists and URL provided and helm exists and URL provided and dinghy exist and URL provided and crew exists and URL provided then updates entry', async () => {
         fetch.mockImplementationOnce((resource, options) => {
             const bodyMatch = {'helm': competitorChrisMarshall.url, 'dinghy': dinghy1234.url, 'crew': competitorLouScrew.url};
@@ -1289,7 +1289,7 @@ describe('when changing an entry for a race', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});
     });
-    it('entry exists url provided helm does not exist dinghy exists url provided crew exists and name provided', async () => {
+    it('entry exists url provided helm does not exist dinghy exists url provided crew exists and name provided does not update entry and returns message explaining reason', async () => {
         const helm = {...competitorChrisMarshall, 'name': 'Lucy Liu', 'url': ''};
         const dinghy = {...dinghy1234};
         const crew = {...competitorLouScrew, 'url': ''};
@@ -1321,7 +1321,7 @@ describe('when changing an entry for a race', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Competitor not found'});
     });
-    it('entry exists and helm exists and name provided dinghy does not exists crew exists and name provided', async () => {
+    it('entry exists and helm exists and name provided dinghy does not exists crew exists and name provided does not update entry and returns message explaining reason', async () => {
         const helm = {...competitorChrisMarshall, 'url': ''};
         const dinghy = {...dinghy1234, 'sailNumber': 'xyz', 'url': null};
         const crew = {...competitorLouScrew, 'url': null};
@@ -1355,7 +1355,7 @@ describe('when changing an entry for a race', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Dinghy does not exist'});
     });
-    it('entry exists url provided helm exists url provided, dinghy exists sail number and class provided crew does not exist', async () => {
+    it('entry exists url provided helm exists url provided, dinghy exists sail number and class provided crew does not exist does not update entry and returns message explaining reason', async () => {
         const race = {...raceScorpionA};
         const helm = {...competitorChrisMarshall};
         const dinghy = {...dinghy1234, 'url': ''};
@@ -1779,6 +1779,75 @@ describe('when creating a new competitor', () => {
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'TypeError: Failed to fetch'});
+    });
+});
+
+describe('when updating a competitor', () => {
+    it('if competitor exists and URL provided then updates competitor', async () => {
+        fetch.mockImplementationOnce((resource, options) => {
+            const bodyMatch = {name: 'Chris Marshal'};
+            if ((resource === 'http://localhost:8081/dinghyracing/api/competitors/8') && (options.body === JSON.stringify(bodyMatch))) {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve({...competitorChrisMarshall, name: 'Chris Marshal'})
+                });
+            };
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.updateCompetitor(competitorChrisMarshall, 'Chris Marshal');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true});
+    });
+    it('if competitor exists but URL not provided then updates competitor', async () => {
+        fetch.mockImplementationOnce((resource, options) => {
+            const bodyMatch = {name: 'Chris Marshal'};
+            if ((resource === 'http://localhost:8081/dinghyracing/api/competitors/8') && (options.body === JSON.stringify(bodyMatch))) {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve({...competitorChrisMarshall, name: 'Chris Marshal'})
+                });
+            };
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+            if (name === 'Chris Marshall') {
+                return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
+            }
+            else {
+                return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
+            }
+        });
+        const promise = dinghyRacingModel.updateCompetitor(competitorChrisMarshall, 'Chris Marshal');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true});
+    });
+    it('if competitor does not exist returns message explaining issue', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+            return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
+        });
+        const promise = dinghyRacingModel.updateCompetitor({name: 'Chris Martian'}, 'Chris Marshal');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Competitor not found: Chris Martian'});
+    });
+    it('if update fails returns failed indicator and message explaining cause of failure', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 404, 
+                json: () => Promise.resolve({})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.updateCompetitor(competitorChrisMarshall, 'Chris Marshal');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
     });
 });
 

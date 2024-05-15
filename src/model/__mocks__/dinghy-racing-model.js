@@ -143,6 +143,10 @@ class DinghyRacingModel {
         return null;
     }
 
+    async updateCompetitor(competitor, name) {
+        return null;
+    }
+
     async createDinghy(dinghy) {
         return null;
     }
