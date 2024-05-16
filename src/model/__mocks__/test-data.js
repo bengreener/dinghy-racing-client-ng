@@ -268,32 +268,35 @@ const raceCometA = { 'name': 'Comet A', 'plannedStartTime' : new Date('2021-10-1
 const raceHandicapA = { 'name': 'Handicap A', 'plannedStartTime': new Date('2021-10-14T10:45:00Z'), 'actualStartTime': null, 'dinghyClass': null, 'duration': 2700000, 'plannedLaps': 5, 'lapsSailed': null, 'lapForecast': 5.0, 'lastLapTime': 0, 'averageLapTime': 0, 'clock': null, 'startSequenceState': 'NONE', 'url': 'http://localhost:8081/dinghyracing/api/races/8' };
 const races = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA];
 
+const entryChrisMarshallScorpionA1234 = {
+	'helm': competitorChrisMarshall, 'crew': null,
+	'race': raceScorpionA,
+	'dinghy': dinghy1234,
+	'crew': competitorLouScrew,
+	'laps': [],
+	'sumOfLapTimes': 0,
+	'onLastLap': false,
+	'finishedRace': false,
+	'scoringAbbreviation': null,
+	'url': 'http://localhost:8081/dinghyracing/api/entries/10'
+};
 const entriesScorpionA = [
-	{'helm': competitorChrisMarshall, 'crew': competitorLouScrew, 'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
+	entryChrisMarshallScorpionA1234,
 	{'helm': competitorSarahPascal, 'crew': competitorOwainDavies, 'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'}
 ];
 const entriesGraduateA = [
 	{'helm': competitorJillMyer, 'crew': null, 'race': raceGraduateA,'dinghy': dinghy2928, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/12'}
 ];
+const entryJillMyerCometA826 = {'helm': competitorJillMyer, 'crew': null, 'race': raceCometA, 'dinghy': dinghy826, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/19'};
 const entriesCometA = [
-	{'helm': competitorJillMyer, 'crew': null, 'race': raceCometA, 'dinghy': dinghy826, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/19'}
+	// {'helm': competitorJillMyer, 'crew': null, 'race': raceCometA, 'dinghy': dinghy826, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/19'}
+	entryJillMyerCometA826
 ];
+const entryChrisMarshallHandicapA1234 = {'helm': competitorChrisMarshall, 'crew': competitorLouScrew, 'race': raceHandicapA, 'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/20'};
 const entriesHandicapA = [
-	{'helm': competitorChrisMarshall, 'crew': competitorLouScrew, 'race': raceHandicapA, 'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/20'}, 
+	entryChrisMarshallHandicapA1234, 
 	{'helm': competitorJillMyer, 'crew': null, 'race': raceHandicapA, 'dinghy': dinghy826, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/21'}
 ];
-const entryChrisMarshallScorpionA1234 = {
-	'helm': competitorChrisMarshall, 'crew': null, 
-	'race': raceScorpionA,
-	'dinghy': dinghy1234,
-	'crew': competitorLouScrew, 
-	'laps': [], 
-	'sumOfLapTimes': 0, 
-	'onLastLap': false,
-	'finishedRace': false, 
-	'scoringAbbreviation': null, 
-	'url': 'http://localhost:8081/dinghyracing/api/entries/10'
-};
 
 export {
 	httpRootURL, wsRootURL,
@@ -326,5 +329,6 @@ export {
 
 	races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA,
 
-	entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA, entryChrisMarshallScorpionA1234
+	entryChrisMarshallHandicapA1234, entryChrisMarshallScorpionA1234, entryJillMyerCometA826,
+	entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA
 }

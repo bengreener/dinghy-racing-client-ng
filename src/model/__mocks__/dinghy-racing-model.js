@@ -143,6 +143,10 @@ class DinghyRacingModel {
         return null;
     }
 
+    async updateCompetitor(competitor, name) {
+        return null;
+    }
+
     async createDinghy(dinghy) {
         return null;
     }
@@ -152,6 +156,10 @@ class DinghyRacingModel {
     }
 
     async createEntry(race, helm, dinghy) {
+        return null;
+    }
+
+    async updateEntry(entry, helm, dinghy, crew = null) {
         return null;
     }
 
@@ -228,7 +236,7 @@ class DinghyRacingModel {
     }
 
     async getCompetitors() {
-        return null;
+        return Promise.resolve({success: true, domainObject: []});
     }
 
     async getCompetitorByName(name) {

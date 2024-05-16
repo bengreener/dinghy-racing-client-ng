@@ -142,14 +142,30 @@ class DinghyRacingController {
 
     /**
      * Add a new competitor
-     * @param {Competitor} 
+     * @param {Competitor} competitor to add
      * @returns {Promise<Result>}
      */
     createCompetitor(competitor) {
         if (!competitor || !competitor.name) {
-            return Promise.resolve({'success': false, 'message': 'A name is required for a new competitor'});
+            return Promise.resolve({'success': false, 'message': 'A name is required for a new competitor.'});
         }
         return this.model.createCompetitor(competitor);
+    }
+
+    /**
+     * Update an exisiting competitor
+     * @param {Competitor} competitor to update
+     * @param {String} name new value for competitors name
+     * @returns {Promise<Result>}
+     */
+    updateCompetitor(competitor, name) {
+        if (!competitor) {
+            return Promise.resolve({'success': false, 'message': 'An exisiting competitor to update is required.'});
+        }
+        if (!name) {
+            return Promise.resolve({'success': false, 'message': 'A new name is required for the competitor.'});
+        }
+        return this.model.updateCompetitor(competitor, name);
     }
 
     /**
@@ -202,7 +218,7 @@ class DinghyRacingController {
      * @param {Race} race Race to sign up to
      * @param {Competitor} helm Competitor signing up to helm dinghy
      * @param {Dinghy} dinghy Dinghy to be sailed in race
-     * @param {Competitor} crew 
+     * @param {Competitor} [crew] Competitor who will crew dinghy
      * @returns {Promise<Result>}
      */
     signupToRace(race, helm, dinghy, crew = null) {
@@ -220,6 +236,31 @@ class DinghyRacingController {
             return Promise.resolve({'success': false, 'message': 'Please provide details for the crew.'});
         }
         return this.model.createEntry(race, helm, dinghy, crew);
+    }
+
+    /**
+     * Update a race entry
+     * @param {Entry} entry Entry to update
+     * @param {Competitor} helm Competitor signing up to helm dinghy
+     * @param {Dinghy} dinghy Dinghy to be sailed in race
+     * @param {Competitor} [crew] Competitor who will crew dinghy
+     * @returns {Promise<Result>}
+     */
+    updateEntry(entry, helm, dinghy, crew = null) {
+        // check valid race, competitor, and dinghy provided
+        if (!entry.url) {
+            return Promise.resolve({'success': false, 'message': 'Please provide an existing race entry.'});
+        }
+        if (!helm.name || helm.name === '') {
+            return Promise.resolve({'success': false, 'message': 'Please provide details for the helm.'});
+        }
+        if (!dinghy.sailNumber || dinghy.sailNumber === '' || !dinghy.dinghyClass || !dinghy.dinghyClass.name || dinghy.dinghyClass.name === '') {
+            return Promise.resolve({'success': false, 'message': 'Please provide details for the dinghy.'});
+        }
+        if (crew && (!crew.name || crew.name === '')) {
+            return Promise.resolve({'success': false, 'message': 'Please provide details for the crew.'});
+        }
+        return this.model.updateEntry(entry, helm, dinghy, crew);
     }
 
     /**

@@ -26,6 +26,7 @@ import RaceConsole from './view/RaceConsole';
 import Authorisation from './controller/authorisation';
 import DownloadRacesForm from './view/DownloadRacesForm';
 import RaceStartConsole from './view/RaceStartConsole';
+import CompetitorsConsole from './view/CompetitorsConsole';
 
 function App({model, controller}) {
   const [displayPort, setDisplayPort] = React.useState();
@@ -64,6 +65,10 @@ function App({model, controller}) {
     setDisplayPort(<RaceConsole key={Date.now()}/>);
   }
 
+  function showCompetitorsConsole() {
+    setDisplayPort(<CompetitorsConsole key={Date.now()}/>);
+  }
+
   function showDownloadRaces() {
     setDisplayPort(<DownloadRacesForm key={Date.now()}/>);
   }
@@ -94,11 +99,12 @@ function App({model, controller}) {
             <button key={4} type='button' className='list-group-item list-group-item-action' onClick={showRaceConsole}>Race Console</button>
             : null
           }
+          <button key={5} type='button' className='list-group-item list-group-item-action' onClick={showCompetitorsConsole}>Competitors</button>
           {roles.includes('ROLE_RACE_OFFICER') ? 
-            <button key={5} type='button' className='list-group-item list-group-item-action' onClick={showDownloadRaces}>Download Races</button>
+            <button key={6} type='button' className='list-group-item list-group-item-action' onClick={showDownloadRaces}>Download Races</button>
             : null
           }
-          <button key={6} type='button' className='list-group-item list-group-item-action' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
+          <button key={7} type='button' className='list-group-item list-group-item-action' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
         </div>
         <div className="display-port">
           <ErrorBoundary key={Date.now()}>

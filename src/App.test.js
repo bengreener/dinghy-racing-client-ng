@@ -19,7 +19,7 @@ import userEvent from '@testing-library/user-event';
 import App from './App';
 import DinghyRacingController from './controller/dinghy-racing-controller';
 import DinghyRacingModel from './model/dinghy-racing-model';
-import { httpRootURL, wsRootURL, dinghyClasses, races, entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA } from './model/__mocks__/test-data';
+import { httpRootURL, wsRootURL, dinghyClasses, races, entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA, competitorsCollection } from './model/__mocks__/test-data';
 import Authorisation from './controller/authorisation';
 
 jest.mock('./controller/dinghy-racing-controller');
@@ -143,7 +143,7 @@ describe('when upcoming races button clicked', () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const dinghyRacingController = new DinghyRacingController(model);
-    jest.spyOn(model, 'getRacesOnOrAfterTime').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
 
     render(<App model={model} controller={dinghyRacingController} />);
     const btnViewUpcomingRaces = await screen.findByRole('button', {name: /upcoming races\b/i});
@@ -217,6 +217,21 @@ describe('when download races console button is clicked', ()  => {
       await user.click(btnDownloadRaces);
     });
     expect(await screen.findByRole('heading', {name: /download races/i})).toBeInTheDocument();
+  });
+});
+
+describe('when competitors console button is clicked', () => {
+  it('displays competitors console', async () => {
+    const user = userEvent.setup();
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+
+    render(<App model={model} />);
+    const btnCompetitors = await screen.findByRole('button', {name: /competitors\b/i});
+    await act(async () => {
+      await user.click(btnCompetitors);
+    });
+    expect(await screen.findByRole('heading', {name: /competitors/i})).toBeInTheDocument();
   });
 });
 
