@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
+import ControllerContext from './ControllerContext';
 
 /**
  * Display a list of competitors and enable editing of the details for a selected competitor
@@ -8,7 +9,10 @@ import ModelContext from './ModelContext';
  */
 function CompetitorsConsole() {
     const model = useContext(ModelContext);
+    const controller = useContext(ControllerContext);
     const [competitorsMap, setCompetitorsMap] = useState(new Map());
+    const [selectedCompetitor, setSelectedCompetitor] = useState();
+    const [competitorName, setCompetitorName] = useState();
     const [message, setMessage] = useState('');
 
     // get competitors
@@ -33,10 +37,36 @@ function CompetitorsConsole() {
         }
     }, [model])
 
+    async function updateCompetitor(competitor, name) {
+        const result = await controller.updateCompetitor(selectedCompetitor, competitorName);
+        if (result.success) {
+            setSelectedCompetitor(null);
+            setCompetitorName('');
+        }
+        else {
+            setMessage(result.message);
+        }
+    }
+
+    function handleCompetitorRowClick({ currentTarget }) {
+        const competitor = competitorsMap.get(currentTarget.id);
+        setSelectedCompetitor(competitor);
+        setCompetitorName(competitor.name);
+        setMessage('');
+    };
+
+    function handleNameChange( { target }) {
+        setCompetitorName(target.value);
+    }
+
+    function handleUpdateButtonClick() {
+        updateCompetitor(selectedCompetitor, competitorName);
+    }
+
     function competitorRows() {
         const rows = [];
         competitorsMap.forEach((competitor, key) => {
-            rows.push(<tr key={key} id={key} ><td>{competitor.name}</td></tr>);
+            rows.push(<tr key={key} id={key} onClick={handleCompetitorRowClick} ><td>{competitor.name}</td></tr>);
         });
         return rows;
     };
@@ -45,6 +75,9 @@ function CompetitorsConsole() {
         <div className="competitors-console">
             <h1>Competitors</h1>
             <p id="competitor-console-message" className={!message ? "hidden" : ""}>{message}</p>
+            {selectedCompetitor ? <label htmlFor="name-input" >Name</label> : null}
+            {selectedCompetitor ? <input id="name-input" type="text" name="name" value={competitorName} onChange={handleNameChange} /> : null}
+            {selectedCompetitor ? <button type='button' onClick={handleUpdateButtonClick} >Update</button> : null}
             <div className="scrollable">
                 <table>
                     <thead>
