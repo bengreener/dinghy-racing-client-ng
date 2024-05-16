@@ -38,7 +38,7 @@ function CompetitorsConsole() {
     }, [model])
 
     async function updateCompetitor(competitor, name) {
-        const result = await controller.updateCompetitor(selectedCompetitor, competitorName);
+        const result = await controller.updateCompetitor(competitor, name);
         if (result.success) {
             clearSelectedCompetitor();
         }
