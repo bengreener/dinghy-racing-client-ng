@@ -69,6 +69,8 @@ describe('when a competitor is selected', () => {
             await user.click(competitorCell);
         });
         expect(await screen.findByLabelText(/name/i)).toHaveValue('Chris Marshall');
+        expect(screen.getByRole('button', {name: /update/i})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: /cancel/i})).toBeInTheDocument();
     });
     it('clears any error message', async () => {
         const user = userEvent.setup();
@@ -192,4 +194,30 @@ describe('when a competitor is selected', () => {
             });
         })
     });
-})
+    describe('when cancelled', () => {
+        it('hides input fields for updating competitor', async () => {
+            const user = userEvent.setup();
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const controller = new DinghyRacingController(model);
+            jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+            await act( async () => {
+                customRender(<CompetitorsConsole />, model, controller);
+            });
+            const competitorCell = await screen.findByRole('cell', {name: /chris marshall/i});
+            await act(async () => {
+                await user.click(competitorCell);
+            });
+            const nameInput = await screen.findByLabelText(/name/i);
+            const cancelButton = screen.getByRole('button', {name: 'Cancel'});
+            await act(async () => {
+                await user.clear(nameInput);
+                await user.type(nameInput, 'John Smith');
+                await user.click(cancelButton);
+            });
+
+            expect(screen.queryByLabelText(/name/i)).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: /update/i})).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: /cancel/i})).not.toBeInTheDocument();
+        });
+    });
+});

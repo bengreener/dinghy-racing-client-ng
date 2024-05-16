@@ -40,14 +40,18 @@ function CompetitorsConsole() {
     async function updateCompetitor(competitor, name) {
         const result = await controller.updateCompetitor(selectedCompetitor, competitorName);
         if (result.success) {
-            setSelectedCompetitor(null);
-            setCompetitorName('');
+            clearSelectedCompetitor();
         }
         else {
             setMessage(result.message);
         }
     }
 
+    function clearSelectedCompetitor() {
+        setSelectedCompetitor(null);
+        setCompetitorName('');
+        setMessage('');
+    }
     function handleCompetitorRowClick({ currentTarget }) {
         const competitor = competitorsMap.get(currentTarget.id);
         setSelectedCompetitor(competitor);
@@ -78,6 +82,7 @@ function CompetitorsConsole() {
             {selectedCompetitor ? <label htmlFor="name-input" >Name</label> : null}
             {selectedCompetitor ? <input id="name-input" type="text" name="name" value={competitorName} onChange={handleNameChange} /> : null}
             {selectedCompetitor ? <button type='button' onClick={handleUpdateButtonClick} >Update</button> : null}
+            {selectedCompetitor ? <button type='button' onClick={clearSelectedCompetitor} >Cancel</button> : null}
             <div className="scrollable">
                 <table>
                     <thead>
