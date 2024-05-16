@@ -177,7 +177,6 @@ describe('when a competitor is selected', () => {
                     customRender(<CompetitorsConsole />, model, controller);
                 });
                 const competitorCell = await screen.findByRole('cell', {name: /chris marshall/i});
-                screen.debug();
                 await act(async () => {
                     await user.click(competitorCell);
                 });
@@ -190,7 +189,6 @@ describe('when a competitor is selected', () => {
                 });
     
                 expect(await screen.findByRole('cell', {name: /john smith/i})).toBeInTheDocument();
-                screen.debug();
                 expect(screen.queryByRole('cell', {name: /chris marshall/i})).not.toBeInTheDocument();
             });
         });
