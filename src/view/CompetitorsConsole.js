@@ -14,6 +14,7 @@ function CompetitorsConsole() {
     const [selectedCompetitor, setSelectedCompetitor] = useState();
     const [competitorName, setCompetitorName] = useState();
     const [message, setMessage] = useState('');
+    const [competitorUpdateRequestAt, setCompetitorUpdateRequestAt] = useState(Date.now());
 
     // get competitors
     useEffect(() => {
@@ -35,12 +36,13 @@ function CompetitorsConsole() {
             ignoreFetch = true;
             setMessage(''); // clear any previous message
         }
-    }, [model])
+    }, [model, competitorUpdateRequestAt])
 
     async function updateCompetitor(competitor, name) {
         const result = await controller.updateCompetitor(competitor, name);
         if (result.success) {
             clearSelectedCompetitor();
+            setCompetitorUpdateRequestAt(Date.now());
         }
         else {
             setMessage(result.message);

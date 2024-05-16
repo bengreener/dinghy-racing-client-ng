@@ -148,7 +148,7 @@ describe('when a competitor is selected', () => {
                 const model = new DinghyRacingModel(httpRootURL, wsRootURL);
                 const controller = new DinghyRacingController(model);
                 jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
-                const updateCompetitorSpy = jest.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: true})});
+                jest.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: true})});
                 await act( async () => {
                     customRender(<CompetitorsConsole />, model, controller);
                 });
@@ -166,6 +166,32 @@ describe('when a competitor is selected', () => {
     
                 expect(screen.queryByLabelText(/name/i)).not.toBeInTheDocument();
                 expect(screen.queryByRole('button', {name: /update/i})).not.toBeInTheDocument();
+            });
+            it('refreshes competitor list', async () => {
+                const user = userEvent.setup();
+                const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const controller = new DinghyRacingController(model);
+                jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [{...competitorChrisMarshall, name: 'John Smith'}]})}).mockImplementationOnce(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+                jest.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: true})});
+                await act( async () => {
+                    customRender(<CompetitorsConsole />, model, controller);
+                });
+                const competitorCell = await screen.findByRole('cell', {name: /chris marshall/i});
+                screen.debug();
+                await act(async () => {
+                    await user.click(competitorCell);
+                });
+                const nameInput = await screen.findByLabelText(/name/i);
+                const updateButton = screen.getByRole('button', {name: 'Update'});
+                await act(async () => {
+                    await user.clear(nameInput);
+                    await user.type(nameInput, 'John Smith');
+                    await user.click(updateButton);
+                });
+    
+                expect(await screen.findByRole('cell', {name: /john smith/i})).toBeInTheDocument();
+                screen.debug();
+                expect(screen.queryByRole('cell', {name: /chris marshall/i})).not.toBeInTheDocument();
             });
         });
         describe('when there is a problem updating competitor', () => {
