@@ -261,7 +261,7 @@ describe('when a race is unselected', () => {
     });
 });
 
-describe('when a error is received', () => {
+describe('when an error is received', () => {
     it('displays error message', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
@@ -369,4 +369,4 @@ describe('when races within session are changed', () => {
         });
         expect(screen.queryByText('Handicap A')).not.toBeInTheDocument();
     });
-})
+});
