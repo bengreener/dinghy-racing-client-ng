@@ -54,7 +54,7 @@ class DinghyRacingModel {
      * @returns {Race}
      */
     static raceTemplate() {
-        return {'name': '', 'plannedStartTime': null, 'actualStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'plannedLaps': null, 'lapsSailed': null, 'lapForecast': null, 
+        return {'name': '', 'plannedStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'plannedLaps': null, 'lapsSailed': null, 'lapForecast': null, 
             'lastLapTime': null, 'averageLapTime': null, 'clock': null, 'startSequenceState': StartSignals.NONE, 'url': ''};
     }
 
@@ -793,7 +793,6 @@ class DinghyRacingModel {
             if (dinghyClassResult.success) {
                 return Promise.resolve({'success': true, 'domainObject': {...DinghyRacingModel.raceTemplate(), 'name': result.domainObject.name, 
                     'plannedStartTime': new Date(result.domainObject.plannedStartTime + 'Z'), 
-                    'actualStartTime': result.domainObject.actualStartTime ? new Date(result.domainObject.actualStartTime + 'Z') : null, 
                     'dinghyClass': dinghyClassResult.domainObject, 'duration': this.convertISO8601DurationToMilliseconds(result.domainObject.duration), 
                     'plannedLaps': result.domainObject.plannedLaps, 'lapsSailed': result.domainObject.leadEntry ? result.domainObject.leadEntry.lapsSailed : null,
                     'lapForecast': result.domainObject.lapForecast,
@@ -896,7 +895,6 @@ class DinghyRacingModel {
                     'crewSize': dinghyClassResults[i].domainObject.crewSize, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
                 // assume time received has been stored in UTC
                 races.push({...DinghyRacingModel.raceTemplate(), 'name': racesHAL[i].name, 'plannedStartTime': new Date(racesHAL[i].plannedStartTime + 'Z'),
-                    'actualStartTime': racesHAL[i].actualStartTime ? new Date(racesHAL[i].actualStartTime + 'Z') : null, 
                     'dinghyClass': dinghyClass, 'duration': this.convertISO8601DurationToMilliseconds(racesHAL[i].duration), 'plannedLaps': racesHAL[i].plannedLaps, 
                     'lapsSailed': racesHAL[i].leadEntry ? racesHAL[i].leadEntry.lapsSailed : null, 
                     'lapForecast': racesHAL[i].lapForecast, 
