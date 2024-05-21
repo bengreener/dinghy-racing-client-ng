@@ -36,22 +36,26 @@ it('provides option to select end time for session', async () => {
     expect(selectSessionEnd).toBeInTheDocument();
 });
 
-it('displays session start provided as prop', () => {
+it('displays session start provided as prop adjusted to local time zone', () => {
     const onSessionStartChangeSpy = jest.fn();
     const sessionStart = new Date('2024', '11', '25', 8, 30);
+    const sessionStartLocal = sessionStart;
+    sessionStartLocal.setMinutes(sessionStartLocal.getMinutes() - sessionStartLocal.getTimezoneOffset());
     render(<SelectSession sessionStart={sessionStart} onSessionStartChange={onSessionStartChangeSpy}/>);
 
     const selectSessionStart = screen.getByLabelText(/session start/i);
-    expect(selectSessionStart).toHaveValue(sessionStart.toISOString().substring(0, 16));
+    expect(selectSessionStart).toHaveValue(sessionStartLocal.toISOString().substring(0, 16));
 });
 
-it('displays session end provided as prop', () => {
+it('displays session end provided as prop adjusted to local time zone', () => {
     const onSessionEndChangeSpy = jest.fn();
     const sessionEnd = new Date('2024', '12', '25', 18, 0);
+    const sessionEndLocal = sessionEnd;
+    sessionEndLocal.setMinutes(sessionEndLocal.getMinutes() - sessionEndLocal.getTimezoneOffset());
     render(<SelectSession sessionEnd={sessionEnd} onSessionEndChange={onSessionEndChangeSpy}/>);
 
     const selectSessionEnd = screen.getByLabelText(/session end/i);
-    expect(selectSessionEnd).toHaveValue(sessionEnd.toISOString().substring(0, 16));
+    expect(selectSessionEnd).toHaveValue(sessionEndLocal.toISOString().substring(0, 16));
 });
 
 describe('when session start is set to a valid date', () => {

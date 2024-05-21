@@ -47,7 +47,9 @@ it('defaults start time for race selection to now', async () => {
         await customRender(<ViewUpcomingRaces />, model);
     });
     
-    expect(screen.getByLabelText(/session start/i)).toHaveValue(new Date().toISOString().substring(0, 16));
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    expect(screen.getByLabelText(/session start/i)).toHaveValue(now.toISOString().substring(0, 16));
 });
 
 it('defaults end time for race selection to 18:00 today', async () => {

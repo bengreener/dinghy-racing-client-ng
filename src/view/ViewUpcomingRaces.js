@@ -27,8 +27,12 @@ import SelectSession from './SelectSession';
 function ViewUpcomingRaces({ showSignUpForm = false }) {
     const model = useContext(ModelContext);
     const [sessionStart, setSessionStart] = useState(new Date());
-    const [sessionEnd, setSessionEnd] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000));
-    const [raceMap, setRaceMap] = useState(new Map());  
+    const [sessionEnd, setSessionEnd] = useState(() => {
+        const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000); // create as 18:00 UTC intially
+        sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
+        return sessionEnd;
+    });
+    const [raceMap, setRaceMap] = useState(new Map());
     const [message, setMessage] = useState('');
 
     function handleRowClick({currentTarget}) {
@@ -38,7 +42,7 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
     }
 
     useEffect(() => {
-        model.getRacesBetweenTimes(new Date(sessionStart), new Date(sessionEnd)).then(result => {
+        model.getRacesBetweenTimes(sessionStart, sessionEnd).then(result => {
             if (result.success) {
                 let map = new Map();
                 const races = result.domainObject;

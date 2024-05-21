@@ -17,7 +17,9 @@
 import { useState } from 'react';
 
 /**
- * Select the time window for a set of races
+ * Select the time window for a set of races.
+ * Converts values dates passed as session start and session end times to loval equivalents for display.
+ * Converst values entered back into UTC date values when calling onSessionStartChange and onSessionEndChange.
  * @param {Object} props
  * @param {Date} props.sessionStart date
  * @param {Date} props.sessionEnd date
@@ -25,8 +27,22 @@ import { useState } from 'react';
  * @param {SelectSession~onSessionTimeChange} props.onSessionEndChange
  */
 function SelectSession({ sessionStart, sessionEnd, onSessionStartChange, onSessionEndChange }) {
-    const [start, setStart] = useState(sessionStart ? sessionStart.toISOString().substring(0, 16) : '');
-    const [end, setEnd] = useState(sessionEnd ? sessionEnd.toISOString().substring(0, 16) : '');
+    const [start, setStart] = useState(() => {
+        let localSessionStart;
+        if (sessionStart) {
+            localSessionStart  = new Date(sessionStart.valueOf()); // as value passed by reference updating sessionStart prop value directly could have side effects (values will be changed on second call under strict mode in development)
+            localSessionStart.setMinutes(localSessionStart.getMinutes() - localSessionStart.getTimezoneOffset());
+        }
+        return localSessionStart ? localSessionStart.toISOString().substring(0, 16) : '';
+    });
+    const [end, setEnd] = useState(() => {
+        let localSessionEnd;
+        if (sessionEnd) {
+            localSessionEnd = new Date(sessionEnd.valueOf()); // as value passed by reference updating sessionEnd prop value directly could have side effects (values will be changed on second call under strict mode in development)
+            localSessionEnd.setMinutes(localSessionEnd.getMinutes() - localSessionEnd.getTimezoneOffset());
+        }
+        return localSessionEnd ? localSessionEnd.toISOString().substring(0, 16) : '';
+    });
     const [message, setMessage] = useState();
 
     function handleSessionStartChange(event) {

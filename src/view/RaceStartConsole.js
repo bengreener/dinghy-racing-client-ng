@@ -33,8 +33,17 @@ function RaceStartConsole () {
     const [flags, setFlags] = useState([]);
     const [actions, setActions] = useState([]);
     const [message, setMessage] = useState(''); // feedback to user
-    const [sessionStart, setSessionStart] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000));
-    const [sessionEnd, setSessionEnd] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000));
+    // const [sessionStart, setSessionStart] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000));
+    const [sessionStart, setSessionStart] = useState(() => {
+        const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
+        sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
+        return sessionStart;
+    });
+    const [sessionEnd, setSessionEnd] = useState(() => {
+        const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000); // create as 18:00 UTC intially
+        sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
+        return sessionEnd;
+    });
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
     const [audio, setAudio] = useState('none');
     const startSequence = useRef(null);

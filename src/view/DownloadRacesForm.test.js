@@ -91,11 +91,15 @@ it('accepts a change to the get races in window start time', async () => {
 it('calls model get races between times with values set for start and end of window', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const getRacesBetweenTimesSpy = jest.spyOn(model, 'getRacesBetweenTimes');
+    const startTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000);
+    startTime.setMinutes(startTime.getMinutes() + startTime.getTimezoneOffset());
+    const endTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000);
+    endTime.setMinutes(endTime.getMinutes() + endTime.getTimezoneOffset());
     await act(async () => {
         await customRender(<DownloadRacesForm />, model);
     })
     
-    expect(getRacesBetweenTimesSpy).toBeCalledWith(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000), new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000));
+    expect(getRacesBetweenTimesSpy).toBeCalledWith(startTime, endTime);
 });
 
 describe('when start time for races window chnages', () => {
@@ -103,7 +107,10 @@ describe('when start time for races window chnages', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const getRacesBetweenTimesSpy = jest.spyOn(model, 'getRacesBetweenTimes');
-        
+        const startTime = new Date('2020-02-12T12:10');
+        startTime.setMinutes(startTime.getMinutes() + startTime.getTimezoneOffset());
+        const endTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000);
+        endTime.setMinutes(endTime.getMinutes() + endTime.getTimezoneOffset());
         await act(async () => {
             await customRender(<DownloadRacesForm />, model);
         })
@@ -114,7 +121,7 @@ describe('when start time for races window chnages', () => {
             await user.type(sessionStartInput, '2020-02-12T12:10');
         });
 
-        expect(getRacesBetweenTimesSpy).toBeCalledWith(new Date('2020-02-12T12:10'), new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000));
+        expect(getRacesBetweenTimesSpy).toBeCalledWith(startTime, endTime);
     });
 });
 
@@ -123,7 +130,9 @@ describe('when end time for races window chnages', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const getRacesBetweenTimesSpy = jest.spyOn(model, 'getRacesBetweenTimes');
-        
+        const startTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000);
+        startTime.setMinutes(startTime.getMinutes() + startTime.getTimezoneOffset());
+
         await act(async () => {
             await customRender(<DownloadRacesForm />, model);
         })
@@ -134,7 +143,7 @@ describe('when end time for races window chnages', () => {
             await user.type(sessionEndInput, '2075-02-12T12:10');
         });
 
-        expect(getRacesBetweenTimesSpy).toBeCalledWith(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000), new Date('2075-02-12T12:10'));
+        expect(getRacesBetweenTimesSpy).toBeCalledWith(startTime, new Date('2075-02-12T12:10'));
     });
 });
 
