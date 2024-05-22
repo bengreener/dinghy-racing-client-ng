@@ -15,7 +15,7 @@
  */
 
 import React from 'react';
-import { useContext } from 'react';
+import { useContext, useRef } from 'react';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import ModelContext from './ModelContext';
 
@@ -25,10 +25,12 @@ function CreateRace({ onCreate }) {
     const [result, setResult] = React.useState({'message': ''});
     const [dinghyClassMap, setDinghyClassMap] = React.useState(new Map());
     const [dinghyClassOptions, setDinghyClassOptions] = React.useState([]);
+    const raceNameInputRef = useRef(null);
 
     const clear = React.useCallback(() => {
-        setRace({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000});
+        setRace({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000, 'plannedLaps': 5});
         showMessage('');
+        raceNameInputRef.current.focus();
     }, []);
 
     React.useEffect(() => {
@@ -92,7 +94,7 @@ function CreateRace({ onCreate }) {
     return (
         <form action="" method="post">
             <label htmlFor="race-name-input">Race Name</label>
-            <input id="race-name-input" name="name" type="text" onChange={handleChange} value={race.name} />
+            <input id="race-name-input" ref={raceNameInputRef} name="name" type="text" onChange={handleChange} value={race.name} autoFocus />
             <label htmlFor="race-time-input">Race Time</label>
             <input id="race-time-input" name="plannedStartTime" type="datetime-local" onChange={handleChange} value={race.plannedStartTime} />
             <label htmlFor="race-duration-input">Duration</label>

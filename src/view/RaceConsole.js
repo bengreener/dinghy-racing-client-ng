@@ -29,8 +29,16 @@ function RaceConsole() {
     const [raceOptions, setRaceOptions] = useState([]); // list of names of races names for selection
     const [raceMap, setRaceMap] = useState(new Map()); // map of race names to races
     const [message, setMessage] = useState(''); // feedback to user
-    const [sessionStart, setSessionStart] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000));
-    const [sessionEnd, setSessionEnd] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000));
+    const [sessionStart, setSessionStart] = useState(() => {
+        const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
+        sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
+        return sessionStart;
+    });
+    const [sessionEnd, setSessionEnd] = useState(() => {
+        const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000); // create as 18:00 UTC intially
+        sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
+        return sessionEnd;
+    });
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
 
     const handleRaceUpdate = useCallback(() => {
@@ -50,7 +58,7 @@ function RaceConsole() {
                 result.domainObject.forEach(race => {
                     race.clock = new Clock(race.plannedStartTime);
                     map.set(race.name, race);
-                    options.push(<option key={race.name + race.plannedStartTime.toISOString()}>{race.name}</option>);
+                    options.push(<option key={race.name + race.plannedStartTime.toISOString()} value={race.name} >{race.name}</option>);
                     optionsRaceNames.push(race.name);
                 });
                 setRaceMap(map);

@@ -34,10 +34,14 @@ it('renders', async () => {
     const inputName = screen.getByLabelText(/name/i);
     const inputTime = screen.getByLabelText(/time/i);
     const inputDuration = screen.getByLabelText(/duration/i);
+    const inputDinghyClass = screen.getByLabelText(/class/i);
+    const inputLaps = screen.getByLabelText(/laps/i);
     const selectRaceClass = screen.getByLabelText(/class/i);
-    expect(inputName).toBeInTheDocument();
-    expect(inputTime).toBeInTheDocument();
-    expect(inputDuration).toBeInTheDocument();
+    expect(inputName).toHaveValue('');
+    expect(inputTime).toHaveValue(new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16));
+    expect(inputDuration).toHaveValue(45);
+    expect(inputDinghyClass).toHaveValue('');
+    expect(inputLaps).toHaveValue(5);
     expect(selectRaceClass).toBeInTheDocument();
 })
 
@@ -213,6 +217,7 @@ describe('when creating a new race', () => {
         const inputTime = screen.getByLabelText(/time/i);
         const inputDuration = screen.getByLabelText(/duration/i);
         const inputDinghyClass = screen.getByLabelText(/class/i);
+        const inputLaps = screen.getByLabelText(/laps/i);
         const btnCreate = screen.getByRole('button', {'name': 'Create'});
         await act(async () => {
             await user.type(inputName, 'Scorpion A');
@@ -227,6 +232,7 @@ describe('when creating a new race', () => {
         expect(inputTime).toHaveValue(new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16));
         expect(inputDuration).toHaveValue(45);
         expect(inputDinghyClass).toHaveValue('');
+        expect(inputLaps).toHaveValue(5);
     })
     it('displays the failure message on failure', async () => {
         const user = userEvent.setup();
