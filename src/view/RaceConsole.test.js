@@ -18,7 +18,7 @@ import { customRender } from '../test-utilities/custom-renders';
 import userEvent from '@testing-library/user-event';
 import { act, screen } from '@testing-library/react';
 import RaceConsole from './RaceConsole';
-import { httpRootURL, wsRootURL, races, entriesScorpionA, entriesGraduateA } from '../model/__mocks__/test-data';
+import { httpRootURL, wsRootURL, races, entriesScorpionA, entriesGraduateA, raceScorpionA, raceGraduateA } from '../model/__mocks__/test-data';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 
@@ -31,13 +31,18 @@ it('renders', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
     jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
+    const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000); // create as 18:00 UTC intially
     
     await act(async () => {        
         customRender(<RaceConsole />, model);
     });
 
+
     const selectRace = screen.getByLabelText(/Select Race/i);
     expect(selectRace).toBeInTheDocument();
+    expect(screen.getByLabelText(/session start/i)).toHaveValue(sessionStart.toISOString().substring(16, 0));
+    expect(screen.getByLabelText(/session end/i)).toHaveValue(sessionEnd.toISOString().substring(16, 0));
 });
 
 it('displays races available for selection', async () => {
@@ -368,5 +373,50 @@ describe('when races within session are changed', () => {
             model.handleRaceUpdate({'body': url});
         });
         expect(screen.queryByText('Handicap A')).not.toBeInTheDocument();
+    });
+});
+
+describe('when start time for the session is changed', () => {
+    it('updates list of races', async () => {
+        const user = userEvent.setup();
+        const races1 = [raceScorpionA];
+        const races2 = [raceScorpionA, raceGraduateA];
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races2})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races1})});
+        await act(async () => {
+            customRender(<RaceConsole />, model);
+        });
+        expect(screen.getByText('Scorpion A')).toBeInTheDocument();
+        expect(screen.queryByText('Graduate A')).not.toBeInTheDocument();
+        const sessionStartInput = screen.getByLabelText(/session start/i);
+        await act(async () => {
+            await user.clear(sessionStartInput); // clear input to avoid errors when typing in new value
+            await user.type(sessionStartInput, '2020-05-12T12:30');
+        });
+        expect(screen.getByText('Scorpion A')).toBeInTheDocument();
+        expect(screen.getByText('Graduate A')).toBeInTheDocument();
+    });
+});
+
+describe('when end time for the session is changed', () => {
+    it('updates list of races', async () => {
+        const user = userEvent.setup();
+        const races1 = [raceScorpionA];
+        const races2 = [raceScorpionA, raceGraduateA];
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 74800000); // create as 18:00 UTC intially
+        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races2})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races1})});
+        await act(async () => {
+            customRender(<RaceConsole />, model);
+        });
+        expect(screen.getByText('Scorpion A')).toBeInTheDocument();
+        expect(screen.queryByText('Graduate A')).not.toBeInTheDocument();
+        const sessionEndInput = screen.getByLabelText(/session end/i);
+        await act(async () => {
+            await user.clear(sessionEndInput); // clear input to avoid errors when typing in new value
+            await user.type(sessionEndInput, sessionEnd.toISOString().substring(16, 0));
+        });
+        expect(screen.getByText('Scorpion A')).toBeInTheDocument();
+        expect(screen.getByText('Graduate A')).toBeInTheDocument();
     });
 });
