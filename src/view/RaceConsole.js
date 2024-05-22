@@ -58,7 +58,7 @@ function RaceConsole() {
                 result.domainObject.forEach(race => {
                     race.clock = new Clock(race.plannedStartTime);
                     map.set(race.name, race);
-                    options.push(<option key={race.name + race.plannedStartTime.toISOString()}>{race.name}</option>);
+                    options.push(<option key={race.name + race.plannedStartTime.toISOString()} value={race.name} >{race.name}</option>);
                     optionsRaceNames.push(race.name);
                 });
                 setRaceMap(map);
