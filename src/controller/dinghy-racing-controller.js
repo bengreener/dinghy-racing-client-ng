@@ -62,7 +62,7 @@ class DinghyRacingController {
         if (time <= 0) {
             return Promise.resolve({'success': false, 'message': 'Time must be greater than zero.'});   
         }
-        return this.model.addLap(entry, this._calculateLapTime(time, entry.laps.toSpliced(entry.laps.length -1, 1)));
+        return this.model.addLap(entry, this._calculateLapTime(time, entry.laps));
     }
 
     /**
