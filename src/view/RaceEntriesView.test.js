@@ -314,7 +314,7 @@ describe('when sorting entries', () => {
 });
 
 describe('when adding a lap time', () => {
-    it('calculates lap time correctly as total elapsed time less sum of previous lap times', async () => {
+    it('calls controller add lap function with value of time sailed', async () => {
         const entrySarahPascalScorpionA6745 = {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
             {'number': 1, 'time': 1}, {'number': 2, 'time': 2}
         ], 'sumOfLapTimes': 0,'url': 'http://localhost:8081/dinghyracing/api/entries/11'};
@@ -334,7 +334,7 @@ describe('when adding a lap time', () => {
             await user.click(entry);
         });
         
-        expect(addLapSpy).toBeCalledWith(entrySarahPascalScorpionA6745, 4);
+        expect(addLapSpy).toBeCalledWith(entrySarahPascalScorpionA6745, 7);
     });
     it('updates model', async () => {
         const user = userEvent.setup();

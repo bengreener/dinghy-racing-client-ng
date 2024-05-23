@@ -35,7 +35,7 @@ class DinghyRacingController {
     /**
      * Add a lap to race entry
      * @param {Entry} entry
-     * @param {Number} time The lap time duration in milliseconds
+     * @param {Number} time The total time sailed to the end of the lap in milliseconds
      * @returns {Promise<Result>}
      */
     addLap(entry, time) {
@@ -62,7 +62,7 @@ class DinghyRacingController {
         if (time <= 0) {
             return Promise.resolve({'success': false, 'message': 'Time must be greater than zero.'});   
         }
-        return this.model.addLap(entry, time);
+        return this.model.addLap(entry, this._calculateLapTime(time, entry.laps.toSpliced(entry.laps.length -1, 1)));
     }
 
     /**
@@ -85,7 +85,7 @@ class DinghyRacingController {
     /**
      * Update the last lap time recorded for an entry in a race
      * @param {Entry} entry
-     * @param {Number | String} time The total time sailed to reach the end of the lap in milliseconds or a string in the format [hh:][mm:]ss
+     * @param {Number | String} time The total time sailed to the end of the lap in milliseconds or a string in the format [hh:][mm:]ss
      * @returns {Promise<Result>}
      */
     updateLap(entry, time) {

@@ -122,8 +122,7 @@ function RaceEntriesView({ races }) {
         const race = races.find((r) => {
             return r.name === entry.race.name && r.plannedStartTime.valueOf() === entry.race.plannedStartTime.valueOf();
         });
-        const lapTime = calculateLapTime(race.clock.getElapsedTime(), entry.laps);
-        const result = await controller.addLap(entry, lapTime);
+        const result = await controller.addLap(entry, race.clock.getElapsedTime());
         if (!result.success) {
             setMessage(result.message);
         }
@@ -148,13 +147,6 @@ function RaceEntriesView({ races }) {
         if (!result.success) {
             setMessage(result.message);
         }
-    }
-
-    function calculateLapTime(elapsedTime, laps) {
-        const lapTimes = laps.reduce((accumulator, initialValue) => {
-            return accumulator + initialValue.time;
-        }, 0);
-        return elapsedTime - lapTimes;
     }
 
     return (
