@@ -27,7 +27,7 @@ import { useCallback, useState } from 'react';
  * @param {ModalDialog~closeDialog} props.closeParent call this to close a dialog containing this form
  * @returns {HTMLFormElement}
  */
-function ShortenCourseForm({ race, minLaps = 1, maxLaps = 100, initialValue, onUpdate, closeParent}) {
+function AdjustCourseForm({ race, minLaps = 1, maxLaps = 100, initialValue, onUpdate, closeParent}) {
     const [laps, setLaps] = useState(initialValue ? initialValue : minLaps);
 
     const handleUpdateButtonClick = useCallback((event) => {
@@ -58,10 +58,10 @@ function ShortenCourseForm({ race, minLaps = 1, maxLaps = 100, initialValue, onU
     )
 }
 
-export default ShortenCourseForm;
+export default AdjustCourseForm;
 
 /**
- * Action to take when ShortenCourseForm update laps button clicked
+ * Action to take when AdjustCourseForm update laps button clicked
  * @callback ShortenCouraseForm~updateLaps
  * @param {Race} race to update
  * @param {Number} laps to set as new number of planned laps

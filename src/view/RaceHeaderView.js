@@ -20,7 +20,7 @@ import ModelContext from './ModelContext';
 import ControllerContext from './ControllerContext';
 import PostponeRaceForm from './PostponeRaceForm';
 import ModalDialog from './ModalDialog';
-import ShortenCourseForm from './ShortenCourseForm';
+import AdjustCourseForm from './AdjustCourseForm';
 
 /**
  * Present summary information ablout a race
@@ -133,7 +133,7 @@ function RaceHeaderView({ race, showInRaceData = true }) {
                 <PostponeRaceForm race={race} onPostpone={controller.postponeRace} closeParent={closePostponeRaceFormDialog} />
             </ModalDialog>
             <ModalDialog show={showShortenCourse} onClose={closeShortenCourseDialog} testid={'shorten-course-dialog'}>
-                <ShortenCourseForm race={race} minLaps={updatedRace.lapsSailed + 1} maxLaps={updatedRace.plannedLaps - 1} initialValue={updatedRace.plannedLaps - 1} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} />
+                <AdjustCourseForm race={race} minLaps={updatedRace.lapsSailed + 1} maxLaps={updatedRace.plannedLaps - 1} initialValue={updatedRace.plannedLaps - 1} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} />
             </ModalDialog>
         </div>
     );
