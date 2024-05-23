@@ -17,6 +17,7 @@
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import ControllerContext from './ControllerContext';
 import ModelContext from './ModelContext';
+
 /**
  * Form for signing up to a race
  * @param {Object} props

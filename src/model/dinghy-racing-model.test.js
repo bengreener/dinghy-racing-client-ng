@@ -1387,7 +1387,7 @@ describe('when updating an entry for a race', () => {
     });
 });
 
-describe('when retrieving a list of cmpetitors', () => {
+describe('when retrieving a list of competitors', () => {
     it('returns a collection of competitors', async () => {
         fetch.mockImplementation((resource) => {
             if (resource === 'http://localhost:8081/dinghyracing/api/competitors?sort=name,asc') {

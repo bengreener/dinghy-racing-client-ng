@@ -149,6 +149,9 @@ export class Client {
               if (key === '/topic/updateEntry') {
                 value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/entries/10'}));
               }
+              if (key === '/topic/deleteEntry') {
+                value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/entries/10'}));
+              }
             });
         }
     }, 1);

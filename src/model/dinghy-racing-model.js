@@ -100,6 +100,7 @@ class DinghyRacingModel {
         this.stompClient.onConnect = (frame) => {
             this.stompClient.subscribe('/topic/updateRace', this.handleRaceUpdate);
             this.stompClient.subscribe('/topic/updateEntry', this.handleEntryUpdate);
+            this.stompClient.subscribe('/topic/deleteEntry', this.handleEntryUpdate);
         };
         this.stompClient.activate();
     }
