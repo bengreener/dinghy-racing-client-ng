@@ -26,7 +26,7 @@ jest.mock('../model/dinghy-racing-model');
 
 // some of the updates display after tests may no longer be required as update route via web sockets is driven from server (2 tests lap times following entry update notification & clears error message after successful update)?
 
-const entryRowLastCellLapTimeCellOffset = 3;
+const entryRowLastCellLapTimeCellOffset = 2;
 
 afterEach(() => {
     jest.resetAllMocks();
@@ -354,8 +354,12 @@ describe('when adding a lap time', () => {
         expect(addLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234, 7);
     });
     it('refreshes display after addLap completed', async () => {
-        const entriesScorpionAPost = [
+        const entriesScorpionAPre = [
             {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 312568, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
+            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'}
+        ];
+        const entriesScorpionAPost = [
+            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}, {'number': 2, 'time': 312568}], 'sumOfLapTimes': 625136, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
             {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'}
         ];
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -363,7 +367,7 @@ describe('when adding a lap time', () => {
         const clock = {getElapsedTime: () => {return 312568}};
         jest.spyOn(model, 'getEntriesByRace')
             .mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
-            .mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+            .mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
@@ -372,7 +376,8 @@ describe('when adding a lap time', () => {
         await act(async () => {
             model.handleEntryUpdate({'body': entriesScorpionA[0].url});
         });
-        expect(await screen.findAllByRole('cell', {'name': '05:13'})).toHaveLength(2);
+        expect(await screen.findByRole('cell', {'name': '05:13'})).toBeInTheDocument();
+        expect(await screen.findByRole('cell', {'name': '10:25'})).toBeInTheDocument();
     });
     it('displays a message if there is a problem adding the lap time', async () => {
         const entriesScorpionAPost = [{'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},{'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
@@ -461,14 +466,14 @@ describe('when removing a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
         const entry = await screen.findByText(/1234/i);
-        const cell = await screen.findAllByRole('cell', {'name': '05:13'});
-        expect(cell).toHaveLength(2);
+        const cell = await screen.findByRole('cell', {'name': '05:13'});
+        expect(cell).toBeInTheDocument();
         await act(async ()=> {
             await user.keyboard('{Control>}');
             await user.click(entry);
             model.handleEntryUpdate({'body': entriesScorpionA[0].url});
         });
-        expect(cell[0]).not.toBeInTheDocument();
+        expect(cell).not.toBeInTheDocument();
     });
     it('displays a message if there is a problem removing the lap time', async () => {
         const entriesScorpionAPre = [
@@ -567,11 +572,11 @@ describe('when updating a lap time', () => {
     });
     it('refreshes display after lap time updated', async () => {
         const entriesScorpionAPre = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7}], 'sumOfLapTimes': 7, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
+            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7000}, {'number': 2, 'time': 7000}], 'sumOfLapTimes': 14000, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
             {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'}
         ];
         const entriesScorpionAPost = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 15678}], 'sumOfLapTimes': 15678, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
+            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7000}, {'number': 2, 'time': 8000}], 'sumOfLapTimes': 15000, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
             {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'}
         ];
         const user = userEvent.setup();
@@ -593,11 +598,11 @@ describe('when updating a lap time', () => {
         // after render perform update
         await act(async () => { 
             await user.clear(lastCell.lastChild);
-            await user.type(lastCell.lastChild, '15678');
+            await user.type(lastCell.lastChild, '15000');
             await user.keyboard('{Enter}');
             model.handleEntryUpdate({'body': entriesScorpionA[0].url});
         });
-        expect(await screen.findAllByRole('cell', {'name': '00:16'})).toHaveLength(2);
+        expect(await screen.findByRole('cell', {'name': '00:15'})).toBeInTheDocument();
     });
     it('displays a message if there is a problem updating the lap time', async () => {
         const entriesScorpionAPre = [

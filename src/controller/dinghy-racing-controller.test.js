@@ -875,6 +875,15 @@ describe('when updating a lap for an entry', () => {
             expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234, 5027000);
         });
     });
+    it('converts a cumulative time to a time for the last lap', () => {
+        const entryChrisMarshallScorpionA1234WithLaps = {...entryChrisMarshallScorpionA1234, laps: [{number: 1, time: 1000}, {number: 2, time: 1000}, {number: 3, time: 1000}]}; 
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        const updateLapSpy = jest.spyOn(dinghyRacingModel, 'updateLap').mockImplementationOnce((entry, time) => {return Promise.resolve({'success': true})});
+        dinghyRacingController.updateLap(entryChrisMarshallScorpionA1234WithLaps, '00:04');
+        
+        expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234WithLaps, 2000);
+    })
     it('returns a promise that resolves to a result indicating failure when operation is unsuccessful and provides a message explaining the cause of failure', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);

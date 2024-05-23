@@ -20,7 +20,7 @@ import RaceEntryView from './RaceEntryView';
 import { entryChrisMarshallScorpionA1234 } from '../model/__mocks__/test-data';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 
-const entryRowLastCellLapTimeCellOffset = 3;
+const entryRowLastCellLapTimeCellOffset = 2;
 
 beforeEach(() => {
     jest.useFakeTimers();
@@ -45,6 +45,16 @@ it('displays lap times', async () => {
     const tableBody = document.createElement('tbody');
     render(<RaceEntryView entry={entry} />, {container: document.body.appendChild(tableBody)});
     expect(screen.getByText('00:01')).toBeInTheDocument();
+});
+
+it('displays cumulative sum of lap times', async () => {
+    const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+    const entry = {...entryChrisMarshallScorpionA1234, laps: [{'number': 1, 'time': 1234}, {'number': 2, 'time': 1234}, {'number': 3, 'time': 1234}]};
+    const tableBody = document.createElement('tbody');
+    render(<RaceEntryView entry={entry} />, {container: document.body.appendChild(tableBody)});
+    expect(screen.getByText('00:01')).toBeInTheDocument();
+    expect(screen.getByText('00:02')).toBeInTheDocument();
+    expect(screen.getByText('00:04')).toBeInTheDocument();
 });
 
 it('calls addLap callback with entry', async () => {
