@@ -579,7 +579,7 @@ describe('when signing up for a race', () => {
             expect(await screen.findByRole('cell', {'name': /Jill Myer/i})).toBeInTheDocument();
             expect((await screen.findAllByRole('cell', {'name': /Comet/i}))[0]).toBeInTheDocument();
             expect(await screen.findByRole('cell', {'name': /826/i})).toBeInTheDocument();
-            expect((await screen.findAllByRole('button', {name: /withdraw/i}))[0]).toBeInTheDocument();
+            expect((await screen.findAllByRole('button', {name: /x/i}))[0]).toBeInTheDocument();
         });
     });    
     describe('when race for dinghy class with crew', () => {
@@ -2089,7 +2089,7 @@ describe('when signing up for a race', () => {
             expect((await screen.findAllByRole('cell', {'name': /Scorpion/i}))[1]).toBeInTheDocument();
             expect(await screen.findByRole('cell', {'name': /6745/i})).toBeInTheDocument();
             expect(await screen.findByRole('cell', {'name': /Owain Davies/i})).toBeInTheDocument();
-            expect((await screen.findAllByRole('button', {name: /withdraw/i}))[0]).toBeInTheDocument();
+            expect((await screen.findAllByRole('button', {name: /x/i}))[0]).toBeInTheDocument();
         });
     });    
     describe('when race is a handicap', () => {
@@ -4328,7 +4328,7 @@ describe('when signing up for a race', () => {
             expect(await screen.findByRole('cell', {'name': /Jill Myer/i})).toBeInTheDocument();
             expect((await screen.findAllByRole('cell', {'name': /Comet/i}))[0]).toBeInTheDocument();
             expect(await screen.findByRole('cell', {'name': /826/i})).toBeInTheDocument();
-            expect((await screen.findAllByRole('button', {name: /withdraw/i}))[0]).toBeInTheDocument();
+            expect((await screen.findAllByRole('button', {name: /x/i}))[0]).toBeInTheDocument();
         });
     });
 });
@@ -9301,10 +9301,10 @@ describe('when the withdraw button for an entry is clicked', () => {
         const user = userEvent.setup();
         jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesCometA})});
         customRender(<SignUp race={raceCometA}/>, model, controller);
-        const withdrawEntrySpy = jest.spyOn(controller, 'withdrawEntry');
+        const withdrawEntrySpy = jest.spyOn(controller, 'withdrawEntry').mockImplementation(() => {return Promise.resolve({success: true})});
         const jillMyerCell = await screen.findByRole('cell', {'name': /Jill Myer/i});
         const entryJillMyerRow = jillMyerCell.parentElement;
-        const withdrawButton = within(entryJillMyerRow).getByRole('button', {name: /withdraw/i});
+        const withdrawButton = within(entryJillMyerRow).getByRole('button', {name: /x/i});
         await act(async () => {
            await user.click(withdrawButton);
         });

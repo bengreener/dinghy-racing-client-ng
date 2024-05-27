@@ -281,7 +281,7 @@ class DinghyRacingController {
      * @param {Entry} entry to withdraw
      * @returns {Promise<Result>}
      */
-    async withdrawEntry(entry) {
+    withdrawEntry(entry) {
         if (!entry || !entry.url) {
             return Promise.resolve({success: false, message: 'An entry with a URL is required to withdraw from a race.'});
         }

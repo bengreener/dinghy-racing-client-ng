@@ -91,15 +91,6 @@ function SignUp({ race }) {
         withdrawEntry(entryMap.current.get(event.target.id));
     }, [race]);
 
-    // register on update callback for race
-    useEffect(() => {
-        model.registerRaceUpdateCallback(race.url, handleRaceUpdate);
-        // cleanup before effect runs and before form close
-        return () => {
-            model.unregisterRaceUpdateCallback(race.url, handleRaceUpdate);
-        }
-    }, [model, race, handleRaceUpdate]);
-
     async function withdrawEntry(entry) {
         const result = await controller.withdrawEntry(entry);
         if (!result.success) {
@@ -110,11 +101,20 @@ function SignUp({ race }) {
         }
     }
 
+    // register on update callback for race
+    useEffect(() => {
+        model.registerRaceUpdateCallback(race.url, handleRaceUpdate);
+        // cleanup before effect runs and before form close
+        return () => {
+            model.unregisterRaceUpdateCallback(race.url, handleRaceUpdate);
+        }
+    }, [model, race, handleRaceUpdate]);
+
     // get competitors
     useEffect(() => {
         let ignoreFetch = false; // set to true if SignUp rerendered before fetch completes to avoid using out of date result
         model.getCompetitors().then((result) => {
-            if (result.success) {
+            if (result.success && !ignoreFetch) {
                 const competitorMap = new Map();
                 const options = [];
                 result.domainObject.forEach(competitor => {
@@ -138,7 +138,7 @@ function SignUp({ race }) {
     useEffect(() => {
         let ignoreFetch = false; // set to true if SignUp rerendered before fetch completes to avoid using out of date result
         model.getDinghyClasses().then(result => {
-            if (result.success) {
+            if (result.success && !ignoreFetch) {
                 // build dinghy class options
                 let options = [];
                 let map = new Map();
@@ -156,6 +156,10 @@ function SignUp({ race }) {
                 showMessage('Unable to load dinghy classes\n' + result.message);
             }
         });
+
+        return () => {
+            ignoreFetch = true;
+        }
     }, [model]);
 
     // get dinghies
@@ -166,7 +170,7 @@ function SignUp({ race }) {
             dinghyClass = dinghyClassMap.get(dinghyClassName);
         }
         model.getDinghies(dinghyClass).then(result => {
-            if (result.success) {
+            if (result.success && !ignoreFetch) {
                 let options = [];
                 let map = new Map();
                 options.push(<option key={''} value = {''}></option>);
@@ -191,7 +195,7 @@ function SignUp({ race }) {
     useEffect(() => {
         let ignoreFetch = false; // set to true if SignUp rerendered before fetch completes to avoid using out of date result
         model.getEntriesByRace(race).then(result => {
-            if (result.success) {
+            if (result.success && !ignoreFetch) {
                 // populate entries map
                 const map = new Map();
                 result.domainObject.map(entry => map.set(entry.url, entry));
