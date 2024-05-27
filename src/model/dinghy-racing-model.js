@@ -450,6 +450,15 @@ class DinghyRacingModel {
     }
 
     /**
+     * Withdraw an entry to a race
+     * @param {Entry} entry to withdraw
+     * @returns {Promise<Result>}
+     */
+    async withdrawEntry(entry) {
+        return this.delete(entry.url);
+    }
+
+    /**
      * Create a new race
      * @param {Race} race 
      * @returns {Promise<Result>}
