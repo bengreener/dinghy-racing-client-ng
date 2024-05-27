@@ -468,6 +468,43 @@ describe('when updating an entry for a race', () => {
     });
 });
 
+describe('when withdrawing from a race', () => {
+    describe('when entry has a URL', () => {
+        describe('when withdrawal successful', () => {
+            it('returns a promise that resolves to a result indicating success', async () => {
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+                jest.spyOn(dinghyRacingModel, 'withdrawEntry').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
+                const promise = dinghyRacingController.withdrawEntry(entryChrisMarshallScorpionA1234);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({'success': true});
+            });
+        });
+        describe('when withdrawal is unsuccessful', () => {
+            it('returns a promise that resolves to a result indicating failure and provides a message explaining the cause', async () => {
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+                jest.spyOn(dinghyRacingModel, 'withdrawEntry').mockImplementationOnce(() => {return Promise.resolve({success: false, message: 'Oops!'})});
+                const promise = dinghyRacingController.withdrawEntry(entryChrisMarshallScorpionA1234);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({success: false, message: 'Oops!'});
+            });
+        });
+    });
+    describe('when entry does not have a URL', () => {
+        it('returns a promise that resolves to a result indicating failure and contining a message explaining the cause of the failure', async () => {
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+            const promise = dinghyRacingController.withdrawEntry(DinghyRacingModel.entryTemplate());
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({success: false, message: 'An entry with a URL is required to withdraw from a race.'});
+        });
+    })
+});
+
 describe('when creating a new dinghy then', () => {
     it('when operation is successful returns a promise that resolves to a result indicating success', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);

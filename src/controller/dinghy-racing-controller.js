@@ -277,6 +277,18 @@ class DinghyRacingController {
     }
 
     /**
+     * Withdraw an entry to a race
+     * @param {Entry} entry to withdraw
+     * @returns {Promise<Result>}
+     */
+    async withdrawEntry(entry) {
+        if (!entry || !entry.url) {
+            return Promise.resolve({success: false, message: 'An entry with a URL is required to withdraw from a race.'});
+        }
+        return this.model.withdrawEntry(entry);
+    }
+
+    /**
      * Update the start sequence state of a race
      * @param {Race} race to start
      * @param {StartSequence} stage of the starting sequence reached
