@@ -437,7 +437,7 @@ function SignUp({ race }) {
             <input id="sail-number-input" name="sailNumber" list="dinghy-datalist" onChange={handleChange} value={sailNumber} />
             <output id="entry-message-output" />
             <button id="entry-update-button" type="button" onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
-            {selectedEntry ? <button id="canel-button" type="button" onClick={clear} >Cancel</button> : null}
+            {selectedEntry ? <button id="cancel-button" type="button" onClick={clear} >Cancel</button> : null}
             </div>
             <h3>Signed-up</h3>
             <div className="scrollable">
