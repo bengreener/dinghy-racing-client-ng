@@ -46,6 +46,11 @@ function SignUp({ race }) {
     const dinghyClassSelect = useRef(null);
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
 
+    const showMessage = useCallback((message) => {
+        const output = document.getElementById('entry-message-output');
+        output.value = message;
+    }, []);
+
     const handleRaceUpdate = useCallback(() => {
         setRacesUpdateRequestAt(Date.now());
     }, []);
@@ -63,7 +68,7 @@ function SignUp({ race }) {
         else {
             dinghyClassSelect.current.focus();
         }
-    }, [race.dinghyClass]);
+    }, [race.dinghyClass, showMessage]);
 
     const handleEntryRowClick = useCallback(({ currentTarget }) => {
         const entry = entryMap.current.get(currentTarget.id);
@@ -83,15 +88,9 @@ function SignUp({ race }) {
             dinghyClassSelect.current.focus();
         }
         showMessage('');
-    }, [race]);
+    }, [race, showMessage]);
 
-    const handleWithdrawEntryButtonClick = useCallback((event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        withdrawEntry(entryMap.current.get(event.target.id));
-    }, [race]);
-
-    async function withdrawEntry(entry) {
+    const withdrawEntry = useCallback(async (entry) => {
         const result = await controller.withdrawEntry(entry);
         if (!result.success) {
             showMessage(result.message);
@@ -99,7 +98,13 @@ function SignUp({ race }) {
         else {
             showMessage('');
         }
-    }
+    }, [controller, showMessage])
+
+    const handleWithdrawEntryButtonClick = useCallback((event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        withdrawEntry(entryMap.current.get(event.target.id));
+    }, [withdrawEntry]);
 
     // register on update callback for race
     useEffect(() => {
@@ -132,7 +137,7 @@ function SignUp({ race }) {
         return () => {
             ignoreFetch = true;
         }
-    }, [model]);
+    }, [model, showMessage]);
 
     // get dinghy classes
     useEffect(() => {
@@ -160,7 +165,7 @@ function SignUp({ race }) {
         return () => {
             ignoreFetch = true;
         }
-    }, [model]);
+    }, [model, showMessage]);
 
     // get dinghies
     useEffect(() => {
@@ -189,7 +194,7 @@ function SignUp({ race }) {
         return () => {
             ignoreFetch = true;
         }
-    }, [model, race.dinghyClass, dinghyClassName, dinghyClassMap]);
+    }, [model, race.dinghyClass, dinghyClassName, dinghyClassMap, showMessage]);
 
     // build entries table
     useEffect(() => {
@@ -233,7 +238,7 @@ function SignUp({ race }) {
         return () => {
             ignoreFetch = true;
         }
-    }, [race, model, handleEntryRowClick, racesUpdateRequestAt, handleWithdrawEntryButtonClick]);
+    }, [race, model, handleEntryRowClick, racesUpdateRequestAt, handleWithdrawEntryButtonClick, showMessage]);
     
     // if error display message 
     useEffect(() => {
@@ -243,7 +248,7 @@ function SignUp({ race }) {
         if (result && !result.success) {
             showMessage(result.message);
         }
-    }, [result, clear]);
+    }, [result, clear, showMessage]);
 
     // check if dinghy class has crew
     useEffect(() => {
@@ -388,11 +393,6 @@ function SignUp({ race }) {
             );
         }
         return crewInput;
-    }
-
-    function showMessage(message) {
-        const output = document.getElementById('entry-message-output');
-        output.value = message;
     }
 
     function getButtonText() {
