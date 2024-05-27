@@ -85,6 +85,12 @@ function SignUp({ race }) {
         showMessage('');
     }, [race]);
 
+    const handleWithdrawEntryButtonClick = useCallback((event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        withdrawEntry(entryMap.current.get(event.target.id));
+    }, [race]);
+
     // register on update callback for race
     useEffect(() => {
         model.registerRaceUpdateCallback(race.url, handleRaceUpdate);
@@ -93,6 +99,16 @@ function SignUp({ race }) {
             model.unregisterRaceUpdateCallback(race.url, handleRaceUpdate);
         }
     }, [model, race, handleRaceUpdate]);
+
+    async function withdrawEntry(entry) {
+        const result = await controller.withdrawEntry(entry);
+        if (!result.success) {
+            showMessage(result.message);
+        }
+        else {
+            showMessage('');
+        }
+    }
 
     // get competitors
     useEffect(() => {
@@ -183,10 +199,11 @@ function SignUp({ race }) {
                 // build table rows
                 const rows = result.domainObject.map(entry => {
                     return <tr key={entry.helm.name} id={entry.url} onClick={handleEntryRowClick} >
-                        <td key={'helm'}>{entry.helm.name}</td>
-                        <td key={'sailNumber'}>{entry.dinghy.sailNumber}</td>
-                        <td key={'dinghyClass'}>{entry.dinghy.dinghyClass.name}</td>
-                        {(!race.dinghyClass || race.dinghyClass.crewSize > 1) ? <td key={'crew'}>{entry.crew ? entry.crew.name : ''}</td> : null}
+                        <td key="helm">{entry.helm.name}</td>
+                        <td key="sailNumber">{entry.dinghy.sailNumber}</td>
+                        <td key="dinghyClass">{entry.dinghy.dinghyClass.name}</td>
+                        {(!race.dinghyClass || race.dinghyClass.crewSize > 1) ? <td key="crew">{entry.crew ? entry.crew.name : ''}</td> : null}
+                        <td key="withdrawEntry-button"><button id={entry.url} className="embedded" type="button" onClick={handleWithdrawEntryButtonClick}>X</button></td>
                     </tr>
                 });
                 setEntriesTable(<table>
@@ -196,6 +213,7 @@ function SignUp({ race }) {
                             <th key="sailNumber">Sail Number</th>
                             <th key="dinghyClass">Class</th>
                             {(!race.dinghyClass || race.dinghyClass.crewSize > 1) ? <th key="crew">Crew</th> : null}
+                            <th key="withdrawEntry-button"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -211,7 +229,7 @@ function SignUp({ race }) {
         return () => {
             ignoreFetch = true;
         }
-    }, [race, model, handleEntryRowClick, racesUpdateRequestAt]);
+    }, [race, model, handleEntryRowClick, racesUpdateRequestAt, handleWithdrawEntryButtonClick]);
     
     // if error display message 
     useEffect(() => {

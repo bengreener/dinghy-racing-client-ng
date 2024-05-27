@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { act, screen } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import { customRender } from '../test-utilities/custom-renders';
 import userEvent from '@testing-library/user-event';
 import DinghyRacingModel from '../model/dinghy-racing-model';
@@ -579,6 +579,7 @@ describe('when signing up for a race', () => {
             expect(await screen.findByRole('cell', {'name': /Jill Myer/i})).toBeInTheDocument();
             expect((await screen.findAllByRole('cell', {'name': /Comet/i}))[0]).toBeInTheDocument();
             expect(await screen.findByRole('cell', {'name': /826/i})).toBeInTheDocument();
+            expect((await screen.findAllByRole('button', {name: /withdraw/i}))[0]).toBeInTheDocument();
         });
     });    
     describe('when race for dinghy class with crew', () => {
@@ -2088,6 +2089,7 @@ describe('when signing up for a race', () => {
             expect((await screen.findAllByRole('cell', {'name': /Scorpion/i}))[1]).toBeInTheDocument();
             expect(await screen.findByRole('cell', {'name': /6745/i})).toBeInTheDocument();
             expect(await screen.findByRole('cell', {'name': /Owain Davies/i})).toBeInTheDocument();
+            expect((await screen.findAllByRole('button', {name: /withdraw/i}))[0]).toBeInTheDocument();
         });
     });    
     describe('when race is a handicap', () => {
@@ -4326,9 +4328,11 @@ describe('when signing up for a race', () => {
             expect(await screen.findByRole('cell', {'name': /Jill Myer/i})).toBeInTheDocument();
             expect((await screen.findAllByRole('cell', {'name': /Comet/i}))[0]).toBeInTheDocument();
             expect(await screen.findByRole('cell', {'name': /826/i})).toBeInTheDocument();
+            expect((await screen.findAllByRole('button', {name: /withdraw/i}))[0]).toBeInTheDocument();
         });
     });
 });
+
 describe('when updating an existing entry', () => {
     describe('when race for dinghy class with no crew', () => {
         it('displays details for selected entry', async () => {
@@ -9289,5 +9293,21 @@ describe('when races within session are changed', () => {
         });
 
         expect(screen.queryByRole('cell', {'name': /sarah pascal/i})).not.toBeInTheDocument();
+    });
+});
+
+describe('when the withdraw button for an entry is clicked', () => {
+    it('calls the controller withDraw entry method with the entry to be withdrawn', async () => {
+        const user = userEvent.setup();
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesCometA})});
+        customRender(<SignUp race={raceCometA}/>, model, controller);
+        const withdrawEntrySpy = jest.spyOn(controller, 'withdrawEntry');
+        const jillMyerCell = await screen.findByRole('cell', {'name': /Jill Myer/i});
+        const entryJillMyerRow = jillMyerCell.parentElement;
+        const withdrawButton = within(entryJillMyerRow).getByRole('button', {name: /withdraw/i});
+        await act(async () => {
+           await user.click(withdrawButton);
+        });
+        expect(withdrawEntrySpy).toBeCalledWith(entryJillMyerCometA826);
     });
 });
