@@ -96,6 +96,7 @@ function SignUp({ race }) {
 
     // get competitors
     useEffect(() => {
+        let ignoreFetch = false; // set to true if SignUp rerendered before fetch completes to avoid using out of date result
         model.getCompetitors().then((result) => {
             if (result.success) {
                 const competitorMap = new Map();
@@ -111,10 +112,15 @@ function SignUp({ race }) {
                 showMessage('Unable to load competitors\n' + result.message);
             }
         });
+
+        return () => {
+            ignoreFetch = true;
+        }
     }, [model]);
 
     // get dinghy classes
     useEffect(() => {
+        let ignoreFetch = false; // set to true if SignUp rerendered before fetch completes to avoid using out of date result
         model.getDinghyClasses().then(result => {
             if (result.success) {
                 // build dinghy class options
@@ -138,6 +144,7 @@ function SignUp({ race }) {
 
     // get dinghies
     useEffect(() => {
+        let ignoreFetch = false; // set to true if SignUp rerendered before fetch completes to avoid using out of date result
         let dinghyClass = race.dinghyClass;
         if (!dinghyClass && dinghyClassMap.has(dinghyClassName)) {
             dinghyClass = dinghyClassMap.get(dinghyClassName);
@@ -158,10 +165,15 @@ function SignUp({ race }) {
                 showMessage('Unable to load dinghies\n' + result.message);
             }
         })
+
+        return () => {
+            ignoreFetch = true;
+        }
     }, [model, race.dinghyClass, dinghyClassName, dinghyClassMap]);
 
     // build entries table
     useEffect(() => {
+        let ignoreFetch = false; // set to true if SignUp rerendered before fetch completes to avoid using out of date result
         model.getEntriesByRace(race).then(result => {
             if (result.success) {
                 // populate entries map
@@ -195,6 +207,10 @@ function SignUp({ race }) {
                 showMessage('Unable to load race entries\n' + result.message);
             }
         });
+
+        return () => {
+            ignoreFetch = true;
+        }
     }, [race, model, handleEntryRowClick, racesUpdateRequestAt]);
     
     // if error display message 
