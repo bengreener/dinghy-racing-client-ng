@@ -37,6 +37,8 @@ const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 const controller = new DinghyRacingController(model);    
 
 beforeEach(() => {
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
     jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': competitorsCollection})});
     jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClasses})});
     jest.spyOn(model, 'getDinghies').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghies})});
@@ -9260,5 +9262,32 @@ describe('when updating an existing entry', () => {
         expect(inputCrew).toHaveValue('');
         expect(inputSailNumber).toHaveValue('');
         expect(btnCreate).toBeInTheDocument();
+    });
+});
+
+it('registers an interest in race updates for the race being signed up to', async () => {
+    const user = userEvent.setup();
+    jest.spyOn(model, 'getEntriesByRace').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    const registerRaceUpdateCallbackSpy = jest.spyOn(model, 'registerRaceUpdateCallback');
+
+    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+    expect((await screen.findAllByRole('cell', {'name': /Scorpion/i}))[0]).toBeInTheDocument();
+
+    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/races/4', expect.any(Function));
+});
+
+describe('when races within session are changed', () => {
+    it('removes an entry that has been withdrawn', async () => {
+        const entriesScorpionADeleted = [entriesScorpionA[0]];
+        jest.spyOn(model, 'getEntriesByRace').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionADeleted})});
+        await act(async () => {
+            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+        });
+        expect(await screen.findByRole('cell', {'name': /sarah pascal/i})).toBeInTheDocument();
+        await act(async () => {
+            model.handleRaceUpdate({'body': 'http://localhost:8081/dinghyracing/api/races/4'});
+        });
+
+        expect(screen.queryByRole('cell', {'name': /sarah pascal/i})).not.toBeInTheDocument();
     });
 });

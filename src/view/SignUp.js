@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import React, { useCallback, useContext, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import ControllerContext from './ControllerContext';
 import ModelContext from './ModelContext';
 
@@ -44,6 +44,11 @@ function SignUp({ race }) {
     const [selectedEntry, setSelectedEntry] = useState(null);
     const helmInput = useRef(null);
     const dinghyClassSelect = useRef(null);
+    const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
+
+    const handleRaceUpdate = useCallback(() => {
+        setRacesUpdateRequestAt(Date.now());
+    }, []);
 
     const clear = React.useCallback(() => {
         setHelmName('');
@@ -80,8 +85,17 @@ function SignUp({ race }) {
         showMessage('');
     }, [race]);
 
+    // register on update callback for race
+    useEffect(() => {
+        model.registerRaceUpdateCallback(race.url, handleRaceUpdate);
+        // cleanup before effect runs and before form close
+        return () => {
+            model.unregisterRaceUpdateCallback(race.url, handleRaceUpdate);
+        }
+    }, [model, race, handleRaceUpdate]);
+
     // get competitors
-    React.useEffect(() => {
+    useEffect(() => {
         model.getCompetitors().then((result) => {
             if (result.success) {
                 const competitorMap = new Map();
@@ -100,7 +114,7 @@ function SignUp({ race }) {
     }, [model]);
 
     // get dinghy classes
-    React.useEffect(() => {
+    useEffect(() => {
         model.getDinghyClasses().then(result => {
             if (result.success) {
                 // build dinghy class options
@@ -123,7 +137,7 @@ function SignUp({ race }) {
     }, [model]);
 
     // get dinghies
-    React.useEffect(() => {
+    useEffect(() => {
         let dinghyClass = race.dinghyClass;
         if (!dinghyClass && dinghyClassMap.has(dinghyClassName)) {
             dinghyClass = dinghyClassMap.get(dinghyClassName);
@@ -147,7 +161,7 @@ function SignUp({ race }) {
     }, [model, race.dinghyClass, dinghyClassName, dinghyClassMap]);
 
     // build entries table
-    React.useEffect(() => {
+    useEffect(() => {
         model.getEntriesByRace(race).then(result => {
             if (result.success) {
                 // populate entries map
@@ -181,10 +195,10 @@ function SignUp({ race }) {
                 showMessage('Unable to load race entries\n' + result.message);
             }
         });
-    }, [race, model, result, handleEntryRowClick]);
+    }, [race, model, handleEntryRowClick, racesUpdateRequestAt]);
     
     // if error display message 
-    React.useEffect(() => {
+    useEffect(() => {
         if (result && result.success) {
             clear();
         }
@@ -194,7 +208,7 @@ function SignUp({ race }) {
     }, [result, clear]);
 
     // check if dinghy class has crew
-    React.useEffect(() => {
+    useEffect(() => {
         if (race.dinghyClass) {
             setDinghyClassHasCrew(race.dinghyClass.crewSize > 1);
         }
