@@ -1112,6 +1112,27 @@ class DinghyRacingModel {
     }
 
     /**
+     * Delete the reosource
+     * @param {String} resource
+     * @returns {Promise<Result>}
+     */
+    async delete(resource) {
+        try {
+            const response = await fetch(resource, {method: 'DELETE'});
+            if (response.ok) {
+                return Promise.resolve({'success': true});
+            }
+            else {
+                const message = 'HTTP Error: ' + response.status + ' Message: No additional information available';
+                return Promise.resolve({'success': false, 'message': message});
+            }
+        }
+        catch (error) {
+            return Promise.resolve({'success': false, 'message': error.toString()});
+        }
+    }
+
+    /**
      * Convert a duration into milliseconds
      * Format of duration is based on ISO 8601 duration format; with further restrictions on expected values.
      * Overall period is expected to be positive.
