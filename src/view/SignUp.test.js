@@ -9280,6 +9280,18 @@ it('registers an interest in race updates for the race being signed up to', asyn
     expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/races/4', expect.any(Function));
 });
 
+it('registers an interest in entry updates for the entries in the race being signed up to', async () => {
+    const user = userEvent.setup();
+    jest.spyOn(model, 'getEntriesByRace').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    const registerEntryUpdateCallbackSpy = jest.spyOn(model, 'registerEntryUpdateCallback');
+
+    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+    expect((await screen.findAllByRole('cell', {'name': /Scorpion/i}))[0]).toBeInTheDocument();
+
+    expect(registerEntryUpdateCallbackSpy).toHaveBeenCalledWith('http://localhost:8081/dinghyracing/api/entries/10', expect.any(Function));
+    expect(registerEntryUpdateCallbackSpy).toHaveBeenCalledWith('http://localhost:8081/dinghyracing/api/entries/11', expect.any(Function));
+});
+
 it('removes an entry that has been withdrawn from list of displayed entries', async () => {
     const entriesScorpionADeleted = [entriesScorpionA[0]];
     jest.spyOn(model, 'getEntriesByRace').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionADeleted})});
