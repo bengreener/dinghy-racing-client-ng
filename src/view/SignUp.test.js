@@ -9280,20 +9280,18 @@ it('registers an interest in race updates for the race being signed up to', asyn
     expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/races/4', expect.any(Function));
 });
 
-describe('when races within session are changed', () => {
-    it('removes an entry that has been withdrawn', async () => {
-        const entriesScorpionADeleted = [entriesScorpionA[0]];
-        jest.spyOn(model, 'getEntriesByRace').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionADeleted})});
-        await act(async () => {
-            customRender(<SignUp race={raceScorpionA}/>, model, controller);
-        });
-        expect(await screen.findByRole('cell', {'name': /sarah pascal/i})).toBeInTheDocument();
-        await act(async () => {
-            model.handleRaceUpdate({'body': 'http://localhost:8081/dinghyracing/api/races/4'});
-        });
-
-        expect(screen.queryByRole('cell', {'name': /sarah pascal/i})).not.toBeInTheDocument();
+it('removes an entry that has been withdrawn from list of displayed entries', async () => {
+    const entriesScorpionADeleted = [entriesScorpionA[0]];
+    jest.spyOn(model, 'getEntriesByRace').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionADeleted})});
+    await act(async () => {
+        customRender(<SignUp race={raceScorpionA}/>, model, controller);
     });
+    expect(await screen.findByRole('cell', {'name': /sarah pascal/i})).toBeInTheDocument();
+    await act(async () => {
+        model.handleRaceUpdate({'body': 'http://localhost:8081/dinghyracing/api/races/4'});
+    });
+
+    expect(screen.queryByRole('cell', {'name': /sarah pascal/i})).not.toBeInTheDocument();
 });
 
 describe('when the withdraw button for an entry is clicked', () => {

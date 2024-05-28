@@ -33,6 +33,7 @@ function SignUp({ race }) {
     const [dinghyClassName, setDinghyClassName] = useState('');
     const [dinghyClassHasCrew, setDinghyClassHasCrew] = useState(false);
     const [result, setResult] = useState({'message': ''});
+    const [message, setMessage] = useState(''); // feedback to user
     const [competitorMap, setCompetitorMap] = useState(new Map());
     const [competitorOptions, setCompetitorOptions] = useState([]);
     const [dinghyClassMap, setDinghyClassMap] = useState(new Map());
@@ -46,11 +47,6 @@ function SignUp({ race }) {
     const dinghyClassSelect = useRef(null);
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
 
-    const showMessage = useCallback((message) => {
-        const output = document.getElementById('entry-message-output');
-        output.value = message;
-    }, []);
-
     const handleRaceUpdate = useCallback(() => {
         setRacesUpdateRequestAt(Date.now());
     }, []);
@@ -60,7 +56,7 @@ function SignUp({ race }) {
         setCrewName('');
         setSailNumber('');
         setDinghyClassName('');
-        showMessage('');
+        setMessage('');
         setSelectedEntry(null);
         if (race.dinghyClass) {
             helmInput.current.focus();
@@ -68,7 +64,7 @@ function SignUp({ race }) {
         else {
             dinghyClassSelect.current.focus();
         }
-    }, [race.dinghyClass, showMessage]);
+    }, [race.dinghyClass]);
 
     const handleEntryRowClick = useCallback(({ currentTarget }) => {
         const entry = entryMap.current.get(currentTarget.id);
@@ -87,18 +83,18 @@ function SignUp({ race }) {
         else {
             dinghyClassSelect.current.focus();
         }
-        showMessage('');
-    }, [race, showMessage]);
+        setMessage('');
+    }, [race]);
 
     const withdrawEntry = useCallback(async (entry) => {
         const result = await controller.withdrawEntry(entry);
         if (!result.success) {
-            showMessage(result.message);
+            setMessage(result.message);
         }
         else {
-            showMessage('');
+            setMessage('');
         }
-    }, [controller, showMessage])
+    }, [controller])
 
     const handleWithdrawEntryButtonClick = useCallback((event) => {
         event.preventDefault();
@@ -130,14 +126,14 @@ function SignUp({ race }) {
                 setCompetitorOptions(options);
             }
             else {
-                showMessage('Unable to load competitors\n' + result.message);
+                setMessage('Unable to load competitors\n' + result.message);
             }
         });
 
         return () => {
             ignoreFetch = true;
         }
-    }, [model, showMessage]);
+    }, [model]);
 
     // get dinghy classes
     useEffect(() => {
@@ -158,14 +154,14 @@ function SignUp({ race }) {
                 setDinghyClassOptions(options);
             }
             else {
-                showMessage('Unable to load dinghy classes\n' + result.message);
+                setMessage('Unable to load dinghy classes\n' + result.message);
             }
         });
 
         return () => {
             ignoreFetch = true;
         }
-    }, [model, showMessage]);
+    }, [model]);
 
     // get dinghies
     useEffect(() => {
@@ -187,14 +183,14 @@ function SignUp({ race }) {
                 setDinghyOptions(options);
             }
             else {
-                showMessage('Unable to load dinghies\n' + result.message);
+                setMessage('Unable to load dinghies\n' + result.message);
             }
         })
 
         return () => {
             ignoreFetch = true;
         }
-    }, [model, race.dinghyClass, dinghyClassName, dinghyClassMap, showMessage]);
+    }, [model, race.dinghyClass, dinghyClassName, dinghyClassMap]);
 
     // build entries table
     useEffect(() => {
@@ -231,14 +227,14 @@ function SignUp({ race }) {
                     </table>);
             }
             else {
-                showMessage('Unable to load race entries\n' + result.message);
+                setMessage('Unable to load race entries\n' + result.message);
             }
         });
 
         return () => {
             ignoreFetch = true;
         }
-    }, [race, model, handleEntryRowClick, racesUpdateRequestAt, handleWithdrawEntryButtonClick, showMessage]);
+    }, [race, model, handleEntryRowClick, racesUpdateRequestAt, handleWithdrawEntryButtonClick]);
     
     // if error display message 
     useEffect(() => {
@@ -246,9 +242,9 @@ function SignUp({ race }) {
             clear();
         }
         if (result && !result.success) {
-            showMessage(result.message);
+            setMessage(result.message);
         }
-    }, [result, clear, showMessage]);
+    }, [result, clear]);
 
     // check if dinghy class has crew
     useEffect(() => {
@@ -451,16 +447,16 @@ function SignUp({ race }) {
             <h1>{race.name}</h1>
             <datalist id="competitor-datalist">{competitorOptions}</datalist>
             <div>
-            {dinghyClassInput(race)}
-            {buildHelmInput()}
-            {buildCrewInput()}
-            <datalist id="dinghy-datalist">{dinghyOptions}</datalist>
-            <label htmlFor="sail-number-input">Sail Number</label>
-            <input id="sail-number-input" name="sailNumber" list="dinghy-datalist" onChange={handleChange} value={sailNumber} />
-            <output id="entry-message-output" />
-            <button id="entry-update-button" type="button" onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
-            {selectedEntry ? <button id="cancel-button" type="button" onClick={clear} >Cancel</button> : null}
+                {dinghyClassInput(race)}
+                {buildHelmInput()}
+                {buildCrewInput()}
+                <datalist id="dinghy-datalist">{dinghyOptions}</datalist>
+                <label htmlFor="sail-number-input">Sail Number</label>
+                <input id="sail-number-input" name="sailNumber" list="dinghy-datalist" onChange={handleChange} value={sailNumber} />
+                <button id="entry-update-button" type="button" onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
+                {selectedEntry ? <button id="cancel-button" type="button" onClick={clear} >Cancel</button> : null}
             </div>
+            <p id="signup-message" className={!message ? "hidden" : ""}>{message}</p>
             <h3>Signed-up</h3>
             <div className="scrollable">
                 {entriesTable}
