@@ -130,6 +130,13 @@ describe('when showInRaceData is false', () => {
         expect(screen.getByRole('button', {name: /postpone start/i})).toBeInTheDocument();
         expect(screen.getByRole('button', {name: /start now/i})).toBeInTheDocument();
     });
+    it('displays adjust course button', () => {
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))} } showInRaceData={false} />, model, controller);
+        expect(screen.queryByRole('button', {name: /shorten course/i})).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: /adjust course/i})).toBeInTheDocument();
+    })
 });
 
 describe('when race has not yet started', () => {

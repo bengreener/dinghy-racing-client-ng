@@ -163,6 +163,10 @@ class DinghyRacingModel {
         return null;
     }
 
+    async withdrawEntry(entry) {
+        return null;
+    }
+
     async createRace(race) {
         return null;
     }

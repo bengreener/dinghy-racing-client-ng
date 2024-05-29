@@ -468,6 +468,43 @@ describe('when updating an entry for a race', () => {
     });
 });
 
+describe('when withdrawing from a race', () => {
+    describe('when entry has a URL', () => {
+        describe('when withdrawal successful', () => {
+            it('returns a promise that resolves to a result indicating success', async () => {
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+                jest.spyOn(dinghyRacingModel, 'withdrawEntry').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
+                const promise = dinghyRacingController.withdrawEntry(entryChrisMarshallScorpionA1234);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({'success': true});
+            });
+        });
+        describe('when withdrawal is unsuccessful', () => {
+            it('returns a promise that resolves to a result indicating failure and provides a message explaining the cause', async () => {
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+                jest.spyOn(dinghyRacingModel, 'withdrawEntry').mockImplementationOnce(() => {return Promise.resolve({success: false, message: 'Oops!'})});
+                const promise = dinghyRacingController.withdrawEntry(entryChrisMarshallScorpionA1234);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({success: false, message: 'Oops!'});
+            });
+        });
+    });
+    describe('when entry does not have a URL', () => {
+        it('returns a promise that resolves to a result indicating failure and contining a message explaining the cause of the failure', async () => {
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+            const promise = dinghyRacingController.withdrawEntry(DinghyRacingModel.entryTemplate());
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({success: false, message: 'An entry with a URL is required to withdraw from a race.'});
+        });
+    })
+});
+
 describe('when creating a new dinghy then', () => {
     it('when operation is successful returns a promise that resolves to a result indicating success', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -709,15 +746,32 @@ describe('when updating the start sequence state for a race', () => {
 });
 
 describe('when adding a lap to an entry', () => {
-    it('returns a promise that resolves to a result indicating success when operation is successful', async () => {
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
-        const expectedResponse = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), 'number': 1, 'time': 1000}]};
-        jest.spyOn(dinghyRacingModel, 'addLap').mockImplementationOnce((entry) => {return Promise.resolve({'success': true, 'domainObject': expectedResponse})});
-        const promise = dinghyRacingController.addLap(entryChrisMarshallScorpionA1234, 1000);
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, 'domainObject': expectedResponse});
+    describe('when first lap', () => {
+        it('returns a promise that resolves to a result indicating success when operation is successful', async () => {
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+            const expectedResponse = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), 'number': 1, 'time': 1000}]};
+            const addLapSpy = jest.spyOn(dinghyRacingModel, 'addLap').mockImplementationOnce((entry) => {return Promise.resolve({'success': true, 'domainObject': expectedResponse})});
+            const promise = dinghyRacingController.addLap(entryChrisMarshallScorpionA1234, 1000);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(addLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234, 1000);
+            expect(result).toEqual({'success': true, 'domainObject': expectedResponse});
+        });
+    });
+    describe('when second lap', () => {
+        it('returns a promise that resolves to a result indicating success when operation is successful', async () => {
+            const entryChrisMarshallScorpionA1234WithLaps = {...entryChrisMarshallScorpionA1234, laps: [{number: 1, time: 1000}]}
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+            const expectedResponse = {...entryChrisMarshallScorpionA1234WithLaps, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {number: 2, time: 2000}]};
+            const addLapSpy = jest.spyOn(dinghyRacingModel, 'addLap').mockImplementationOnce((entry) => {return Promise.resolve({'success': true, 'domainObject': expectedResponse})});
+            const promise = dinghyRacingController.addLap(entryChrisMarshallScorpionA1234WithLaps, 3000);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(addLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234WithLaps, 2000);
+            expect(result).toEqual({'success': true, 'domainObject': expectedResponse});
+        });
     });
     it('returns a promise that resolves to a result indicating failure when operation is unsuccessful and provides a message explaining the cause of failure', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -875,6 +929,15 @@ describe('when updating a lap for an entry', () => {
             expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234, 5027000);
         });
     });
+    it('converts a cumulative time to a time for the last lap', () => {
+        const entryChrisMarshallScorpionA1234WithLaps = {...entryChrisMarshallScorpionA1234, laps: [{number: 1, time: 1000}, {number: 2, time: 1000}, {number: 3, time: 1000}]}; 
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        const updateLapSpy = jest.spyOn(dinghyRacingModel, 'updateLap').mockImplementationOnce((entry, time) => {return Promise.resolve({'success': true})});
+        dinghyRacingController.updateLap(entryChrisMarshallScorpionA1234WithLaps, '00:04');
+        
+        expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234WithLaps, 2000);
+    })
     it('returns a promise that resolves to a result indicating failure when operation is unsuccessful and provides a message explaining the cause of failure', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);

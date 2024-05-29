@@ -69,7 +69,7 @@ describe('when creating a new object via REST', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Message: No additional information available'});
     });
-})
+});
 
 describe('when reading a resource from REST', () => {
     it('returns a promise that resolves to a result indicating success and containing the hal+json resource when http status 200', async () => {
@@ -110,7 +110,78 @@ describe('when reading a resource from REST', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'TypeError: Failed to fetch'});
     });
-})
+});
+
+describe('when updating an object via REST', () => {
+    it('returns a promise that resolves to a success response when update is successful', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: true,
+                status: 200,
+                json: () => Promise.resolve({})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.update(httpRootURL, {});
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result.success).toBeTruthy();
+    });
+    it('resturns a promise that resolves to a failed response and probviding the cause of failure when update is unsuccessful', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 404, 
+                json: () => Promise.resolve({})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.update(httpRootURL, {});
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
+    });
+});
+
+describe('when deleting an object via REST', () => {
+    it('returns a promise that resolves to a success response when update is successful', async () => {
+        fetch.mockImplementationOnce((resource, options) => {
+            if (resource === 'http://localhost:8081/dinghyracing/api/entries/6' && options.method === 'DELETE') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 204,
+                    json: () => Promise.resolve({})
+                });
+            }
+            else {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404,
+                    json: () => Promise.resolve({})
+                });
+            }
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.delete('http://localhost:8081/dinghyracing/api/entries/6');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result.success).toBeTruthy();
+    });
+    it('resturns a promise that resolves to a failed response and probviding the cause of failure when update is unsuccessful', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 404,
+                json: () => Promise.resolve({})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.delete('http://localhost:8081/dinghyracing/api/entries/6');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
+    });
+});
 
 describe('when creating a new instance of DinghyRacingModel', () => {
     it('requires a URL for http calls', () => {
@@ -1387,7 +1458,47 @@ describe('when updating an entry for a race', () => {
     });
 });
 
-describe('when retrieving a list of cmpetitors', () => {
+describe('when withdrawing an entry for a race', () => {
+    it('return a promise resolving to a success result when entry successfully withdrawn', async () => {
+        fetch.mockImplementationOnce((resource, options) => {
+            if (resource === 'http://localhost:8081/dinghyracing/api/entries/10' && options.method === 'DELETE') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 204,
+                    json: () => Promise.resolve({})
+                });
+            }
+            else {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404,
+                    json: () => Promise.resolve({})
+                });
+            }
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.withdrawEntry(entryChrisMarshallScorpionA1234);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result.success).toBeTruthy();
+    });
+    it('returns a promise resolvig to a failure result and containing a message describibg the cause of the failure when unable to withdraw', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 404,
+                json: () => Promise.resolve({})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.delete(entryChrisMarshallScorpionA1234);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
+    });
+});
+
+describe('when retrieving a list of competitors', () => {
     it('returns a collection of competitors', async () => {
         fetch.mockImplementation((resource) => {
             if (resource === 'http://localhost:8081/dinghyracing/api/competitors?sort=name,asc') {
@@ -3486,37 +3597,6 @@ describe('when a dinghy class is requested', () => {
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'});
-    });
-});
-
-describe('when updating an object via REST', () => {
-    it('returns a promise that resolves to a success response when update is successful', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: true,
-                status: 200,
-                json: () => Promise.resolve({})
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.update(httpRootURL, {});
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result.success).toBeTruthy();
-    });
-    it('resturns a promise that resolves to a failed response and probviding the cause of failure when update is unsuccessful', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: false,
-                status: 404, 
-                json: () => Promise.resolve({})
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.update(httpRootURL, {});
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
     });
 });
 

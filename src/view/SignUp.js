@@ -14,9 +14,10 @@
  * limitations under the License. 
  */
 
-import React, { useCallback, useContext, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import ControllerContext from './ControllerContext';
 import ModelContext from './ModelContext';
+
 /**
  * Form for signing up to a race
  * @param {Object} props
@@ -32,24 +33,35 @@ function SignUp({ race }) {
     const [dinghyClassName, setDinghyClassName] = useState('');
     const [dinghyClassHasCrew, setDinghyClassHasCrew] = useState(false);
     const [result, setResult] = useState({'message': ''});
+    const [message, setMessage] = useState(''); // feedback to user
     const [competitorMap, setCompetitorMap] = useState(new Map());
     const [competitorOptions, setCompetitorOptions] = useState([]);
     const [dinghyClassMap, setDinghyClassMap] = useState(new Map());
     const [dinghyClassOptions, setDinghyClassOptions] = useState([]);
     const [dinghyMap, setDinghyMap] = useState(new Map());
     const [dinghyOptions, setDinghyOptions] = useState([]);
-    const entryMap = useRef(new Map());
+    const entriesMap = useRef(new Map());
     const [entriesTable, setEntriesTable] = useState([]);
     const [selectedEntry, setSelectedEntry] = useState(null);
     const helmInput = useRef(null);
     const dinghyClassSelect = useRef(null);
+    const [raceUpdateRequestAt, setRaceUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
+    const [entryUpdateRequestAt, setEntryUpdateRequestAt] = useState(Date.now()); // time of last request to fetch an entry from server. change triggers a new fetch; for instance when server notifies an entry has been updated
+
+    const handleRaceUpdate = useCallback(() => {
+        setRaceUpdateRequestAt(Date.now());
+    }, []);
+
+    const handleEntryUpdate = useCallback(() => {
+        setEntryUpdateRequestAt(Date.now());
+    }, []);
 
     const clear = React.useCallback(() => {
         setHelmName('');
         setCrewName('');
         setSailNumber('');
         setDinghyClassName('');
-        showMessage('');
+        setMessage('');
         setSelectedEntry(null);
         if (race.dinghyClass) {
             helmInput.current.focus();
@@ -60,7 +72,7 @@ function SignUp({ race }) {
     }, [race.dinghyClass]);
 
     const handleEntryRowClick = useCallback(({ currentTarget }) => {
-        const entry = entryMap.current.get(currentTarget.id);
+        const entry = entriesMap.current.get(currentTarget.id);
         setSelectedEntry(entry);
         setHelmName(entry.helm.name);
         if (entry.crew) {
@@ -76,124 +88,185 @@ function SignUp({ race }) {
         else {
             dinghyClassSelect.current.focus();
         }
-        showMessage('');
+        setMessage('');
     }, [race]);
 
+    const withdrawEntry = useCallback(async (entry) => {
+        const result = await controller.withdrawEntry(entry);
+        if (!result.success) {
+            setMessage(result.message);
+        }
+        else {
+            setMessage('');
+        }
+    }, [controller])
+
+    const handleWithdrawEntryButtonClick = useCallback((event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        withdrawEntry(entriesMap.current.get(event.target.id));
+    }, [withdrawEntry]);
+
+    // register on update callback for race
+    useEffect(() => {
+        model.registerRaceUpdateCallback(race.url, handleRaceUpdate);
+        // cleanup before effect runs and before form close
+        return () => {
+            model.unregisterRaceUpdateCallback(race.url, handleRaceUpdate);
+        }
+    }, [model, race, handleRaceUpdate]);
+
     // get competitors
-    React.useEffect(() => {
+    useEffect(() => {
+        let ignoreFetch = false; // set to true if SignUp rerendered before fetch completes to avoid using out of date result
         model.getCompetitors().then((result) => {
-            if (result.success) {
-                const competitorMap = new Map();
-                const options = [];
-                result.domainObject.forEach(competitor => {
-                   competitorMap.set(competitor.name, competitor);
-                   options.push(<option key={competitor.name} value={competitor.name}>{competitor.name}</option>);
-                });
-                setCompetitorMap(competitorMap);
-                setCompetitorOptions(options);
-            }
-            else {
-                showMessage('Unable to load competitors\n' + result.message);
+            if (!ignoreFetch) {
+                if (result.success) {
+                    const competitorMap = new Map();
+                    const options = [];
+                    result.domainObject.forEach(competitor => {
+                    competitorMap.set(competitor.name, competitor);
+                    options.push(<option key={competitor.name} value={competitor.name}>{competitor.name}</option>);
+                    });
+                    setCompetitorMap(competitorMap);
+                    setCompetitorOptions(options);
+                }
+                else {
+                    setMessage('Unable to load competitors\n' + result.message);
+                }
             }
         });
+
+        return () => {
+            ignoreFetch = true;
+        }
     }, [model]);
 
     // get dinghy classes
-    React.useEffect(() => {
+    useEffect(() => {
+        let ignoreFetch = false; // set to true if SignUp rerendered before fetch completes to avoid using out of date result
         model.getDinghyClasses().then(result => {
-            if (result.success) {
-                // build dinghy class options
-                let options = [];
-                let map = new Map();
-                // set handicap options
-                options.push(<option key={''} value={''}></option> );
-                // set dinghy classes
-                result.domainObject.forEach(dinghyClass => {
-                    options.push(<option key={dinghyClass.name} value={dinghyClass.name}>{dinghyClass.name}</option>);
-                    map.set(dinghyClass.name, dinghyClass);
-                });
-                setDinghyClassMap(map);
-                setDinghyClassOptions(options);
-            }
-            else {
-                showMessage('Unable to load dinghy classes\n' + result.message);
+            if (!ignoreFetch) {
+                if (result.success) {
+                    // build dinghy class options
+                    let options = [];
+                    let map = new Map();
+                    // set handicap options
+                    options.push(<option key={''} value={''}></option> );
+                    // set dinghy classes
+                    result.domainObject.forEach(dinghyClass => {
+                        options.push(<option key={dinghyClass.name} value={dinghyClass.name}>{dinghyClass.name}</option>);
+                        map.set(dinghyClass.name, dinghyClass);
+                    });
+                    setDinghyClassMap(map);
+                    setDinghyClassOptions(options);
+                }
+                else {
+                    setMessage('Unable to load dinghy classes\n' + result.message);
+                }
             }
         });
+
+        return () => {
+            ignoreFetch = true;
+        }
     }, [model]);
 
     // get dinghies
-    React.useEffect(() => {
+    useEffect(() => {
+        let ignoreFetch = false; // set to true if SignUp rerendered before fetch completes to avoid using out of date result
         let dinghyClass = race.dinghyClass;
         if (!dinghyClass && dinghyClassMap.has(dinghyClassName)) {
             dinghyClass = dinghyClassMap.get(dinghyClassName);
         }
         model.getDinghies(dinghyClass).then(result => {
-            if (result.success) {
-                let options = [];
-                let map = new Map();
-                options.push(<option key={''} value = {''}></option>);
-                result.domainObject.forEach(dinghy => {
-                    options.push(<option key={dinghy.dinghyClass.name + dinghy.sailNumber} value={dinghy.sailNumber}>{dinghy.sailNumber}</option>)
-                    map.set(dinghy.sailNumber, dinghy);
-                });
-                setDinghyMap(map);
-                setDinghyOptions(options);
-            }
-            else {
-                showMessage('Unable to load dinghies\n' + result.message);
-            }
-        })
-    }, [model, race.dinghyClass, dinghyClassName, dinghyClassMap]);
-
-    // build entries table
-    React.useEffect(() => {
-        model.getEntriesByRace(race).then(result => {
-            if (result.success) {
-                // populate entries map
-                const map = new Map();
-                result.domainObject.map(entry => map.set(entry.url, entry));
-                entryMap.current = map; // tried using setState but was failing tests with entryMap === null even when entriesTable populated; entriesMap is nt a visual element so useRef may be a better fit anyway
-                // build table rows
-                const rows = result.domainObject.map(entry => {
-                    return <tr key={entry.helm.name} id={entry.url} onClick={handleEntryRowClick} >
-                        <td key={'helm'}>{entry.helm.name}</td>
-                        <td key={'sailNumber'}>{entry.dinghy.sailNumber}</td>
-                        <td key={'dinghyClass'}>{entry.dinghy.dinghyClass.name}</td>
-                        {(!race.dinghyClass || race.dinghyClass.crewSize > 1) ? <td key={'crew'}>{entry.crew ? entry.crew.name : ''}</td> : null}
-                    </tr>
-                });
-                setEntriesTable(<table>
-                    <thead>
-                        <tr>
-                            <th key="helm">Helm</th>
-                            <th key="sailNumber">Sail Number</th>
-                            <th key="dinghyClass">Class</th>
-                            {(!race.dinghyClass || race.dinghyClass.crewSize > 1) ? <th key="crew">Crew</th> : null}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {rows}
-                    </tbody>
-                    </table>);
-            }
-            else {
-                showMessage('Unable to load race entries\n' + result.message);
+            if (!ignoreFetch) {
+                if (result.success) {
+                    let options = [];
+                    let map = new Map();
+                    options.push(<option key={''} value = {''}></option>);
+                    result.domainObject.forEach(dinghy => {
+                        options.push(<option key={dinghy.dinghyClass.name + dinghy.sailNumber} value={dinghy.sailNumber}>{dinghy.sailNumber}</option>)
+                        map.set(dinghy.sailNumber, dinghy);
+                    });
+                    setDinghyMap(map);
+                    setDinghyOptions(options);
+                }
+                else {
+                    setMessage('Unable to load dinghies\n' + result.message);
+                }
             }
         });
-    }, [race, model, result, handleEntryRowClick]);
+
+        return () => {
+            ignoreFetch = true;
+        }
+    }, [model, race.dinghyClass, dinghyClassName, dinghyClassMap]);
+
+    // setup entries
+    useEffect(() => {
+        let ignoreFetch = false; // set to true if SignUp rerendered before fetch completes to avoid using out of date result
+        model.getEntriesByRace(race).then(result => {
+            if (!ignoreFetch) {
+                if (result.success) {
+                    // populate entries map and register for updates
+                    const map = new Map();
+                    result.domainObject.map(entry => {
+                        model.registerEntryUpdateCallback(entry.url, handleEntryUpdate);
+                        return map.set(entry.url, entry);
+                    });
+                    entriesMap.current = map; // tried using setState but was failing tests with entriesMap === null even when entriesTable populated; entriesMap is nt a visual element so useRef may be a better fit anyway
+                    // build table rows
+                    const rows = result.domainObject.map(entry => {
+                        return <tr key={entry.helm.name} id={entry.url} onClick={handleEntryRowClick} >
+                            <td key="helm">{entry.helm.name}</td>
+                            <td key="sailNumber">{entry.dinghy.sailNumber}</td>
+                            <td key="dinghyClass">{entry.dinghy.dinghyClass.name}</td>
+                            {(!race.dinghyClass || race.dinghyClass.crewSize > 1) ? <td key="crew">{entry.crew ? entry.crew.name : ''}</td> : null}
+                            <td key="withdrawEntry-button"><button id={entry.url} className="embedded" type="button" onClick={handleWithdrawEntryButtonClick}>X</button></td>
+                        </tr>
+                    });
+                    setEntriesTable(<table>
+                        <thead>
+                            <tr>
+                                <th key="helm">Helm</th>
+                                <th key="sailNumber">Sail Number</th>
+                                <th key="dinghyClass">Class</th>
+                                {(!race.dinghyClass || race.dinghyClass.crewSize > 1) ? <th key="crew">Crew</th> : null}
+                                <th key="withdrawEntry-button"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {rows}
+                        </tbody>
+                        </table>);
+                }
+                else {
+                    setMessage('Unable to load race entries\n' + result.message);
+                }
+            }
+        });
+
+        return () => {
+            ignoreFetch = true;
+            entriesMap.current.forEach(entry => {
+                model.unregisterEntryUpdateCallback(entry.url, handleEntryUpdate);
+            });
+        }
+    }, [race, model, handleEntryRowClick, raceUpdateRequestAt, handleWithdrawEntryButtonClick, entryUpdateRequestAt, handleEntryUpdate]);
     
     // if error display message 
-    React.useEffect(() => {
+    useEffect(() => {
         if (result && result.success) {
             clear();
         }
         if (result && !result.success) {
-            showMessage(result.message);
+            setMessage(result.message);
         }
     }, [result, clear]);
 
     // check if dinghy class has crew
-    React.useEffect(() => {
+    useEffect(() => {
         if (race.dinghyClass) {
             setDinghyClassHasCrew(race.dinghyClass.crewSize > 1);
         }
@@ -337,11 +410,6 @@ function SignUp({ race }) {
         return crewInput;
     }
 
-    function showMessage(message) {
-        const output = document.getElementById('entry-message-output');
-        output.value = message;
-    }
-
     function getButtonText() {
         if (!selectedEntry) {
             if (!competitorMap.has(helmName) && (crewName !== '' && crewName != null && !competitorMap.has(crewName)) && !dinghyMap.has(sailNumber)) {
@@ -398,16 +466,16 @@ function SignUp({ race }) {
             <h1>{race.name}</h1>
             <datalist id="competitor-datalist">{competitorOptions}</datalist>
             <div>
-            {dinghyClassInput(race)}
-            {buildHelmInput()}
-            {buildCrewInput()}
-            <datalist id="dinghy-datalist">{dinghyOptions}</datalist>
-            <label htmlFor="sail-number-input">Sail Number</label>
-            <input id="sail-number-input" name="sailNumber" list="dinghy-datalist" onChange={handleChange} value={sailNumber} />
-            <output id="entry-message-output" />
-            <button id="entry-update-button" type="button" onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
-            {selectedEntry ? <button id="canel-button" type="button" onClick={clear} >Cancel</button> : null}
+                {dinghyClassInput(race)}
+                {buildHelmInput()}
+                {buildCrewInput()}
+                <datalist id="dinghy-datalist">{dinghyOptions}</datalist>
+                <label htmlFor="sail-number-input">Sail Number</label>
+                <input id="sail-number-input" name="sailNumber" list="dinghy-datalist" onChange={handleChange} value={sailNumber} />
+                <button id="entry-update-button" type="button" onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
+                {selectedEntry ? <button id="cancel-button" type="button" onClick={clear} >Cancel</button> : null}
             </div>
+            <p id="signup-message" className={!message ? "hidden" : ""}>{message}</p>
             <h3>Signed-up</h3>
             <div className="scrollable">
                 {entriesTable}

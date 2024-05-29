@@ -85,7 +85,7 @@ function RaceConsole() {
                 model.unregisterRaceUpdateCallback(race.url, handleRaceUpdate);
             });
         }
-    }, [model, raceMap, handleRaceUpdate])
+    }, [model, raceMap, handleRaceUpdate]);
 
     function handleRaceSelect(event) {
         const options = [...event.target.selectedOptions]; // convert from HTMLCollection to Array; trying to go direct to value results in event.target.selectedOptions.value is not iterable error

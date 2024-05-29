@@ -16,18 +16,18 @@
 
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import ShortenCourseForm from './ShortenCourseForm';
+import AdjustCourseForm from './AdjustCourseForm';
 import { raceScorpionA } from '../model/__mocks__/test-data';
 
 it('renders', () => {
-    render(<ShortenCourseForm />);
+    render(<AdjustCourseForm />);
     expect(screen.getByLabelText(/set laps/i)).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /Update Laps/})).toBeInTheDocument();
 });
 
 it('displays new value typed in for laps', async () => {
     const user = userEvent.setup();
-    render(<ShortenCourseForm minLaps={0}/>); // minLaps is set to 0 to allow user.clear to work; otherwise cleared value ('') will fail handleChange value test and value will not be updated
+    render(<AdjustCourseForm minLaps={0}/>); // minLaps is set to 0 to allow user.clear to work; otherwise cleared value ('') will fail handleChange value test and value will not be updated
     const lapInput = screen.getByLabelText(/set laps/i);
     await act(async () => {
         await user.clear(lapInput);
@@ -38,7 +38,7 @@ it('displays new value typed in for laps', async () => {
 
 it('does not accept an input greater than value set for maximum laps', async () => {
     const user = userEvent.setup();
-    render(<ShortenCourseForm minLaps={0} maxLaps={3} />);
+    render(<AdjustCourseForm minLaps={0} maxLaps={3} />);
     const lapInput = screen.getByLabelText(/set laps/i);
     await act(async () => {
         await user.clear(lapInput);
@@ -49,7 +49,7 @@ it('does not accept an input greater than value set for maximum laps', async () 
 
 it('does not accept an input less than value set for minimum laps', async () => {
     const user = userEvent.setup();
-    render(<ShortenCourseForm minLaps={3} />);
+    render(<AdjustCourseForm minLaps={3} />);
     const lapInput = screen.getByLabelText(/set laps/i);
     await act(async () => {
         await user.clear(lapInput); // fails as value would be 0
@@ -59,7 +59,7 @@ it('does not accept an input less than value set for minimum laps', async () => 
 });
 
 it('shows initial value set for number of laps', () => {
-    render(<ShortenCourseForm initialValue={3} />);
+    render(<AdjustCourseForm initialValue={3} />);
     expect(screen.getByLabelText(/set laps/i)).toHaveValue(3);
 });
 
@@ -67,7 +67,7 @@ describe('when update laps button clicked', () => {
     it('calls function passed to onUpdate with race and value entered for laps', async () => {
         const onUpdateSpy = jest.fn();
         const user = userEvent.setup();
-        render(<ShortenCourseForm race={raceScorpionA} minLaps={0} maxLaps={5} initialValue={3} onUpdate={onUpdateSpy} />);
+        render(<AdjustCourseForm race={raceScorpionA} minLaps={0} maxLaps={5} initialValue={3} onUpdate={onUpdateSpy} />);
         const lapInput = screen.getByLabelText(/set laps/i);
         await act(async () => {
             await user.clear(lapInput);
@@ -84,7 +84,7 @@ describe('when contained in a modal dialog', () => {
             const onUpdateSpy = jest.fn();
             const closeParentSpy = jest.fn();
             const user = userEvent.setup();
-            render(<ShortenCourseForm race={raceScorpionA} minLaps={0} maxLaps={5} initialValue={3} onUpdate={onUpdateSpy} closeParent={closeParentSpy} />);
+            render(<AdjustCourseForm race={raceScorpionA} minLaps={0} maxLaps={5} initialValue={3} onUpdate={onUpdateSpy} closeParent={closeParentSpy} />);
             const lapInput = screen.getByLabelText(/set laps/i);
             await act(async () => {
                 await user.clear(lapInput);
@@ -97,7 +97,7 @@ describe('when contained in a modal dialog', () => {
     it('when cancelled it closes containing dialog', async () => {
         const closeParentSpy = jest.fn();
         const user = userEvent.setup();
-        render(<ShortenCourseForm closeParent={closeParentSpy} />);
+        render(<AdjustCourseForm closeParent={closeParentSpy} />);
         const cancelButtton = screen.getByRole('button', {'name': /cancel/i});
         await user.click(cancelButtton);
         expect(closeParentSpy).toBeCalledTimes(1);

@@ -100,6 +100,7 @@ class DinghyRacingModel {
         this.stompClient.onConnect = (frame) => {
             this.stompClient.subscribe('/topic/updateRace', this.handleRaceUpdate);
             this.stompClient.subscribe('/topic/updateEntry', this.handleEntryUpdate);
+            this.stompClient.subscribe('/topic/deleteEntry', this.handleEntryUpdate);
         };
         this.stompClient.activate();
     }
@@ -446,6 +447,15 @@ class DinghyRacingModel {
             })
             return Promise.resolve({'success': false, 'message': message});
         }
+    }
+
+    /**
+     * Withdraw an entry to a race
+     * @param {Entry} entry to withdraw
+     * @returns {Promise<Result>}
+     */
+    async withdrawEntry(entry) {
+        return this.delete(entry.url);
     }
 
     /**
@@ -1108,6 +1118,27 @@ class DinghyRacingModel {
         catch (error) {
             return Promise.resolve({'success': false, 'message': error.toString()});
         }        
+    }
+
+    /**
+     * Delete the reosource
+     * @param {String} resource
+     * @returns {Promise<Result>}
+     */
+    async delete(resource) {
+        try {
+            const response = await fetch(resource, {method: 'DELETE'});
+            if (response.ok) {
+                return Promise.resolve({'success': true});
+            }
+            else {
+                const message = 'HTTP Error: ' + response.status + ' Message: No additional information available';
+                return Promise.resolve({'success': false, 'message': message});
+            }
+        }
+        catch (error) {
+            return Promise.resolve({'success': false, 'message': error.toString()});
+        }
     }
 
     /**

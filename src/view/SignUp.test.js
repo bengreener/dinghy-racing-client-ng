@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { act, screen } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import { customRender } from '../test-utilities/custom-renders';
 import userEvent from '@testing-library/user-event';
 import DinghyRacingModel from '../model/dinghy-racing-model';
@@ -37,6 +37,8 @@ const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 const controller = new DinghyRacingController(model);    
 
 beforeEach(() => {
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
     jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': competitorsCollection})});
     jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClasses})});
     jest.spyOn(model, 'getDinghies').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghies})});
@@ -577,6 +579,7 @@ describe('when signing up for a race', () => {
             expect(await screen.findByRole('cell', {'name': /Jill Myer/i})).toBeInTheDocument();
             expect((await screen.findAllByRole('cell', {'name': /Comet/i}))[0]).toBeInTheDocument();
             expect(await screen.findByRole('cell', {'name': /826/i})).toBeInTheDocument();
+            expect((await screen.findAllByRole('button', {name: /x/i}))[0]).toBeInTheDocument();
         });
     });    
     describe('when race for dinghy class with crew', () => {
@@ -2086,6 +2089,7 @@ describe('when signing up for a race', () => {
             expect((await screen.findAllByRole('cell', {'name': /Scorpion/i}))[1]).toBeInTheDocument();
             expect(await screen.findByRole('cell', {'name': /6745/i})).toBeInTheDocument();
             expect(await screen.findByRole('cell', {'name': /Owain Davies/i})).toBeInTheDocument();
+            expect((await screen.findAllByRole('button', {name: /x/i}))[0]).toBeInTheDocument();
         });
     });    
     describe('when race is a handicap', () => {
@@ -4324,9 +4328,11 @@ describe('when signing up for a race', () => {
             expect(await screen.findByRole('cell', {'name': /Jill Myer/i})).toBeInTheDocument();
             expect((await screen.findAllByRole('cell', {'name': /Comet/i}))[0]).toBeInTheDocument();
             expect(await screen.findByRole('cell', {'name': /826/i})).toBeInTheDocument();
+            expect((await screen.findAllByRole('button', {name: /x/i}))[0]).toBeInTheDocument();
         });
     });
 });
+
 describe('when updating an existing entry', () => {
     describe('when race for dinghy class with no crew', () => {
         it('displays details for selected entry', async () => {
@@ -9260,5 +9266,58 @@ describe('when updating an existing entry', () => {
         expect(inputCrew).toHaveValue('');
         expect(inputSailNumber).toHaveValue('');
         expect(btnCreate).toBeInTheDocument();
+    });
+});
+
+it('registers an interest in race updates for the race being signed up to', async () => {
+    const user = userEvent.setup();
+    jest.spyOn(model, 'getEntriesByRace').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    const registerRaceUpdateCallbackSpy = jest.spyOn(model, 'registerRaceUpdateCallback');
+
+    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+    expect((await screen.findAllByRole('cell', {'name': /Scorpion/i}))[0]).toBeInTheDocument();
+
+    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/races/4', expect.any(Function));
+});
+
+it('registers an interest in entry updates for the entries in the race being signed up to', async () => {
+    const user = userEvent.setup();
+    jest.spyOn(model, 'getEntriesByRace').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    const registerEntryUpdateCallbackSpy = jest.spyOn(model, 'registerEntryUpdateCallback');
+
+    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+    expect((await screen.findAllByRole('cell', {'name': /Scorpion/i}))[0]).toBeInTheDocument();
+
+    expect(registerEntryUpdateCallbackSpy).toHaveBeenCalledWith('http://localhost:8081/dinghyracing/api/entries/10', expect.any(Function));
+    expect(registerEntryUpdateCallbackSpy).toHaveBeenCalledWith('http://localhost:8081/dinghyracing/api/entries/11', expect.any(Function));
+});
+
+it('removes an entry that has been withdrawn from list of displayed entries', async () => {
+    const entriesScorpionADeleted = [entriesScorpionA[0]];
+    jest.spyOn(model, 'getEntriesByRace').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionADeleted})});
+    await act(async () => {
+        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+    });
+    expect(await screen.findByRole('cell', {'name': /sarah pascal/i})).toBeInTheDocument();
+    await act(async () => {
+        model.handleRaceUpdate({'body': 'http://localhost:8081/dinghyracing/api/races/4'});
+    });
+
+    expect(screen.queryByRole('cell', {'name': /sarah pascal/i})).not.toBeInTheDocument();
+});
+
+describe('when the withdraw button for an entry is clicked', () => {
+    it('calls the controller withDraw entry method with the entry to be withdrawn', async () => {
+        const user = userEvent.setup();
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesCometA})});
+        customRender(<SignUp race={raceCometA}/>, model, controller);
+        const withdrawEntrySpy = jest.spyOn(controller, 'withdrawEntry').mockImplementation(() => {return Promise.resolve({success: true})});
+        const jillMyerCell = await screen.findByRole('cell', {'name': /Jill Myer/i});
+        const entryJillMyerRow = jillMyerCell.parentElement;
+        const withdrawButton = within(entryJillMyerRow).getByRole('button', {name: /x/i});
+        await act(async () => {
+           await user.click(withdrawButton);
+        });
+        expect(withdrawEntrySpy).toBeCalledWith(entryJillMyerCometA826);
     });
 });
