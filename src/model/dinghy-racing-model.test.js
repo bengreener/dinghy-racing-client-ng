@@ -4577,3 +4577,47 @@ describe('when a websocket message callback has been set for competitor creation
         expect(dinghyRacingModel.competitorCreationCallbacks.size).toBe(1);
     });
 });
+
+describe('when a websocket message callback has been set for dinghy creation', () => {
+    it('calls the callback', done => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerDinghyCreationCallback(callback);
+        // create delay to give time for stomp mock to trigger callback
+        setTimeout(() => {
+            expect(callback).toBeCalled();
+            done();
+        }, 1);
+    });
+    it('does not set another reference to the same callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerDinghyCreationCallback(callback);
+        dinghyRacingModel.registerDinghyCreationCallback(callback);
+        expect(dinghyRacingModel.dinghyCreationCallbacks.size).toBe(1);
+    });
+    it('sets a functionally equivalent but different callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback1 = jest.fn();
+        const callback2 = jest.fn();
+        dinghyRacingModel.registerDinghyCreationCallback(callback1);
+        dinghyRacingModel.registerDinghyCreationCallback(callback2);
+        expect(dinghyRacingModel.dinghyCreationCallbacks.size).toBe(2);
+    });
+    it('removes websocket message when requested', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerDinghyCreationCallback(callback);
+        dinghyRacingModel.unregisterDinghyCreationCallback(callback);
+        expect(dinghyRacingModel.dinghyCreationCallbacks.size).toBe(0);
+    });
+    it('does not remove functionally equivalent but different callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback1 = jest.fn();
+        const callback2 = jest.fn();
+        dinghyRacingModel.registerDinghyCreationCallback(callback1);
+        dinghyRacingModel.registerDinghyCreationCallback(callback2);
+        dinghyRacingModel.unregisterDinghyCreationCallback(callback1);
+        expect(dinghyRacingModel.dinghyCreationCallbacks.size).toBe(1);
+    });
+});

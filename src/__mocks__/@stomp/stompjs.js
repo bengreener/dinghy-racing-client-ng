@@ -155,7 +155,7 @@ export class Client {
               if (key === '/topic/createCompetitor') {
                 value.forEach(cb => cb({body: 'http://localhost:8081/dinghyracing/api/competitors/99'}));
               }
-              if (key === '/topic/createDnghy') {
+              if (key === '/topic/createDinghy') {
                 value.forEach(cb => cb({body: 'http://localhost:8081/dinghyracing/api/dinghies/99'}));
               }
             });

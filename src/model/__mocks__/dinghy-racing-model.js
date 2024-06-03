@@ -23,6 +23,7 @@ class DinghyRacingModel {
     raceUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
     entryUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
     competitorCreationCallbacks = new Set();
+    dinghyCreationCallbacks = new Set();
 
     /**
      * Provide a blank competitor template
@@ -74,6 +75,7 @@ class DinghyRacingModel {
 
     constructor(httpRootURL, wsRootURL) {
         this.handleCompetitorCreation = this.handleCompetitorCreation.bind(this);
+        this.handleDinghyCreation = this.handleDinghyCreation.bind(this);
         this.handleRaceUpdate = this.handleRaceUpdate.bind(this);
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
         this.getStartSequence = this.getStartSequence.bind(this);
@@ -96,7 +98,19 @@ class DinghyRacingModel {
     }
 
     handleCompetitorCreation(message) {
-            this.competitorCreationCallbacks.forEach(cb => cb());
+        this.competitorCreationCallbacks.forEach(cb => cb());
+    }
+
+    registerDinghyCreationCallback(callback) {
+        this.dinghyCreationCallbacks.add(callback);
+    }
+
+    unregisterDinghyCreationCallback(callback) {
+        this.dinghyCreationCallbacks.delete(callback);
+    }
+
+    handleDinghyCreation(message) {
+        this.dinghyCreationCallbacks.forEach(cb => cb());
     }
 
     registerRaceUpdateCallback(key, callback) {
