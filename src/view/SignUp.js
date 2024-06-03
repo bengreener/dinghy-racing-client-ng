@@ -296,8 +296,7 @@ function SignUp({ race }) {
         }
     }
 
-    async function handleEntryUpdateButtonClick(event) {
-        event.preventDefault();        
+    async function updateEntry() {
         const creationPromises = [];
         // handle creation of 
         if (!competitorMap.has(helmName)) {
@@ -354,6 +353,11 @@ function SignUp({ race }) {
         else {
             setResult({'success': false, 'message': message});
         }
+    }
+
+    function handleEntryUpdateButtonClick(event) {
+        event.preventDefault();
+        updateEntry();
     }
 
     function dinghyClassInput(race) {
