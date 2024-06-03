@@ -162,3 +162,49 @@ describe('when races fail to load', () => {
         expect(message).toBeInTheDocument();
     })
 });
+
+it('registers an interest in race updates for races in selected period', async () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    const registerRaceUpdateCallbackSpy = jest.spyOn(model, 'registerRaceUpdateCallback');
+
+    customRender(<ViewUpcomingRaces />, model);
+    await screen.findAllByRole('cell');
+    
+    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/races/4', expect.any(Function));
+    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(2, 'http://localhost:8081/dinghyracing/api/races/7', expect.any(Function));
+    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(3, 'http://localhost:8081/dinghyracing/api/races/17', expect.any(Function));
+    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(4, 'http://localhost:8081/dinghyracing/api/races/8', expect.any(Function));
+});
+
+describe('when races within session are changed', () => {
+    it('updates recorded details', async () => {
+        const races_copy = [...races];
+        races_copy[0] = {...races[0]};
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races_copy})});
+        await act(async () => {        
+            customRender(<ViewUpcomingRaces />, model);
+        });
+        expect(screen.getByText('Scorpion A')).toBeInTheDocument();
+        races_copy[0].name = 'Popeye Special';
+        await act(async () => {
+            model.handleRaceUpdate({'body': races_copy[0].url});
+        });
+        expect(screen.getByText('Popeye Special')).toBeInTheDocument();
+    });
+    it('removes a race that has had start time changed so it falls outside session time window', async () => {
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        await act(async () => {        
+            customRender(<ViewUpcomingRaces />, model);
+        });
+        expect(screen.getByText('Handicap A')).toBeInTheDocument();
+        const url = races[races.length -1].url;
+        races.pop();
+        await act(async () => {
+            model.handleRaceUpdate({'body': url});
+        });
+        expect(screen.queryByText('Handicap A')).not.toBeInTheDocument();
+    });
+});
