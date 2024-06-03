@@ -24,6 +24,7 @@ class DinghyRacingModel {
     stompClient;
     raceUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
     entryUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
+    competitorCreationCallbacks = new Set();
 
     /**
      * Provide a blank competitor template
@@ -80,6 +81,7 @@ class DinghyRacingModel {
      * @returns {DinghyRacingModel} 
      */
     constructor(httpRootURL, wsRootURL) {
+        this.handleCompetitorCreation = this.handleCompetitorCreation.bind(this);
         this.handleRaceUpdate = this.handleRaceUpdate.bind(this);
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
         this.getStartSequence = this.getStartSequence.bind(this);
@@ -98,11 +100,36 @@ class DinghyRacingModel {
             console.error(frame);
         };
         this.stompClient.onConnect = (frame) => {
+            this.stompClient.subscribe('/topic/createCompetitor', this.handleCompetitorCreation);
             this.stompClient.subscribe('/topic/updateRace', this.handleRaceUpdate);
             this.stompClient.subscribe('/topic/updateEntry', this.handleEntryUpdate);
             this.stompClient.subscribe('/topic/deleteEntry', this.handleEntryUpdate);
         };
         this.stompClient.activate();
+    }
+
+    /**
+     * Register a callback for when a new competitor is created
+     * @param {Function} callback
+     */
+    registerCompetitorCreationCallback(callback) {
+        this.competitorCreationCallbacks.add(callback);
+    }
+
+    /**
+     * Unregister a callback for when a new competitor is created
+     * @param {Function} callback
+     */
+    unregisterCompetitorCreationCallback(callback) {
+        this.competitorCreationCallbacks.delete(callback);
+    }
+
+    /**
+     * Handle a websocket competitor creation message via the Stomp client
+     * @param {string} message URI of competitor that was created
+     */
+    handleCompetitorCreation(message) {
+            this.competitorCreationCallbacks.forEach(cb => cb());
     }
 
     /**
@@ -131,7 +158,7 @@ class DinghyRacingModel {
     }
 
     /**
-     * Handle a websocket update via the Stomp client
+     * Handle a websocket race update message via the Stomp client
      * @param {string} message URI of race that has been updated
      */
     handleRaceUpdate(message) {
@@ -166,7 +193,7 @@ class DinghyRacingModel {
     }
 
     /**
-     * Handle a websocket update via the Stomp client
+     * Handle a websocket entry update message via the Stomp client
      * @param {string} message URI of entry that has been updated
      */
     handleEntryUpdate(message) {

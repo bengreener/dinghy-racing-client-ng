@@ -152,6 +152,12 @@ export class Client {
               if (key === '/topic/deleteEntry') {
                 value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/entries/10'}));
               }
+              if (key === '/topic/createCompetitor') {
+                value.forEach(cb => cb({body: 'http://localhost:8081/dinghyracing/api/competitors/99'}));
+              }
+              if (key === '/topic/createDnghy') {
+                value.forEach(cb => cb({body: 'http://localhost:8081/dinghyracing/api/dinghies/99'}));
+              }
             });
         }
     }, 1);

@@ -4533,3 +4533,47 @@ describe('when updating the plannedLaps for a race', () => {
         });
     });
 });
+
+describe('when a websocket message callback has been set for competitor creation', () => {
+    it('calls the callback', done => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerCompetitorCreationCallback(callback);
+        // create delay to give time for stomp mock to trigger callback
+        setTimeout(() => {
+            expect(callback).toBeCalled();
+            done();
+        }, 1);
+    });
+    it('does not set another reference to the same callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerCompetitorCreationCallback(callback);
+        dinghyRacingModel.registerCompetitorCreationCallback(callback);
+        expect(dinghyRacingModel.competitorCreationCallbacks.size).toBe(1);
+    });
+    it('sets a functionally equivalent but different callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback1 = jest.fn();
+        const callback2 = jest.fn();
+        dinghyRacingModel.registerCompetitorCreationCallback(callback1);
+        dinghyRacingModel.registerCompetitorCreationCallback(callback2);
+        expect(dinghyRacingModel.competitorCreationCallbacks.size).toBe(2);
+    });
+    it('removes websocket message when requested', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerCompetitorCreationCallback(callback);
+        dinghyRacingModel.unregisterCompetitorCreationCallback(callback);
+        expect(dinghyRacingModel.competitorCreationCallbacks.size).toBe(0);
+    });
+    it('does not remove functionally equivalent but different callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback1 = jest.fn();
+        const callback2 = jest.fn();
+        dinghyRacingModel.registerCompetitorCreationCallback(callback1);
+        dinghyRacingModel.registerCompetitorCreationCallback(callback2);
+        dinghyRacingModel.unregisterCompetitorCreationCallback(callback1);
+        expect(dinghyRacingModel.competitorCreationCallbacks.size).toBe(1);
+    });
+});
