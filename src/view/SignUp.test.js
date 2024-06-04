@@ -9343,3 +9343,25 @@ describe('when a new competitor is created', () => {
         expect(await screen.findByRole('option', {name: /new/i, hidden: true})).toBeInTheDocument();
     });
 });
+
+it('registers an interest in new dinghies', async () => {
+    const registerDinghyCreationCallbackSpy = jest.spyOn(model, 'registerDinghyCreationCallback');
+
+    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+    expect((await screen.findAllByRole('cell', {'name': /Scorpion/i}))[0]).toBeInTheDocument();
+
+    expect(registerDinghyCreationCallbackSpy).toHaveBeenNthCalledWith(1, expect.any(Function));
+});
+
+describe('when a new dinghy is created', () => {
+    it('updates the list of known dinghies', async () => {
+        const dinghies_updated = [...dinghies, {sailNumber: '999', dinghyClass: dinghyClassScorpion, url: 'http://localhost:8081/dinghyracing/api/dinghies/99'}]
+        jest.spyOn(model, 'getDinghies').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghies_updated})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghies})});
+        customRender(<SignUp race={raceCometA}/>, model, controller);
+        
+        await act(async () => {
+            model.handleDinghyCreation('http://localhost:8081/dinghyracing/api/dinghies/99');
+        });
+        expect(await screen.findByRole('option', {name: /999/i, hidden: true})).toBeInTheDocument();
+    });
+});
