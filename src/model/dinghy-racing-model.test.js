@@ -1327,6 +1327,24 @@ describe('when signing up to a race', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Competitor not found: Lucy Liu'});
     });
+    describe('when dinghy is already recorded for entry in race', () => {
+        it('returns a clear error message to user', async () => {
+            fetch.mockImplementationOnce((resource, options) => {
+                if (resource === 'http://localhost:8081/dinghyracing/api/entries') {
+                    return Promise.resolve({
+                        ok: false,
+                        status: 409,
+                        json: () => Promise.resolve({message: "could not execute statement [Duplicate entry '6-1' for key 'entry.UK_entry_dinghy_id_race_id'] [insert into entry (crew_id,dinghy_id,helm_id,race_id,scoring_abbreviation,version,id) values (?,?,?,?,?,?,?)]; SQL [insert into entry (crew_id,dinghy_id,helm_id,race_id,scoring_abbreviation,version,id) values (?,?,?,?,?,?,?)]; constraint [entry.UK_entry_dinghy_id_race_id]"})
+                    });
+                };
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, message: 'HTTP Error: 409 Message: A race entry already exists for the selected dinghy.'});
+        });
+    });
 });
 
 describe('when updating an entry for a race', () => {
@@ -1568,6 +1586,24 @@ describe('when updating an entry for a race', () => {
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Competitor not found: Lucy Liu'});
+    });
+    describe('when dinghy is already recorded for entry in race', () => {
+        it('returns a clear error message to user', async () => {
+            fetch.mockImplementationOnce((resource, options) => {
+                if (resource === 'http://localhost:8081/dinghyracing/api/entries/10') {
+                    return Promise.resolve({
+                        ok: false,
+                        status: 409,
+                        json: () => Promise.resolve({message: "could not execute statement [Duplicate entry '3-1' for key 'entry.UK_entry_dinghy_id_race_id'] [update entry set crew_id=?,dinghy_id=?,helm_id=?,race_id=?,scoring_abbreviation=?,version=? where id=? and version=?]; SQL [update entry set crew_id=?,dinghy_id=?,helm_id=?,race_id=?,scoring_abbreviation=?,version=? where id=? and version=?]; constraint [entry.UK_entry_dinghy_id_race_id]"})
+                    });
+                };
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, competitorChrisMarshall, dinghy1234, competitorLouScrew);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, message: 'HTTP Error: 409 Message: A race entry already exists for the selected dinghy.'});
+        });
     });
 });
 

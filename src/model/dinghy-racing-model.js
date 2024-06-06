@@ -1245,13 +1245,22 @@ class DinghyRacingModel {
                 return Promise.resolve({'success': true, domainObject: json});
             }
             else {
-                const message = json.message ? 'HTTP Error: ' + response.status + ' Message: ' + json.message : 'HTTP Error: ' + response.status + ' Message: ' + response.statusText;
+                const message = json.message ? 'HTTP Error: ' + response.status + ' Message: ' + this._convertServerErrorMessageToClientErrorMessage(json.message) : 'HTTP Error: ' + response.status + ' Message: ' + response.statusText;
                 return Promise.resolve({'success': false, 'message': message});
             }
         }
         catch (error) {
             return Promise.resolve({'success': false, 'message': error.toString()});
         }
+    }
+
+    _convertServerErrorMessageToClientErrorMessage(serverMessage) {
+        // An existing race entry already exists for the selected dinghy
+        if (/constraint \[entry.UK_entry_dinghy_id_race_id\]/.test(serverMessage)) {
+            return 'A race entry already exists for the selected dinghy.';
+        }
+        // no mapping to user message found
+        return serverMessage;
     }
 
     /**
