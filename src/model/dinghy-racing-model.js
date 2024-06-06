@@ -1260,6 +1260,12 @@ class DinghyRacingModel {
             if (/constraint \[entry.UK_entry_dinghy_id_race_id\]/.test(json.message)) {
                 return 'A race entry already exists for the selected dinghy.';
             }
+            if (/constraint \[entry.UK_entry_helm_id_race_id\]/.test(json.message)) {
+                return 'A race entry already exists for the selected helm.';
+            }
+            if (/constraint \[entry.UK_entry_crew_id_race_id\]/.test(json.message)) {
+                return 'A race entry already exists for the selected crew.';
+            }
             // no mapping to user message found
             return 'HTTP Error: ' + response.status + ' ' + response.statusText + ' Message: ' + json.message;
         }
