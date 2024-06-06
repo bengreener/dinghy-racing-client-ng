@@ -60,6 +60,7 @@ describe('when creating a new object via REST', () => {
             return Promise.resolve({
                 ok: false,
                 status: 400,
+                statusText: 'Bad Request',
                 json: () => {throw new SyntaxError('Unexpected end of JSON input')}
             });
         });
@@ -67,7 +68,7 @@ describe('when creating a new object via REST', () => {
         const promise = dinghyRacingModel.create('someobject', {'prop1': 'foo', 'prop2': 'bar'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Message: No additional information available'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Message: Bad Request'});
     });
 });
 
@@ -91,6 +92,7 @@ describe('when reading a resource from REST', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404,
+                statusText: 'Not Found',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
             });
         });
@@ -132,6 +134,7 @@ describe('when updating an object via REST', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404, 
+                statusText: 'Not Found',
                 json: () => Promise.resolve({})
             });
         });
@@ -139,7 +142,7 @@ describe('when updating an object via REST', () => {
         const promise = dinghyRacingModel.update(httpRootURL, {});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
     });
 });
 
@@ -157,6 +160,7 @@ describe('when deleting an object via REST', () => {
                 return Promise.resolve({
                     ok: false,
                     status: 404,
+                    statusText: 'Not Found',
                     json: () => Promise.resolve({})
                 });
             }
@@ -172,6 +176,7 @@ describe('when deleting an object via REST', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404,
+                statusText: 'Not Found',
                 json: () => Promise.resolve({})
             });
         });
@@ -179,7 +184,7 @@ describe('when deleting an object via REST', () => {
         const promise = dinghyRacingModel.delete('http://localhost:8081/dinghyracing/api/entries/6');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
     });
 });
 
@@ -206,10 +211,11 @@ describe('when creating a new dinghy class', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
+        const newDinghyClass = {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion', crew: 2};
+        const promise = dinghyRacingModel.createDinghyClass(newDinghyClass);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
+        expect(result).toEqual({'success': true, domainObject: dinghyClassScorpion});
     });
     it('returns a promise that resolves to a result indicating success when dinghy class is created with http status 201', async () => {
         fetch.mockImplementationOnce(() => {
@@ -223,7 +229,7 @@ describe('when creating a new dinghy class', () => {
         const promise = dinghyRacingModel.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
+        expect(result).toEqual({'success': true, domainObject: dinghyClassScorpion});
     });
     it('returns a promise that resolves to a result indicating failure when dinghy class is not created with http status 400 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
@@ -244,6 +250,7 @@ describe('when creating a new dinghy class', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404, 
+                statusText: 'Not Found',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
             });
         });
@@ -341,6 +348,7 @@ describe('when searcing for a dinghy class by name', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404,
+                statusText: 'Not Found',
                 json: () => {throw new SyntaxError('Unexpected end of JSON input')}
             });
         });
@@ -348,7 +356,7 @@ describe('when searcing for a dinghy class by name', () => {
         const promise = dinghyRacingModel.getDinghyClassByName('Scorpion');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Resource not found'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
     });
 })
 
@@ -371,11 +379,13 @@ describe('when creating a new race', () => {
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
-        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}, 'duration': 2700000});
+        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClassScorpion})});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00.000Z'), 
+            'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}, 'duration': 2700000});
         const result = await promise;
         expect(getDinghyClassByNameSpy).toHaveBeenCalled();
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
+        expect(result).toEqual({'success': true, domainObject: raceScorpionA});
     });
     it('if a dinghy class URL is supplied does not look up dinghy class to get URL and returns a promise that resolves to a result indicating success when race is created with http status 200', async () => {
         fetch.mockImplementationOnce((resource, options) => {
@@ -395,11 +405,12 @@ describe('when creating a new race', () => {
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
+        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClassScorpion})});
         const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': dinghyClassScorpion, 'duration': 2700000});
         const result = await promise;
         expect(getDinghyClassByNameSpy).not.toHaveBeenCalled();
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
+        expect(result).toEqual({'success': true, domainObject: raceScorpionA});
     });
     it('returns a promise that resolves to a result indicating success when race is created with http status 201', async () => {
         fetch.mockImplementationOnce((resource, options) => {// check format of data passed to fetch to reduce risk of false positive
@@ -419,10 +430,11 @@ describe('when creating a new race', () => {
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
+        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClassScorpion})});
         const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}, 'duration': 2700000});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
+        expect(result).toEqual({'success': true, domainObject: raceScorpionA});
     });
     it('returns a promise that resolves to a result indicating failure when race is not created with http status 400 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
@@ -443,6 +455,7 @@ describe('when creating a new race', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404, 
+                statusText: 'Not Found',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
             });
         });
@@ -657,6 +670,7 @@ describe('when retrieving a list of dinghy classes', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404,
+                statusText: 'Not Found',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
             });
         });
@@ -713,7 +727,8 @@ describe('when retrieving a list of races that start at or after a specified tim
             else {
                 return Promise.resolve({
                     ok: false,
-                    status: 404
+                    status: 404,
+                    statusText: 'Not Found'
                 });
             }
         });
@@ -762,7 +777,8 @@ describe('when retrieving a list of races that start at or after a specified tim
                 else {
                     return Promise.resolve({
                         ok: false,
-                        status: 404
+                        status: 404,
+                        statusText: 'Not Found'
                     });
                 }
             });
@@ -810,7 +826,8 @@ describe('when retrieving a list of races that start at or after a specified tim
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 }).mockImplementationOnce((resource) => {
@@ -824,7 +841,8 @@ describe('when retrieving a list of races that start at or after a specified tim
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 });
@@ -872,7 +890,8 @@ describe('when retrieving a list of races that start at or after a specified tim
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 }).mockImplementationOnce((resource) => {
@@ -886,7 +905,8 @@ describe('when retrieving a list of races that start at or after a specified tim
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 });
@@ -934,7 +954,8 @@ describe('when retrieving a list of races that start at or after a specified tim
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 }).mockImplementationOnce((resource) => {
@@ -948,7 +969,8 @@ describe('when retrieving a list of races that start at or after a specified tim
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 });
@@ -996,7 +1018,8 @@ describe('when retrieving a list of races that start at or after a specified tim
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 }).mockImplementationOnce((resource) => {
@@ -1010,7 +1033,8 @@ describe('when retrieving a list of races that start at or after a specified tim
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 });
@@ -1038,10 +1062,21 @@ describe('when signing up to a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
+                return Promise.resolve({success: true, domainObject: competitorLouScrew});
+            }
+            else {
+                return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
+        expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
     });
     it('if race exists and URL provided helm exists and URL provided and dinghy exist and URL provided and crew not provided then creates race entry', async () => {
         fetch.mockImplementationOnce((resource, options) => {
@@ -1055,10 +1090,21 @@ describe('when signing up to a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
+                return Promise.resolve({success: true, domainObject: competitorLouScrew});
+            }
+            else {
+                return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
+        expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
     });
     it('if race exists and name and planned start time provided and helm exists and name provided and dinghy exists and sail number and class provided and crew exists and name provided then creates race entry', async () => {
         const race = {...raceScorpionA, 'url': ''};
@@ -1076,6 +1122,17 @@ describe('when signing up to a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
+                return Promise.resolve({success: true, domainObject: competitorLouScrew});
+            }
+            else {
+                return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': raceScorpionA}));
         jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
             if (name === 'Chris Marshall') {
@@ -1093,7 +1150,7 @@ describe('when signing up to a race', () => {
         const promise = dinghyRacingModel.createEntry(race, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
+        expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
     });
     it('if race exists and name and planned start time provided and helm exists and name provided and dinghy exists and sail number and class provided and crew not provided then creates race entry', async () => {
         const race = {...raceScorpionA, 'url': null};
@@ -1110,6 +1167,17 @@ describe('when signing up to a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
+                return Promise.resolve({success: true, domainObject: competitorLouScrew});
+            }
+            else {
+                return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': raceScorpionA}));
         jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
             if (name === 'Chris Marshall') {
@@ -1124,7 +1192,7 @@ describe('when signing up to a race', () => {
         const promise = dinghyRacingModel.createEntry(race, helm, dinghy);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
+        expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
     });
     it('race does not exist helm exists and URL provided dinghy exists and sail number and class provided crew exists and URL provided then does not create entry and provides message indicating cause of failure', async () => {
         const race = {...raceScorpionA, 'name': 'Race Nope', 'url': null};
@@ -1274,28 +1342,51 @@ describe('when updating an entry for a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
+                return Promise.resolve({success: true, domainObject: competitorLouScrew});
+            }
+            else {
+                return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, competitorChrisMarshall, dinghy1234, competitorLouScrew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
+        expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
     });
     it('if entry exists and URL provided helm exists and URL provided and dinghy exists and URL provided and crew not provided then updates entry', async () => {
-        const entryResponse = {...entryChrisMarshallScorpionA1234, crew: null};
         fetch.mockImplementationOnce((resource, options) => {
             const bodyMatch = {'helm': competitorChrisMarshall.url, 'dinghy': dinghy1234.url, 'crew': null};
             if ((resource === 'http://localhost:8081/dinghyracing/api/entries/10') && (options.body === JSON.stringify(bodyMatch))) {
                 return Promise.resolve({
                     ok: true,
                     status: 200,
-                    json: () => Promise.resolve(entryResponse)
+                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
                 });
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
+                return Promise.resolve({success: true, domainObject: competitorLouScrew});
+            }
+            else {
+                return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, competitorChrisMarshall, dinghy1234);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
+        expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
     });
     it('if entry exists and URL provided and helm exists and name provided and dinghy exists and sail number and class provided and crew exists and name provided then updates entry', async () => {
         const helm = {...competitorChrisMarshall, 'url': null};
@@ -1325,10 +1416,21 @@ describe('when updating an entry for a race', () => {
         });
         jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
         jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
+        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
+                return Promise.resolve({success: true, domainObject: competitorLouScrew});
+            }
+            else {
+                return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
+        expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
     });
     it('if entry exists url provided and helm exists and name provided and dinghy exists and sail number and class provided and crew not provided then updates entry', async () => {
         const helm = {...competitorChrisMarshall, 'url': ''};
@@ -1355,10 +1457,21 @@ describe('when updating an entry for a race', () => {
         });
         jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
         jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
+        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
+                return Promise.resolve({success: true, domainObject: competitorLouScrew});
+            }
+            else {
+                return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, helm, dinghy);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
+        expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
     });
     it('entry exists url provided helm does not exist dinghy exists url provided crew exists and name provided does not update entry and returns message explaining reason', async () => {
         const helm = {...competitorChrisMarshall, 'name': 'Lucy Liu', 'url': ''};
@@ -1472,6 +1585,7 @@ describe('when withdrawing an entry for a race', () => {
                 return Promise.resolve({
                     ok: false,
                     status: 404,
+                    statusText: 'Not Found',
                     json: () => Promise.resolve({})
                 });
             }
@@ -1487,6 +1601,7 @@ describe('when withdrawing an entry for a race', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404,
+                statusText: 'Not Found',
                 json: () => Promise.resolve({})
             });
         });
@@ -1494,7 +1609,7 @@ describe('when withdrawing an entry for a race', () => {
         const promise = dinghyRacingModel.delete(entryChrisMarshallScorpionA1234);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
     });
 });
 
@@ -1511,7 +1626,8 @@ describe('when retrieving a list of competitors', () => {
             else {
                 return Promise.resolve({
                     ok: false,
-                    status: 404
+                    status: 404,
+                    statusText: 'Not Found'
                 });
             }
         });
@@ -1541,7 +1657,8 @@ describe('when retrieving a list of competitors', () => {
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 }).mockImplementationOnce((resource) => {
@@ -1555,7 +1672,8 @@ describe('when retrieving a list of competitors', () => {
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 });
@@ -1586,7 +1704,8 @@ describe('when retrieving a list of competitors', () => {
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 }).mockImplementationOnce((resource) => {
@@ -1600,7 +1719,8 @@ describe('when retrieving a list of competitors', () => {
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 });
@@ -1631,7 +1751,8 @@ describe('when retrieving a list of competitors', () => {
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 }).mockImplementationOnce((resource) => {
@@ -1645,7 +1766,8 @@ describe('when retrieving a list of competitors', () => {
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 });
@@ -1676,7 +1798,8 @@ describe('when retrieving a list of competitors', () => {
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 }).mockImplementationOnce((resource) => {
@@ -1690,7 +1813,8 @@ describe('when retrieving a list of competitors', () => {
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 });
@@ -1725,6 +1849,7 @@ describe('when searching for a competitor by name', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404,
+                statusText: 'Not Found',
                 json: () => {throw new SyntaxError('Unexpected end of JSON input')}
             });
         });
@@ -1732,7 +1857,7 @@ describe('when searching for a competitor by name', () => {
         const promise = dinghyRacingModel.getCompetitorByName('Bob Smith');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Resource not found'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
     });
 });
 
@@ -1757,6 +1882,7 @@ describe('when searching for a dinghy by sail number and dinghy class', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404,
+                statusText: 'Not Found',
                 json: () => {throw new SyntaxError('Unexpected end of JSON input')}
             });
         });
@@ -1764,7 +1890,7 @@ describe('when searching for a dinghy by sail number and dinghy class', () => {
         const promise = dinghyRacingModel.getDinghyBySailNumberAndDinghyClass('999', dinghyClassScorpion);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Resource not found'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
     });
 });
 
@@ -1781,7 +1907,7 @@ describe('when creating a new competitor', () => {
         const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
+        expect(result).toEqual({'success': true, domainObject: competitorChrisMarshall});
     });
     it('returns a promise that resolves to a result indicating success when competitor is created with http status 201', async () => {
         fetch.mockImplementationOnce(() => {
@@ -1795,7 +1921,7 @@ describe('when creating a new competitor', () => {
         const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
+        expect(result).toEqual({'success': true, domainObject: competitorChrisMarshall});
     });
     it('returns a promise that resolves to a result indicating failure when competitor is not created with http status 400 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
@@ -1816,6 +1942,7 @@ describe('when creating a new competitor', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404, 
+                statusText: 'Not Found',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
             });
         });
@@ -1909,7 +2036,7 @@ describe('when updating a competitor', () => {
         const promise = dinghyRacingModel.updateCompetitor(competitorChrisMarshall, 'Chris Marshal');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
+        expect(result).toEqual({'success': true, domainObject: {...competitorChrisMarshall, name: 'Chris Marshal'}});
     });
     it('if competitor exists but URL not provided then updates competitor', async () => {
         fetch.mockImplementationOnce((resource, options) => {
@@ -1934,7 +2061,7 @@ describe('when updating a competitor', () => {
         const promise = dinghyRacingModel.updateCompetitor(competitorChrisMarshall, 'Chris Marshal');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
+        expect(result).toEqual({'success': true, domainObject: {...competitorChrisMarshall, name: 'Chris Marshal'}});
     });
     it('if competitor does not exist returns message explaining issue', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -1951,6 +2078,7 @@ describe('when updating a competitor', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404, 
+                statusText: 'Not Found',
                 json: () => Promise.resolve({})
             });
         });
@@ -1958,7 +2086,7 @@ describe('when updating a competitor', () => {
         const promise = dinghyRacingModel.updateCompetitor(competitorChrisMarshall, 'Chris Marshal');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
     });
 });
 
@@ -1972,12 +2100,13 @@ describe('when creating a new dinghy', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => Promise.resolve({success: true, domainObject: dinghyClassScorpion}));
 
         const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', 'dinghyClass': dinghyClassScorpion});
         const result = await promise;
 
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
+        expect(result).toEqual({'success': true, domainObject: dinghy1234});
     });
     it('when supplied dinghy class does not contain URL but dinghy class exists returns a promise that resolves to a result indicating success when dinghy is created', async () => {
         fetch.mockImplementation(() => {
@@ -1989,13 +2118,14 @@ describe('when creating a new dinghy', () => {
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
+        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => Promise.resolve({success: true, domainObject: dinghyClassScorpion}));
 
         const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', 'dinghyClass': {'name': 'Scorpion'}});
         const result = await promise;
         
         expect(getDinghyClassByNameSpy).toBeCalled();
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true});
+        expect(result).toEqual({'success': true, domainObject: dinghy1234});
     });
     it('when supplied dinghy class does not contain URL and dinghy class does not exist returns a promise that resolves to a result indicating failure', async () => {        
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -2076,7 +2206,8 @@ describe('when retrieving a list of dinghies', () => {
                 else {
                     return Promise.resolve({
                         ok: false,
-                        status: 404
+                        status: 404,
+                        statusText: 'Not Found'
                     });
                 }
             });
@@ -2124,7 +2255,8 @@ describe('when retrieving a list of dinghies', () => {
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 }).mockImplementationOnce((resource) => {
@@ -2138,7 +2270,8 @@ describe('when retrieving a list of dinghies', () => {
                         else {
                             return Promise.resolve({
                                 ok: false,
-                                status: 404
+                                status: 404,
+                                statusText: 'Not Found'
                             });
                         }
                     });
@@ -2187,7 +2320,8 @@ describe('when retrieving a list of dinghies', () => {
                         else {
                             return Promise.resolve({
                                 ok: false,
-                                status: 404
+                                status: 404,
+                                statusText: 'Not Found'
                             });
                         }
                     }).mockImplementationOnce((resource) => {
@@ -2201,7 +2335,8 @@ describe('when retrieving a list of dinghies', () => {
                             else {
                                 return Promise.resolve({
                                     ok: false,
-                                    status: 404
+                                    status: 404,
+                                    statusText: 'Not Found'
                                 });
                             }
                         });
@@ -2250,7 +2385,8 @@ describe('when retrieving a list of dinghies', () => {
                         else {
                             return Promise.resolve({
                                 ok: false,
-                                status: 404
+                                status: 404,
+                                statusText: 'Not Found'
                             });
                         }
                     }).mockImplementationOnce((resource) => {
@@ -2264,7 +2400,8 @@ describe('when retrieving a list of dinghies', () => {
                             else {
                                 return Promise.resolve({
                                     ok: false,
-                                    status: 404
+                                    status: 404,
+                                    statusText: 'Not Found'
                                 });
                             }
                         });
@@ -2313,7 +2450,8 @@ describe('when retrieving a list of dinghies', () => {
                         else {
                             return Promise.resolve({
                                 ok: false,
-                                status: 404
+                                status: 404,
+                                statusText: 'Not Found'
                             });
                         }
                     }).mockImplementationOnce((resource) => {
@@ -2327,7 +2465,8 @@ describe('when retrieving a list of dinghies', () => {
                             else {
                                 return Promise.resolve({
                                     ok: false,
-                                    status: 404
+                                    status: 404,
+                                    statusText: 'Not Found'
                                 });
                             }
                         });
@@ -2381,7 +2520,8 @@ describe('when retrieving a list of dinghies', () => {
                 else {
                     return Promise.resolve({
                         ok: false,
-                        status: 404
+                        status: 404,
+                        statusText: 'Not Found'
                     });
                 }
             });
@@ -2436,7 +2576,8 @@ describe('when retrieving a list of dinghies', () => {
                         else {
                             return Promise.resolve({
                                 ok: false,
-                                status: 404
+                                status: 404,
+                                statusText: 'Not Found'
                             });
                         }
                     }).mockImplementationOnce((resource) => {
@@ -2457,7 +2598,8 @@ describe('when retrieving a list of dinghies', () => {
                         else {
                             return Promise.resolve({
                                 ok: false,
-                                status: 404
+                                status: 404,
+                                statusText: 'Not Found'
                             });
                         }
                     });
@@ -2506,7 +2648,8 @@ describe('when retrieving a list of dinghies', () => {
                         else {
                             return Promise.resolve({
                                 ok: false,
-                                status: 404
+                                status: 404,
+                                statusText: 'Not Found'
                             });
                         }
                     }).mockImplementationOnce((resource) => {
@@ -2520,7 +2663,8 @@ describe('when retrieving a list of dinghies', () => {
                         else {
                             return Promise.resolve({
                                 ok: false,
-                                status: 404
+                                status: 404,
+                                statusText: 'Not Found'
                             });
                         }
                     });
@@ -2569,7 +2713,8 @@ describe('when retrieving a list of dinghies', () => {
                         else {
                             return Promise.resolve({
                                 ok: false,
-                                status: 404
+                                status: 404,
+                                statusText: 'Not Found'
                             });
                         }
                     }).mockImplementationOnce((resource) => {
@@ -2583,7 +2728,8 @@ describe('when retrieving a list of dinghies', () => {
                         else {
                             return Promise.resolve({
                                 ok: false,
-                                status: 404
+                                status: 404,
+                                statusText: 'Not Found'
                             });
                         }
                     });
@@ -2632,7 +2778,8 @@ describe('when retrieving a list of dinghies', () => {
                         else {
                             return Promise.resolve({
                                 ok: false,
-                                status: 404
+                                status: 404,
+                                statusText: 'Not Found'
                             });
                         }
                     }).mockImplementationOnce((resource) => {
@@ -2646,7 +2793,8 @@ describe('when retrieving a list of dinghies', () => {
                         else {
                             return Promise.resolve({
                                 ok: false,
-                                status: 404
+                                status: 404,
+                                statusText: 'Not Found'
                             });
                         }
                     });
@@ -2664,6 +2812,7 @@ describe('when retrieving a list of dinghies', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404,
+                statusText: 'Not Found',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
             });
         });
@@ -3072,6 +3221,7 @@ describe('when searching for entries by race', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404,
+                statusText: 'Not Found',
                 json: () => {throw new SyntaxError('Unexpected end of JSON input')}
             });
         });
@@ -3079,7 +3229,7 @@ describe('when searching for entries by race', () => {
         const promise = dinghyRacingModel.getEntriesByRace(raceScorpionA);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Resource not found'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
     });
     it('returns a promise that resolves to a result indicating failure when race does not have a URL', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -3109,6 +3259,7 @@ describe('when searching for entries by race', () => {
                     return Promise.resolve({
                         ok: false,
                         status: 404,
+                        statusText: 'Not Found',
                         json: () => {throw new SyntaxError('Unexpected end of JSON input')}
                     });
                 }
@@ -3480,6 +3631,7 @@ describe('when a race is requested', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404,
+                statusText: 'Not Found',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
             });
         });
@@ -3526,6 +3678,7 @@ describe('when a competitor is requested', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404,
+                statusText: 'Not Found',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
             });
         });
@@ -3558,6 +3711,7 @@ describe('when a dinghy is requested', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404,
+                statusText: 'Not Found',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
             });
         });
@@ -3589,6 +3743,7 @@ describe('when a dinghy class is requested', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404,
+                statusText: 'Not Found',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
             });
         });
@@ -3621,6 +3776,7 @@ describe('when starting a race', () => {
                 return Promise.resolve({
                     ok: false,
                     status: 404, 
+                    statusText: 'Not Found',
                     json: () => Promise.resolve({})
                 });
             });
@@ -3628,7 +3784,7 @@ describe('when starting a race', () => {
             const promise = dinghyRacingModel.startRace(raceScorpionA, new Date());
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
+            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
         });
     });
     describe('when a url is not provided for race', () => {
@@ -3686,6 +3842,7 @@ describe('when updating the start sequence state for a race', () => {
                 return Promise.resolve({
                     ok: false,
                     status: 404, 
+                    statusText: 'Not Found',
                     json: () => Promise.resolve({})
                 });
             });
@@ -3693,7 +3850,7 @@ describe('when updating the start sequence state for a race', () => {
             const promise = dinghyRacingModel.updateRaceStartSequenceState(raceScorpionA, 'black flagged');
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
+            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
         });
     });
     describe('when a url is not provided for race', () => {
@@ -3841,6 +3998,7 @@ describe('when adding a lap to a race', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404, 
+                statusText: 'Not Found',
                 json: () => Promise.resolve({})
             });
         });
@@ -3848,7 +4006,7 @@ describe('when adding a lap to a race', () => {
         const promise = dinghyRacingModel.addLap(entryChrisMarshallScorpionA1234, 1000);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
     });
 });
 
@@ -3872,6 +4030,7 @@ describe('when removing a lap from a race', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404, 
+                statusText: 'Not Found',
                 json: () => Promise.resolve({})
             });
         });
@@ -3879,7 +4038,7 @@ describe('when removing a lap from a race', () => {
         const promise = dinghyRacingModel.removeLap(entryChrisMarshallScorpionA1234, {...DinghyRacingModel.lapTemplate(),'number': 1, 'time': 1000});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
     });
 });
 
@@ -3903,6 +4062,7 @@ describe('when updating a lap from a race', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404, 
+                statusText: 'Not Found',
                 json: () => Promise.resolve({})
             });
         });
@@ -3910,7 +4070,7 @@ describe('when updating a lap from a race', () => {
         const promise = dinghyRacingModel.updateLap(entryChrisMarshallScorpionA1234, 2000);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
     });
 });
 
@@ -4037,7 +4197,8 @@ describe('when retrieving a list of races that start between the specified times
             else {
                 return Promise.resolve({
                     ok: false,
-                    status: 404
+                    status: 404,
+                    statusText: 'Not Found'
                 });
             }
         });
@@ -4086,7 +4247,8 @@ describe('when retrieving a list of races that start between the specified times
                 else {
                     return Promise.resolve({
                         ok: false,
-                        status: 404
+                        status: 404, 
+                        statusText: 'Not Found'
                     });
                 }
             });
@@ -4134,7 +4296,8 @@ describe('when retrieving a list of races that start between the specified times
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404, 
+                            statusText: 'Not Found'
                         });
                     }
                 }).mockImplementationOnce((resource) => {
@@ -4148,7 +4311,8 @@ describe('when retrieving a list of races that start between the specified times
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 });
@@ -4196,7 +4360,8 @@ describe('when retrieving a list of races that start between the specified times
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 }).mockImplementationOnce((resource) => {
@@ -4210,7 +4375,8 @@ describe('when retrieving a list of races that start between the specified times
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 });
@@ -4258,7 +4424,8 @@ describe('when retrieving a list of races that start between the specified times
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 }).mockImplementationOnce((resource) => {
@@ -4272,7 +4439,8 @@ describe('when retrieving a list of races that start between the specified times
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 });
@@ -4320,7 +4488,8 @@ describe('when retrieving a list of races that start between the specified times
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 }).mockImplementationOnce((resource) => {
@@ -4334,7 +4503,8 @@ describe('when retrieving a list of races that start between the specified times
                     else {
                         return Promise.resolve({
                             ok: false,
-                            status: 404
+                            status: 404,
+                            statusText: 'Not Found'
                         });
                     }
                 });
@@ -4383,7 +4553,8 @@ describe('when retrieving a list of races that start between the specified times
                 else {
                     return Promise.resolve({
                         ok: false,
-                        status: 404
+                        status: 404,
+                        statusText: 'Not Found'
                     });
                 }
             });
@@ -4432,7 +4603,8 @@ describe('when a StartSequence is requested', () => {
             else {
                 return Promise.resolve({
                     ok: false,
-                    status: 404
+                    status: 404,
+                    statusText: 'Not Found'
                 });
             }
         });
@@ -4458,6 +4630,7 @@ describe('when a StartSequence is requested', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404,
+                statusText: 'Not Found',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
             });
         });
@@ -4489,7 +4662,8 @@ describe('when updating the plannedLaps for a race', () => {
             fetch.mockImplementationOnce(() => {
                 return Promise.resolve({
                     ok: false,
-                    status: 404, 
+                    status: 404,
+                    statusText: 'Not Found',
                     json: () => Promise.resolve({})
                 });
             });
@@ -4497,7 +4671,7 @@ describe('when updating the plannedLaps for a race', () => {
             const promise = dinghyRacingModel.updateRacePlannedLaps(raceScorpionA, 4);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: No additional information available'});
+            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
         });
     });
     describe('when a url is not provided for race', () => {
