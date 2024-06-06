@@ -559,7 +559,7 @@ class DinghyRacingModel {
         const helmResult = await this.getCompetitor(entryResult.domainObject._links.helm.href);
         const dinghyResult = await this.getDinghy(entryResult.domainObject._links.dinghy.href);
         const lapsResult = await this.getLaps(entryResult.domainObject._links.laps.href);
-        const crewResult = await this.getCompetitor(entryResult.domainObject._links.crew.href);
+        let crewResult = await this.getCompetitor(entryResult.domainObject._links.crew.href);
         if (!raceResult.success) {
             return Promise.resolve(raceResult);
         }
