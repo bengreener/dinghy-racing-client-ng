@@ -68,7 +68,7 @@ describe('when creating a new object via REST', () => {
         const promise = dinghyRacingModel.create('someobject', {'prop1': 'foo', 'prop2': 'bar'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Message: Bad Request'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Bad Request'});
     });
 });
 
@@ -100,7 +100,7 @@ describe('when reading a resource from REST', () => {
         const promise = dinghyRacingModel.read('unknown');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
     });
     it('returns a promise that resolves to a result indicating failure when an error causes fetch to reject; such as a network failure', async () => {
         fetch.mockImplementationOnce(() => {
@@ -142,7 +142,7 @@ describe('when updating an object via REST', () => {
         const promise = dinghyRacingModel.update(httpRootURL, {});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
     });
 });
 
@@ -184,7 +184,7 @@ describe('when deleting an object via REST', () => {
         const promise = dinghyRacingModel.delete('http://localhost:8081/dinghyracing/api/entries/6');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
     });
 });
 
@@ -235,7 +235,8 @@ describe('when creating a new dinghy class', () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
-                status: 400, 
+                status: 400,
+                statusText: 'Bad Request',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 400'}, 'message': 'Some error resulting in HTTP 400'})
             });
         });
@@ -243,7 +244,7 @@ describe('when creating a new dinghy class', () => {
         const promise = dinghyRacingModel.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Message: Some error resulting in HTTP 400'}); 
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Bad Request Message: Some error resulting in HTTP 400'}); 
     });
     it('returns a promise that resolves to a result indicating failure when dinghy class is not created with http status 404 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
@@ -258,13 +259,14 @@ describe('when creating a new dinghy class', () => {
         const promise = dinghyRacingModel.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'}); 
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'}); 
     });
     it('returns a promise that resolves to a result indicating failure when dinghy class is not created with http status 408 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
                 status: 408, 
+                statusText: 'Request Timeout',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 408'}, 'message': 'Some error resulting in HTTP 408'})
             });
         });
@@ -272,13 +274,14 @@ describe('when creating a new dinghy class', () => {
         const promise = dinghyRacingModel.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 408 Message: Some error resulting in HTTP 408'}); 
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 408 Request Timeout Message: Some error resulting in HTTP 408'}); 
     });
     it('returns a promise that resolves to a result indicating failure when dinghy class is not created with http status 409 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
-                status: 409, 
+                status: 409,
+                statusText: 'Conflict',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 409'}, 'message': 'Some error resulting in HTTP 409'})
             });
         });
@@ -286,13 +289,14 @@ describe('when creating a new dinghy class', () => {
         const promise = dinghyRacingModel.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 409 Message: Some error resulting in HTTP 409'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 409 Conflict Message: Some error resulting in HTTP 409'});
     });
     it('returns a promise that resolves to a result indicating failure when dinghy class is not created with http status 500 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
-                status: 500, 
+                status: 500,
+                statusText: 'Internal Server Error',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 500'}, 'message': 'Some error resulting in HTTP 500'})
             });
         });
@@ -300,13 +304,14 @@ describe('when creating a new dinghy class', () => {
         const promise = dinghyRacingModel.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 500 Message: Some error resulting in HTTP 500'}); 
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 500 Internal Server Error Message: Some error resulting in HTTP 500'}); 
     });
     it('returns a promise that resolves to a result indicating failure when dinghy class is not created with http status 503 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
-                status: 503, 
+                status: 503,
+                statusText: 'Service Unavailable',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 503'}, 'message': 'Some error resulting in HTTP 503'})
             });
         });
@@ -314,7 +319,7 @@ describe('when creating a new dinghy class', () => {
         const promise = dinghyRacingModel.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 503 Message: Some error resulting in HTTP 503'}); 
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 503 Service Unavailable Message: Some error resulting in HTTP 503'}); 
     });
     it('returns a promise that resolves to a result indicating failure when dinghy class is not created due to an error that causes fetch to reject; such as a network failure', async () => {
         fetch.mockImplementationOnce(() => {
@@ -356,7 +361,7 @@ describe('when searcing for a dinghy class by name', () => {
         const promise = dinghyRacingModel.getDinghyClassByName('Scorpion');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
     });
 })
 
@@ -440,7 +445,8 @@ describe('when creating a new race', () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
-                status: 400, 
+                status: 400,
+                statusText: 'Bad Request',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 400'}, 'message': 'Some error resulting in HTTP 400'})
             });
         });
@@ -448,7 +454,7 @@ describe('when creating a new race', () => {
         const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Message: Some error resulting in HTTP 400'}); 
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Bad Request Message: Some error resulting in HTTP 400'}); 
     });
     it('returns a promise that resolves to a result indicating failure when race is not created with http status 404 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
@@ -463,13 +469,14 @@ describe('when creating a new race', () => {
         const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'}); 
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'}); 
     });
     it('returns a promise that resolves to a result indicating failure when race is not created with http status 408 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
-                status: 408, 
+                status: 408,
+                statusText: 'Request Timeout',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 408'}, 'message': 'Some error resulting in HTTP 408'})
             });
         });
@@ -477,13 +484,14 @@ describe('when creating a new race', () => {
         const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 408 Message: Some error resulting in HTTP 408'}); 
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 408 Request Timeout Message: Some error resulting in HTTP 408'}); 
     });
     it('returns a promise that resolves to a result indicating failure when race is not created with http status 409 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
-                status: 409, 
+                status: 409,
+                statusText: 'Conflict',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 409'}, 'message': 'Some error resulting in HTTP 409'})
             });
         });
@@ -491,13 +499,14 @@ describe('when creating a new race', () => {
         const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 409 Message: Some error resulting in HTTP 409'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 409 Conflict Message: Some error resulting in HTTP 409'});
     });
     it('returns a promise that resolves to a result indicating failure when race is not created with http status 500 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
-                status: 500, 
+                status: 500,
+                statusText: 'Internal Server Error',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 500'}, 'message': 'Some error resulting in HTTP 500'})
             });
         });
@@ -505,13 +514,14 @@ describe('when creating a new race', () => {
         const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 500 Message: Some error resulting in HTTP 500'}); 
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 500 Internal Server Error Message: Some error resulting in HTTP 500'}); 
     });
     it('returns a promise that resolves to a result indicating failure when race is not created with http status 503 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
-                status: 503, 
+                status: 503,
+                statusText: 'Service Unavailable',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 503'}, 'message': 'Some error resulting in HTTP 503'})
             });
         });
@@ -519,7 +529,7 @@ describe('when creating a new race', () => {
         const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 503 Message: Some error resulting in HTTP 503'}); 
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 503 Service Unavailable Message: Some error resulting in HTTP 503'}); 
     });
     it('returns a promise that resolves to a result indicating failure when race is not created due to an error that causes fetch to reject; such as a network failure', async () => {
         fetch.mockImplementationOnce(() => {
@@ -678,7 +688,7 @@ describe('when retrieving a list of dinghy classes', () => {
         const promise = dinghyRacingModel.read('unknown');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
     });
     it('returns a promise that resolves to a result indicating failure when an error causes fetch to reject; such as a network failure', async () => {
         fetch.mockImplementationOnce(() => {
@@ -1342,7 +1352,7 @@ describe('when signing up to a race', () => {
             const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': false, message: 'HTTP Error: 409 Message: A race entry already exists for the selected dinghy.'});
+            expect(result).toEqual({'success': false, message: 'A race entry already exists for the selected dinghy.'});
         });
     });
 });
@@ -1602,7 +1612,7 @@ describe('when updating an entry for a race', () => {
             const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, competitorChrisMarshall, dinghy1234, competitorLouScrew);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': false, message: 'HTTP Error: 409 Message: A race entry already exists for the selected dinghy.'});
+            expect(result).toEqual({'success': false, message: 'A race entry already exists for the selected dinghy.'});
         });
     });
 });
@@ -1645,7 +1655,7 @@ describe('when withdrawing an entry for a race', () => {
         const promise = dinghyRacingModel.delete(entryChrisMarshallScorpionA1234);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
     });
 });
 
@@ -1893,7 +1903,7 @@ describe('when searching for a competitor by name', () => {
         const promise = dinghyRacingModel.getCompetitorByName('Bob Smith');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
     });
 });
 
@@ -1926,7 +1936,7 @@ describe('when searching for a dinghy by sail number and dinghy class', () => {
         const promise = dinghyRacingModel.getDinghyBySailNumberAndDinghyClass('999', dinghyClassScorpion);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
     });
 });
 
@@ -1963,7 +1973,8 @@ describe('when creating a new competitor', () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
-                status: 400, 
+                status: 400,
+                statusText: 'Bad Request',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 400'}, 'message': 'Some error resulting in HTTP 400'})
             });
         });
@@ -1971,7 +1982,7 @@ describe('when creating a new competitor', () => {
         const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Message: Some error resulting in HTTP 400'}); 
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Bad Request Message: Some error resulting in HTTP 400'}); 
     });
     it('returns a promise that resolves to a result indicating failure when competitor is not created with http status 404 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
@@ -1986,13 +1997,14 @@ describe('when creating a new competitor', () => {
         const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'}); 
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'}); 
     });
     it('returns a promise that resolves to a result indicating failure when competitor is not created with http status 408 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
-                status: 408, 
+                status: 408,
+                statusText: 'Request Timeout',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 408'}, 'message': 'Some error resulting in HTTP 408'})
             });
         });
@@ -2000,13 +2012,14 @@ describe('when creating a new competitor', () => {
         const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 408 Message: Some error resulting in HTTP 408'}); 
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 408 Request Timeout Message: Some error resulting in HTTP 408'}); 
     });
     it('returns a promise that resolves to a result indicating failure when competitor is not created with http status 409 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
-                status: 409, 
+                status: 409,
+                statusText: 'Conflict',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 409'}, 'message': 'Some error resulting in HTTP 409'})
             });
         });
@@ -2014,13 +2027,14 @@ describe('when creating a new competitor', () => {
         const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 409 Message: Some error resulting in HTTP 409'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 409 Conflict Message: Some error resulting in HTTP 409'});
     });
     it('returns a promise that resolves to a result indicating failure when competitor is not created with http status 500 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
-                status: 500, 
+                status: 500,
+                statusText: 'Internal Server Error',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 500'}, 'message': 'Some error resulting in HTTP 500'})
             });
         });
@@ -2028,13 +2042,14 @@ describe('when creating a new competitor', () => {
         const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 500 Message: Some error resulting in HTTP 500'}); 
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 500 Internal Server Error Message: Some error resulting in HTTP 500'}); 
     });
     it('returns a promise that resolves to a result indicating failure when competitor is not created with http status 503 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
-                status: 503, 
+                status: 503,
+                statusText: 'Service Unavailable',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 503'}, 'message': 'Some error resulting in HTTP 503'})
             });
         });
@@ -2042,7 +2057,7 @@ describe('when creating a new competitor', () => {
         const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 503 Message: Some error resulting in HTTP 503'}); 
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 503 Service Unavailable Message: Some error resulting in HTTP 503'}); 
     });
     it('returns a promise that resolves to a result indicating failure when competitor is not created due to an error that causes fetch to reject; such as a network failure', async () => {
         fetch.mockImplementationOnce(() => {
@@ -2122,7 +2137,7 @@ describe('when updating a competitor', () => {
         const promise = dinghyRacingModel.updateCompetitor(competitorChrisMarshall, 'Chris Marshal');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
     });
 });
 
@@ -2178,7 +2193,8 @@ describe('when creating a new dinghy', () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
-                status: 400, 
+                status: 400,
+                statusText: 'Bad Request',
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 400'}, 'message': 'Some error resulting in HTTP 400'})
             });
         });
@@ -2186,7 +2202,7 @@ describe('when creating a new dinghy', () => {
         const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', 'dinghyClass': dinghyClassScorpion});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Message: Some error resulting in HTTP 400'}); 
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Bad Request Message: Some error resulting in HTTP 400'}); 
     });
     it('returns a promise that resolves to a result indicating failure when dinghy is not created due to an error that causes fetch to reject; such as a network failure', async () => {
         fetch.mockImplementationOnce(() => {
@@ -2856,7 +2872,7 @@ describe('when retrieving a list of dinghies', () => {
         const promise = model.getDinghies(dinghyClassScorpion);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
     });
 });
 
@@ -3265,7 +3281,7 @@ describe('when searching for entries by race', () => {
         const promise = dinghyRacingModel.getEntriesByRace(raceScorpionA);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
     });
     it('returns a promise that resolves to a result indicating failure when race does not have a URL', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -3618,7 +3634,7 @@ describe('when a race is requested', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'})});
+        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'})});
         const promise = dinghyRacingModel.getRace(raceHandicapA.url);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -3675,7 +3691,7 @@ describe('when a race is requested', () => {
         const promise = dinghyRacingModel.getRace(raceScorpionA.url);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
     });
     it('returns a promise that resolves to a result indicating success and containing the race when the race is found and lead entry is null', async () => {
         fetch.mockImplementationOnce(() => {
@@ -3722,7 +3738,7 @@ describe('when a competitor is requested', () => {
         const promise = dinghyRacingModel.getCompetitor(competitorChrisMarshall.url);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
     });
 });
 
@@ -3755,7 +3771,7 @@ describe('when a dinghy is requested', () => {
         const promise = dinghyRacingModel.getDinghy(dinghy1234.url);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
     });
 });
 
@@ -3787,7 +3803,7 @@ describe('when a dinghy class is requested', () => {
         const promise = dinghyRacingModel.getDinghyClass(dinghyClassScorpion.url);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
     });
 });
 
@@ -3820,7 +3836,7 @@ describe('when starting a race', () => {
             const promise = dinghyRacingModel.startRace(raceScorpionA, new Date());
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
+            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
         });
     });
     describe('when a url is not provided for race', () => {
@@ -3886,7 +3902,7 @@ describe('when updating the start sequence state for a race', () => {
             const promise = dinghyRacingModel.updateRaceStartSequenceState(raceScorpionA, 'black flagged');
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
+            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
         });
     });
     describe('when a url is not provided for race', () => {
@@ -4042,7 +4058,7 @@ describe('when adding a lap to a race', () => {
         const promise = dinghyRacingModel.addLap(entryChrisMarshallScorpionA1234, 1000);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
     });
 });
 
@@ -4074,7 +4090,7 @@ describe('when removing a lap from a race', () => {
         const promise = dinghyRacingModel.removeLap(entryChrisMarshallScorpionA1234, {...DinghyRacingModel.lapTemplate(),'number': 1, 'time': 1000});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
     });
 });
 
@@ -4106,7 +4122,7 @@ describe('when updating a lap from a race', () => {
         const promise = dinghyRacingModel.updateLap(entryChrisMarshallScorpionA1234, 2000);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
     });
 });
 
@@ -4674,7 +4690,7 @@ describe('when a StartSequence is requested', () => {
         const promise = dinghyRacingModel.getStartSequence(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'));
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Some error resulting in HTTP 404'});
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
     });
 });
 
@@ -4707,7 +4723,7 @@ describe('when updating the plannedLaps for a race', () => {
             const promise = dinghyRacingModel.updateRacePlannedLaps(raceScorpionA, 4);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Message: Not Found'});
+            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
         });
     });
     describe('when a url is not provided for race', () => {

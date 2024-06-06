@@ -1245,7 +1245,7 @@ class DinghyRacingModel {
                 return Promise.resolve({'success': true, domainObject: json});
             }
             else {
-                const message = json.message ? 'HTTP Error: ' + response.status + ' Message: ' + this._convertServerErrorMessageToClientErrorMessage(json.message) : 'HTTP Error: ' + response.status + ' Message: ' + response.statusText;
+                const message = this._buildClientErrorMessage(response, json);
                 return Promise.resolve({'success': false, 'message': message});
             }
         }
@@ -1254,13 +1254,17 @@ class DinghyRacingModel {
         }
     }
 
-    _convertServerErrorMessageToClientErrorMessage(serverMessage) {
-        // An existing race entry already exists for the selected dinghy
-        if (/constraint \[entry.UK_entry_dinghy_id_race_id\]/.test(serverMessage)) {
-            return 'A race entry already exists for the selected dinghy.';
+    _buildClientErrorMessage(response, json) {
+        if (json.message) {
+            // An existing race entry already exists for the selected dinghy
+            if (/constraint \[entry.UK_entry_dinghy_id_race_id\]/.test(json.message)) {
+                return 'A race entry already exists for the selected dinghy.';
+            }
+            // no mapping to user message found
+            return 'HTTP Error: ' + response.status + ' ' + response.statusText + ' Message: ' + json.message;
         }
-        // no mapping to user message found
-        return serverMessage;
+        // additional error details provided by server
+        return 'HTTP Error: ' + response.status + ' ' + response.statusText;
     }
 
     /**
