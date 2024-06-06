@@ -58,6 +58,7 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
                     model.registerRaceUpdateCallback(race.url, handleRaceUpdate);
                 });
                 setRaceMap(map);
+                setMessage('');
             }
             else {
                 setMessage('Unable to load races\n' + result.message);
