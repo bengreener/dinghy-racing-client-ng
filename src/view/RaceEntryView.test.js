@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RaceEntryView from './RaceEntryView';
 import { entryChrisMarshallScorpionA1234 } from '../model/__mocks__/test-data';
@@ -302,6 +302,78 @@ describe('when a scoring abbreviation is selected', () => {
             render(<RaceEntryView entry={entryRET} />, {container: document.body.appendChild(tableBody)});
             const SMScorp1234entry = screen.getByText(/1234/i).parentElement;
             expect(SMScorp1234entry.getAttribute('class')).toMatch(/disqualified/i);
+        });
+    });
+});
+
+describe('when the entry is selected to add a new lap', () => {
+    it('updates the display to show it has been selected', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const entry = {...entryChrisMarshallScorpionA1234};
+        const addLapCallback = jest.fn();
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entry} addLap={addLapCallback} />, {container: document.body.appendChild(tableBody)});
+        const SMScorp1234entry = screen.getByText(/1234/i);
+        await act(async () => {
+            await user.click(SMScorp1234entry);
+        });
+        expect(SMScorp1234entry.parentElement.getAttribute('class')).toMatch(/disabled/i);
+    });
+    it('does not accept selection to add a new lap time', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const entry = {...entryChrisMarshallScorpionA1234};
+        const addLapCallback = jest.fn();
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entry} addLap={addLapCallback} />, {container: document.body.appendChild(tableBody)});
+        const SMScorp1234entry = screen.getByText(/1234/i);
+        await act(async () => {
+            await user.click(SMScorp1234entry);
+        });
+        expect(addLapCallback).toHaveBeenCalledTimes(1);
+        await act(async () => {
+            await user.click(SMScorp1234entry);
+        });
+        expect(addLapCallback).toHaveBeenCalledTimes(1);
+    });
+    // how to make this work useEffect results in a class on a visible field being chnaged so can't wait for an element to appear so waitFor doesn't seem to wait :-/
+    xdescribe('when confirmation is received pf the recorded lap', () => {
+        it('updates the display to show it can be selected for lap entry', async () => {
+            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const entry = {...entryChrisMarshallScorpionA1234, laps: []};
+            const addLapCallback = jest.fn();
+            const tableBody = document.createElement('tbody');
+            const { rerender } = render(<RaceEntryView entry={entry} addLap={addLapCallback} />, {container: document.body.appendChild(tableBody)});
+            const SMScorp1234entry = await screen.findByText(/1234/i);
+            await act(async () => {
+                await user.click(SMScorp1234entry);
+            });
+            entry.laps.push({number:1, time: 1000 });
+            await act(async () => {
+                rerender(<RaceEntryView entry={entry} addLap={addLapCallback} />);
+            });
+            
+            await waitFor(() => {
+                expect(SMScorp1234entry.parentElement.getAttribute('class')).not.toMatch(/disabled/i);
+            });            
+        });
+        it('accepts selection to add a new lap time', async () => {
+            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const entry = {...entryChrisMarshallScorpionA1234, laps: []};
+            const addLapCallback = jest.fn();
+            const tableBody = document.createElement('tbody');
+            const { rerender } = render(<RaceEntryView entry={entry} addLap={addLapCallback} />, {container: document.body.appendChild(tableBody)});
+            const SMScorp1234entry = screen.getByText(/1234/i);
+            await act(async () => {
+                await user.click(SMScorp1234entry);
+            });
+            entry.laps.push({number: 1, time: 1000 });
+            await act(async () => {
+                rerender(<RaceEntryView entry={entry} addLap={addLapCallback} />);
+            });
+            await act(async () => {
+                await user.click(SMScorp1234entry);
+            });
+            expect(addLapCallback).toHaveBeenCalledTimes(2);
         });
     });
 });

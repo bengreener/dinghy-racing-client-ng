@@ -68,6 +68,10 @@ table {
     border-collapse: collapse;
 	margin: 5px;
 }
+tr.disabled > th, 
+tr.disabled > td {
+	 color: lightgray; 
+}
 th.sail-number {
 	text-align: right;
 }
