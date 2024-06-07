@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
 import SelectSession from './SelectSession';
 
@@ -34,6 +34,11 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
     });
     const [raceMap, setRaceMap] = useState(new Map());
     const [message, setMessage] = useState('');
+    const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
+
+    const handleRaceUpdate = useCallback(() => {
+        setRacesUpdateRequestAt(Date.now());
+    }, []);
 
     function handleRowClick({currentTarget}) {
         if (showSignUpForm) {
@@ -42,20 +47,31 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
     }
 
     useEffect(() => {
+        let ignoreFetch = false;
+        let races = [];
         model.getRacesBetweenTimes(sessionStart, sessionEnd).then(result => {
-            if (result.success) {
+            if (result.success && !ignoreFetch) {
                 let map = new Map();
-                const races = result.domainObject;
+                races = result.domainObject;
                 races.forEach(race => {
                     map.set(race.url, race);
+                    model.registerRaceUpdateCallback(race.url, handleRaceUpdate);
                 });
                 setRaceMap(map);
+                setMessage('');
             }
             else {
                 setMessage('Unable to load races\n' + result.message);
             }
         });
-    }, [model, sessionStart, sessionEnd])
+
+        return () => {
+            ignoreFetch = true;
+            races.forEach(race => {
+                model.unregisterRaceUpdateCallback(race.url);
+            });
+        }
+    }, [model, sessionStart, sessionEnd, racesUpdateRequestAt, handleRaceUpdate])
 
     function handlesessionStartInputChange(date) {
         setSessionStart(date);

@@ -236,7 +236,9 @@ const entryChrisMarshallDinghy1234HAL = {
 		'entry':{'href':'http://localhost:8081/dinghyracing/api/entries/10'},
 		'dinghy':{'href':'http://localhost:8081/dinghyracing/api/entries/10/dinghy'},
 		'helm':{'href':'http://localhost:8081/dinghyracing/api/entries/10/helm'}, 
-		'crew':{'href':'http://localhost:8081/dinghyracing/api/entries/10/crew'}
+		'crew':{'href':'http://localhost:8081/dinghyracing/api/entries/10/crew'}, 
+		'race':{'href':'http://localhost:8081/dinghyracing/api/entries/10/race'}, 
+		'laps':{'href':'http://localhost:8081/dinghyracing/api/entries/10/laps'}
 	}
 }; 
 

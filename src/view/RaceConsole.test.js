@@ -327,7 +327,6 @@ it('provides option to select end time for first race', async () => {
 });
 
 it('registers an interest in race updates for races in session', async () => {
-    const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});

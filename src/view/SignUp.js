@@ -47,6 +47,8 @@ function SignUp({ race }) {
     const dinghyClassSelect = useRef(null);
     const [raceUpdateRequestAt, setRaceUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
     const [entryUpdateRequestAt, setEntryUpdateRequestAt] = useState(Date.now()); // time of last request to fetch an entry from server. change triggers a new fetch; for instance when server notifies an entry has been updated
+    const [competitorUpdateRequestAt, setCompetitorUpdateRequestAt] = useState(Date.now());
+    const [dinghyUpdateRequestAt, setDinghyUpdateRequestAt] = useState(Date.now());
 
     const handleRaceUpdate = useCallback(() => {
         setRaceUpdateRequestAt(Date.now());
@@ -54,6 +56,14 @@ function SignUp({ race }) {
 
     const handleEntryUpdate = useCallback(() => {
         setEntryUpdateRequestAt(Date.now());
+    }, []);
+
+    const handleCompetitorUpdate = useCallback(() => {
+        setCompetitorUpdateRequestAt(Date.now());
+    }, []);
+
+    const handleDinghyUpdate = useCallback(() => {
+        setDinghyUpdateRequestAt(Date.now());
     }, []);
 
     const clear = React.useCallback(() => {
@@ -99,7 +109,7 @@ function SignUp({ race }) {
         else {
             setMessage('');
         }
-    }, [controller])
+    }, [controller]);
 
     const handleWithdrawEntryButtonClick = useCallback((event) => {
         event.preventDefault();
@@ -115,6 +125,24 @@ function SignUp({ race }) {
             model.unregisterRaceUpdateCallback(race.url, handleRaceUpdate);
         }
     }, [model, race, handleRaceUpdate]);
+
+    // register on creation callback for competitors
+    useEffect(() => {
+        model.registerCompetitorCreationCallback(handleCompetitorUpdate);
+        // cleanup before effect runs and before form close
+        return () => {
+            model.unregisterCompetitorCreationCallback(handleCompetitorUpdate);
+        }
+    }, [model, handleCompetitorUpdate]);
+
+    // register on creation callback for dinghies
+    useEffect(() => {
+        model.registerDinghyCreationCallback(handleDinghyUpdate);
+        // cleanup before effect runs and before form close
+        return () => {
+            model.unregisterDinghyCreationCallback(handleDinghyUpdate);
+        }
+    }, [model, handleDinghyUpdate]);
 
     // get competitors
     useEffect(() => {
@@ -140,7 +168,7 @@ function SignUp({ race }) {
         return () => {
             ignoreFetch = true;
         }
-    }, [model]);
+    }, [model, competitorUpdateRequestAt]);
 
     // get dinghy classes
     useEffect(() => {
@@ -201,7 +229,7 @@ function SignUp({ race }) {
         return () => {
             ignoreFetch = true;
         }
-    }, [model, race.dinghyClass, dinghyClassName, dinghyClassMap]);
+    }, [model, race.dinghyClass, dinghyClassName, dinghyClassMap, dinghyUpdateRequestAt]);
 
     // setup entries
     useEffect(() => {
@@ -296,8 +324,7 @@ function SignUp({ race }) {
         }
     }
 
-    async function handleEntryUpdateButtonClick(event) {
-        event.preventDefault();        
+    async function updateEntry() {
         const creationPromises = [];
         // handle creation of 
         if (!competitorMap.has(helmName)) {
@@ -354,6 +381,11 @@ function SignUp({ race }) {
         else {
             setResult({'success': false, 'message': message});
         }
+    }
+
+    function handleEntryUpdateButtonClick(event) {
+        event.preventDefault();
+        updateEntry();
     }
 
     function dinghyClassInput(race) {

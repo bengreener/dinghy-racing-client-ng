@@ -14,12 +14,14 @@
  * limitations under the License. 
  */
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import LapView from './LapView';
 import ScoringAbbreviation from './ScoringAbbreviation';
 
 function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation}) {
     const [editMode, setEditMode] = useState(false);
+    const [disabled, setDisabled] = useState(false);
+    const prevLapCount = useRef(entry.laps.length);
     const lapsView = [];
     let classes = 'race-entry-view';
 
@@ -47,15 +49,23 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         setEditMode(false);
     }, []);
 
+    useEffect(() => {
+        if (prevLapCount.current !== entry.laps.length) {
+            setDisabled(false);
+            prevLapCount.current = entry.laps.length;
+        }
+    }, [entry]);
+
     function handleClick(event) {
-        if (!editMode) {
+        if (!editMode && !disabled) {
             if (event.button === 0 && event.ctrlKey) {
                 if (removeLap) {
                     removeLap(entry);
                 }    
             }
             else if (event.button === 0) {
-                if (addLap) {
+                if (!entry.finishedRace && !entry.scoringAbbreviation && addLap) {
+                    setDisabled(true);
                     addLap(entry);
                 }
             }
@@ -63,7 +73,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     }
 
     function handleAuxClick(event) {
-        if (!editMode) {
+        if (!editMode && !disabled) {
             setEditMode(true);
         }
     }
@@ -80,7 +90,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         start.x = event.clientX;
         start.y = event.clientY;
         touchTimeoutId = setTimeout(() => {
-            if (!editMode) {
+            if (!editMode && !disabled) {
                 setEditMode(true);
                 tracking = false;
             }
@@ -175,6 +185,14 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     }
     else if (entry.finishedRace) {
         classes = 'race-entry-view finished-race';
+    }
+    if (disabled) {
+        if (classes === '') {
+            classes = 'disabled';
+        }
+        else {
+            classes += ' disabled';
+        }
     }
 
     return (
