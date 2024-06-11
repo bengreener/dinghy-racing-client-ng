@@ -38,7 +38,7 @@ class DinghyRacingModel {
      * @returns {DinghyClass}
      */
     static dinghyClassTemplate() {
-        return {'name': '', 'url': ''};
+        return {'name': '', 'crewSize': 1, portsmouthNumber: null, 'url': ''};
     }
 
     /**
