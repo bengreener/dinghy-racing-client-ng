@@ -48,6 +48,19 @@ it('accepts the crew size', async () => {
     expect(crewSizeInput).toHaveValue(2);
 });
 
+it('accepts the portsmouth number', async () => {
+    const user = userEvent.setup();
+
+    render(<CreateDinghyClass />);
+    const portsmouthNumberInput = await screen.findByLabelText('Portsmouth Number');
+    await act(async () => {
+        await user.clear(portsmouthNumberInput);
+        await user.type(portsmouthNumberInput, '999');
+    });
+
+    expect(portsmouthNumberInput).toHaveValue(999);
+});
+
 it('calls the function passed in to createDinghyClass prop', async () => {
     const user = userEvent.setup();
     const fnCreateDinghyClass = jest.fn(() => {return Promise.resolve({'success': true})});
@@ -69,14 +82,17 @@ it('calls the function passed in to createDinghyClass prop with new dinghy class
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
     const txtClassName = screen.getByLabelText('Class Name');
     const crewSizeInput = await screen.findByLabelText('Crew Size');
+    const portsmouthNumberInput = await screen.findByLabelText('Portsmouth Number');
     await act(async () => {
         await user.type(txtClassName, 'Scorpion');
         await user.clear(crewSizeInput);
         await user.type(crewSizeInput, '2');
+        await user.clear(portsmouthNumberInput);
+        await user.type(portsmouthNumberInput, '999');
         await user.click(btnCreate);
     });
 
-    expect(fnCreateDinghyClass).toBeCalledWith({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion', 'crewSize': 2});
+    expect(fnCreateDinghyClass).toBeCalledWith({...DinghyRacingModel.dinghyClassTemplate(), name: 'Scorpion', crewSize: 2, portsmouthNumber: 999});
 });
 
 describe('when creating a new dinghy class', () => {
@@ -87,12 +103,20 @@ describe('when creating a new dinghy class', () => {
         render(<CreateDinghyClass createDinghyClass={fnCreateDinghyClass} />);
         const btnCreate = screen.getByRole('button', {'name': 'Create'});
         const txtClassName = screen.getByLabelText('Class Name');
+        const crewSizeInput = await screen.findByLabelText('Crew Size');
+        const portsmouthNumberInput = await screen.findByLabelText('Portsmouth Number');
         await act(async () => {
             await user.type(txtClassName, 'Scorpion');
+            await user.clear(crewSizeInput);
+            await user.type(crewSizeInput, '2');
+            await user.clear(portsmouthNumberInput);
+            await user.type(portsmouthNumberInput, '999');
             await user.click(btnCreate);
         });
     
         expect(txtClassName.value).toBe('');
+        expect(crewSizeInput.value).toBe('1');
+        expect(portsmouthNumberInput.value).toBe('1000');
     })
     it('displays the failure message on failure', async () => {
         const user = userEvent.setup();
