@@ -17,7 +17,11 @@
 import React from 'react';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 
-function CreateDinghyClass({ onCreate }) {
+/**
+ * Get information required to create a new dinghy class
+ * @param {CreateDinghyClass~createDinghyClass} createDinghyClass
+ */
+function CreateDinghyClass({ createDinghyClass }) {
     const [dinghyClass, setDinghyClass] = React.useState(DinghyRacingModel.dinghyClassTemplate());
     const [result, setResult] = React.useState({message: ''});
     
@@ -37,7 +41,7 @@ function CreateDinghyClass({ onCreate }) {
 
     async function handleCreate(event) {
         event.preventDefault();
-        setResult(await onCreate(dinghyClass));
+        setResult(await createDinghyClass(dinghyClass));
     }
 
     function handleChange({target}) {
@@ -67,3 +71,9 @@ function CreateDinghyClass({ onCreate }) {
 }
 
 export default CreateDinghyClass;
+
+/**
+ * Method to create dinghy class when create dinghy class button clicked
+ * @callback async CreateDinghyClass~createDinghyClass
+ * @param {DinghyClass} dinghyClass to create
+ */

@@ -48,24 +48,24 @@ it('accepts the crew size', async () => {
     expect(crewSizeInput).toHaveValue(2);
 });
 
-it('calls the function passed in to onCreate prop', async () => {
+it('calls the function passed in to createDinghyClass prop', async () => {
     const user = userEvent.setup();
-    const fnOnCreate = jest.fn(() => {return Promise.resolve({'success': true})});
+    const fnCreateDinghyClass = jest.fn(() => {return Promise.resolve({'success': true})});
     
-    render(<CreateDinghyClass onCreate={fnOnCreate} />);
+    render(<CreateDinghyClass createDinghyClass={fnCreateDinghyClass} />);
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
     await act(async () => {
         await user.click(btnCreate);
     });
 
-    expect(fnOnCreate).toBeCalledTimes(1);
+    expect(fnCreateDinghyClass).toBeCalledTimes(1);
 });
 
-it('calls the function passed in to onCreate prop with new dinghy class as parameter', async () => {
+it('calls the function passed in to createDinghyClass prop with new dinghy class as parameter', async () => {
     const user = userEvent.setup();
-    const fnOnCreate = jest.fn((dinghyClass) => {return Promise.resolve({'success': true})});
+    const fnCreateDinghyClass = jest.fn((dinghyClass) => {return Promise.resolve({'success': true})});
     
-    render(<CreateDinghyClass onCreate={fnOnCreate} />);
+    render(<CreateDinghyClass createDinghyClass={fnCreateDinghyClass} />);
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
     const txtClassName = screen.getByLabelText('Class Name');
     const crewSizeInput = await screen.findByLabelText('Crew Size');
@@ -76,15 +76,15 @@ it('calls the function passed in to onCreate prop with new dinghy class as param
         await user.click(btnCreate);
     });
 
-    expect(fnOnCreate).toBeCalledWith({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion', 'crewSize': 2});
+    expect(fnCreateDinghyClass).toBeCalledWith({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion', 'crewSize': 2});
 });
 
 describe('when creating a new dinghy class', () => {
     it('clears the input on success', async () => {
         const user = userEvent.setup();
-        const fnOnCreate = jest.fn(() => {return Promise.resolve({'success': true})});
+        const fnCreateDinghyClass = jest.fn(() => {return Promise.resolve({'success': true})});
         
-        render(<CreateDinghyClass onCreate={fnOnCreate} />);
+        render(<CreateDinghyClass createDinghyClass={fnCreateDinghyClass} />);
         const btnCreate = screen.getByRole('button', {'name': 'Create'});
         const txtClassName = screen.getByLabelText('Class Name');
         await act(async () => {
@@ -96,9 +96,9 @@ describe('when creating a new dinghy class', () => {
     })
     it('displays the failure message on failure', async () => {
         const user = userEvent.setup();
-        const fnOnCreate = jest.fn(() => {return Promise.resolve({'success': false, 'message': 'That was a bust!'})});
+        const fnCreateDinghyClass = jest.fn(() => {return Promise.resolve({'success': false, 'message': 'That was a bust!'})});
         
-        render(<CreateDinghyClass onCreate={fnOnCreate} />);
+        render(<CreateDinghyClass createDinghyClass={fnCreateDinghyClass} />);
         const btnCreate = screen.getByRole('button', {'name': 'Create'});
         await act(async () => {
             await user.click(btnCreate);
