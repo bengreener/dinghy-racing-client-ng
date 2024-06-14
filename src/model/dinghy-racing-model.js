@@ -369,6 +369,45 @@ class DinghyRacingModel {
     }
 
     /**
+     * Update a dinghy class
+     * @param {DinghyClass} dinghyClass to update
+     * @param {String} [name]
+     * @param {Integer} [crewSize]
+     * @param {Integer} [portsmouthNumber]
+     * @returns {Promise<Result>}
+     */
+    async updateDinghyClass(dinghyClass, name, crewSize, portsmouthNumber) {
+        let dinghyClassURL = dinghyClass.url;
+        if (!dinghyClass.url) {
+            const result = await this.getDinghyClassByName(dinghyClass.name);
+            if (result.success) {
+                dinghyClassURL = result.domainObject.url;
+            }
+            else {
+                return Promise.resolve(result);
+            }
+        }
+        const updateObject = {};
+        if (name) {
+            updateObject.name = name;
+        }
+        if(crewSize) {
+            updateObject.crewSize = crewSize;
+        }
+        if (portsmouthNumber) {
+            updateObject.portsmouthNumber = portsmouthNumber;
+        }
+
+        const result = await this.update(dinghyClassURL, updateObject);
+        if (result.success) {
+            return Promise.resolve({'success': true, 'domainObject': this._convertDinghyClassHALToDinghyClass(result.domainObject)});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
      * Create a new entry to a race
      * Supplied helm, dinghy, and crew must exist
      * @param {Race} race Race to enter

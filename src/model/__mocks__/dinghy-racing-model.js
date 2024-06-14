@@ -183,6 +183,10 @@ class DinghyRacingModel {
         return null;
     }
 
+    async updateDinghyClass(dinghyClass, name, crewSize, portsmouthNumber) {
+        return null;
+    }
+
     async createEntry(race, helm, dinghy) {
         return null;
     }
