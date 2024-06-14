@@ -2187,7 +2187,7 @@ describe('when updating a competitor', () => {
                 return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
             }
         });
-        const promise = dinghyRacingModel.updateCompetitor(competitorChrisMarshall, 'Chris Marshal');
+        const promise = dinghyRacingModel.updateCompetitor({...competitorChrisMarshall, url: undefined}, 'Chris Marshal');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true, domainObject: {...competitorChrisMarshall, name: 'Chris Marshal'}});
