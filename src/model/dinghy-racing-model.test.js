@@ -2157,7 +2157,7 @@ describe('when updating a competitor', () => {
                 return Promise.resolve({
                     ok: true,
                     status: 200,
-                    json: () => Promise.resolve({...competitorChrisMarshall, name: 'Chris Marshal'})
+                    json: () => Promise.resolve({...competitorChrisMarshallHAL, name: 'Chris Marshal'})
                 });
             };
         });
@@ -2174,7 +2174,7 @@ describe('when updating a competitor', () => {
                 return Promise.resolve({
                     ok: true,
                     status: 200,
-                    json: () => Promise.resolve({...competitorChrisMarshall, name: 'Chris Marshal'})
+                    json: () => Promise.resolve({...competitorChrisMarshallHAL, name: 'Chris Marshal'})
                 });
             };
         });

@@ -308,9 +308,9 @@ class DinghyRacingModel {
                 return Promise.resolve(result);
             }
         }
-        const result = this.update(competitorURL, {name: name});
+        const result = await this.update(competitorURL, {name: name});
         if (result.success) {
-            return Promise.resolve({success: true, domainObject: this._convertCompetitorHALToCompetitor((await result).domainObject)});
+            return Promise.resolve({success: true, domainObject: this._convertCompetitorHALToCompetitor(result.domainObject)});
         }
         else {
             return Promise.resolve(result);
@@ -358,25 +358,7 @@ class DinghyRacingModel {
      * @param {DinghyClass} dinghyClass 
      * @returns {Promise<Result>}
      */
-     async createDinghyClass(dinghyClass) {
-        const result = await this.create('dinghyClasses', dinghyClass);
-        if (result.success) {
-            return Promise.resolve({'success': true, 'domainObject': this._convertDinghyClassHALToDinghyClass(result.domainObject)});
-        }
-        else {
-            return Promise.resolve(result);
-        }
-    }
-
-    /**
-     * Update a dinghy class
-     * @param {DinghyClass} dinghyClass to update
-     * @param {String} name
-     * @param {Integer} crew number of crew
-     * @param {Integer} portsmouthNumber
-     * @returns {Promise<Result>}
-     */
-     async updateDinghyClass(dinghyClass) {
+    async createDinghyClass(dinghyClass) {
         const result = await this.create('dinghyClasses', dinghyClass);
         if (result.success) {
             return Promise.resolve({'success': true, 'domainObject': this._convertDinghyClassHALToDinghyClass(result.domainObject)});
