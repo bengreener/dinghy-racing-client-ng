@@ -16,7 +16,7 @@
 
 /**
  * Get a Promise that resolves to the properties for connection to the web service and web socket service of a Dinghy Racing server
- * @param {string} resource URL of the server that will provide the properties
+ * @param {String} resource URL of the server that will provide the properties
  * @returns {Promise<Object>}
  */
 async function getDinghyRacingProperties(resource) {

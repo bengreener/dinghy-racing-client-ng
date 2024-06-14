@@ -26,7 +26,7 @@ class StartSignals {
 
     /**
      * Return a StartSequence stage value based on the supplied string
-     * @param {string} stage
+     * @param {String} stage
      */
     static from(stage) {
         const lowerStage = stage?.toUpperCase();

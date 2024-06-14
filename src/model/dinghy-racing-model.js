@@ -77,8 +77,8 @@ class DinghyRacingModel {
 
     /**
      * 
-     * @param {string} httpRootURL
-     * @param {string} wsRootURL
+     * @param {String} httpRootURL
+     * @param {String} wsRootURL
      * @returns {DinghyRacingModel} 
      */
     constructor(httpRootURL, wsRootURL) {
@@ -129,7 +129,7 @@ class DinghyRacingModel {
 
     /**
      * Handle a websocket competitor creation message via the Stomp client
-     * @param {string} message URI of competitor that was created
+     * @param {String} message URI of competitor that was created
      */
     handleCompetitorCreation(message) {
         this.competitorCreationCallbacks.forEach(cb => cb());
@@ -153,7 +153,7 @@ class DinghyRacingModel {
 
     /**
      * Handle a websocket dinghy creation message via the Stomp client
-     * @param {string} message URI of competitor that was created
+     * @param {String} message URI of competitor that was created
      */
     handleDinghyCreation(message) {
         this.dinghyCreationCallbacks.forEach(cb => cb());
@@ -161,7 +161,7 @@ class DinghyRacingModel {
 
     /**
      * Register a callback for when a race idenified by key is updated
-     * @param {string} key URI of the race for which the update callback is being registered
+     * @param {String} key URI of the race for which the update callback is being registered
      * @param {Function} callback
      */
     registerRaceUpdateCallback(key, callback) {
@@ -175,7 +175,7 @@ class DinghyRacingModel {
 
     /**
      * Unregister a callback for when a race idenified by key is updated
-     * @param {string} key URI of the race for which the update callback is being unregistered
+     * @param {String} key URI of the race for which the update callback is being unregistered
      * @param {Function} callback
      */
     unregisterRaceUpdateCallback(key, callback) {
@@ -186,7 +186,7 @@ class DinghyRacingModel {
 
     /**
      * Handle a websocket race update message via the Stomp client
-     * @param {string} message URI of race that has been updated
+     * @param {String} message URI of race that has been updated
      */
     handleRaceUpdate(message) {
         if (this.raceUpdateCallbacks.has(message.body)) {
@@ -196,7 +196,7 @@ class DinghyRacingModel {
 
     /**
      * Register a callback for when an entry identified by key is updated
-     * @param {string} key URI of the entry for which the update callback is being registered
+     * @param {String} key URI of the entry for which the update callback is being registered
      * @param {Function} callback 
      */
     registerEntryUpdateCallback(key, callback) {
@@ -210,7 +210,7 @@ class DinghyRacingModel {
 
     /**
      * Unregister a callback for when an entry idenified by key is updated
-     * @param {string} key URI of the entry for which the update callback is being unregistered
+     * @param {String} key URI of the entry for which the update callback is being unregistered
      * @param {Function} callback
      */
     unregisterEntryUpdateCallback(key, callback) {
@@ -221,7 +221,7 @@ class DinghyRacingModel {
 
     /**
      * Handle a websocket entry update message via the Stomp client
-     * @param {string} message URI of entry that has been updated
+     * @param {String} message URI of entry that has been updated
      */
     handleEntryUpdate(message) {
         if (this.entryUpdateCallbacks.has(message.body)) {
@@ -359,6 +359,24 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
      async createDinghyClass(dinghyClass) {
+        const result = await this.create('dinghyClasses', dinghyClass);
+        if (result.success) {
+            return Promise.resolve({'success': true, 'domainObject': this._convertDinghyClassHALToDinghyClass(result.domainObject)});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
+     * Update a dinghy class
+     * @param {DinghyClass} dinghyClass to update
+     * @param {String} name
+     * @param {Integer} crew number of crew
+     * @param {Integer} portsmouthNumber
+     * @returns {Promise<Result>}
+     */
+     async updateDinghyClass(dinghyClass) {
         const result = await this.create('dinghyClasses', dinghyClass);
         if (result.success) {
             return Promise.resolve({'success': true, 'domainObject': this._convertDinghyClassHALToDinghyClass(result.domainObject)});
@@ -1161,7 +1179,7 @@ class DinghyRacingModel {
 
     /**
      * Get a competitor by name
-     * @param {string} name Name of the competitor
+     * @param {String} name Name of the competitor
      * @returns {Promise<Result>}
      */
     async getCompetitorByName(name) {
@@ -1179,7 +1197,7 @@ class DinghyRacingModel {
 
     /**
      * Create a new domain object
-     * @param {string} urlPathSegment
+     * @param {String} urlPathSegment
      * @param {Object} object
      * @returns {Promise<Result>}
      */
@@ -1323,8 +1341,8 @@ class DinghyRacingModel {
 
 /**
  * @typedef SortParameters
- * @property {string} by name of the property to sort the collection by
- * @property {string} order sort order for collection; 'ASC' or 'DESC'
+ * @property {String} by name of the property to sort the collection by
+ * @property {String} order sort order for collection; 'ASC' or 'DESC'
  */
 
 /**

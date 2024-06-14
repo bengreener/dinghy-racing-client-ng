@@ -26,5 +26,5 @@
  * @property {boolean} onLastLap
  * @property {boolean} finishedRace
  * @property {String} scoringAbbreviation records the scoring abbreviation that identifies an adjustment required to an entries scoring for the race 
- * @property {string} url The URL to the remote resource
+ * @property {String} url The URL to the remote resource
  */
