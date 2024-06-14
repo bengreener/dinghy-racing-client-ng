@@ -18,5 +18,5 @@
  * @typedef Flag
  * @property {String} name of the flag
  * @property {FlagState} state of the flag
- * @property {integer} timeToChange in milliseconds
+ * @property {Integer} timeToChange in milliseconds
  */

@@ -42,7 +42,7 @@ function FlagControl({ flag }) {
 
 /**
  * @typedef {Object} FlagStateChangeTiming
- * @property {integer} startTimeOffset duration in milliseconds, before or after, the start time set for the associated clock that flag should be set to this state
+ * @property {Integer} startTimeOffset duration in milliseconds, before or after, the start time set for the associated clock that flag should be set to this state
  * @property {FlagState} state of flag to be set at this time 
  */
 

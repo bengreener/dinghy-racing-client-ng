@@ -672,8 +672,8 @@ class DinghyRacingModel {
 
     /**
      * Get a collection of competitors, sorted by name in ascending order
-     * @param {integer} [page] number to return (0 indexed)
-     * @param {integer} [size] number of elements to return per page
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
      * @returns {Promise<Result>} If successful Result.domainObject will be an Array<Competitor>
      */
     async getCompetitors(page, size) {
@@ -727,8 +727,8 @@ class DinghyRacingModel {
     /**
      * Get dinghies. If a dinghy class is provided only dinghies with that class will be returned
      * @param {dinghyClass} [dinghyClass] The dinghy class to filter by
-     * @param {integer} [page] number to return (0 indexed)
-     * @param {integer} [size] number of elements to return per page
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
      */
     async getDinghies(dinghyClass, page, size) {
         let resource;
@@ -830,8 +830,8 @@ class DinghyRacingModel {
     /**
      * Get dinghy classes in ascending order by class name
      * If page and/ or size are not provided will return all dinghy classes
-     * @param {integer} [page] number to return (0 indexed)
-     * @param {integer} [size] number of elements to return per page
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
      * @return {Promise<Result>>} If successful Result.domainObject will be an Array<DinghyClass>
      */
     async getDinghyClasses(page, size) {
@@ -988,8 +988,8 @@ class DinghyRacingModel {
     /**
      * Get races scheduled to start after the specified time
      * @param {Date} startTime The start time of the race
-     * @param {integer} [page] number to return (0 indexed)
-     * @param {integer} [size] number of elements to return per page
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
     async getRacesOnOrAfterTime(startTime, page, size) {
@@ -1002,8 +1002,8 @@ class DinghyRacingModel {
      * Get races scheduled to start between the specified times
      * @param {Date} startTime The start time of the first race
      * @param {Date} endTime The start time of the last race
-     * @param {integer} [page] number to return (0 indexed)
-     * @param {integer} [size] number of elements to return per page
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
      * @param {SortParameters} [sortParameters] and order for sorting the requested races
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
@@ -1016,8 +1016,8 @@ class DinghyRacingModel {
     /**
      * Get races from the specified resource location
      * @param {String} url to use to retrieve a collection of races
-     * @param {integer} [page] number to return (0 indexed)
-     * @param {integer} [size] number of elements to return per page
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
      * @param {SortParameters} [sortParameters] and order for sorting the requested races
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */

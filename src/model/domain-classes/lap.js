@@ -16,6 +16,6 @@
 
 /**
  * @typedef Lap
- * @property {integer} number Lap number
- * @property {integer} time The duration of the lap in milliseconds
+ * @property {Integer} number Lap number
+ * @property {Integer} time The duration of the lap in milliseconds
  */
