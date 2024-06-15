@@ -81,8 +81,20 @@ function DinghyClassConsole() {
         }
     }
 
+    function dinghyClassRows() {
+        const rows = [];
+        dinghyClassMap.forEach((dinghyClass, key) => {
+            rows.push(<tr key={key} id={key} >
+                <td id={dinghyClass.name} >{dinghyClass.name}</td>
+                <td id={dinghyClass.crewSize} >{dinghyClass.crewSize}</td>
+                <td id={dinghyClass.portsmouthNumber} >{dinghyClass.portsmouthNumber}</td>
+            </tr>);
+        });
+        return rows;
+    };
+
     return (
-        <div className="dinghy-class-console">
+        <div className="console">
             <h1>Dinghy Classes</h1>
             <p id="dinghy-class-console-message" className={!message ? "hidden" : ""}>{message}</p>
             <form action="" method="get">
@@ -95,6 +107,20 @@ function DinghyClassConsole() {
                 <output id="dinghy-class-message-output" />
                 <button id="dinghy-class-create-button" type="button" onClick={handleCreate}>Create</button>
             </form>
+            <div className="scrollable">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Dinghy Class</th>
+                            <th>Crew Size</th>
+                            <th>Portsmouth Number</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {dinghyClassRows()}
+                    </tbody>
+                </table>
+            </div>
         </div>
     )
 }

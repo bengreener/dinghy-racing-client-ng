@@ -172,5 +172,33 @@ describe('when creating a new dinghy class', () => {
         const message = await screen.findByText('That was a bust!');
     
         expect(message).toBeInTheDocument();
+    });
+});
+
+describe('when there are dinghy classes', () => {
+    it('displays list of dinghy classes', async () => {
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+        await act( async () => {
+            customRender(<DinghyClassConsole />, model);
+        });
+        expect(await screen.findByRole('cell', {name: /scorpion/i})).toBeInTheDocument();
+        expect(await screen.findByRole('cell', {name: /graduate/i})).toBeInTheDocument();
+        expect(await screen.findByRole('cell', {name: /comet/i})).toBeInTheDocument();
+    });
+    describe('when successfully retrieves dinghy classes', () => {
+        it('clears any error message', async () => {
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})}).mockImplementationOnce(() => {return Promise.resolve({success: false, message: 'Oops!'})});
+            let render;
+            await act( async () => {
+                render = customRender(<DinghyClassConsole />, model);
+            });
+            expect(await screen.findByText(/oops/i)).toBeInTheDocument();
+            await act(async () => {
+                render.rerender(<DinghyClassConsole />, model);
+            });
+            expect(screen.queryByText('Oops!')).not.toBeInTheDocument();
+        });
     })
-})
+});
