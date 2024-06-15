@@ -15,7 +15,7 @@
  */
 
 import React, { useEffect } from 'react';
-import CreateDinghyClass from './view/CreateDinghyClass';
+import DinghyClassConsole from './view/DinghyClassConsole';
 import CreateRace from './view/CreateRace';
 import ErrorBoundary from './view/ErrorBoundary';
 import ModelContext from './view/ModelContext';
@@ -42,7 +42,7 @@ function App({model, controller}) {
   });
 
   function showCreateDinghyClassForm() {
-    setDisplayPort(<CreateDinghyClass key={Date.now()} createDinghyClass={controller.createDinghyClass} />);
+    setDisplayPort(<DinghyClassConsole key={Date.now()} createDinghyClass={controller.createDinghyClass} />);
   }
 
   function showCreateRaceForm() {

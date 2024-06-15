@@ -19,9 +19,9 @@ import DinghyRacingModel from '../model/dinghy-racing-model';
 
 /**
  * Get information required to create a new dinghy class
- * @param {CreateDinghyClass~createDinghyClass} createDinghyClass
+ * @param {DinghyClassConsole~createDinghyClass} createDinghyClass
  */
-function CreateDinghyClass({ createDinghyClass }) {
+function DinghyClassConsole({ createDinghyClass }) {
     const [dinghyClass, setDinghyClass] = React.useState({...DinghyRacingModel.dinghyClassTemplate(), portsmouthNumber: 1000});
     const [result, setResult] = React.useState({message: ''});
     
@@ -72,10 +72,10 @@ function CreateDinghyClass({ createDinghyClass }) {
     )
 }
 
-export default CreateDinghyClass;
+export default DinghyClassConsole;
 
 /**
  * Method to create dinghy class when create dinghy class button clicked
- * @callback async CreateDinghyClass~createDinghyClass
+ * @callback async DinghyClassConsole~createDinghyClass
  * @param {DinghyClass} dinghyClass to create
  */

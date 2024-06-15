@@ -16,17 +16,17 @@
 
 import { act, screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import CreateDinghyClass from './CreateDinghyClass';
+import DinghyClassConsole from './DinghyClassConsole';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 
 it('renders', () => {
-    render(<CreateDinghyClass />);
+    render(<DinghyClassConsole />);
 });
 
 it('accepts the name of a dinghy class', async () => {
     const user = userEvent.setup();
     
-    render(<CreateDinghyClass />);
+    render(<DinghyClassConsole />);
     const txtClassName = await screen.findByLabelText('Class Name');
     await act(async () => {
         await user.type(txtClassName, 'Scorpion');
@@ -38,7 +38,7 @@ it('accepts the name of a dinghy class', async () => {
 it('accepts the crew size', async () => {
     const user = userEvent.setup();
     
-    render(<CreateDinghyClass />);
+    render(<DinghyClassConsole />);
     const crewSizeInput = await screen.findByLabelText('Crew Size');
     await act(async () => {
         await user.clear(crewSizeInput);
@@ -51,7 +51,7 @@ it('accepts the crew size', async () => {
 it('accepts the portsmouth number', async () => {
     const user = userEvent.setup();
 
-    render(<CreateDinghyClass />);
+    render(<DinghyClassConsole />);
     const portsmouthNumberInput = await screen.findByLabelText('Portsmouth Number');
     await act(async () => {
         await user.clear(portsmouthNumberInput);
@@ -65,7 +65,7 @@ it('calls the function passed in to createDinghyClass prop', async () => {
     const user = userEvent.setup();
     const fnCreateDinghyClass = jest.fn(() => {return Promise.resolve({'success': true})});
     
-    render(<CreateDinghyClass createDinghyClass={fnCreateDinghyClass} />);
+    render(<DinghyClassConsole createDinghyClass={fnCreateDinghyClass} />);
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
     await act(async () => {
         await user.click(btnCreate);
@@ -78,7 +78,7 @@ it('calls the function passed in to createDinghyClass prop with new dinghy class
     const user = userEvent.setup();
     const fnCreateDinghyClass = jest.fn((dinghyClass) => {return Promise.resolve({'success': true})});
     
-    render(<CreateDinghyClass createDinghyClass={fnCreateDinghyClass} />);
+    render(<DinghyClassConsole createDinghyClass={fnCreateDinghyClass} />);
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
     const txtClassName = screen.getByLabelText('Class Name');
     const crewSizeInput = await screen.findByLabelText('Crew Size');
@@ -100,7 +100,7 @@ describe('when creating a new dinghy class', () => {
         const user = userEvent.setup();
         const fnCreateDinghyClass = jest.fn(() => {return Promise.resolve({'success': true})});
         
-        render(<CreateDinghyClass createDinghyClass={fnCreateDinghyClass} />);
+        render(<DinghyClassConsole createDinghyClass={fnCreateDinghyClass} />);
         const btnCreate = screen.getByRole('button', {'name': 'Create'});
         const txtClassName = screen.getByLabelText('Class Name');
         const crewSizeInput = await screen.findByLabelText('Crew Size');
@@ -122,7 +122,7 @@ describe('when creating a new dinghy class', () => {
         const user = userEvent.setup();
         const fnCreateDinghyClass = jest.fn(() => {return Promise.resolve({'success': false, 'message': 'That was a bust!'})});
         
-        render(<CreateDinghyClass createDinghyClass={fnCreateDinghyClass} />);
+        render(<DinghyClassConsole createDinghyClass={fnCreateDinghyClass} />);
         const btnCreate = screen.getByRole('button', {'name': 'Create'});
         await act(async () => {
             await user.click(btnCreate);
