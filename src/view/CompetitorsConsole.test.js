@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { act, screen, render } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import { customRender } from '../test-utilities/custom-renders';
 import userEvent from '@testing-library/user-event';
 import DinghyRacingModel from '../model/dinghy-racing-model';
@@ -44,7 +44,7 @@ describe('when there are competitors', () => {
         expect(await screen.findByRole('cell', {name: /chris marshall/i})).toBeInTheDocument();
         expect(await screen.findByRole('cell', {name: /Sarah Pascal/i})).toBeInTheDocument();
     });
-    describe('when sucesfully retrieves competitors', () => {
+    describe('when successfully retrieves competitors', () => {
         it('clears any error message', async () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})}).mockImplementationOnce(() => {return Promise.resolve({success: false, message: 'Oops!'})});

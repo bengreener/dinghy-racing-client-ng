@@ -110,9 +110,10 @@ describe('when create dinghy class button clicked', () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     jest.spyOn(DinghyRacingModel, 'dinghyClassTemplate').mockImplementation(() => {return {'name': '', 'url': ''}});
+    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
     const dinghyRacingController = new DinghyRacingController(model);
 
-    render(<App controller={dinghyRacingController} />);
+    render(<App model={model} controller={dinghyRacingController} />);
     const btnCreateDinghyClass = await screen.findByRole('button', {name: /create dinghy class\b/i});
     await act(async () => {
       await user.click(btnCreateDinghyClass);

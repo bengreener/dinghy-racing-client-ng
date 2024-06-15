@@ -14,34 +14,62 @@
  * limitations under the License. 
  */
 
-import React from 'react';
+import { useCallback, useContext, useEffect, useState, } from 'react';
+import ModelContext from './ModelContext';
 import DinghyRacingModel from '../model/dinghy-racing-model';
+import ControllerContext from './ControllerContext';
 
 /**
  * Get information required to create a new dinghy class
- * @param {DinghyClassConsole~createDinghyClass} createDinghyClass
+ * @returns {HTMLDivElement}
  */
-function DinghyClassConsole({ createDinghyClass }) {
-    const [dinghyClass, setDinghyClass] = React.useState({...DinghyRacingModel.dinghyClassTemplate(), portsmouthNumber: 1000});
-    const [result, setResult] = React.useState({message: ''});
+function DinghyClassConsole() {
+    const model = useContext(ModelContext);
+    const controller = useContext(ControllerContext);
+    const [dinghyClassMap, setDinghyClassMap] = useState(new Map());
+    const [dinghyClass, setDinghyClass] = useState({...DinghyRacingModel.dinghyClassTemplate(), portsmouthNumber: 1000});
+    const [message, setMessage] = useState('');
     
-    const clear = React.useCallback(() => {
+    const clear = useCallback(() => {
         setDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), portsmouthNumber: 1000});
-        showMessage('');
+        setMessage('');
     }, []);
 
-    React.useEffect(() => {
-        if (result && result.success) {
+    // get dinghy classes
+    useEffect(() => {
+        let ignoreFetch = false; // set to true if DinghyClassConsole rerendered before fetch completes to avoid using out of date result
+        model.getDinghyClasses().then(result => {
+            if (!ignoreFetch && !result.success) {
+                setMessage('Unable to load dinghy classes\n' + result.message);
+            }
+            else if (!ignoreFetch) {
+                const map = new Map();
+                result.domainObject.forEach(dinghyClass => {
+                    map.set(dinghyClass.url, dinghyClass);
+                });
+                setDinghyClassMap(map);
+            }
+        });
+        // cleanup before effect runs and before form close
+        return () => {
+            ignoreFetch = true;
+            setMessage(''); // clear any previous message
+        }
+    }, [model])
+
+    async function createDinghyClass() {
+        const result = await controller.createDinghyClass(dinghyClass);
+        if (result.success) {
             clear();
         }
-        if (result && !result.success) {
-            showMessage(result.message);
+        else {
+            setMessage(result.message);
         }
-    }, [result, clear]);
+    }
 
-    async function handleCreate(event) {
+    function handleCreate(event) {
         event.preventDefault();
-        setResult(await createDinghyClass(dinghyClass));
+        createDinghyClass(dinghyClass);
     }
 
     function handleChange({target}) {
@@ -53,29 +81,22 @@ function DinghyClassConsole({ createDinghyClass }) {
         }
     }
 
-    function showMessage(message) {
-        const output = document.getElementById('dinghy-class-message-output');
-        output.value = message;
-    }
-
     return (
-        <form action="" method="get">
-            <label htmlFor="dinghy-class-input">Class Name</label>
-            <input id="dinghy-class-input" name="name" type="text" onChange={handleChange} value={dinghyClass.name} />
-            <label htmlFor="crew-size-input">Crew Size</label>
-            <input id="crew-size-input" name="crewSize" type="number" min="1" onChange={handleChange} value={dinghyClass.crewSize} />
-            <label htmlFor="portsmouth-number-input">Portsmouth Number</label>
-            <input id="portsmouth-number-input" name="portsmouthNumber" type="number" onChange={handleChange} value={dinghyClass.portsmouthNumber} />
-            <output id="dinghy-class-message-output" />
-            <button id="dinghy-class-create-button" type="button" onClick={handleCreate}>Create</button>
-        </form>
+        <div className="dinghy-class-console">
+            <h1>Dinghy Classes</h1>
+            <p id="dinghy-class-console-message" className={!message ? "hidden" : ""}>{message}</p>
+            <form action="" method="get">
+                <label htmlFor="dinghy-class-input">Class Name</label>
+                <input id="dinghy-class-input" name="name" type="text" onChange={handleChange} value={dinghyClass.name} />
+                <label htmlFor="crew-size-input">Crew Size</label>
+                <input id="crew-size-input" name="crewSize" type="number" min="1" onChange={handleChange} value={dinghyClass.crewSize} />
+                <label htmlFor="portsmouth-number-input">Portsmouth Number</label>
+                <input id="portsmouth-number-input" name="portsmouthNumber" type="number" onChange={handleChange} value={dinghyClass.portsmouthNumber} />
+                <output id="dinghy-class-message-output" />
+                <button id="dinghy-class-create-button" type="button" onClick={handleCreate}>Create</button>
+            </form>
+        </div>
     )
 }
 
 export default DinghyClassConsole;
-
-/**
- * Method to create dinghy class when create dinghy class button clicked
- * @callback async DinghyClassConsole~createDinghyClass
- * @param {DinghyClass} dinghyClass to create
- */

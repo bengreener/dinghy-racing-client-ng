@@ -42,7 +42,7 @@ function App({model, controller}) {
   });
 
   function showCreateDinghyClassForm() {
-    setDisplayPort(<DinghyClassConsole key={Date.now()} createDinghyClass={controller.createDinghyClass} />);
+    setDisplayPort(<DinghyClassConsole key={Date.now()} />);
   }
 
   function showCreateRaceForm() {

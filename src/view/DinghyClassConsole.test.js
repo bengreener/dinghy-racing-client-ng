@@ -14,19 +14,33 @@
  * limitations under the License. 
  */
 
-import { act, screen, render } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
+import { customRender } from '../test-utilities/custom-renders';
 import userEvent from '@testing-library/user-event';
 import DinghyClassConsole from './DinghyClassConsole';
 import DinghyRacingModel from '../model/dinghy-racing-model';
+import DinghyRacingController from '../controller/dinghy-racing-controller';
+import { httpRootURL, wsRootURL, dinghyClasses, dinghyClassScorpion } from '../model/__mocks__/test-data';
 
-it('renders', () => {
-    render(<DinghyClassConsole />);
+jest.mock('../model/dinghy-racing-model');
+jest.mock('../controller/dinghy-racing-controller');
+
+it('renders', async () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+    await act( async () => {
+        customRender(<DinghyClassConsole />, model);
+    });
 });
 
 it('accepts the name of a dinghy class', async () => {
     const user = userEvent.setup();
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
     
-    render(<DinghyClassConsole />);
+    await act( async () => {
+        customRender(<DinghyClassConsole />, model);
+    });
     const txtClassName = await screen.findByLabelText('Class Name');
     await act(async () => {
         await user.type(txtClassName, 'Scorpion');
@@ -37,8 +51,12 @@ it('accepts the name of a dinghy class', async () => {
 
 it('accepts the crew size', async () => {
     const user = userEvent.setup();
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
     
-    render(<DinghyClassConsole />);
+    await act( async () => {
+        customRender(<DinghyClassConsole />, model);
+    });
     const crewSizeInput = await screen.findByLabelText('Crew Size');
     await act(async () => {
         await user.clear(crewSizeInput);
@@ -50,8 +68,12 @@ it('accepts the crew size', async () => {
 
 it('accepts the portsmouth number', async () => {
     const user = userEvent.setup();
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
 
-    render(<DinghyClassConsole />);
+    await act( async () => {
+        customRender(<DinghyClassConsole />, model);
+    });
     const portsmouthNumberInput = await screen.findByLabelText('Portsmouth Number');
     await act(async () => {
         await user.clear(portsmouthNumberInput);
@@ -61,24 +83,34 @@ it('accepts the portsmouth number', async () => {
     expect(portsmouthNumberInput).toHaveValue(999);
 });
 
-it('calls the function passed in to createDinghyClass prop', async () => {
+it('calls the controller createDinghyClass method', async () => {
     const user = userEvent.setup();
-    const fnCreateDinghyClass = jest.fn(() => {return Promise.resolve({'success': true})});
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const controller = new DinghyRacingController(model);
+    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+    const createDinghyClassSpy = jest.spyOn(controller, 'createDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true})});
     
-    render(<DinghyClassConsole createDinghyClass={fnCreateDinghyClass} />);
+    await act( async () => {
+        customRender(<DinghyClassConsole />, model, controller);
+    });
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
     await act(async () => {
         await user.click(btnCreate);
     });
 
-    expect(fnCreateDinghyClass).toBeCalledTimes(1);
+    expect(createDinghyClassSpy).toBeCalledTimes(1);
 });
 
-it('calls the function passed in to createDinghyClass prop with new dinghy class as parameter', async () => {
+it('calls the controller createDinghyClass with new dinghy class as parameter', async () => {
     const user = userEvent.setup();
-    const fnCreateDinghyClass = jest.fn((dinghyClass) => {return Promise.resolve({'success': true})});
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const controller = new DinghyRacingController(model);
+    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+    const createDinghyClassSpy = jest.spyOn(controller, 'createDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true})});
     
-    render(<DinghyClassConsole createDinghyClass={fnCreateDinghyClass} />);
+    await act( async () => {
+        customRender(<DinghyClassConsole />, model, controller);
+    });
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
     const txtClassName = screen.getByLabelText('Class Name');
     const crewSizeInput = await screen.findByLabelText('Crew Size');
@@ -92,15 +124,20 @@ it('calls the function passed in to createDinghyClass prop with new dinghy class
         await user.click(btnCreate);
     });
 
-    expect(fnCreateDinghyClass).toBeCalledWith({...DinghyRacingModel.dinghyClassTemplate(), name: 'Scorpion', crewSize: 2, portsmouthNumber: 999});
+    expect(createDinghyClassSpy).toBeCalledWith({...DinghyRacingModel.dinghyClassTemplate(), name: 'Scorpion', crewSize: 2, portsmouthNumber: 999});
 });
 
 describe('when creating a new dinghy class', () => {
     it('clears the input on success', async () => {
         const user = userEvent.setup();
-        const fnCreateDinghyClass = jest.fn(() => {return Promise.resolve({'success': true})});
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        jest.spyOn(controller, 'createDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, domainObject: dinghyClassScorpion})});
         
-        render(<DinghyClassConsole createDinghyClass={fnCreateDinghyClass} />);
+        await act( async () => {
+            customRender(<DinghyClassConsole />, model, controller);
+        });
         const btnCreate = screen.getByRole('button', {'name': 'Create'});
         const txtClassName = screen.getByLabelText('Class Name');
         const crewSizeInput = await screen.findByLabelText('Crew Size');
@@ -120,9 +157,14 @@ describe('when creating a new dinghy class', () => {
     })
     it('displays the failure message on failure', async () => {
         const user = userEvent.setup();
-        const fnCreateDinghyClass = jest.fn(() => {return Promise.resolve({'success': false, 'message': 'That was a bust!'})});
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        jest.spyOn(controller, 'createDinghyClass').mockImplementation(() => {return Promise.resolve({'success': false, 'message': 'That was a bust!'})});
         
-        render(<DinghyClassConsole createDinghyClass={fnCreateDinghyClass} />);
+        await act( async () => {
+            customRender(<DinghyClassConsole />, model, controller);
+        });
         const btnCreate = screen.getByRole('button', {'name': 'Create'});
         await act(async () => {
             await user.click(btnCreate);
