@@ -209,6 +209,24 @@ class DinghyRacingController {
     }
 
     /**
+     * Update an exisiting dinghy class
+     * @param {DinghyClass} dinghyClass to update
+     * @param {String} name
+     * @param {Integer} [crewSize]
+     * @param {Integer} [portsmouthNumber]
+     * @returns {Promise<Result>}
+     */
+    updateDinghyClass(dinghyClass, name, crewSize, portsmouthNumber) {
+        if (!dinghyClass) {
+            return Promise.resolve({'success': false, 'message': 'An exisiting dinghy class to update is required.'});
+        }
+        if (!name && !crewSize && !portsmouthNumber) {
+            return Promise.resolve({'success': false, 'message': 'A new name, crew size, or portsmouth number value is required.'});
+        }
+        return this.model.updateDinghyClass(dinghyClass, name, crewSize, portsmouthNumber);
+    }
+
+    /**
      * Create a new race
      * @param {Race} race
      * @returns {Promise<Result>}
