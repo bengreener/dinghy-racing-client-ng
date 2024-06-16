@@ -93,7 +93,7 @@ describe('when a competitor is selected', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
-        const updateCompetitorSpy = jest.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
+        jest.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
         await act( async () => {
             customRender(<CompetitorsConsole />, model, controller);
         });
