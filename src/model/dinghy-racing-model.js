@@ -26,6 +26,7 @@ class DinghyRacingModel {
     entryUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
     competitorCreationCallbacks = new Set();
     dinghyCreationCallbacks = new Set();
+    dinghyClassCreationCallbacks = new Set();
     dinghyClassUpdateCallbacks = new Map();
 
     /**
@@ -87,6 +88,7 @@ class DinghyRacingModel {
         this.handleDinghyCreation = this.handleDinghyCreation.bind(this);
         this.handleRaceUpdate = this.handleRaceUpdate.bind(this);
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
+        this.handleDinghyClassCreation = this.handleDinghyClassCreation.bind(this);
         this.handleDinghyClassUpdate = this.handleDinghyClassUpdate.bind(this);
         this.getStartSequence = this.getStartSequence.bind(this);
         if (!httpRootURL) {
@@ -106,6 +108,7 @@ class DinghyRacingModel {
         this.stompClient.onConnect = (frame) => {
             this.stompClient.subscribe('/topic/createCompetitor', this.handleCompetitorCreation);
             this.stompClient.subscribe('/topic/createDinghy', this.handleDinghyCreation);
+            this.stompClient.subscribe('/topic/createDinghyClass', this.handleDinghyClassCreation);
             this.stompClient.subscribe('/topic/updateRace', this.handleRaceUpdate);
             this.stompClient.subscribe('/topic/updateEntry', this.handleEntryUpdate);
             this.stompClient.subscribe('/topic/deleteEntry', this.handleEntryUpdate);
@@ -230,6 +233,30 @@ class DinghyRacingModel {
         if (this.entryUpdateCallbacks.has(message.body)) {
             this.entryUpdateCallbacks.get(message.body).forEach(cb => cb());
         }
+    }
+
+    /**
+     * Register a callback for when a new dinghy class is created
+     * @param {Function} callback
+     */
+    registerDinghyClassCreationCallback(callback) {
+        this.dinghyClassCreationCallbacks.add(callback);
+    }
+
+    /**
+     * Unregister a callback for when a new dinghy class is created
+     * @param {Function} callback
+     */
+    unregisterDinghyClassCreationCallback(callback) {
+        this.dinghyClassCreationCallbacks.delete(callback);
+    }
+
+    /**
+     * Handle a websocket dinghy class creation message via the Stomp client
+     * @param {String} message URI of competitor that was created
+     */
+    handleDinghyClassCreation(message) {
+        this.dinghyClassCreationCallbacks.forEach(cb => cb());
     }
 
     /**
