@@ -26,6 +26,7 @@ class DinghyRacingModel {
     entryUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
     competitorCreationCallbacks = new Set();
     dinghyCreationCallbacks = new Set();
+    dinghyClassUpdateCallbacks = new Map();
 
     /**
      * Provide a blank competitor template
@@ -86,6 +87,7 @@ class DinghyRacingModel {
         this.handleDinghyCreation = this.handleDinghyCreation.bind(this);
         this.handleRaceUpdate = this.handleRaceUpdate.bind(this);
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
+        this.handleDinghyClassUpdate = this.handleDinghyClassUpdate.bind(this);
         this.getStartSequence = this.getStartSequence.bind(this);
         if (!httpRootURL) {
             throw new Error('An HTTP root URL is required when creating an instance of DinghyRacingModel');
@@ -107,6 +109,7 @@ class DinghyRacingModel {
             this.stompClient.subscribe('/topic/updateRace', this.handleRaceUpdate);
             this.stompClient.subscribe('/topic/updateEntry', this.handleEntryUpdate);
             this.stompClient.subscribe('/topic/deleteEntry', this.handleEntryUpdate);
+            this.stompClient.subscribe('/topic/updateDinghyClass', this.handleDinghyClassUpdate);
         };
         this.stompClient.activate();
     }
@@ -226,6 +229,41 @@ class DinghyRacingModel {
     handleEntryUpdate(message) {
         if (this.entryUpdateCallbacks.has(message.body)) {
             this.entryUpdateCallbacks.get(message.body).forEach(cb => cb());
+        }
+    }
+
+    /**
+     * Register a callback for when a dinghy class identified by key is updated
+     * @param {String} key URI of the dinghy class for which the update callback is being registered
+     * @param {Function} callback
+     */
+    registerDinghyClassUpdateCallback(key, callback) {
+        if (this.dinghyClassUpdateCallbacks.has(key)) {
+            this.dinghyClassUpdateCallbacks.get(key).add(callback);
+        }
+        else {
+            this.dinghyClassUpdateCallbacks.set(key, new Set([callback]));
+        }
+    }
+
+    /**
+     * Unregister a callback for when a dinghy class idenified by key is updated
+     * @param {String} key URI of the dinghy class for which the update callback is being unregistered
+     * @param {Function} callback
+     */
+    unregisterDinghyClassUpdateCallback(key, callback) {
+        if (this.dinghyClassUpdateCallbacks.has(key)) {
+            this.dinghyClassUpdateCallbacks.get(key).delete(callback);
+        }
+    }
+
+    /**
+     * Handle a websocket dinghy class update message via the Stomp client
+     * @param {String} message URI of dinghy class that has been updated
+     */
+    handleDinghyClassUpdate(message) {
+        if (this.dinghyClassUpdateCallbacks.has(message.body)) {
+            this.dinghyClassUpdateCallbacks.get(message.body).forEach(cb => cb());
         }
     }
 

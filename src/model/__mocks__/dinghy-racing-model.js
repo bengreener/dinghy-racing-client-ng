@@ -24,6 +24,7 @@ class DinghyRacingModel {
     entryUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
     competitorCreationCallbacks = new Set();
     dinghyCreationCallbacks = new Set();
+    dinghyClassUpdateCallbacks = new Map();
 
     /**
      * Provide a blank competitor template
@@ -78,6 +79,7 @@ class DinghyRacingModel {
         this.handleDinghyCreation = this.handleDinghyCreation.bind(this);
         this.handleRaceUpdate = this.handleRaceUpdate.bind(this);
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
+        this.getStartSequence = this.getStartSequence.bind(this);
         this.getStartSequence = this.getStartSequence.bind(this);
         if (!httpRootURL) {
             throw new Error('An HTTP root URL is required when creating an instance of DinghyRacingModel');
@@ -152,6 +154,27 @@ class DinghyRacingModel {
     handleEntryUpdate(message) {
         if (this.entryUpdateCallbacks.has(message.body)) {
             this.entryUpdateCallbacks.get(message.body).forEach(cb => cb());
+        }
+    }
+    
+    registerDinghyClassUpdateCallback(key, callback) {
+        if (this.dinghyClassUpdateCallbacks.has(key)) {
+            this.dinghyClassUpdateCallbacks.get(key).add(callback);
+        }
+        else {
+            this.dinghyClassUpdateCallbacks.set(key, new Set([callback]));
+        }
+    }
+    
+    unregisterDinghyClassUpdateCallback(key, callback) {
+        if (this.dinghyClassUpdateCallbacks.has(key)) {
+            this.dinghyClassUpdateCallbacks.get(key).delete(callback);
+        }
+    }
+    
+    handleDinghyClassUpdate(message) {
+        if (this.dinghyClassUpdateCallbacks.has(message.body)) {
+            this.dinghyClassUpdateCallbacks.get(message.body).forEach(cb => cb());
         }
     }
 

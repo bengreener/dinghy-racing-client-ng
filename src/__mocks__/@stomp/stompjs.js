@@ -158,6 +158,9 @@ export class Client {
               if (key === '/topic/createDinghy') {
                 value.forEach(cb => cb({body: 'http://localhost:8081/dinghyracing/api/dinghies/99'}));
               }
+              if (key === '/topic/updateDinghyClass') {
+                value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/dinghyClasses/1'}));
+              }
             });
         }
     }, 1);
