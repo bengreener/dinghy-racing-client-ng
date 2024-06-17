@@ -9365,3 +9365,16 @@ describe('when a new dinghy is created', () => {
         expect(await screen.findByRole('option', {name: /999/i, hidden: true})).toBeInTheDocument();
     });
 });
+
+describe('when a new dinghy class is created', () => {
+    it('updates the list of known dinghy classes', async () => {
+        const dinghyClasses_updated = [...dinghyClasses, {name: 'Avalon', crewSize: 5, portsMouthNumber: 856, url: 'http://localhost:8081/dinghyracing/api/dinghyClasses/99'}]
+        jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClasses_updated})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClasses})});
+        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+
+        await act(async () => {
+            model.handleDinghyClassCreation('http://localhost:8081/dinghyracing/api/dinghyClasses/99');
+        });
+        expect(await screen.findByRole('option', {name: /avalon/i, hidden: true})).toBeInTheDocument();
+    });
+});

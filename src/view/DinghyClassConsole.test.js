@@ -436,7 +436,7 @@ describe('when a new dinghy class is created', () => {
         });
 
         await act(async () => {
-            model.handleDinghyClassCreation('http://localhost:8081/dinghyracing/api/dinghies/99');
+            model.handleDinghyClassCreation('http://localhost:8081/dinghyracing/api/dinghyClasses/99');
         });
         expect(await screen.findByRole('cell', {name: /avalon/i})).toBeInTheDocument();
     });

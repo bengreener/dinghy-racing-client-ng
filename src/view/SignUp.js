@@ -49,6 +49,7 @@ function SignUp({ race }) {
     const [entryUpdateRequestAt, setEntryUpdateRequestAt] = useState(Date.now()); // time of last request to fetch an entry from server. change triggers a new fetch; for instance when server notifies an entry has been updated
     const [competitorUpdateRequestAt, setCompetitorUpdateRequestAt] = useState(Date.now());
     const [dinghyUpdateRequestAt, setDinghyUpdateRequestAt] = useState(Date.now());
+    const [dinghyClassUpdateRequestAt, setDinghyClassUpdateRequestAt] = useState(Date.now());
 
     const handleRaceUpdate = useCallback(() => {
         setRaceUpdateRequestAt(Date.now());
@@ -64,6 +65,10 @@ function SignUp({ race }) {
 
     const handleDinghyUpdate = useCallback(() => {
         setDinghyUpdateRequestAt(Date.now());
+    }, []);
+
+    const handleDinghyClassUpdate = useCallback(() => {
+        setDinghyClassUpdateRequestAt(Date.now());
     }, []);
 
     const clear = React.useCallback(() => {
@@ -144,6 +149,15 @@ function SignUp({ race }) {
         }
     }, [model, handleDinghyUpdate]);
 
+    // register on creation callback for dinghy classes
+    useEffect(() => {
+        model.registerDinghyClassCreationCallback(handleDinghyClassUpdate);
+        // cleanup before effect runs and before form close
+        return () => {
+            model.unregisterDinghyClassCreationCallback(handleDinghyClassUpdate);
+        }
+    }, [model, handleDinghyClassUpdate]);
+
     // get competitors
     useEffect(() => {
         let ignoreFetch = false; // set to true if SignUp rerendered before fetch completes to avoid using out of date result
@@ -198,7 +212,7 @@ function SignUp({ race }) {
         return () => {
             ignoreFetch = true;
         }
-    }, [model]);
+    }, [model, dinghyClassUpdateRequestAt]);
 
     // get dinghies
     useEffect(() => {
