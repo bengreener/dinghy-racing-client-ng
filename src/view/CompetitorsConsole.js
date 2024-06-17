@@ -70,6 +70,7 @@ function CompetitorsConsole() {
         setCompetitorName('');
         setMessage('');
     }
+
     function handleCompetitorRowClick({ currentTarget }) {
         const competitor = competitorsMap.get(currentTarget.id);
         setSelectedCompetitor(competitor);

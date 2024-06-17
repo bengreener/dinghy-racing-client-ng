@@ -27,11 +27,18 @@ function DinghyClassConsole() {
     const model = useContext(ModelContext);
     const controller = useContext(ControllerContext);
     const [dinghyClassMap, setDinghyClassMap] = useState(new Map());
+    const [selectedDinghyClass, setSelectedDinghyClass] = useState();
     const [dinghyClass, setDinghyClass] = useState({...DinghyRacingModel.dinghyClassTemplate(), portsmouthNumber: 1000});
     const [message, setMessage] = useState('');
+    const [dinghyClassUpdateRequestAt, setDinghyClassUpdateRequestAt] = useState(Date.now());
+
+    const handleDinghyClassUpdate = useCallback(() => {
+        setDinghyClassUpdateRequestAt(Date.now());
+    }, []);
     
     const clear = useCallback(() => {
         setDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), portsmouthNumber: 1000});
+        setSelectedDinghyClass(null);
         setMessage('');
     }, []);
 
@@ -55,10 +62,34 @@ function DinghyClassConsole() {
             ignoreFetch = true;
             setMessage(''); // clear any previous message
         }
-    }, [model])
+    }, [model, dinghyClassUpdateRequestAt]);
+
+    // register on update callbacks for dinghyClasses
+    useEffect(() => {
+        const races = Array.from(dinghyClassMap.values());
+        races.forEach(dinghyClass => {
+            model.registerDinghyClassUpdateCallback(dinghyClass.url, handleDinghyClassUpdate);
+        });
+        // cleanup before effect runs and before form close
+        return () => {
+            races.forEach(dinghyClass => {
+                model.unregisterDinghyClassUpdateCallback(dinghyClass.url, handleDinghyClassUpdate);
+            });
+        }
+    }, [model, dinghyClassMap, handleDinghyClassUpdate]);
 
     async function createDinghyClass() {
         const result = await controller.createDinghyClass(dinghyClass);
+        if (result.success) {
+            clear();
+        }
+        else {
+            setMessage(result.message);
+        }
+    }
+
+    async function updateDinghyClass() {
+        const result = await controller.updateDinghyClass(selectedDinghyClass, dinghyClass.name, dinghyClass.crewSize, dinghyClass.portsmouthNumber);
         if (result.success) {
             clear();
         }
@@ -72,6 +103,22 @@ function DinghyClassConsole() {
         createDinghyClass(dinghyClass);
     }
 
+    function handleUpdate(event) {
+        event.preventDefault();
+        updateDinghyClass(dinghyClass);
+    }
+
+    function handleDinghyClassRowClick({ currentTarget }) {
+        const dinghyClass = {...dinghyClassMap.get(currentTarget.id)};
+        setSelectedDinghyClass(dinghyClass);
+        // portsmouthNumber should be a numeric value greater than 0
+        if (!dinghyClass.portsmouthNumber) {
+            dinghyClass.portsmouthNumber = 1000;
+        }
+        setDinghyClass(dinghyClass);
+        setMessage('');
+    };
+
     function handleChange({target}) {
         if (target.name === 'crewSize' || target.name === 'portsmouthNumber') {
             setDinghyClass({...dinghyClass, [target.name]: Number(target.value)});
@@ -84,7 +131,7 @@ function DinghyClassConsole() {
     function dinghyClassRows() {
         const rows = [];
         dinghyClassMap.forEach((dinghyClass, key) => {
-            rows.push(<tr key={key} id={key} >
+            rows.push(<tr key={key} id={key} onClick={handleDinghyClassRowClick} >
                 <td id={dinghyClass.name} >{dinghyClass.name}</td>
                 <td id={dinghyClass.crewSize} >{dinghyClass.crewSize}</td>
                 <td id={dinghyClass.portsmouthNumber} >{dinghyClass.portsmouthNumber}</td>
@@ -105,7 +152,8 @@ function DinghyClassConsole() {
                 <label htmlFor="portsmouth-number-input">Portsmouth Number</label>
                 <input id="portsmouth-number-input" name="portsmouthNumber" type="number" onChange={handleChange} value={dinghyClass.portsmouthNumber} />
                 <output id="dinghy-class-message-output" />
-                <button id="dinghy-class-create-button" type="button" onClick={handleCreate}>Create</button>
+                {selectedDinghyClass ? <button id="dinghy-class-update-button" type="button" onClick={handleUpdate} >Update</button> : <button id="dinghy-class-create-button" type="button" onClick={handleCreate}>Create</button>}
+                <button id="dinghy-class-cancel-button" type="button" onClick={clear}>Cancel</button>
             </form>
             <div className="scrollable">
                 <table>
