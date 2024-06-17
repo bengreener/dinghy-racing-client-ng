@@ -66,6 +66,15 @@ function DinghyClassConsole() {
         }
     }, [model, dinghyClassUpdateRequestAt]);
 
+    // register on creation callback for dinghy classes
+    useEffect(() => {
+        model.registerDinghyClassCreationCallback(handleDinghyClassUpdate);
+        // cleanup before effect runs and before form close
+        return () => {
+            model.unregisterDinghyClassCreationCallback(handleDinghyClassUpdate);
+        }
+    }, [model, handleDinghyClassUpdate]);
+
     // register on update callbacks for dinghyClasses
     useEffect(() => {
         const races = Array.from(dinghyClassMap.values());

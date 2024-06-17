@@ -425,3 +425,19 @@ describe('when a dinghy class is selected', () => {
         });
     });
 });
+
+describe('when a new dinghy class is created', () => {
+    it('updates the list of dinghy classes', async () => {
+        const dinghyClasses_updated = [...dinghyClasses, {name: 'Avalon', crewSize: 5, portsMouthNumber: 856, url: 'http://localhost:8081/dinghyracing/api/dinghyClasses/99'}]
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClasses_updated})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClasses})});
+        await act( async () => {
+            customRender(<DinghyClassConsole />, model);
+        });
+
+        await act(async () => {
+            model.handleDinghyClassCreation('http://localhost:8081/dinghyracing/api/dinghies/99');
+        });
+        expect(await screen.findByRole('cell', {name: /avalon/i})).toBeInTheDocument();
+    });
+});
