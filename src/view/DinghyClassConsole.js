@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { useCallback, useContext, useEffect, useState, } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState, } from 'react';
 import ModelContext from './ModelContext';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import ControllerContext from './ControllerContext';
@@ -31,6 +31,7 @@ function DinghyClassConsole() {
     const [dinghyClass, setDinghyClass] = useState({...DinghyRacingModel.dinghyClassTemplate(), portsmouthNumber: 1000});
     const [message, setMessage] = useState('');
     const [dinghyClassUpdateRequestAt, setDinghyClassUpdateRequestAt] = useState(Date.now());
+    const dinghyClassNameInputRef = useRef(null);
 
     const handleDinghyClassUpdate = useCallback(() => {
         setDinghyClassUpdateRequestAt(Date.now());
@@ -39,6 +40,7 @@ function DinghyClassConsole() {
     const clear = useCallback(() => {
         setDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), portsmouthNumber: 1000});
         setSelectedDinghyClass(null);
+        dinghyClassNameInputRef.current.focus();
         setMessage('');
     }, []);
 
@@ -116,6 +118,7 @@ function DinghyClassConsole() {
             dinghyClass.portsmouthNumber = 1000;
         }
         setDinghyClass(dinghyClass);
+        dinghyClassNameInputRef.current.focus();
         setMessage('');
     };
 
@@ -146,7 +149,7 @@ function DinghyClassConsole() {
             <p id="dinghy-class-console-message" className={!message ? "hidden" : ""}>{message}</p>
             <form action="" method="get">
                 <label htmlFor="dinghy-class-input">Class Name</label>
-                <input id="dinghy-class-input" name="name" type="text" onChange={handleChange} value={dinghyClass.name} />
+                <input id="dinghy-class-input" ref={dinghyClassNameInputRef} name="name" type="text" onChange={handleChange} value={dinghyClass.name} autoFocus />
                 <label htmlFor="crew-size-input">Crew Size</label>
                 <input id="crew-size-input" name="crewSize" type="number" min="1" onChange={handleChange} value={dinghyClass.crewSize} />
                 <label htmlFor="portsmouth-number-input">Portsmouth Number</label>
