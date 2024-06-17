@@ -83,7 +83,7 @@ function App({model, controller}) {
         </header>
         <div className='list-group'>
           {roles.includes('ROLE_RACE_SCHEDULER') ? 
-            <button key={0} type='button' className='list-group-item list-group-item-action' onClick={showCreateDinghyClassForm}>Create Dinghy Class</button> 
+            <button key={0} type='button' className='list-group-item list-group-item-action' onClick={showCreateDinghyClassForm}>Dinghy Classes</button> 
             : null
           }
           {roles.includes('ROLE_RACE_SCHEDULER') ? 
