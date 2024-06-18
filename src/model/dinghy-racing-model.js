@@ -17,7 +17,7 @@
 import { Client } from '@stomp/stompjs';
 import StartSignal from './domain-classes/start-signal';
 import StartSequence from './domain-classes/start-sequence';
-import RaceType from './race-type';
+import RaceType from './domain-classes/race-type';
 
 class DinghyRacingModel {
     httpRootURL;
