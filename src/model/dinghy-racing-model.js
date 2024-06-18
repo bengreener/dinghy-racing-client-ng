@@ -15,7 +15,7 @@
  */
 
 import { Client } from '@stomp/stompjs';
-import StartSignals from './domain-classes/start-signals';
+import StartSignal from './domain-classes/start-signal';
 import StartSequence from './domain-classes/start-sequence';
 
 class DinghyRacingModel {
@@ -59,7 +59,7 @@ class DinghyRacingModel {
      */
     static raceTemplate() {
         return {'name': '', 'plannedStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'plannedLaps': null, 'lapsSailed': null, 'lapForecast': null, 
-            'lastLapTime': null, 'averageLapTime': null, 'clock': null, 'startSequenceState': StartSignals.NONE, 'url': ''};
+            'lastLapTime': null, 'averageLapTime': null, 'clock': null, 'startSequenceState': StartSignal.NONE, 'url': ''};
     }
 
     /**
@@ -1058,7 +1058,7 @@ class DinghyRacingModel {
                     'lapForecast': result.domainObject.lapForecast,
                     'lastLapTime': result.domainObject.leadEntry ? this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.lastLapTime) : null, 
                     'averageLapTime': result.domainObject.leadEntry ? this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.averageLapTime) : null, 
-                    'startSequenceState': StartSignals.from(result.domainObject.startSequenceState),
+                    'startSequenceState': StartSignal.from(result.domainObject.startSequenceState),
                     'url': result.domainObject._links.self.href
                 }});
             }
@@ -1159,7 +1159,7 @@ class DinghyRacingModel {
                     'lapForecast': racesHAL[i].lapForecast, 
                     'lastLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.lastLapTime) : null, 
                     'averageLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.averageLapTime) : null, 
-                    'startSequenceState': StartSignals.from(racesHAL[i].startSequenceState),
+                    'startSequenceState': StartSignal.from(racesHAL[i].startSequenceState),
                     'url': racesHAL[i]._links.self.href});
             };
             return Promise.resolve({'success': true, 'domainObject': races});
@@ -1184,7 +1184,7 @@ class DinghyRacingModel {
     /**
      * Update the start sequence for a race
      * @param {Race} race to update
-     * @param {StartSignals} stage of the starting sequence reached
+     * @param {StartSignal} stage of the starting sequence reached
      */
     async updateRaceStartSequenceState(race, stage) {
         let result;
@@ -1419,7 +1419,7 @@ class DinghyRacingModel {
             'lapForecast': raceHAL.lapForecast,
             'lastLapTime': raceHAL.leadEntry ? this.convertISO8601DurationToMilliseconds(raceHAL.leadEntry.lastLapTime) : null,
             'averageLapTime': raceHAL.leadEntry ? this.convertISO8601DurationToMilliseconds(raceHAL.leadEntry.averageLapTime) : null,
-            'startSequenceState': StartSignals.from(raceHAL.startSequenceState),
+            'startSequenceState': StartSignal.from(raceHAL.startSequenceState),
             'url': raceHAL._links.self.href
         }
     }

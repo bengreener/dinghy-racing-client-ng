@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import StartSequence from '../model/domain-classes/start-signals';
+import StartSequence from '../model/domain-classes/start-signal';
 import { downloadRaceEntriesCSV } from '../utilities/csv-writer'
 class DinghyRacingController {
 

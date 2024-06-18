@@ -21,7 +21,7 @@ import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 import { httpRootURL, wsRootURL, races, raceScorpionA, raceGraduateA, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet } from '../model/__mocks__/test-data';
 import StartSequence from '../model/domain-classes/start-sequence';
-import StartSignals from '../model/domain-classes/start-signals';
+import StartSignal from '../model/domain-classes/start-signal';
 
 
 jest.mock('../model/dinghy-racing-model');
@@ -327,7 +327,7 @@ describe('when clock ticks', () => {
     });
     describe('when ticks to 1 minute before a race start state change', () => {
         it('prepare for race start state change audio is present in document', async () => {
-            const races = [{...raceScorpionA, startSequenceState: StartSignals.WARNINGSIGNAL}, raceGraduateA];
+            const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, raceGraduateA];
             jest.setSystemTime(new Date('2021-10-14T10:23:59Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
@@ -346,7 +346,7 @@ describe('when clock ticks', () => {
     });
     describe('when ticks to 59 seconds before a race start state change', () => {
         it('prepare for race start state change audio is not present in document', async () => {
-            const races = [{...raceScorpionA, startSequenceState: StartSignals.WARNINGSIGNAL}, raceGraduateA];
+            const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, raceGraduateA];
             jest.setSystemTime(new Date('2021-10-14T10:24:00Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
@@ -365,7 +365,7 @@ describe('when clock ticks', () => {
     });
     describe('when ticks to time for a race start state change', () => {
         it('race start state change audio is present in document', async () => {
-            const races = [{...raceScorpionA, startSequenceState: StartSignals.WARNINGSIGNAL}, {...raceGraduateA, startSequenceState: StartSignals.NONE}];
+            const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, {...raceGraduateA, startSequenceState: StartSignal.NONE}];
             jest.setSystemTime(new Date('2021-10-14T10:24:59Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
@@ -383,7 +383,7 @@ describe('when clock ticks', () => {
     })
     describe('when ticks to 1 second after a race start state change', () => {
         it('race start state change audio is not present in document', async () => {
-            const races = [{...raceScorpionA, startSequenceState: StartSignals.PREPARATORYSIGNAL}, {...raceGraduateA, startSequenceState: StartSignals.WARNINGSIGNAL}];
+            const races = [{...raceScorpionA, startSequenceState: StartSignal.PREPARATORYSIGNAL}, {...raceGraduateA, startSequenceState: StartSignal.WARNINGSIGNAL}];
             jest.setSystemTime(new Date('2021-10-14T10:25:00Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
@@ -454,7 +454,7 @@ describe('when races within session are changed', () => {
 
 describe('when 6 minutes 1 second before start of first race', () => {
     it('prepare for race start state change audio is not present in document', async () => {
-        const races = [{...raceScorpionA, startSequenceState: StartSignals.WARNINGSIGNAL}, raceGraduateA];
+        const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, raceGraduateA];
         jest.setSystemTime(new Date('2021-10-14T10:23:59Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -471,7 +471,7 @@ describe('when 6 minutes 1 second before start of first race', () => {
 
 describe('when 6 minutes before start of first race', () => {
     it('prepare for race start state change audio is present in document', async () => {
-        const races = [{...raceScorpionA, startSequenceState: StartSignals.WARNINGSIGNAL}, raceGraduateA];
+        const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, raceGraduateA];
         jest.setSystemTime(new Date('2021-10-14T10:24:00Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -488,7 +488,7 @@ describe('when 6 minutes before start of first race', () => {
 
 describe('when 5 minutes 59 second before start of first race', () => {
     it('prepare for race start state change audio is not present in document', async () => {
-        const races = [{...raceScorpionA, startSequenceState: StartSignals.WARNINGSIGNAL}, raceGraduateA];
+        const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, raceGraduateA];
         jest.setSystemTime(new Date('2021-10-14T10:24:01Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -505,7 +505,7 @@ describe('when 5 minutes 59 second before start of first race', () => {
 
 describe('when 1 second before start of first race', () => {
     it('race start state change audio is not present in document', async () => {
-        const races = [{...raceScorpionA, startSequenceState: StartSignals.PREPARATORYSIGNAL}, {...raceGraduateA, startSequenceState: StartSignals.WARNINGSIGNAL}];
+        const races = [{...raceScorpionA, startSequenceState: StartSignal.PREPARATORYSIGNAL}, {...raceGraduateA, startSequenceState: StartSignal.WARNINGSIGNAL}];
         jest.setSystemTime(new Date('2021-10-14T10:29:59Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -522,7 +522,7 @@ describe('when 1 second before start of first race', () => {
 
 describe('when start of first race', () => {
     it('race start state change audio is present in document', async () => {
-        const races = [{...raceScorpionA, startSequenceState: StartSignals.PREPARATORYSIGNAL}, {...raceGraduateA, startSequenceState: StartSignals.WARNINGSIGNAL}];
+        const races = [{...raceScorpionA, startSequenceState: StartSignal.PREPARATORYSIGNAL}, {...raceGraduateA, startSequenceState: StartSignal.WARNINGSIGNAL}];
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {
@@ -538,7 +538,7 @@ describe('when start of first race', () => {
 
 describe('when 1 second after start of first race', () => {
     it('prepare for race start state change audio is not present in document', async () => {
-        const races = [{...raceScorpionA, startSequenceState: StartSignals.STARTINGSIGNAL}, {...raceGraduateA, startSequenceState: StartSignals.PREPARATORYSIGNAL}];
+        const races = [{...raceScorpionA, startSequenceState: StartSignal.STARTINGSIGNAL}, {...raceGraduateA, startSequenceState: StartSignal.PREPARATORYSIGNAL}];
         jest.setSystemTime(new Date('2021-10-14T10:30:01Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);

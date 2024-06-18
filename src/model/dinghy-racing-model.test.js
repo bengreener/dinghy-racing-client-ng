@@ -45,7 +45,7 @@ import {
 
     entriesGraduateA_bigData
 } from './__mocks__/test-data-more-data';
-import StartSignals from './domain-classes/start-signals';
+import StartSignal from './domain-classes/start-signal';
 import FlagState from './domain-classes/flag-state';
 
 global.fetch = jest.fn();
@@ -4070,7 +4070,7 @@ describe('when updating the start sequence state for a race', () => {
                 });
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const promise = dinghyRacingModel.updateRaceStartSequenceState(raceScorpionA, StartSignals.WARNINGSIGNAL);
+            const promise = dinghyRacingModel.updateRaceStartSequenceState(raceScorpionA, StartSignal.WARNINGSIGNAL);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
             expect(result.success).toBeTruthy();
@@ -4102,7 +4102,7 @@ describe('when updating the start sequence state for a race', () => {
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
             jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': {raceScorpionA}})});
-            const promise = dinghyRacingModel.updateRaceStartSequenceState({ 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00Z'), 'dinghyClass': dinghyClassScorpion}, StartSignals.PREPARATORYSIGNAL);
+            const promise = dinghyRacingModel.updateRaceStartSequenceState({ 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00Z'), 'dinghyClass': dinghyClassScorpion}, StartSignal.PREPARATORYSIGNAL);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
             expect(result.success).toBeTruthy();
@@ -4117,7 +4117,7 @@ describe('when updating the start sequence state for a race', () => {
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
             jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
-            const promise = dinghyRacingModel.updateRaceStartSequenceState({ 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00Z'), 'dinghyClass': dinghyClassScorpion}, StartSignals.ONEMINUTE);
+            const promise = dinghyRacingModel.updateRaceStartSequenceState({ 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00Z'), 'dinghyClass': dinghyClassScorpion}, StartSignal.ONEMINUTE);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
             expect(result).toEqual({'success': false, 'message': 'Something went wrong'});

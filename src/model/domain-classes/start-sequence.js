@@ -16,14 +16,14 @@
 
 import Clock from './clock';
 import FlagState from './flag-state';
-import StartSignals from './start-signals';
+import StartSignal from './start-signal';
 import { sortArray } from '../../utilities/array-utilities';
 
 const raceStartSequenceTemplate = {
     startingStateTemplates: [
-        {startSequenceState: StartSignals.WARNINGSIGNAL, startTimeOffset: -600000, flags: [{name: 'Warning', state: FlagState.RAISED}, {name: 'Blue Peter', state: FlagState.LOWERED}]},
-        {startSequenceState: StartSignals.PREPARATORYSIGNAL, startTimeOffset: -300000, flags: [{name: 'Warning', state: FlagState.RAISED}, {name: 'Blue Peter', state: FlagState.RAISED}]},
-        {startSequenceState: StartSignals.STARTINGSIGNAL, startTimeOffset: 0, flags: [{name: 'Warning', state: FlagState.LOWERED}, {name: 'Blue Peter', state: FlagState.LOWERED}]}
+        {startSequenceState: StartSignal.WARNINGSIGNAL, startTimeOffset: -600000, flags: [{name: 'Warning', state: FlagState.RAISED}, {name: 'Blue Peter', state: FlagState.LOWERED}]},
+        {startSequenceState: StartSignal.PREPARATORYSIGNAL, startTimeOffset: -300000, flags: [{name: 'Warning', state: FlagState.RAISED}, {name: 'Blue Peter', state: FlagState.RAISED}]},
+        {startSequenceState: StartSignal.STARTINGSIGNAL, startTimeOffset: 0, flags: [{name: 'Warning', state: FlagState.LOWERED}, {name: 'Blue Peter', state: FlagState.LOWERED}]}
     ]
 }
 
@@ -279,7 +279,7 @@ class StartSequence {
         const now = this._clock.getTime();
         let raceStartStateChange = false;
         this._currentStatus.forEach(status => {
-            if (status.race.startSequenceState !== status.status.startSequenceState || (status.race.startSequenceState !== StartSignals.NONE && now.valueOf() >= status.status.time.valueOf() && now.valueOf() < status.status.time.valueOf() + 1000)) {
+            if (status.race.startSequenceState !== status.status.startSequenceState || (status.race.startSequenceState !== StartSignal.NONE && now.valueOf() >= status.status.time.valueOf() && now.valueOf() < status.status.time.valueOf() + 1000)) {
                 raceStartStateChange = true;
             }
         });
@@ -365,7 +365,7 @@ class RaceStartSequence {
                 return {...flag, state: FlagState.LOWERED}
             });
             const now = new Date();
-            this.startingStates.push(new StartingState(StartSignals.NONE, now, race.plannedStartTime.valueOf() - now.valueOf() + raceStartSequenceTemplate.startingStateTemplates[0].startTimeOffset, flags));
+            this.startingStates.push(new StartingState(StartSignal.NONE, now, race.plannedStartTime.valueOf() - now.valueOf() + raceStartSequenceTemplate.startingStateTemplates[0].startTimeOffset, flags));
         }
         // build up start sequence from template
         raceStartSequenceTemplate.startingStateTemplates.forEach((sst, index, array) => {

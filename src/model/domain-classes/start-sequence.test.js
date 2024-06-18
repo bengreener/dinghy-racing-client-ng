@@ -18,7 +18,7 @@ import StartSequence from './start-sequence';
 import { httpRootURL, wsRootURL, raceScorpionA, raceGraduateA } from '../__mocks__/test-data';
 import FlagState from './flag-state';
 import DinghyRacingModel from '../dinghy-racing-model';
-import StartSignals from './start-signals';
+import StartSignal from './start-signal';
 
 beforeEach(() => {success: true
     jest.useFakeTimers();
@@ -195,7 +195,7 @@ describe('when time passes', () => {
             expect(startSequence.getPrepareForRaceStartStateChange()).toBeTruthy();
         });
         it('race state start change flag is false', async () => {
-            const races = [{...raceScorpionA, startSequenceState: StartSignals.WARNINGSIGNAL}, {...raceGraduateA}];
+            const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, {...raceGraduateA}];
             jest.setSystemTime(new Date('2021-10-14T10:23:59Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const startSequence = new StartSequence(races, model);
