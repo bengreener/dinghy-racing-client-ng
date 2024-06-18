@@ -14,6 +14,8 @@
  * limitations under the License. 
  */
 
+import RaceType from '../race-type';
+
 /**
  * @typedef Race
  * @property {String} name Name of the race
@@ -21,6 +23,7 @@
  * @property {DinghyClass} dinghyClass The class of dinghy that may participate in the race
  * @property {Number} duration The duration of the race; in milliseconds
  * @property {Number} plannedLaps The number of laps planned to be completed during the race
+ * @property {RaceType} type The type of the race
  * @property {Number} lapsSailed The number of laps sailed by the lead boat in the race
  * @property {Number} lapForecast A forecast of the total number of race laps that will be completed given laps already completed, last lap time, and remaining race time
  * @property {Number} lastLapTime The last lap time of the lead boat in the race; in milliseconds
