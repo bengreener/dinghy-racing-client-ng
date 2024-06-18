@@ -17,7 +17,7 @@
 /**
  * Class providng enumeration of race type options
  */
-class RaceTypes {
+class RaceType {
     static FLEET = 'FLEET';
     static PURSUIT = 'PURSUIT';
 
@@ -36,4 +36,4 @@ class RaceTypes {
     }
 }
 
-export default RaceTypes;
+export default RaceType;
