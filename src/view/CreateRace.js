@@ -18,17 +18,18 @@ import React from 'react';
 import { useContext, useRef } from 'react';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import ModelContext from './ModelContext';
+import RaceType from '../model/domain-classes/race-type';
 
 function CreateRace({ onCreate }) {
     const model = useContext(ModelContext);
-    const [race, setRace] = React.useState({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000, 'plannedLaps': 5});
+    const [race, setRace] = React.useState({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000, 'plannedLaps': 5, type: RaceType.FLEET});
     const [result, setResult] = React.useState({'message': ''});
     const [dinghyClassMap, setDinghyClassMap] = React.useState(new Map());
     const [dinghyClassOptions, setDinghyClassOptions] = React.useState([]);
     const raceNameInputRef = useRef(null);
 
     const clear = React.useCallback(() => {
-        setRace({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000, 'plannedLaps': 5});
+        setRace({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000, 'plannedLaps': 5, type: RaceType.FLEET});
         showMessage('');
         raceNameInputRef.current.focus();
     }, []);
@@ -103,6 +104,11 @@ function CreateRace({ onCreate }) {
             <input id="race-laps-input" name="plannedLaps" type="number" min="1" onChange={handleChange} value={race.plannedLaps ? race.plannedLaps : ''} />
             <label htmlFor="race-class-select">Race Class</label>
             <select id="race-class-select" name="dinghyClass" multiple={false} onChange={handleChange} value={race.dinghyClass ? race.dinghyClass.name : ''} >{dinghyClassOptions}</select>
+            <label htmlFor="race-type-select">Type</label>
+            <select id="race-type-select" name="type" multiple={false} onChange={handleChange} value={race.type} >
+                <option value="FLEET">Fleet</option>
+                <option value="PURSUIT">Pursuit</option>
+            </select>
             <output id="race-message-output" />
             <button id="race-create-button" type="button" onClick={handleCreate}>Create</button>
         </form>
