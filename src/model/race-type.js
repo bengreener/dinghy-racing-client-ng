@@ -29,9 +29,9 @@ class RaceType {
         const lowerType = type?.toUpperCase();
         switch (lowerType) {
             case 'FLEET':
-                return RaceTypes.FLEET;
+                return RaceType.FLEET;
             case 'PURSUIT':
-                return RaceTypes.PURSUIT;
+                return RaceType.PURSUIT;
         }
     }
 }

@@ -17,6 +17,7 @@
 import { Client } from '@stomp/stompjs';
 import StartSignal from './domain-classes/start-signal';
 import StartSequence from './domain-classes/start-sequence';
+import RaceType from './race-type';
 
 class DinghyRacingModel {
     httpRootURL;
@@ -58,8 +59,8 @@ class DinghyRacingModel {
      * @returns {Race}
      */
     static raceTemplate() {
-        return {'name': '', 'plannedStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'plannedLaps': null, 'lapsSailed': null, 'lapForecast': null, 
-            'lastLapTime': null, 'averageLapTime': null, 'clock': null, 'startSequenceState': StartSignal.NONE, 'url': ''};
+        return {name: '', plannedStartTime: null, dinghyClass: DinghyRacingModel.dinghyClassTemplate(), type: null, duration: 0, plannedLaps: null, lapsSailed: null, lapForecast: null, 
+            lastLapTime: null, averageLapTime: null, clock: null, startSequenceState: StartSignal.NONE, url: ''};
     }
 
     /**
@@ -1051,16 +1052,7 @@ class DinghyRacingModel {
                 dinghyClassResult = {'success': true, 'domainObject': null};
             }
             if (dinghyClassResult.success) {
-                return Promise.resolve({'success': true, 'domainObject': {...DinghyRacingModel.raceTemplate(), 'name': result.domainObject.name, 
-                    'plannedStartTime': new Date(result.domainObject.plannedStartTime + 'Z'), 
-                    'dinghyClass': dinghyClassResult.domainObject, 'duration': this.convertISO8601DurationToMilliseconds(result.domainObject.duration), 
-                    'plannedLaps': result.domainObject.plannedLaps, 'lapsSailed': result.domainObject.leadEntry ? result.domainObject.leadEntry.lapsSailed : null,
-                    'lapForecast': result.domainObject.lapForecast,
-                    'lastLapTime': result.domainObject.leadEntry ? this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.lastLapTime) : null, 
-                    'averageLapTime': result.domainObject.leadEntry ? this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.averageLapTime) : null, 
-                    'startSequenceState': StartSignal.from(result.domainObject.startSequenceState),
-                    'url': result.domainObject._links.self.href
-                }});
+                return Promise.resolve({'success': true, 'domainObject': this._convertRaceHALToRace(result.domainObject, dinghyClassResult.domainObject)});
             }
             else {
                 return Promise.resolve(dinghyClassResult);
@@ -1153,14 +1145,7 @@ class DinghyRacingModel {
             for (let i = 0; i < racesHAL.length; i++  ) {
                 const dinghyClass = dinghyClassResults[i].success ? this._convertDinghyClassHALToDinghyClass(dinghyClassResults[i].domainObject) : null;
                 // assume time received has been stored in UTC
-                races.push({...DinghyRacingModel.raceTemplate(), 'name': racesHAL[i].name, 'plannedStartTime': new Date(racesHAL[i].plannedStartTime + 'Z'),
-                    'dinghyClass': dinghyClass, 'duration': this.convertISO8601DurationToMilliseconds(racesHAL[i].duration), 'plannedLaps': racesHAL[i].plannedLaps, 
-                    'lapsSailed': racesHAL[i].leadEntry ? racesHAL[i].leadEntry.lapsSailed : null, 
-                    'lapForecast': racesHAL[i].lapForecast, 
-                    'lastLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.lastLapTime) : null, 
-                    'averageLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.averageLapTime) : null, 
-                    'startSequenceState': StartSignal.from(racesHAL[i].startSequenceState),
-                    'url': racesHAL[i]._links.self.href});
+                races.push(this._convertRaceHALToRace(racesHAL[i], dinghyClass));
             };
             return Promise.resolve({'success': true, 'domainObject': races});
         }
@@ -1412,15 +1397,16 @@ class DinghyRacingModel {
     }
 
     _convertRaceHALToRace(raceHAL, dinghyClass) {
-        return {...DinghyRacingModel.raceTemplate(), 'name': raceHAL.name,
-            'plannedStartTime': new Date(raceHAL.plannedStartTime + 'Z'),
-            'dinghyClass': dinghyClass, 'duration': this.convertISO8601DurationToMilliseconds(raceHAL.duration),
-            'plannedLaps': raceHAL.plannedLaps, 'lapsSailed': raceHAL.leadEntry ? raceHAL.leadEntry.lapsSailed : null,
-            'lapForecast': raceHAL.lapForecast,
-            'lastLapTime': raceHAL.leadEntry ? this.convertISO8601DurationToMilliseconds(raceHAL.leadEntry.lastLapTime) : null,
-            'averageLapTime': raceHAL.leadEntry ? this.convertISO8601DurationToMilliseconds(raceHAL.leadEntry.averageLapTime) : null,
-            'startSequenceState': StartSignal.from(raceHAL.startSequenceState),
-            'url': raceHAL._links.self.href
+        return {...DinghyRacingModel.raceTemplate(), name: raceHAL.name,
+            plannedStartTime: new Date(raceHAL.plannedStartTime + 'Z'),
+            dinghyClass: dinghyClass, duration: this.convertISO8601DurationToMilliseconds(raceHAL.duration),
+            type: RaceType.from(raceHAL.type),
+            plannedLaps: raceHAL.plannedLaps, lapsSailed: raceHAL.leadEntry ? raceHAL.leadEntry.lapsSailed : null,
+            lapForecast: raceHAL.lapForecast,
+            lastLapTime: raceHAL.leadEntry ? this.convertISO8601DurationToMilliseconds(raceHAL.leadEntry.lastLapTime) : null,
+            averageLapTime: raceHAL.leadEntry ? this.convertISO8601DurationToMilliseconds(raceHAL.leadEntry.averageLapTime) : null,
+            startSequenceState: StartSignal.from(raceHAL.startSequenceState),
+            url: raceHAL._links.self.href
         }
     }
 }
