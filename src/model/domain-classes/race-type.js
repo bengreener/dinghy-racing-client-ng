@@ -32,6 +32,8 @@ class RaceType {
                 return RaceType.FLEET;
             case 'PURSUIT':
                 return RaceType.PURSUIT;
+            default:
+                return null;
         }
     }
 }
