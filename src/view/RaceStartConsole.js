@@ -152,7 +152,7 @@ function RaceStartConsole () {
                     <input id="radio-race-type-pursuit" name="race-type" type="radio" value="PURSUIT" onChange={handleRaceTypeChange} />
                     <label htmlFor="radio-race-type-pursuit">Pursuit</label>
                 </fieldset>
-            </div>            
+            </div>
             <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
             <CollapsableContainer heading={'Flags'}>
                 {flags.map(flag => { return <FlagControl key={flag.name} flag={flag} /> })}

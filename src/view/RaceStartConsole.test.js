@@ -106,7 +106,7 @@ describe('when new value set for race type', () => {
     
         expect(getStartSequenceSpy).toHaveBeenCalledWith(sessionStart, sessionEnd, RaceType.PURSUIT);
     });
-})
+});
 
 it('defaults session start to 8:00 today', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);

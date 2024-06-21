@@ -287,6 +287,10 @@ class DinghyRacingModel {
     async getRacesBetweenTimes(startTime, endTime) {
         return Promise.resolve({success: true, domainObject: []});
     }
+    
+    async getRacesBetweenTimesForType(startTime, endTime, type, page, size, sortParameters) {
+        return Promise.resolve({success: true, domainObject: []});
+    }
 
     async getRaceByNameAndPlannedStartTime(name, time) {
         return null;
