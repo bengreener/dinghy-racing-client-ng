@@ -127,6 +127,14 @@ header {
 	display: flex;
 	flex-direction: column;
 }
+.select-race {
+    display: flex;
+    align-items: top;
+}
+.select-race > select {
+    height: 3lh;
+    max-width:fit-content;
+}
 .sign-up-form {
     height: 100%;
 	display: flex;
