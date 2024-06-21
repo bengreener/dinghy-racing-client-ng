@@ -14,11 +14,6 @@
  * limitations under the License. 
  */
 
- .race-console {
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-}
 .select-race {
     display: flex;
     align-items: top;

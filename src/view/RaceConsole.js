@@ -107,7 +107,7 @@ function RaceConsole() {
     }
 
     return (
-        <div className="race-console">
+        <div className="console">
             <div className="select-race">
                 <label htmlFor="race-select">Select Race</label>
                 <select id="race-select" name="race" multiple={true} onChange={handleRaceSelect} value={selectedRaces}>{raceOptions}</select>
