@@ -143,15 +143,17 @@ function RaceStartConsole () {
 
     return (
         <div className="race-start-console">
-            <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
-            <div>
-                <fieldset>
-                    <legend>Race Type</legend>
-                    <input id="radio-race-type-fleet" name="race-type" type="radio" value="FLEET" onChange={handleRaceTypeChange} defaultChecked="true"/>
-                    <label htmlFor="radio-race-type-fleet">Fleet</label>
-                    <input id="radio-race-type-pursuit" name="race-type" type="radio" value="PURSUIT" onChange={handleRaceTypeChange} />
-                    <label htmlFor="radio-race-type-pursuit">Pursuit</label>
-                </fieldset>
+            <div className="select-race">
+                <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
+                <div>
+                    <fieldset>
+                        <legend>Race Type</legend>
+                        <input id="radio-race-type-fleet" name="race-type" type="radio" value="FLEET" onChange={handleRaceTypeChange} defaultChecked="true"/>
+                        <label htmlFor="radio-race-type-fleet">Fleet</label>
+                        <input id="radio-race-type-pursuit" name="race-type" type="radio" value="PURSUIT" onChange={handleRaceTypeChange} />
+                        <label htmlFor="radio-race-type-pursuit">Pursuit</label>
+                    </fieldset>
+                </div>
             </div>
             <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
             <CollapsableContainer heading={'Flags'}>
