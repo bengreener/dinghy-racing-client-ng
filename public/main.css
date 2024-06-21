@@ -98,6 +98,9 @@ header {
 	grid-area: header;
 	background-size: contain;
 }
+fieldset {
+	border-radius: 25pt;
+}
 .action-list-view {
     display: flex;
     flex-direction: column;
