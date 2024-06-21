@@ -1092,6 +1092,22 @@ class DinghyRacingModel {
     }
 
     /**
+     * Get races of a specific type that are scheduled to start between the specified times
+     * @param {Date} startTime The start time of the first race
+     * @param {Date} endTime The start time of the last race
+     * @param {RaceType} type The type of race
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
+     * @param {SortParameters} [sortParameters] and order for sorting the requested races
+     * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
+     */
+    async getRacesBetweenTimesForType(startTime, endTime, type, page, size, sortParameters) {
+        const resource = this.httpRootURL + '/races/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=' + startTime.toISOString() + '&endTime=' + endTime.toISOString() + '&type=' + type;
+
+        return this.getRacesFromURL(resource, page, size, sortParameters);
+    }
+
+    /**
      * Get races from the specified resource location
      * @param {String} url to use to retrieve a collection of races
      * @param {Integer} [page] number to return (0 indexed)
