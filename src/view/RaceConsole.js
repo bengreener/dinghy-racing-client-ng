@@ -112,15 +112,13 @@ function RaceConsole() {
                 <label htmlFor="race-select">Select Race</label>
                 <select id="race-select" name="race" multiple={true} onChange={handleRaceSelect} value={selectedRaces}>{raceOptions}</select>
                 <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
-                <div>
-                    <fieldset>
-                        <legend>Race Type</legend>
-                        <input id="radio-race-type-fleet" name="race-type" type="radio" value="FLEET" onChange={handleRaceTypeChange} defaultChecked="true"/>
-                        <label htmlFor="radio-race-type-fleet">Fleet</label>
-                        <input id="radio-race-type-pursuit" name="race-type" type="radio" value="PURSUIT" onChange={handleRaceTypeChange} />
-                        <label htmlFor="radio-race-type-pursuit">Pursuit</label>
-                    </fieldset>
-                </div>
+                <fieldset>
+                    <legend>Race Type</legend>
+                    <input id="radio-race-type-fleet" name="race-type" type="radio" value="FLEET" onChange={handleRaceTypeChange} defaultChecked="true"/>
+                    <label htmlFor="radio-race-type-fleet">Fleet</label>
+                    <input id="radio-race-type-pursuit" name="race-type" type="radio" value="PURSUIT" onChange={handleRaceTypeChange} />
+                    <label htmlFor="radio-race-type-pursuit">Pursuit</label>
+                </fieldset>
             </div>
             <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
             <CollapsableContainer heading={'Races'}>
