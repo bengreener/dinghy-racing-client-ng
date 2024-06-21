@@ -5216,7 +5216,7 @@ describe('when a StartSequence is requested', () => {
         jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
 
         fetch.mockImplementation((resource) => {
-            if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&sort=plannedStartTime,ASC') {
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&type=FLEET&sort=plannedStartTime,ASC') {
                 return Promise.resolve({
                     ok: true,
                     status: 200,
@@ -5254,7 +5254,7 @@ describe('when a StartSequence is requested', () => {
         });
 
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.getStartSequence(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'));
+        const promise = dinghyRacingModel.getStartSequence(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), RaceType.FLEET);
         const result = await promise;
         const flags = result.domainObject.getFlags();
 
@@ -5279,7 +5279,7 @@ describe('when a StartSequence is requested', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.getStartSequence(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'));
+        const promise = dinghyRacingModel.getStartSequence(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), RaceType.FLEET);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});

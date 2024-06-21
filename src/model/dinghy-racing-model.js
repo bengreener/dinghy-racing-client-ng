@@ -1226,12 +1226,14 @@ class DinghyRacingModel {
 
     /**
      * Get a start sequence for starting races during a session
+     * Only one type of race can be included in the start sequence
      * @param {Date} startTime The start time of the first race
      * @param {Date} endTime The start time of the last race
+     * @param {RaceType} type The type of race to include in the start sequence
      * @returns {Promise<Result>} If successful result domainObject will be StartSequence
      */
-    async getStartSequence(startTime, endTime) {
-        const result = await this.getRacesBetweenTimes(startTime, endTime, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
+    async getStartSequence(startTime, endTime, type) {
+        const result = await this.getRacesBetweenTimesForType(startTime, endTime, type, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
 
         if (result.success) {
             const startSequence = new StartSequence(result.domainObject, this);
