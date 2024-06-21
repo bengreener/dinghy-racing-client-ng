@@ -60,6 +60,9 @@ it('renders', async () => {
     expect(selectSessionStart).toBeInTheDocument();
     const selectSessionEnd = screen.getByLabelText(/session end/i);
     expect(selectSessionEnd).toBeInTheDocument();
+    expect(screen.getByLabelText(/fleet/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/fleet/i)).toBeChecked();
+    expect(screen.getByLabelText(/pursuit/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: /flags/i})).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: /races/i})).toBeInTheDocument();
 });

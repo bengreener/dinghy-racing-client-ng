@@ -48,6 +48,9 @@ button.embedded {
     cursor: pointer;
     background-color: inherit;
 }
+fieldset {
+	display: inline;
+}
 input {
     border-radius: 25pt;
     padding: 5pt;
