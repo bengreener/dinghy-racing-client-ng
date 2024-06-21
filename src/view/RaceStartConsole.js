@@ -22,6 +22,7 @@ import ActionListView from './ActionListView';
 import { sortArray } from '../utilities/array-utilities';
 import CollapsableContainer from './CollapsableContainer';
 import FlagControl from './FlagControl';
+import RaceType from '../model/domain-classes/race-type';
 
 /**
  * Provide Race Officer with information needed to successfully start races in a session
@@ -46,6 +47,7 @@ function RaceStartConsole () {
     });
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
     const [audio, setAudio] = useState('none');
+    const [raceType, setRaceType] = useState(RaceType.FLEET);
     const startSequence = useRef(null);
 
     const handleRaceUpdate = useCallback(() => {
@@ -68,7 +70,7 @@ function RaceStartConsole () {
     // get start sequence for selected session
     useEffect(() => {
         let ignoreFetch = false; // set to true if RaceStartConsole rerendered before fetch completes to avoid using out of date result
-        model.getStartSequence(new Date(sessionStart), new Date(sessionEnd)).then(result => {
+        model.getStartSequence(new Date(sessionStart), new Date(sessionEnd), raceType).then(result => {
             if (!ignoreFetch && !result.success) {
                 setMessage('Unable to load start sequence\n' + result.message);
             }
@@ -100,7 +102,7 @@ function RaceStartConsole () {
                 startSequence.current = null;
             }
         }
-    }, [model, sessionStart, sessionEnd, racesUpdateRequestAt, handleStartSequenceTick]);
+    }, [model, sessionStart, sessionEnd, raceType, racesUpdateRequestAt, handleStartSequenceTick]);
 
     // register on update callbacks for races
     useEffect(() => {
@@ -123,6 +125,10 @@ function RaceStartConsole () {
         setSessionEnd(date);
     }
 
+    function handleRaceTypeChange({ target }) {
+        setRaceType(RaceType.from(target.value));
+    }
+
     // create race start actions list
     const actionsMap = new Map();
     actions.forEach(action => {
@@ -141,9 +147,9 @@ function RaceStartConsole () {
             <div>
                 <fieldset>
                     <legend>Race Type</legend>
-                    <input id="radio-race-type-fleet" name="race-type" type="radio" value="FLEET" defaultChecked="true"/>
+                    <input id="radio-race-type-fleet" name="race-type" type="radio" value="FLEET" onChange={handleRaceTypeChange} defaultChecked="true"/>
                     <label htmlFor="radio-race-type-fleet">Fleet</label>
-                    <input id="radio-race-type-pursuit" name="race-type" type="radio" value="PURSUIT" />
+                    <input id="radio-race-type-pursuit" name="race-type" type="radio" value="PURSUIT" onChange={handleRaceTypeChange} />
                     <label htmlFor="radio-race-type-pursuit">Pursuit</label>
                 </fieldset>
             </div>            

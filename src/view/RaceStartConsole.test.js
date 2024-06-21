@@ -15,13 +15,15 @@
  */
 
 import { customRender } from '../test-utilities/custom-renders';
-import { act, screen, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import RaceStartConsole from './RaceStartConsole';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 import { httpRootURL, wsRootURL, races, raceScorpionA, raceGraduateA, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet } from '../model/__mocks__/test-data';
 import StartSequence from '../model/domain-classes/start-sequence';
 import StartSignal from '../model/domain-classes/start-signal';
+import RaceType from '../model/domain-classes/race-type';
 
 
 jest.mock('../model/dinghy-racing-model');
@@ -66,6 +68,45 @@ it('renders', async () => {
     expect(screen.getByRole('heading', {name: /flags/i})).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: /races/i})).toBeInTheDocument();
 });
+
+it('calls getStartSequence with correct arguments', async () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const controller = new DinghyRacingController(model);
+    const getStartSequenceSpy = jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+    const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
+    sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
+    const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000); // create as 18:00 UTC intially
+    sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
+    
+    await act(async () => {        
+        customRender(<RaceStartConsole />, model, controller);
+    });
+
+    expect(getStartSequenceSpy).toHaveBeenCalledWith(sessionStart, sessionEnd, RaceType.FLEET);
+});
+
+describe('when new value set for race type', () => {
+    it('calls getStartSequence with correct arguments', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const getStartSequenceSpy = jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+        const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
+        sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
+        const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000); // create as 18:00 UTC intially
+        sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
+        
+        await act(async () => {        
+            customRender(<RaceStartConsole />, model, controller);
+        });
+        
+        await act(async () => {
+            await user.click(screen.getByLabelText(/pursuit/i));
+        });
+    
+        expect(getStartSequenceSpy).toHaveBeenCalledWith(sessionStart, sessionEnd, RaceType.PURSUIT);
+    });
+})
 
 it('defaults session start to 8:00 today', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
