@@ -4,6 +4,9 @@
  * @returns {string} 
  */
 function toTitleCase(string) {
+    if (string == null) {
+        return '';
+    }
       return string.replace(/\w\S*/g, function(text) {
         return text.charAt(0).toUpperCase() + text.substring(1).toLowerCase();
     });
@@ -15,6 +18,9 @@ function toTitleCase(string) {
  * @returns {string}
  */
 function insertSpaceInCamelCase(string) {
+    if (string == null) {
+        return '';
+    }
     const regex = /[A-Z]/g;
     return string.replaceAll(regex, x => ` ${x}`);
 }
