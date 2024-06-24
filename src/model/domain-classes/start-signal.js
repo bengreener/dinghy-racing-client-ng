@@ -23,6 +23,10 @@ class StartSignal {
     static PREPARATORYSIGNAL = 'PREPARATORYSIGNAL';
     static ONEMINUTE = 'ONEMINUTE';
 	static STARTINGSIGNAL = 'STARTINGSIGNAL';
+    static WARNINGSIGNALCLASS = 'WARNINGSIGNALCLASS';
+    static PREPARATORYSIGNALCLASS = 'PREPARATORYSIGNALCLASS';
+    static ONEMINUTECLASS = 'ONEMINUTECLASS';
+	static STARTINGSIGNALCLASS = 'STARTINGSIGNALCLASS';
 
     /**
      * Return a StartSequence stage value based on the supplied string
@@ -39,6 +43,14 @@ class StartSignal {
                 return StartSignal.ONEMINUTE;
             case 'STARTINGSIGNAL':
                 return StartSignal.STARTINGSIGNAL;
+            case 'WARNINGSIGNALCLASS':
+                return StartSignal.WARNINGSIGNALCLASS;
+            case 'PREPARATORYSIGNALCLASS':
+                return StartSignal.PREPARATORYSIGNALCLASS;
+            case 'ONEMINUTECLASS':
+                return StartSignal.ONEMINUTECLASS;
+            case 'STARTINGSIGNALCLASS':
+                return StartSignal.STARTINGSIGNALCLASS;
             default:
                 return StartSignal.NONE;
         }
