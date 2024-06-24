@@ -160,4 +160,5 @@ class StartSequence {
     }
 }
 
+>>>>>>> 6fd2b98 (correct spelling and syntac in start-sequence.js)
 export default StartSequence;
