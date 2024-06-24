@@ -60,7 +60,7 @@ class DinghyRacingModel {
      */
     static raceTemplate() {
         return {name: '', plannedStartTime: null, dinghyClass: DinghyRacingModel.dinghyClassTemplate(), type: null, duration: 0, plannedLaps: null, lapsSailed: null, lapForecast: null, 
-            lastLapTime: null, averageLapTime: null, clock: null, startSequenceState: StartSignal.NONE, url: ''};
+            lastLapTime: null, averageLapTime: null, clock: null, startSequenceState: StartSignal.NONE, dinghyClasses: [], url: ''};
     }
 
     /**

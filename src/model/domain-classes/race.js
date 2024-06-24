@@ -30,5 +30,6 @@ import RaceType from '../race-type';
  * @property {Number} averageLapTime The average lap time of the lead boat in the race; in milliseconds
  * @property {Clock} clock The race clock
  * @property {StartSignal} startSequenceState The stage the race has reached in it's start sequence
+ * @property {Array<DinghyClass>} dinghyClasses The set of dinghy classes for boats that have been entered into the race
  * @property {String} url The URL to the remote resource
  */
