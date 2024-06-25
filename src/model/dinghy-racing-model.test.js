@@ -3798,11 +3798,13 @@ describe('when searching for entries by race', () => {
 
 describe('when a race is requested', () => {
     it('returns a promise that resolves to a result indicating success and containing the race when the race is found', async () => {
+        const raceScorpion_AHAL_withEntries = {...raceScorpion_AHAL, dinghyClasses: [{name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043}]};
+        const raceScorpionA_withEntries = {...raceScorpionA, dinghyClasses: [{name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043}]};
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,
                 status: 200, 
-                json: () => Promise.resolve(raceScorpion_AHAL)
+                json: () => Promise.resolve(raceScorpion_AHAL_withEntries)
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -3810,7 +3812,7 @@ describe('when a race is requested', () => {
         const promise = dinghyRacingModel.getRace(raceScorpionA.url);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, 'domainObject': raceScorpionA});
+        expect(result).toEqual({'success': true, 'domainObject': raceScorpionA_withEntries});
     });
     // handicap races do not have a dinghy class set so a 404 when searcing for a dinghy class from race is an expected result
     it('returns a promise that resolves to a result indicating success and containing the race when the race is found but the dinghyClass is not found as the race is a handicap', async () => {

@@ -1424,6 +1424,7 @@ class DinghyRacingModel {
             lastLapTime: raceHAL.leadEntry ? this.convertISO8601DurationToMilliseconds(raceHAL.leadEntry.lastLapTime) : null,
             averageLapTime: raceHAL.leadEntry ? this.convertISO8601DurationToMilliseconds(raceHAL.leadEntry.averageLapTime) : null,
             startSequenceState: StartSignal.from(raceHAL.startSequenceState),
+            dinghyClasses: raceHAL.dinghyClasses,
             url: raceHAL._links.self.href
         }
     }
