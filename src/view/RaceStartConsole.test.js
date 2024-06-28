@@ -144,11 +144,11 @@ it('displays race names and blue peter', async () => {
     });
 
     const flagIndicators = (screen.getByRole('heading', {name: 'Flags'})).parentNode;
-    expect(within(flagIndicators).getByText(/scorpion a/i)).toBeInTheDocument();
+    expect(within(flagIndicators).getByText(/scorpion class/i)).toBeInTheDocument();
     expect(within(flagIndicators).getByText(/blue peter/i)).toBeInTheDocument();
-    expect(within(flagIndicators).getByText(/graduate a/i)).toBeInTheDocument();
-    expect(within(flagIndicators).getByText(/handicap a/i)).toBeInTheDocument();
-    expect(within(flagIndicators).getByText(/comet a/i)).toBeInTheDocument();
+    expect(within(flagIndicators).getByText(/graduate class/i)).toBeInTheDocument();
+    expect(within(flagIndicators).getByText(/club burgee/i)).toBeInTheDocument();
+    expect(within(flagIndicators).getByText(/comet class/i)).toBeInTheDocument();
 });
 
 it('displays initial state for each flag', async () => {
@@ -274,21 +274,20 @@ it('displays actions to start races in session', async () => {
     await act(async () => {
         customRender(<RaceStartConsole />, model, controller);
     });
-
     const actionRows = screen.getAllByRole('row');
     expect(actionRows).toHaveLength(5);
     expect(within(actionRows[1]).getByText(timeFormat.format(new Date('2021-10-14T14:00:00Z')))).toBeInTheDocument();
-    expect(within(actionRows[1]).getByText(/raise warning flag for scorpion a/i)).toBeInTheDocument();
+    expect(within(actionRows[1]).getByText(/raise scorpion class flag/i)).toBeInTheDocument();
     expect(within(actionRows[1]).getByText(/00:00/i)).toBeInTheDocument();
     expect(within(actionRows[2]).getByText(timeFormat.format(new Date('2021-10-14T14:05:00Z')))).toBeInTheDocument();
     expect(within(actionRows[2]).getByText(/raise blue peter/i)).toBeInTheDocument();
-    expect(within(actionRows[2]).getByText(/raise warning flag for graduate a/i)).toBeInTheDocument();
+    expect(within(actionRows[2]).getByText(/raise graduate class flag/i)).toBeInTheDocument();
     expect(within(actionRows[2]).getByText(/00:00/i)).toBeInTheDocument();
     expect(within(actionRows[3]).getByText(timeFormat.format(new Date('2021-10-14T14:10:00Z')))).toBeInTheDocument();
-    expect(within(actionRows[3]).getByText(/lower warning flag for scorpion a/i)).toBeInTheDocument();
+    expect(within(actionRows[3]).getByText(/lower scorpion class flag/i)).toBeInTheDocument();
     expect(within(actionRows[3]).getByText(/05:00/i)).toBeInTheDocument();
     expect(within(actionRows[4]).getByText(timeFormat.format(new Date('2021-10-14T14:15:00Z')))).toBeInTheDocument();
-    expect(within(actionRows[4]).getByText(/lower warning flag for graduate a/i)).toBeInTheDocument();
+    expect(within(actionRows[4]).getByText(/lower graduate class flag/i)).toBeInTheDocument();
     expect(within(actionRows[4]).getByText(/10:00/i)).toBeInTheDocument();
 });
 
@@ -356,17 +355,17 @@ describe('when clock ticks', () => {
         const actionRows = screen.getAllByRole('row');
         expect(actionRows).toHaveLength(5);
         expect(within(actionRows[1]).getByText(timeFormat.format(new Date('2021-10-14T14:00:00Z')))).toBeInTheDocument();
-        expect(within(actionRows[1]).getByText(/raise warning flag for scorpion a/i)).toBeInTheDocument();
+        expect(within(actionRows[1]).getByText(/raise scorpion class flag/i)).toBeInTheDocument();
         expect(within(actionRows[1]).getByText(/00:00/i)).toBeInTheDocument();
         expect(within(actionRows[2]).getByText(timeFormat.format(new Date('2021-10-14T14:05:00Z')))).toBeInTheDocument();
         expect(within(actionRows[2]).getByText(/raise blue peter/i)).toBeInTheDocument();
-        expect(within(actionRows[2]).getByText(/raise warning flag for graduate a/i)).toBeInTheDocument();
+        expect(within(actionRows[2]).getByText(/raise graduate class flag/i)).toBeInTheDocument();
         expect(within(actionRows[2]).getByText(/00:00/i)).toBeInTheDocument();
         expect(within(actionRows[3]).getByText(timeFormat.format(new Date('2021-10-14T14:10:00Z')))).toBeInTheDocument();
-        expect(within(actionRows[3]).getByText(/lower warning flag for scorpion a/i)).toBeInTheDocument();
+        expect(within(actionRows[3]).getByText(/lower scorpion class flag/i)).toBeInTheDocument();
         expect(within(actionRows[3]).getByText(/04:59/i)).toBeInTheDocument();
         expect(within(actionRows[4]).getByText(timeFormat.format(new Date('2021-10-14T14:15:00Z')))).toBeInTheDocument();
-        expect(within(actionRows[4]).getByText(/lower warning flag for graduate a/i)).toBeInTheDocument();
+        expect(within(actionRows[4]).getByText(/lower graduate class flag/i)).toBeInTheDocument();
         expect(within(actionRows[4]).getByText(/09:59/i)).toBeInTheDocument();
     });
     describe('when ticks to 1 minute before a race start state change', () => {
@@ -567,6 +566,7 @@ describe('when 1 second before start of first race', () => {
 describe('when start of first race', () => {
     it('race start state change audio is present in document', async () => {
         const races = [{...raceScorpionA, startSequenceState: StartSignal.PREPARATORYSIGNAL}, {...raceGraduateA, startSequenceState: StartSignal.WARNINGSIGNAL}];
+        jest.setSystemTime(new Date('2021-10-14T10:20:00Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {

@@ -16,6 +16,8 @@
 
 import { act, render, screen, within } from '@testing-library/react';
 import ActionListView from './ActionListView';
+import FlagState from '../model/domain-classes/flag-state';
+import FlagRole from '../model/domain-classes/flag-role';
 
 const formatOptions = {
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -37,13 +39,11 @@ afterEach(() => {
 
 it('renders', () => {
     render(<ActionListView actions={[]}/>);
-
     expect(screen.getByRole('heading', {name: /action list/i})).toBeInTheDocument();
 });
 
 it('displays a header for the action list', () => {
     render(<ActionListView actions={[]}/>);
-
     expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByRole('columnheader', {name: /time/i})).toBeInTheDocument();
     expect(screen.getByRole('columnheader', {name: /action/i})).toBeInTheDocument();
@@ -57,43 +57,39 @@ it('displays actions', () => {
         minute: '2-digit',
         hour12: false
     };
-
     const now = Date.now();
     const actions = [
-        {time: new Date(now), description: 'Action 1'},
-        {time: new Date(now + 300000), description: 'Action 2'},
-        {time: new Date(now + 600000), description: 'Action 3'}
+        {flag: {name: 'A Class Flag', role: FlagRole.WARNING}, time: new Date(now), afterState: FlagState.RAISED},
+        {flag: {name: 'P Flag', role: FlagRole.PREPARATORY}, time: new Date(now + 300000), afterState: FlagState.RAISED},
+        {flag: {name: 'B Class Flag', role: FlagRole.WARNING}, time: new Date(now + 300000), afterState: FlagState.RAISED},
+        {flag: {name: 'A Class Flag', role: FlagRole.WARNING}, time: new Date(now + 600000), afterState: FlagState.LOWERED}
     ];
-
     render(<ActionListView actions={actions}/>);
-
     const actionRows = screen.getAllByRole('row');
     expect(actionRows).toHaveLength(4);
     expect(within(actionRows[1]).getByText(timeFormat.format(new Date(now)))).toBeInTheDocument();
-    expect(within(actionRows[1]).getByText(/action 1/i)).toBeInTheDocument();
+    expect(within(actionRows[1]).getByText(/raise a class flag/i)).toBeInTheDocument();
     expect(within(actionRows[1]).getByText(/00:00/i)).toBeInTheDocument();
     expect(within(actionRows[2]).getByText(timeFormat.format(new Date(now + 300000)))).toBeInTheDocument();
-    expect(within(actionRows[2]).getByText(/action 2/i)).toBeInTheDocument();
+    expect(within(actionRows[2]).getByText(/raise p flag.+raise b class flag/i)).toBeInTheDocument();
     expect(within(actionRows[2]).getByText(/05:00/i)).toBeInTheDocument();
     expect(within(actionRows[3]).getByText(timeFormat.format(new Date(now + 600000)))).toBeInTheDocument();
-    expect(within(actionRows[3]).getByText(/action 3/i)).toBeInTheDocument();
+    expect(within(actionRows[3]).getByText(/lower a class flag/i)).toBeInTheDocument();
     expect(within(actionRows[3]).getByText(/10:00/i)).toBeInTheDocument();
 });
 
 it('updates action countdowns every second', async () => {
     const now = Date.now();
     const actions = [
-        {time: new Date(now), description: 'Action 1'},
-        {time: new Date(now + 300000), description: 'Action 2'},
-        {time: new Date(now + 600000), description: 'Action 3'}
+        {flag: {name: 'A Class Flag', role: FlagRole.WARNING}, time: new Date(now), afterState: FlagState.RAISED},
+        {flag: {name: 'P Flag', role: FlagRole.PREPARATORY}, time: new Date(now + 300000), afterState: FlagState.RAISED},
+        {flag: {name: 'B Class Flag', role: FlagRole.WARNING}, time: new Date(now + 300000), afterState: FlagState.RAISED},
+        {flag: {name: 'A Class Flag', role: FlagRole.WARNING}, time: new Date(now + 600000), afterState: FlagState.LOWERED}
     ];
-
     render(<ActionListView actions={actions}/>);
-
     act(() => {
         jest.advanceTimersByTime(1000);
     });
-
     const actionRows = screen.getAllByRole('row');
     expect(actionRows).toHaveLength(4);
     expect(await within(actionRows[1]).findByText(/00:00/i)).toBeInTheDocument();

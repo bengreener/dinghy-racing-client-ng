@@ -48,6 +48,7 @@ import {
 import StartSignal from './domain-classes/start-signal';
 import FlagState from './domain-classes/flag-state';
 import RaceType from './domain-classes/race-type';
+import FlagRole from './domain-classes/flag-role';
 
 global.fetch = jest.fn();
 
@@ -5260,11 +5261,11 @@ describe('when a StartSequence is requested', () => {
 
         expect(promise).toBeInstanceOf(Promise);
         expect(flags.length).toBe(5);
-        expect(flags[0]).toEqual({ name: 'Scorpion A Warning', state: FlagState.LOWERED, timeToChange: -600000 });
-        expect(flags[1]).toEqual({ name: 'Blue Peter', state: FlagState.LOWERED, timeToChange: -900000 });
-        expect(flags[2]).toEqual({ name: 'Graduate A Warning', state: FlagState.LOWERED, timeToChange: -900000 });
-        expect(flags[3]).toEqual({ name: 'Comet A Warning', state: FlagState.LOWERED, timeToChange: -1200000 });
-        expect(flags[4]).toEqual({ name: 'Handicap A Warning', state: FlagState.LOWERED, timeToChange: -1500000 });
+        expect(flags[0]).toEqual({flag: { name: 'Scorpion Class Flag', state: FlagState.LOWERED, role: FlagRole.WARNING}, action: {flag: {name: 'Scorpion Class Flag', role: FlagRole.WARNING}, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED}});
+        expect(flags[1]).toEqual({flag: { name: 'Blue Peter', state: FlagState.LOWERED, role: FlagRole.PREPARATORY}, action: {flag: {name: 'Blue Peter', role: FlagRole.PREPARATORY}, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED}});
+        expect(flags[2]).toEqual({flag: { name: 'Graduate Class Flag', state: FlagState.LOWERED, role: FlagRole.WARNING}, action: {flag: {name: 'Graduate Class Flag', role: FlagRole.WARNING}, time: new Date(raceGraduateA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED}});
+        expect(flags[3]).toEqual({flag: { name: 'Comet Class Flag', state: FlagState.LOWERED, role: FlagRole.WARNING}, action: {flag: {name: 'Comet Class Flag', role: FlagRole.WARNING}, time: new Date(raceCometA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED}});
+        expect(flags[4]).toEqual({flag: { name: 'Club Burgee', state: FlagState.LOWERED, role: FlagRole.WARNING}, action: {flag: {name: 'Club Burgee', role: FlagRole.WARNING}, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED}});
 
         jest.runOnlyPendingTimers();
         jest.useRealTimers();
