@@ -111,32 +111,82 @@ class RaceStartSequence {
     _generateFlags(race) {
         const flags = [];
         const actions = []
-        let warningFlag;
-        if (race.dinghyClass) {
-            warningFlag = {name: race.dinghyClass.name + ' Class Flag', role: FlagRole.WARNING, actions: []};
+        if (race.type === RaceType.FLEET) {
+            let warningFlag;
+            if (race.dinghyClass) {
+                warningFlag = {name: race.dinghyClass.name + ' Class Flag', role: FlagRole.WARNING, actions: []};
+            }
+            else {
+                warningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, actions: []};
+            }
+            const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
+
+            const warningFlagRaiseAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
+            const warningFlagLowerAction = {flag: warningFlag, time: race.plannedStartTime, afterState: FlagState.LOWERED};
+            const preparatotyFlagRaiseAction = {flag: preparatoryFlag, time: new Date(race.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
+            const preparatotyFlagLowerAction = {flag: preparatoryFlag, time: race.plannedStartTime, afterState: FlagState.LOWERED};
+
+            warningFlag.actions.push(warningFlagRaiseAction);
+            warningFlag.actions.push(warningFlagLowerAction);
+            preparatoryFlag.actions.push(preparatotyFlagRaiseAction);
+            preparatoryFlag.actions.push(preparatotyFlagLowerAction);
+            flags.push(warningFlag);
+            flags.push(preparatoryFlag);
+
+            actions.push({flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED});
+            actions.push({flag: warningFlag, time: race.plannedStartTime, afterState: FlagState.LOWERED});
+            actions.push({flag: preparatoryFlag, time: new Date(race.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED});
+            actions.push({flag: preparatoryFlag, time: race.plannedStartTime, afterState: FlagState.LOWERED});
         }
-        else {
-            warningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, actions: []};
+        else if (race.type === RaceType.PURSUIT) {
+            // get dinghy classes of boats signed up to race and sort in PN order
+            const sortedDinghyClasses = sortArray(race.dinghyClasses, (dinghyClass => dinghyClass.portsmouthNumber)).reverse();
+            // first flag for the race is going to be the base class for the race (start with assumption this is a Club Optimist)
+            if (!sortedDinghyClasses.some(dc => dc.name === "Optimist (Club)")) {
+                sortedDinghyClasses.unshift({name: "Optimist (Club)", crewSize: 1, portsmouthNumber: 1831});
+            };
+            const basePN = sortedDinghyClasses[0].portsmouthNumber;
+            const baseDuration = race.duration;
+            for(let i = 0; i < sortedDinghyClasses.length; i++) {
+                if (i === 0) {
+                    // setup starting flags for first dinghy class
+                    const warningFlag = {name: sortedDinghyClasses[i].name + ' Class Flag', role: FlagRole.WARNING, actions: []};
+                    const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
+
+                    const warningFlagRaiseAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
+                    const warningFlagLowerAction = {flag: warningFlag, time: race.plannedStartTime, afterState: FlagState.LOWERED};
+                    const preparatotyFlagRaiseAction = {flag: preparatoryFlag, time: new Date(race.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
+                    const preparatotyFlagLowerAction = {flag: preparatoryFlag, time: race.plannedStartTime, afterState: FlagState.LOWERED};
+
+                    warningFlag.actions.push(warningFlagRaiseAction);
+                    warningFlag.actions.push(warningFlagLowerAction);
+                    preparatoryFlag.actions.push(preparatotyFlagRaiseAction);
+                    preparatoryFlag.actions.push(preparatotyFlagLowerAction);
+                    flags.push(warningFlag);
+                    flags.push(preparatoryFlag);
+
+                    actions.push(warningFlagRaiseAction);
+                    actions.push(warningFlagLowerAction);
+                    actions.push(preparatotyFlagRaiseAction);
+                    actions.push(preparatotyFlagLowerAction);
+                }
+                else {
+                    const warningFlag = {name: sortedDinghyClasses[i].name + ' Class Flag', role: FlagRole.WARNING, actions: []};
+
+                    const offset = Math.round((baseDuration - ((baseDuration * sortedDinghyClasses[i].portsmouthNumber) / basePN)) / 1000) * 1000; // round to the nearest second as this is the precision we are working with
+                    
+                    const warningFlagRaiseAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + offset - 60000), afterState: FlagState.RAISED};
+                    const warningFlagLowerAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + offset), afterState: FlagState.LOWERED};
+
+                    warningFlag.actions.push(warningFlagRaiseAction);
+                    warningFlag.actions.push(warningFlagLowerAction);
+                    flags.push(warningFlag);
+
+                    actions.push(warningFlagRaiseAction);
+                    actions.push(warningFlagLowerAction);
+                }
+            }
         }
-        const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
-
-        const warningFlagRaiseAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-        const warningFlagLowerAction = {flag: warningFlag, time: race.plannedStartTime, afterState: FlagState.LOWERED};
-        const preparatotyFlagRaiseAction = {flag: preparatoryFlag, time: new Date(race.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-        const preparatotyFlagLowerAction = {flag: preparatoryFlag, time: race.plannedStartTime, afterState: FlagState.LOWERED};
-
-        warningFlag.actions.push(warningFlagRaiseAction);
-        warningFlag.actions.push(warningFlagLowerAction);
-        preparatoryFlag.actions.push(preparatotyFlagRaiseAction);
-        preparatoryFlag.actions.push(preparatotyFlagLowerAction);
-        flags.push(warningFlag);
-        flags.push(preparatoryFlag);
-
-        actions.push({flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED});
-        actions.push({flag: warningFlag, time: race.plannedStartTime, afterState: FlagState.LOWERED});
-        actions.push({flag: preparatoryFlag, time: new Date(race.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED});
-        actions.push({flag: preparatoryFlag, time: race.plannedStartTime, afterState: FlagState.LOWERED});
-
         return {flags: flags, actions: actions};
     }
 

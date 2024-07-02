@@ -272,7 +272,7 @@ const raceCometA = {name: 'Comet A', plannedStartTime: new Date('2021-10-14T10:4
 const raceHandicapA = {name: 'Handicap A', plannedStartTime: new Date('2021-10-14T10:45:00Z'), dinghyClass: null, duration: 2700000, type: 'FLEET', plannedLaps: 5, lapsSailed: null, lapForecast: 5.0, lastLapTime: 0, averageLapTime: 0, clock: null, startSequenceState: 'NONE', dinghyClasses: [], url: 'http://localhost:8081/dinghyracing/api/races/8' };
 const races = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA];
 
-const racePurusitA = {name: 'Pursuit A', plannedStartTime: new Date('2021-10-14T10:45:00Z'), dinghyClass: null, duration: 2700000, type: 'PURSUIT', plannedLaps: 5, lapsSailed: null, lapForecast: 5.0, lastLapTime: 0, averageLapTime: 0, clock: null, startSequenceState: 'NONE', dinghyClasses: [], url: 'http://localhost:8081/dinghyracing/api/races/9' };
+const racePursuitA = {name: 'Pursuit A', plannedStartTime: new Date('2021-10-14T10:45:00Z'), dinghyClass: null, duration: 2700000, type: 'PURSUIT', plannedLaps: 5, lapsSailed: null, lapForecast: 5.0, lastLapTime: 0, averageLapTime: 0, clock: null, startSequenceState: 'NONE', dinghyClasses: [], url: 'http://localhost:8081/dinghyracing/api/races/9' };
 
 const entryChrisMarshallScorpionA1234 = {
 	helm: competitorChrisMarshall, crew: null,
@@ -333,8 +333,8 @@ export {
 
 	dinghies, dinghiesScorpion, dinghy1234, dinghy2726, dinghy6745, dinghy2928, dinghy826,
 
-	races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA, racePurusitA,
-	
+	races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA, racePursuitA,
+
 	entryChrisMarshallHandicapA1234, entryChrisMarshallScorpionA1234, entryJillMyerCometA826,
 	entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA
 }
