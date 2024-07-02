@@ -31,19 +31,19 @@ afterEach(() => {
 });
 
 it('diaplays the name of the flag', () => {
-    render(<FlagControl flag={{name: 'Flag A', role: FlagRole.WARNING, state: FlagState.LOWERED}} timeToChange={-1000} />);
+    render(<FlagControl flag={{name: 'Flag A', role: FlagRole.WARNING, state: FlagState.LOWERED}} timeToChange={1000} />);
 
     expect(screen.getByLabelText(/flag/i)).toHaveValue('Flag A');
 });
 
 it('displays the correct status for the flag', () => {
-    render(<FlagControl flag={{name: 'Flag A', role: FlagRole.PREPARATORY, state: FlagState.RAISED}} timeToChange={-1000} />);
+    render(<FlagControl flag={{name: 'Flag A', role: FlagRole.PREPARATORY, state: FlagState.RAISED}} timeToChange={1000} />);
 
     expect(screen.getByLabelText(/state/i)).toHaveValue('Raised');
 });
 
 it('displays the time to the next flag state change', () => {
-    render(<FlagControl flag={{name: 'Flag A', role: FlagRole.WARNING, state: FlagState.RAISED}} timeToChange={-60000} />);
+    render(<FlagControl flag={{name: 'Flag A', role: FlagRole.WARNING, state: FlagState.RAISED}} timeToChange={60000} />);
 
     expect(screen.getByLabelText(/change in/i)).toHaveValue('01:00');
 });
