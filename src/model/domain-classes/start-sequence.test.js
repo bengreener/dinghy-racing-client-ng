@@ -32,6 +32,18 @@ afterEach(() => {
 
 const races = [ raceScorpionA, raceGraduateA ];
 
+describe('when 11 minutes and .001 seconds before start of first race', () => {
+    it('does not provide an indicator to prepare for a race start state change', async () => {
+        jest.setSystemTime(new Date('2021-10-14T10:18:59.999Z'));
+    
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const startSequence = new StartSequence(races, model);
+        const prepare = startSequence.getPrepareForRaceStartStateChange();
+
+        expect(prepare).toEqual(false);
+    });
+});
+
 describe('when 11 minutes before start of first race', () => {
     it('provides an indicator to prepare for a race start state change', async () => {
         jest.setSystemTime(new Date('2021-10-14T10:19:00Z'));
@@ -41,6 +53,30 @@ describe('when 11 minutes before start of first race', () => {
         const prepare = startSequence.getPrepareForRaceStartStateChange();
 
         expect(prepare).toEqual(true);
+    });
+});
+
+describe('when 10 minutes and 59.001 seconds before start of first race', () => {
+    it('provides an indicator to prepare for a race start state change', async () => {
+        jest.setSystemTime(new Date('2021-10-14T10:19:00.999Z'));
+    
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const startSequence = new StartSequence(races, model);
+        const prepare = startSequence.getPrepareForRaceStartStateChange();
+
+        expect(prepare).toEqual(true);
+    });
+});
+
+describe('when 10 minutes and 59 seconds before start of first race', () => {
+    it('does not provide an indicator for a race start state change', async () => {
+        jest.setSystemTime(new Date('2021-10-14T10:19:01Z'));
+    
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const startSequence = new StartSequence(races, model);
+        const prepare = startSequence.getPrepareForRaceStartStateChange();
+
+        expect(prepare).toEqual(false);
     });
 });
 
@@ -75,6 +111,16 @@ describe('when 10 minutes 1 second before start of first race', () => {
     });
 });
 
+describe('when 10 minutes .001 seconds before start of first race', () => {
+    it('does not provide an indicator for a race start state change', () => {
+        jest.setSystemTime(new Date('2021-10-14T10:19:59.999Z'));
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const startSequence = new StartSequence(races, model);
+        const start = startSequence.getRaceStartStateChange();
+        expect(start).toEqual(false);
+    });
+});
+
 describe('when 10 minutes before start of first race', () => {
     it('warning flag for 1st race is raised other flags lowered', () => {
         jest.setSystemTime(new Date('2021-10-14T10:20:00Z'));
@@ -95,6 +141,27 @@ describe('when 10 minutes before start of first race', () => {
         const startSequence = new StartSequence(races, model);
         const start = startSequence.getRaceStartStateChange();
         expect(start).toEqual(true);
+    });
+});
+
+describe('when 9 minutes and 59.001 seconds before start of first race', () => {
+    it('provides an indicator for a race start state change', () => {
+        jest.setSystemTime(new Date('2021-10-14T10:20:00.999Z'));
+    
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const startSequence = new StartSequence(races, model);
+        const start = startSequence.getRaceStartStateChange();
+        expect(start).toEqual(true);
+    });
+});
+
+describe('when 9 minutes 59 seconds before start of first race', () => {
+    it('does not provide an indicator for a race start state change', () => {
+        jest.setSystemTime(new Date('2021-10-14T10:20:01Z'));
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const startSequence = new StartSequence(races, model);
+        const start = startSequence.getRaceStartStateChange();
+        expect(start).toEqual(false);
     });
 });
 
