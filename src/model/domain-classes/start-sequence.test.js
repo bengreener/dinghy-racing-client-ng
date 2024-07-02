@@ -53,9 +53,9 @@ describe('when 10 minutes 1 second before start of first race', () => {
         const flags = startSequence.getFlags();
 
         expect(flags.length).toBe(3);
-        expect(flags[0]).toEqual({flag: { name: 'Scorpion Class Flag', state: FlagState.LOWERED, role: FlagRole.WARNING}, action: {flag: {name: 'Scorpion Class Flag', role: FlagRole.WARNING}, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED}});
-        expect(flags[1]).toEqual({flag: { name: 'Blue Peter', state: FlagState.LOWERED, role: FlagRole.PREPARATORY}, action: {flag: {name: 'Blue Peter', role: FlagRole.PREPARATORY}, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED}});
-        expect(flags[2]).toEqual({flag: { name: 'Graduate Class Flag', state: FlagState.LOWERED, role: FlagRole.WARNING}, action: {flag: {name: 'Graduate Class Flag', role: FlagRole.WARNING}, time: new Date(raceGraduateA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED}});
+        expect(flags[0].flag.state).toEqual(FlagState.LOWERED);
+        expect(flags[1].flag.state).toEqual(FlagState.LOWERED);
+        expect(flags[2].flag.state).toEqual(FlagState.LOWERED);
     });
     it('does not provide an indicator to prepare for a race start state change', () => {
         jest.setSystemTime(new Date('2021-10-14T10:19:59Z'));
@@ -80,13 +80,13 @@ describe('when 10 minutes before start of first race', () => {
         jest.setSystemTime(new Date('2021-10-14T10:20:00Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const startSequence = new StartSequence(races, model);
-
+        
         const flags = startSequence.getFlags();
 
         expect(flags.length).toBe(3);
-        expect(flags[0]).toEqual({flag: { name: 'Scorpion Class Flag', state: FlagState.RAISED, role: FlagRole.WARNING}, action: {flag: {name: 'Scorpion Class Flag', role: FlagRole.WARNING}, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED}});
-        expect(flags[1]).toEqual({flag: { name: 'Blue Peter', state: FlagState.LOWERED, role: FlagRole.PREPARATORY}, action: {flag: {name: 'Blue Peter', role: FlagRole.PREPARATORY}, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED}});
-        expect(flags[2]).toEqual({flag: { name: 'Graduate Class Flag', state: FlagState.LOWERED, role: FlagRole.WARNING}, action: {flag: {name: 'Graduate Class Flag', role: FlagRole.WARNING}, time: new Date(raceGraduateA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED}});
+        expect(flags[0].flag.state).toEqual(FlagState.RAISED);
+        expect(flags[1].flag.state).toEqual(FlagState.LOWERED);
+        expect(flags[2].flag.state).toEqual(FlagState.LOWERED);
     });
     it('provides an indicator for a race start state change', () => {
         jest.setSystemTime(new Date('2021-10-14T10:20:00Z'));
@@ -107,9 +107,9 @@ describe('when 5 minutes before start of first race', () => {
         const flags = startSequence.getFlags();
 
         expect(flags.length).toBe(3);
-        expect(flags[0]).toEqual({flag: { name: 'Scorpion Class Flag', state: FlagState.RAISED, role: FlagRole.WARNING}, action: {flag: {name: 'Scorpion Class Flag', role: FlagRole.WARNING}, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED}});
-        expect(flags[1]).toEqual({flag: { name: 'Blue Peter', state: FlagState.RAISED, role: FlagRole.PREPARATORY}, action: {flag: {name: 'Blue Peter', role: FlagRole.PREPARATORY}, time: raceGraduateA.plannedStartTime, afterState: FlagState.LOWERED}});
-        expect(flags[2]).toEqual({flag: { name: 'Graduate Class Flag', state: FlagState.RAISED, role: FlagRole.WARNING}, action: {flag: {name: 'Graduate Class Flag', role: FlagRole.WARNING}, time: raceGraduateA.plannedStartTime, afterState: FlagState.LOWERED}});
+        expect(flags[0].flag.state).toEqual(FlagState.RAISED);
+        expect(flags[1].flag.state).toEqual(FlagState.RAISED);
+        expect(flags[2].flag.state).toEqual(FlagState.RAISED);
     });
 });
 
@@ -122,9 +122,9 @@ describe('when 0 minutes before start of first race', () => {
         const flags = startSequence.getFlags();
 
         expect(flags.length).toBe(3);
-        expect(flags[0]).toEqual({flag: { name: 'Scorpion Class Flag', state: FlagState.LOWERED, role: FlagRole.WARNING}, action: undefined});
-        expect(flags[1]).toEqual({flag: { name: 'Blue Peter', state: FlagState.RAISED, role: FlagRole.PREPARATORY}, action: {flag: {name: 'Blue Peter', role: FlagRole.PREPARATORY}, time: raceGraduateA.plannedStartTime, afterState: FlagState.LOWERED}});
-        expect(flags[2]).toEqual({flag: { name: 'Graduate Class Flag', state: FlagState.RAISED, role: FlagRole.WARNING}, action: {flag: {name: 'Graduate Class Flag', role: FlagRole.WARNING}, time: raceGraduateA.plannedStartTime, afterState: FlagState.LOWERED}});
+        expect(flags[0].flag.state).toEqual(FlagState.LOWERED);
+        expect(flags[1].flag.state).toEqual(FlagState.RAISED);
+        expect(flags[2].flag.state).toEqual(FlagState.RAISED);
     });
 });
 
@@ -137,9 +137,9 @@ describe('when 0 minutes before start of last race', () => {
         const flags = startSequence.getFlags();
 
         expect(flags.length).toBe(3);
-        expect(flags[0]).toEqual({flag: { name: 'Scorpion Class Flag', state: FlagState.LOWERED, role: FlagRole.WARNING}, action: undefined});
-        expect(flags[1]).toEqual({flag: { name: 'Blue Peter', state: FlagState.LOWERED, role: FlagRole.PREPARATORY}, action: undefined});
-        expect(flags[2]).toEqual({flag: { name: 'Graduate Class Flag', state: FlagState.LOWERED, role: FlagRole.WARNING}, action: undefined});
+        expect(flags[0].flag.state).toEqual(FlagState.LOWERED);
+        expect(flags[1].flag.state).toEqual(FlagState.LOWERED);
+        expect(flags[2].flag.state).toEqual(FlagState.LOWERED);
     });
 });
 
@@ -237,19 +237,40 @@ describe('when time passes', () => {
 
 it('returns list of actions for the 2 races', () => {
     jest.setSystemTime(new Date('2021-10-14T10:19:59Z'));
-
-    const expectedActions = [
-        { flag: { name: 'Scorpion Class Flag', role: FlagRole.WARNING}, time: new Date('2021-10-14T10:20:00Z'), afterState: FlagState.RAISED },
-        { flag: { name: 'Scorpion Class Flag', role: FlagRole.WARNING}, time: new Date('2021-10-14T10:30:00Z'), afterState: FlagState.LOWERED },
-        { flag: { name: 'Blue Peter', role: FlagRole.PREPARATORY}, time: new Date('2021-10-14T10:25:00Z'), afterState: FlagState.RAISED },
-        { flag: { name: 'Blue Peter', role: FlagRole.PREPARATORY}, time: new Date('2021-10-14T10:35:00Z'), afterState: FlagState.LOWERED },
-        { flag: { name: 'Graduate Class Flag', role: FlagRole.WARNING}, time: new Date('2021-10-14T10:25:00Z'), afterState: FlagState.RAISED },
-        { flag: { name: 'Graduate Class Flag', role: FlagRole.WARNING}, time: new Date('2021-10-14T10:35:00Z'), afterState: FlagState.LOWERED }
-    ];
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const startSequence = new StartSequence(races, model);
+
+    const scorpionAWarningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, actions: []};
+    const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
+    const graduateAWarningFlag = {name: 'Graduate Class Flag', role: FlagRole.WARNING, actions: []};
+
+    const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
+    const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+    
+    const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
+    const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceGraduateA.plannedStartTime, afterState: FlagState.LOWERED};
+    
+    const graduateAWarningflagRaiseAction = {flag: graduateAWarningFlag, time: new Date(raceGraduateA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
+    const graduateAWarningflagLowerAction = {flag: graduateAWarningFlag, time: raceGraduateA.plannedStartTime, afterState: FlagState.LOWERED};
+
+    scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
+    scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
+    
+    preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
+    preparatoryFlag.actions.push(preparatoryFlagLowerAction);
+    
+    graduateAWarningFlag.actions.push(graduateAWarningflagRaiseAction);
+    graduateAWarningFlag.actions.push(graduateAWarningflagLowerAction);
+
     const actions = startSequence.getActions();
-    expect(actions).toEqual(expectedActions);
+
+    expect(actions).toHaveLength(6);
+    expect(actions[0]).toStrictEqual(scorpionAWarningflagRaiseAction);
+    expect(actions[1]).toStrictEqual(scorpionAWarningflagLowerAction);
+    expect(actions[2]).toStrictEqual(graduateAWarningflagRaiseAction);
+    expect(actions[3]).toStrictEqual(graduateAWarningflagLowerAction);
+    expect(actions[4]).toStrictEqual(preparatoryFlagRaiseAction);
+    expect(actions[5]).toStrictEqual(preparatoryFlagLowerAction);
 });
 
 it('returns the races included in the race session', () => {

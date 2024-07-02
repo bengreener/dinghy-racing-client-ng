@@ -16,10 +16,12 @@
 
 import RaceStartSequence from './race-start-sequence';
 import FlagState from './flag-state';
+import FlagRole from './flag-role';
 import { sortArray } from '../../utilities/array-utilities';
 
 class SessionStartSequence {
-    _raceStartSequences;
+    _raceStartSequences = [];
+    _flags = [];
     _actions = [];
 
     /**
@@ -28,7 +30,16 @@ class SessionStartSequence {
      */
     constructor(races, model) {
         this._raceStartSequences = races.map(race => new RaceStartSequence(race, model));
-        this._actions = this._generateActions();
+        // this._actions = this._generateActions();
+        ({flags: this._flags, actions: this._actions} = this._generateFlags(this._raceStartSequences));
+    }
+
+    /**
+     * Get all flags for this race start
+     * @returns {Array<Flag>}
+     */
+    getFlags() {
+        return this._flags;
     }
 
     /**
@@ -37,24 +48,28 @@ class SessionStartSequence {
      * @returns {Array<Flag>}
      */
     getFlagsAtTime(time) {
-        const flags = this._raceStartSequences.flatMap(rss => rss.getFlagsAtTime(time));
-        // consolidate flags with the same name
-        // raised status has precedence
-        const consolidatedFlags = [];
-        flags.forEach(flag => {
-            if (!consolidatedFlags.some(element => element.name === flag.name)) { // only process new flags
-                const newFlag = {...flag};
-                for (let i = 0; i < flags.length; i++) {
-                    if (newFlag.name === flags[i].name) {
-                        if (newFlag.state === FlagState.RAISED || flags[i].state === FlagState.RAISED) {
-                            newFlag.state = FlagState.RAISED;
-                        }
-                    }
-                }
-                consolidatedFlags.push(newFlag);
+        const truncatedTime = Math.trunc(time.valueOf() / 1000) * 1000;
+        const flagsWithState = this._flags.map(flag => {
+            const fws = flag;
+            const actions = sortArray(fws.actions, action => action.time);
+            switch (actions[0].afterState) {
+                case FlagState.LOWERED:
+                    fws.state = FlagState.RAISED;
+                    break;
+                default:
+                    fws.state = FlagState.LOWERED;
             }
+            for(const action of actions) {
+                if (Math.trunc(action.time.valueOf() / 1000) * 1000 <= truncatedTime ) { // round off to containing second to identify actions occurring within that second
+                    fws.state = action.afterState;
+                }
+                else {
+                    break;
+                }
+            }
+            return fws;
         });
-        return consolidatedFlags;
+        return flagsWithState;
     }
 
     /**
@@ -64,10 +79,11 @@ class SessionStartSequence {
      * @returns {Array<Object>}
      */
     getFlagsAtTimeWithNextAction(time) {
+        const truncatedTime = Math.trunc(time.valueOf() / 1000) * 1000;
         const flagsWithNextAction = this.getFlagsAtTime(time).map(flag => {
             const futureActions = [];
             this._actions.forEach(action => {
-                if (action.flag.name === flag.name && action.time > time) {
+                if (action.flag.name === flag.name && Math.trunc(action.time.valueOf() / 1000) * 1000 > truncatedTime) { // round off to containing second to identify actions occurring within that second
                     futureActions.push(action);
                 }
             });
@@ -84,32 +100,66 @@ class SessionStartSequence {
         return this._actions;
     }
 
-    _generateActions() {
+    /**
+     * Identify flags and corresponding actions required to start race  
+     * Returns an object with two properties flags, an array of flags, and actions, an array of actions
+     * @param {Array<RaceStartSequence} raceStartSequences 
+     * @returns {Object}
+     */
+    _generateFlags() {
+        const flags = this._raceStartSequences.flatMap(rss => rss.getFlags());
         const actions = this._raceStartSequences.flatMap(rss => rss.getActions());
-        // consolidate actions the same flag
-        // First action with raised after State and last action with lowered after state
-        const consolidatedActions = [];
-        actions.forEach(action => {
-            if (!consolidatedActions.some(element => element.flag.name === action.flag.name && element.afterState === action.afterState)) { // only process new actions
-                const newAction = {...action};
-                for (let i = 0; i < actions.length; i++) {
-                    if (newAction.flag.name === actions[i].flag.name && newAction.afterState === actions[i].afterState) {
-                        if (newAction.afterState === FlagState.RAISED) {
-                            if (actions[i].time < newAction.time) {
-                                newAction.time = actions[i].time;
-                            }
-                        }
-                        if (newAction.afterState === FlagState.LOWERED) {
-                            if (actions[i].time > newAction.time) {
-                                newAction.time = actions[i].time;
-                            }
-                        }
+        // warning flags should be specific to each race
+        // the preparatrory flag needs to use the earliest raise action and the last lower action from all race sessions
+        // also want all warning flag actions to reference the same instance of flag (doesn't matter which one ;-))
+        const newFlags = [];
+        const newActions = [];
+        let preparatoryFlag;
+        let firstPreparatoryFlagRaise;
+        let lastPreparatoryFlagLower;
+        flags.forEach(flag => {
+            switch (flag.role) {
+                case FlagRole.PREPARATORY:
+                    if (!preparatoryFlag) {
+                        // preparatoryFlag = {...flag, actions: []};
+                        preparatoryFlag = flag;
+                        preparatoryFlag.actions = [];
+                        newFlags.push(preparatoryFlag);
                     }
-                }
-                consolidatedActions.push(newAction);
+                    break;
+                default:
+                    // newFlags.push({...flag});
+                    newFlags.push(flag);
             }
         });
-        return consolidatedActions;
+        actions.forEach(action => {
+            switch (action.flag.role) {
+                case FlagRole.PREPARATORY:
+                    if (action.afterState === FlagState.RAISED && (!firstPreparatoryFlagRaise || action.time < firstPreparatoryFlagRaise.time)) {
+                        // firstPreparatoryFlagRaise = {...action, flag: preparatoryFlag};
+                        firstPreparatoryFlagRaise = action;
+                        firstPreparatoryFlagRaise.flag = preparatoryFlag;
+                    }
+                    else if (action.afterState === FlagState.LOWERED && (!lastPreparatoryFlagLower || action.time > lastPreparatoryFlagLower.time)) {
+                        // lastPreparatoryFlagLower = {...action, flag: preparatoryFlag};
+                        lastPreparatoryFlagLower = action;
+                        lastPreparatoryFlagLower.flag = preparatoryFlag;
+                    }
+                    break;
+                default:
+                    // newActions.push({...action});
+                    newActions.push(action);
+            }
+        });
+        if (firstPreparatoryFlagRaise) {
+            preparatoryFlag.actions.push(firstPreparatoryFlagRaise);
+            newActions.push(firstPreparatoryFlagRaise);
+        }
+        if (lastPreparatoryFlagLower) {
+            preparatoryFlag.actions.push(lastPreparatoryFlagLower);
+            newActions.push(lastPreparatoryFlagLower);
+        }
+        return {flags: newFlags, actions: newActions};
     }
 
     /**

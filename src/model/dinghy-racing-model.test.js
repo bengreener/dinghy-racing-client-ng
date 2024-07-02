@@ -5257,17 +5257,60 @@ describe('when a StartSequence is requested', () => {
         });
 
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+
+        const scorpionAWarningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, actions: []};
+        const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
+        const graduateAWarningFlag = {name: 'Graduate Class Flag', role: FlagRole.WARNING, actions: []};
+        const cometAWarningFlag = {name: 'Comet Class Flag', role: FlagRole.WARNING, actions: []};
+        const handicapAWarningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, actions: []};
+    
+        const scorpionAWarningFlagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
+        const scorpionAWarningFlagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+        
+        const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
+        const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
+        
+        const graduateAWarningFlagRaiseAction = {flag: graduateAWarningFlag, time: new Date(raceGraduateA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
+        const graduateAWarningFlagLowerAction = {flag: graduateAWarningFlag, time: raceGraduateA.plannedStartTime, afterState: FlagState.LOWERED};
+
+        const cometAWarningFlagRaiseAction = {flag: cometAWarningFlag, time: new Date(raceCometA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
+        const cometAWarningFlagLowerAction = {flag: cometAWarningFlag, time: raceCometA.plannedStartTime, afterState: FlagState.LOWERED};
+
+        const handicapAWarningFlagRaiseAction = {flag: handicapAWarningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
+        const handicapAWarningFlagLowerAction = {flag: handicapAWarningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
+    
+        scorpionAWarningFlag.actions.push(scorpionAWarningFlagRaiseAction);
+        scorpionAWarningFlag.actions.push(scorpionAWarningFlagLowerAction);
+        
+        preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
+        preparatoryFlag.actions.push(preparatoryFlagLowerAction);
+        
+        graduateAWarningFlag.actions.push(graduateAWarningFlagRaiseAction);
+        graduateAWarningFlag.actions.push(graduateAWarningFlagLowerAction);
+        
+        cometAWarningFlag.actions.push(cometAWarningFlagRaiseAction);
+        cometAWarningFlag.actions.push(cometAWarningFlagLowerAction);
+        
+        handicapAWarningFlag.actions.push(handicapAWarningFlagRaiseAction);
+        handicapAWarningFlag.actions.push(handicapAWarningFlagLowerAction);
+
+
         const promise = dinghyRacingModel.getStartSequence(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), RaceType.FLEET);
         const result = await promise;
-        const flags = result.domainObject.getFlags();
+        const actions = result.domainObject.getActions();
 
         expect(promise).toBeInstanceOf(Promise);
-        expect(flags.length).toBe(5);
-        expect(flags[0]).toEqual({flag: { name: 'Scorpion Class Flag', state: FlagState.LOWERED, role: FlagRole.WARNING}, action: {flag: {name: 'Scorpion Class Flag', role: FlagRole.WARNING}, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED}});
-        expect(flags[1]).toEqual({flag: { name: 'Blue Peter', state: FlagState.LOWERED, role: FlagRole.PREPARATORY}, action: {flag: {name: 'Blue Peter', role: FlagRole.PREPARATORY}, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED}});
-        expect(flags[2]).toEqual({flag: { name: 'Graduate Class Flag', state: FlagState.LOWERED, role: FlagRole.WARNING}, action: {flag: {name: 'Graduate Class Flag', role: FlagRole.WARNING}, time: new Date(raceGraduateA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED}});
-        expect(flags[3]).toEqual({flag: { name: 'Comet Class Flag', state: FlagState.LOWERED, role: FlagRole.WARNING}, action: {flag: {name: 'Comet Class Flag', role: FlagRole.WARNING}, time: new Date(raceCometA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED}});
-        expect(flags[4]).toEqual({flag: { name: 'Club Burgee', state: FlagState.LOWERED, role: FlagRole.WARNING}, action: {flag: {name: 'Club Burgee', role: FlagRole.WARNING}, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED}});
+        expect(actions).toHaveLength(10);
+        expect(actions[0]).toStrictEqual(scorpionAWarningFlagRaiseAction);
+        expect(actions[1]).toStrictEqual(scorpionAWarningFlagLowerAction);
+        expect(actions[2]).toStrictEqual(graduateAWarningFlagRaiseAction);
+        expect(actions[3]).toStrictEqual(graduateAWarningFlagLowerAction);
+        expect(actions[4]).toStrictEqual(cometAWarningFlagRaiseAction);
+        expect(actions[5]).toStrictEqual(cometAWarningFlagLowerAction);
+        expect(actions[6]).toStrictEqual(handicapAWarningFlagRaiseAction);
+        expect(actions[7]).toStrictEqual(handicapAWarningFlagLowerAction);
+        expect(actions[8]).toStrictEqual(preparatoryFlagRaiseAction);
+        expect(actions[9]).toStrictEqual(preparatoryFlagLowerAction);
 
         jest.runOnlyPendingTimers();
         jest.useRealTimers();
