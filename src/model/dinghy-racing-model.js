@@ -67,8 +67,8 @@ class DinghyRacingModel {
      * Provide a blank entry template.
      */
     static entryTemplate() {
-        return {'race': DinghyRacingModel.raceTemplate(), 'helm': DinghyRacingModel.competitorTemplate(), 'crew': null, 
-        'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': ''};
+        return {race: DinghyRacingModel.raceTemplate(), helm: DinghyRacingModel.competitorTemplate(), crew: null, 
+        dinghy: DinghyRacingModel.dinghyTemplate(), laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: ''};
     }
 
     /**
@@ -1408,9 +1408,9 @@ class DinghyRacingModel {
     }
 
     _convertEntryHALtoEntry(entryHAL, race, helm, dinghy, crew, laps) {
-        return {...DinghyRacingModel.entryTemplate(), 'race': race, 'helm': helm, 'dinghy': dinghy, 'laps': laps, 'crew': crew,
-            'sumOfLapTimes': this.convertISO8601DurationToMilliseconds(entryHAL.sumOfLapTimes), 'onLastLap': entryHAL.onLastLap,
-            'finishedRace': entryHAL.finishedRace, 'scoringAbbreviation': entryHAL.scoringAbbreviation, 'url': entryHAL._links.self.href
+        return {...DinghyRacingModel.entryTemplate(), race: race, helm: helm, dinghy: dinghy, laps: laps, crew: crew,
+            sumOfLapTimes: this.convertISO8601DurationToMilliseconds(entryHAL.sumOfLapTimes), onLastLap: entryHAL.onLastLap,
+            finishedRace: entryHAL.finishedRace, scoringAbbreviation: entryHAL.scoringAbbreviation, position: entryHAL.position, url: entryHAL._links.self.href
         }
     }
 
