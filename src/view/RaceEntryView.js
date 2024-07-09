@@ -202,6 +202,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
             <th scope='row'>{entry.dinghy.dinghyClass.name}</th>
             <th className='sail-number' scope='row'>{entry.dinghy.sailNumber}</th>
             <th scope='row'>{entry.helm.name}</th>
+            <th scope='row'>{entry.position}</th>
             {lapsView}
             <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
         </tr>
