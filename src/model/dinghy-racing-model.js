@@ -999,7 +999,6 @@ class DinghyRacingModel {
                 return Promise.resolve(lapsResults[i]);
             }
             if (!crewResults[i].success) {
-                // return Promise.resolve(crewResults[i]);
                 if (/404/.test(crewResults[i].message)) {
                     crewResults[i] = {...crewResults[i], 'domainObject': null};
                 }
@@ -1007,10 +1006,7 @@ class DinghyRacingModel {
                     return Promise.resolve(crewResults[i]);
                 }
             }
-            entries.push({...DinghyRacingModel.entryTemplate(), 'race': raceResult.domainObject, 'helm': helmResults[i].domainObject, 
-                'dinghy': dinghyResults[i].domainObject, 'laps': lapsResults[i].domainObject,  'crew': crewResults[i].domainObject, 
-                'sumOfLapTimes': this.convertISO8601DurationToMilliseconds(entryCollectionHAL[i].sumOfLapTimes), 'onLastLap': entryCollectionHAL[i].onLastLap, 
-                'finishedRace': entryCollectionHAL[i].finishedRace, 'scoringAbbreviation': entryCollectionHAL[i].scoringAbbreviation, 'url': entryCollectionHAL[i]._links.self.href});
+            entries.push(this._convertEntryHALtoEntry(entryCollectionHAL[i], raceResult.domainObject, helmResults[i].domainObject, dinghyResults[i].domainObject, crewResults[i].domainObject, lapsResults[i].domainObject));
         };
         return Promise.resolve({'success': true, 'domainObject': entries});
     }
