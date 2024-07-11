@@ -94,13 +94,19 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     }
 
     function handlePositionUpClick(event) {
+        event.stopPropagation();
         event.preventDefault();
-        updatePosition(entry, entry.position - 1);
+        if (updatePosition) {
+            updatePosition(entry, entry.position - 1);
+        }
     }
 
     function handlePositionDownClick(event) {
+        event.stopPropagation();
         event.preventDefault();
-        updatePosition(entry, entry.position + 1);
+        if (updatePosition) {
+            updatePosition(entry, entry.position + 1);
+        }
     }
 
     function gestureStart(event) {

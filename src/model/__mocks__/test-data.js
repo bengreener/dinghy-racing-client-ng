@@ -292,10 +292,12 @@ const entryChrisMarshallScorpionA1234 = {
 	position: null,
 	url: 'http://localhost:8081/dinghyracing/api/entries/10'
 };
+const entrySarahPascalScorpionA6745 = {helm: competitorSarahPascal, crew: competitorOwainDavies, race: raceScorpionA, dinghy: dinghy6745, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
+	position: null, url: 'http://localhost:8081/dinghyracing/api/entries/11'};
+
 const entriesScorpionA = [
 	entryChrisMarshallScorpionA1234,
-	{helm: competitorSarahPascal, crew: competitorOwainDavies, race: raceScorpionA, dinghy: dinghy6745, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
-		position: null, url: 'http://localhost:8081/dinghyracing/api/entries/11'}
+	entrySarahPascalScorpionA6745
 ];
 const entriesGraduateA = [
 	{helm: competitorJillMyer, crew: null, race: raceGraduateA,dinghy: dinghy2928, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
@@ -345,6 +347,6 @@ export {
 
 	races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA, racePursuitA,
 
-	entryChrisMarshallHandicapA1234, entryChrisMarshallScorpionA1234, entryJillMyerCometA826,
+	entryChrisMarshallHandicapA1234, entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745, entryJillMyerCometA826,
 	entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA
 }

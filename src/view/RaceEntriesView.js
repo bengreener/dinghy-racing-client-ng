@@ -149,6 +149,13 @@ function RaceEntriesView({ races }) {
         }
     }
 
+    async function updateEntryPosition(entry, newPosition) {
+        const result = await controller.updateEntryPosition(entry, newPosition);
+        if (!result.success) {
+            setMessage(result.message);
+        }
+    }
+
     return (
         <div className="race-entries-view" >
             <p id="race-entries-message" className={!message ? "hidden" : ""}>{message}</p>
@@ -162,7 +169,7 @@ function RaceEntriesView({ races }) {
             <div className="scrollable">
                 <table id="race-entries-table" style={{touchAction: 'pinch-zoom pan-y'}}>
                     <tbody>
-                    {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} />)}
+                    {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} updatePosition={updateEntryPosition} />)}
                     </tbody>
                 </table>
             </div>
