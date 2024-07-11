@@ -307,6 +307,35 @@ class DinghyRacingController {
     }
 
     /**
+     * Update the position of an entry in a race
+     * @param {Entry} entry
+     * @param {Integer} newPosition
+     * @returns {Promise<Result}
+     */
+    async updateEntryPosition(entry, newPosition) {
+        let message = '';
+        if (!entry.race.url) {
+            message += 'The race URL is required to update an entry position.';
+        }
+        if (!entry.url) {
+            if (message != '') {
+                message += '/n';
+            }
+            message += 'An entry with a URL is required to update an entry position.';
+        }
+        if (!newPosition || newPosition <= 0) {
+            if (message != '') {
+                message += '/n';
+            }
+            message += 'A numeric new position greater than 0 is required to update an entry position.';
+        }
+        if (message !== '') {
+            return Promise.resolve({success: false, message: message});
+        }
+        return this.model.updateEntryPosition(entry, newPosition);
+    }
+
+    /**
      * Update the start sequence state of a race
      * @param {Race} race to start
      * @param {StartSequence} stage of the starting sequence reached

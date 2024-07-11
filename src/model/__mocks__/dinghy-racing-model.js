@@ -236,6 +236,10 @@ class DinghyRacingModel {
         return null;
     }
 
+    async updateEntryPosition(entry, newPosition) {
+        return null;
+    }
+
     async createRace(race) {
         return null;
     }

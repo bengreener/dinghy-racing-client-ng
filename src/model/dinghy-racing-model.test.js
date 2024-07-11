@@ -5614,7 +5614,7 @@ describe('when updating an entries position in the race', () => {
                 json: () => Promise.resolve({})
             });
         });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);s
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const promise = dinghyRacingModel.updateEntryPosition(entryChrisMarshallScorpionA1234, 2);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);

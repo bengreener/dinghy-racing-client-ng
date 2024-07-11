@@ -1378,3 +1378,47 @@ describe('when updating the planned laps for a race', () => {
         });
     });
 });
+
+describe('when updating the position of an entry in a race', () => {
+    describe('when operation is successful', () => {
+        it('returns a promise that resolves to a result indicating success', async () => {
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(dinghyRacingModel, 'updateEntryPosition').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
+            const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+            const promise = dinghyRacingController.updateEntryPosition(entryChrisMarshallScorpionA1234, 2);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true});
+        });
+    });
+    describe('when race url is not provided', () => {
+        it('returns a promise that resolves to a result inficating failure and provides a message explaining the cause of failure', async () => {
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+            const promise = dinghyRacingController.updateEntryPosition({...entryChrisMarshallScorpionA1234, race: {...raceScorpionA, url: undefined}}, 2);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'The race URL is required to update an entry position.'});
+        });
+    });
+    describe('when an entry URL is not provided', () => {
+        it('returns a promise that resolves to a result inficating failure and provides a message explaining the cause of failure', async () => {
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+            const promise = dinghyRacingController.updateEntryPosition({...entryChrisMarshallScorpionA1234, url: ''}, 2);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'An entry with a URL is required to update an entry position.'});
+        });
+    });
+    describe('when new position is not provided', () => {
+        it('returns a promise that resolves to a result inficating failure and provides a message explaining the cause of failure', async () => {
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+            const promise = dinghyRacingController.updateCompetitor(competitorChrisMarshall);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'A new name is required for the competitor.'});
+        });
+    });
+});
