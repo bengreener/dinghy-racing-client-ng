@@ -697,6 +697,30 @@ class DinghyRacingModel {
     }
 
     /**
+     * Update the position of an entry in a race
+     * @param {Race} race
+     * @param {Entry} entry
+     * @param {Integer} newPosition
+     * @returns {Promise<Result}
+     */
+    async updateEntryPosition(race, entry, newPosition) {
+        let message = '';
+        if (!race.url) {
+            message += 'A race with a URL is required to update an entry position.';
+        }
+        if (!entry.url) {
+            if (message != '') {
+                message += '/n';
+            }
+            message += 'An entry with a URL is required to update an entry position.';
+        }
+        if (message !== '') {
+            return Promise.resolve({success: false, message: message});
+        }
+        return this.update(race.url + '?entry=' + entry.url + '&position=' + newPosition);
+    }
+
+    /**
      * Create a new race
      * @param {Race} race 
      * @returns {Promise<Result>}

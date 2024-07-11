@@ -5573,3 +5573,51 @@ describe('when a websocket message callback has been set for dinghy class update
         expect(dinghyRacingModel.dinghyClassUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/dinghyClasses/1').size).toBe(1);
     });
 });
+
+describe('when updating an entries position in the race', () => {
+    it('if race exists and entry exists and URLs provided and position provided then updates competitor', async () => {
+        fetch.mockImplementationOnce((resource, options) => {
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/4?entry=http://localhost:8081/dinghyracing/api/entries/10&position=2') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 204,
+                    json: () => Promise.resolve({})
+                });
+            };
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.updateEntryPosition(raceScorpionA, entryChrisMarshallScorpionA1234, 2);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toBeTruthy();
+    });
+    it('if race URL not provided and entry exists and URL provided then returns message explaining issue', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.updateEntryPosition({...raceScorpionA, url: null}, entryChrisMarshallScorpionA1234, 2);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, message: 'A race with a URL is required to update an entry position.'});
+    });
+    it('if race exists and URL provided and entry URL not provided then returns message explaining issue', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.updateEntryPosition(raceScorpionA, {...entryChrisMarshallScorpionA1234, url: ''}, 2);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, message: 'An entry with a URL is required to update an entry position.'});
+    });
+    it('if update fails returns failed indicator and message explaining cause of failure', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 500, 
+                statusText: 'Internal Server Error',
+                json: () => Promise.resolve({})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.updateEntryPosition(raceScorpionA, entryChrisMarshallScorpionA1234, 2);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 500 Internal Server Error'});
+    });
+})
