@@ -708,7 +708,7 @@ class DinghyRacingModel {
             message += 'The race URL is required to update an entry position.';
         }
         if (!entry.url) {
-            if (message != '') {
+            if (message !== '') {
                 message += '/n';
             }
             message += 'An entry with a URL is required to update an entry position.';
@@ -716,7 +716,7 @@ class DinghyRacingModel {
         if (message !== '') {
             return Promise.resolve({success: false, message: message});
         }
-        return this.update(entry.race.url + '?entry=' + entry.url + '&position=' + newPosition);
+        return this.update(entry.race.url + '/updateEntryPosition?entry=' + entry.url + '&position=' + newPosition);
     }
 
     /**

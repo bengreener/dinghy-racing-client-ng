@@ -318,13 +318,13 @@ class DinghyRacingController {
             message += 'The race URL is required to update an entry position.';
         }
         if (!entry.url) {
-            if (message != '') {
+            if (message !== '') {
                 message += '/n';
             }
             message += 'An entry with a URL is required to update an entry position.';
         }
         if (!newPosition || newPosition <= 0) {
-            if (message != '') {
+            if (message !== '') {
                 message += '/n';
             }
             message += 'A numeric new position greater than 0 is required to update an entry position.';

@@ -5577,7 +5577,7 @@ describe('when a websocket message callback has been set for dinghy class update
 describe('when updating an entries position in the race', () => {
     it('if race exists and entry exists and URLs provided and position provided then updates competitor', async () => {
         fetch.mockImplementationOnce((resource, options) => {
-            if (resource === 'http://localhost:8081/dinghyracing/api/races/4?entry=http://localhost:8081/dinghyracing/api/entries/10&position=2') {
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/4/updateEntryPosition?entry=http://localhost:8081/dinghyracing/api/entries/10&position=2') {
                 return Promise.resolve({
                     ok: true,
                     status: 204,
@@ -5589,7 +5589,7 @@ describe('when updating an entries position in the race', () => {
         const promise = dinghyRacingModel.updateEntryPosition(entryChrisMarshallScorpionA1234, 2);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toBeTruthy();
+        expect(result.success).toBeTruthy();
     });
     it('if race URL not provided and entry exists and URL provided then returns message explaining issue', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
