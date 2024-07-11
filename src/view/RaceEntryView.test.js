@@ -20,7 +20,7 @@ import RaceEntryView from './RaceEntryView';
 import { entryChrisMarshallScorpionA1234 } from '../model/__mocks__/test-data';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 
-const entryRowLastCellLapTimeCellOffset = 2;
+const entryRowLastCellLapTimeCellOffset = 4;
 
 beforeEach(() => {
     jest.useFakeTimers();
@@ -381,5 +381,35 @@ describe('when the entry is selected to add a new lap', () => {
             });
             expect(addLapCallback).toHaveBeenCalledTimes(2);
         });
+    });
+});
+
+describe('when move position up button is clicked', () => {
+    it('calls update position prop with a new position 1 greater than the current position', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const entry = {...entryChrisMarshallScorpionA1234, position: 4};
+        const updatePositionSpy = jest.fn((entry, newPosition) => {});
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entry} updatePosition={updatePositionSpy} />, {container: document.body.appendChild(tableBody)});
+        const updatePositionButton = screen.getByText(/position up/i);
+        await act(async () => {
+            await user.click(updatePositionButton);
+        });
+        expect(updatePositionSpy).toHaveBeenCalledWith(entry, 3);
+    });
+});
+
+describe('when move position down button is clicked', () => {
+    it('calls update position prop with a new position 1 greater than the current position', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const entry = {...entryChrisMarshallScorpionA1234, position: 4};
+        const updatePositionSpy = jest.fn((entry, newPosition) => {});
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entry} updatePosition={updatePositionSpy} />, {container: document.body.appendChild(tableBody)});
+        const updatePositionButton = screen.getByText(/position down/i);
+        await act(async () => {
+            await user.click(updatePositionButton);
+        });
+        expect(updatePositionSpy).toHaveBeenCalledWith(entry, 5);
     });
 });

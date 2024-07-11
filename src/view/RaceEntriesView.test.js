@@ -26,7 +26,7 @@ jest.mock('../model/dinghy-racing-model');
 
 // some of the updates display after tests may no longer be required as update route via web sockets is driven from server (2 tests lap times following entry update notification & clears error message after successful update)?
 
-const entryRowLastCellLapTimeCellOffset = 2;
+const entryRowLastCellLapTimeCellOffset = 4;
 
 afterEach(() => {
     jest.resetAllMocks();

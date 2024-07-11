@@ -18,7 +18,17 @@ import React, { useCallback, useEffect, useState, useRef } from 'react';
 import LapView from './LapView';
 import ScoringAbbreviation from './ScoringAbbreviation';
 
-function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation}) {
+/**
+ * Display the details of a race entry
+ * @param {Object} props
+ * @param {Function} props.addLap
+ * @param {function} props.removeLap
+ * @param {function} props.updateLap
+ * @param {function} props.setScoringAbbreviation
+ * @param {function} props.updatePosition
+ * @returns {HTMLTableRowElement}
+ */
+function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, updatePosition}) {
     const [editMode, setEditMode] = useState(false);
     const [disabled, setDisabled] = useState(false);
     const prevLapCount = useRef(entry.laps.length);
@@ -81,6 +91,16 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     // disable context menu
     function handleContextMenu(event) {
         event.preventDefault();
+    }
+
+    function handlePositionUpClick(event) {
+        event.preventDefault();
+        updatePosition(entry, entry.position - 1);
+    }
+
+    function handlePositionDownClick(event) {
+        event.preventDefault();
+        updatePosition(entry, entry.position + 1);
     }
 
     function gestureStart(event) {
@@ -205,6 +225,8 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
             <th scope='row'>{entry.position}</th>
             {lapsView}
             <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
+            <td><button type="button" onClick={handlePositionUpClick}>Position Up</button></td>
+            <td><button type="button" onClick={handlePositionDownClick}>Position Down</button></td>
         </tr>
     )
 }
