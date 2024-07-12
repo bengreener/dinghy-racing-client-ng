@@ -32,6 +32,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     const [editMode, setEditMode] = useState(false);
     const [disabled, setDisabled] = useState(false);
     const prevLapCount = useRef(entry.laps.length);
+    const prevPosition = useRef(entry.position);
     const lapsView = [];
     let classes = 'race-entry-view';
 
@@ -60,7 +61,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     }, []);
 
     useEffect(() => {
-        if (prevLapCount.current !== entry.laps.length) {
+        if (prevLapCount.current !== entry.laps.length || prevPosition !== entry.position) {
             setDisabled(false);
             prevLapCount.current = entry.laps.length;
         }
@@ -97,6 +98,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         event.stopPropagation();
         event.preventDefault();
         if (updatePosition) {
+            setDisabled(true);
             updatePosition(entry, entry.position - 1);
         }
     }
@@ -105,6 +107,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         event.stopPropagation();
         event.preventDefault();
         if (updatePosition) {
+            setDisabled(true);
             updatePosition(entry, entry.position + 1);
         }
     }

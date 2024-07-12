@@ -341,8 +341,8 @@ describe('when the entry is selected to add a new lap', () => {
         });
         expect(addLapCallback).toHaveBeenCalledTimes(1);
     });
-    // how to make this work useEffect results in a class on a visible field being chnaged so can't wait for an element to appear so waitFor doesn't seem to wait :-/
-    xdescribe('when confirmation is received pf the recorded lap', () => {
+    // how to make this work useEffect results in a class on a visible field being changed so can't wait for an element to appear so waitFor doesn't seem to wait :-/
+    xdescribe('when confirmation is received of the recorded lap', () => {
         it('updates the display to show it can be selected for lap entry', async () => {
             const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
             const entry = {...entryChrisMarshallScorpionA1234, laps: []};
@@ -397,6 +397,18 @@ describe('when move position up button is clicked', () => {
         });
         expect(updatePositionSpy).toHaveBeenCalledWith(entry, 3);
     });
+    it('updates the display to show it has been selected', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const entry = {...entryChrisMarshallScorpionA1234, position: 4};
+        const updatePositionSpy = jest.fn((entry, newPosition) => {});
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entry} updatePosition={updatePositionSpy} />, {container: document.body.appendChild(tableBody)});
+        const updatePositionButton = screen.getByText(/position up/i);
+        await act(async () => {
+            await user.click(updatePositionButton);
+        });
+        expect(updatePositionButton.parentElement.parentElement.getAttribute('class')).toMatch(/disabled/i);
+    });
 });
 
 describe('when move position down button is clicked', () => {
@@ -411,5 +423,17 @@ describe('when move position down button is clicked', () => {
             await user.click(updatePositionButton);
         });
         expect(updatePositionSpy).toHaveBeenCalledWith(entry, 5);
+    });
+    it('updates the display to show it has been selected', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const entry = {...entryChrisMarshallScorpionA1234, position: 4};
+        const updatePositionSpy = jest.fn((entry, newPosition) => {});
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entry} updatePosition={updatePositionSpy} />, {container: document.body.appendChild(tableBody)});
+        const updatePositionButton = screen.getByText(/position down/i);
+        await act(async () => {
+            await user.click(updatePositionButton);
+        });
+        expect(updatePositionButton.parentElement.parentElement.getAttribute('class')).toMatch(/disabled/i);
     });
 });
