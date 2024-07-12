@@ -108,6 +108,11 @@ function RaceEntriesView({ races }) {
                     return [entry.race.plannedStartTime.getTime() + entry.sumOfLapTimes + weighting, entry.dinghy.dinghyClass.name, isNaN(entry.dinghy.sailNumber) ? entry.dinghy.sailNumber : Number(entry.dinghy.sailNumber)];
                 });
                 break;
+            case 'position':
+                ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
+                    return entry.position;
+                });
+                break;
             default:
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
                     return [entry.dinghy.dinghyClass.name, Number(entry.dinghy.sailNumber)];
@@ -165,6 +170,7 @@ function RaceEntriesView({ races }) {
                 <button onClick={() => setSortOrder('lastThree')}>By last 3</button>
                 <button onClick={() => setSortOrder('classLastThree')}>By class & last 3</button>
                 <button onClick={() => setSortOrder('lapTimes')}>By lap times</button>
+                <button onClick={() => setSortOrder('position')}>By position</button>
             </div>
             <div className="scrollable">
                 <table id="race-entries-table" style={{touchAction: 'pinch-zoom pan-y'}}>

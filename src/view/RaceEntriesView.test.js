@@ -223,6 +223,33 @@ describe('when sorting entries', () => {
 
         expect(orderedEntries).toEqual(['1234', '6745', '2928']);
     });
+    it('sorts by position in ascending order', async () => {
+        const entries = [
+            {'helm': competitorJillMyer, 'crew': null, 'race': raceGraduateA,'dinghy': dinghy2928, 'laps': [
+                {'number': 1, 'time': 2}, {'number': 2, 'time': 2}, {'number': 3, 'time': 2}
+            ], 'sumOfLapTimes': 6, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, position: 2, 'url': 'http://localhost:8081/dinghyracing/api/entries/12'},
+            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
+                {'number': 1, 'time': 2}, {'number': 2, 'time': 2}
+            ], 'sumOfLapTimes': 4, position: 3, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'},
+            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [
+                {'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}
+            ], 'sumOfLapTimes': 3, position: 1, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'}
+        ];
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entries})});
+        await act(async () => {
+            customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
+        });
+        
+        const sortByPositionButton = screen.getByRole('button', {'name': /by position/i});
+        await act(async () => {
+            await user.click(sortByPositionButton);
+        });
+        const cells = await screen.findAllByRole('rowheader', {name: /\d{4}/i});
+        const orderedEntries = cells.map(cell => cell.textContent);
+        expect(orderedEntries).toEqual(['1234', '2928', '6745']);
+    });
     describe('when sorting entries that include an entry that did not start', () => {
         it('sorts by the total recorded lap times of dinghies in ascending order except for DNS entry which is placed last', async () => {
             const entriesScorpionA = [
