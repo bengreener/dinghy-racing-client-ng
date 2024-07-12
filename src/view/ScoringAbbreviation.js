@@ -17,7 +17,7 @@
 /**
  * Get a scoring abbreviation from a list of scoring abbreviations
  * @param {Object} props
- * @param {string} props.value to set as displayed value
+ * @param {String} props.value to set as displayed value
  * @param {eventHandler} props.onChange
  */
 function ScoringAbbreviation({value = '', onChange}) {

@@ -15,7 +15,7 @@
  */
 
 import React, { useEffect } from 'react';
-import CreateDinghyClass from './view/CreateDinghyClass';
+import DinghyClassConsole from './view/DinghyClassConsole';
 import CreateRace from './view/CreateRace';
 import ErrorBoundary from './view/ErrorBoundary';
 import ModelContext from './view/ModelContext';
@@ -42,7 +42,7 @@ function App({model, controller}) {
   });
 
   function showCreateDinghyClassForm() {
-    setDisplayPort(<CreateDinghyClass key={Date.now()} onCreate={controller.createDinghyClass} />);
+    setDisplayPort(<DinghyClassConsole key={Date.now()} />);
   }
 
   function showCreateRaceForm() {
@@ -83,7 +83,7 @@ function App({model, controller}) {
         </header>
         <div className='list-group'>
           {roles.includes('ROLE_RACE_SCHEDULER') ? 
-            <button key={0} type='button' className='list-group-item list-group-item-action' onClick={showCreateDinghyClassForm}>Create Dinghy Class</button> 
+            <button key={0} type='button' className='list-group-item list-group-item-action' onClick={showCreateDinghyClassForm}>Dinghy Classes</button> 
             : null
           }
           {roles.includes('ROLE_RACE_SCHEDULER') ? 

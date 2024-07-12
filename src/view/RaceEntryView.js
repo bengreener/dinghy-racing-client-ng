@@ -18,10 +18,21 @@ import React, { useCallback, useEffect, useState, useRef } from 'react';
 import LapView from './LapView';
 import ScoringAbbreviation from './ScoringAbbreviation';
 
-function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation}) {
+/**
+ * Display the details of a race entry
+ * @param {Object} props
+ * @param {Function} props.addLap
+ * @param {function} props.removeLap
+ * @param {function} props.updateLap
+ * @param {function} props.setScoringAbbreviation
+ * @param {function} props.updatePosition
+ * @returns {HTMLTableRowElement}
+ */
+function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, updatePosition}) {
     const [editMode, setEditMode] = useState(false);
     const [disabled, setDisabled] = useState(false);
     const prevLapCount = useRef(entry.laps.length);
+    const prevPosition = useRef(entry.position);
     const lapsView = [];
     let classes = 'race-entry-view';
 
@@ -50,7 +61,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     }, []);
 
     useEffect(() => {
-        if (prevLapCount.current !== entry.laps.length) {
+        if (prevLapCount.current !== entry.laps.length || prevPosition !== entry.position) {
             setDisabled(false);
             prevLapCount.current = entry.laps.length;
         }
@@ -81,6 +92,24 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     // disable context menu
     function handleContextMenu(event) {
         event.preventDefault();
+    }
+
+    function handlePositionUpClick(event) {
+        event.stopPropagation();
+        event.preventDefault();
+        if (updatePosition) {
+            setDisabled(true);
+            updatePosition(entry, entry.position - 1);
+        }
+    }
+
+    function handlePositionDownClick(event) {
+        event.stopPropagation();
+        event.preventDefault();
+        if (updatePosition) {
+            setDisabled(true);
+            updatePosition(entry, entry.position + 1);
+        }
     }
 
     function gestureStart(event) {
@@ -202,8 +231,11 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
             <th scope='row'>{entry.dinghy.dinghyClass.name}</th>
             <th className='sail-number' scope='row'>{entry.dinghy.sailNumber}</th>
             <th scope='row'>{entry.helm.name}</th>
+            <th scope='row'>{entry.position}</th>
             {lapsView}
             <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
+            <td><button type="button" onClick={handlePositionUpClick}>Position Up</button></td>
+            <td><button type="button" onClick={handlePositionDownClick}>Position Down</button></td>
         </tr>
     )
 }

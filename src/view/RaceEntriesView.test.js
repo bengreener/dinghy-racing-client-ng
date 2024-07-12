@@ -14,19 +14,19 @@
  * limitations under the License. 
  */
 
-import { act, screen, waitForElementToBeRemoved, waitFor, logRoles } from '@testing-library/react';
+import { act, screen,  } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import { customRender } from '../test-utilities/custom-renders';
 import RaceEntriesView from './RaceEntriesView';
-import { httpRootURL, wsRootURL, competitorSarahPascal, competitorChrisMarshall, competitorJillMyer, dinghy6745, dinghy1234, dinghy2928, raceScorpionA, raceGraduateA, entriesScorpionA, entriesGraduateA, entryChrisMarshallScorpionA1234 } from '../model/__mocks__/test-data';
+import { httpRootURL, wsRootURL, competitorSarahPascal, competitorChrisMarshall, competitorJillMyer, dinghy6745, dinghy1234, dinghy2928, raceScorpionA, raceGraduateA, entriesScorpionA, entriesGraduateA, entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745 } from '../model/__mocks__/test-data';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 
 jest.mock('../model/dinghy-racing-model');
 
 // some of the updates display after tests may no longer be required as update route via web sockets is driven from server (2 tests lap times following entry update notification & clears error message after successful update)?
 
-const entryRowLastCellLapTimeCellOffset = 2;
+const entryRowLastCellLapTimeCellOffset = 4;
 
 afterEach(() => {
     jest.resetAllMocks();
@@ -222,6 +222,33 @@ describe('when sorting entries', () => {
         const orderedEntries = cells.map(cell => cell.textContent);
 
         expect(orderedEntries).toEqual(['1234', '6745', '2928']);
+    });
+    it('sorts by position in ascending order', async () => {
+        const entries = [
+            {'helm': competitorJillMyer, 'crew': null, 'race': raceGraduateA,'dinghy': dinghy2928, 'laps': [
+                {'number': 1, 'time': 2}, {'number': 2, 'time': 2}, {'number': 3, 'time': 2}
+            ], 'sumOfLapTimes': 6, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, position: 2, 'url': 'http://localhost:8081/dinghyracing/api/entries/12'},
+            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
+                {'number': 1, 'time': 2}, {'number': 2, 'time': 2}
+            ], 'sumOfLapTimes': 4, position: 3, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'},
+            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [
+                {'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}
+            ], 'sumOfLapTimes': 3, position: 1, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'}
+        ];
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entries})});
+        await act(async () => {
+            customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
+        });
+        
+        const sortByPositionButton = screen.getByRole('button', {'name': /by position/i});
+        await act(async () => {
+            await user.click(sortByPositionButton);
+        });
+        const cells = await screen.findAllByRole('rowheader', {name: /\d{4}/i});
+        const orderedEntries = cells.map(cell => cell.textContent);
+        expect(orderedEntries).toEqual(['1234', '2928', '6745']);
     });
     describe('when sorting entries that include an entry that did not start', () => {
         it('sorts by the total recorded lap times of dinghies in ascending order except for DNS entry which is placed last', async () => {
@@ -730,4 +757,112 @@ describe('when setting a scoring abbreviation', () => {
         });
         expect(screen.queryByText(/oops/i)).not.toBeInTheDocument();
     });
-})
+});
+
+describe('when moving an entry up a position', () => {
+    it('call controller updateEntryPosition', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234, position: 4}, entrySarahPascalScorpionA6745]});})
+        const controller = new DinghyRacingController(model);
+        const setUpdateEntryPositionSpy = jest.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': true})});
+        await act(async () => {
+            customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
+        });
+        const updatePositionButton = screen.getAllByText(/position up/i)[0];
+        await act(async () => {
+            await user.click(updatePositionButton);
+        });
+        expect(setUpdateEntryPositionSpy).toBeCalledWith({...entryChrisMarshallScorpionA1234, position: 4}, 3);
+    });
+    it('displays a message if there is a problem updating the position', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': false, message: 'Any old nonsense'})});
+        await act(async () => {
+            customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
+        });
+        const updatePositionButton = screen.getAllByText(/position up/i)[0];
+        await act(async () => {
+            await user.click(updatePositionButton);
+        });
+        expect(await screen.findByText(/any old nonsense/i)).toBeInTheDocument();
+    });
+    it('clears error message on success', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': true})}).mockImplementationOnce((entry, newPosition) => {return Promise.resolve({'success': false, message: 'Any old nonsense'})});
+        await act(async () => {
+            customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
+        });
+        // after render perform update
+        const updatePositionButton = screen.getAllByText(/position up/i)[0];
+        await act(async () => {
+            await user.click(updatePositionButton);
+        });
+        expect(await screen.findByText(/Any old nonsense/i)).toBeInTheDocument();
+        // after render perform update
+        await act(async () => {
+            await user.click(updatePositionButton);
+            model.handleEntryUpdate({'body': entriesScorpionA[0].url});
+        });
+        expect(screen.queryByText(/Any old nonsense/i)).not.toBeInTheDocument();
+    });
+});
+
+describe('when moving an entry down a position', () => {
+    it('call controller updateEntryPosition', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234, position: 4}, entrySarahPascalScorpionA6745]});})
+        const controller = new DinghyRacingController(model);
+        const setUpdateEntryPositionSpy = jest.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': true})});
+        await act(async () => {
+            customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
+        });
+        const updatePositionButton = screen.getAllByText(/position down/i)[0];
+        await act(async () => {
+            await user.click(updatePositionButton);
+        });
+        expect(setUpdateEntryPositionSpy).toBeCalledWith({...entryChrisMarshallScorpionA1234, position: 4}, 5);
+    });
+    it('displays a message if there is a problem updating the position', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': false, message: 'Any old nonsense'})});
+        await act(async () => {
+            customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
+        });
+        const updatePositionButton = screen.getAllByText(/position down/i)[0];
+        await act(async () => {
+            await user.click(updatePositionButton);
+        });
+        expect(await screen.findByText(/any old nonsense/i)).toBeInTheDocument();
+    });
+    it('clears error message on success', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': true})}).mockImplementationOnce((entry, newPosition) => {return Promise.resolve({'success': false, message: 'Any old nonsense'})});
+        await act(async () => {
+            customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
+        });
+        // after render perform update
+        const updatePositionButton = screen.getAllByText(/position down/i)[0];
+        await act(async () => {
+            await user.click(updatePositionButton);
+        });
+        expect(await screen.findByText(/Any old nonsense/i)).toBeInTheDocument();
+        // after render perform update
+        await act(async () => {
+            await user.click(updatePositionButton);
+            model.handleEntryUpdate({'body': entriesScorpionA[0].url});
+        });
+        expect(screen.queryByText(/Any old nonsense/i)).not.toBeInTheDocument();
+    });
+});

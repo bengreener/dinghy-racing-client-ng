@@ -14,9 +14,12 @@
  * limitations under the License. 
  */
 
+import FlagRole from './flag-role';
+
 /**
  * @typedef Flag
- * @property {string} name of the flag
- * @property {FlagState} state of the flag
- * @property {integer} timeToChange in milliseconds
+ * @property {String} name of the flag
+ * @property {FlagRole} role of the flag
+ * @property {FlagState} [state] of the flag
+ * @property {Array<Action>} [actions] to chamge the state of the flag
  */

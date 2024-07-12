@@ -14,16 +14,28 @@
  * limitations under the License. 
  */
 
- .race-console {
-	height: 100%;
-	display: flex;
-	flex-direction: column;
+/**
+ * Class providng enumeration of race type options
+ */
+class RaceType {
+    static FLEET = 'FLEET';
+    static PURSUIT = 'PURSUIT';
+
+    /**
+     * Return a StartSequence stage value based on the supplied string
+     * @param {String} stage
+     */
+    static from(type) {
+        const lowerType = type?.toUpperCase();
+        switch (lowerType) {
+            case 'FLEET':
+                return RaceType.FLEET;
+            case 'PURSUIT':
+                return RaceType.PURSUIT;
+            default:
+                return null;
+        }
+    }
 }
-.select-race {
-    display: flex;
-    align-items: top;
-}
-.select-race > select {
-    height: 3lh;
-    max-width:fit-content;
-}
+
+export default RaceType;

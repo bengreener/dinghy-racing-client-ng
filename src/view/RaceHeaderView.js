@@ -21,6 +21,7 @@ import ControllerContext from './ControllerContext';
 import PostponeRaceForm from './PostponeRaceForm';
 import ModalDialog from './ModalDialog';
 import AdjustCourseForm from './AdjustCourseForm';
+import RaceType from '../model/domain-classes/race-type';
 
 /**
  * Present summary information ablout a race
@@ -111,22 +112,22 @@ function RaceHeaderView({ race, showInRaceData = true }) {
     return (
         <div>
             <label>{race.name}</label>
-            <label htmlFor={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>Laps</label>
-            <output id={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{race.plannedLaps}</output>
+            {race.type !== RaceType.PURSUIT ? <label htmlFor={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>Laps</label> : null}
+            {race.type !== RaceType.PURSUIT ? <output id={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{race.plannedLaps}</output> : null}
             <label htmlFor={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()}>Duration</label>
             <output id={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(race.duration)}</output>
             {showInRaceData && elapsedTime >= 0 ? <label htmlFor={'race-elapsed-time-' + race.name.replace(/ /g, '-').toLowerCase()}>Elapsed</label> : null}
             {showInRaceData && elapsedTime >= 0 ? <output id={'race-elapsed-time-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(elapsedTime)}</output> : null}
             <label htmlFor={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>{(elapsedTime < 0) ? 'Countdown' : 'Remaining'}</label>
             <output id={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()}>{(elapsedTime < 0) ? Clock.formatDuration(-elapsedTime) : Clock.formatDuration(race.duration - elapsedTime)}</output>
-            {showInRaceData && updatedRace.lastLapTime > 0 ? <label htmlFor={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>Laps estimate</label> : null}
-            {showInRaceData && updatedRace.lastLapTime > 0 ? <output id={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{Number(updatedRace.lapForecast).toFixed(2)}</output> : null}
-            {showInRaceData && updatedRace.lastLapTime > 0 ? <label htmlFor={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Last lap time</label> : null}
-            {showInRaceData && updatedRace.lastLapTime > 0 ? <output id={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.lastLapTime)}</output> : null}
-            {showInRaceData && updatedRace.lastLapTime > 0 ? <label htmlFor={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Average lap time</label> : null}
-            {showInRaceData && updatedRace.lastLapTime > 0 ? <output id={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.averageLapTime)}</output> : null}
-            {showInRaceData && updatedRace.lapsSailed < updatedRace.plannedLaps - 1 ? <button id='shorten-course-button' onClick={handleShortenCourseClick}>Shorten Course</button> : null}
-            {!showInRaceData ? <button id='adjust-course-button' onClick={handleShortenCourseClick}>Adjust Course</button> : null}
+            {showInRaceData && race.type !== RaceType.PURSUIT && updatedRace.lastLapTime > 0 ? <label htmlFor={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>Laps estimate</label> : null}
+            {showInRaceData && race.type !== RaceType.PURSUIT && updatedRace.lastLapTime > 0 ? <output id={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()}>{Number(updatedRace.lapForecast).toFixed(2)}</output> : null}
+            {showInRaceData && race.type !== RaceType.PURSUIT && updatedRace.lastLapTime > 0 ? <label htmlFor={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Last lap time</label> : null}
+            {showInRaceData && race.type !== RaceType.PURSUIT && updatedRace.lastLapTime > 0 ? <output id={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.lastLapTime)}</output> : null}
+            {showInRaceData && race.type !== RaceType.PURSUIT && updatedRace.lastLapTime > 0 ? <label htmlFor={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>Average lap time</label> : null}
+            {showInRaceData && race.type !== RaceType.PURSUIT && updatedRace.lastLapTime > 0 ? <output id={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()}>{Clock.formatDuration(updatedRace.averageLapTime)}</output> : null}
+            {showInRaceData && race.type !== RaceType.PURSUIT && updatedRace.lapsSailed < updatedRace.plannedLaps - 1 ? <button id='shorten-course-button' onClick={handleShortenCourseClick}>Shorten Course</button> : null}
+            {!showInRaceData && race.type !== RaceType.PURSUIT ? <button id='adjust-course-button' onClick={handleShortenCourseClick}>Adjust Course</button> : null}
             {elapsedTime < 0 ? <button id='race-postpone-button' onClick={handleRacePostponeClick}>Postpone Start</button> : null}
             {elapsedTime < 0 ? <button id='race-start-button' onClick={handleRaceStartClick}>Start Now</button> : null}
             <p id="race-header-message" className={!message ? "hidden" : ""}>{message}</p>

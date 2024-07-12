@@ -34,7 +34,7 @@ function CompetitorsConsole() {
 
     // get competitors
     useEffect(() => {
-        let ignoreFetch = false; // set to true if RaceEntriewView rerendered before fetch completes to avoid using out of date result
+        let ignoreFetch = false; // set to true if CompetitorsConsole rerendered before fetch completes to avoid using out of date result
         model.getCompetitors().then(result => {
             if (!ignoreFetch && !result.success) {
                 setMessage('Unable to load competitors\n' + result.message);
@@ -70,6 +70,7 @@ function CompetitorsConsole() {
         setCompetitorName('');
         setMessage('');
     }
+
     function handleCompetitorRowClick({ currentTarget }) {
         const competitor = competitorsMap.get(currentTarget.id);
         setSelectedCompetitor(competitor);

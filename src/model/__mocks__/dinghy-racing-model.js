@@ -24,6 +24,8 @@ class DinghyRacingModel {
     entryUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
     competitorCreationCallbacks = new Set();
     dinghyCreationCallbacks = new Set();
+    dinghyClassCreationCallbacks = new Set();
+    dinghyClassUpdateCallbacks = new Map();
 
     /**
      * Provide a blank competitor template
@@ -38,7 +40,7 @@ class DinghyRacingModel {
      * @returns {DinghyClass}
      */
     static dinghyClassTemplate() {
-        return {'name': '', 'url': ''};
+        return {'name': '', 'crewSize': 1, portsmouthNumber: null, 'url': ''};
     }
 
     /**
@@ -78,6 +80,8 @@ class DinghyRacingModel {
         this.handleDinghyCreation = this.handleDinghyCreation.bind(this);
         this.handleRaceUpdate = this.handleRaceUpdate.bind(this);
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
+        this.handleDinghyClassCreation = this.handleDinghyClassCreation.bind(this);
+        this.handleDinghyClassUpdate = this.handleDinghyClassUpdate.bind(this);
         this.getStartSequence = this.getStartSequence.bind(this);
         if (!httpRootURL) {
             throw new Error('An HTTP root URL is required when creating an instance of DinghyRacingModel');
@@ -155,6 +159,39 @@ class DinghyRacingModel {
         }
     }
 
+    registerDinghyClassCreationCallback(callback) {
+        this.dinghyClassCreationCallbacks.add(callback);
+    }
+
+    unregisterDinghyClassCreationCallback(callback) {
+        this.dinghyClassCreationCallbacks.delete(callback);
+    }
+
+    handleDinghyClassCreation(message) {
+        this.dinghyClassCreationCallbacks.forEach(cb => cb());
+    }
+    
+    registerDinghyClassUpdateCallback(key, callback) {
+        if (this.dinghyClassUpdateCallbacks.has(key)) {
+            this.dinghyClassUpdateCallbacks.get(key).add(callback);
+        }
+        else {
+            this.dinghyClassUpdateCallbacks.set(key, new Set([callback]));
+        }
+    }
+    
+    unregisterDinghyClassUpdateCallback(key, callback) {
+        if (this.dinghyClassUpdateCallbacks.has(key)) {
+            this.dinghyClassUpdateCallbacks.get(key).delete(callback);
+        }
+    }
+    
+    handleDinghyClassUpdate(message) {
+        if (this.dinghyClassUpdateCallbacks.has(message.body)) {
+            this.dinghyClassUpdateCallbacks.get(message.body).forEach(cb => cb());
+        }
+    }
+
     async addLap(entry, time) {
         return null;
     }
@@ -183,6 +220,10 @@ class DinghyRacingModel {
         return null;
     }
 
+    async updateDinghyClass(dinghyClass, name, crewSize, portsmouthNumber) {
+        return null;
+    }
+
     async createEntry(race, helm, dinghy) {
         return null;
     }
@@ -192,6 +233,10 @@ class DinghyRacingModel {
     }
 
     async withdrawEntry(entry) {
+        return null;
+    }
+
+    async updateEntryPosition(entry, newPosition) {
         return null;
     }
 
@@ -244,6 +289,10 @@ class DinghyRacingModel {
     }
 
     async getRacesBetweenTimes(startTime, endTime) {
+        return Promise.resolve({success: true, domainObject: []});
+    }
+    
+    async getRacesBetweenTimesForType(startTime, endTime, type, page, size, sortParameters) {
         return Promise.resolve({success: true, domainObject: []});
     }
 

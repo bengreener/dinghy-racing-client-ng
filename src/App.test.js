@@ -47,7 +47,7 @@ it('displays menu buttons', async () => {
   await act(async () => {
     render(<App controller={dinghyRacingController} />);
   });
-  const btnCreateDinghyClass = screen.getByRole('button', {name: /create dinghy class\b/i});
+  const btnCreateDinghyClass = screen.getByRole('button', {name: /dinghy classes\b/i});
   const btnCreateRace = screen.getByRole('button', {name: /create race\b/i});
   const btnUpcomingRaces = screen.getByRole('button', {name: /upcoming races\b/i});
   const btnRaceStartConsole = screen.getByRole('button', {name: /race start console\b/i});
@@ -105,15 +105,16 @@ describe('user roles does not include ROLE_RACE_OFFICER', () => {
   });
 });
 
-describe('when create dinghy class button clicked', () => {
-  it('displays create dinghy class form', async () => {
+describe('when dinghy classes button clicked', () => {
+  it('displays dinghy class console', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     jest.spyOn(DinghyRacingModel, 'dinghyClassTemplate').mockImplementation(() => {return {'name': '', 'url': ''}});
+    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
     const dinghyRacingController = new DinghyRacingController(model);
 
-    render(<App controller={dinghyRacingController} />);
-    const btnCreateDinghyClass = await screen.findByRole('button', {name: /create dinghy class\b/i});
+    render(<App model={model} controller={dinghyRacingController} />);
+    const btnCreateDinghyClass = await screen.findByRole('button', {name: /dinghy classes\b/i});
     await act(async () => {
       await user.click(btnCreateDinghyClass);
     });

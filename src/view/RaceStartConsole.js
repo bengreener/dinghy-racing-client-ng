@@ -19,9 +19,9 @@ import ModelContext from './ModelContext';
 import SelectSession from './SelectSession';
 import RaceHeaderView from './RaceHeaderView';
 import ActionListView from './ActionListView';
-import { sortArray } from '../utilities/array-utilities';
 import CollapsableContainer from './CollapsableContainer';
 import FlagControl from './FlagControl';
+import RaceType from '../model/domain-classes/race-type';
 
 /**
  * Provide Race Officer with information needed to successfully start races in a session
@@ -30,7 +30,7 @@ import FlagControl from './FlagControl';
 function RaceStartConsole () {
     const model = useContext(ModelContext);
     const [races, setRaces] = useState([]);
-    const [flags, setFlags] = useState([]);
+    const [flagsWithNextAction, setFlagsWithNextAction] = useState([]);
     const [actions, setActions] = useState([]);
     const [message, setMessage] = useState(''); // feedback to user
     // const [sessionStart, setSessionStart] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000));
@@ -46,6 +46,7 @@ function RaceStartConsole () {
     });
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
     const [audio, setAudio] = useState('none');
+    const [raceType, setRaceType] = useState(RaceType.FLEET);
     const startSequence = useRef(null);
 
     const handleRaceUpdate = useCallback(() => {
@@ -53,7 +54,7 @@ function RaceStartConsole () {
     }, []);
 
     const handleStartSequenceTick = useCallback(() => {
-        setFlags(startSequence.current.getFlags());
+        setFlagsWithNextAction(startSequence.current.getFlags());
         if (startSequence.current.getRaceStartStateChange()) {
             setAudio('act');
         }
@@ -68,7 +69,7 @@ function RaceStartConsole () {
     // get start sequence for selected session
     useEffect(() => {
         let ignoreFetch = false; // set to true if RaceStartConsole rerendered before fetch completes to avoid using out of date result
-        model.getStartSequence(new Date(sessionStart), new Date(sessionEnd)).then(result => {
+        model.getStartSequence(new Date(sessionStart), new Date(sessionEnd), raceType).then(result => {
             if (!ignoreFetch && !result.success) {
                 setMessage('Unable to load start sequence\n' + result.message);
             }
@@ -77,7 +78,7 @@ function RaceStartConsole () {
                 startSequence.current.addTickHandler(handleStartSequenceTick);
                 startSequence.current.startClock();
                 setRaces(startSequence.current.getRaces());
-                setFlags(startSequence.current.getFlags());
+                setFlagsWithNextAction(startSequence.current.getFlags());
                 setActions(startSequence.current.getActions());
                 if (startSequence.current.getRaceStartStateChange()) {
                     setAudio('act');
@@ -100,7 +101,7 @@ function RaceStartConsole () {
                 startSequence.current = null;
             }
         }
-    }, [model, sessionStart, sessionEnd, racesUpdateRequestAt, handleStartSequenceTick]);
+    }, [model, sessionStart, sessionEnd, raceType, racesUpdateRequestAt, handleStartSequenceTick]);
 
     // register on update callbacks for races
     useEffect(() => {
@@ -123,31 +124,34 @@ function RaceStartConsole () {
         setSessionEnd(date);
     }
 
-    // create race start actions list
-    const actionsMap = new Map();
-    actions.forEach(action => {
-        if (actionsMap.has(action.time.valueOf())) {
-            const oldAction = actionsMap.get(action.time.valueOf());
-            actionsMap.set(action.time.valueOf(), {...oldAction, description: oldAction.description + '\n' + action.description});
-        }
-        else {
-            actionsMap.set(action.time.valueOf(), action);
-        }
-    });
+    function handleRaceTypeChange({ target }) {
+        setRaceType(RaceType.from(target.value));
+    }
 
     return (
         <div className="race-start-console">
-            <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
+            <div className="select-race">
+                <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
+                <div>
+                    <fieldset>
+                        <legend>Race Type</legend>
+                        <input id="radio-race-type-fleet" name="race-type" type="radio" value="FLEET" onChange={handleRaceTypeChange} defaultChecked="true"/>
+                        <label htmlFor="radio-race-type-fleet">Fleet</label>
+                        <input id="radio-race-type-pursuit" name="race-type" type="radio" value="PURSUIT" onChange={handleRaceTypeChange} />
+                        <label htmlFor="radio-race-type-pursuit">Pursuit</label>
+                    </fieldset>
+                </div>
+            </div>
             <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
             <CollapsableContainer heading={'Flags'}>
-                {flags.map(flag => { return <FlagControl key={flag.name} flag={flag} /> })}
+                {flagsWithNextAction.map(flag => { return <FlagControl key={flag.flag.name} flag={flag.flag} timeToChange={flag.action ? flag.action.time.valueOf() - Date.now() : 0} /> })}
             </CollapsableContainer>
             <CollapsableContainer heading={'Races'}>
                 {races.map(race => {
                     return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} showInRaceData={false} />
                 })}
             </CollapsableContainer>
-            <ActionListView actions={sortArray(Array.from(actionsMap.values()), (action) => action.time)} />
+            <ActionListView actions={actions} />
             {audio === 'prepare' ? <audio data-testid='prepare-sound-warning-audio' autoPlay={true} src='./sounds/prepare_alert.mp3' /> : null}
             {audio === 'act' ? <audio data-testid='act-sound-warning-audio' autoPlay={true} src='./sounds/act_alert.mp3' /> : null}
         </div>

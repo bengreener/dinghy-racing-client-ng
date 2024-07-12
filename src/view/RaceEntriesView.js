@@ -108,6 +108,11 @@ function RaceEntriesView({ races }) {
                     return [entry.race.plannedStartTime.getTime() + entry.sumOfLapTimes + weighting, entry.dinghy.dinghyClass.name, isNaN(entry.dinghy.sailNumber) ? entry.dinghy.sailNumber : Number(entry.dinghy.sailNumber)];
                 });
                 break;
+            case 'position':
+                ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
+                    return entry.position;
+                });
+                break;
             default:
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
                     return [entry.dinghy.dinghyClass.name, Number(entry.dinghy.sailNumber)];
@@ -149,6 +154,13 @@ function RaceEntriesView({ races }) {
         }
     }
 
+    async function updateEntryPosition(entry, newPosition) {
+        const result = await controller.updateEntryPosition(entry, newPosition);
+        if (!result.success) {
+            setMessage(result.message);
+        }
+    }
+
     return (
         <div className="race-entries-view" >
             <p id="race-entries-message" className={!message ? "hidden" : ""}>{message}</p>
@@ -158,11 +170,12 @@ function RaceEntriesView({ races }) {
                 <button onClick={() => setSortOrder('lastThree')}>By last 3</button>
                 <button onClick={() => setSortOrder('classLastThree')}>By class & last 3</button>
                 <button onClick={() => setSortOrder('lapTimes')}>By lap times</button>
+                <button onClick={() => setSortOrder('position')}>By position</button>
             </div>
             <div className="scrollable">
                 <table id="race-entries-table" style={{touchAction: 'pinch-zoom pan-y'}}>
                     <tbody>
-                    {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} />)}
+                    {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} updatePosition={updateEntryPosition} />)}
                     </tbody>
                 </table>
             </div>

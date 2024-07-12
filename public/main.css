@@ -48,6 +48,9 @@ button.embedded {
     cursor: pointer;
     background-color: inherit;
 }
+fieldset {
+	display: inline;
+}
 input {
     border-radius: 25pt;
     padding: 5pt;
@@ -95,10 +98,18 @@ header {
 	grid-area: header;
 	background-size: contain;
 }
+fieldset {
+	border-radius: 25pt;
+}
 .action-list-view {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+}
+.console {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
 }
 .competitors-console {
 	height: 100%;
@@ -118,6 +129,14 @@ header {
 	height: 100%;
 	display: flex;
 	flex-direction: column;
+}
+.select-race {
+    display: flex;
+    align-items: top;
+}
+.select-race > select {
+    height: 3lh;
+    max-width:fit-content;
 }
 .sign-up-form {
     height: 100%;

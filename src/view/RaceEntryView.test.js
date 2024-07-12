@@ -20,7 +20,7 @@ import RaceEntryView from './RaceEntryView';
 import { entryChrisMarshallScorpionA1234 } from '../model/__mocks__/test-data';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 
-const entryRowLastCellLapTimeCellOffset = 2;
+const entryRowLastCellLapTimeCellOffset = 4;
 
 beforeEach(() => {
     jest.useFakeTimers();
@@ -41,20 +41,26 @@ it('renders', () => {
 
 it('displays lap times', async () => {
     const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-    const entry = {...entryChrisMarshallScorpionA1234, laps: [{'number': 1, 'time': 1234}]};
+    const entry = {...entryChrisMarshallScorpionA1234, laps: [{number: 1, time: 1234}]};
     const tableBody = document.createElement('tbody');
     render(<RaceEntryView entry={entry} />, {container: document.body.appendChild(tableBody)});
     expect(screen.getByText('00:01')).toBeInTheDocument();
 });
 
 it('displays cumulative sum of lap times', async () => {
-    const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-    const entry = {...entryChrisMarshallScorpionA1234, laps: [{'number': 1, 'time': 1234}, {'number': 2, 'time': 1234}, {'number': 3, 'time': 1234}]};
+    const entry = {...entryChrisMarshallScorpionA1234, laps: [{number: 1, time: 1234}, {number: 2, time: 1234}, {number: 3, time: 1234}]};
     const tableBody = document.createElement('tbody');
     render(<RaceEntryView entry={entry} />, {container: document.body.appendChild(tableBody)});
     expect(screen.getByText('00:01')).toBeInTheDocument();
     expect(screen.getByText('00:02')).toBeInTheDocument();
     expect(screen.getByText('00:04')).toBeInTheDocument();
+});
+
+it('displays position', () => {
+    const entry = {...entryChrisMarshallScorpionA1234, laps: [{number: 1, time: 1234}, {number: 2, time: 1234}, {number: 3, time: 1234}], position: 5};
+    const tableBody = document.createElement('tbody');
+    render(<RaceEntryView entry={entry} />, {container: document.body.appendChild(tableBody)});
+    expect(screen.getByText('5')).toBeInTheDocument();
 });
 
 it('calls addLap callback with entry', async () => {
@@ -335,8 +341,8 @@ describe('when the entry is selected to add a new lap', () => {
         });
         expect(addLapCallback).toHaveBeenCalledTimes(1);
     });
-    // how to make this work useEffect results in a class on a visible field being chnaged so can't wait for an element to appear so waitFor doesn't seem to wait :-/
-    xdescribe('when confirmation is received pf the recorded lap', () => {
+    // how to make this work useEffect results in a class on a visible field being changed so can't wait for an element to appear so waitFor doesn't seem to wait :-/
+    xdescribe('when confirmation is received of the recorded lap', () => {
         it('updates the display to show it can be selected for lap entry', async () => {
             const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
             const entry = {...entryChrisMarshallScorpionA1234, laps: []};
@@ -375,5 +381,59 @@ describe('when the entry is selected to add a new lap', () => {
             });
             expect(addLapCallback).toHaveBeenCalledTimes(2);
         });
+    });
+});
+
+describe('when move position up button is clicked', () => {
+    it('calls update position prop with a new position 1 greater than the current position', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const entry = {...entryChrisMarshallScorpionA1234, position: 4};
+        const updatePositionSpy = jest.fn((entry, newPosition) => {});
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entry} updatePosition={updatePositionSpy} />, {container: document.body.appendChild(tableBody)});
+        const updatePositionButton = screen.getByText(/position up/i);
+        await act(async () => {
+            await user.click(updatePositionButton);
+        });
+        expect(updatePositionSpy).toHaveBeenCalledWith(entry, 3);
+    });
+    it('updates the display to show it has been selected', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const entry = {...entryChrisMarshallScorpionA1234, position: 4};
+        const updatePositionSpy = jest.fn((entry, newPosition) => {});
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entry} updatePosition={updatePositionSpy} />, {container: document.body.appendChild(tableBody)});
+        const updatePositionButton = screen.getByText(/position up/i);
+        await act(async () => {
+            await user.click(updatePositionButton);
+        });
+        expect(updatePositionButton.parentElement.parentElement.getAttribute('class')).toMatch(/disabled/i);
+    });
+});
+
+describe('when move position down button is clicked', () => {
+    it('calls update position prop with a new position 1 greater than the current position', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const entry = {...entryChrisMarshallScorpionA1234, position: 4};
+        const updatePositionSpy = jest.fn((entry, newPosition) => {});
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entry} updatePosition={updatePositionSpy} />, {container: document.body.appendChild(tableBody)});
+        const updatePositionButton = screen.getByText(/position down/i);
+        await act(async () => {
+            await user.click(updatePositionButton);
+        });
+        expect(updatePositionSpy).toHaveBeenCalledWith(entry, 5);
+    });
+    it('updates the display to show it has been selected', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const entry = {...entryChrisMarshallScorpionA1234, position: 4};
+        const updatePositionSpy = jest.fn((entry, newPosition) => {});
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entry} updatePosition={updatePositionSpy} />, {container: document.body.appendChild(tableBody)});
+        const updatePositionButton = screen.getByText(/position down/i);
+        await act(async () => {
+            await user.click(updatePositionButton);
+        });
+        expect(updatePositionButton.parentElement.parentElement.getAttribute('class')).toMatch(/disabled/i);
     });
 });

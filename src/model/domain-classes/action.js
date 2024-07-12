@@ -17,6 +17,7 @@
 /**
  * An action to perform at the assigned time
  * @typedef {Object} Action
+ * @property {Flag} flag the action relates to
  * @property {Date} time of the action
- * @property {string} description of the action
+ * @property {FlagState} afterState state of the flag after the action
  */

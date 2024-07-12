@@ -17,6 +17,7 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
 import SelectSession from './SelectSession';
+import { toTitleCase } from '../utilities/text-utilities';
 
 /**
  * Show races that are scheduled to be held
@@ -90,11 +91,17 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
                 <table>
                     <thead>
                         <tr>
-                            <th>Race</th><th>Class</th><th>Start Time</th>
+                            <th>Race</th><th>Class</th><th>Start Time</th><th>Type</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {Array.from(raceMap.values()).map(race => <tr key={race.url} id={race.url} onClick={handleRowClick}><td>{race.name}</td><td>{race.dinghyClass ? race.dinghyClass.name : ''}</td><td>{race.plannedStartTime.toLocaleString()}</td></tr>)}
+                        {Array.from(raceMap.values()).map(race => 
+                            <tr key={race.url} id={race.url} onClick={handleRowClick} >
+                                <td>{race.name}</td>
+                                <td>{race.dinghyClass ? race.dinghyClass.name : ''}</td>
+                                <td>{race.plannedStartTime.toLocaleString()}</td>
+                                <td>{toTitleCase(race.type)}</td>
+                            </tr>)}
                     </tbody>
                 </table>
             </div>

@@ -29,7 +29,7 @@ function CollapsableContainer({ heading, children }) {
     }
 
     return (
-        <div className='collpsable-container'>
+        <div className='collapsable-container'>
         <h1>
             {heading}
             <button id='toggle-children-button' className='embedded' type='button' title={showChildren ? 'Hide' : 'Show'} onClick={handleToggleChildrenButtonClick}>

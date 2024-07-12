@@ -14,9 +14,28 @@
  * limitations under the License. 
  */
 
-/**
- * @typedef Result
- * @property {boolean} success Indicates the success or failure of the operation
- * @property {String} message Provides additional information on the outcome of the operation; such as the cause of failure
- * @property {Object} domainObject The domain object returned by the operation
+/** 
+ * Class providing enumeration of flag roles
  */
+class FlagRole {
+    static WARNING = 'WARNING';
+    static PREPARATORY = 'PREPARATORY';
+
+    /**
+     * Return a FlagRole value based on the supplied string
+     * @param {String} role
+     */
+    static from(role) {
+        const upperRole = role?.toUpperCase();
+        switch (upperRole) {
+            case 'WARNING':
+                return FlagRole.WARNING;
+            case 'PREPARATORY':
+                return FlagRole.PREPARATORY;
+            default:
+                return null;
+        }
+    }
+}
+
+export default FlagRole;

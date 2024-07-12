@@ -22,6 +22,7 @@ import RaceHeaderView from './RaceHeaderView';
 import Clock from '../model/domain-classes/clock';
 import CollapsableContainer from './CollapsableContainer';
 import SelectSession from './SelectSession';
+import RaceType from '../model/domain-classes/race-type';
 
 function RaceConsole() {
     const model = useContext(ModelContext);
@@ -40,6 +41,7 @@ function RaceConsole() {
         return sessionEnd;
     });
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
+    const [raceType, setRaceType] = useState(RaceType.FLEET);
 
     const handleRaceUpdate = useCallback(() => {
         setRacesUpdateRequestAt(Date.now());
@@ -47,7 +49,7 @@ function RaceConsole() {
 
     useEffect(() => {
         let ignoreFetch = false; // set to true if RaceConsole rerendered before fetch completes to avoid using out of date result
-        model.getRacesBetweenTimes(new Date(sessionStart), new Date(sessionEnd)).then(result => {
+        model.getRacesBetweenTimesForType(new Date(sessionStart), new Date(sessionEnd), raceType).then(result => {
             if (!ignoreFetch && !result.success) {
                 setMessage('Unable to load races\n' + result.message);
             }
@@ -71,7 +73,7 @@ function RaceConsole() {
             ignoreFetch = true;
             setMessage('');
         }
-    }, [model, sessionStart, sessionEnd, racesUpdateRequestAt]);
+    }, [model, sessionStart, sessionEnd, raceType, racesUpdateRequestAt]);
 
     // register on update callbacks for races
     useEffect(() => {
@@ -100,12 +102,23 @@ function RaceConsole() {
         setSessionEnd(date);
     }
 
+    function handleRaceTypeChange({ target }) {
+        setRaceType(RaceType.from(target.value));
+    }
+
     return (
-        <div className="race-console">
+        <div className="console">
             <div className="select-race">
                 <label htmlFor="race-select">Select Race</label>
                 <select id="race-select" name="race" multiple={true} onChange={handleRaceSelect} value={selectedRaces}>{raceOptions}</select>
                 <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
+                <fieldset>
+                    <legend>Race Type</legend>
+                    <input id="radio-race-type-fleet" name="race-type" type="radio" value="FLEET" onChange={handleRaceTypeChange} defaultChecked="true"/>
+                    <label htmlFor="radio-race-type-fleet">Fleet</label>
+                    <input id="radio-race-type-pursuit" name="race-type" type="radio" value="PURSUIT" onChange={handleRaceTypeChange} />
+                    <label htmlFor="radio-race-type-pursuit">Pursuit</label>
+                </fieldset>
             </div>
             <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
             <CollapsableContainer heading={'Races'}>

@@ -143,6 +143,15 @@ export class Client {
         if (this._stompHandler) {
             // this._stompHandler.forEach(value => value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/entries/10'})));
             this._stompHandler.forEach((value, key) => {
+              if (key === '/topic/createCompetitor') {
+                value.forEach(cb => cb({body: 'http://localhost:8081/dinghyracing/api/competitors/99'}));
+              }
+              if (key === '/topic/createDinghy') {
+                value.forEach(cb => cb({body: 'http://localhost:8081/dinghyracing/api/dinghies/99'}));
+              }
+              if (key === '/topic/createDinghyClass') {
+                value.forEach(cb => cb({body: 'http://localhost:8081/dinghyracing/api/dinghyClasses/99'}));
+              }
               if (key === '/topic/updateRace') {
                 value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/races/4'}));
               }
@@ -152,11 +161,8 @@ export class Client {
               if (key === '/topic/deleteEntry') {
                 value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/entries/10'}));
               }
-              if (key === '/topic/createCompetitor') {
-                value.forEach(cb => cb({body: 'http://localhost:8081/dinghyracing/api/competitors/99'}));
-              }
-              if (key === '/topic/createDinghy') {
-                value.forEach(cb => cb({body: 'http://localhost:8081/dinghyracing/api/dinghies/99'}));
+              if (key === '/topic/updateDinghyClass') {
+                value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/dinghyClasses/1'}));
               }
             });
         }

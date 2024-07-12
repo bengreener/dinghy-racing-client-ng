@@ -27,3 +27,10 @@ it('sorts an array', () => {
     const sortedArray = sortArray(startArray, (value) => value);
     expect(sortedArray).toEqual([1, 2, 3, 7, 12]);
 });
+
+it('leaves original array unchanged', () => {
+    const startArray = [ 2, 7, 3, 12, 1];
+    const copyStartArray = [...startArray];
+    sortArray(startArray, (value) => value);
+    expect(startArray).toEqual(copyStartArray);
+})

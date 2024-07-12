@@ -45,8 +45,10 @@ import {
 
     entriesGraduateA_bigData
 } from './__mocks__/test-data-more-data';
-import StartSignals from './domain-classes/start-signals';
+import StartSignal from './domain-classes/start-signal';
 import FlagState from './domain-classes/flag-state';
+import RaceType from './domain-classes/race-type';
+import FlagRole from './domain-classes/flag-role';
 
 global.fetch = jest.fn();
 
@@ -369,7 +371,7 @@ describe('when creating a new race', () => {
     it('if a dinghy class URL is not supplied looks up dinghy class to get URL and returns a promise that resolves to a result indicating success when race is created with http status 200', async () => {
         fetch.mockImplementationOnce((resource, options) => {
             // check format of data passed to fetch to reduce risk of false positive
-            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700,"plannedLaps":null,"lapsSailed":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"startSequenceState":"NONE","url":""}') {
+            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","type":"FLEET","duration":2700,"plannedLaps":null,"lapsSailed":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"startSequenceState":"NONE","dinghyClasses":[],"url":""}') {
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -386,7 +388,7 @@ describe('when creating a new race', () => {
         const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
         jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClassScorpion})});
         const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00.000Z'), 
-            'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}, 'duration': 2700000});
+            'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}, 'duration': 2700000, type:'FLEET'});
         const result = await promise;
         expect(getDinghyClassByNameSpy).toHaveBeenCalled();
         expect(promise).toBeInstanceOf(Promise);
@@ -395,7 +397,7 @@ describe('when creating a new race', () => {
     it('if a dinghy class URL is supplied does not look up dinghy class to get URL and returns a promise that resolves to a result indicating success when race is created with http status 200', async () => {
         fetch.mockImplementationOnce((resource, options) => {
             // check format of data passed to fetch to reduce risk of false positive
-            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700,"plannedLaps":null,"lapsSailed":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"startSequenceState":"NONE","url":""}') {
+            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","type":"FLEET","duration":2700,"plannedLaps":null,"lapsSailed":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"startSequenceState":"NONE","dinghyClasses":[],"url":""}') {
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -411,7 +413,7 @@ describe('when creating a new race', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
         jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClassScorpion})});
-        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': dinghyClassScorpion, 'duration': 2700000});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': dinghyClassScorpion, 'duration': 2700000, type:'FLEET'});
         const result = await promise;
         expect(getDinghyClassByNameSpy).not.toHaveBeenCalled();
         expect(promise).toBeInstanceOf(Promise);
@@ -420,7 +422,7 @@ describe('when creating a new race', () => {
     it('returns a promise that resolves to a result indicating success when race is created with http status 201', async () => {
         fetch.mockImplementationOnce((resource, options) => {// check format of data passed to fetch to reduce risk of false positive
             // check format of data passed to fetch to reduce risk of false positive
-            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","duration":2700,"plannedLaps":null,"lapsSailed":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"startSequenceState":"NONE","url":""}') {
+            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","type":"FLEET","duration":2700,"plannedLaps":null,"lapsSailed":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"startSequenceState":"NONE","dinghyClasses":[],"url":""}') {
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -436,7 +438,7 @@ describe('when creating a new race', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
         jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClassScorpion})});
-        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}, 'duration': 2700000});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00.000Z'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}, 'duration': 2700000, type:'FLEET'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true, domainObject: raceScorpionA});
@@ -451,7 +453,7 @@ describe('when creating a new race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}, type:'FLEET'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Bad Request Message: Some error resulting in HTTP 400'}); 
@@ -466,7 +468,7 @@ describe('when creating a new race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}, type:'FLEET'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'}); 
@@ -481,7 +483,7 @@ describe('when creating a new race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}, type:'FLEET'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 408 Request Timeout Message: Some error resulting in HTTP 408'}); 
@@ -496,7 +498,7 @@ describe('when creating a new race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}, type:'FLEET'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 409 Conflict Message: Some error resulting in HTTP 409'});
@@ -511,7 +513,7 @@ describe('when creating a new race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}, type:'FLEET'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 500 Internal Server Error Message: Some error resulting in HTTP 500'}); 
@@ -526,7 +528,7 @@ describe('when creating a new race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}, type:'FLEET'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 503 Service Unavailable Message: Some error resulting in HTTP 503'}); 
@@ -536,7 +538,7 @@ describe('when creating a new race', () => {
             throw new TypeError('Failed to fetch');
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}});
+        const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00'), 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'}, type:'FLEET'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'TypeError: Failed to fetch'});
@@ -2157,7 +2159,7 @@ describe('when updating a competitor', () => {
                 return Promise.resolve({
                     ok: true,
                     status: 200,
-                    json: () => Promise.resolve({...competitorChrisMarshall, name: 'Chris Marshal'})
+                    json: () => Promise.resolve({...competitorChrisMarshallHAL, name: 'Chris Marshal'})
                 });
             };
         });
@@ -2174,7 +2176,7 @@ describe('when updating a competitor', () => {
                 return Promise.resolve({
                     ok: true,
                     status: 200,
-                    json: () => Promise.resolve({...competitorChrisMarshall, name: 'Chris Marshal'})
+                    json: () => Promise.resolve({...competitorChrisMarshallHAL, name: 'Chris Marshal'})
                 });
             };
         });
@@ -2187,7 +2189,7 @@ describe('when updating a competitor', () => {
                 return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
             }
         });
-        const promise = dinghyRacingModel.updateCompetitor(competitorChrisMarshall, 'Chris Marshal');
+        const promise = dinghyRacingModel.updateCompetitor({...competitorChrisMarshall, url: undefined}, 'Chris Marshal');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true, domainObject: {...competitorChrisMarshall, name: 'Chris Marshal'}});
@@ -2213,6 +2215,114 @@ describe('when updating a competitor', () => {
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const promise = dinghyRacingModel.updateCompetitor(competitorChrisMarshall, 'Chris Marshal');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
+    });
+});
+
+describe('when updating a dinghy class', () => {
+    it('if dinghy class exists and URL provided then updates dinghy class', async () => {
+        fetch.mockImplementationOnce((resource, options) => {
+            const bodyMatch = {name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215};
+            if ((resource === 'http://localhost:8081/dinghyracing/api/dinghyclasses/1') && (options.body === JSON.stringify(bodyMatch))) {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve({...dinghyClassScorpionHAL, name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215})
+                });
+            };
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.updateDinghyClass(dinghyClassScorpion, 'Scorpion Two', 3, 1215);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, domainObject: {...dinghyClassScorpion, name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215}});
+    });
+    describe('when only one property provided to update', () => {
+        it('updates only provided value and leaves other values unchanged', async () => {
+            fetch.mockImplementationOnce((resource, options) => {
+                const bodyMatch = {name: 'Scorpion Two'};
+                if ((resource === 'http://localhost:8081/dinghyracing/api/dinghyclasses/1') && (options.body === JSON.stringify(bodyMatch))) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200,
+                        json: () => Promise.resolve({...dinghyClassScorpionHAL, name: 'Scorpion Two'})
+                    });
+                };
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.updateDinghyClass(dinghyClassScorpion, 'Scorpion Two');
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, domainObject: {...dinghyClassScorpion, name: 'Scorpion Two'}});
+        });
+    });
+    describe('when two properties provided to update', () => {
+        it('updates only provided properties and leaves other values unchanged', async () => {
+            fetch.mockImplementationOnce((resource, options) => {
+                const bodyMatch = {crewSize: 3, portsmouthNumber: 1215};
+                if ((resource === 'http://localhost:8081/dinghyracing/api/dinghyclasses/1') && (options.body === JSON.stringify(bodyMatch))) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200,
+                        json: () => Promise.resolve({...dinghyClassScorpionHAL, crewSize: 3, portsmouthNumber: 1215})
+                    });
+                };
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.updateDinghyClass(dinghyClassScorpion, null, 3, 1215);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, domainObject: {...dinghyClassScorpion, crewSize: 3, portsmouthNumber: 1215}});
+        });
+    });
+    it('if dinghy class exists but URL not provided then updates dinghy class', async () => {
+        fetch.mockImplementationOnce((resource, options) => {
+            const bodyMatch = {name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215};
+            if ((resource === 'http://localhost:8081/dinghyracing/api/dinghyclasses/1') && (options.body === JSON.stringify(bodyMatch))) {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve({...dinghyClassScorpionHAL, name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215})
+                });
+            };
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation((name) => {
+            if (name === 'Scorpion') {
+                return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion});
+            }
+            else {
+                return Promise.resolve({'success': false, 'message': `Dinghy class not found: ${name}`});
+            }
+        });
+        const promise = dinghyRacingModel.updateDinghyClass({...dinghyClassScorpion, url: undefined}, 'Scorpion Two', 3, 1215);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, domainObject: {...dinghyClassScorpion, name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215}});
+    });
+    it('if dinghy class does not exist returns message explaining issue', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation((name) => {
+            return Promise.resolve({'success': false, 'message': `Dinghy class not found: ${name}`});
+        });
+        const promise = dinghyRacingModel.updateDinghyClass({...dinghyClassScorpion, url: undefined}, 'Scorpion Two', 3, 1215);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Dinghy class not found: Scorpion'});
+    });
+    it('if update fails returns failed indicator and message explaining cause of failure', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 404, 
+                statusText: 'Not Found',
+                json: () => Promise.resolve({})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.updateDinghyClass({...dinghyClassScorpion, url: undefined}, 'Scorpion Two', 3, 1215);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
@@ -2963,7 +3073,7 @@ it('provides a blank template for a competitor', () => {
 it('provides a blank template for a dinghy class', () => {
     const dinghyClass = DinghyRacingModel.dinghyClassTemplate();
 
-    expect(dinghyClass).toEqual({'name': '', 'crewSize': 1, 'url': ''});
+    expect(dinghyClass).toEqual({'name': '', 'crewSize': 1, portsmouthNumber: null, 'url': ''});
 });
 
 it('provides a blank template for a dinghy', () => {
@@ -2975,13 +3085,13 @@ it('provides a blank template for a dinghy', () => {
 it('provides a blank template for a race', () => {
     const race = DinghyRacingModel.raceTemplate();
 
-    expect(race).toEqual({'name': '', 'plannedStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'plannedLaps': null, 'lapsSailed': null, 'lapForecast': null, 'lastLapTime': null, 'averageLapTime': null, 'startSequenceState': 'NONE', 'clock': null, 'url': ''});
+    expect(race).toEqual({name: '', plannedStartTime: null, dinghyClass: DinghyRacingModel.dinghyClassTemplate(), type: null, duration: 0, plannedLaps: null, lapsSailed: null, lapForecast: null, lastLapTime: null, averageLapTime: null, startSequenceState: 'NONE', dinghyClasses: [], clock: null, url: ''});
 });
 
 it('provides a blank template for a race entry', () => {
     const entry = DinghyRacingModel.entryTemplate();
 
-    expect(entry).toEqual({'race': DinghyRacingModel.raceTemplate(), 'helm': DinghyRacingModel.competitorTemplate(), 'crew': null, 'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': ''});
+    expect(entry).toEqual({race: DinghyRacingModel.raceTemplate(), helm: DinghyRacingModel.competitorTemplate(), crew: null, dinghy: DinghyRacingModel.dinghyTemplate(), laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: ''});
 });
 
 it('provides a blank template for a lap', () => {
@@ -3122,30 +3232,30 @@ describe('when searching for entries by race', () => {
         expect(result).toEqual({'success': true, 'domainObject': entriesHandicapA});
     });
     it('returns a promise that resolves to a result indicating success and containing the entries when entries are found and some entries are on the last lap', async () => {
-        const entriesHandicapAHAL_onLastLap = { '_embedded' : { 'entries' : [
-            { 'averageLapTime': 'PT0S', 'lastLapTime': 'PT0S', 'sumOfLapTimes': 'PT0S' , 'onLastLap': true, 'finishedRace': false, 'scoringAbbreviation': null, 
-                '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20' }, 
-                'entry' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20' }, 
-                'helm' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/helm' }, 
-                'crew' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/crew' }, 
-                'laps' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/laps' }, 
-                'race' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/race' }, 
-                'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/dinghy' } } 
+        const entriesHandicapAHAL_onLastLap = { _embedded : { entries : [
+            { averageLapTime: 'PT0S', lastLapTime: 'PT0S', sumOfLapTimes: 'PT0S', onLastLap: true, finishedRace: false, scoringAbbreviation: null, position: null, 
+                _links : { self : { href : 'http://localhost:8081/dinghyracing/api/entries/20' }, 
+                entry : { href : 'http://localhost:8081/dinghyracing/api/entries/20' }, 
+                helm : { href : 'http://localhost:8081/dinghyracing/api/entries/20/helm' }, 
+                crew : { href : 'http://localhost:8081/dinghyracing/api/entries/20/crew' }, 
+                laps : { href : 'http://localhost:8081/dinghyracing/api/entries/20/laps' }, 
+                race : { href : 'http://localhost:8081/dinghyracing/api/entries/20/race' }, 
+                dinghy : { href : 'http://localhost:8081/dinghyracing/api/entries/20/dinghy' } } 
             }, 
-            { 'averageLapTime': 'PT0S', 'lastLapTime': 'PT0S', 'sumOfLapTimes': 'PT0S', 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null,
-                '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21' }, 
-                'entry' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21' }, 
-                'helm' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/helm' }, 
-                'crew' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/crew' }, 
-                'laps' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/laps' }, 
-                'race' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/race' }, 
-                'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/dinghy' } }
+            { averageLapTime: 'PT0S', lastLapTime: 'PT0S', sumOfLapTimes: 'PT0S', onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, 
+                _links : { self : { href : 'http://localhost:8081/dinghyracing/api/entries/21' }, 
+                entry : { href : 'http://localhost:8081/dinghyracing/api/entries/21' }, 
+                helm : { href : 'http://localhost:8081/dinghyracing/api/entries/21/helm' }, 
+                crew : { href : 'http://localhost:8081/dinghyracing/api/entries/21/crew' }, 
+                laps : { href : 'http://localhost:8081/dinghyracing/api/entries/21/laps' }, 
+                race : { href : 'http://localhost:8081/dinghyracing/api/entries/21/race' }, 
+                dinghy : { href : 'http://localhost:8081/dinghyracing/api/entries/21/dinghy' } }
             } 
-        ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/races/8/signedUp' } }};
+        ] }, _links : { self : { href : 'http://localhost:8081/dinghyracing/api/races/8/signedUp' } }};
 
         const entriesHandicapA_OnLastLap = [
-            {'helm': competitorChrisMarshall, 'crew': competitorLouScrew, 'race': raceHandicapA, 'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': true, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/20'}, 
-            {'helm': competitorJillMyer, 'crew': null, 'race': raceHandicapA, 'dinghy': dinghy826, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/21'}
+            {helm: competitorChrisMarshall, crew: competitorLouScrew, race: raceHandicapA, dinghy: dinghy1234, laps: [], sumOfLapTimes: 0, onLastLap: true, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/20'}, 
+            {helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/21'}
         ];
 
         fetch.mockImplementationOnce(() => {
@@ -3197,30 +3307,30 @@ describe('when searching for entries by race', () => {
         expect(result).toEqual({'success': true, 'domainObject': entriesHandicapA_OnLastLap});
     });
     it('returns a promise that resolves to a result indicating success and containing the entries when entries are found and some entries have finished the race', async () => {
-        const entriesHandicapAHAL_finishedRace = { '_embedded' : { 'entries' : [
-            { 'averageLapTime': 'PT0S', 'lastLapTime': 'PT0S', 'sumOfLapTimes': 'PT0S' , 'onLastLap': false, 'finishedRace': true, 'scoringAbbreviation': null,
-                '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20' }, 
-                'entry' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20' }, 
-                'helm' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/helm' }, 
-                'crew' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/crew' }, 
-                'laps' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/laps' }, 
-                'race' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/race' }, 
-                'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/dinghy' } } 
+        const entriesHandicapAHAL_finishedRace = { _embedded : { entries : [
+            { averageLapTime: 'PT0S', lastLapTime: 'PT0S', sumOfLapTimes: 'PT0S' , onLastLap: false, finishedRace: true, scoringAbbreviation: null, position: null,
+                _links : { self : { href : 'http://localhost:8081/dinghyracing/api/entries/20' }, 
+                entry : { href : 'http://localhost:8081/dinghyracing/api/entries/20' }, 
+                helm : { href : 'http://localhost:8081/dinghyracing/api/entries/20/helm' }, 
+                crew : { href : 'http://localhost:8081/dinghyracing/api/entries/20/crew' }, 
+                laps : { href : 'http://localhost:8081/dinghyracing/api/entries/20/laps' }, 
+                race : { href : 'http://localhost:8081/dinghyracing/api/entries/20/race' }, 
+                dinghy : { href : 'http://localhost:8081/dinghyracing/api/entries/20/dinghy' } } 
             }, 
-            { 'averageLapTime': 'PT0S', 'lastLapTime': 'PT0S', 'sumOfLapTimes': 'PT0S', 'onLastLap': true, 'finishedRace': false, 'scoringAbbreviation': null,
-                '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21' }, 
-                'entry' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21' }, 
-                'helm' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/helm' }, 
-                'crew' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/crew' }, 
-                'laps' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/laps' }, 
-                'race' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/race' }, 
-                'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/dinghy' } }
+            { averageLapTime: 'PT0S', lastLapTime: 'PT0S', sumOfLapTimes: 'PT0S', onLastLap: true, finishedRace: false, scoringAbbreviation: null, position: null,
+                _links : { self : { href : 'http://localhost:8081/dinghyracing/api/entries/21' }, 
+                entry : { href : 'http://localhost:8081/dinghyracing/api/entries/21' }, 
+                helm : { href : 'http://localhost:8081/dinghyracing/api/entries/21/helm' }, 
+                crew : { href : 'http://localhost:8081/dinghyracing/api/entries/21/crew' }, 
+                laps : { href : 'http://localhost:8081/dinghyracing/api/entries/21/laps' }, 
+                race : { href : 'http://localhost:8081/dinghyracing/api/entries/21/race' }, 
+                dinghy : { href : 'http://localhost:8081/dinghyracing/api/entries/21/dinghy' } }
             } 
-        ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/races/8/signedUp' } }};
+        ] }, _links : { self : { href : 'http://localhost:8081/dinghyracing/api/races/8/signedUp' } }};
 
         const entriesHandicapA_OnLastLap = [
-            {'helm': competitorChrisMarshall, 'crew': competitorLouScrew, 'race': raceHandicapA, 'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': true, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/20'}, 
-            {'helm': competitorJillMyer, 'crew': null, 'race': raceHandicapA, 'dinghy': dinghy826, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': true, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/21'}
+            {helm: competitorChrisMarshall, crew: competitorLouScrew, race: raceHandicapA, dinghy: dinghy1234, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: true, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/20'}, 
+            {helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, onLastLap: true, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/21'}
         ];
 
         fetch.mockImplementationOnce(() => {
@@ -3272,30 +3382,30 @@ describe('when searching for entries by race', () => {
         expect(result).toEqual({'success': true, 'domainObject': entriesHandicapA_OnLastLap});
     });
     it('returns a promise that resolves to a result indicating success and containing the entries when entries are found and some entries have a scoring abbreviation of DNS recorded', async () => {
-        const entriesHandicapAHAL_DNS = { '_embedded' : { 'entries' : [
-            { 'averageLapTime': 'PT0S', 'lastLapTime': 'PT0S', 'sumOfLapTimes': 'PT0S' , 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': 'DNS',
-                '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20' }, 
-                'entry' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20' }, 
-                'helm' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/helm' }, 
-                'crew' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/crew' }, 
-                'laps' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/laps' }, 
-                'race' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/race' }, 
-                'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/20/dinghy' } } 
+        const entriesHandicapAHAL_DNS = { _embedded : { entries : [
+            { averageLapTime: 'PT0S', lastLapTime: 'PT0S', sumOfLapTimes: 'PT0S' , onLastLap: false, finishedRace: false, scoringAbbreviation: 'DNS', position: null,
+                _links : { self : { href : 'http://localhost:8081/dinghyracing/api/entries/20' }, 
+                entry : { href : 'http://localhost:8081/dinghyracing/api/entries/20' }, 
+                helm : { href : 'http://localhost:8081/dinghyracing/api/entries/20/helm' }, 
+                crew : { href : 'http://localhost:8081/dinghyracing/api/entries/20/crew' }, 
+                laps : { href : 'http://localhost:8081/dinghyracing/api/entries/20/laps' }, 
+                race : { href : 'http://localhost:8081/dinghyracing/api/entries/20/race' }, 
+                dinghy : { href : 'http://localhost:8081/dinghyracing/api/entries/20/dinghy' } } 
             }, 
-            { 'averageLapTime': 'PT0S', 'lastLapTime': 'PT0S', 'sumOfLapTimes': 'PT0S', 'onLastLap': true, 'finishedRace': false, 'scoringAbbreviation': null,
-                '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21' }, 
-                'entry' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21' }, 
-                'helm' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/helm' }, 
-                'crew' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/crew' }, 
-                'laps' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/laps' }, 
-                'race' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/race' }, 
-                'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/entries/21/dinghy' } }
+            { averageLapTime: 'PT0S', lastLapTime: 'PT0S', sumOfLapTimes: 'PT0S', onLastLap: true, finishedRace: false, scoringAbbreviation: null, position: null,
+                _links : { self : { href : 'http://localhost:8081/dinghyracing/api/entries/21' }, 
+                entry : { href : 'http://localhost:8081/dinghyracing/api/entries/21' }, 
+                helm : { href : 'http://localhost:8081/dinghyracing/api/entries/21/helm' }, 
+                crew : { href : 'http://localhost:8081/dinghyracing/api/entries/21/crew' }, 
+                laps : { href : 'http://localhost:8081/dinghyracing/api/entries/21/laps' }, 
+                race : { href : 'http://localhost:8081/dinghyracing/api/entries/21/race' }, 
+                dinghy : { href : 'http://localhost:8081/dinghyracing/api/entries/21/dinghy' } }
             } 
-        ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/races/8/signedUp' } }};
+        ] }, _links : { self : { href : 'http://localhost:8081/dinghyracing/api/races/8/signedUp' } }};
 
         const entriesHandicapA_DNS = [
-            {'helm': competitorChrisMarshall, 'crew': competitorLouScrew, 'race': raceHandicapA, 'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': 'DNS', 'url': 'http://localhost:8081/dinghyracing/api/entries/20'}, 
-            {'helm': competitorJillMyer, 'crew': null, 'race': raceHandicapA, 'dinghy': dinghy826, 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': true, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/21'}
+            {helm: competitorChrisMarshall, crew: competitorLouScrew, race: raceHandicapA, dinghy: dinghy1234, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: 'DNS', position: null, url: 'http://localhost:8081/dinghyracing/api/entries/20'}, 
+            {helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, onLastLap: true, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/21'}
         ];
 
         fetch.mockImplementationOnce(() => {
@@ -3688,11 +3798,13 @@ describe('when searching for entries by race', () => {
 
 describe('when a race is requested', () => {
     it('returns a promise that resolves to a result indicating success and containing the race when the race is found', async () => {
+        const raceScorpion_AHAL_withEntries = {...raceScorpion_AHAL, dinghyClasses: [{name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043}]};
+        const raceScorpionA_withEntries = {...raceScorpionA, dinghyClasses: [{name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043}]};
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,
                 status: 200, 
-                json: () => Promise.resolve(raceScorpion_AHAL)
+                json: () => Promise.resolve(raceScorpion_AHAL_withEntries)
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -3700,7 +3812,7 @@ describe('when a race is requested', () => {
         const promise = dinghyRacingModel.getRace(raceScorpionA.url);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, 'domainObject': raceScorpionA});
+        expect(result).toEqual({'success': true, 'domainObject': raceScorpionA_withEntries});
     });
     // handicap races do not have a dinghy class set so a 404 when searcing for a dinghy class from race is an expected result
     it('returns a promise that resolves to a result indicating success and containing the race when the race is found but the dinghyClass is not found as the race is a handicap', async () => {
@@ -3962,7 +4074,7 @@ describe('when updating the start sequence state for a race', () => {
                 });
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const promise = dinghyRacingModel.updateRaceStartSequenceState(raceScorpionA, StartSignals.WARNINGSIGNAL);
+            const promise = dinghyRacingModel.updateRaceStartSequenceState(raceScorpionA, StartSignal.WARNINGSIGNAL);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
             expect(result.success).toBeTruthy();
@@ -3994,7 +4106,7 @@ describe('when updating the start sequence state for a race', () => {
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
             jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': {raceScorpionA}})});
-            const promise = dinghyRacingModel.updateRaceStartSequenceState({ 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00Z'), 'dinghyClass': dinghyClassScorpion}, StartSignals.PREPARATORYSIGNAL);
+            const promise = dinghyRacingModel.updateRaceStartSequenceState({ 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00Z'), 'dinghyClass': dinghyClassScorpion}, StartSignal.PREPARATORYSIGNAL);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
             expect(result.success).toBeTruthy();
@@ -4009,7 +4121,7 @@ describe('when updating the start sequence state for a race', () => {
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
             jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
-            const promise = dinghyRacingModel.updateRaceStartSequenceState({ 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00Z'), 'dinghyClass': dinghyClassScorpion}, StartSignals.ONEMINUTE);
+            const promise = dinghyRacingModel.updateRaceStartSequenceState({ 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00Z'), 'dinghyClass': dinghyClassScorpion}, StartSignal.ONEMINUTE);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
             expect(result).toEqual({'success': false, 'message': 'Something went wrong'});
@@ -4697,12 +4809,417 @@ describe('when retrieving a list of races that start between the specified times
     });
 });
 
+describe('when retrieving a list of races that start between the specified times', () => {
+    // Can this test can be affected by BST, or other time zones (yes, if timezone changes test data (races) will need to be adjusted to reflect the change in the timezone (currently set up for British Summer Time))
+    it('returns a collection of races that start between the specified times', async () => {
+        fetch.mockImplementation((resource) => {
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&type=FLEET') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(racesCollectionHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/4/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassScorpionHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/7/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassGraduateHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/17/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassCometHAL)
+                });
+            }
+            else {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404,
+                    statusText: 'Not Found'
+                });
+            }
+        });
+    
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.getRacesBetweenTimesForType(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), RaceType.FLEET);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': races});
+    });
+    describe('when a race is at a start sequence stage', () => {
+        it('returns a promise that resolves to a race that includes the start sequence stage', async () => {
+            const raceScorpion_warningSignal_AHAL = {...raceScorpion_AHAL, 'startSequenceState': 'WARNINGSIGNAL'};
+            const raceScorpionA_warningSignal = {...raceScorpionA, 'startSequenceState': 'WARNINGSIGNAL'};
+            const racesCollectionHAL = {'_embedded':{'races':[raceScorpion_warningSignal_AHAL, raceGraduate_AHAL, raceComet_AHAL, raceHandicap_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':20,'totalElements':4,'totalPages':1,'number':0}};
+            const races = [raceScorpionA_warningSignal, raceGraduateA, raceCometA, raceHandicapA];
+            fetch.mockImplementation((resource) => {
+                if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&type=FLEET') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(racesCollectionHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/races/4/dinghyClass') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghyClassScorpionHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/races/7/dinghyClass') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghyClassGraduateHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/races/17/dinghyClass') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghyClassCometHAL)
+                    });
+                }
+                else {
+                    return Promise.resolve({
+                        ok: false,
+                        status: 404, 
+                        statusText: 'Not Found'
+                    });
+                }
+            });
+    
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.getRacesBetweenTimesForType(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), RaceType.FLEET);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, 'domainObject': races});
+        });
+    });
+    describe('when there are more races than fit on a single page', () => {
+        describe('when page and size are not supplied', () => {
+            it('returns a success result containing all the races that start at or after the specified time', async () => {
+                const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
+                fetch.mockImplementation((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&type=FLEET&page=0&size=4') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(racesCollectionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/4/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassScorpionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/7/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassGraduateHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/17/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassCometHAL)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404, 
+                            statusText: 'Not Found'
+                        });
+                    }
+                }).mockImplementationOnce((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&type=FLEET') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(racesCollectionHAL_p0)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404,
+                            statusText: 'Not Found'
+                        });
+                    }
+                });
+        
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const promise = dinghyRacingModel.getRacesBetweenTimesForType(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), RaceType.FLEET);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({'success': true, 'domainObject': races});
+            });
+        });
+        describe('when page number supplied', () => {
+            it('returns only a single page of data', async () => {
+                const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
+                const races_p0 = [raceScorpionA, raceGraduateA];
+                fetch.mockImplementation((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&type=FLEET') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(racesCollectionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/4/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassScorpionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/7/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassGraduateHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/17/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassCometHAL)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404,
+                            statusText: 'Not Found'
+                        });
+                    }
+                }).mockImplementationOnce((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&type=FLEET&page=0') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(racesCollectionHAL_p0)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404,
+                            statusText: 'Not Found'
+                        });
+                    }
+                });
+        
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const promise = dinghyRacingModel.getRacesBetweenTimesForType(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), RaceType.FLEET, 0);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({'success': true, 'domainObject': races_p0});
+            });
+        });
+        describe('when size is supplied', () => {
+            it('returns only a single page of data', async () => {
+                const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
+                const races_p0 = [raceScorpionA, raceGraduateA];
+                fetch.mockImplementation((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&type=FLEET') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(racesCollectionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/4/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassScorpionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/7/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassGraduateHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/17/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassCometHAL)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404,
+                            statusText: 'Not Found'
+                        });
+                    }
+                }).mockImplementationOnce((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&type=FLEET&size=2') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(racesCollectionHAL_p0)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404,
+                            statusText: 'Not Found'
+                        });
+                    }
+                });
+        
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const promise = dinghyRacingModel.getRacesBetweenTimesForType(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), RaceType.FLEET, null, 2);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({'success': true, 'domainObject': races_p0});
+            });
+        });
+        describe('when page and size supplied', () => {
+            it('returns only a single page of data', async () => {
+                const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
+                const races_p0 = [raceScorpionA, raceGraduateA];
+                fetch.mockImplementation((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&type=FLEET') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(racesCollectionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/4/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassScorpionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/7/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassGraduateHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/17/dinghyClass') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(dinghyClassCometHAL)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404,
+                            statusText: 'Not Found'
+                        });
+                    }
+                }).mockImplementationOnce((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&type=FLEET&page=0&size=2') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(racesCollectionHAL_p0)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404,
+                            statusText: 'Not Found'
+                        });
+                    }
+                });
+        
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const promise = dinghyRacingModel.getRacesBetweenTimesForType(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), RaceType.FLEET, 0, 2);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({'success': true, 'domainObject': races_p0});
+            });
+        });
+    });
+    describe('when sort criteria are provided', () => {
+        it('requests a sorted collection from server', async () => {
+            // checking request is correctly structured
+            // not checking a sorted collection is returned as that is the responsibility of the server
+            fetch.mockImplementation((resource) => {
+                if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&type=FLEET&sort=plannedStartTime,ASC') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(racesCollectionHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/races/4/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassScorpionHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/7/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassGraduateHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/17/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassCometHAL)
+                });
+            }
+                else {
+                    return Promise.resolve({
+                        ok: false,
+                        status: 404,
+                        statusText: 'Not Found'
+                    });
+                }
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.getRacesBetweenTimesForType(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), RaceType.FLEET, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, 'domainObject': races});
+        });
+    });
+});
+
 describe('when a StartSequence is requested', () => {
     it('returns a promise that resolves to a success containing a StartSequence for the races between the start and end times', async () => {
         jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
 
         fetch.mockImplementation((resource) => {
-            if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&sort=plannedStartTime,ASC') {
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&type=FLEET&sort=plannedStartTime,ASC') {
                 return Promise.resolve({
                     ok: true,
                     status: 200,
@@ -4740,17 +5257,60 @@ describe('when a StartSequence is requested', () => {
         });
 
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.getStartSequence(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'));
+
+        const scorpionAWarningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, actions: []};
+        const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
+        const graduateAWarningFlag = {name: 'Graduate Class Flag', role: FlagRole.WARNING, actions: []};
+        const cometAWarningFlag = {name: 'Comet Class Flag', role: FlagRole.WARNING, actions: []};
+        const handicapAWarningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, actions: []};
+    
+        const scorpionAWarningFlagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
+        const scorpionAWarningFlagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+        
+        const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
+        const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
+        
+        const graduateAWarningFlagRaiseAction = {flag: graduateAWarningFlag, time: new Date(raceGraduateA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
+        const graduateAWarningFlagLowerAction = {flag: graduateAWarningFlag, time: raceGraduateA.plannedStartTime, afterState: FlagState.LOWERED};
+
+        const cometAWarningFlagRaiseAction = {flag: cometAWarningFlag, time: new Date(raceCometA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
+        const cometAWarningFlagLowerAction = {flag: cometAWarningFlag, time: raceCometA.plannedStartTime, afterState: FlagState.LOWERED};
+
+        const handicapAWarningFlagRaiseAction = {flag: handicapAWarningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
+        const handicapAWarningFlagLowerAction = {flag: handicapAWarningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
+    
+        scorpionAWarningFlag.actions.push(scorpionAWarningFlagRaiseAction);
+        scorpionAWarningFlag.actions.push(scorpionAWarningFlagLowerAction);
+        
+        preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
+        preparatoryFlag.actions.push(preparatoryFlagLowerAction);
+        
+        graduateAWarningFlag.actions.push(graduateAWarningFlagRaiseAction);
+        graduateAWarningFlag.actions.push(graduateAWarningFlagLowerAction);
+        
+        cometAWarningFlag.actions.push(cometAWarningFlagRaiseAction);
+        cometAWarningFlag.actions.push(cometAWarningFlagLowerAction);
+        
+        handicapAWarningFlag.actions.push(handicapAWarningFlagRaiseAction);
+        handicapAWarningFlag.actions.push(handicapAWarningFlagLowerAction);
+
+
+        const promise = dinghyRacingModel.getStartSequence(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), RaceType.FLEET);
         const result = await promise;
-        const flags = result.domainObject.getFlags();
+        const actions = result.domainObject.getActions();
 
         expect(promise).toBeInstanceOf(Promise);
-        expect(flags.length).toBe(5);
-        expect(flags[0]).toEqual({ name: 'Scorpion A Warning', state: FlagState.LOWERED, timeToChange: -600000 });
-        expect(flags[1]).toEqual({ name: 'Blue Peter', state: FlagState.LOWERED, timeToChange: -900000 });
-        expect(flags[2]).toEqual({ name: 'Graduate A Warning', state: FlagState.LOWERED, timeToChange: -900000 });
-        expect(flags[3]).toEqual({ name: 'Comet A Warning', state: FlagState.LOWERED, timeToChange: -1200000 });
-        expect(flags[4]).toEqual({ name: 'Handicap A Warning', state: FlagState.LOWERED, timeToChange: -1500000 });
+        expect(actions).toHaveLength(10);
+        expect(actions[0]).toStrictEqual(scorpionAWarningFlagRaiseAction);
+        expect(actions[1]).toStrictEqual(scorpionAWarningFlagLowerAction);
+        expect(actions[2]).toStrictEqual(graduateAWarningFlagRaiseAction);
+        expect(actions[3]).toStrictEqual(graduateAWarningFlagLowerAction);
+        expect(actions[4]).toStrictEqual(cometAWarningFlagRaiseAction);
+        expect(actions[5]).toStrictEqual(cometAWarningFlagLowerAction);
+        expect(actions[6]).toStrictEqual(handicapAWarningFlagRaiseAction);
+        expect(actions[7]).toStrictEqual(handicapAWarningFlagLowerAction);
+        expect(actions[8]).toStrictEqual(preparatoryFlagRaiseAction);
+        expect(actions[9]).toStrictEqual(preparatoryFlagLowerAction);
 
         jest.runOnlyPendingTimers();
         jest.useRealTimers();
@@ -4765,7 +5325,7 @@ describe('when a StartSequence is requested', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.getStartSequence(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'));
+        const promise = dinghyRacingModel.getStartSequence(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), RaceType.FLEET);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
@@ -4923,5 +5483,141 @@ describe('when a websocket message callback has been set for dinghy creation', (
         dinghyRacingModel.registerDinghyCreationCallback(callback2);
         dinghyRacingModel.unregisterDinghyCreationCallback(callback1);
         expect(dinghyRacingModel.dinghyCreationCallbacks.size).toBe(1);
+    });
+});
+
+describe('when a websocket message callback has been set for dinghy class creation', () => {
+    it('calls the callback', done => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerDinghyClassCreationCallback(callback);
+        // create delay to give time for stomp mock to trigger callback
+        setTimeout(() => {
+            expect(callback).toBeCalled();
+            done();
+        }, 1);
+    });
+    it('does not set another reference to the same callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerDinghyClassCreationCallback(callback);
+        dinghyRacingModel.registerDinghyClassCreationCallback(callback);
+        expect(dinghyRacingModel.dinghyClassCreationCallbacks.size).toBe(1);
+    });
+    it('sets a functionally equivalent but different callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback1 = jest.fn();
+        const callback2 = jest.fn();
+        dinghyRacingModel.registerDinghyClassCreationCallback(callback1);
+        dinghyRacingModel.registerDinghyClassCreationCallback(callback2);
+        expect(dinghyRacingModel.dinghyClassCreationCallbacks.size).toBe(2);
+    });
+    it('removes websocket message when requested', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerDinghyClassCreationCallback(callback);
+        dinghyRacingModel.unregisterDinghyClassCreationCallback(callback);
+        expect(dinghyRacingModel.dinghyClassCreationCallbacks.size).toBe(0);
+    });
+    it('does not remove functionally equivalent but different callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback1 = jest.fn();
+        const callback2 = jest.fn();
+        dinghyRacingModel.registerDinghyClassCreationCallback(callback1);
+        dinghyRacingModel.registerDinghyClassCreationCallback(callback2);
+        dinghyRacingModel.unregisterDinghyClassCreationCallback(callback1);
+        expect(dinghyRacingModel.dinghyClassCreationCallbacks.size).toBe(1);
+    });
+});
+
+describe('when a websocket message callback has been set for dinghy class update', () => {
+    it('calls the callback', done => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClasses/1', callback);
+        // create delay to give time for stomp mock to trigger callback
+        setTimeout(() => {
+            expect(callback).toBeCalled();
+            done();
+        }, 1);
+    });
+    it('does not set another reference to the same callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClasses/1', callback);
+        dinghyRacingModel.registerDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClasses/1', callback);
+        expect(dinghyRacingModel.dinghyClassUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/dinghyClasses/1').size).toBe(1);
+    });
+    it('sets a functionally equivalent but different callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback1 = jest.fn();
+        const callback2 = jest.fn();
+        dinghyRacingModel.registerDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClass/1', callback1);
+        dinghyRacingModel.registerDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClass/1', callback2);
+        expect(dinghyRacingModel.dinghyClassUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/dinghyClass/1').size).toBe(2);
+    });
+    it('removes websocket message when requested', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClasses/1', callback);
+        dinghyRacingModel.unregisterDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClasses/1', callback);
+        expect(dinghyRacingModel.dinghyClassUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/dinghyClasses/1').size).toBe(0);
+    });
+    it('does not remove functionally equivalent but different callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback1 = jest.fn();
+        const callback2 = jest.fn();
+        dinghyRacingModel.registerDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClasses/1', callback1);
+        dinghyRacingModel.registerDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClasses/1', callback2);
+        dinghyRacingModel.unregisterDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClasses/1', callback1);
+        expect(dinghyRacingModel.dinghyClassUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/dinghyClasses/1').size).toBe(1);
+    });
+});
+
+describe('when updating an entries position in the race', () => {
+    it('if race exists and entry exists and URLs provided and position provided then updates competitor', async () => {
+        fetch.mockImplementationOnce((resource, options) => {
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/4/updateEntryPosition?entry=http://localhost:8081/dinghyracing/api/entries/10&position=2') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 204,
+                    json: () => Promise.resolve({})
+                });
+            };
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.updateEntryPosition(entryChrisMarshallScorpionA1234, 2);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result.success).toBeTruthy();
+    });
+    it('if race URL not provided and entry exists and URL provided then returns message explaining issue', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.updateEntryPosition({...entryChrisMarshallScorpionA1234, race: {...raceScorpionA, url: null}}, 2);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, message: 'The race URL is required to update an entry position.'});
+    });
+    it('if race exists and URL provided and entry URL not provided then returns message explaining issue', async () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.updateEntryPosition({...entryChrisMarshallScorpionA1234, url: ''}, 2);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, message: 'An entry with a URL is required to update an entry position.'});
+    });
+    it('if update fails returns failed indicator and message explaining cause of failure', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 500, 
+                statusText: 'Internal Server Error',
+                json: () => Promise.resolve({})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.updateEntryPosition(entryChrisMarshallScorpionA1234, 2);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 500 Internal Server Error'});
     });
 });

@@ -15,21 +15,22 @@
  */
 
 /**
- * Sort an array in ascending order, smallest to largest, based on value returned by getValueFunction
+ * Retirn a shallow copy of an array sorted in ascending order, smallest to largest, based on value returned by getValueFunction
  * @param {Array} array Array to sort
  * @param {Function} getValueFunction Function that returns the value to sort by
  * @returns {Array}
  */
 function sortArray(array, getValueFunction) {
+    const tempArray = [...array];
     const newArray = [];
     
-    while(array.length > 0) {
+    while(tempArray.length > 0) {
         // find index of lowest value in array
-        const lowestIndex = findIndexOfLowest(array, getValueFunction);
+        const lowestIndex = findIndexOfLowest(tempArray, getValueFunction);
         // put lowest item into a new array
-        newArray.push(array[lowestIndex]);
-        // remove item from old array
-        array.splice(lowestIndex, 1);
+        newArray.push(tempArray[lowestIndex]);
+        // remove item from temp array
+        tempArray.splice(lowestIndex, 1);
     }
     return newArray;
 }

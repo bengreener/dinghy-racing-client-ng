@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import StartSequence from '../model/domain-classes/start-signals';
+import StartSequence from '../model/domain-classes/start-signal';
 import { downloadRaceEntriesCSV } from '../utilities/csv-writer'
 class DinghyRacingController {
 
@@ -209,6 +209,24 @@ class DinghyRacingController {
     }
 
     /**
+     * Update an exisiting dinghy class
+     * @param {DinghyClass} dinghyClass to update
+     * @param {String} name
+     * @param {Integer} [crewSize]
+     * @param {Integer} [portsmouthNumber]
+     * @returns {Promise<Result>}
+     */
+    updateDinghyClass(dinghyClass, name, crewSize, portsmouthNumber) {
+        if (!dinghyClass) {
+            return Promise.resolve({'success': false, 'message': 'An exisiting dinghy class to update is required.'});
+        }
+        if (!name && !crewSize && !portsmouthNumber) {
+            return Promise.resolve({'success': false, 'message': 'A new name, crew size, or portsmouth number value is required.'});
+        }
+        return this.model.updateDinghyClass(dinghyClass, name, crewSize, portsmouthNumber);
+    }
+
+    /**
      * Create a new race
      * @param {Race} race
      * @returns {Promise<Result>}
@@ -286,6 +304,35 @@ class DinghyRacingController {
             return Promise.resolve({success: false, message: 'An entry with a URL is required to withdraw from a race.'});
         }
         return this.model.withdrawEntry(entry);
+    }
+
+    /**
+     * Update the position of an entry in a race
+     * @param {Entry} entry
+     * @param {Integer} newPosition
+     * @returns {Promise<Result}
+     */
+    async updateEntryPosition(entry, newPosition) {
+        let message = '';
+        if (!entry.race.url) {
+            message += 'The race URL is required to update an entry position.';
+        }
+        if (!entry.url) {
+            if (message !== '') {
+                message += '/n';
+            }
+            message += 'An entry with a URL is required to update an entry position.';
+        }
+        if (!newPosition || newPosition <= 0) {
+            if (message !== '') {
+                message += '/n';
+            }
+            message += 'A numeric new position greater than 0 is required to update an entry position.';
+        }
+        if (message !== '') {
+            return Promise.resolve({success: false, message: message});
+        }
+        return this.model.updateEntryPosition(entry, newPosition);
     }
 
     /**

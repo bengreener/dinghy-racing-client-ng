@@ -15,8 +15,9 @@
  */
 
 import { Client } from '@stomp/stompjs';
-import StartSignals from './domain-classes/start-signals';
+import StartSignal from './domain-classes/start-signal';
 import StartSequence from './domain-classes/start-sequence';
+import RaceType from './domain-classes/race-type';
 
 class DinghyRacingModel {
     httpRootURL;
@@ -26,6 +27,8 @@ class DinghyRacingModel {
     entryUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
     competitorCreationCallbacks = new Set();
     dinghyCreationCallbacks = new Set();
+    dinghyClassCreationCallbacks = new Set();
+    dinghyClassUpdateCallbacks = new Map();
 
     /**
      * Provide a blank competitor template
@@ -40,7 +43,7 @@ class DinghyRacingModel {
      * @returns {DinghyClass}
      */
     static dinghyClassTemplate() {
-        return {'name': '', 'crewSize': 1, 'url': ''};
+        return {'name': '', 'crewSize': 1, portsmouthNumber: null, 'url': ''};
     }
 
     /**
@@ -56,16 +59,16 @@ class DinghyRacingModel {
      * @returns {Race}
      */
     static raceTemplate() {
-        return {'name': '', 'plannedStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'plannedLaps': null, 'lapsSailed': null, 'lapForecast': null, 
-            'lastLapTime': null, 'averageLapTime': null, 'clock': null, 'startSequenceState': StartSignals.NONE, 'url': ''};
+        return {name: '', plannedStartTime: null, dinghyClass: DinghyRacingModel.dinghyClassTemplate(), type: null, duration: 0, plannedLaps: null, lapsSailed: null, lapForecast: null, 
+            lastLapTime: null, averageLapTime: null, clock: null, startSequenceState: StartSignal.NONE, dinghyClasses: [], url: ''};
     }
 
     /**
      * Provide a blank entry template.
      */
     static entryTemplate() {
-        return {'race': DinghyRacingModel.raceTemplate(), 'helm': DinghyRacingModel.competitorTemplate(), 'crew': null, 
-        'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': ''};
+        return {race: DinghyRacingModel.raceTemplate(), helm: DinghyRacingModel.competitorTemplate(), crew: null, 
+        dinghy: DinghyRacingModel.dinghyTemplate(), laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: ''};
     }
 
     /**
@@ -77,8 +80,8 @@ class DinghyRacingModel {
 
     /**
      * 
-     * @param {string} httpRootURL
-     * @param {string} wsRootURL
+     * @param {String} httpRootURL
+     * @param {String} wsRootURL
      * @returns {DinghyRacingModel} 
      */
     constructor(httpRootURL, wsRootURL) {
@@ -86,6 +89,8 @@ class DinghyRacingModel {
         this.handleDinghyCreation = this.handleDinghyCreation.bind(this);
         this.handleRaceUpdate = this.handleRaceUpdate.bind(this);
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
+        this.handleDinghyClassCreation = this.handleDinghyClassCreation.bind(this);
+        this.handleDinghyClassUpdate = this.handleDinghyClassUpdate.bind(this);
         this.getStartSequence = this.getStartSequence.bind(this);
         if (!httpRootURL) {
             throw new Error('An HTTP root URL is required when creating an instance of DinghyRacingModel');
@@ -104,9 +109,11 @@ class DinghyRacingModel {
         this.stompClient.onConnect = (frame) => {
             this.stompClient.subscribe('/topic/createCompetitor', this.handleCompetitorCreation);
             this.stompClient.subscribe('/topic/createDinghy', this.handleDinghyCreation);
+            this.stompClient.subscribe('/topic/createDinghyClass', this.handleDinghyClassCreation);
             this.stompClient.subscribe('/topic/updateRace', this.handleRaceUpdate);
             this.stompClient.subscribe('/topic/updateEntry', this.handleEntryUpdate);
             this.stompClient.subscribe('/topic/deleteEntry', this.handleEntryUpdate);
+            this.stompClient.subscribe('/topic/updateDinghyClass', this.handleDinghyClassUpdate);
         };
         this.stompClient.activate();
     }
@@ -129,7 +136,7 @@ class DinghyRacingModel {
 
     /**
      * Handle a websocket competitor creation message via the Stomp client
-     * @param {string} message URI of competitor that was created
+     * @param {String} message URI of competitor that was created
      */
     handleCompetitorCreation(message) {
         this.competitorCreationCallbacks.forEach(cb => cb());
@@ -153,7 +160,7 @@ class DinghyRacingModel {
 
     /**
      * Handle a websocket dinghy creation message via the Stomp client
-     * @param {string} message URI of competitor that was created
+     * @param {String} message URI of competitor that was created
      */
     handleDinghyCreation(message) {
         this.dinghyCreationCallbacks.forEach(cb => cb());
@@ -161,7 +168,7 @@ class DinghyRacingModel {
 
     /**
      * Register a callback for when a race idenified by key is updated
-     * @param {string} key URI of the race for which the update callback is being registered
+     * @param {String} key URI of the race for which the update callback is being registered
      * @param {Function} callback
      */
     registerRaceUpdateCallback(key, callback) {
@@ -175,7 +182,7 @@ class DinghyRacingModel {
 
     /**
      * Unregister a callback for when a race idenified by key is updated
-     * @param {string} key URI of the race for which the update callback is being unregistered
+     * @param {String} key URI of the race for which the update callback is being unregistered
      * @param {Function} callback
      */
     unregisterRaceUpdateCallback(key, callback) {
@@ -186,7 +193,7 @@ class DinghyRacingModel {
 
     /**
      * Handle a websocket race update message via the Stomp client
-     * @param {string} message URI of race that has been updated
+     * @param {String} message URI of race that has been updated
      */
     handleRaceUpdate(message) {
         if (this.raceUpdateCallbacks.has(message.body)) {
@@ -196,7 +203,7 @@ class DinghyRacingModel {
 
     /**
      * Register a callback for when an entry identified by key is updated
-     * @param {string} key URI of the entry for which the update callback is being registered
+     * @param {String} key URI of the entry for which the update callback is being registered
      * @param {Function} callback 
      */
     registerEntryUpdateCallback(key, callback) {
@@ -210,7 +217,7 @@ class DinghyRacingModel {
 
     /**
      * Unregister a callback for when an entry idenified by key is updated
-     * @param {string} key URI of the entry for which the update callback is being unregistered
+     * @param {String} key URI of the entry for which the update callback is being unregistered
      * @param {Function} callback
      */
     unregisterEntryUpdateCallback(key, callback) {
@@ -221,11 +228,70 @@ class DinghyRacingModel {
 
     /**
      * Handle a websocket entry update message via the Stomp client
-     * @param {string} message URI of entry that has been updated
+     * @param {String} message URI of entry that has been updated
      */
     handleEntryUpdate(message) {
         if (this.entryUpdateCallbacks.has(message.body)) {
             this.entryUpdateCallbacks.get(message.body).forEach(cb => cb());
+        }
+    }
+
+    /**
+     * Register a callback for when a new dinghy class is created
+     * @param {Function} callback
+     */
+    registerDinghyClassCreationCallback(callback) {
+        this.dinghyClassCreationCallbacks.add(callback);
+    }
+
+    /**
+     * Unregister a callback for when a new dinghy class is created
+     * @param {Function} callback
+     */
+    unregisterDinghyClassCreationCallback(callback) {
+        this.dinghyClassCreationCallbacks.delete(callback);
+    }
+
+    /**
+     * Handle a websocket dinghy class creation message via the Stomp client
+     * @param {String} message URI of competitor that was created
+     */
+    handleDinghyClassCreation(message) {
+        this.dinghyClassCreationCallbacks.forEach(cb => cb());
+    }
+
+    /**
+     * Register a callback for when a dinghy class identified by key is updated
+     * @param {String} key URI of the dinghy class for which the update callback is being registered
+     * @param {Function} callback
+     */
+    registerDinghyClassUpdateCallback(key, callback) {
+        if (this.dinghyClassUpdateCallbacks.has(key)) {
+            this.dinghyClassUpdateCallbacks.get(key).add(callback);
+        }
+        else {
+            this.dinghyClassUpdateCallbacks.set(key, new Set([callback]));
+        }
+    }
+
+    /**
+     * Unregister a callback for when a dinghy class idenified by key is updated
+     * @param {String} key URI of the dinghy class for which the update callback is being unregistered
+     * @param {Function} callback
+     */
+    unregisterDinghyClassUpdateCallback(key, callback) {
+        if (this.dinghyClassUpdateCallbacks.has(key)) {
+            this.dinghyClassUpdateCallbacks.get(key).delete(callback);
+        }
+    }
+
+    /**
+     * Handle a websocket dinghy class update message via the Stomp client
+     * @param {String} message URI of dinghy class that has been updated
+     */
+    handleDinghyClassUpdate(message) {
+        if (this.dinghyClassUpdateCallbacks.has(message.body)) {
+            this.dinghyClassUpdateCallbacks.get(message.body).forEach(cb => cb());
         }
     }
 
@@ -308,9 +374,9 @@ class DinghyRacingModel {
                 return Promise.resolve(result);
             }
         }
-        const result = this.update(competitorURL, {name: name});
+        const result = await this.update(competitorURL, {name: name});
         if (result.success) {
-            return Promise.resolve({success: true, domainObject: this._convertCompetitorHALToCompetitor((await result).domainObject)});
+            return Promise.resolve({success: true, domainObject: this._convertCompetitorHALToCompetitor(result.domainObject)});
         }
         else {
             return Promise.resolve(result);
@@ -358,11 +424,49 @@ class DinghyRacingModel {
      * @param {DinghyClass} dinghyClass 
      * @returns {Promise<Result>}
      */
-     async createDinghyClass(dinghyClass) {
+    async createDinghyClass(dinghyClass) {
         const result = await this.create('dinghyClasses', dinghyClass);
         if (result.success) {
-            return Promise.resolve({'success': true, 'domainObject': {...DinghyRacingModel.dinghyClassTemplate(), 'name': result.domainObject.name, 
-            'crewSize': result.domainObject.crewSize, 'url': result.domainObject._links.self.href}});
+            return Promise.resolve({'success': true, 'domainObject': this._convertDinghyClassHALToDinghyClass(result.domainObject)});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
+     * Update a dinghy class
+     * @param {DinghyClass} dinghyClass to update
+     * @param {String} [name]
+     * @param {Integer} [crewSize]
+     * @param {Integer} [portsmouthNumber]
+     * @returns {Promise<Result>}
+     */
+    async updateDinghyClass(dinghyClass, name, crewSize, portsmouthNumber) {
+        let dinghyClassURL = dinghyClass.url;
+        if (!dinghyClass.url) {
+            const result = await this.getDinghyClassByName(dinghyClass.name);
+            if (result.success) {
+                dinghyClassURL = result.domainObject.url;
+            }
+            else {
+                return Promise.resolve(result);
+            }
+        }
+        const updateObject = {};
+        if (name) {
+            updateObject.name = name;
+        }
+        if(crewSize) {
+            updateObject.crewSize = crewSize;
+        }
+        if (portsmouthNumber) {
+            updateObject.portsmouthNumber = portsmouthNumber;
+        }
+
+        const result = await this.update(dinghyClassURL, updateObject);
+        if (result.success) {
+            return Promise.resolve({'success': true, 'domainObject': this._convertDinghyClassHALToDinghyClass(result.domainObject)});
         }
         else {
             return Promise.resolve(result);
@@ -593,6 +697,29 @@ class DinghyRacingModel {
     }
 
     /**
+     * Update the position of an entry in a race
+     * @param {Entry} entry
+     * @param {Integer} newPosition
+     * @returns {Promise<Result}
+     */
+    async updateEntryPosition(entry, newPosition) {
+        let message = '';
+        if (!entry.race.url) {
+            message += 'The race URL is required to update an entry position.';
+        }
+        if (!entry.url) {
+            if (message !== '') {
+                message += '/n';
+            }
+            message += 'An entry with a URL is required to update an entry position.';
+        }
+        if (message !== '') {
+            return Promise.resolve({success: false, message: message});
+        }
+        return this.update(entry.race.url + '/updateEntryPosition?entry=' + entry.url + '&position=' + newPosition);
+    }
+
+    /**
      * Create a new race
      * @param {Race} race 
      * @returns {Promise<Result>}
@@ -655,8 +782,8 @@ class DinghyRacingModel {
 
     /**
      * Get a collection of competitors, sorted by name in ascending order
-     * @param {integer} [page] number to return (0 indexed)
-     * @param {integer} [size] number of elements to return per page
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
      * @returns {Promise<Result>} If successful Result.domainObject will be an Array<Competitor>
      */
     async getCompetitors(page, size) {
@@ -710,8 +837,8 @@ class DinghyRacingModel {
     /**
      * Get dinghies. If a dinghy class is provided only dinghies with that class will be returned
      * @param {dinghyClass} [dinghyClass] The dinghy class to filter by
-     * @param {integer} [page] number to return (0 indexed)
-     * @param {integer} [size] number of elements to return per page
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
      */
     async getDinghies(dinghyClass, page, size) {
         let resource;
@@ -749,8 +876,7 @@ class DinghyRacingModel {
             
             const dinghies = [];
             for (let i = 0; i < dinghiesHAL.length; i++  ) {
-                const dinghyClass = dinghyClassResults[i].success ? {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassResults[i].domainObject.name, 
-                    'crewSize': dinghyClassResults[i].domainObject.crewSize, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
+                const dinghyClass = dinghyClassResults[i].success ? this._convertDinghyClassHALToDinghyClass(dinghyClassResults[i].domainObject) : null;
                 dinghies.push({'sailNumber': dinghiesHAL[i].sailNumber, 'dinghyClass': dinghyClass, 'url': dinghiesHAL[i]._links.self.href});
             };
             return Promise.resolve({'success': true, 'domainObject': dinghies});
@@ -787,8 +913,7 @@ class DinghyRacingModel {
     async getDinghyClass(url) {
         const result = await this.read(url);
         if (result.success) {
-            return Promise.resolve({'success': true, 'domainObject': {...DinghyRacingModel.dinghyClassTemplate(), 'name': result.domainObject.name, 
-            'crewSize': result.domainObject.crewSize, 'url': result.domainObject._links.self.href}});
+            return Promise.resolve({'success': true, 'domainObject': this._convertDinghyClassHALToDinghyClass(result.domainObject)});
         }
         else {
             return Promise.resolve(result);
@@ -805,9 +930,7 @@ class DinghyRacingModel {
 
         const result = await this.read(resource);
         if(result.success) {
-            const domainObject = {...DinghyRacingModel.dinghyClassTemplate(), 'name': result.domainObject.name, 
-                'crewSize': result.domainObject.crewSize, 'url': result.domainObject._links.self.href};
-            return Promise.resolve({'success': true, 'domainObject': domainObject});
+            return Promise.resolve({'success': true, 'domainObject': this._convertDinghyClassHALToDinghyClass(result.domainObject)});
         }
         else {
             return Promise.resolve(result);
@@ -817,8 +940,8 @@ class DinghyRacingModel {
     /**
      * Get dinghy classes in ascending order by class name
      * If page and/ or size are not provided will return all dinghy classes
-     * @param {integer} [page] number to return (0 indexed)
-     * @param {integer} [size] number of elements to return per page
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
      * @return {Promise<Result>>} If successful Result.domainObject will be an Array<DinghyClass>
      */
     async getDinghyClasses(page, size) {
@@ -838,8 +961,7 @@ class DinghyRacingModel {
             if (!Number.isInteger(page) && !Number.isInteger(size) && result.domainObject.page.totalElements > result.domainObject.page.size) {
                 return this.getDinghyClasses(0, result.domainObject.page.totalElements);
             }
-            const dinghyClassCollection = collection.map(dinghyClass => {return {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClass.name, 
-                'crewSize': dinghyClass.crewSize, 'url': dinghyClass._links.self.href}});
+            const dinghyClassCollection = collection.map(dinghyClassHAL => {return this._convertDinghyClassHALToDinghyClass(dinghyClassHAL)});
             return Promise.resolve({'success': true, 'domainObject': dinghyClassCollection});
         }
         else {
@@ -900,7 +1022,6 @@ class DinghyRacingModel {
                 return Promise.resolve(lapsResults[i]);
             }
             if (!crewResults[i].success) {
-                // return Promise.resolve(crewResults[i]);
                 if (/404/.test(crewResults[i].message)) {
                     crewResults[i] = {...crewResults[i], 'domainObject': null};
                 }
@@ -908,10 +1029,7 @@ class DinghyRacingModel {
                     return Promise.resolve(crewResults[i]);
                 }
             }
-            entries.push({...DinghyRacingModel.entryTemplate(), 'race': raceResult.domainObject, 'helm': helmResults[i].domainObject, 
-                'dinghy': dinghyResults[i].domainObject, 'laps': lapsResults[i].domainObject,  'crew': crewResults[i].domainObject, 
-                'sumOfLapTimes': this.convertISO8601DurationToMilliseconds(entryCollectionHAL[i].sumOfLapTimes), 'onLastLap': entryCollectionHAL[i].onLastLap, 
-                'finishedRace': entryCollectionHAL[i].finishedRace, 'scoringAbbreviation': entryCollectionHAL[i].scoringAbbreviation, 'url': entryCollectionHAL[i]._links.self.href});
+            entries.push(this._convertEntryHALtoEntry(entryCollectionHAL[i], raceResult.domainObject, helmResults[i].domainObject, dinghyResults[i].domainObject, crewResults[i].domainObject, lapsResults[i].domainObject));
         };
         return Promise.resolve({'success': true, 'domainObject': entries});
     }
@@ -953,16 +1071,7 @@ class DinghyRacingModel {
                 dinghyClassResult = {'success': true, 'domainObject': null};
             }
             if (dinghyClassResult.success) {
-                return Promise.resolve({'success': true, 'domainObject': {...DinghyRacingModel.raceTemplate(), 'name': result.domainObject.name, 
-                    'plannedStartTime': new Date(result.domainObject.plannedStartTime + 'Z'), 
-                    'dinghyClass': dinghyClassResult.domainObject, 'duration': this.convertISO8601DurationToMilliseconds(result.domainObject.duration), 
-                    'plannedLaps': result.domainObject.plannedLaps, 'lapsSailed': result.domainObject.leadEntry ? result.domainObject.leadEntry.lapsSailed : null,
-                    'lapForecast': result.domainObject.lapForecast,
-                    'lastLapTime': result.domainObject.leadEntry ? this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.lastLapTime) : null, 
-                    'averageLapTime': result.domainObject.leadEntry ? this.convertISO8601DurationToMilliseconds(result.domainObject.leadEntry.averageLapTime) : null, 
-                    'startSequenceState': StartSignals.from(result.domainObject.startSequenceState),
-                    'url': result.domainObject._links.self.href
-                }});
+                return Promise.resolve({'success': true, 'domainObject': this._convertRaceHALToRace(result.domainObject, dinghyClassResult.domainObject)});
             }
             else {
                 return Promise.resolve(dinghyClassResult);
@@ -976,8 +1085,8 @@ class DinghyRacingModel {
     /**
      * Get races scheduled to start after the specified time
      * @param {Date} startTime The start time of the race
-     * @param {integer} [page] number to return (0 indexed)
-     * @param {integer} [size] number of elements to return per page
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
     async getRacesOnOrAfterTime(startTime, page, size) {
@@ -990,8 +1099,8 @@ class DinghyRacingModel {
      * Get races scheduled to start between the specified times
      * @param {Date} startTime The start time of the first race
      * @param {Date} endTime The start time of the last race
-     * @param {integer} [page] number to return (0 indexed)
-     * @param {integer} [size] number of elements to return per page
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
      * @param {SortParameters} [sortParameters] and order for sorting the requested races
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
@@ -1002,10 +1111,26 @@ class DinghyRacingModel {
     }
 
     /**
+     * Get races of a specific type that are scheduled to start between the specified times
+     * @param {Date} startTime The start time of the first race
+     * @param {Date} endTime The start time of the last race
+     * @param {RaceType} type The type of race
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
+     * @param {SortParameters} [sortParameters] and order for sorting the requested races
+     * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
+     */
+    async getRacesBetweenTimesForType(startTime, endTime, type, page, size, sortParameters) {
+        const resource = this.httpRootURL + '/races/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=' + startTime.toISOString() + '&endTime=' + endTime.toISOString() + '&type=' + type;
+
+        return this.getRacesFromURL(resource, page, size, sortParameters);
+    }
+
+    /**
      * Get races from the specified resource location
      * @param {String} url to use to retrieve a collection of races
-     * @param {integer} [page] number to return (0 indexed)
-     * @param {integer} [size] number of elements to return per page
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
      * @param {SortParameters} [sortParameters] and order for sorting the requested races
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
@@ -1053,17 +1178,9 @@ class DinghyRacingModel {
             
             const races = [];
             for (let i = 0; i < racesHAL.length; i++  ) {
-                const dinghyClass = dinghyClassResults[i].success ? {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassResults[i].domainObject.name, 
-                    'crewSize': dinghyClassResults[i].domainObject.crewSize, 'url': dinghyClassResults[i].domainObject._links.self.href} : null;
+                const dinghyClass = dinghyClassResults[i].success ? this._convertDinghyClassHALToDinghyClass(dinghyClassResults[i].domainObject) : null;
                 // assume time received has been stored in UTC
-                races.push({...DinghyRacingModel.raceTemplate(), 'name': racesHAL[i].name, 'plannedStartTime': new Date(racesHAL[i].plannedStartTime + 'Z'),
-                    'dinghyClass': dinghyClass, 'duration': this.convertISO8601DurationToMilliseconds(racesHAL[i].duration), 'plannedLaps': racesHAL[i].plannedLaps, 
-                    'lapsSailed': racesHAL[i].leadEntry ? racesHAL[i].leadEntry.lapsSailed : null, 
-                    'lapForecast': racesHAL[i].lapForecast, 
-                    'lastLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.lastLapTime) : null, 
-                    'averageLapTime': racesHAL[i].leadEntry ? this.convertISO8601DurationToMilliseconds(racesHAL[i].leadEntry.averageLapTime) : null, 
-                    'startSequenceState': StartSignals.from(racesHAL[i].startSequenceState),
-                    'url': racesHAL[i]._links.self.href});
+                races.push(this._convertRaceHALToRace(racesHAL[i], dinghyClass));
             };
             return Promise.resolve({'success': true, 'domainObject': races});
         }
@@ -1087,7 +1204,7 @@ class DinghyRacingModel {
     /**
      * Update the start sequence for a race
      * @param {Race} race to update
-     * @param {StartSignals} stage of the starting sequence reached
+     * @param {StartSignal} stage of the starting sequence reached
      */
     async updateRaceStartSequenceState(race, stage) {
         let result;
@@ -1128,12 +1245,14 @@ class DinghyRacingModel {
 
     /**
      * Get a start sequence for starting races during a session
+     * Only one type of race can be included in the start sequence
      * @param {Date} startTime The start time of the first race
      * @param {Date} endTime The start time of the last race
+     * @param {RaceType} type The type of race to include in the start sequence
      * @returns {Promise<Result>} If successful result domainObject will be StartSequence
      */
-    async getStartSequence(startTime, endTime) {
-        const result = await this.getRacesBetweenTimes(startTime, endTime, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
+    async getStartSequence(startTime, endTime, type) {
+        const result = await this.getRacesBetweenTimesForType(startTime, endTime, type, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
 
         if (result.success) {
             const startSequence = new StartSequence(result.domainObject, this);
@@ -1168,7 +1287,7 @@ class DinghyRacingModel {
 
     /**
      * Get a competitor by name
-     * @param {string} name Name of the competitor
+     * @param {String} name Name of the competitor
      * @returns {Promise<Result>}
      */
     async getCompetitorByName(name) {
@@ -1186,7 +1305,7 @@ class DinghyRacingModel {
 
     /**
      * Create a new domain object
-     * @param {string} urlPathSegment
+     * @param {String} urlPathSegment
      * @param {Object} object
      * @returns {Promise<Result>}
      */
@@ -1304,34 +1423,36 @@ class DinghyRacingModel {
     }
 
     _convertDinghyClassHALToDinghyClass(dinghyClassHAL) {
-        return {...DinghyRacingModel.dinghyClassTemplate(), 'name': dinghyClassHAL.name, 'crewSize': dinghyClassHAL.crewSize, 'url': dinghyClassHAL._links.self.href};
+        return {...DinghyRacingModel.dinghyClassTemplate(), name: dinghyClassHAL.name, crewSize: dinghyClassHAL.crewSize, portsmouthNumber: dinghyClassHAL.portsmouthNumber, url: dinghyClassHAL._links.self.href};
     }
 
     _convertEntryHALtoEntry(entryHAL, race, helm, dinghy, crew, laps) {
-        return {...DinghyRacingModel.entryTemplate(), 'race': race, 'helm': helm, 'dinghy': dinghy, 'laps': laps, 'crew': crew,
-            'sumOfLapTimes': this.convertISO8601DurationToMilliseconds(entryHAL.sumOfLapTimes), 'onLastLap': entryHAL.onLastLap,
-            'finishedRace': entryHAL.finishedRace, 'scoringAbbreviation': entryHAL.scoringAbbreviation, 'url': entryHAL._links.self.href
+        return {...DinghyRacingModel.entryTemplate(), race: race, helm: helm, dinghy: dinghy, laps: laps, crew: crew,
+            sumOfLapTimes: this.convertISO8601DurationToMilliseconds(entryHAL.sumOfLapTimes), onLastLap: entryHAL.onLastLap,
+            finishedRace: entryHAL.finishedRace, scoringAbbreviation: entryHAL.scoringAbbreviation, position: entryHAL.position, url: entryHAL._links.self.href
         }
     }
 
     _convertRaceHALToRace(raceHAL, dinghyClass) {
-        return {...DinghyRacingModel.raceTemplate(), 'name': raceHAL.name,
-            'plannedStartTime': new Date(raceHAL.plannedStartTime + 'Z'),
-            'dinghyClass': dinghyClass, 'duration': this.convertISO8601DurationToMilliseconds(raceHAL.duration),
-            'plannedLaps': raceHAL.plannedLaps, 'lapsSailed': raceHAL.leadEntry ? raceHAL.leadEntry.lapsSailed : null,
-            'lapForecast': raceHAL.lapForecast,
-            'lastLapTime': raceHAL.leadEntry ? this.convertISO8601DurationToMilliseconds(raceHAL.leadEntry.lastLapTime) : null,
-            'averageLapTime': raceHAL.leadEntry ? this.convertISO8601DurationToMilliseconds(raceHAL.leadEntry.averageLapTime) : null,
-            'startSequenceState': StartSignals.from(raceHAL.startSequenceState),
-            'url': raceHAL._links.self.href
+        return {...DinghyRacingModel.raceTemplate(), name: raceHAL.name,
+            plannedStartTime: new Date(raceHAL.plannedStartTime + 'Z'),
+            dinghyClass: dinghyClass, duration: this.convertISO8601DurationToMilliseconds(raceHAL.duration),
+            type: RaceType.from(raceHAL.type),
+            plannedLaps: raceHAL.plannedLaps, lapsSailed: raceHAL.leadEntry ? raceHAL.leadEntry.lapsSailed : null,
+            lapForecast: raceHAL.lapForecast,
+            lastLapTime: raceHAL.leadEntry ? this.convertISO8601DurationToMilliseconds(raceHAL.leadEntry.lastLapTime) : null,
+            averageLapTime: raceHAL.leadEntry ? this.convertISO8601DurationToMilliseconds(raceHAL.leadEntry.averageLapTime) : null,
+            startSequenceState: StartSignal.from(raceHAL.startSequenceState),
+            dinghyClasses: raceHAL.dinghyClasses,
+            url: raceHAL._links.self.href
         }
     }
 }
 
 /**
  * @typedef SortParameters
- * @property {string} by name of the property to sort the collection by
- * @property {string} order sort order for collection; 'ASC' or 'DESC'
+ * @property {String} by name of the property to sort the collection by
+ * @property {String} order sort order for collection; 'ASC' or 'DESC'
  */
 
 /**

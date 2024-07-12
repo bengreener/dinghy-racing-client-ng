@@ -15,13 +15,15 @@
  */
 
 import { customRender } from '../test-utilities/custom-renders';
-import { act, screen, within } from '@testing-library/react';
+import { act, screen, within, prettyDOM } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import RaceStartConsole from './RaceStartConsole';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
-import { httpRootURL, wsRootURL, races, raceScorpionA, raceGraduateA, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet } from '../model/__mocks__/test-data';
+import { httpRootURL, wsRootURL, races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet } from '../model/__mocks__/test-data';
 import StartSequence from '../model/domain-classes/start-sequence';
-import StartSignals from '../model/domain-classes/start-signals';
+import StartSignal from '../model/domain-classes/start-signal';
+import RaceType from '../model/domain-classes/race-type';
 
 
 jest.mock('../model/dinghy-racing-model');
@@ -38,7 +40,7 @@ const formatOptions = {
 const timeFormat = new Intl.DateTimeFormat('utc', formatOptions);
 
 beforeEach(() => {
-    jest.useFakeTimers().setSystemTime(new Date('2021-10-14T14:05:00Z'));
+    jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:25:00Z'));
     jest.spyOn(global, 'setTimeout');
 });
 
@@ -60,8 +62,50 @@ it('renders', async () => {
     expect(selectSessionStart).toBeInTheDocument();
     const selectSessionEnd = screen.getByLabelText(/session end/i);
     expect(selectSessionEnd).toBeInTheDocument();
+    expect(screen.getByLabelText(/fleet/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/fleet/i)).toBeChecked();
+    expect(screen.getByLabelText(/pursuit/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: /flags/i})).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: /races/i})).toBeInTheDocument();
+});
+
+it('calls getStartSequence with correct arguments', async () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const controller = new DinghyRacingController(model);
+    const getStartSequenceSpy = jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+    const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
+    sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
+    const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000); // create as 18:00 UTC intially
+    sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
+    
+    await act(async () => {        
+        customRender(<RaceStartConsole />, model, controller);
+    });
+
+    expect(getStartSequenceSpy).toHaveBeenCalledWith(sessionStart, sessionEnd, RaceType.FLEET);
+});
+
+describe('when new value set for race type', () => {
+    it('calls getStartSequence with correct arguments', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const getStartSequenceSpy = jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+        const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
+        sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
+        const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000); // create as 18:00 UTC intially
+        sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
+        
+        await act(async () => {        
+            customRender(<RaceStartConsole />, model, controller);
+        });
+        
+        await act(async () => {
+            await user.click(screen.getByLabelText(/pursuit/i));
+        });
+    
+        expect(getStartSequenceSpy).toHaveBeenCalledWith(sessionStart, sessionEnd, RaceType.PURSUIT);
+    });
 });
 
 it('defaults session start to 8:00 today', async () => {
@@ -100,19 +144,19 @@ it('displays race names and blue peter', async () => {
     });
 
     const flagIndicators = (screen.getByRole('heading', {name: 'Flags'})).parentNode;
-    expect(within(flagIndicators).getByText(/scorpion a/i)).toBeInTheDocument();
+    expect(within(flagIndicators).getByText(/scorpion class/i)).toBeInTheDocument();
     expect(within(flagIndicators).getByText(/blue peter/i)).toBeInTheDocument();
-    expect(within(flagIndicators).getByText(/graduate a/i)).toBeInTheDocument();
-    expect(within(flagIndicators).getByText(/handicap a/i)).toBeInTheDocument();
-    expect(within(flagIndicators).getByText(/comet a/i)).toBeInTheDocument();
+    expect(within(flagIndicators).getByText(/graduate class/i)).toBeInTheDocument();
+    expect(within(flagIndicators).getByText(/club burgee/i)).toBeInTheDocument();
+    expect(within(flagIndicators).getByText(/comet class/i)).toBeInTheDocument();
 });
 
 it('displays initial state for each flag', async () => {
-    const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
-    const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
-    const raceCometA = { "name": "Comet A", "plannedStartTime" : new Date("2021-10-14T14:20:00Z"), "dinghyClass": dinghyClassComet, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/17" };
-    const raceHandicapA = { "name": "Handicap A", "plannedStartTime": new Date("2021-10-14T14:25:00Z"), "dinghyClass": null, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/8" };
-    const races = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA];
+    // const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
+    // const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
+    // const raceCometA = { "name": "Comet A", "plannedStartTime" : new Date("2021-10-14T14:20:00Z"), "dinghyClass": dinghyClassComet, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/17" };
+    // const raceHandicapA = { "name": "Handicap A", "plannedStartTime": new Date("2021-10-14T14:25:00Z"), "dinghyClass": null, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/8" };
+    // const races = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA];
 
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
@@ -128,11 +172,11 @@ it('displays initial state for each flag', async () => {
 });
 
 it('displays time to next flag state change for each flag', async () => {
-    const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
-    const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
-    const raceCometA = { "name": "Comet A", "plannedStartTime" : new Date("2021-10-14T14:20:00Z"), "dinghyClass": dinghyClassComet, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/17" };
-    const raceHandicapA = { "name": "Handicap A", "plannedStartTime": new Date("2021-10-14T14:25:00Z"), "dinghyClass": null, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/8" };
-    const races = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA];
+    // const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
+    // const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
+    // const raceCometA = { "name": "Comet A", "plannedStartTime" : new Date("2021-10-14T14:20:00Z"), "dinghyClass": dinghyClassComet, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/17" };
+    // const raceHandicapA = { "name": "Handicap A", "plannedStartTime": new Date("2021-10-14T14:25:00Z"), "dinghyClass": null, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/8" };
+    // const races = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA];
 
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
@@ -149,11 +193,11 @@ it('displays time to next flag state change for each flag', async () => {
 });
 
 it('displays race headers for races in session', async () => {
-    const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
-    const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
-    const raceCometA = { "name": "Comet A", "plannedStartTime" : new Date("2021-10-14T14:20:00Z"), "dinghyClass": dinghyClassComet, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/17" };
-    const raceHandicapA = { "name": "Handicap A", "plannedStartTime": new Date("2021-10-14T14:25:00Z"), "dinghyClass": null, "duration": 2100000, "plannedLaps": 3, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/8" };
-    const races = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA];
+    // const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
+    // const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
+    // const raceCometA = { "name": "Comet A", "plannedStartTime" : new Date("2021-10-14T14:20:00Z"), "dinghyClass": dinghyClassComet, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/17" };
+    // const raceHandicapA = { "name": "Handicap A", "plannedStartTime": new Date("2021-10-14T14:25:00Z"), "dinghyClass": null, "duration": 2100000, "plannedLaps": 3, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/8" };
+    const races = [raceScorpionA, raceGraduateA, raceCometA, {...raceHandicapA, duration: 2100000, plannedLaps: 3}];
 
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
@@ -198,7 +242,7 @@ it('displays race headers for races in session', async () => {
 });
 
 it('does not displays in race data in race headers', async () => {
-    const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
+    // const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
     const races = [raceScorpionA];
 
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -219,8 +263,8 @@ it('does not displays in race data in race headers', async () => {
 });
 
 it('displays actions to start races in session', async () => {
-    const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
-    const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
+    // const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
+    // const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
     const races = [raceScorpionA, raceGraduateA];
 
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -230,28 +274,27 @@ it('displays actions to start races in session', async () => {
     await act(async () => {
         customRender(<RaceStartConsole />, model, controller);
     });
-
     const actionRows = screen.getAllByRole('row');
     expect(actionRows).toHaveLength(5);
-    expect(within(actionRows[1]).getByText(timeFormat.format(new Date('2021-10-14T14:00:00Z')))).toBeInTheDocument();
-    expect(within(actionRows[1]).getByText(/raise warning flag for scorpion a/i)).toBeInTheDocument();
+    expect(within(actionRows[1]).getByText(timeFormat.format(new Date('2021-10-14T10:20:00Z')))).toBeInTheDocument();
+    expect(within(actionRows[1]).getByText(/raise scorpion class flag/i)).toBeInTheDocument();
     expect(within(actionRows[1]).getByText(/00:00/i)).toBeInTheDocument();
-    expect(within(actionRows[2]).getByText(timeFormat.format(new Date('2021-10-14T14:05:00Z')))).toBeInTheDocument();
+    expect(within(actionRows[2]).getByText(timeFormat.format(new Date('2021-10-14T10:25:00Z')))).toBeInTheDocument();
     expect(within(actionRows[2]).getByText(/raise blue peter/i)).toBeInTheDocument();
-    expect(within(actionRows[2]).getByText(/raise warning flag for graduate a/i)).toBeInTheDocument();
+    expect(within(actionRows[2]).getByText(/raise graduate class flag/i)).toBeInTheDocument();
     expect(within(actionRows[2]).getByText(/00:00/i)).toBeInTheDocument();
-    expect(within(actionRows[3]).getByText(timeFormat.format(new Date('2021-10-14T14:10:00Z')))).toBeInTheDocument();
-    expect(within(actionRows[3]).getByText(/lower warning flag for scorpion a/i)).toBeInTheDocument();
+    expect(within(actionRows[3]).getByText(timeFormat.format(new Date('2021-10-14T10:30:00Z')))).toBeInTheDocument();
+    expect(within(actionRows[3]).getByText(/lower scorpion class flag/i)).toBeInTheDocument();
     expect(within(actionRows[3]).getByText(/05:00/i)).toBeInTheDocument();
-    expect(within(actionRows[4]).getByText(timeFormat.format(new Date('2021-10-14T14:15:00Z')))).toBeInTheDocument();
-    expect(within(actionRows[4]).getByText(/lower warning flag for graduate a/i)).toBeInTheDocument();
+    expect(within(actionRows[4]).getByText(timeFormat.format(new Date('2021-10-14T10:35:00Z')))).toBeInTheDocument();
+    expect(within(actionRows[4]).getByText(/lower graduate class flag/i)).toBeInTheDocument();
     expect(within(actionRows[4]).getByText(/10:00/i)).toBeInTheDocument();
 });
 
 describe('when clock ticks', () => {
     it('updates time to next flag state change', async () => {
-        const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
-        const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
+        // const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
+        // const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
         const races = [raceScorpionA, raceGraduateA];
         
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -272,8 +315,8 @@ describe('when clock ticks', () => {
 	});
     describe('when a flag state change is triggered', () => {
         it('updates the displayed flag state to the new flag state', async () => {
-            const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
-            const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
+            // const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
+            // const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
             const races = [raceScorpionA, raceGraduateA];
 
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -293,8 +336,9 @@ describe('when clock ticks', () => {
         });
     });
     it('updates countdown for actions', async () => {
-        const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
-        const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
+        jest.setSystemTime(new Date('2021-10-14T10:25:00Z'));
+        // const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
+        // const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
         const races = [raceScorpionA, raceGraduateA];
 
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -311,23 +355,23 @@ describe('when clock ticks', () => {
 
         const actionRows = screen.getAllByRole('row');
         expect(actionRows).toHaveLength(5);
-        expect(within(actionRows[1]).getByText(timeFormat.format(new Date('2021-10-14T14:00:00Z')))).toBeInTheDocument();
-        expect(within(actionRows[1]).getByText(/raise warning flag for scorpion a/i)).toBeInTheDocument();
+        expect(within(actionRows[1]).getByText(timeFormat.format(new Date('2021-10-14T10:20:00Z')))).toBeInTheDocument();
+        expect(within(actionRows[1]).getByText(/raise scorpion class flag/i)).toBeInTheDocument();
         expect(within(actionRows[1]).getByText(/00:00/i)).toBeInTheDocument();
-        expect(within(actionRows[2]).getByText(timeFormat.format(new Date('2021-10-14T14:05:00Z')))).toBeInTheDocument();
+        expect(within(actionRows[2]).getByText(timeFormat.format(new Date('2021-10-14T10:25:00Z')))).toBeInTheDocument();
         expect(within(actionRows[2]).getByText(/raise blue peter/i)).toBeInTheDocument();
-        expect(within(actionRows[2]).getByText(/raise warning flag for graduate a/i)).toBeInTheDocument();
+        expect(within(actionRows[2]).getByText(/raise graduate class flag/i)).toBeInTheDocument();
         expect(within(actionRows[2]).getByText(/00:00/i)).toBeInTheDocument();
-        expect(within(actionRows[3]).getByText(timeFormat.format(new Date('2021-10-14T14:10:00Z')))).toBeInTheDocument();
-        expect(within(actionRows[3]).getByText(/lower warning flag for scorpion a/i)).toBeInTheDocument();
+        expect(within(actionRows[3]).getByText(timeFormat.format(new Date('2021-10-14T10:30:00Z')))).toBeInTheDocument();
+        expect(within(actionRows[3]).getByText(/lower scorpion class flag/i)).toBeInTheDocument();
         expect(within(actionRows[3]).getByText(/04:59/i)).toBeInTheDocument();
-        expect(within(actionRows[4]).getByText(timeFormat.format(new Date('2021-10-14T14:15:00Z')))).toBeInTheDocument();
-        expect(within(actionRows[4]).getByText(/lower warning flag for graduate a/i)).toBeInTheDocument();
+        expect(within(actionRows[4]).getByText(timeFormat.format(new Date('2021-10-14T10:35:00Z')))).toBeInTheDocument();
+        expect(within(actionRows[4]).getByText(/lower graduate class flag/i)).toBeInTheDocument();
         expect(within(actionRows[4]).getByText(/09:59/i)).toBeInTheDocument();
     });
     describe('when ticks to 1 minute before a race start state change', () => {
         it('prepare for race start state change audio is present in document', async () => {
-            const races = [{...raceScorpionA, startSequenceState: StartSignals.WARNINGSIGNAL}, raceGraduateA];
+            const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, raceGraduateA];
             jest.setSystemTime(new Date('2021-10-14T10:23:59Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
@@ -346,7 +390,7 @@ describe('when clock ticks', () => {
     });
     describe('when ticks to 59 seconds before a race start state change', () => {
         it('prepare for race start state change audio is not present in document', async () => {
-            const races = [{...raceScorpionA, startSequenceState: StartSignals.WARNINGSIGNAL}, raceGraduateA];
+            const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, raceGraduateA];
             jest.setSystemTime(new Date('2021-10-14T10:24:00Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
@@ -365,7 +409,7 @@ describe('when clock ticks', () => {
     });
     describe('when ticks to time for a race start state change', () => {
         it('race start state change audio is present in document', async () => {
-            const races = [{...raceScorpionA, startSequenceState: StartSignals.WARNINGSIGNAL}, {...raceGraduateA, startSequenceState: StartSignals.NONE}];
+            const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, {...raceGraduateA, startSequenceState: StartSignal.NONE}];
             jest.setSystemTime(new Date('2021-10-14T10:24:59Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
@@ -383,7 +427,7 @@ describe('when clock ticks', () => {
     })
     describe('when ticks to 1 second after a race start state change', () => {
         it('race start state change audio is not present in document', async () => {
-            const races = [{...raceScorpionA, startSequenceState: StartSignals.PREPARATORYSIGNAL}, {...raceGraduateA, startSequenceState: StartSignals.WARNINGSIGNAL}];
+            const races = [{...raceScorpionA, startSequenceState: StartSignal.PREPARATORYSIGNAL}, {...raceGraduateA, startSequenceState: StartSignal.WARNINGSIGNAL}];
             jest.setSystemTime(new Date('2021-10-14T10:25:00Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
@@ -454,7 +498,7 @@ describe('when races within session are changed', () => {
 
 describe('when 6 minutes 1 second before start of first race', () => {
     it('prepare for race start state change audio is not present in document', async () => {
-        const races = [{...raceScorpionA, startSequenceState: StartSignals.WARNINGSIGNAL}, raceGraduateA];
+        const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, raceGraduateA];
         jest.setSystemTime(new Date('2021-10-14T10:23:59Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -471,7 +515,7 @@ describe('when 6 minutes 1 second before start of first race', () => {
 
 describe('when 6 minutes before start of first race', () => {
     it('prepare for race start state change audio is present in document', async () => {
-        const races = [{...raceScorpionA, startSequenceState: StartSignals.WARNINGSIGNAL}, raceGraduateA];
+        const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, raceGraduateA];
         jest.setSystemTime(new Date('2021-10-14T10:24:00Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -488,7 +532,7 @@ describe('when 6 minutes before start of first race', () => {
 
 describe('when 5 minutes 59 second before start of first race', () => {
     it('prepare for race start state change audio is not present in document', async () => {
-        const races = [{...raceScorpionA, startSequenceState: StartSignals.WARNINGSIGNAL}, raceGraduateA];
+        const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, raceGraduateA];
         jest.setSystemTime(new Date('2021-10-14T10:24:01Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -505,7 +549,7 @@ describe('when 5 minutes 59 second before start of first race', () => {
 
 describe('when 1 second before start of first race', () => {
     it('race start state change audio is not present in document', async () => {
-        const races = [{...raceScorpionA, startSequenceState: StartSignals.PREPARATORYSIGNAL}, {...raceGraduateA, startSequenceState: StartSignals.WARNINGSIGNAL}];
+        const races = [{...raceScorpionA, startSequenceState: StartSignal.PREPARATORYSIGNAL}, {...raceGraduateA, startSequenceState: StartSignal.WARNINGSIGNAL}];
         jest.setSystemTime(new Date('2021-10-14T10:29:59Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -522,7 +566,8 @@ describe('when 1 second before start of first race', () => {
 
 describe('when start of first race', () => {
     it('race start state change audio is present in document', async () => {
-        const races = [{...raceScorpionA, startSequenceState: StartSignals.PREPARATORYSIGNAL}, {...raceGraduateA, startSequenceState: StartSignals.WARNINGSIGNAL}];
+        const races = [{...raceScorpionA, startSequenceState: StartSignal.PREPARATORYSIGNAL}, {...raceGraduateA, startSequenceState: StartSignal.WARNINGSIGNAL}];
+        jest.setSystemTime(new Date('2021-10-14T10:20:00Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {
@@ -538,7 +583,7 @@ describe('when start of first race', () => {
 
 describe('when 1 second after start of first race', () => {
     it('prepare for race start state change audio is not present in document', async () => {
-        const races = [{...raceScorpionA, startSequenceState: StartSignals.STARTINGSIGNAL}, {...raceGraduateA, startSequenceState: StartSignals.PREPARATORYSIGNAL}];
+        const races = [{...raceScorpionA, startSequenceState: StartSignal.STARTINGSIGNAL}, {...raceGraduateA, startSequenceState: StartSignal.PREPARATORYSIGNAL}];
         jest.setSystemTime(new Date('2021-10-14T10:30:01Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);

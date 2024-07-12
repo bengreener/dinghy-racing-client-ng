@@ -16,6 +16,8 @@
 
 import React, { useEffect, useState } from 'react';
 import Clock from '../model/domain-classes/clock';
+import FlagState from '../model/domain-classes/flag-state';
+import { sortArray } from '../utilities/array-utilities';
 
 /**
  * Provide a list, withing timings, of the actions that need to be completed to start the races
@@ -45,19 +47,39 @@ function ActionListView({ actions }) {
     };
     const timeFormat = new Intl.DateTimeFormat(resolvedOptions.locale, formatOptions);
 
-    const actionRows = actions.map(action => {
-        const countdown = Math.max(action.time.valueOf() - time, 0);
-        return (<tr key={action.time}>
+    // create race start actions list
+    const actionsDescriptionsMap = new Map();
+    sortArray(actions, (action) => action.time).forEach(action => {
+        let actionDescription = '';
+        if (action.afterState === FlagState.RAISED) {
+            actionDescription += 'Raise ' + action.flag.name;// + ' flag';
+        }
+        else if (action.afterState === FlagState.LOWERED) {
+            actionDescription += 'Lower ' + action.flag.name;// + ' flag';
+        }
+        if (actionsDescriptionsMap.has(action.time.valueOf())) {
+            const oldAction = actionsDescriptionsMap.get(action.time.valueOf());
+            actionsDescriptionsMap.set(action.time.valueOf(), oldAction + '\n' + actionDescription);
+        }
+        else {
+            actionsDescriptionsMap.set(action.time.valueOf(), actionDescription);
+        }
+    });
+
+    const actionRows = []
+    actionsDescriptionsMap.forEach((actionDescription, timestamp) => {
+        const countdown = Math.max(timestamp - time, 0);
+        actionRows.push(<tr key={timestamp}>
             <td key='time'>
-                {timeFormat.format(action.time)}
+                {timeFormat.format(new Date(timestamp))}
             </td>
             <td key='action'>
-                {action.description}
+                {actionDescription}
             </td>
             <td key='countdown'>
                 {Clock.formatDuration(countdown)}
             </td>
-        </tr>)
+        </tr>);
     });
 
     return (
