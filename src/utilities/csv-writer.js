@@ -41,9 +41,9 @@ function downloadRaceEntriesCSV(race, entries) {
 
 function createHeader(race) {
     if (!race.dinghyClass || race.dinghyClass.crewSize > 1) {
-        return 'HelmName, CrewName, SailNo, Class, Elapsed, Laps, Code\n';
+        return 'HelmName, CrewName, SailNo, Class, Place, Elapsed, Laps, Code\n';
     }
-    return 'HelmName, SailNo, Class, Elapsed, Laps, Code\n';
+    return 'HelmName, SailNo, Class, Place, Elapsed, Laps, Code\n';
 }
 
 function convertRaceEntriesToCSVArray(race, entries) {
@@ -57,6 +57,7 @@ function convertRaceEntriesToCSVArray(race, entries) {
         }
         record += entry.dinghy.sailNumber + ',';
         record += entry.dinghy.dinghyClass.name + ',';
+        record += entry.position + ',';
         record += Math.round(entry.sumOfLapTimes / 1000) + ',';
         record += entry.laps.length + ',';
         record += (entry.scoringAbbreviation ? entry.scoringAbbreviation : '') + '\n';
