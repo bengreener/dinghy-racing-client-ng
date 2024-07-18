@@ -18,6 +18,7 @@ import { useContext, useCallback, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
 import ControllerContext from './ControllerContext';
 import SelectSession from './SelectSession';
+import DownloadRace from './DownloadRace';
 
 /**
  * Select races to download results for.
@@ -76,19 +77,7 @@ function DownloadRacesForm() {
             <h1>Download Races</h1>
             <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
             <p id="download-races-message" className={!message ? "hidden" : ""}>{message}</p>
-            {races.map(race => {return (
-                <div key={race.name+race.plannedStartTime.toISOString()} >
-                    <label>{race.name}</label>
-                    <label>{race.dinghyClass ? race.dinghyClass.name : ''}</label>
-                    <label htmlFor={'race-start-' + race.name.replace(/ /g, '-').toLowerCase()} >Start Time</label>
-                    <output id={'race-start-' + race.name.replace(/ /g, '-').toLowerCase()}>{new Intl.DateTimeFormat(navigator.language, {
-                        dateStyle: 'medium',
-                        timeStyle: 'medium',
-                        hour12: false
-                    }).format(race.plannedStartTime)}</output>
-                    <button id="race-result-download-button" onClick={() => handleRaceResultDownloadClick(race)}>Download Results</button>
-                </div>
-            )})}
+            {races.map(race => <DownloadRace key={race.name+race.plannedStartTime.toISOString()} race={race} downloadFunction={handleRaceResultDownloadClick} />)}
         </div>
     );
 }
