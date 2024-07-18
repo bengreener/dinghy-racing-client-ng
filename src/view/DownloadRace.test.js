@@ -18,6 +18,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { raceScorpionA } from '../model/__mocks__/test-data';
 import DownloadRace from './DownloadRace';
+import NameFormat from '../controller/name-format';
 
 it('displays race name', () => {
     render(<DownloadRace race={raceScorpionA} />);
@@ -62,5 +63,5 @@ it('calls method passed to download function with race', async () => {
     render(<DownloadRace race={raceScorpionA} downloadFunction={downloadFunctionSpy} />);
 
     await user.click(screen.getByRole('button', {name: /download results/i}));
-    expect(downloadFunctionSpy).toBeCalledWith(raceScorpionA);
+    expect(downloadFunctionSpy).toBeCalledWith(raceScorpionA, {nameFormat: NameFormat.FIRSTNAMESURNAME});
 });

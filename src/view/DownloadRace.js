@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+import { useState } from 'react';
 import NameFormat from '../controller/name-format';
 
 /**
@@ -24,10 +25,15 @@ import NameFormat from '../controller/name-format';
  * @returns 
  */
 function DownloadRace({ race, downloadFunction }) {
+    const [selectedNameFormat, setSelectedNameFormat] = useState(NameFormat.FIRSTNAMESURNAME);
+
+    function handleOptionChange({ target }) {
+        setSelectedNameFormat(target.value);
+    }
 
     function handleDownloadButtonClick() {
         if (downloadFunction) {
-            downloadFunction(race);
+            downloadFunction(race, {nameFormat: selectedNameFormat});
         }
     }
 
@@ -40,9 +46,9 @@ function DownloadRace({ race, downloadFunction }) {
             </output>
             <fieldset>
                 <legend>Choose Name Format</legend>
-                <input id="firstname-surname" name="name-format" type="radio" value={NameFormat.FIRSTNAMESURNAME} checked />
+                <input id="firstname-surname" name="name-format" type="radio" value={NameFormat.FIRSTNAMESURNAME} checked={selectedNameFormat === NameFormat.FIRSTNAMESURNAME} onChange={handleOptionChange} />
                 <label htmlFor="firstname-surname">Firstname Surname</label>
-                <input id="surname-firstname" name="name-format" type="radio" value={NameFormat.SURNAMEFIRSTNAME} />
+                <input id="surname-firstname" name="name-format" type="radio" value={NameFormat.SURNAMEFIRSTNAME} checked={selectedNameFormat === NameFormat.SURNAMEFIRSTNAME} onChange={handleOptionChange} />
                 <label htmlFor="surname-firstname">Surname, Firstname</label>
             </fieldset>
             <button id="race-result-download-button" onClick={handleDownloadButtonClick} >Download Results</button>
