@@ -43,6 +43,13 @@ it('displays race start time', () => {
     expect(screen.getByText(expectedPlannedTime));
 });
 
+it('displays options to output name as firstname surname or surname, firstname', () => {
+    render(<DownloadRace race={raceScorpionA} />);
+
+    expect(screen.getByRole('radio', {name: /firstname surname/i}));
+    expect(screen.getByRole('radio', {name: /surname, firstname/i}));
+});
+
 it('displays download race button', () => {
     render(<DownloadRace race={raceScorpionA} />);
 

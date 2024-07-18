@@ -14,6 +14,8 @@
  * limitations under the License. 
  */
 
+import NameFormat from '../controller/name-format';
+
 /**
  * Provide an interface to support downloading race results
  * @param {Object} props
@@ -36,6 +38,13 @@ function DownloadRace({ race, downloadFunction }) {
             <output id={'race-start-' + race.name.replace(/ /g, '-').toLowerCase()}>
                 {new Intl.DateTimeFormat(navigator.language, {dateStyle: 'medium', timeStyle: 'medium', hour12: false}).format(race.plannedStartTime)}
             </output>
+            <fieldset>
+                <legend>Choose Name Format</legend>
+                <input id="firstname-surname" name="name-format" type="radio" value={NameFormat.FIRSTNAMESURNAME} checked />
+                <label htmlFor="firstname-surname">Firstname Surname</label>
+                <input id="surname-firstname" name="name-format" type="radio" value={NameFormat.SURNAMEFIRSTNAME} />
+                <label htmlFor="surname-firstname">Surname, Firstname</label>
+            </fieldset>
             <button id="race-result-download-button" onClick={handleDownloadButtonClick} >Download Results</button>
         </div>
     );
