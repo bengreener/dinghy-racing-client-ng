@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import RaceType from '../race-type';
+import RaceType from './race-type';
 
 /**
  * @typedef Race

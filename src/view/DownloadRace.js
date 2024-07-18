@@ -18,6 +18,7 @@
  * Provide an interface to support downloading race results
  * @param {Object} props
  * @param {Race} props.race
+ * @param {DownloadRace~downloadFunction} props.downloadFunction
  * @returns 
  */
 function DownloadRace({ race, downloadFunction }) {
@@ -41,3 +42,10 @@ function DownloadRace({ race, downloadFunction }) {
 }
 
 export default DownloadRace;
+
+/**
+ * Action to take when AdjustCourseForm update laps button clicked
+ * @callback DownloadRace~downloadFunction
+ * @param {Race} race to download
+ * @param {DownloadOptions} options to configure download file
+ */
