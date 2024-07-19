@@ -39,8 +39,8 @@ function DownloadRacesForm() {
     const [races, setRaces] = useState([]);
     const [message, setMessage] = useState(''); // feedback to user
 
-    const handleRaceResultDownloadClick = useCallback((race) => {
-        controller.downloadRaceResults(race).then(result => {
+    const handleRaceResultDownloadClick = useCallback((race, options) => {
+        controller.downloadRaceResults(race, options).then(result => {
             if (!result.success) {
                 setMessage('Unable to download results\n' + result.message);
             }

@@ -21,6 +21,7 @@ import { httpRootURL, wsRootURL, races, raceScorpionA } from '../model/__mocks__
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 import DownloadRacesForm from './DownloadRacesForm';
+import NameFormat from '../controller/name-format';
 
 jest.mock('../model/dinghy-racing-model');
 
@@ -207,6 +208,7 @@ describe('when download results button clicked', () => {
         await user.click(screen.getByText(/download results/i));
 
         expect(downloadFunctionSpy).toBeCalledTimes(1);
+        expect(downloadFunctionSpy).toBeCalledWith(raceScorpionA, {nameFormat: NameFormat.FIRSTNAMESURNAME});
     });
     it('displays the error message if the request to download is unsuccessful', async () => {
         const user = userEvent.setup();
