@@ -27,7 +27,7 @@ function downloadRaceEntriesCSV(race, entries, options) {
     const link = document.createElement('a');
     return new Promise((resolve, reject) => {
         try {
-            const data = new Blob(convertRaceEntriesToCSVArray(race, entries), {'type': 'text/csv'}, options);
+            const data = new Blob(convertRaceEntriesToCSVArray(race, entries, options), {'type': 'text/csv'});
             link.href = window.URL.createObjectURL(data);
             link.download = race.name + '.csv';
             link.click();
@@ -79,8 +79,10 @@ function convertRaceEntriesToCSVArray(race, entries, options) {
 };
 
 function _firstnameSurnameToSurnameFirstname(name) {
-    const nameArray = name.split(' ');
-    nameArray.unshift(nameArray.pop() + ',');
+    const nameArray = name.trim().split(' ');
+    if (nameArray.length > 1) {
+        nameArray.unshift(nameArray.pop() + ',');
+    }
     const newName = nameArray.join(' ');
 
     return newName;

@@ -138,7 +138,7 @@ describe('when an entry has a scoring abbreviation set', () => {
 
 describe('when download options are provided', () => {
     describe('when name format option provided is firstname surname', () => {
-        it('outpust name as firstname surname', () => {
+        it('outputs name as firstname surname', () => {
             const entriesScorpionA_with_laps = [{...entriesScorpionA[0]}, {...entriesScorpionA[1]}];
             entriesScorpionA_with_laps[0].laps = [{'number': 1, 'time': 923000}, {'number': 2, 'time': 896000}, {'number': 3, 'time': 934000}];
             entriesScorpionA_with_laps[1].laps = [{'number': 1, 'time': 970000}, {'number': 2, 'time': 947000}, {'number': 3, 'time': 963000}];
@@ -169,4 +169,4 @@ describe('when download options are provided', () => {
             ]);
         });
     });
-})
+});
