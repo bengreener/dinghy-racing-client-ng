@@ -46,10 +46,11 @@ function DownloadRace({ race, downloadFunction }) {
             </output>
             <fieldset>
                 <legend>Choose Name Format</legend>
-                <input id="firstname-surname" name="name-format" type="radio" value={NameFormat.FIRSTNAMESURNAME} checked={selectedNameFormat === NameFormat.FIRSTNAMESURNAME} onChange={handleOptionChange} />
-                <label htmlFor="firstname-surname">Firstname Surname</label>
-                <input id="surname-firstname" name="name-format" type="radio" value={NameFormat.SURNAMEFIRSTNAME} checked={selectedNameFormat === NameFormat.SURNAMEFIRSTNAME} onChange={handleOptionChange} />
-                <label htmlFor="surname-firstname">Surname, Firstname</label>
+                {/** name of radio buttons in a group needs to be unique among all radio button groups on page; for example multiple DownloadRace componenent */}
+                <input id={race.name + '-' + race.plannedStartTime.toISOString() + '-firstname-surname'} name={race.name + '-' + race.plannedStartTime.toISOString() + '-name-format'} type="radio" value={NameFormat.FIRSTNAMESURNAME} checked={selectedNameFormat === NameFormat.FIRSTNAMESURNAME} onChange={handleOptionChange} />
+                <label htmlFor={race.name + '-' + race.plannedStartTime.toISOString() + '-firstname-surname'}>Firstname Surname</label>
+                <input id={race.name + '-' + race.plannedStartTime.toISOString() + '-surname-firstname'} name={race.name + '-' + race.plannedStartTime.toISOString() + '-name-format'} type="radio" value={NameFormat.SURNAMEFIRSTNAME} checked={selectedNameFormat === NameFormat.SURNAMEFIRSTNAME} onChange={handleOptionChange} />
+                <label htmlFor={race.name + '-' + race.plannedStartTime.toISOString() + '-surname-firstname'}>Surname, Firstname</label>
             </fieldset>
             <button id="race-result-download-button" onClick={handleDownloadButtonClick} >Download Results</button>
         </div>
