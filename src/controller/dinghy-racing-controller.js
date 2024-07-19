@@ -385,16 +385,17 @@ class DinghyRacingController {
     /**
      * Download a file containing the results for race
      * @param {Race} race to donwload results for
+     * @param {import('./download-options').DownloadOptions} [options]
      * @return {Promise<Result>}
      */
-    async downloadRaceResults(race) {
+    async downloadRaceResults(race, options) {
         // check valid race (a URL is sufficient, otherwise a name and start time is required)
         if (!race.url && (!race.name || race.name === '' || !race.plannedStartTime)) {
             return Promise.resolve({'success': false, 'message': 'Please provide details of the race.'});
         }
         const result = await this.model.getEntriesByRace(race);
         if (result.success) {
-            return downloadRaceEntriesCSV(race, result.domainObject);
+            return downloadRaceEntriesCSV(race, result.domainObject, options);
         }
         else {
             return Promise.resolve(result);

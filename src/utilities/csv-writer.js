@@ -14,17 +14,20 @@
  * limitations under the License. 
  */
 
+import NameFormat from '../controller/name-format';
+
 /**
  * Write race, entries, and any recorded laps to a CSV file
  * File will be saved via browsers URL file download feature
  * @param {Race} race 
- * @param {Array<Entry>} entries 
+ * @param {Array<Entry>} entries
+ * @param {import('../controller/download-options').DownloadOptions} [options]
  */
-function downloadRaceEntriesCSV(race, entries) {
+function downloadRaceEntriesCSV(race, entries, options) {
     const link = document.createElement('a');
     return new Promise((resolve, reject) => {
         try {
-            const data = new Blob(convertRaceEntriesToCSVArray(race, entries), {'type': 'text/csv'});
+            const data = new Blob(convertRaceEntriesToCSVArray(race, entries, options), {'type': 'text/csv'});
             link.href = window.URL.createObjectURL(data);
             link.download = race.name + '.csv';
             link.click();
@@ -46,14 +49,23 @@ function createHeader(race) {
     return 'HelmName, SailNo, Class, Place, Elapsed, Laps, Code\n';
 }
 
-function convertRaceEntriesToCSVArray(race, entries) {
+function convertRaceEntriesToCSVArray(race, entries, options) {
     let data = [];
     data.push(createHeader(race));
     data = data.concat(entries.map(entry => {
         let record = '';
-        record += entry.helm.name + ',';
-        if (!race.dinghyClass || race.dinghyClass.crewSize > 1) {
-            record += entry.crew ? entry.crew.name + ',' : ',';
+        switch (options?.nameFormat) {
+            case NameFormat.SURNAMEFIRSTNAME:
+                record += '"' + _firstnameSurnameToSurnameFirstname(entry.helm.name) + '",';
+                if (!race.dinghyClass || race.dinghyClass.crewSize > 1) {
+                    record += entry.crew ? '"' + _firstnameSurnameToSurnameFirstname(entry.crew.name) + '",' : ',';
+                }
+                break;
+            default:
+                record += entry.helm.name + ',';
+                if (!race.dinghyClass || race.dinghyClass.crewSize > 1) {
+                    record += entry.crew ? entry.crew.name + ',' : ',';
+                }
         }
         record += entry.dinghy.sailNumber + ',';
         record += entry.dinghy.dinghyClass.name + ',';
@@ -65,6 +77,16 @@ function convertRaceEntriesToCSVArray(race, entries) {
     }));
     return data;
 };
+
+function _firstnameSurnameToSurnameFirstname(name) {
+    const nameArray = name.trim().split(' ');
+    if (nameArray.length > 1) {
+        nameArray.unshift(nameArray.pop() + ',');
+    }
+    const newName = nameArray.join(' ');
+
+    return newName;
+}
 
 // Functions exposed through this object should only be used in tests that confirm they perform as expected
 const functionsForTestingOnly = {

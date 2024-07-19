@@ -63,18 +63,36 @@ it('displays position', () => {
     expect(screen.getByText('5')).toBeInTheDocument();
 });
 
-it('calls addLap callback with entry', async () => {
-    const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-    const entry = {...entryChrisMarshallScorpionA1234};
-    const addLapCallback = jest.fn((e) => {entry.laps.push({'number': 1, 'time': 1234})});
-    const tableBody = document.createElement('tbody');
-    render(<RaceEntryView entry={entry} addLap={addLapCallback} />, {container: document.body.appendChild(tableBody)});
-    const SMScorp1234entry = screen.getByText(/1234/i);
-    await act(async () => {
-        await user.click(SMScorp1234entry);
+describe('before race has started', () => {
+    it('calls addLap callback with entry', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const entry = {...entryChrisMarshallScorpionA1234, race: {...entryChrisMarshallScorpionA1234.race, plannedStartTime: new Date(Date.now() + 60000)}};
+        const addLapCallback = jest.fn((e) => {entry.laps.push({'number': 1, 'time': 1234})});
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entry} addLap={addLapCallback} />, {container: document.body.appendChild(tableBody)});
+        const SMScorp1234entry = screen.getByText(/1234/i);
+        await act(async () => {
+            await user.click(SMScorp1234entry);
+        });
+        expect(addLapCallback).not.toBeCalledWith(entry);
     });
-    expect(addLapCallback).toBeCalledWith(entry);
 });
+
+describe('after race has started', () => {
+    it('calls addLap callback with entry', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const entry = {...entryChrisMarshallScorpionA1234};
+        const addLapCallback = jest.fn((e) => {entry.laps.push({'number': 1, 'time': 1234})});
+        const tableBody = document.createElement('tbody');
+        render(<RaceEntryView entry={entry} addLap={addLapCallback} />, {container: document.body.appendChild(tableBody)});
+        const SMScorp1234entry = screen.getByText(/1234/i);
+        await act(async () => {
+            await user.click(SMScorp1234entry);
+        });
+        expect(addLapCallback).toBeCalledWith(entry);
+    });
+});
+
 
 it('calls removeLap callback with entry', async () => {
     const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});

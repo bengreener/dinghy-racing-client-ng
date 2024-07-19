@@ -98,12 +98,12 @@ function CompetitorsConsole() {
         <div className="competitors-console">
             <h1>Competitors</h1>
             <p id="competitor-console-message" className={!message ? "hidden" : ""}>{message}</p>
-            {selectedCompetitor ? <div>
-                    <label htmlFor="name-input" >Name</label>
-                    <input id="name-input" type="text" name="name" value={competitorName} onChange={handleNameChange} />
-                    <button type='button' onClick={handleUpdateButtonClick} >Update</button>
-                    <button type='button' onClick={clearSelectedCompetitor} >Cancel</button>
-                </div> : null}
+            {selectedCompetitor ? <form action="" method="post">
+                <label htmlFor="name-input" >Name</label>
+                <input id="name-input" type="text" name="name" value={competitorName} onChange={handleNameChange} />
+                <button type='button' onClick={handleUpdateButtonClick} >Update</button>
+                <button type='button' onClick={clearSelectedCompetitor} >Cancel</button>
+            </form> : null}
             <div className="scrollable">
                 <table>
                     <thead>

@@ -74,7 +74,11 @@ function CreateRace({ onCreate }) {
 
     function handleChange({target}) {
         if (target.name === 'dinghyClass') {
-            setRace({...race, 'dinghyClass': dinghyClassMap.get(target.value)});
+            if (target.value === '') {
+                setRace({...race, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate()});
+            } else {
+                setRace({...race, 'dinghyClass': dinghyClassMap.get(target.value)});
+            }
         }
         else if (target.name === 'duration') {
             setRace({...race, [target.name]: target.value * 60000});

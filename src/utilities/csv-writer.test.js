@@ -16,6 +16,7 @@
 
 import { downloadRaceEntriesCSV, functionsForTestingOnly } from './csv-writer';
 import  { raceScorpionA, raceCometA, raceHandicapA, entriesScorpionA, entriesCometA, entriesHandicapA } from '../model/__mocks__/test-data';
+import NameFormat from '../controller/name-format';
 
 // Testing requires coding of createObjectURL that would probably invalidate test
 xit('writes race entry data to a file', async () => {
@@ -40,7 +41,7 @@ it('returns a promise indicating failure and providing a message with the cause'
 
 describe('when race is for dinghy class with crew', () => {
     it('provides a header row that includes crew name header', () => {
-        const entriesScorpionA_with_laps = entriesScorpionA;
+        const entriesScorpionA_with_laps = [{...entriesScorpionA[0]}, {...entriesScorpionA[1]}];
         entriesScorpionA_with_laps[0].laps = [{'number': 1, 'time': 1000}, {'number': 2, 'time': 1100}, {'number': 3, 'time': 1200}];
         entriesScorpionA_with_laps[1].laps = [{'number': 1, 'time': 1010}, {'number': 2, 'time': 1110}, {'number': 3, 'time': 1210}];
         entriesScorpionA_with_laps[0].sumOfLapTimes =  3300;
@@ -52,7 +53,7 @@ describe('when race is for dinghy class with crew', () => {
         expect(header).toEqual('HelmName, CrewName, SailNo, Class, Place, Elapsed, Laps, Code\n');
     });
     it('converts race entry data to an array of comma seperated value data with one row per entry in race', () => {
-        const entriesScorpionA_with_laps = entriesScorpionA;
+        const entriesScorpionA_with_laps = [{...entriesScorpionA[0]}, {...entriesScorpionA[1]}];
         entriesScorpionA_with_laps[0].laps = [{'number': 1, 'time': 923000}, {'number': 2, 'time': 896000}, {'number': 3, 'time': 934000}];
         entriesScorpionA_with_laps[1].laps = [{'number': 1, 'time': 970000}, {'number': 2, 'time': 947000}, {'number': 3, 'time': 963000}];
         entriesScorpionA_with_laps[0].sumOfLapTimes =  2753000;
@@ -90,7 +91,7 @@ describe('when race is for dinghy class without crew', () => {
 
 describe('when race is a handicap race', () => {
     it('provides a header row that includes crew name header', () => {
-        const entriesScorpionA_with_laps = entriesScorpionA;
+        const entriesScorpionA_with_laps = [{...entriesScorpionA[0]}, {...entriesScorpionA[1]}];
         entriesScorpionA_with_laps[0].laps = [{'number': 1, 'time': 1000}, {'number': 2, 'time': 1100}, {'number': 3, 'time': 1200}];
         entriesScorpionA_with_laps[1].laps = [{'number': 1, 'time': 1010}, {'number': 2, 'time': 1110}, {'number': 3, 'time': 1210}];
         entriesScorpionA_with_laps[0].sumOfLapTimes =  3300;
@@ -119,7 +120,7 @@ describe('when race is a handicap race', () => {
 
 describe('when an entry has a scoring abbreviation set', () => {
     it('converts race entry data to an array of comma seperated value data with one row per entry in race including scoring abbreviation', () => {
-        const entriesScorpionA_with_laps = entriesScorpionA;
+        const entriesScorpionA_with_laps = [{...entriesScorpionA[0]}, {...entriesScorpionA[1]}];
         entriesScorpionA_with_laps[0].laps = [{'number': 1, 'time': 1000}, {'number': 2, 'time': 1100}, {'number': 3, 'time': 1200}];
         entriesScorpionA_with_laps[0].sumOfLapTimes =  3300;
         entriesScorpionA_with_laps[1].laps = [];
@@ -132,5 +133,40 @@ describe('when an entry has a scoring abbreviation set', () => {
             'Chris Marshall,Lou Screw,1234,Scorpion,1,3,3,\n',
             'Sarah Pascal,Owain Davies,6745,Scorpion,2,0,0,DNS\n'
         ]);
+    });
+});
+
+describe('when download options are provided', () => {
+    describe('when name format option provided is firstname surname', () => {
+        it('outputs name as firstname surname', () => {
+            const entriesScorpionA_with_laps = [{...entriesScorpionA[0]}, {...entriesScorpionA[1]}];
+            entriesScorpionA_with_laps[0].laps = [{'number': 1, 'time': 923000}, {'number': 2, 'time': 896000}, {'number': 3, 'time': 934000}];
+            entriesScorpionA_with_laps[1].laps = [{'number': 1, 'time': 970000}, {'number': 2, 'time': 947000}, {'number': 3, 'time': 963000}];
+            entriesScorpionA_with_laps[0].sumOfLapTimes =  2753000;
+            entriesScorpionA_with_laps[1].sumOfLapTimes =  2880000;
+            entriesScorpionA_with_laps[0].position = 1;
+            entriesScorpionA_with_laps[1].position = 2;
+            const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceScorpionA, entriesScorpionA_with_laps, {nameFormat: NameFormat.FIRSTNAMESURNAME});
+            expect(data.slice(1)).toEqual([
+                'Chris Marshall,Lou Screw,1234,Scorpion,1,2753,3,\n',
+                'Sarah Pascal,Owain Davies,6745,Scorpion,2,2880,3,\n'
+            ]);
+        });
+    });
+    describe('when name format option provided is surname firstname', () => {
+        it('outputs name as surname, firstname and wraps in quotation marks', () => {
+            const entriesScorpionA_with_laps = [{...entriesScorpionA[0]}, {...entriesScorpionA[1]}];
+            entriesScorpionA_with_laps[0].laps = [{'number': 1, 'time': 923000}, {'number': 2, 'time': 896000}, {'number': 3, 'time': 934000}];
+            entriesScorpionA_with_laps[1].laps = [{'number': 1, 'time': 970000}, {'number': 2, 'time': 947000}, {'number': 3, 'time': 963000}];
+            entriesScorpionA_with_laps[0].sumOfLapTimes =  2753000;
+            entriesScorpionA_with_laps[1].sumOfLapTimes =  2880000;
+            entriesScorpionA_with_laps[0].position = 1;
+            entriesScorpionA_with_laps[1].position = 2;
+            const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceScorpionA, entriesScorpionA_with_laps, {nameFormat: NameFormat.SURNAMEFIRSTNAME});
+            expect(data.slice(1)).toEqual([
+                '"Marshall, Chris","Screw, Lou",1234,Scorpion,1,2753,3,\n',
+                '"Pascal, Sarah","Davies, Owain",6745,Scorpion,2,2880,3,\n'
+            ]);
+        });
     });
 });

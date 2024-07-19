@@ -189,6 +189,31 @@ it('calls the function passed in to onCreate prop', async () => {
     expect(fnOnCreate).toBeCalledTimes(1);
 });
 
+describe('when empty value selected for dinghy class', () => {
+    it('calls the function passed in to onCreate prop with a blank dinghy class value', async () => {
+        const user = userEvent.setup();
+        const fnOnCreate = jest.fn((race) => {return Promise.resolve({'success': true})});
+
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
+        await act(async () => {
+            customRender(<CreateRace onCreate={fnOnCreate} />, model);
+        });
+
+        const btnCreate = screen.getByRole('button', {'name': 'Create'});
+        const selectRaceClass = screen.getByLabelText('Race Class');
+        await screen.findAllByRole('option');
+        await act(async () => {
+            await user.selectOptions(selectRaceClass, '');
+        });
+        await act(async () => {
+            await user.click(btnCreate);
+        });
+
+        expect(fnOnCreate).toBeCalledWith({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Math.trunc(Date.now() / 60000) * 60000), 'duration': 2700000, 'plannedLaps': 5, type: RaceType.FLEET});
+    });
+})
+
 it('calls the function passed in to onCreate prop with new race as parameter', async () => {
     
     const user = userEvent.setup();
