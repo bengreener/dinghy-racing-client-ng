@@ -18,6 +18,9 @@ import DinghyRacingController from './dinghy-racing-controller.js';
 import DinghyRacingModel from '../model/dinghy-racing-model.js';
 import { httpRootURL, wsRootURL, competitorChrisMarshall, dinghyClassScorpion, dinghy1234, raceScorpionA, entryChrisMarshallScorpionA1234, entriesScorpionA, competitorLouScrew } from '../model/__mocks__/test-data.js';
 import StartSignal from '../model/domain-classes/start-signal.js';
+// import { downloadRaceEntriesCSV } from '../utilities/csv-writer.js';
+import * as csvWriter from '../utilities/csv-writer.js';
+import NameFormat from './name-format.js';
 
 jest.mock('../model/dinghy-racing-model');
 
@@ -1071,7 +1074,7 @@ describe('when writing race entries to a CSV file', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result.success).toBe(true);
     });
-    it('returns a promise that resolves to a result indicating failure when operation cannot retrieve entries for the race and provides a message indicating teh cause of the failure', async () => {
+    it('returns a promise that resolves to a result indicating failure when operation cannot retrieve entries for the race and provides a message indicating the cause of the failure', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         jest.spyOn(dinghyRacingModel, 'getEntriesByRace').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Unable to retrieve entries'})})
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
@@ -1080,6 +1083,18 @@ describe('when writing race entries to a CSV file', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Unable to retrieve entries'});
     });
+    it('calls downloadRaceEntriesCSV with options parameter passed in', async () => {
+        global.URL.createObjectURL = jest.fn(); // function does not exist in jsdom
+        global.URL.revokeObjectURL = jest.fn(); // function does not exist in jsdom
+        const downloadRaceEntriesCSVSpy = jest.spyOn(csvWriter, 'downloadRaceEntriesCSV');
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        const promise = dinghyRacingController.downloadRaceResults(raceScorpionA, {nameFormat: NameFormat.FIRSTNAMESURNAME});
+        const result = await promise;
+        expect(downloadRaceEntriesCSVSpy).toBeCalledWith(raceScorpionA, entriesScorpionA, {nameFormat: NameFormat.FIRSTNAMESURNAME});
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result.success).toBe(true);
+    })
 });
 
 describe('when race is postponed', () => {
