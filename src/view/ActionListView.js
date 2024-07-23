@@ -43,6 +43,7 @@ function ActionListView({ actions }) {
         timeZone: resolvedOptions.timeZone,
         hour: '2-digit',
         minute: '2-digit',
+        second: '2-digit',
         hour12: false
     };
     const timeFormat = new Intl.DateTimeFormat(resolvedOptions.locale, formatOptions);
