@@ -50,7 +50,7 @@ describe('when race is for dinghy class with crew', () => {
         entriesScorpionA_with_laps[1].position = 2;
         const header = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceScorpionA, entriesScorpionA_with_laps)[0];
     
-        expect(header).toEqual('HelmName, CrewName, SailNo, Class, Place, Elapsed, Laps, Code\n');
+        expect(header).toEqual('HelmName,CrewName,SailNo,Class,Place,Elapsed,Laps,Code,RaceRating\n');
     });
     it('converts race entry data to an array of comma seperated value data with one row per entry in race', () => {
         const entriesScorpionA_with_laps = [{...entriesScorpionA[0]}, {...entriesScorpionA[1]}];
@@ -62,8 +62,8 @@ describe('when race is for dinghy class with crew', () => {
         entriesScorpionA_with_laps[1].position = 2;
         const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceScorpionA, entriesScorpionA_with_laps);
         expect(data.slice(1)).toEqual([
-            'Chris Marshall,Lou Screw,1234,Scorpion,1,2753,3,\n',
-            'Sarah Pascal,Owain Davies,6745,Scorpion,2,2880,3,\n'
+            'Chris Marshall,Lou Screw,1234,Scorpion,1,2753,3,,1043\n',
+            'Sarah Pascal,Owain Davies,6745,Scorpion,2,2880,3,,1043\n'
         ]);
     });
 });
@@ -75,7 +75,7 @@ describe('when race is for dinghy class without crew', () => {
         entriesCometA_with_laps[0].sumOfLapTimes =  3300;
         const header = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceCometA, entriesCometA_with_laps)[0];
     
-        expect(header).toEqual('HelmName, SailNo, Class, Place, Elapsed, Laps, Code\n');
+        expect(header).toEqual('HelmName,SailNo,Class,Place,Elapsed,Laps,Code,RaceRating\n');
     });
     it('converts race entry data to an array of comma seperated value data with one row per entry in race', () => {
         const entriesCometA_with_laps = entriesCometA;
@@ -84,7 +84,7 @@ describe('when race is for dinghy class without crew', () => {
         entriesCometA_with_laps[0].position = 1;
         const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceCometA, entriesCometA_with_laps);
         expect(data.slice(1)).toEqual([
-            'Jill Myer,826,Comet,1,3,3,\n'
+            'Jill Myer,826,Comet,1,3,3,,1210\n'
         ]);
     });
 });
@@ -100,7 +100,7 @@ describe('when race is a handicap race', () => {
         entriesScorpionA_with_laps[1].position =  2;
         const header = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceScorpionA, entriesScorpionA_with_laps)[0];
     
-        expect(header).toEqual('HelmName, CrewName, SailNo, Class, Place, Elapsed, Laps, Code\n');
+        expect(header).toEqual('HelmName,CrewName,SailNo,Class,Place,Elapsed,Laps,Code,RaceRating\n');
     });
     it('converts race entry data to an array of comma seperated value data with one row per entry in race', () => {
         const entriesHandicapA_with_laps = entriesHandicapA;
@@ -112,8 +112,8 @@ describe('when race is a handicap race', () => {
         entriesHandicapA_with_laps[1].position =  2;
         const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceHandicapA, entriesHandicapA_with_laps);
         expect(data.slice(1)).toEqual([
-            'Chris Marshall,Lou Screw,1234,Scorpion,1,3177,3,\n',
-            'Jill Myer,,826,Comet,2,3721,3,\n'
+            'Chris Marshall,Lou Screw,1234,Scorpion,1,3177,3,,1043\n',
+            'Jill Myer,,826,Comet,2,3721,3,,1210\n'
         ]);
     });
 });
@@ -130,8 +130,8 @@ describe('when an entry has a scoring abbreviation set', () => {
         entriesScorpionA_with_laps[1].position =  2;
         const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceScorpionA, entriesScorpionA_with_laps);
         expect(data.slice(1)).toEqual([
-            'Chris Marshall,Lou Screw,1234,Scorpion,1,3,3,\n',
-            'Sarah Pascal,Owain Davies,6745,Scorpion,2,0,0,DNS\n'
+            'Chris Marshall,Lou Screw,1234,Scorpion,1,3,3,,1043\n',
+            'Sarah Pascal,Owain Davies,6745,Scorpion,2,0,0,DNS,1043\n'
         ]);
     });
 });
@@ -148,8 +148,8 @@ describe('when download options are provided', () => {
             entriesScorpionA_with_laps[1].position = 2;
             const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceScorpionA, entriesScorpionA_with_laps, {nameFormat: NameFormat.FIRSTNAMESURNAME});
             expect(data.slice(1)).toEqual([
-                'Chris Marshall,Lou Screw,1234,Scorpion,1,2753,3,\n',
-                'Sarah Pascal,Owain Davies,6745,Scorpion,2,2880,3,\n'
+                'Chris Marshall,Lou Screw,1234,Scorpion,1,2753,3,,1043\n',
+                'Sarah Pascal,Owain Davies,6745,Scorpion,2,2880,3,,1043\n'
             ]);
         });
     });
@@ -164,8 +164,8 @@ describe('when download options are provided', () => {
             entriesScorpionA_with_laps[1].position = 2;
             const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceScorpionA, entriesScorpionA_with_laps, {nameFormat: NameFormat.SURNAMEFIRSTNAME});
             expect(data.slice(1)).toEqual([
-                '"Marshall, Chris","Screw, Lou",1234,Scorpion,1,2753,3,\n',
-                '"Pascal, Sarah","Davies, Owain",6745,Scorpion,2,2880,3,\n'
+                '"Marshall, Chris","Screw, Lou",1234,Scorpion,1,2753,3,,1043\n',
+                '"Pascal, Sarah","Davies, Owain",6745,Scorpion,2,2880,3,,1043\n'
             ]);
         });
     });
