@@ -110,7 +110,12 @@ function RaceEntriesView({ races }) {
                 break;
             case 'position':
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
-                    return entry.position;
+                    const weighIfScoringAbbreviation = ['DNS', 'DSQ', 'RET'];
+                    let weight = .5;
+                    if (weighIfScoringAbbreviation.includes(entry.scoringAbbreviation)) {
+                        weight = weight * 2;
+                    }
+                    return entry.position ? entry.position : Date.now() * weight; // if entry doesn't have a position return a large number to put it to the bottom
                 });
                 break;
             default:
