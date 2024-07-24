@@ -17,6 +17,7 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import LapView from './LapView';
 import ScoringAbbreviation from './ScoringAbbreviation';
+import { PositionConstant } from './RaceEntriesView';
 
 /**
  * Display the details of a race entry
@@ -99,7 +100,12 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         event.preventDefault();
         if (updatePosition) {
             setDisabled(true);
-            updatePosition(entry, entry.position - 1);
+            if (entry.position == null ) {
+                updatePosition(entry, PositionConstant.MOVEUPONE);    
+            }
+            else {
+                updatePosition(entry, entry.position - 1);
+            }
         }
     }
 
@@ -108,7 +114,12 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         event.preventDefault();
         if (updatePosition) {
             setDisabled(true);
-            updatePosition(entry, entry.position + 1);
+            if (entry.position == null ) {
+                updatePosition(entry, PositionConstant.MOVEDOWNONE);    
+            }
+            else {
+                updatePosition(entry, entry.position + 1);
+            }
         }
     }
 

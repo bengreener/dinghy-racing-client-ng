@@ -154,8 +154,43 @@ function RaceEntriesView({ races }) {
         }
     }
 
+    function getLastEntryPosition() {
+        let lowestPosition = 1;
+        entriesMap.forEach(entry => {
+            if (entry.position > lowestPosition) {
+                lowestPosition = entry.position;
+            }
+        });
+        return lowestPosition;
+    };
+
+    /**
+     * Update the position of an entry in the race
+     * @param {Entry} entry 
+     * @param {(Integer|PositionConstant)} newPosition 
+     */
     async function updateEntryPosition(entry, newPosition) {
-        const result = await controller.updateEntryPosition(entry, newPosition);
+        let result;
+        switch (newPosition) {
+            case PositionConstant.MOVEUPONE:
+                if (entry.position != null) {
+                    result = await controller.updateEntryPosition(entry, entry.position - 1);
+                }
+                else {
+                    result = await controller.updateEntryPosition(entry, getLastEntryPosition());
+                }
+                break;
+            case PositionConstant.MOVEDOWNONE:
+                if (entry.position != null) {
+                    result = await controller.updateEntryPosition(entry, entry.position + 1);
+                }
+                else {
+                    result = await controller.updateEntryPosition(entry, getLastEntryPosition() + 1);
+                }
+                break;
+            default:
+                result = await controller.updateEntryPosition(entry, newPosition);
+        }
         if (!result.success) {
             setMessage(result.message);
         }
@@ -183,4 +218,13 @@ function RaceEntriesView({ races }) {
     );
 }
 
+/**
+ * Class providng enumeration of constants for use instead of numeric postion value when updating an entries position
+ */
+class PositionConstant {
+    static MOVEUPONE = 'moveUpOne';
+    static MOVEDOWNONE = 'moveDownOne';
+}
+
 export default RaceEntriesView;
+export { PositionConstant };
