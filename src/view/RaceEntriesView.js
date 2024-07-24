@@ -155,7 +155,7 @@ function RaceEntriesView({ races }) {
     }
 
     function getLastEntryPosition() {
-        let lowestPosition = 1;
+        let lowestPosition = 0;
         entriesMap.forEach(entry => {
             if (entry.position > lowestPosition) {
                 lowestPosition = entry.position;
@@ -177,7 +177,8 @@ function RaceEntriesView({ races }) {
                     result = await controller.updateEntryPosition(entry, entry.position - 1);
                 }
                 else {
-                    result = await controller.updateEntryPosition(entry, getLastEntryPosition());
+                    const lastEntryPosition = getLastEntryPosition();
+                    result = await controller.updateEntryPosition(entry, lastEntryPosition || 1);
                 }
                 break;
             case PositionConstant.MOVEDOWNONE:
