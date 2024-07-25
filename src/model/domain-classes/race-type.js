@@ -22,8 +22,8 @@ class RaceType {
     static PURSUIT = 'PURSUIT';
 
     /**
-     * Return a StartSequence stage value based on the supplied string
-     * @param {String} stage
+     * Return a RaceType value based on the supplied string
+     * @param {String} raceType
      */
     static from(type) {
         const lowerType = type?.toUpperCase();
