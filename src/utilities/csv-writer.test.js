@@ -15,7 +15,7 @@
  */
 
 import { downloadRaceEntriesCSV, functionsForTestingOnly } from './csv-writer';
-import  { raceScorpionA, raceCometA, raceHandicapA, entriesScorpionA, entriesCometA, entriesHandicapA } from '../model/__mocks__/test-data';
+import  { raceScorpionA, raceCometA, raceHandicapA, entriesScorpionA, racePursuitA, entriesCometA, entriesHandicapA, entriesPursuitA } from '../model/__mocks__/test-data';
 import NameFormat from '../controller/name-format';
 
 // Testing requires coding of createObjectURL that would probably invalidate test
@@ -170,3 +170,26 @@ describe('when download options are provided', () => {
         });
     });
 });
+
+describe('when race is a pursuit race', () => {
+    it('provides a header row that does not includes elapsed or laps headers', () => {
+        const entriesPursuitA_with_laps = [{...entriesPursuitA[0]}];
+        entriesPursuitA_with_laps[0].laps = [{'number': 1, 'time': 923000}, {'number': 2, 'time': 896000}, {'number': 3, 'time': 934000}];
+        entriesPursuitA_with_laps[0].sumOfLapTimes =  2753000;
+        entriesPursuitA_with_laps[0].position = 1;
+        const header = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(racePursuitA, entriesPursuitA_with_laps)[0];
+    
+        expect(header).not.toContain('Elapsed');
+        expect(header).not.toContain('Laps');
+    });
+    it('converts race entry data to an array of comma seperated value data with one row per entry in race', () => {
+        const entriesPursuitA_with_laps = [{...entriesPursuitA[0]}];
+        entriesPursuitA_with_laps[0].laps = [{'number': 1, 'time': 923000}, {'number': 2, 'time': 896000}, {'number': 3, 'time': 934000}];
+        entriesPursuitA_with_laps[0].sumOfLapTimes =  2753000;
+        entriesPursuitA_with_laps[0].position = 1;
+        const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(racePursuitA, entriesPursuitA_with_laps);
+        expect(data.slice(1)).toEqual([
+            'Chris Marshall,Lou Screw,1234,Scorpion,1,,1043\n'
+        ]);
+    });
+})

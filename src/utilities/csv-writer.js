@@ -15,6 +15,7 @@
  */
 
 import NameFormat from '../controller/name-format';
+import RaceType from '../model/domain-classes/race-type';
 
 /**
  * Write race, entries, and any recorded laps to a CSV file
@@ -43,10 +44,18 @@ function downloadRaceEntriesCSV(race, entries, options) {
 };
 
 function createHeader(race) {
-    if (!race.dinghyClass || race.dinghyClass.crewSize > 1) {
-        return 'HelmName,CrewName,SailNo,Class,Place,Elapsed,Laps,Code,RaceRating\n';
+    switch (race.type) {
+        case RaceType.PURSUIT:
+            if (!race.dinghyClass || race.dinghyClass.crewSize > 1) {
+                return 'HelmName,CrewName,SailNo,Class,Place,Code,RaceRating\n';
+            }
+            return 'HelmName,SailNo,Class,Place,Code,RaceRating\n';
+        default:
+            if (!race.dinghyClass || race.dinghyClass.crewSize > 1) {
+                return 'HelmName,CrewName,SailNo,Class,Place,Elapsed,Laps,Code,RaceRating\n';
+            }
+            return 'HelmName,SailNo,Class,Place,Elapsed,Laps,Code,RaceRating\n';
     }
-    return 'HelmName,SailNo,Class,Place,Elapsed,Laps,Code,RaceRating\n';
 }
 
 function convertRaceEntriesToCSVArray(race, entries, options) {
@@ -70,8 +79,10 @@ function convertRaceEntriesToCSVArray(race, entries, options) {
         record += entry.dinghy.sailNumber + ',';
         record += entry.dinghy.dinghyClass.name + ',';
         record += entry.position + ',';
-        record += Math.round(entry.sumOfLapTimes / 1000) + ',';
-        record += entry.laps.length + ',';
+        if (race.type !== RaceType.PURSUIT) {
+            record += Math.round(entry.sumOfLapTimes / 1000) + ',';
+            record += entry.laps.length + ',';
+        }
         record += (entry.scoringAbbreviation ? entry.scoringAbbreviation : '') + ',';
         record += (entry.dinghy.dinghyClass.portsmouthNumber ? entry.dinghy.dinghyClass.portsmouthNumber : '') + '\n';
         return record;
