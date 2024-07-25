@@ -174,7 +174,7 @@ it('accepts the type for the race', async () => {
     expect(inputType).toHaveValue('PURSUIT');
 });
 
-it('accepts the type for the race', async () => {
+it('accepts the start type for the race', async () => {
     const user = userEvent.setup();
 
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -285,6 +285,7 @@ describe('when creating a new race', () => {
         const inputDinghyClass = screen.getByLabelText(/class/i);
         const inputLaps = screen.getByLabelText(/laps/i);
         const inputType = screen.getByLabelText(/^type/i);
+        const inputStartType = screen.getByLabelText(/start type/i);
         const btnCreate = screen.getByRole('button', {'name': 'Create'});
         await act(async () => {
             await user.type(inputName, 'Scorpion A');
@@ -293,6 +294,7 @@ describe('when creating a new race', () => {
             await user.type(inputDuration, '65');
             await user.type(inputDinghyClass, 'Scorpion');
             await user.selectOptions(inputType, 'Pursuit');
+            await user.selectOptions(inputStartType, '5-4-1-GO');
             await user.click(btnCreate);
         });
     
@@ -302,6 +304,7 @@ describe('when creating a new race', () => {
         expect(inputDinghyClass).toHaveValue('');
         expect(inputType).toHaveValue('FLEET');
         expect(inputLaps).toHaveValue(5);
+        expect(inputStartType).toHaveValue('CSCCLUBSTART');
     })
     it('displays the failure message on failure', async () => {
         const user = userEvent.setup();
