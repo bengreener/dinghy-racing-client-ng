@@ -22,6 +22,7 @@ import CreateRace from './CreateRace';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import { httpRootURL, wsRootURL, dinghyClasses, dinghyClassScorpion, dinghyClassesByNameAsc } from '../model/__mocks__/test-data';
 import RaceType from '../model/domain-classes/race-type';
+import StartType from '../model/domain-classes/start-type';
 
 jest.mock('../model/dinghy-racing-model');
 
@@ -37,8 +38,9 @@ it('renders', async () => {
     const inputDuration = screen.getByLabelText(/duration/i);
     const inputDinghyClass = screen.getByLabelText(/class/i);
     const inputLaps = screen.getByLabelText(/laps/i);
-    const inputType = screen.getByLabelText(/type/i);
+    const inputType = screen.getByLabelText(/^type/i);
     const selectRaceClass = screen.getByLabelText(/class/i);
+    const inputStartType = screen.getByLabelText(/start type/i);
     expect(inputName).toHaveValue('');
     expect(inputTime).toHaveValue(new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16));
     expect(inputDuration).toHaveValue(45);
@@ -46,6 +48,7 @@ it('renders', async () => {
     expect(inputType).toHaveValue('FLEET');
     expect(inputLaps).toHaveValue(5);
     expect(selectRaceClass).toBeInTheDocument();
+    expect(inputStartType).toBeInTheDocument();
 })
 
 it('displays the available dinghyClasses and handicap option', async () => {
@@ -163,12 +166,28 @@ it('accepts the type for the race', async () => {
     await act(async () => {
         customRender(<CreateRace />, model);
     });
-    const inputType = screen.getByLabelText(/type/i);
+    const inputType = screen.getByLabelText(/^type/i);
     await act(async () => {
         await user.selectOptions(inputType, 'Pursuit');
     });
     
     expect(inputType).toHaveValue('PURSUIT');
+});
+
+it('accepts the type for the race', async () => {
+    const user = userEvent.setup();
+
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
+    await act(async () => {
+        customRender(<CreateRace />, model);
+    });
+    const inputStartType = screen.getByLabelText(/start type/i);
+    await act(async () => {
+        await user.selectOptions(inputStartType, '5-4-1-GO');
+    });
+    
+    expect(inputStartType).toHaveValue('RRS26');
 });
 
 it('calls the function passed in to onCreate prop', async () => {
@@ -210,7 +229,7 @@ describe('when empty value selected for dinghy class', () => {
             await user.click(btnCreate);
         });
 
-        expect(fnOnCreate).toBeCalledWith({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Math.trunc(Date.now() / 60000) * 60000), 'duration': 2700000, 'plannedLaps': 5, type: RaceType.FLEET});
+        expect(fnOnCreate).toBeCalledWith({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Math.trunc(Date.now() / 60000) * 60000), 'duration': 2700000, 'plannedLaps': 5, type: RaceType.FLEET, startType: StartType.CSCCLUBSTART});
     });
 })
 
@@ -229,7 +248,7 @@ it('calls the function passed in to onCreate prop with new race as parameter', a
     const inputDuration = screen.getByLabelText(/duration/i);
     const inputLaps = screen.getByLabelText(/laps/i);
     const selectRaceClass = screen.getByLabelText(/class/i);
-    const inputType = screen.getByLabelText(/type/i);
+    const inputType = screen.getByLabelText(/^type/i);
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
     await screen.findAllByRole('option'); // wait for dinghy class options to be built
     await act(async () => {
@@ -245,7 +264,7 @@ it('calls the function passed in to onCreate prop with new race as parameter', a
         await user.click(btnCreate);
     });
 
-    expect(fnOnCreate).toBeCalledWith({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2020-05-12T12:30'), 'dinghyClass': dinghyClassScorpion, 'plannedLaps': 7, 'duration': 3900000, type: RaceType.PURSUIT});
+    expect(fnOnCreate).toBeCalledWith({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2020-05-12T12:30'), 'dinghyClass': dinghyClassScorpion, 'plannedLaps': 7, 'duration': 3900000, type: RaceType.PURSUIT, startType: StartType.CSCCLUBSTART});
 });
 
 describe('when creating a new race', () => {
@@ -265,7 +284,7 @@ describe('when creating a new race', () => {
         const inputDuration = screen.getByLabelText(/duration/i);
         const inputDinghyClass = screen.getByLabelText(/class/i);
         const inputLaps = screen.getByLabelText(/laps/i);
-        const inputType = screen.getByLabelText(/type/i);
+        const inputType = screen.getByLabelText(/^type/i);
         const btnCreate = screen.getByRole('button', {'name': 'Create'});
         await act(async () => {
             await user.type(inputName, 'Scorpion A');
