@@ -26,8 +26,8 @@ class StartType {
      * @param {String} startType
      */
     static from(type) {
-        const lowerType = type?.toUpperCase();
-        switch (lowerType) {
+        const upperType = type?.toUpperCase();
+        switch (upperType) {
             case 'CSCCLUBSTART':
                 return StartType.CSCCLUBSTART;
             case 'RRS26':

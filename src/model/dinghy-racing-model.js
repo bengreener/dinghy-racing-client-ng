@@ -18,6 +18,7 @@ import { Client } from '@stomp/stompjs';
 import StartSignal from './domain-classes/start-signal';
 import StartSequence from './domain-classes/start-sequence';
 import RaceType from './domain-classes/race-type';
+import StartType from './domain-classes/start-type';
 
 class DinghyRacingModel {
     httpRootURL;
@@ -59,7 +60,7 @@ class DinghyRacingModel {
      * @returns {Race}
      */
     static raceTemplate() {
-        return {name: '', plannedStartTime: null, dinghyClass: DinghyRacingModel.dinghyClassTemplate(), type: null, duration: 0, plannedLaps: null, lapsSailed: null, lapForecast: null, 
+        return {name: '', plannedStartTime: null, dinghyClass: DinghyRacingModel.dinghyClassTemplate(), type: null, startType: null, duration: 0, plannedLaps: null, lapsSailed: null, lapForecast: null, 
             lastLapTime: null, averageLapTime: null, clock: null, startSequenceState: StartSignal.NONE, dinghyClasses: [], url: ''};
     }
 
@@ -1438,6 +1439,7 @@ class DinghyRacingModel {
             plannedStartTime: new Date(raceHAL.plannedStartTime + 'Z'),
             dinghyClass: dinghyClass, duration: this.convertISO8601DurationToMilliseconds(raceHAL.duration),
             type: RaceType.from(raceHAL.type),
+            startType: StartType.from(raceHAL.startType),
             plannedLaps: raceHAL.plannedLaps, lapsSailed: raceHAL.leadEntry ? raceHAL.leadEntry.lapsSailed : null,
             lapForecast: raceHAL.lapForecast,
             lastLapTime: raceHAL.leadEntry ? this.convertISO8601DurationToMilliseconds(raceHAL.leadEntry.lastLapTime) : null,

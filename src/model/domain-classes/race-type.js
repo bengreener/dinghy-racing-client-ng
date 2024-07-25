@@ -26,8 +26,8 @@ class RaceType {
      * @param {String} raceType
      */
     static from(type) {
-        const lowerType = type?.toUpperCase();
-        switch (lowerType) {
+        const upperType = type?.toUpperCase();
+        switch (upperType) {
             case 'FLEET':
                 return RaceType.FLEET;
             case 'PURSUIT':
