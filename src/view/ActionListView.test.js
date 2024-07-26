@@ -23,6 +23,7 @@ const formatOptions = {
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     hour: '2-digit',
     minute: '2-digit',
+    second: '2-digit',
     hour12: false
 };
 const timeFormat = new Intl.DateTimeFormat('utc', formatOptions);
@@ -51,12 +52,6 @@ it('displays a header for the action list', () => {
 });
 
 it('displays actions', () => {
-    let formatOptions = {
-        timeZone: 'UTC',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-    };
     const now = Date.now();
     const actions = [
         {flag: {name: 'A Class Flag', role: FlagRole.WARNING}, time: new Date(now), afterState: FlagState.RAISED},

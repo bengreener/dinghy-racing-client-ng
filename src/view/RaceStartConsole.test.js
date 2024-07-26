@@ -35,6 +35,7 @@ const formatOptions = {
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     hour: '2-digit',
     minute: '2-digit',
+    second: '2-digit',
     hour12: false
 };
 const timeFormat = new Intl.DateTimeFormat('utc', formatOptions);
@@ -337,8 +338,6 @@ describe('when clock ticks', () => {
     });
     it('updates countdown for actions', async () => {
         jest.setSystemTime(new Date('2021-10-14T10:25:00Z'));
-        // const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
-        // const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
         const races = [raceScorpionA, raceGraduateA];
 
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);

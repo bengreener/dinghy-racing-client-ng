@@ -19,6 +19,7 @@ import userEvent from '@testing-library/user-event';
 import RaceEntryView from './RaceEntryView';
 import { entryChrisMarshallScorpionA1234 } from '../model/__mocks__/test-data';
 import DinghyRacingModel from '../model/dinghy-racing-model';
+import { PositionConstant } from './RaceEntriesView';
 
 const entryRowLastCellLapTimeCellOffset = 4;
 
@@ -427,6 +428,20 @@ describe('when move position up button is clicked', () => {
         });
         expect(updatePositionButton.parentElement.parentElement.getAttribute('class')).toMatch(/disabled/i);
     });
+    describe('when entry does not have a recorded position', () => {
+        it('calls update position prop with PositionConstant.MOVEUPONE', async () => {
+            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const entry = {...entryChrisMarshallScorpionA1234};
+            const updatePositionSpy = jest.fn((entry, newPosition) => {});
+            const tableBody = document.createElement('tbody');
+            render(<RaceEntryView entry={entry} updatePosition={updatePositionSpy} />, {container: document.body.appendChild(tableBody)});
+            const updatePositionButton = screen.getByText(/position up/i);
+            await act(async () => {
+                await user.click(updatePositionButton);
+            });
+            expect(updatePositionSpy).toHaveBeenCalledWith(entry, PositionConstant.MOVEUPONE);
+        });
+    });
 });
 
 describe('when move position down button is clicked', () => {
@@ -453,5 +468,19 @@ describe('when move position down button is clicked', () => {
             await user.click(updatePositionButton);
         });
         expect(updatePositionButton.parentElement.parentElement.getAttribute('class')).toMatch(/disabled/i);
+    });
+    describe('when entry does not have a recorded position', () => {
+        it('calls update position prop with PositionConstant.MOVEDOWNONE', async () => {
+            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const entry = {...entryChrisMarshallScorpionA1234};
+            const updatePositionSpy = jest.fn((entry, newPosition) => {});
+            const tableBody = document.createElement('tbody');
+            render(<RaceEntryView entry={entry} updatePosition={updatePositionSpy} />, {container: document.body.appendChild(tableBody)});
+            const updatePositionButton = screen.getByText(/position down/i);
+            await act(async () => {
+                await user.click(updatePositionButton);
+            });
+            expect(updatePositionSpy).toHaveBeenCalledWith(entry, PositionConstant.MOVEDOWNONE);
+        });
     });
 });

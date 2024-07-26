@@ -110,7 +110,12 @@ function RaceEntriesView({ races }) {
                 break;
             case 'position':
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
-                    return entry.position;
+                    const weighIfScoringAbbreviation = ['DNS', 'DSQ', 'RET'];
+                    let weight = .5;
+                    if (weighIfScoringAbbreviation.includes(entry.scoringAbbreviation)) {
+                        weight = weight * 2;
+                    }
+                    return entry.position ? entry.position : Date.now() * weight; // if entry doesn't have a position return a large number to put it to the bottom
                 });
                 break;
             default:
@@ -154,8 +159,44 @@ function RaceEntriesView({ races }) {
         }
     }
 
+    function getLastEntryPosition() {
+        let lowestPosition = 0;
+        entriesMap.forEach(entry => {
+            if (entry.position > lowestPosition) {
+                lowestPosition = entry.position;
+            }
+        });
+        return lowestPosition;
+    };
+
+    /**
+     * Update the position of an entry in the race
+     * @param {Entry} entry 
+     * @param {(Integer|PositionConstant)} newPosition 
+     */
     async function updateEntryPosition(entry, newPosition) {
-        const result = await controller.updateEntryPosition(entry, newPosition);
+        let result;
+        switch (newPosition) {
+            case PositionConstant.MOVEUPONE:
+                if (entry.position != null) {
+                    result = await controller.updateEntryPosition(entry, entry.position - 1);
+                }
+                else {
+                    const lastEntryPosition = getLastEntryPosition();
+                    result = await controller.updateEntryPosition(entry, lastEntryPosition || 1);
+                }
+                break;
+            case PositionConstant.MOVEDOWNONE:
+                if (entry.position != null) {
+                    result = await controller.updateEntryPosition(entry, entry.position + 1);
+                }
+                else {
+                    result = await controller.updateEntryPosition(entry, getLastEntryPosition() + 1);
+                }
+                break;
+            default:
+                result = await controller.updateEntryPosition(entry, newPosition);
+        }
         if (!result.success) {
             setMessage(result.message);
         }
@@ -183,4 +224,13 @@ function RaceEntriesView({ races }) {
     );
 }
 
+/**
+ * Class providng enumeration of constants for use instead of numeric postion value when updating an entries position
+ */
+class PositionConstant {
+    static MOVEUPONE = 'moveUpOne';
+    static MOVEDOWNONE = 'moveDownOne';
+}
+
 export default RaceEntriesView;
+export { PositionConstant };
