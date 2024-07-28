@@ -81,6 +81,7 @@ it('displays the details of upcoming races', async () => {
     expect(cellValues).toContain('Graduate');
     expect(cellValues).toContain(timeCheck);
     expect(cellValues).toContain('Fleet');
+    expect(cellValues).toContain('10-5-Go');
 });
 
 describe('when start time is changed', () => {
