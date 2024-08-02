@@ -236,18 +236,32 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     }
 
     return (
-        <tr className={classes} onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}
+        <div className={classes} onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}
             onPointerDown={gestureStart} onPointerMove={gestureMove} onPointerUp={gestureEnd} onPointerOut={gestureEnd}
             onPointerLeave={gestureEnd} onPointerCancel={gestureCancel} >
-            <th scope='row'>{entry.dinghy.dinghyClass.name}</th>
-            <th className='sail-number' scope='row'>{entry.dinghy.sailNumber}</th>
-            <th scope='row'>{entry.helm.name}</th>
-            <th scope='row'>{entry.position}</th>
-            {lapsView}
-            <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
-            <td><button type="button" onClick={handlePositionUpClick}>Position Up</button></td>
-            <td><button type="button" onClick={handlePositionDownClick}>Position Down</button></td>
-        </tr>
+            <div className="race-entry-view-container race-entry-view-border">
+                <output>{entry.dinghy.dinghyClass.name}</output>
+            </div>
+            <div className="race-entry-view-container race-entry-view-border">
+                <output className='sail-number'>{entry.dinghy.sailNumber}</output>
+            </div>
+            <div className="race-entry-view-container race-entry-view-border">
+                <output>{entry.helm.name}</output>
+            </div>
+            <div className="race-entry-view-container race-entry-view-border">
+                <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'}>{entry.position}</output>
+            </div>
+            <div className="race-entry-view-laps">
+                {lapsView}
+            </div>
+            <div className="race-entry-view-container">
+                <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
+            </div>
+            <div className="entry-buttons">
+                <button type="button" onClick={handlePositionUpClick}>Position Up</button>
+                <button type="button" onClick={handlePositionDownClick}>Position Down</button>
+            </div>
+        </div>
     )
 }
 

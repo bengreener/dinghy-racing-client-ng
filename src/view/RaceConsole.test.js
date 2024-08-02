@@ -16,7 +16,7 @@
 
 import { customRender } from '../test-utilities/custom-renders';
 import userEvent from '@testing-library/user-event';
-import { act, screen } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import RaceConsole from './RaceConsole';
 import { httpRootURL, wsRootURL, races, entriesScorpionA, entriesGraduateA, raceScorpionA, raceGraduateA } from '../model/__mocks__/test-data';
 import DinghyRacingModel from '../model/dinghy-racing-model';
@@ -261,7 +261,8 @@ describe('when a race is unselected', () => {
             await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
         });
         
-        const graduateEntries = await screen.findAllByRole('rowheader', {'name': /Graduate/i});
+
+        const graduateEntries = await within(document.getElementsByClassName('race-entries-view')[0]).findAllByText(/Graduate/i);
         graduateEntries.forEach(entry => expect(entry).toBeInTheDocument());
         await act(async () => {
             await user.deselectOptions(selectRace, ['Graduate A']);

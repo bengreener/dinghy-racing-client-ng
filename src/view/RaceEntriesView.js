@@ -214,11 +214,7 @@ function RaceEntriesView({ races }) {
                 <button onClick={() => setSortOrder('position')}>By position</button>
             </div>
             <div className="scrollable">
-                <table id="race-entries-table" style={{touchAction: 'pinch-zoom pan-y'}}>
-                    <tbody>
-                    {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} updatePosition={updateEntryPosition} />)}
-                    </tbody>
-                </table>
+                {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} updatePosition={updateEntryPosition} />)}
             </div>
         </div>
     );

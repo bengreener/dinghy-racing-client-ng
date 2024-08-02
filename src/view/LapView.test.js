@@ -20,15 +20,13 @@ import LapView from './LapView';
 
 describe('when editable is false', () => {
     it('displays value in time format', () => {
-        const container = document.createElement('tr');
-        render(<LapView value={1015897} />, {'container': document.body.appendChild(container)});
+        render(<LapView value={1015897} />);
         screen.getByText('16:56');
     });
     it('does not call value passed to keyup', async () => {
         const keyupMock = jest.fn();
-        const user = userEvent.setup(); 
-        const container = document.createElement('tr');
-        render(<LapView value={895689} editable={false} keyup={keyupMock} />, {'container': document.body.appendChild(container)});
+        const user = userEvent.setup();
+        render(<LapView value={895689} editable={false} keyup={keyupMock} />);
         screen.getByText('14:56').focus();
         await user.keyboard('{Enter}');
         expect(keyupMock).not.toBeCalled();
@@ -37,8 +35,7 @@ describe('when editable is false', () => {
         const keyupMock = jest.fn();
         const focusoutMock = jest.fn();
         const user = userEvent.setup(); 
-        const container = document.createElement('tr');
-        render(<LapView value={312568} editable={false} keyup={keyupMock} focusout={focusoutMock} />, {'container': document.body.appendChild(container)});
+        render(<LapView value={312568} editable={false} keyup={keyupMock} focusout={focusoutMock} />);
         const cell = screen.getByText('05:13');
         cell.focus();
         cell.blur();
@@ -46,8 +43,7 @@ describe('when editable is false', () => {
     });
     describe('when cell contains a total', () => {
         it('has class total', () => {
-            const container = document.createElement('tr');
-            render(<LapView value={1015897} total={true} />, {'container': document.body.appendChild(container)});
+            render(<LapView value={1015897} total={true} />);
             expect(screen.getByText('16:56').getAttribute('class')).toMatch(/total/i);
         });
     });
@@ -55,14 +51,12 @@ describe('when editable is false', () => {
 
 describe('when editable is true', () => {
     it('displays value in time format', () => {
-        const container = document.createElement('tr');
-        render(<LapView value={1234} editable={true}/>, {'container': document.body.appendChild(container)});
+        render(<LapView value={1234} editable={true}/>);
         screen.getByRole('textbox', {'value': '00:01'});
     });
     it('accepts a new value', async () => {
         const user = userEvent.setup();
-        const container = document.createElement('tr');
-        render(<LapView value={1234} editable={true}/>, {'container': document.body.appendChild(container)});
+        render(<LapView value={1234} editable={true}/>);
         const input = screen.getByRole('textbox', {'value': '00:01'});
         await act(async () => {
             await user.clear(input);
@@ -72,9 +66,8 @@ describe('when editable is true', () => {
     }); 
     it('calls value passed to keyup', async () => {
         const keyupMock = jest.fn();
-        const user = userEvent.setup(); 
-        const container = document.createElement('tr');
-        render(<LapView value={1234} editable={true} keyup={keyupMock} />, {'container': document.body.appendChild(container)});
+        const user = userEvent.setup();
+        render(<LapView value={1234} editable={true} keyup={keyupMock} />);
         screen.getByRole('textbox').focus();
         await user.keyboard('{Enter}');
         expect(keyupMock).toBeCalled();
@@ -82,9 +75,8 @@ describe('when editable is true', () => {
     it('calls value passed to focusout', () => {
         const keyupMock = jest.fn();
         const focusoutMock = jest.fn();
-        const user = userEvent.setup(); 
-        const container = document.createElement('tr');
-        render(<LapView value={1234} editable={true} keyup={keyupMock} focusout={focusoutMock} />, {'container': document.body.appendChild(container)});
+        const user = userEvent.setup();
+        render(<LapView value={1234} editable={true} keyup={keyupMock} focusout={focusoutMock} />);
         const cell = screen.getByRole('textbox');
         cell.focus();
         cell.blur();
@@ -93,8 +85,7 @@ describe('when editable is true', () => {
     describe('when validating entry', () => {
         it('does not accept letters', async () => {
             const user = userEvent.setup();
-            const container = document.createElement('tr');
-            render(<LapView value={1234} editable={true}/>, {'container': document.body.appendChild(container)});
+            render(<LapView value={1234} editable={true}/>);
             const input = screen.getByRole('textbox', {'value': '00:01'});
             await act(async () => {
                 await user.clear(input);
@@ -104,8 +95,7 @@ describe('when editable is true', () => {
         });
         it('does not accept 999:63', async () => {
             const user = userEvent.setup();
-            const container = document.createElement('tr');
-            render(<LapView value={1234} editable={true}/>, {'container': document.body.appendChild(container)});
+            render(<LapView value={1234} editable={true}/>);
             const input = screen.getByRole('textbox', {'value': '00:01'});
             await act(async () => {
                 await user.clear(input);
@@ -115,8 +105,7 @@ describe('when editable is true', () => {
         });
         it('does not accept 999:63', async () => {
             const user = userEvent.setup();
-            const container = document.createElement('tr');
-            render(<LapView value={1234} editable={true}/>, {'container': document.body.appendChild(container)});
+            render(<LapView value={1234} editable={true}/>);
             const input = screen.getByRole('textbox', {'value': '00:01'});
             await act(async () => {
                 await user.clear(input);
@@ -127,8 +116,7 @@ describe('when editable is true', () => {
     })
     describe('when cell contains a total', () => {
         it('has class total', () => {
-            const container = document.createElement('tr');
-            render(<LapView value={1015897} total={true} />, {'container': document.body.appendChild(container)});
+            render(<LapView value={1015897} total={true} />);
             expect(screen.getByText('16:56').getAttribute('class')).toMatch(/total/i);
         });
     });

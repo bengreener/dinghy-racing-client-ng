@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { act, screen,  } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import { customRender } from '../test-utilities/custom-renders';
@@ -38,8 +38,17 @@ it('renders', async () => {
     await act(async () => {
         customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
     });
-    const raceEntries = document.getElementById('race-entries-table');
-    expect(raceEntries).toBeInTheDocument();
+    // const raceEntries = document.getElementById('race-entries-table');
+    // expect(raceEntries).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /by sail number/i})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /by class & sail number/i})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /by last 3/i})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /by class & last 3/i})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /by lap times/i})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /by position/i})).toBeInTheDocument();
+    expect(screen.getByText(/1234/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Scorpion/i)[0]).toBeInTheDocument();
+    expect(screen.getByText(/Chris marshaLL/i)).toBeInTheDocument();
 });
 
 it('displays entries for selected races', async () => {
@@ -109,9 +118,10 @@ describe('when sorting entries', () => {
         await act(async () => {
             await user.click(sortBySailNumber);
         });
-        const cells = await screen.findAllByRole('rowheader', {name: /\d+/i});
-        const orderedEntries = cells.map(cell => cell.textContent);
-        expect(orderedEntries).toEqual(['1234', '2928', '6745']);
+        const raceEntryViews = document.getElementsByClassName('race-entry-view');
+        expect(within(raceEntryViews[0]).getByText(/1234/)).toBeInTheDocument();
+        expect(within(raceEntryViews[1]).getByText(/2928/)).toBeInTheDocument();
+        expect(within(raceEntryViews[2]).getByText(/6745/)).toBeInTheDocument();
     });
     it('sorts by the dinghy class and sail number', async () => {
         const entriesScorpionA = [
@@ -136,10 +146,10 @@ describe('when sorting entries', () => {
         await act(async () => {
             await user.click(sortByClassAndSailNumber);
         });
-        
-        const cells = await screen.findAllByRole('rowheader', {name: /\d+/i});
-        const orderedEntries = cells.map(cell => cell.textContent);
-        expect(orderedEntries).toEqual(['2928', '1234', '6745']);
+        const raceEntryViews = document.getElementsByClassName('race-entry-view');
+        expect(within(raceEntryViews[0]).getByText(/2928/)).toBeInTheDocument();
+        expect(within(raceEntryViews[1]).getByText(/1234/)).toBeInTheDocument();
+        expect(within(raceEntryViews[2]).getByText(/6745/)).toBeInTheDocument();
     });
     it('sorts by the last three digits of the sail number', async () => {
         const entriesScorpionA = [
@@ -163,9 +173,10 @@ describe('when sorting entries', () => {
         await act(async () => {
             await user.click(sortByLastThreeButton);
         });
-        const cells = await screen.findAllByRole('rowheader', {name: /\d+/i});
-        const orderedEntries = cells.map(cell => cell.textContent);
-        expect(orderedEntries).toEqual(['1234', '6745', '2928']);
+        const raceEntryViews = document.getElementsByClassName('race-entry-view');
+        expect(within(raceEntryViews[0]).getByText(/1234/)).toBeInTheDocument();
+        expect(within(raceEntryViews[1]).getByText(/6745/)).toBeInTheDocument();
+        expect(within(raceEntryViews[2]).getByText(/2928/)).toBeInTheDocument();
     });
     it('sorts by the dinghy class and last three digits of the sail number', async () => {
         const entriesScorpionA = [
@@ -190,10 +201,10 @@ describe('when sorting entries', () => {
         await act(async () => {
             await user.click(sortByClassAndLastThreeButton);
         });
-        
-        const cells = await screen.findAllByRole('rowheader', {name: /\d+/i});
-        const orderedEntries = cells.map(cell => cell.textContent);
-        expect(orderedEntries).toEqual(['2928', '1234', '6745']);
+        const raceEntryViews = document.getElementsByClassName('race-entry-view');
+        expect(within(raceEntryViews[0]).getByText(/2928/)).toBeInTheDocument();
+        expect(within(raceEntryViews[1]).getByText(/1234/)).toBeInTheDocument();
+        expect(within(raceEntryViews[2]).getByText(/6745/)).toBeInTheDocument();
     });
     it('sorts by the total recorded lap times plus race start time of dinghies in ascending order', async () => {
         const entries = [
@@ -218,10 +229,10 @@ describe('when sorting entries', () => {
         await act(async () => {
             await user.click(sortByLapTimeButton);
         });
-        const cells = await screen.findAllByRole('rowheader', {name: /\d+/i});
-        const orderedEntries = cells.map(cell => cell.textContent);
-
-        expect(orderedEntries).toEqual(['1234', '6745', '2928']);
+        const raceEntryViews = document.getElementsByClassName('race-entry-view');
+        expect(within(raceEntryViews[0]).getByText(/1234/)).toBeInTheDocument();
+        expect(within(raceEntryViews[1]).getByText(/6745/)).toBeInTheDocument();
+        expect(within(raceEntryViews[2]).getByText(/2928/)).toBeInTheDocument();
     });
     it('sorts by position in ascending order', async () => {
         const entries = [
@@ -250,9 +261,15 @@ describe('when sorting entries', () => {
             await user.click(sortByPositionButton);
         });
         // screen.debug();
-        const cells = await screen.findAllByRole('rowheader', {name: /\d{4}/i});
-        const orderedEntries = cells.map(cell => cell.textContent);
-        expect(orderedEntries).toEqual(['1234', '2928', '6745', '9999', '8888']);
+        // const cells = await screen.findAllByRole('rowheader', {name: /\d{4}/i});
+        // const orderedEntries = cells.map(cell => cell.textContent);
+        // expect(orderedEntries).toEqual(['1234', '2928', '6745', '9999', '8888']);
+        const raceEntryViews = document.getElementsByClassName('race-entry-view');
+        expect(within(raceEntryViews[0]).getByText(/1234/)).toBeInTheDocument();
+        expect(within(raceEntryViews[1]).getByText(/2928/)).toBeInTheDocument();
+        expect(within(raceEntryViews[2]).getByText(/6745/)).toBeInTheDocument();
+        expect(within(raceEntryViews[3]).getByText(/9999/)).toBeInTheDocument();
+        expect(within(raceEntryViews[4]).getByText(/8888/)).toBeInTheDocument();
     });
     describe('when sorting entries that include an entry that did not start', () => {
         it('sorts by the total recorded lap times of dinghies in ascending order except for DNS entry which is placed last', async () => {
@@ -269,10 +286,13 @@ describe('when sorting entries', () => {
             await act(async () => {
                 await user.click(sortByLapTimeButton);
             });
-            const cells = await screen.findAllByRole('rowheader', {name: /\d+/i});
-            const orderedEntries = cells.map(cell => cell.textContent);
+            // const cells = await screen.findAllByRole('rowheader', {name: /\d+/i});
+            // const orderedEntries = cells.map(cell => cell.textContent);
 
-            expect(orderedEntries).toEqual(['6745', '1234']);
+            // expect(orderedEntries).toEqual(['6745', '1234']);
+            const raceEntryViews = document.getElementsByClassName('race-entry-view');
+            expect(within(raceEntryViews[0]).getByText(/6745/)).toBeInTheDocument();
+            expect(within(raceEntryViews[1]).getByText(/1234/)).toBeInTheDocument();
         });
     });
     describe('when sorting entries that include an entry that retired', () => {
@@ -292,10 +312,13 @@ describe('when sorting entries', () => {
             await act(async () => {
                 await user.click(sortByLapTimeButton);
             });
-            const cells = await screen.findAllByRole('rowheader', {name: /\d+/i});
-            const orderedEntries = cells.map(cell => cell.textContent);
+            // const cells = await screen.findAllByRole('rowheader', {name: /\d+/i});
+            // const orderedEntries = cells.map(cell => cell.textContent);
 
-            expect(orderedEntries).toEqual(['6745', '1234']);
+            // expect(orderedEntries).toEqual(['6745', '1234']);
+            const raceEntryViews = document.getElementsByClassName('race-entry-view');
+            expect(within(raceEntryViews[0]).getByText(/6745/)).toBeInTheDocument();
+            expect(within(raceEntryViews[1]).getByText(/1234/)).toBeInTheDocument();
         });
     });
     describe('when sorting entries that include an entry that has been disqualified', () => {
@@ -315,10 +338,13 @@ describe('when sorting entries', () => {
             await act(async () => {
                 await user.click(sortByLapTimeButton);
             });
-            const cells = await screen.findAllByRole('rowheader', {name:/\d+/i});
-            const orderedEntries = cells.map(cell => cell.textContent);
+            // const cells = await screen.findAllByRole('rowheader', {name:/\d+/i});
+            // const orderedEntries = cells.map(cell => cell.textContent);
 
-            expect(orderedEntries).toEqual(['6745', '1234']);
+            // expect(orderedEntries).toEqual(['6745', '1234']);
+            const raceEntryViews = document.getElementsByClassName('race-entry-view');
+            expect(within(raceEntryViews[0]).getByText(/6745/)).toBeInTheDocument();
+            expect(within(raceEntryViews[1]).getByText(/1234/)).toBeInTheDocument();
         });
     });
     describe('when sorting entries that include an entry that has finished the race', () => {
@@ -336,10 +362,13 @@ describe('when sorting entries', () => {
             await act(async () => {
                 await user.click(sortByLapTimeButton);
             });
-            const cells = await screen.findAllByRole('rowheader', {'name': /\d{4}/i});
-            const orderedEntries = cells.map(cell => cell.textContent);
+            // const cells = await screen.findAllByRole('rowheader', {'name': /\d{4}/i});
+            // const orderedEntries = cells.map(cell => cell.textContent);
 
-            expect(orderedEntries).toEqual(['1234', '6745']);
+            // expect(orderedEntries).toEqual(['1234', '6745']);
+            const raceEntryViews = document.getElementsByClassName('race-entry-view');
+            expect(within(raceEntryViews[0]).getByText(/1234/)).toBeInTheDocument();
+            expect(within(raceEntryViews[1]).getByText(/6745/)).toBeInTheDocument();
         });
     });
 });
@@ -404,11 +433,12 @@ describe('when adding a lap time', () => {
         });
                
         const entry = await screen.findByText(/1234/i);
+        
+        expect(await screen.queryByText('10:25')).not.toBeInTheDocument();
         await act(async () => {
             model.handleEntryUpdate({'body': entriesScorpionA[0].url});
         });
-        expect(await screen.findByRole('cell', {'name': '05:13'})).toBeInTheDocument();
-        expect(await screen.findByRole('cell', {'name': '10:25'})).toBeInTheDocument();
+        expect(await screen.findByText('10:25')).toBeInTheDocument();
     });
     it('displays a message if there is a problem adding the lap time', async () => {
         const entriesScorpionAPost = [{'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},{'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
@@ -497,14 +527,14 @@ describe('when removing a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
         const entry = await screen.findByText(/1234/i);
-        const cell = await screen.findByRole('cell', {'name': '05:13'});
-        expect(cell).toBeInTheDocument();
+        const lapTime = await screen.findByText('05:13');
+        expect(lapTime).toBeInTheDocument();
         await act(async ()=> {
             await user.keyboard('{Control>}');
             await user.click(entry);
             model.handleEntryUpdate({'body': entriesScorpionA[0].url});
         });
-        expect(cell).not.toBeInTheDocument();
+        expect(lapTime).not.toBeInTheDocument();
     });
     it('displays a message if there is a problem removing the lap time', async () => {
         const entriesScorpionAPre = [
@@ -573,7 +603,7 @@ describe('when removing a lap time', () => {
 
 describe('when updating a lap time', () => {
     it('updates model', async () => {
-        const entryChrisMarshallScorpionA1234Pre = {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7}], 'sumOfLapTimes': 7, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'};
+        const entryChrisMarshallScorpionA1234Pre = {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7000}], 'sumOfLapTimes': 7000, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'};
         const entriesScorpionAPre = [
             entryChrisMarshallScorpionA1234Pre, 
             {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0,'url': 'http://localhost:8081/dinghyracing/api/entries/11'}
@@ -587,16 +617,17 @@ describe('when updating a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
-        const entryRow = screen.getByText(/1234/i).parentElement;
-        const lastCell = entryRow.children[entryRow.children.length - entryRowLastCellLapTimeCellOffset];
+        const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+        const lapEntryCellOutput = within(raceEntryView).getByText('00:07');
         // render updated components
         await act(async () => {
-            await user.pointer({target: lastCell, keys: '[MouseRight]'});
+            await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
         });
         // after render perform update
+        const lapEntryCellInput = within(raceEntryView).getByRole('textbox', {value: '00:07'});
         await act(async () => {
-            await user.clear(lastCell.lastChild);
-            await user.type(lastCell.lastChild, '15:23');
+            await user.clear(lapEntryCellInput);
+            await user.type(lapEntryCellInput, '15:23');
             await user.keyboard('{Enter}');
         });
         expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234Pre, '15:23');
@@ -620,28 +651,29 @@ describe('when updating a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
-        const entryRow = screen.getByText(/1234/i).parentElement;
-        const lastCell = entryRow.children[entryRow.children.length - entryRowLastCellLapTimeCellOffset];
+        const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+        const lapEntryCellOutput = within(raceEntryView).getByText('00:14');
         // render updated components
         await act(async () => {
-            await user.pointer({target: lastCell, keys: '[MouseRight]'});
+            await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
         });
         // after render perform update
+        const lapEntryCellInput = within(raceEntryView).getByRole('textbox', {value: '00:14'});
         await act(async () => { 
-            await user.clear(lastCell.lastChild);
-            await user.type(lastCell.lastChild, '15000');
+            await user.clear(lapEntryCellInput);
+            await user.type(lapEntryCellInput, '15000');
             await user.keyboard('{Enter}');
             model.handleEntryUpdate({'body': entriesScorpionA[0].url});
         });
-        expect(await screen.findByRole('cell', {'name': '00:15'})).toBeInTheDocument();
+        expect(await within(raceEntryView).findByText('00:15')).toBeInTheDocument();
     });
     it('displays a message if there is a problem updating the lap time', async () => {
         const entriesScorpionAPre = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7}], 'sumOfLapTimes': 7, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
+            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7000}], 'sumOfLapTimes': 7000, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
             {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'}
         ];
         const entriesScorpionAPost = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 312568, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
+            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 15000}], 'sumOfLapTimes': 15000, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
             {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'}
         ];
         const user = userEvent.setup();
@@ -654,22 +686,23 @@ describe('when updating a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
-        const entryRow = screen.getByText(/1234/i).parentElement;
-        const lastCell = entryRow.children[entryRow.children.length - entryRowLastCellLapTimeCellOffset];
+        const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+        const lapEntryCellOutput = within(raceEntryView).getByText('00:07');
         await act(async () => {
-            await user.pointer({target: lastCell, keys: '[MouseRight]'});
+            await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
         });
         // after render perform update
+        const lapEntryCellInput = within(raceEntryView).getByRole('textbox', {value: '00:07'});
         await act(async () => { 
-            await user.clear(lastCell.lastChild);
-            await user.type(lastCell.lastChild, '15678');
+            await user.clear(lapEntryCellInput);
+            await user.type(lapEntryCellInput, '00:15');
             await user.keyboard('{Enter}');
         });
         expect(await screen.findByText(/oops/i)).toBeInTheDocument();
     });
     it('clears error message on success', async () => {
         const entriesScorpionAPre = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7}], 'sumOfLapTimes': 7, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
+            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7000}], 'sumOfLapTimes': 7000, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
             {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0,'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
         const entriesScorpionAPost = [
             {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 312568, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
@@ -685,26 +718,28 @@ describe('when updating a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
-        const entryRow = screen.getByText(/1234/i).parentElement;
-        const lastCell = entryRow.children[entryRow.children.length - entryRowLastCellLapTimeCellOffset];
+        let raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+        let lapEntryCellOutput = within(raceEntryView).getByText('00:07');
         await act(async () => {
-            await user.pointer({target: lastCell, keys: '[MouseRight]'});
+            await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
         });
         // after render perform update
+        let lapEntryCellInput = within(raceEntryView).getByRole('textbox', {value: '00:07'});
         await act(async () => { 
-            await user.clear(lastCell.lastChild);
-            await user.type(lastCell.lastChild, '15678');
+            await user.clear(lapEntryCellInput);
+            await user.type(lapEntryCellInput, '00:15');
             await user.keyboard('{Enter}');
         });
         expect(await screen.findByText(/oops/i)).toBeInTheDocument();
-
+        
+        raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+        lapEntryCellOutput = within(raceEntryView).getByText('00:07');
         await act(async () => {
-            await user.pointer({target: lastCell, keys: '[MouseRight]'});
+            await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
         });
         // after render perform update
+        lapEntryCellInput = within(raceEntryView).getByRole('textbox', {value: '00:15'});
         await act(async () => { 
-            await user.clear(lastCell.lastChild);
-            await user.type(lastCell.lastChild, '15678');
             await user.keyboard('{Enter}');
             model.handleEntryUpdate({'body': entriesScorpionA[0].url});
         });
