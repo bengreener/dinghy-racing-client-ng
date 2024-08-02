@@ -17,25 +17,25 @@
 /**
  * Class providng enumeration of race type options
  */
-class RaceType {
-    static FLEET = 'FLEET';
-    static PURSUIT = 'PURSUIT';
+class StartType {
+    static CSCCLUBSTART = 'CSCCLUBSTART';
+    static RRS26 = 'RRS26';
 
     /**
-     * Return a RaceType value based on the supplied string
-     * @param {String} raceType
+     * Return a StartType stage value based on the supplied string
+     * @param {String} startType
      */
     static from(type) {
         const upperType = type?.toUpperCase();
         switch (upperType) {
-            case 'FLEET':
-                return RaceType.FLEET;
-            case 'PURSUIT':
-                return RaceType.PURSUIT;
+            case 'CSCCLUBSTART':
+                return StartType.CSCCLUBSTART;
+            case 'RRS26':
+                return StartType.RRS26;
             default:
                 return null;
         }
     }
 }
 
-export default RaceType;
+export default StartType;

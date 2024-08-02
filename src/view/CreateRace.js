@@ -19,17 +19,18 @@ import { useContext, useRef } from 'react';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import ModelContext from './ModelContext';
 import RaceType from '../model/domain-classes/race-type';
+import StartType from '../model/domain-classes/start-type';
 
 function CreateRace({ onCreate }) {
     const model = useContext(ModelContext);
-    const [race, setRace] = React.useState({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000, 'plannedLaps': 5, type: RaceType.FLEET});
+    const [race, setRace] = React.useState({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000, 'plannedLaps': 5, type: RaceType.FLEET, startType: StartType.CSCCLUBSTART});
     const [result, setResult] = React.useState({'message': ''});
     const [dinghyClassMap, setDinghyClassMap] = React.useState(new Map());
     const [dinghyClassOptions, setDinghyClassOptions] = React.useState([]);
     const raceNameInputRef = useRef(null);
 
     const clear = React.useCallback(() => {
-        setRace({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000, 'plannedLaps': 5, type: RaceType.FLEET});
+        setRace({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000, 'plannedLaps': 5, type: RaceType.FLEET, startType: StartType.CSCCLUBSTART});
         showMessage('');
         raceNameInputRef.current.focus();
     }, []);
@@ -112,6 +113,11 @@ function CreateRace({ onCreate }) {
             <select id="race-type-select" name="type" multiple={false} onChange={handleChange} value={race.type} >
                 <option value="FLEET">Fleet</option>
                 <option value="PURSUIT">Pursuit</option>
+            </select>
+            <label htmlFor="race-start-type-select">Start Type</label>
+            <select id="race-start-type-select" name="startType" multiple={false} onChange={handleChange} value={race.startType} >
+                <option value="CSCCLUBSTART">10-5-GO</option>
+                <option value="RRS26">5-4-1-GO</option>
             </select>
             <output id="race-message-output" />
             <button id="race-create-button" type="button" onClick={handleCreate}>Create</button>

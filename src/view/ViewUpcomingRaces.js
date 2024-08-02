@@ -18,6 +18,7 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
 import SelectSession from './SelectSession';
 import { toTitleCase } from '../utilities/text-utilities';
+import StartType from '../model/domain-classes/start-type';
 
 /**
  * Show races that are scheduled to be held
@@ -82,6 +83,17 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
         setSessionEnd(date);
     }
 
+    function startTypeDisplayValue(startType) {
+        switch (startType) {
+            case StartType.CSCCLUBSTART:
+                return '10-5-Go';
+            case StartType.RRS26:
+                return '5-4-1-Go';
+            default:
+                return '';
+        }
+    }
+
     return (
         <div className="upcoming-races">
             <h1>Upcoming Races</h1>
@@ -91,7 +103,7 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
                 <table>
                     <thead>
                         <tr>
-                            <th>Race</th><th>Class</th><th>Start Time</th><th>Type</th>
+                            <th>Race</th><th>Class</th><th>Start Time</th><th>Type</th><th>Start Type</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -101,6 +113,7 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
                                 <td>{race.dinghyClass ? race.dinghyClass.name : ''}</td>
                                 <td>{race.plannedStartTime.toLocaleString()}</td>
                                 <td>{toTitleCase(race.type)}</td>
+                                <td>{startTypeDisplayValue(race.startType)}</td>
                             </tr>)}
                     </tbody>
                 </table>

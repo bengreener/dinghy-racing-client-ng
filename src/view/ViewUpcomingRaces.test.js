@@ -37,7 +37,8 @@ it('renders', async () => {
     expect(screen.getByText(/^race$/i)).toBeInTheDocument();
     expect(screen.getByText(/class/i)).toBeInTheDocument();
     expect(screen.getByText(/start time/i)).toBeInTheDocument();
-    expect(screen.getByText(/type/i)).toBeInTheDocument();
+    expect(screen.getByText(/^type/i)).toBeInTheDocument();
+    expect(screen.getByText(/start type/i)).toBeInTheDocument();
 });
 
 it('defaults start time for race selection to now', async () => {
@@ -81,6 +82,7 @@ it('displays the details of upcoming races', async () => {
     expect(cellValues).toContain('Graduate');
     expect(cellValues).toContain(timeCheck);
     expect(cellValues).toContain('Fleet');
+    expect(cellValues).toContain('10-5-Go');
 });
 
 describe('when start time is changed', () => {
