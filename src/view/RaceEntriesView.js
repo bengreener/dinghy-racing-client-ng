@@ -202,6 +202,10 @@ function RaceEntriesView({ races }) {
         }
     }
 
+    function onRaceEntryPositionSetByDrag(entryKey, newPosition) {
+        updateEntryPosition(entriesMap.get(entryKey), newPosition);
+    }
+
     return (
         <div className="race-entries-view" >
             <p id="race-entries-message" className={!message ? "hidden" : ""}>{message}</p>
@@ -214,7 +218,8 @@ function RaceEntriesView({ races }) {
                 <button onClick={() => setSortOrder('position')}>By position</button>
             </div>
             <div className="scrollable">
-                {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} updatePosition={updateEntryPosition} />)}
+                {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} 
+                    removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} updatePosition={updateEntryPosition} onRaceEntryDrop={onRaceEntryPositionSetByDrag} />)}
             </div>
         </div>
     );

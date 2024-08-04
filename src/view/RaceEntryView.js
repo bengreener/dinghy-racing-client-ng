@@ -29,7 +29,7 @@ import { PositionConstant } from './RaceEntriesView';
  * @param {function} props.updatePosition
  * @returns {HTMLTableRowElement}
  */
-function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, updatePosition}) {
+function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, updatePosition, onRaceEntryDrop}) {
     const [editMode, setEditMode] = useState(false);
     const [disabled, setDisabled] = useState(false);
     const prevLapCount = useRef(entry.laps.length);
@@ -192,6 +192,23 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         }
     }
 
+    function dragStartHandler(event) {
+        event.dataTransfer.setData('text/html', entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
+        event.dataTransfer.dropEffect = 'move';
+    }
+
+    function dragOverHandler(event) {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'move';
+    }
+
+    function dropHandler(event) {
+        event.preventDefault();
+        if (onRaceEntryDrop) {
+            onRaceEntryDrop(event.dataTransfer.getData('text/html'), entry.position);
+        }
+    }
+
     let cumulativeLapTimes = 0;
     for (let i = 0; i < entry.laps.length; i++) {
         const lap = entry.laps[i];
@@ -238,7 +255,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     return (
         <div className={classes} onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}
             onPointerDown={gestureStart} onPointerMove={gestureMove} onPointerUp={gestureEnd} onPointerOut={gestureEnd}
-            onPointerLeave={gestureEnd} onPointerCancel={gestureCancel} >
+            onPointerLeave={gestureEnd} onPointerCancel={gestureCancel} onDragStart={dragStartHandler} onDragOver={dragOverHandler} onDrop={dropHandler} draggable >
             <div className="race-entry-view-container race-entry-view-border">
                 <output>{entry.dinghy.dinghyClass.name}</output>
             </div>
