@@ -176,6 +176,10 @@ function RaceEntriesView({ races }) {
      */
     async function updateEntryPosition(entry, newPosition) {
         let result;
+        if (!newPosition) {
+            setMessage('No position to set');
+            return;
+        }
         switch (newPosition) {
             case PositionConstant.MOVEUPONE:
                 if (entry.position != null) {
@@ -219,7 +223,7 @@ function RaceEntriesView({ races }) {
             </div>
             <div className="scrollable">
                 {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} 
-                    removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} updatePosition={updateEntryPosition} onRaceEntryDrop={onRaceEntryPositionSetByDrag} />)}
+                    removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} />)}
             </div>
         </div>
     );

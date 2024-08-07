@@ -14,10 +14,10 @@
  * limitations under the License. 
  */
 
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RaceEntryView from './RaceEntryView';
-import { entryChrisMarshallScorpionA1234 } from '../model/__mocks__/test-data';
+import { entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745 } from '../model/__mocks__/test-data';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import { PositionConstant } from './RaceEntriesView';
 
@@ -208,7 +208,6 @@ describe('when user taps and holds on row', () => {
             await user.clear(lapEntryCellInput);
             await user.type(lapEntryCellInput, '00:15');
         });
-        // expect(lastCell.lastChild).toHaveValue(15678);
         expect(lapEntryCellInput).toHaveValue('00:15');
     });
 });
@@ -377,78 +376,54 @@ describe('when the entry is selected to add a new lap', () => {
     });
 });
 
-describe('when move position up button is clicked', () => {
-    it('calls update position prop with a new position 1 greater than the current position', async () => {
+describe('when user drags and drops an entry to a new position', () => {
+    // seems like a forced test but, couldn't get pointer events to trigger drag and drop API events :-(
+    it('calls function passed to onRaceEntryDrop', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, position: 4};
-        const updatePositionSpy = jest.fn((entry, newPosition) => {});
-        render(<RaceEntryView entry={entry} updatePosition={updatePositionSpy} />);
-        const updatePositionButton = screen.getByText(/position up/i);
-        await act(async () => {
-            await user.click(updatePositionButton);
-        });
-        expect(updatePositionSpy).toHaveBeenCalledWith(entry, 3);
-    });
-    it('updates the display to show it has been selected', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, position: 4};
-        const updatePositionSpy = jest.fn((entry, newPosition) => {});
-        render(<RaceEntryView entry={entry} updatePosition={updatePositionSpy} />);
-        const updatePositionButton = screen.getByText(/position up/i);
-        await act(async () => {
-            await user.click(updatePositionButton);
-        });
-        expect(updatePositionButton.parentElement.parentElement.getAttribute('class')).toMatch(/disabled/i);
-    });
-    describe('when entry does not have a recorded position', () => {
-        it('calls update position prop with PositionConstant.MOVEUPONE', async () => {
-            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-            const entry = {...entryChrisMarshallScorpionA1234};
-            const updatePositionSpy = jest.fn((entry, newPosition) => {});
-            render(<RaceEntryView entry={entry} updatePosition={updatePositionSpy} />);
-            const updatePositionButton = screen.getByText(/position up/i);
-            await act(async () => {
-                await user.click(updatePositionButton);
-            });
-            expect(updatePositionSpy).toHaveBeenCalledWith(entry, PositionConstant.MOVEUPONE);
-        });
-    });
-});
+        const onRaceEntryDropSpy = jest.fn();
+        const entry1 = {...entryChrisMarshallScorpionA1234};
+        const entry2 = {...entrySarahPascalScorpionA6745};
+        const addLapCallback = jest.fn();
+        render(
+            <div>
+                <RaceEntryView entry={entry1} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
+                <RaceEntryView entry={entry2} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
+            </div>
+        );
+        const rev1 = screen.getByText(/chris marshall/i).parentElement.parentElement;
+        const rev2 = screen.getByText(/sarah pascal/i).parentElement.parentElement;
 
-describe('when move position down button is clicked', () => {
-    it('calls update position prop with a new position 1 greater than the current position', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, position: 4};
-        const updatePositionSpy = jest.fn((entry, newPosition) => {});
-        render(<RaceEntryView entry={entry} updatePosition={updatePositionSpy} />);
-        const updatePositionButton = screen.getByText(/position down/i);
         await act(async () => {
-            await user.click(updatePositionButton);
+            fireEvent.drop(rev1, {dataTransfer: {getData: () => {}}});
         });
-        expect(updatePositionSpy).toHaveBeenCalledWith(entry, 5);
+        expect(onRaceEntryDropSpy).toHaveBeenCalled();
     });
-    it('updates the display to show it has been selected', async () => {
+    it('calls function passed to onRaceEntryDrop with value set by dragStart event', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, position: 4};
-        const updatePositionSpy = jest.fn((entry, newPosition) => {});
-        render(<RaceEntryView entry={entry} updatePosition={updatePositionSpy} />);
-        const updatePositionButton = screen.getByText(/position down/i);
+        const onRaceEntryDropSpy = jest.fn();
+        const entry1 = {...entryChrisMarshallScorpionA1234};
+        const entry2 = {...entrySarahPascalScorpionA6745};
+        const addLapCallback = jest.fn();
+        render(
+            <div>
+                <RaceEntryView entry={entry1} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
+                <RaceEntryView entry={entry2} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
+            </div>
+        );
+        const rev1 = screen.getByText(/chris marshall/i).parentElement.parentElement;
+        const rev2 = screen.getByText(/sarah pascal/i).parentElement.parentElement;
+
+        const dataTransferObject = {
+            data: new Map(), 
+            setData(key, value) {this.data.set(key, value)},
+            getData(key) {this.data.get(key)}
+        };
         await act(async () => {
-            await user.click(updatePositionButton);
+            fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
         });
-        expect(updatePositionButton.parentElement.parentElement.getAttribute('class')).toMatch(/disabled/i);
-    });
-    describe('when entry does not have a recorded position', () => {
-        it('calls update position prop with PositionConstant.MOVEDOWNONE', async () => {
-            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-            const entry = {...entryChrisMarshallScorpionA1234};
-            const updatePositionSpy = jest.fn((entry, newPosition) => {});
-            render(<RaceEntryView entry={entry} updatePosition={updatePositionSpy} />);
-            const updatePositionButton = screen.getByText(/position down/i);
-            await act(async () => {
-                await user.click(updatePositionButton);
-            });
-            expect(updatePositionSpy).toHaveBeenCalledWith(entry, PositionConstant.MOVEDOWNONE);
+        await act(async () => {
+            fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
         });
+        expect(onRaceEntryDropSpy).toHaveBeenCalled();
     });
 });

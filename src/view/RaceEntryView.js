@@ -26,10 +26,10 @@ import { PositionConstant } from './RaceEntriesView';
  * @param {function} props.removeLap
  * @param {function} props.updateLap
  * @param {function} props.setScoringAbbreviation
- * @param {function} props.updatePosition
+ * @param {function} props.onRaceEntryDrop
  * @returns {HTMLTableRowElement}
  */
-function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, updatePosition, onRaceEntryDrop}) {
+function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, onRaceEntryDrop}) {
     const [editMode, setEditMode] = useState(false);
     const [disabled, setDisabled] = useState(false);
     const prevLapCount = useRef(entry.laps.length);
@@ -93,34 +93,6 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     // disable context menu
     function handleContextMenu(event) {
         event.preventDefault();
-    }
-
-    function handlePositionUpClick(event) {
-        event.stopPropagation();
-        event.preventDefault();
-        if (updatePosition) {
-            setDisabled(true);
-            if (entry.position == null ) {
-                updatePosition(entry, PositionConstant.MOVEUPONE);    
-            }
-            else {
-                updatePosition(entry, entry.position - 1);
-            }
-        }
-    }
-
-    function handlePositionDownClick(event) {
-        event.stopPropagation();
-        event.preventDefault();
-        if (updatePosition) {
-            setDisabled(true);
-            if (entry.position == null ) {
-                updatePosition(entry, PositionConstant.MOVEDOWNONE);    
-            }
-            else {
-                updatePosition(entry, entry.position + 1);
-            }
-        }
     }
 
     function gestureStart(event) {
@@ -273,10 +245,6 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
             </div>
             <div className="race-entry-view-container">
                 <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
-            </div>
-            <div className="entry-buttons">
-                <button type="button" onClick={handlePositionUpClick}>Position Up</button>
-                <button type="button" onClick={handlePositionDownClick}>Position Down</button>
             </div>
         </div>
     )
