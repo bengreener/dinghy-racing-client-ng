@@ -304,14 +304,7 @@ class DinghyRacingModel {
      */
     async addLap(entry, time) {
         const lapNumber = entry.laps.length + 1;
-        const result = await this.update(entry.url + '/addLap', {'number': lapNumber, 'time': time / 1000}); 
-        if (result.success) {
-            entry.laps.push({...DinghyRacingModel.lapTemplate(), 'number': lapNumber, 'time': time}); 
-            return Promise.resolve({...result, 'domainObject': entry});
-        }
-        else {
-            return result;
-        }
+        return this.update(entry.url + '/addLap', {'number': lapNumber, 'time': time / 1000});
     }
     
     /**
@@ -321,8 +314,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result}
      */
     async removeLap(entry, lap) {
-        const result = await this.update(entry.url + '/removeLap', lap);
-        return result;
+        return this.update(entry.url + '/removeLap', lap);
     }
 
     /**
@@ -333,14 +325,7 @@ class DinghyRacingModel {
      */
     async updateLap(entry, time) {
         const lapNumber = entry.laps.length;
-        const result = await this.update(entry.url + '/updateLap', {'number': lapNumber, 'time': time / 1000}); 
-        if (result.success) {
-            entry.laps.push({...DinghyRacingModel.lapTemplate(), 'number': lapNumber, 'time': time}); 
-            return Promise.resolve({...result, 'domainObject': entry});
-        }
-        else {
-            return result;
-        }
+        return this.update(entry.url + '/updateLap', {'number': lapNumber, 'time': time / 1000}); 
     }
 
     /**
@@ -964,6 +949,55 @@ class DinghyRacingModel {
             }
             const dinghyClassCollection = collection.map(dinghyClassHAL => {return this._convertDinghyClassHALToDinghyClass(dinghyClassHAL)});
             return Promise.resolve({'success': true, 'domainObject': dinghyClassCollection});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
+     * Get entry
+     * @param {String} url Address of the remote resource
+     * @returns {Promise<Result>}
+     */
+    async getEntry(url) {
+        const result = await this.read(url);
+        if (result.success) {
+            // get race, helm, crew, and dinghy
+            const promises = [];
+            promises.push(this.getRace(result.domainObject._links.race.href)); // race
+            promises.push(this.getCompetitor(result.domainObject._links.helm.href)); // helm
+            promises.push(this.getDinghy(result.domainObject._links.dinghy.href)); // dinghy
+            promises.push(this.getCompetitor(result.domainObject._links.crew.href)); // crew
+            promises.push(this.getLaps(result.domainObject._links.laps.href)); // laps
+            const results = await Promise.all(promises);
+            // race
+            if (!results[0].success) {
+                return Promise.resolve(results[0]);
+            }
+            // helm
+            if (!results[1].success) {
+                return Promise.resolve(results[1]);
+            }
+            // dinghy
+            if (!results[2].success) {
+                // entry may not have a crew
+                if (/404/.test(results[2].message)) {
+                    results[2] = {...results[2], 'domainObject': null};
+                }
+                else {
+                    return Promise.resolve(results[2]);
+                }
+            }
+            // crew
+            if (!results[3].success) {
+                return Promise.resolve(results[3]);
+            }
+            // laps
+            if (!results[4].success) {
+                return Promise.resolve(results[4]);
+            }
+            return {success: true, domainObject: this._convertEntryHALtoEntry(result.domainObject, results[0].domainObject, results[1].domainObject, results[2].domainObject, results[3].domainObject, results[4].domainObject)};
         }
         else {
             return Promise.resolve(result);

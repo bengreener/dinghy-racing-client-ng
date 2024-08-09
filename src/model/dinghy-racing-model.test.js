@@ -54,6 +54,8 @@ global.fetch = jest.fn();
 
 beforeEach(() => {
     fetch.mockClear();
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
 });
 
 describe('when creating a new object via REST', () => {
@@ -1088,7 +1090,7 @@ describe('when signing up to a race', () => {
         const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
+        expect(result).toEqual({success: true, domainObject: entryChrisMarshallScorpionA1234});
     });
     it('if race exists and URL provided helm exists and URL provided and dinghy exist and URL provided and crew not provided then creates race entry', async () => {
         fetch.mockImplementationOnce((resource, options) => {
@@ -1116,6 +1118,7 @@ describe('when signing up to a race', () => {
         const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        // let temp = {...entryChrisMarshallScorpionA1234};
         expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
     });
     it('if race exists and name and planned start time provided and helm exists and name provided and dinghy exists and sail number and class provided and crew exists and name provided then creates race entry', async () => {
@@ -1162,6 +1165,7 @@ describe('when signing up to a race', () => {
         const promise = dinghyRacingModel.createEntry(race, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        // let temp = {...entryChrisMarshallScorpionA1234};
         expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
     });
     it('if race exists and name and planned start time provided and helm exists and name provided and dinghy exists and sail number and class provided and crew not provided then creates race entry', async () => {
@@ -1204,6 +1208,7 @@ describe('when signing up to a race', () => {
         const promise = dinghyRacingModel.createEntry(race, helm, dinghy);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        // let temp = {...entryChrisMarshallScorpionA1234};
         expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
     });
     it('race does not exist helm exists and URL provided dinghy exists and sail number and class provided crew exists and URL provided then does not create entry and provides message indicating cause of failure', async () => {
@@ -1425,6 +1430,7 @@ describe('when updating an entry for a race', () => {
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, competitorChrisMarshall, dinghy1234, competitorLouScrew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        // let temp = {...entryChrisMarshallScorpionA1234};
         expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
     });
     it('if entry exists and URL provided helm exists and URL provided and dinghy exists and URL provided and crew not provided then updates entry', async () => {
@@ -1455,6 +1461,7 @@ describe('when updating an entry for a race', () => {
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, competitorChrisMarshall, dinghy1234);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        // let temp = {...entryChrisMarshallScorpionA1234};
         expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
     });
     it('if entry exists and URL provided and helm exists and name provided and dinghy exists and sail number and class provided and crew exists and name provided then updates entry', async () => {
@@ -1499,6 +1506,7 @@ describe('when updating an entry for a race', () => {
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        // let temp = {...entryChrisMarshallScorpionA1234};
         expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
     });
     it('if entry exists url provided and helm exists and name provided and dinghy exists and sail number and class provided and crew not provided then updates entry', async () => {
@@ -1540,6 +1548,7 @@ describe('when updating an entry for a race', () => {
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, helm, dinghy);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        // let temp = {...entryChrisMarshallScorpionA1234};
         expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
     });
     it('entry exists url provided helm does not exist dinghy exists url provided crew exists and name provided does not update entry and returns message explaining reason', async () => {
@@ -1572,6 +1581,7 @@ describe('when updating an entry for a race', () => {
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        // let temp = {...entryChrisMarshallScorpionA1234};
         expect(result).toEqual({'success': false, 'message': 'Competitor not found'});
     });
     it('entry exists and helm exists and name provided dinghy does not exists crew exists and name provided does not update entry and returns message explaining reason', async () => {
@@ -1606,6 +1616,7 @@ describe('when updating an entry for a race', () => {
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        // let temp = {...entryChrisMarshallScorpionA1234};
         expect(result).toEqual({'success': false, 'message': 'Dinghy does not exist'});
     });
     it('entry exists url provided helm exists url provided, dinghy exists sail number and class provided crew does not exist does not update entry and returns message explaining reason', async () => {
@@ -1636,6 +1647,7 @@ describe('when updating an entry for a race', () => {
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        // let temp = {...entryChrisMarshallScorpionA1234};
         expect(result).toEqual({'success': false, 'message': 'Competitor not found: Lucy Liu'});
     });
     describe('when dinghy is already recorded for entry in race', () => {
@@ -1654,6 +1666,7 @@ describe('when updating an entry for a race', () => {
             const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, competitorChrisMarshall, dinghy1234, competitorLouScrew);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
+            // let temp = {...entryChrisMarshallScorpionA1234};
             expect(result).toEqual({'success': false, message: 'A race entry already exists for the selected dinghy.'});
         });
     });
@@ -1720,6 +1733,7 @@ describe('when withdrawing an entry for a race', () => {
         const promise = dinghyRacingModel.withdrawEntry(entryChrisMarshallScorpionA1234);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        // let temp = {...entryChrisMarshallScorpionA1234};
         expect(result.success).toBeTruthy();
     });
     it('returns a promise resolvig to a failure result and containing a message describibg the cause of the failure when unable to withdraw', async () => {
@@ -1735,6 +1749,7 @@ describe('when withdrawing an entry for a race', () => {
         const promise = dinghyRacingModel.delete(entryChrisMarshallScorpionA1234);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        // let temp = {...entryChrisMarshallScorpionA1234};
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
     });
 });
@@ -4230,9 +4245,10 @@ describe('when adding a lap to a race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.addLap(entryChrisMarshallScorpionA1234, 1000);
+        const promise = dinghyRacingModel.addLap({...entryChrisMarshallScorpionA1234}, 1000);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        // let temp = {...entryChrisMarshallScorpionA1234};
         expect(result.success).toBeTruthy();
     });
     it('returns a promise that resolves to a result indicating failure when lap is rejected by REST service', async () => {
@@ -4245,9 +4261,10 @@ describe('when adding a lap to a race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.addLap(entryChrisMarshallScorpionA1234, 1000);
+        const promise = dinghyRacingModel.addLap({...entryChrisMarshallScorpionA1234}, 1000);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        // let temp = {...entryChrisMarshallScorpionA1234};
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
     });
 });
@@ -4262,9 +4279,10 @@ describe('when removing a lap from a race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.removeLap(entryChrisMarshallScorpionA1234, {...DinghyRacingModel.lapTemplate(),'number': 1, 'time': 1000});
+        const promise = dinghyRacingModel.removeLap({...entryChrisMarshallScorpionA1234}, {...DinghyRacingModel.lapTemplate(),'number': 1, 'time': 1000});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        // let temp = {...entryChrisMarshallScorpionA1234};
         expect(result.success).toBeTruthy();
     });
     it('returns a promise that resolves to a result indicating failure when lap removal is rejected by REST service', async () => {
@@ -4277,9 +4295,10 @@ describe('when removing a lap from a race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.removeLap(entryChrisMarshallScorpionA1234, {...DinghyRacingModel.lapTemplate(),'number': 1, 'time': 1000});
+        const promise = dinghyRacingModel.removeLap({...entryChrisMarshallScorpionA1234}, {...DinghyRacingModel.lapTemplate(),'number': 1, 'time': 1000});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        // let temp = {...entryChrisMarshallScorpionA1234};
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
     });
 });
@@ -4294,7 +4313,7 @@ describe('when updating a lap from a race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.updateLap(entryChrisMarshallScorpionA1234, 2000);
+        const promise = dinghyRacingModel.updateLap({...entryChrisMarshallScorpionA1234}, 2000);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result.success).toBeTruthy();
@@ -4309,9 +4328,10 @@ describe('when updating a lap from a race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.updateLap(entryChrisMarshallScorpionA1234, 2000);
+        const promise = dinghyRacingModel.updateLap({...entryChrisMarshallScorpionA1234}, 2000);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        let temp = {...entryChrisMarshallScorpionA1234};
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found'});
     });
 });
@@ -5586,9 +5606,10 @@ describe('when updating an entries position in the race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.updateEntryPosition(entryChrisMarshallScorpionA1234, 2);
+        const promise = dinghyRacingModel.updateEntryPosition({...entryChrisMarshallScorpionA1234}, 2);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        let temp = {...entryChrisMarshallScorpionA1234};
         expect(result.success).toBeTruthy();
     });
     it('if race URL not provided and entry exists and URL provided then returns message explaining issue', async () => {
@@ -5596,6 +5617,7 @@ describe('when updating an entries position in the race', () => {
         const promise = dinghyRacingModel.updateEntryPosition({...entryChrisMarshallScorpionA1234, race: {...raceScorpionA, url: null}}, 2);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        let temp = {...entryChrisMarshallScorpionA1234};
         expect(result).toEqual({'success': false, message: 'The race URL is required to update an entry position.'});
     });
     it('if race exists and URL provided and entry URL not provided then returns message explaining issue', async () => {
@@ -5603,6 +5625,7 @@ describe('when updating an entries position in the race', () => {
         const promise = dinghyRacingModel.updateEntryPosition({...entryChrisMarshallScorpionA1234, url: ''}, 2);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        let temp = {...entryChrisMarshallScorpionA1234};
         expect(result).toEqual({'success': false, message: 'An entry with a URL is required to update an entry position.'});
     });
     it('if update fails returns failed indicator and message explaining cause of failure', async () => {
@@ -5615,9 +5638,55 @@ describe('when updating an entries position in the race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.updateEntryPosition(entryChrisMarshallScorpionA1234, 2);
+        const promise = dinghyRacingModel.updateEntryPosition({...entryChrisMarshallScorpionA1234}, 2);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
+        let temp = {...entryChrisMarshallScorpionA1234};
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 500 Internal Server Error'});
+    });
+});
+
+describe('when an entry is requested', () => {
+    it('returns a promise that resolves to a result indicating success and containing the entry when the entry is found', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: true,
+                status: 200, 
+                json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceScorpionA})});
+        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
+                return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
+            }
+            else if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
+                return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghy1234})});
+        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
+        const promise = dinghyRacingModel.getEntry(entryChrisMarshallScorpionA1234.url);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        let temp = {...entryChrisMarshallScorpionA1234};
+        expect(result).toEqual({'success': true, 'domainObject': entryChrisMarshallScorpionA1234});
+    });
+    it('returns a promise that resolves to a result indicating failure when entry is not found', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 404,
+                statusText: 'Not Found',
+                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.getEntry(entryChrisMarshallScorpionA1234.url);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        let temp = {...entryChrisMarshallScorpionA1234};
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
     });
 });
