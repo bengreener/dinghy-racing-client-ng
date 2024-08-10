@@ -1026,46 +1026,19 @@ class DinghyRacingModel {
             // no entries for race
             return Promise.resolve({'success': true, 'domainObject': []})
         }
-        // get race, helm, dinghies, and laps
-        const raceResult = await this.getRace(entryCollectionHAL[0]._links.race.href);
-        if (!raceResult.success) {
-            return Promise.resolve(raceResult);
-        }
-        const helmPromises = [];
-        const dinghyPromises = [];
-        const lapsPromises = [];
-        const crewPromises = [];
+        // get individual entries (this will assist later with version management but, 1st up is an attempt to fix an issue with retrieving out of date data through the entity collection)
+        const entryPromises = [];
         entryCollectionHAL.forEach(entry => {
-            helmPromises.push(this.getCompetitor(entry._links.helm.href));
-            dinghyPromises.push(this.getDinghy(entry._links.dinghy.href));
-            lapsPromises.push(this.getLaps(entry._links.laps.href));
-            crewPromises.push(this.getCompetitor(entry._links.crew.href));
+            entryPromises.push(this.getEntry(entry._links.self.href));
         });
-        const helmResults = await Promise.all(helmPromises);
-        const dinghyResults = await Promise.all(dinghyPromises);
-        const lapsResults = await Promise.all(lapsPromises);
-        const crewResults = await Promise.all(crewPromises);
+        const entryResults = await Promise.all(entryPromises);
         const entries = [];
-        for (let i = 0; i < entryCollectionHAL.length; i++) {
-            if (!helmResults[i].success) {
-                return Promise.resolve(helmResults[i]);
+        for (const entryResult of entryResults) {
+            if (!entryResult.success) {
+                return Promise.resolve(entryResult);
             }
-            if (!dinghyResults[i].success) {
-                return Promise.resolve(dinghyResults[i]);
-            }
-            if (!lapsResults[i].success) {
-                return Promise.resolve(lapsResults[i]);
-            }
-            if (!crewResults[i].success) {
-                if (/404/.test(crewResults[i].message)) {
-                    crewResults[i] = {...crewResults[i], 'domainObject': null};
-                }
-                else {
-                    return Promise.resolve(crewResults[i]);
-                }
-            }
-            entries.push(this._convertEntryHALtoEntry(entryCollectionHAL[i], raceResult.domainObject, helmResults[i].domainObject, dinghyResults[i].domainObject, crewResults[i].domainObject, lapsResults[i].domainObject));
-        };
+            entries.push(entryResult.domainObject);
+        }
         return Promise.resolve({'success': true, 'domainObject': entries});
     }
 

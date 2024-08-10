@@ -26,7 +26,8 @@ import { httpRootURL, wsRootURL, competitorsCollectionHAL,
     competitorsCollection, competitorChrisMarshall, competitorLouScrew, 
     entriesScorpionAHAL, entriesCometAHAL, entryChrisMarshallDinghy1234HAL, entriesHandicapAHAL,
     entriesScorpionA, entriesCometA, entriesHandicapA,
-    competitorSarahPascal, raceHandicapA, entryChrisMarshallScorpionA1234, competitorOwainDavies, competitorJillMyer } from './__mocks__/test-data';
+    competitorSarahPascal, raceHandicapA, entryChrisMarshallScorpionA1234, competitorJillMyer, 
+    entrySarahPascalScorpionA6745, entryJillMyerCometA826, entryChrisMarshallHandicapA1234 } from './__mocks__/test-data';
 import {
     findByRaceGraduate_AHAL_bigData, signedUpGraduateAHAL_bigData,
     competitorCarmenWhiting, competitorAjDavis, competitorIvanPlatt, competitorNellPowell, competitorGraceRees, competitorArranAshley, competitorMacySmall,
@@ -3125,37 +3126,14 @@ describe('when searching for entries by race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceScorpionA})});
-        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
-                return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
+        jest.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/10') {
+                return Promise.resolve({success: true, domainObject: entryChrisMarshallScorpionA1234});
             }
-            else if (url === 'http://localhost:8081/dinghyracing/api/entries/11/helm') {
-                return Promise.resolve({'success': true, 'domainObject': competitorSarahPascal});
-            }
-            else if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
-                return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
-            }
-            else if (url === 'http://localhost:8081/dinghyracing/api/entries/11/crew') {
-                return Promise.resolve({'success': true, 'domainObject': competitorOwainDavies});
-            }
-            else {
-                return Promise.resolve({'success': false, 'message': 'Unable to identify competitor.'});
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/11') {
+                return Promise.resolve({success: true, domainObject: entrySarahPascalScorpionA6745});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/dinghy') {
-                return Promise.resolve({'success': true, 'domainObject': dinghy1234});
-            }
-            else if (url === 'http://localhost:8081/dinghyracing/api/entries/11/dinghy') {
-                return Promise.resolve({'success': true, 'domainObject': dinghy6745});
-            }
-            else {
-                return Promise.resolve({'success': false, 'message': 'Unable to identify dinghy.'});
-            }
-        });
-        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
-        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
         const promise = dinghyRacingModel.getEntriesByRace(raceScorpionA);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -3170,28 +3148,11 @@ describe('when searching for entries by race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceCometA})});
-        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/19/helm') {
-                return Promise.resolve({'success': true, 'domainObject': competitorJillMyer});
-            }
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/19/crew') {
-                return Promise.resolve({'success': false, 'message': '404 Not Found'});
-            }
-            else {
-                return Promise.resolve({'success': false, 'message': 'Unable to identify competitor.'});
+        jest.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/19') {
+                return Promise.resolve({success: true, domainObject: entryJillMyerCometA826});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/19/dinghy') {
-                return Promise.resolve({'success': true, 'domainObject': dinghy826});
-            }
-            else {
-                return Promise.resolve({'success': false, 'message': 'Unable to identify dinghy.'});
-            }
-        });
-        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassComet})});
-        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
         const promise = dinghyRacingModel.getEntriesByRace(raceCometA);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -3206,41 +3167,15 @@ describe('when searching for entries by race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceHandicapA})});
-        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/20/helm') {
-                return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
-            };
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/20/crew') {
-                return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
-            };
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/21/helm') {
-                return Promise.resolve({'success': true, 'domainObject': competitorJillMyer});
-            };
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/21/crew') {
-                return Promise.resolve({'success': false, 'message': 'Error 404 Not Found'});
-            };
-            return Promise.resolve({'success': false, 'message': 'Unable to identify competitor.'});
-        });
-        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/20/dinghy') {
-                return Promise.resolve({'success': true, 'domainObject': dinghy1234});
-            };
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/21/dinghy') {
-                return Promise.resolve({'success': true, 'domainObject': dinghy826});
-            };
-            return Promise.resolve({'success': false, 'message': 'Unable to identify dinghy.'});
-        });
-        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass') {
-                return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion});
+        jest.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/20') {
+                return Promise.resolve({success: true, domainObject: entryChrisMarshallHandicapA1234});
             }
-            if (url === 'http://localhost:8081/dinghyracing/api/dinghies/18/dinghyClass') {
-                return Promise.resolve({'success': true, 'domainObject': dinghyClassComet});
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/21') {
+                return Promise.resolve({success: true, domainObject: {helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
+                    position: null, url: 'http://localhost:8081/dinghyracing/api/entries/21'}});
             }
-            return Promise.resolve({'success': false, 'message': 'Error 404 Not Found'});
         });
-        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
         const promise = dinghyRacingModel.getEntriesByRace(raceHandicapA);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -3281,41 +3216,22 @@ describe('when searching for entries by race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceHandicapA})});
-        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/20/helm') {
-                return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
-            };
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/20/crew') {
-                return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
-            };
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/21/helm') {
-                return Promise.resolve({'success': true, 'domainObject': competitorJillMyer});
-            };
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/21/crew') {
-                return Promise.resolve({'success': false, 'message': 'Error 404 Not Found'});
-            };
-            return Promise.resolve({'success': false, 'message': 'Unable to identify competitor.'});
-        });
-        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/20/dinghy') {
-                return Promise.resolve({'success': true, 'domainObject': dinghy1234});
-            };
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/21/dinghy') {
-                return Promise.resolve({'success': true, 'domainObject': dinghy826});
-            };
-            return Promise.resolve({'success': false, 'message': 'Unable to identify dinghy.'});
-        });
-        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass') {
-                return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion});
+        jest.spyOn(dinghyRacingModel, 'getEntry').mockImplementationOnce((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/20') {
+                return Promise.resolve({success: true, domainObject: {helm: competitorChrisMarshall, crew: competitorLouScrew, race: raceHandicapA, dinghy: dinghy1234, laps: [], sumOfLapTimes: 0, onLastLap: true, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/20'}});
             }
-            if (url === 'http://localhost:8081/dinghyracing/api/dinghies/18/dinghyClass') {
-                return Promise.resolve({'success': true, 'domainObject': dinghyClassComet});
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/21') {
+                return Promise.resolve({success: true, domainObject: {helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/21'}});
             }
-            return Promise.resolve({'success': false, 'message': 'Error 404 Not Found'});
+        }).mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/20') {
+                return Promise.resolve({success: true, domainObject: entryChrisMarshallHandicapA1234});
+            }
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/21') {
+                return Promise.resolve({success: true, domainObject: {helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
+                    position: null, url: 'http://localhost:8081/dinghyracing/api/entries/21'}});
+            }
         });
-        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
         const promise = dinghyRacingModel.getEntriesByRace(raceHandicapA);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -3356,39 +3272,13 @@ describe('when searching for entries by race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceHandicapA})});
-        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/20/helm') {
-                return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
-            };
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/20/crew') {
-                return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
-            };
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/21/helm') {
-                return Promise.resolve({'success': true, 'domainObject': competitorJillMyer});
-            };
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/21/crew') {
-                return Promise.resolve({'success': false, 'message': 'Error 404 Not Found'});
-            };
-            return Promise.resolve({'success': false, 'message': 'Unable to identify competitor.'});
-        });
-        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/20/dinghy') {
-                return Promise.resolve({'success': true, 'domainObject': dinghy1234});
-            };
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/21/dinghy') {
-                return Promise.resolve({'success': true, 'domainObject': dinghy826});
-            };
-            return Promise.resolve({'success': false, 'message': 'Unable to identify dinghy.'});
-        });
-        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass') {
-                return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion});
+        jest.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/20') {
+                return Promise.resolve({success: true, domainObject: {helm: competitorChrisMarshall, crew: competitorLouScrew, race: raceHandicapA, dinghy: dinghy1234, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: true, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/20'}});
             }
-            if (url === 'http://localhost:8081/dinghyracing/api/dinghies/18/dinghyClass') {
-                return Promise.resolve({'success': true, 'domainObject': dinghyClassComet});
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/21') {
+                return Promise.resolve({success: true, domainObject: {helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, onLastLap: true, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/21'}});
             }
-            return Promise.resolve({'success': false, 'message': 'Error 404 Not Found'});
         });
         jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
         const promise = dinghyRacingModel.getEntriesByRace(raceHandicapA);
@@ -3418,10 +3308,9 @@ describe('when searching for entries by race', () => {
             } 
         ] }, _links : { self : { href : 'http://localhost:8081/dinghyracing/api/races/8/signedUp' } }};
 
-        const entriesHandicapA_DNS = [
-            {helm: competitorChrisMarshall, crew: competitorLouScrew, race: raceHandicapA, dinghy: dinghy1234, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: 'DNS', position: null, url: 'http://localhost:8081/dinghyracing/api/entries/20'}, 
-            {helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, onLastLap: true, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/21'}
-        ];
+        const entryChrisMarshall_DNS = {helm: competitorChrisMarshall, crew: competitorLouScrew, race: raceHandicapA, dinghy: dinghy1234, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: 'DNS', position: null, url: 'http://localhost:8081/dinghyracing/api/entries/20'};
+        const entryJillMyer_DNS = {helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, onLastLap: true, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/21'};
+        const entriesHandicapA_DNS = [entryChrisMarshall_DNS, entryJillMyer_DNS];
 
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
@@ -3431,41 +3320,14 @@ describe('when searching for entries by race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceHandicapA})});
-        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/20/helm') {
-                return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
-            };
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/20/crew') {
-                return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
-            };
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/21/helm') {
-                return Promise.resolve({'success': true, 'domainObject': competitorJillMyer});
-            };
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/21/crew') {
-                return Promise.resolve({'success': false, 'message': 'Error 404 Not Found'});
-            };
-            return Promise.resolve({'success': false, 'message': 'Unable to identify competitor.'});
-        });
-        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/20/dinghy') {
-                return Promise.resolve({'success': true, 'domainObject': dinghy1234});
-            };
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/21/dinghy') {
-                return Promise.resolve({'success': true, 'domainObject': dinghy826});
-            };
-            return Promise.resolve({'success': false, 'message': 'Unable to identify dinghy.'});
-        });
-        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass') {
-                return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion});
+        jest.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/20') {
+                return Promise.resolve({success: true, domainObject: entryChrisMarshall_DNS});
             }
-            if (url === 'http://localhost:8081/dinghyracing/api/dinghies/18/dinghyClass') {
-                return Promise.resolve({'success': true, 'domainObject': dinghyClassComet});
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/21') {
+                return Promise.resolve({success: true, domainObject: entryJillMyer_DNS});
             }
-            return Promise.resolve({'success': false, 'message': 'Error 404 Not Found'});
         });
-        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
         const promise = dinghyRacingModel.getEntriesByRace(raceHandicapA);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -3494,7 +3356,7 @@ describe('when searching for entries by race', () => {
         expect(result).toEqual({'success': false, 'message': 'Cannot retrieve race entries without URL for race.'});
     });
     describe('when there are more than 20 entries (default Spring page size) for a race', () => {
-        it(' returns all the entries', async () => {
+        it('returns all the entries', async () => {
             fetch.mockImplementationOnce((resource) => {
                 if (resource === 'http://localhost:8081/dinghyracing/api/entries/search/findByRace?race=http://localhost:8081/dinghyracing/api/races/7') {
                     return Promise.resolve({
@@ -3520,289 +3382,98 @@ describe('when searching for entries by race', () => {
                 }
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceGraduateA})});
-            jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
-                if (url === 'http://localhost:8081/dinghyracing/api/entries/1430/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorCarmenWhiting});
+            jest.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1430') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorCarmenWhiting, crew: competitorNoelHills, race: raceGraduateA, dinghy: dinghy1, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1430'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1431/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorAjDavis});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1431') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorAjDavis, crew: competitorDanielLittle, race: raceGraduateA, dinghy: dinghy290, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1431'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1432/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorIvanPlatt});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1432') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorIvanPlatt, crew: competitorAizaAustin, race: raceGraduateA, dinghy: dinghy2009, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1432'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1433/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorNellPowell});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1433') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorNellPowell, crew: competitorWilliamMorrison, race: raceGraduateA, dinghy: dinghy2097, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1433'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1434/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorGraceRees});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1434') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorGraceRees, crew: competitorAugustKhan, race: raceGraduateA, dinghy: dinghy2373, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1434'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1435/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorArranAshley});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1435') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorArranAshley, crew: competitorYuvrajSheppard, race: raceGraduateA, dinghy: dinghy2471, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1435'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1436/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorMacySmall});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1436') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorMacySmall, crew: competitorMaximFlynn, race: raceGraduateA, dinghy: dinghy2482, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1436'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1437/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorDestinyBourne});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1437') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorDestinyBourne, crew: competitorCezarWhelan, race: raceGraduateA, dinghy: dinghy2725, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1437'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1438/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorDominicBarnett});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1438') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorDominicBarnett, crew: competitorBaileyPreston, race: raceGraduateA, dinghy: dinghy2849, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1438'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1439/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorAlaraTaylor});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1439') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorAlaraTaylor, crew: competitorNadiaBarrow, race: raceGraduateA, dinghy: dinghy2862, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1439'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1440/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorKieraDaniels});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1440') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorKieraDaniels, crew: competitorZimalGrainger, race: raceGraduateA, dinghy: dinghy2889, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1440'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1441/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorAmariBarber});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1441') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorAmariBarber, crew: competitorRuqayyahWhittle, race: raceGraduateA, dinghy: dinghy2910, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1441'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1442/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorHazelWheeler});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1442') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorHazelWheeler, crew: competitorJaysonGraves, race: raceGraduateA, dinghy: dinghy2912, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1442'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1443/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorLucasMillward});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1443') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorLucasMillward, crew: competitorBellaBourne, race: raceGraduateA, dinghy: dinghy2928, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1443'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1444/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorLouiseBarron});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1444') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorLouiseBarron, crew: competitorCobieBaldwin, race: raceGraduateA, dinghy: dinghy2931, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1444'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1445/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorAlastairKhatun});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1445') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorAlastairKhatun, crew: competitorIrisSandhu, race: raceGraduateA, dinghy: dinghy2938, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1445'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1446/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorSamsonMcGowan});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1446') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorSamsonMcGowan, crew: competitorEsmeHyde, race: raceGraduateA, dinghy: dinghy2969, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1446'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1447/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorCalebParkinson});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1447') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorCalebParkinson, crew: competitorDakotaMoss, race: raceGraduateA, dinghy: dinghy2970, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1447'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1448/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorInayaRegan});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1448') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorInayaRegan, crew: competitorLeoEaton, race: raceGraduateA, dinghy: dinghy2971, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1448'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1449/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorLeiaHaynes});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1449') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorLeiaHaynes, crew: competitorDarcyEmery, race: raceGraduateA, dinghy: dinghy2973, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1449'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1450/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorNatanNewman});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1450') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorNatanNewman, crew: competitorDiegoHoughton, race: raceGraduateA, dinghy: dinghy2985, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1450'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1451/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorJamesonSharpe});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1451') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorJamesonSharpe, crew: competitorShelbyMiller, race: raceGraduateA, dinghy: dinghy2987, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1451'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1452/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorElifPugh});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1452') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorElifPugh, crew: competitorMaceyVaughan, race: raceGraduateA, dinghy: dinghy3006, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1452'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1453/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorWilfredMead});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1453') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorWilfredMead, crew: competitorLaineyAbbott, race: raceGraduateA, dinghy: dinghy3009, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1453'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1454/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorFrankySheppard});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1454') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorFrankySheppard, crew: competitorPaddyLowe, race: raceGraduateA, dinghy: dinghy3014, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1454'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1455/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorLeniTyler});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1455') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorLeniTyler, crew: competitorBaaniManning, race: raceGraduateA, dinghy: dinghy3015, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1455'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1456/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorMahnoorHope});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1456') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorMahnoorHope, crew: competitorSarahPritchard, race: raceGraduateA, dinghy: dinghy3020, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1456'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1457/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorAnthonyDillon});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1457') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorAnthonyDillon, crew: competitorLucienHoare, race: raceGraduateA, dinghy: dinghy3021, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1457'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1458/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorZackaryLindsay});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1458') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorZackaryLindsay, crew: competitorSerenDuffy, race: raceGraduateA, dinghy: dinghy3022, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1458'}});
                 }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1459/helm') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorKhalilRushton});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1430/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorNoelHills});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1431/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorDanielLittle});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1432/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorAizaAustin});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1433/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorWilliamMorrison});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1434/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorAugustKhan});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1435/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorYuvrajSheppard});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1436/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorMaximFlynn});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1437/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorCezarWhelan});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1438/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorBaileyPreston});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1439/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorNadiaBarrow});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1440/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorZimalGrainger});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1441/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorRuqayyahWhittle});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1442/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorJaysonGraves});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1443/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorBellaBourne});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1444/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorCobieBaldwin});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1445/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorIrisSandhu});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1446/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorEsmeHyde});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1447/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorDakotaMoss});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1448/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorLeoEaton});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1449/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorDarcyEmery});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1450/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorDiegoHoughton});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1451/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorShelbyMiller});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1452/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorMaceyVaughan});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1453/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorLaineyAbbott});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1454/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorPaddyLowe});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1455/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorBaaniManning});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1456/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorSarahPritchard});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1457/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorLucienHoare});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1458/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorSerenDuffy});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1459/crew') {
-                    return Promise.resolve({'success': true, 'domainObject': competitorBiancaSwan});
-                }
-                else {
-                    return Promise.resolve({'success': false, 'message': 'Unable to identify competitor.'});
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/1459') {
+                    return Promise.resolve({success: true, domainObject: {helm: competitorKhalilRushton, crew: competitorBiancaSwan, race: raceGraduateA, dinghy: dinghy3088, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1459'}});
                 }
             });
-            jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation((url) => {
-                if (url === 'http://localhost:8081/dinghyracing/api/entries/1430/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy1});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1431/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy290});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1432/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2009});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1433/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2097});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1434/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2373});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1435/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2471});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1436/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2482});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1437/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2725});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1438/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2849});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1439/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2862});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1440/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2889});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1441/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2910});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1442/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2912});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1443/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2928});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1444/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2931});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1445/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2938});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1446/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2969});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1447/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2970});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1448/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2971});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1449/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2973});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1450/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2985});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1451/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy2987});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1452/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy3006});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1453/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy3009});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1454/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy3014});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1455/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy3015});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1456/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy3020});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1457/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy3021});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1458/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy3022});
-                }
-                else if (url === 'http://localhost:8081/dinghyracing/api/entries/1459/dinghy') {
-                    return Promise.resolve({'success': true, 'domainObject': dinghy3088});
-                }
-                else {
-                    return Promise.resolve({'success': false, 'message': 'Unable to identify dinghy.'});
-                }
-            });
-            jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassGraduate})});
-            jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
             const promise = dinghyRacingModel.getEntriesByRace(raceGraduateA);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
