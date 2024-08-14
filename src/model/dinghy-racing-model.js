@@ -981,17 +981,17 @@ class DinghyRacingModel {
             }
             // dinghy
             if (!results[2].success) {
-                // entry may not have a crew
-                if (/404/.test(results[2].message)) {
-                    results[2] = {...results[2], 'domainObject': null};
-                }
-                else {
-                    return Promise.resolve(results[2]);
-                }
+                return Promise.resolve(results[3]);
             }
             // crew
             if (!results[3].success) {
-                return Promise.resolve(results[3]);
+                // entry may not have a crew
+                if (/404/.test(results[3].message)) {
+                    results[3] = {...results[3], 'domainObject': null};
+                }
+                else {
+                    return Promise.resolve(results[3]);
+                }
             }
             // laps
             if (!results[4].success) {

@@ -5318,31 +5318,59 @@ describe('when updating an entries position in the race', () => {
 });
 
 describe('when an entry is requested', () => {
-    it('returns a promise that resolves to a result indicating success and containing the entry when the entry is found', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: true,
-                status: 200, 
-                json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+    describe('when dinghy has a crew', () => {
+        it('returns a promise that resolves to a result indicating success and containing the entry when the entry is found', async () => {
+            fetch.mockImplementationOnce(() => {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                });
             });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceScorpionA})});
+            jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
+                }
+            });
+            jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghy1234})});
+            jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
+            const promise = dinghyRacingModel.getEntry(entryChrisMarshallScorpionA1234.url);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, 'domainObject': entryChrisMarshallScorpionA1234});
         });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceScorpionA})});
-        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
-                return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
-            }
-            else if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
-                return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
-            }
+    });
+    describe('when dinghy does not have a crew', () => {
+        it('returns a promise that resolves to a result indicating success and containing the entry when the entry is found', async () => {
+            fetch.mockImplementationOnce(() => {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                });
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceScorpionA})});
+            jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
+                    return Promise.resolve({'success': false, message: 'Unable to load race entries HTTP Error: 404 Message: JSON.parse: unexpected end of data at line 1 column 1 of the JSON data'});
+                }
+            });
+            jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghy1234})});
+            jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
+            const promise = dinghyRacingModel.getEntry(entryChrisMarshallScorpionA1234.url);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({success: true, domainObject: {...entryChrisMarshallScorpionA1234, crew: null}});
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghy1234})});
-        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
-        const promise = dinghyRacingModel.getEntry(entryChrisMarshallScorpionA1234.url);
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        let temp = {...entryChrisMarshallScorpionA1234};
-        expect(result).toEqual({'success': true, 'domainObject': entryChrisMarshallScorpionA1234});
     });
     it('returns a promise that resolves to a result indicating failure when entry is not found', async () => {
         fetch.mockImplementationOnce(() => {
@@ -5357,7 +5385,6 @@ describe('when an entry is requested', () => {
         const promise = dinghyRacingModel.getEntry(entryChrisMarshallScorpionA1234.url);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        let temp = {...entryChrisMarshallScorpionA1234};
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
     });
 });
