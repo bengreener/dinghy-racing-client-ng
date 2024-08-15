@@ -15,6 +15,8 @@
  */
 
 class Clock {
+    static _synchOffset = 0;
+
     _startTime
     _performanceTimerStartTime; // when the race is due to start based on the value of performance.now() when clock was initialised
     _dateNowPerformanceNowDiff; // difference between Date.now() and performance.now() on clock initialisation
@@ -49,6 +51,10 @@ class Clock {
         }
         const timeFormat = new Intl.DateTimeFormat('en-GB', formatOptions);
         return (duration < 0 ? '-' : '') + timeFormat.format(d);
+    }
+
+    static synchToTime(time) {
+        this._synchOffset = time.valueOf() - Date.now();
     }
 
     /**
@@ -131,7 +137,7 @@ class Clock {
             this._dateNowPerformanceNowDiff = dNow - pNow;
             this._performanceTimerStartTime =  this._startTime - this._dateNowPerformanceNowDiff;
         }
-        return pNow - this._performanceTimerStartTime;
+        return pNow - this._performanceTimerStartTime + Clock._synchOffset;
     }
     
     /**

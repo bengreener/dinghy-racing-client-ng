@@ -21,7 +21,7 @@ describe('when provided with a start time', () => {
         const clock = new Clock(new Date(Date.now() + 10000));
         expect(Math.round(clock.getElapsedTime())).toBe(-10000);
     });
-    it('returns the amount of time elapsed sins the start time when start time is in the past', () => {
+    it('returns the amount of time elapsed since the start time when start time is in the past', () => {
         const clock = new Clock(new Date(Date.now() - 999));
         expect(Math.round(clock.getElapsedTime())).toBe(999);
     });
@@ -34,7 +34,7 @@ describe('when started without providing a start time', () => {
         // sleep thread and then check time is as expected
         setTimeout(() => {
             const elapsed = clock.getElapsedTime();
-        expect(Math.round(elapsed)).toBe(1000);    
+        expect(Math.round(elapsed)).toBe(1000);
         }, 1000);
     });    
 });
@@ -101,3 +101,25 @@ describe('when formatting a duration', () => {
         expect(Clock.formatDuration(-1379000)).toBe('-22:59');
     });
 });
+
+describe('when need to synch with an external clock accepts a time to synch clocks to and any associated clocks synch to that time when calculating elapsed time', () => {
+    it('returns the time to elapse to reach start time when start time is ahead of now', () => {
+        Clock.synchToTime(new Date(Date.now() - 3000)); // set time to synch all clocks to
+        const clock = new Clock(new Date(Date.now() + 10000)); // create a clock
+        expect(Math.round(clock.getElapsedTime())).toBe(-10000 - 3000);
+    });
+    it('returns the amount of time elapsed since the start time when start time is in the past', () => {
+        Clock.synchToTime(new Date(Date.now() - 3000)); // set time to synch all clocks to
+        const clock = new Clock(new Date(Date.now() - 999));
+        expect(Math.round(clock.getElapsedTime())).toBe(999 - 3000);
+    });
+    describe('when more than one clock', () => {
+        it('all clock return adjusted time', () => {
+            Clock.synchToTime(new Date(Date.now() - 3000)); // set time to synch all clocks to
+            const clock1 = new Clock(new Date(Date.now() + 10000)); // create a clock
+            const clock2 = new Clock(new Date(Date.now() + 6000)); // create a clock
+            expect(Math.round(clock1.getElapsedTime())).toBe(-10000 - 3000);
+            expect(Math.round(clock2.getElapsedTime())).toBe(-6000 - 3000);
+        });
+    });
+})
