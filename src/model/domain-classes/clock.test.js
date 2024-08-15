@@ -16,6 +16,14 @@
 
 import Clock from './clock';
 
+it('returns the correct time', () => {
+    jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
+    const clock = new Clock(new Date(Date.now() + 10000));
+    const time = clock.getTime().valueOf();
+    const pMod = Date.now() - Math.floor(performance.now());
+    expect(time).toEqual(Math.floor(performance.now() + pMod));
+});
+
 describe('when provided with a start time', () => {
     it('returns the time to elapse to reach start time when start time is ahead of now', () => {
         const clock = new Clock(new Date(Date.now() + 10000));
@@ -103,6 +111,14 @@ describe('when formatting a duration', () => {
 });
 
 describe('when need to synch with an external clock accepts a time to synch clocks to and any associated clocks synch to that time when calculating elapsed time', () => {
+    it('returns the correct time', () => {
+        jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
+        Clock.synchToTime(new Date(Date.now() - 3000)); // set time to synch all clocks to
+        const clock = new Clock(new Date(Date.now() + 10000));
+        const time = clock.getTime().valueOf();
+        const pMod = Date.now() - Math.floor(performance.now());
+        expect(time).toEqual(Math.floor(performance.now() + pMod) - 3000);
+    });
     it('returns the time to elapse to reach start time when start time is ahead of now', () => {
         Clock.synchToTime(new Date(Date.now() - 3000)); // set time to synch all clocks to
         const clock = new Clock(new Date(Date.now() + 10000)); // create a clock
