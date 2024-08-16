@@ -112,7 +112,7 @@ class Clock {
     
     /**
      * Return a time based on the start time of the clock and the elapsed time calculated by the performance timer
-     * This may differ from the time that would be rturned by new Date() or Date.now()
+     * This may differ from the time that would be returned by new Date() or Date.now()
      * @returns {Date}
      */
     getTime() {
