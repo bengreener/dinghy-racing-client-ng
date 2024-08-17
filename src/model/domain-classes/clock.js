@@ -54,7 +54,7 @@ class Clock {
     }
 
     static synchToTime(time) {
-        this._synchOffset = time.valueOf() - Date.now();
+        Clock._synchOffset = time.valueOf() - Date.now();
     }
 
     /**
