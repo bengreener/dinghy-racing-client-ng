@@ -33,7 +33,6 @@ function RaceStartConsole () {
     const [flagsWithNextAction, setFlagsWithNextAction] = useState([]);
     const [actions, setActions] = useState([]);
     const [message, setMessage] = useState(''); // feedback to user
-    // const [sessionStart, setSessionStart] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000));
     const [sessionStart, setSessionStart] = useState(() => {
         const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
         sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time

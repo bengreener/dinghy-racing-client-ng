@@ -57,6 +57,10 @@ class Clock {
         Clock._synchOffset = time.valueOf() - Date.now();
     }
 
+    static now() {
+        return Date.now() + Clock._synchOffset;
+    }
+
     /**
      * Create a new instance of Clock
      * @param {Date} startTime The start time for the clock. Defaults to the time of instantiation.

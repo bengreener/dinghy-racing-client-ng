@@ -110,6 +110,11 @@ describe('when formatting a duration', () => {
     });
 });
 
+describe('when not synched against an external clocl', () => {
+    it('returns the same value for Clock.now() as Date.now()', () => {
+        expect(Clock.now()).toEqual(Date.now());
+    })
+})
 describe('when need to synch with an external clock accepts a time to synch clocks to and any associated clocks synch to that time when calculating elapsed time', () => {
     it('returns the correct time', () => {
         jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
