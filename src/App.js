@@ -27,10 +27,14 @@ import Authorisation from './controller/authorisation';
 import DownloadRacesForm from './view/DownloadRacesForm';
 import RaceStartConsole from './view/RaceStartConsole';
 import CompetitorsConsole from './view/CompetitorsConsole';
+import ModalDialog from './view/ModalDialog';
+import SetTimeForm from './view/SetTimeForm';
+import Clock from './model/domain-classes/clock';
 
 function App({model, controller}) {
   const [displayPort, setDisplayPort] = React.useState();
   const [roles, setRoles] = React.useState([]);
+  const [showSetTimeForm, setShowSetTimeForm] = React.useState(false);
   
   useEffect(() => {
     const authorisation = new Authorisation();
@@ -73,6 +77,14 @@ function App({model, controller}) {
     setDisplayPort(<DownloadRacesForm key={Date.now()}/>);
   }
 
+  function handleSynchExternalClockClick() {
+    setShowSetTimeForm(true);
+  }
+
+  function closeSetTimeFormDialog() {
+    setShowSetTimeForm(false);
+  }
+
   return (
     <ModelContext.Provider value={model}>
     <ControllerContext.Provider value={controller}>
@@ -104,7 +116,11 @@ function App({model, controller}) {
             <button key={6} type='button' className='list-group-item list-group-item-action' onClick={showDownloadRaces}>Download Races</button>
             : null
           }
-          <button key={7} type='button' className='list-group-item list-group-item-action' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
+          {roles.includes('ROLE_RACE_OFFICER') ? 
+            <button key={7} type='button' className='list-group-item list-group-item-action' onClick={handleSynchExternalClockClick}>Synch External Clock</button>
+            : null
+          }
+          <button key={8} type='button' className='list-group-item list-group-item-action' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
         </div>
         <div className="display-port">
           <ErrorBoundary key={Date.now()}>
@@ -112,6 +128,9 @@ function App({model, controller}) {
           </ErrorBoundary>
         </div>
       </div>
+      <ModalDialog show={showSetTimeForm} onClose={() => setShowSetTimeForm(false)} testid={'synch-external-time-dialog'} >
+        <SetTimeForm setTime={Clock.synchToTime} closeParent={closeSetTimeFormDialog} />
+      </ModalDialog>
     </ErrorBoundary>
     </ControllerContext.Provider>
     </ModelContext.Provider>
