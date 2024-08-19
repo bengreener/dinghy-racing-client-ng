@@ -22,6 +22,7 @@ import ActionListView from './ActionListView';
 import CollapsableContainer from './CollapsableContainer';
 import FlagControl from './FlagControl';
 import RaceType from '../model/domain-classes/race-type';
+import Clock from '../model/domain-classes/clock';
 
 /**
  * Provide Race Officer with information needed to successfully start races in a session
@@ -143,7 +144,7 @@ function RaceStartConsole () {
             </div>
             <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
             <CollapsableContainer heading={'Flags'}>
-                {flagsWithNextAction.map(flag => { return <FlagControl key={flag.flag.name} flag={flag.flag} timeToChange={flag.action ? flag.action.time.valueOf() - Date.now() : 0} /> })}
+                {flagsWithNextAction.map(flag => { return <FlagControl key={flag.flag.name} flag={flag.flag} timeToChange={flag.action ? flag.action.time.valueOf() - Clock.now() : 0} /> })} {/* use Clock.now to get adjusted time when synched to an external clock */}
             </CollapsableContainer>
             <CollapsableContainer heading={'Races'}>
                 {races.map(race => {
