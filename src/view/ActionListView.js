@@ -27,10 +27,10 @@ import { sortArray } from '../utilities/array-utilities';
  */
 function ActionListView({ actions }) {
     const [clock] = useState(new Clock(Date.now()));
-    const [time, setTime] = useState(new Date());
+    const [time, setTime] = useState(Clock.now());
 
     function handleTick() {
-        setTime(new Date());
+        setTime(Clock.now());
     };
 
     useEffect(() => {
