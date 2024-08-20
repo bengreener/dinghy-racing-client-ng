@@ -16,6 +16,22 @@
 
 class Clock {
     static _synchOffset = 0;
+    static _broadcastChannel = new BroadcastChannel('DinghyRacingClock');
+    static _synchEvent = false;
+
+    // fancy static initialisation to avoid need for Bable configuration; https://babeljs.io/docs/babel-plugin-transform-class-static-block
+    static #_ = (() => {
+        this._broadcastChannel.onmessage = ({ data }) => {
+            switch (data.message) {
+                case 'synchToTime':
+                    Clock.synchEvent = true;
+                    Clock.synchToTime(data.body);
+                    break;
+                default:
+                    break;
+            }
+        };
+    })();
 
     _startTime
     _performanceTimerStartTime; // when the race is due to start based on the value of performance.now() when clock was initialised
@@ -55,6 +71,12 @@ class Clock {
 
     static synchToTime(time) {
         Clock._synchOffset = time.valueOf() - Date.now();
+        if (!Clock.synchEvent) {
+            Clock._broadcastChannel.postMessage({message: 'synchToTime', body: time});
+        }
+        else {
+            Clock._synchEvent = false;
+        }
     }
 
     static now() {

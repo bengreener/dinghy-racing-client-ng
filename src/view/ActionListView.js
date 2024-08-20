@@ -27,7 +27,7 @@ import { sortArray } from '../utilities/array-utilities';
  */
 function ActionListView({ actions }) {
     const [clock] = useState(new Clock(Date.now()));
-    const [time, setTime] = useState(Clock.now());
+    const [time, setTime] = useState(Clock.now()); // use Clock.now to get adjusted time when synched to an external clock
 
     function handleTick() {
         setTime(Clock.now());

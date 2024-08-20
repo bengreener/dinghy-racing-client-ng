@@ -114,7 +114,8 @@ describe('when not synched against an external clocl', () => {
     it('returns the same value for Clock.now() as Date.now()', () => {
         expect(Clock.now()).toEqual(Date.now());
     })
-})
+});
+
 describe('when need to synch with an external clock accepts a time to synch clocks to and any associated clocks synch to that time when calculating elapsed time', () => {
     it('returns the correct time', () => {
         jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
@@ -142,5 +143,18 @@ describe('when need to synch with an external clock accepts a time to synch cloc
             expect(Math.round(clock1.getElapsedTime())).toBe(-10000 - 3000);
             expect(Math.round(clock2.getElapsedTime())).toBe(-6000 - 3000);
         });
+    });
+    it('sends message to a broadcast channel to advise either Clocks to synch to external time', () => {
+        const postMessageSpy = jest.spyOn(BroadcastChannel.prototype, 'postMessage');
+        const testTime = new Date();
+        Clock.synchToTime(testTime);
+        expect(postMessageSpy).toBeCalledWith({message: 'synchToTime', body: testTime});
+    });
+    // not sure how to make this work. May need to bring in broadcast-channel package from NPM and use to pollyfill jest. Would then need to create a seperate context to send messages between? :-/
+    xit('picks up a message from a broadcast channel to receive notification to synch against an external time', () => {
+        // const onmessageSpy = jest.spyOn(BroadcastChannel.prototype, 'onmessage');
+        const testTime = new Date(Date.now() + 1000);
+        Clock.synchToTime(testTime);
+        expect(onmessageSpy).toBeCalledWith({message: 'synchToTime', body: testTime});
     });
 })
