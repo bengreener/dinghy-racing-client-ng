@@ -10,18 +10,11 @@ class BroadcastChannel {
 
     constructor(name) {
         this.name = name;
-        // this.onmessage = this.onmessage.bind(this);
     }
 
-    // postMessage = jest.fn();
     postMessage(message) { 
         this.onmessage({data: {message: message}});
     }
-
-    // onmessage = jest.fn();
-    // onmessage(event) {
-    //     return null;
-    // }
 }
 
 if(!global.BroadcastChannel) {
