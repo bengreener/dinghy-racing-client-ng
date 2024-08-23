@@ -71,10 +71,6 @@ table {
     border-collapse: collapse;
 	margin: 5px;
 }
-tr.disabled > th, 
-tr.disabled > td {
-	 color: lightgray; 
-}
 th.sail-number {
 	text-align: right;
 }
@@ -116,14 +112,46 @@ fieldset {
 	display: flex;
 	flex-direction: column;
 }
+.disabled {
+	color: lightgray;
+}
 .display-port {
 	grid-area: main;
 	overflow: hidden;
+}
+.entry-buttons {
+	display: grid;
+	grid-auto-flow: column;
+	grid-auto-columns: 1fr;
+}
+.race-entry-view-border {
+	border: solid;
+	border-width: thin;
+}
+.race-entry-view-container {
+	display: flex;
+	align-items: center;
 }
 .race-entries-view {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+}
+.race-entry-view {
+	display: grid;
+	grid-template-columns: 6% 6% 10% 3% 50% 5% 20%;
+	vertical-align: middle;
+	border: solid;
+	border-width: thin;
+}
+.race-entry-view-laps {
+	display: grid;
+	grid-auto-flow: column;
+	grid-auto-columns: 10%;
+	justify-content: left;
+}
+.race-entry-view-scoring-abbreviation {
+	height: fit-content;
 }
 .race-start-console {
 	height: 100%;

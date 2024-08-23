@@ -15,6 +15,24 @@
  */
 
 class Clock {
+    static _synchOffset = 0;
+    static _broadcastChannel = new BroadcastChannel('DinghyRacingClock');
+    static _synchEvent = false;
+
+    // fancy static initialisation to avoid need for Bable configuration; https://babeljs.io/docs/babel-plugin-transform-class-static-block
+    static #_ = (() => {
+        this._broadcastChannel.onmessage = ({ data }) => {
+            switch (data.message) {
+                case 'synchToTime':
+                    Clock.synchEvent = true;
+                    Clock.synchToTime(data.body);
+                    break;
+                default:
+                    break;
+            }
+        };
+    })();
+
     _startTime
     _performanceTimerStartTime; // when the race is due to start based on the value of performance.now() when clock was initialised
     _dateNowPerformanceNowDiff; // difference between Date.now() and performance.now() on clock initialisation
@@ -49,6 +67,20 @@ class Clock {
         }
         const timeFormat = new Intl.DateTimeFormat('en-GB', formatOptions);
         return (duration < 0 ? '-' : '') + timeFormat.format(d);
+    }
+
+    static synchToTime(time) {
+        Clock._synchOffset = time.valueOf() - Date.now();
+        if (!Clock.synchEvent) {
+            Clock._broadcastChannel.postMessage({message: 'synchToTime', body: time});
+        }
+        else {
+            Clock._synchEvent = false;
+        }
+    }
+
+    static now() {
+        return Date.now() + Clock._synchOffset;
     }
 
     /**
@@ -106,7 +138,7 @@ class Clock {
     
     /**
      * Return a time based on the start time of the clock and the elapsed time calculated by the performance timer
-     * This may differ from the time that would be rturned by new Date() or Date.now()
+     * This may differ from the time that would be returned by new Date() or Date.now()
      * @returns {Date}
      */
     getTime() {
@@ -131,7 +163,7 @@ class Clock {
             this._dateNowPerformanceNowDiff = dNow - pNow;
             this._performanceTimerStartTime =  this._startTime - this._dateNowPerformanceNowDiff;
         }
-        return pNow - this._performanceTimerStartTime;
+        return pNow - this._performanceTimerStartTime + Clock._synchOffset;
     }
     
     /**

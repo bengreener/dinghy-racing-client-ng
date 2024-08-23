@@ -385,7 +385,7 @@ describe('when start now button clicked', () => {
 
 describe('when shorten course button clicked', () => {
     it('displays shorten course dialog', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});;
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))} } />, model, controller);

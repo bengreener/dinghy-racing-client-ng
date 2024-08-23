@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { render, screen, act, getByText } from '@testing-library/react';
+import { render, screen, act, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
 import DinghyRacingController from './controller/dinghy-racing-controller';
@@ -26,6 +26,7 @@ jest.mock('./controller/dinghy-racing-controller');
 jest.mock('./model/dinghy-racing-model');
 jest.mock('./controller/authorisation');
 
+HTMLDialogElement.prototype.showModal = jest.fn();
 HTMLDialogElement.prototype.close = jest.fn();
 
 beforeEach(() => {
@@ -53,6 +54,7 @@ it('displays menu buttons', async () => {
   const btnRaceStartConsole = screen.getByRole('button', {name: /race start console\b/i});
   const btnRaceConsole = screen.getByRole('button', {name: /race console\b/i});
   const btnDownloadRaces = screen.getByRole('button', {name: /download races\b/i});
+  const btnSynchExternalCloclRaces = screen.getByRole('button', {name: /synch external clock\b/i});
   const btnLogout = screen.getByRole('button', {name: /logout\b/i});
   expect(btnCreateDinghyClass).toBeInTheDocument();
   expect(btnCreateRace).toBeInTheDocument();
@@ -60,6 +62,7 @@ it('displays menu buttons', async () => {
   expect(btnRaceStartConsole).toBeInTheDocument();
   expect(btnRaceConsole).toBeInTheDocument();
   expect(btnDownloadRaces).toBeInTheDocument();
+  expect(btnSynchExternalCloclRaces).toBeInTheDocument();
   expect(btnLogout).toBeInTheDocument();
 });
 
@@ -259,4 +262,30 @@ it('enables user to logout', async () => {
     value: {...holdOldWindowLocation},
     configurable: true,
   });
+});
+
+describe('when synch external clock button clicked button clicked', () => {
+      it('displays synch external clock dialog', async () => {
+        let formatOptions = {
+          timeZone: 'UTC',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        };
+        const timeFormat = new Intl.DateTimeFormat('en-GB', formatOptions);
+        const testTimeString = timeFormat.format(Date.now());
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        await act(async () => {
+          render(<App model={model} controller={controller} />);
+        });
+        await act(async () => {
+            await user.click(screen.getByRole('button', {'name': /synch external clock/i}));
+        });
+        const dialog = within(screen.getByTestId('synch-external-time-dialog'));
+        expect(dialog.getByLabelText(/enter time/i)).toHaveValue(testTimeString);
+        expect(dialog.getByRole('button', {name: /set time/i, 'hidden': true})).toBeInTheDocument();
+        expect(dialog.getByRole('button', {name: /cancel/i, 'hidden': true})).toBeInTheDocument();
+    });
 });

@@ -22,6 +22,7 @@ import ActionListView from './ActionListView';
 import CollapsableContainer from './CollapsableContainer';
 import FlagControl from './FlagControl';
 import RaceType from '../model/domain-classes/race-type';
+import Clock from '../model/domain-classes/clock';
 
 /**
  * Provide Race Officer with information needed to successfully start races in a session
@@ -33,7 +34,6 @@ function RaceStartConsole () {
     const [flagsWithNextAction, setFlagsWithNextAction] = useState([]);
     const [actions, setActions] = useState([]);
     const [message, setMessage] = useState(''); // feedback to user
-    // const [sessionStart, setSessionStart] = useState(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000));
     const [sessionStart, setSessionStart] = useState(() => {
         const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
         sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
@@ -144,7 +144,7 @@ function RaceStartConsole () {
             </div>
             <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
             <CollapsableContainer heading={'Flags'}>
-                {flagsWithNextAction.map(flag => { return <FlagControl key={flag.flag.name} flag={flag.flag} timeToChange={flag.action ? flag.action.time.valueOf() - Date.now() : 0} /> })}
+                {flagsWithNextAction.map(flag => { return <FlagControl key={flag.flag.name} flag={flag.flag} timeToChange={flag.action ? flag.action.time.valueOf() - Clock.now() : 0} /> })} {/* use Clock.now to get adjusted time when synched to an external clock */}
             </CollapsableContainer>
             <CollapsableContainer heading={'Races'}>
                 {races.map(race => {

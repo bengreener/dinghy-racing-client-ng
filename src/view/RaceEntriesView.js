@@ -176,6 +176,10 @@ function RaceEntriesView({ races }) {
      */
     async function updateEntryPosition(entry, newPosition) {
         let result;
+        if (!newPosition) {
+            setMessage('No position to set');
+            return;
+        }
         switch (newPosition) {
             case PositionConstant.MOVEUPONE:
                 if (entry.position != null) {
@@ -202,6 +206,10 @@ function RaceEntriesView({ races }) {
         }
     }
 
+    function onRaceEntryPositionSetByDrag(entryKey, newPosition) {
+        updateEntryPosition(entriesMap.get(entryKey), newPosition);
+    }
+
     return (
         <div className="race-entries-view" >
             <p id="race-entries-message" className={!message ? "hidden" : ""}>{message}</p>
@@ -214,11 +222,8 @@ function RaceEntriesView({ races }) {
                 <button onClick={() => setSortOrder('position')}>By position</button>
             </div>
             <div className="scrollable">
-                <table id="race-entries-table" style={{touchAction: 'pinch-zoom pan-y'}}>
-                    <tbody>
-                    {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} updatePosition={updateEntryPosition} />)}
-                    </tbody>
-                </table>
+                {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} 
+                    removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} />)}
             </div>
         </div>
     );

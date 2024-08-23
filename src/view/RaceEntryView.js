@@ -26,10 +26,10 @@ import { PositionConstant } from './RaceEntriesView';
  * @param {function} props.removeLap
  * @param {function} props.updateLap
  * @param {function} props.setScoringAbbreviation
- * @param {function} props.updatePosition
+ * @param {function} props.onRaceEntryDrop
  * @returns {HTMLTableRowElement}
  */
-function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, updatePosition}) {
+function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, onRaceEntryDrop}) {
     const [editMode, setEditMode] = useState(false);
     const [disabled, setDisabled] = useState(false);
     const prevLapCount = useRef(entry.laps.length);
@@ -93,34 +93,6 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     // disable context menu
     function handleContextMenu(event) {
         event.preventDefault();
-    }
-
-    function handlePositionUpClick(event) {
-        event.stopPropagation();
-        event.preventDefault();
-        if (updatePosition) {
-            setDisabled(true);
-            if (entry.position == null ) {
-                updatePosition(entry, PositionConstant.MOVEUPONE);    
-            }
-            else {
-                updatePosition(entry, entry.position - 1);
-            }
-        }
-    }
-
-    function handlePositionDownClick(event) {
-        event.stopPropagation();
-        event.preventDefault();
-        if (updatePosition) {
-            setDisabled(true);
-            if (entry.position == null ) {
-                updatePosition(entry, PositionConstant.MOVEDOWNONE);    
-            }
-            else {
-                updatePosition(entry, entry.position + 1);
-            }
-        }
     }
 
     function gestureStart(event) {
@@ -192,6 +164,23 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         }
     }
 
+    function dragStartHandler(event) {
+        event.dataTransfer.setData('text/html', entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
+        event.dataTransfer.dropEffect = 'move';
+    }
+
+    function dragOverHandler(event) {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'move';
+    }
+
+    function dropHandler(event) {
+        event.preventDefault();
+        if (onRaceEntryDrop) {
+            onRaceEntryDrop(event.dataTransfer.getData('text/html'), entry.position);
+        }
+    }
+
     let cumulativeLapTimes = 0;
     for (let i = 0; i < entry.laps.length; i++) {
         const lap = entry.laps[i];
@@ -236,18 +225,28 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     }
 
     return (
-        <tr className={classes} onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}
+        <div className={classes} onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}
             onPointerDown={gestureStart} onPointerMove={gestureMove} onPointerUp={gestureEnd} onPointerOut={gestureEnd}
-            onPointerLeave={gestureEnd} onPointerCancel={gestureCancel} >
-            <th scope='row'>{entry.dinghy.dinghyClass.name}</th>
-            <th className='sail-number' scope='row'>{entry.dinghy.sailNumber}</th>
-            <th scope='row'>{entry.helm.name}</th>
-            <th scope='row'>{entry.position}</th>
-            {lapsView}
-            <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
-            <td><button type="button" onClick={handlePositionUpClick}>Position Up</button></td>
-            <td><button type="button" onClick={handlePositionDownClick}>Position Down</button></td>
-        </tr>
+            onPointerLeave={gestureEnd} onPointerCancel={gestureCancel} onDragStart={dragStartHandler} onDragOver={dragOverHandler} onDrop={dropHandler} draggable >
+            <div className="race-entry-view-container race-entry-view-border">
+                <output>{entry.dinghy.dinghyClass.name}</output>
+            </div>
+            <div className="race-entry-view-container race-entry-view-border">
+                <output className='sail-number'>{entry.dinghy.sailNumber}</output>
+            </div>
+            <div className="race-entry-view-container race-entry-view-border">
+                <output>{entry.helm.name}</output>
+            </div>
+            <div className="race-entry-view-container race-entry-view-border">
+                <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'}>{entry.position}</output>
+            </div>
+            <div className="race-entry-view-laps">
+                {lapsView}
+            </div>
+            <div className="race-entry-view-container">
+                <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
+            </div>
+        </div>
     )
 }
 

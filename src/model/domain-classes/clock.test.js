@@ -16,12 +16,20 @@
 
 import Clock from './clock';
 
+it('returns the correct time', () => {
+    jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
+    const clock = new Clock(new Date(Date.now() + 10000));
+    const time = clock.getTime().valueOf();
+    const pMod = Date.now() - Math.floor(performance.now());
+    expect(time).toEqual(Math.floor(performance.now() + pMod));
+});
+
 describe('when provided with a start time', () => {
     it('returns the time to elapse to reach start time when start time is ahead of now', () => {
         const clock = new Clock(new Date(Date.now() + 10000));
         expect(Math.round(clock.getElapsedTime())).toBe(-10000);
     });
-    it('returns the amount of time elapsed sins the start time when start time is in the past', () => {
+    it('returns the amount of time elapsed since the start time when start time is in the past', () => {
         const clock = new Clock(new Date(Date.now() - 999));
         expect(Math.round(clock.getElapsedTime())).toBe(999);
     });
@@ -34,7 +42,7 @@ describe('when started without providing a start time', () => {
         // sleep thread and then check time is as expected
         setTimeout(() => {
             const elapsed = clock.getElapsedTime();
-        expect(Math.round(elapsed)).toBe(1000);    
+        expect(Math.round(elapsed)).toBe(1000);
         }, 1000);
     });    
 });
@@ -101,3 +109,52 @@ describe('when formatting a duration', () => {
         expect(Clock.formatDuration(-1379000)).toBe('-22:59');
     });
 });
+
+describe('when not synched against an external clocl', () => {
+    it('returns the same value for Clock.now() as Date.now()', () => {
+        expect(Clock.now()).toEqual(Date.now());
+    })
+});
+
+describe('when need to synch with an external clock accepts a time to synch clocks to and any associated clocks synch to that time when calculating elapsed time', () => {
+    it('returns the correct time', () => {
+        jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
+        Clock.synchToTime(new Date(Date.now() - 3000)); // set time to synch all clocks to
+        const clock = new Clock(new Date(Date.now() + 10000));
+        const time = clock.getTime().valueOf();
+        const pMod = Date.now() - Math.floor(performance.now());
+        expect(time).toEqual(Math.floor(performance.now() + pMod) - 3000);
+    });
+    it('returns the time to elapse to reach start time when start time is ahead of now', () => {
+        Clock.synchToTime(new Date(Date.now() - 3000)); // set time to synch all clocks to
+        const clock = new Clock(new Date(Date.now() + 10000)); // create a clock
+        expect(Math.round(clock.getElapsedTime())).toBe(-10000 - 3000);
+    });
+    it('returns the amount of time elapsed since the start time when start time is in the past', () => {
+        Clock.synchToTime(new Date(Date.now() - 3000)); // set time to synch all clocks to
+        const clock = new Clock(new Date(Date.now() - 999));
+        expect(Math.round(clock.getElapsedTime())).toBe(999 - 3000);
+    });
+    describe('when more than one clock', () => {
+        it('all clock return adjusted time', () => {
+            Clock.synchToTime(new Date(Date.now() - 3000)); // set time to synch all clocks to
+            const clock1 = new Clock(new Date(Date.now() + 10000)); // create a clock
+            const clock2 = new Clock(new Date(Date.now() + 6000)); // create a clock
+            expect(Math.round(clock1.getElapsedTime())).toBe(-10000 - 3000);
+            expect(Math.round(clock2.getElapsedTime())).toBe(-6000 - 3000);
+        });
+    });
+    it('sends message to a broadcast channel to advise either Clocks to synch to external time', () => {
+        const postMessageSpy = jest.spyOn(BroadcastChannel.prototype, 'postMessage');
+        const testTime = new Date();
+        Clock.synchToTime(testTime);
+        expect(postMessageSpy).toBeCalledWith({message: 'synchToTime', body: testTime});
+    });
+    // not sure how to make this work. May need to bring in broadcast-channel package from NPM and use to pollyfill jest. Would then need to create a seperate context to send messages between? :-/
+    xit('picks up a message from a broadcast channel to receive notification to synch against an external time', () => {
+        // const onmessageSpy = jest.spyOn(BroadcastChannel.prototype, 'onmessage');
+        const testTime = new Date(Date.now() + 1000);
+        Clock.synchToTime(testTime);
+        expect(onmessageSpy).toBeCalledWith({message: 'synchToTime', body: testTime});
+    });
+})

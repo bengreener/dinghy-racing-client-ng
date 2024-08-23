@@ -188,7 +188,7 @@ class RaceStartSequence {
                     // set up start signals for subsequent dinghy classes
                     const warningFlag = {name: sortedDinghyClasses[i].name + ' Class Flag', role: FlagRole.WARNING, actions: []};
 
-                    const offset = Math.round((baseDuration - ((baseDuration * sortedDinghyClasses[i].portsmouthNumber) / basePN)) / 1000) * 1000; // round to the nearest second as this is the precision we are working with
+                    const offset = Math.ceil((baseDuration - ((baseDuration * sortedDinghyClasses[i].portsmouthNumber) / basePN)) / 1000) * 1000; // round to the nearest second as this is the precision we are working with
                     
                     const warningFlagRaiseAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + offset - 60000), afterState: FlagState.RAISED};
                     const warningFlagLowerAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + offset), afterState: FlagState.LOWERED};
