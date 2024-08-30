@@ -115,7 +115,7 @@ function RaceEntriesView({ races }) {
                     if (weighIfScoringAbbreviation.includes(entry.scoringAbbreviation)) {
                         weight = weight * 2;
                     }
-                    return entry.position ? entry.position : Date.now() * weight; // if entry doesn't have a position return a large number to put it to the bottom
+                    return (entry.position && weight === .5) ? entry.position : Date.now() * weight; // if entry doesn't have a position return a large number to put it to the bottom
                 });
                 break;
             default:

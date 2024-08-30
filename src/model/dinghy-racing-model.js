@@ -19,6 +19,7 @@ import StartSignal from './domain-classes/start-signal';
 import StartSequence from './domain-classes/start-sequence';
 import RaceType from './domain-classes/race-type';
 import StartType from './domain-classes/start-type';
+import { getDefaultNormalizer } from '@testing-library/react';
 
 class DinghyRacingModel {
     httpRootURL;
@@ -1392,6 +1393,11 @@ class DinghyRacingModel {
             }
             if (/constraint \[entry.UK_entry_crew_id_race_id\]/.test(json.message)) {
                 return 'A race entry already exists for the selected crew.';
+            }
+            const regex = /(could not execute statement \[)(Duplicate entry)( ')([\w -]+)(' for key ')(\w+)(.+)/;
+            const regexResult = regex.exec(json.message);
+            if (regexResult && regexResult[2] === 'Duplicate entry') {
+                return `HTTP Error: 409 Conflict Message: The ${regexResult[6]} '${regexResult[4]}' already exissts; this may be caused by an uppercase/ lowercase differencce between existing record and the value entered.`;
             }
             // no mapping to user message found
             return 'HTTP Error: ' + response.status + ' ' + response.statusText + ' Message: ' + json.message;
