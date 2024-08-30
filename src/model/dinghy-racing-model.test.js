@@ -2116,14 +2116,22 @@ describe('when creating a new competitor', () => {
                 ok: false,
                 status: 409,
                 statusText: 'Conflict',
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 409'}, 'message': 'Some error resulting in HTTP 409'})
+                json: () => Promise.resolve({
+                    "cause": {
+                        "cause": {
+                            "cause": null, "message": "Duplicate entry 'some name' for key 'competitor.UK_competitor_name'"
+                        },
+                        "message": "could not execute statement [Duplicate entry 'some name' for key 'competitor.UK_competitor_name'] [insert into competitor (name,version,id) values (?,?,?)]"
+                    }, 
+                    "message": "could not execute statement [Duplicate entry 'some name' for key 'competitor.UK_competitor_name'] [insert into competitor (name,version,id) values (?,?,?)]; SQL [insert into competitor (name,version,id) values (?,?,?)]; constraint [competitor.UK_competitor_name]"
+                })
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 409 Conflict Message: Some error resulting in HTTP 409'});
+        expect(result).toEqual({success: false, message: "HTTP Error: 409 Conflict Message: The competitor 'some name' already exissts; this may be caused by an uppercase/ lowercase differencce between existing record and the value entered."});
     });
     it('returns a promise that resolves to a result indicating failure when competitor is not created with http status 500 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
@@ -2392,6 +2400,27 @@ describe('when creating a new dinghy', () => {
         expect(getDinghyClassByNameSpy).toBeCalled();
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Dinghy class does not exist.'});
+    });
+    it('returns a promise that resolves to a result indicating failure when dinghy is not created with http status 409 and provides a message explaining the cause of failure', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 409,
+                statusText: 'Conflict',
+                json: () => Promise.resolve({
+                    "cause":{
+                        "cause":{
+                            "cause":null,"message":"Duplicate entry '102-None' for key 'dinghy.UK_dinghy_dinghy_class_id_sail_number'"
+                        },"message":"could not execute statement [Duplicate entry '102-None' for key 'dinghy.UK_dinghy_dinghy_class_id_sail_number'] [insert into dinghy (dinghy_class_id,sail_number,version,id) values (?,?,?,?)]"
+                    },"message":"could not execute statement [Duplicate entry '102-None' for key 'dinghy.UK_dinghy_dinghy_class_id_sail_number'] [insert into dinghy (dinghy_class_id,sail_number,version,id) values (?,?,?,?)]; SQL [insert into dinghy (dinghy_class_id,sail_number,version,id) values (?,?,?,?)]; constraint [dinghy.UK_dinghy_dinghy_class_id_sail_number]"
+                })
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({success: false, message: "HTTP Error: 409 Conflict Message: The dinghy '102-None' already exissts; this may be caused by an uppercase/ lowercase differencce between existing record and the value entered."});
     });
     it('returns a promise that resolves to a result indicating failure when request is rejected by REST service', async () => {
         fetch.mockImplementationOnce(() => {
