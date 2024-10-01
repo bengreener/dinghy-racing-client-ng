@@ -1,0 +1,4 @@
+@media (min-width:601px) {
+    .w3-bginfosys-display-bottommiddle-m1{position:absolute;left:50%;bottom:0;transform:translate(-50%,0%)}
+    /* .w3-bginfosys-display-middle-m1{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);-ms-transform:translate(-50%,-50%)} */
+}

@@ -36,26 +36,19 @@ beforeEach(() => {
   // console.error.mockImplementation(() => null);
 });
 
-it('renders banner', async () => {
-  const dinghyRacingController = new DinghyRacingController(new DinghyRacingModel(httpRootURL, wsRootURL));
-  render(<App controller={dinghyRacingController} />);  
-  const banner = await screen.findByRole('banner');
-  expect(banner).toBeInTheDocument();
-});
-
 it('displays menu buttons', async () => {
   const dinghyRacingController = new DinghyRacingController(new DinghyRacingModel(httpRootURL, wsRootURL));
   await act(async () => {
     render(<App controller={dinghyRacingController} />);
   });
-  const btnCreateDinghyClass = screen.getByRole('button', {name: /dinghy classes\b/i});
-  const btnCreateRace = screen.getByRole('button', {name: /create race\b/i});
-  const btnUpcomingRaces = screen.getByRole('button', {name: /upcoming races\b/i});
-  const btnRaceStartConsole = screen.getByRole('button', {name: /race start console\b/i});
-  const btnRaceConsole = screen.getByRole('button', {name: /race console\b/i});
-  const btnDownloadRaces = screen.getByRole('button', {name: /download races\b/i});
-  const btnSynchExternalCloclRaces = screen.getByRole('button', {name: /synch external clock\b/i});
-  const btnLogout = screen.getByRole('button', {name: /logout\b/i});
+  const btnCreateDinghyClass = screen.getByRole('button', {name: /dinghy classes\b/i, hidden: true});
+  const btnCreateRace = screen.getByRole('button', {name: /create race\b/i, hidden: true});
+  const btnUpcomingRaces = screen.getByRole('button', {name: /upcoming races\b/i, hidden: true});
+  const btnRaceStartConsole = screen.getByRole('button', {name: /race start console\b/i, hidden: true});
+  const btnRaceConsole = screen.getByRole('button', {name: /race console\b/i, hidden: true});
+  const btnDownloadRaces = screen.getByRole('button', {name: /download races\b/i, hidden: true});
+  const btnSynchExternalCloclRaces = screen.getByRole('button', {name: /synch external clock\b/i, hidden: true});
+  const btnLogout = screen.getByRole('button', {name: /logout\b/i, hidden: true});
   expect(btnCreateDinghyClass).toBeInTheDocument();
   expect(btnCreateRace).toBeInTheDocument();
   expect(btnUpcomingRaces).toBeInTheDocument();
@@ -117,6 +110,10 @@ describe('when dinghy classes button clicked', () => {
     const dinghyRacingController = new DinghyRacingController(model);
 
     render(<App model={model} controller={dinghyRacingController} />);
+    const btnMenu = await screen.findByRole('button', {name: /☰/i})
+    await act(async () => {
+      await user.click(btnMenu);
+    });
     const btnCreateDinghyClass = await screen.findByRole('button', {name: /dinghy classes\b/i});
     await act(async () => {
       await user.click(btnCreateDinghyClass);
@@ -133,6 +130,10 @@ describe('when create race button clicked', () => {
     jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve(dinghyClasses)});
 
     render(<App model={model} controller={dinghyRacingController} />);
+    const btnMenu = await screen.findByRole('button', {name: /☰/i})
+    await act(async () => {
+      await user.click(btnMenu);
+    });
     const btnCreateRace = await screen.findByRole('button', {name: /create race\b/i});
     await act(async () => {
       await user.click(btnCreateRace);
@@ -150,6 +151,10 @@ describe('when upcoming races button clicked', () => {
     jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
 
     render(<App model={model} controller={dinghyRacingController} />);
+    const btnMenu = await screen.findByRole('button', {name: /☰/i})
+    await act(async () => {
+      await user.click(btnMenu);
+    });
     const btnViewUpcomingRaces = await screen.findByRole('button', {name: /upcoming races\b/i});
     await act(async () => {
       await user.click(btnViewUpcomingRaces);
@@ -216,6 +221,10 @@ describe('when download races console button is clicked', ()  => {
     const dinghyRacingController = new DinghyRacingController(model);
 
     render(<App model={model} controller={dinghyRacingController} />);
+    const btnMenu = await screen.findByRole('button', {name: /☰/i})
+    await act(async () => {
+      await user.click(btnMenu);
+    });
     const btnDownloadRaces = await screen.findByRole('button', {name: /download races\b/i});
     await act(async () => {
       await user.click(btnDownloadRaces);
@@ -231,6 +240,10 @@ describe('when competitors console button is clicked', () => {
     jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
 
     render(<App model={model} />);
+    const btnMenu = await screen.findByRole('button', {name: /☰/i})
+    await act(async () => {
+      await user.click(btnMenu);
+    });
     const btnCompetitors = await screen.findByRole('button', {name: /competitors\b/i});
     await act(async () => {
       await user.click(btnCompetitors);
@@ -251,6 +264,10 @@ it('enables user to logout', async () => {
   const dinghyRacingController = new DinghyRacingController(model);
 
   render(<App model={model} controller={dinghyRacingController} />);
+  const btnMenu = await screen.findByRole('button', {name: /☰/i})
+  await act(async () => {
+    await user.click(btnMenu);
+  });
   const btnLogout = screen.getByRole('button', { 'name': /logout/i});
   await act(async () => {
     await user.click(btnLogout);
@@ -279,6 +296,10 @@ describe('when synch external clock button clicked button clicked', () => {
         const controller = new DinghyRacingController(model);
         await act(async () => {
           render(<App model={model} controller={controller} />);
+        });
+        const btnMenu = await screen.findByRole('button', {name: /☰/i})
+        await act(async () => {
+          await user.click(btnMenu);
         });
         await act(async () => {
             await user.click(screen.getByRole('button', {'name': /synch external clock/i}));

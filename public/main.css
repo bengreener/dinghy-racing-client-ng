@@ -26,19 +26,8 @@ h1 {
 	margin-top: 0.335em;
 	margin-bottom: 0.335em;
 }
-button {
-	border-radius: 25pt;
-    padding: 10pt;
-    margin: 5px;
-    border: 0pt;
-    cursor: pointer;
-    background-color: #85D6FF;
-}
 button:active {
     transform: translateY(.5px);
-}
-button:hover {
-    background-color: #0096E0;
 }
 button.embedded {
 	border-radius: 0pt;
@@ -48,7 +37,7 @@ button.embedded {
     cursor: pointer;
     background-color: inherit;
 }
-fieldset {
+/* fieldset {
 	display: inline;
 }
 input {
@@ -57,8 +46,8 @@ input {
 }
 input[disabled] {
 	background-color: lightgrey;
-}
-select {
+} */
+/* select {
 	border-width: 2px;
 	border-radius: 25pt;
 	padding: 5pt;
@@ -73,8 +62,8 @@ table {
 }
 th.sail-number {
 	text-align: right;
-}
-td, th {
+} */
+/* td, th {
     border: 1px solid #999;
     padding: 0.5em;
     text-align: left;
@@ -82,21 +71,21 @@ td, th {
 }
 td.total {
 	border: 2px solid black;
-}
-.container-fluid {
+} */
+/* .container-fluid {
 	display: grid;
 	grid-template-columns: 15vw 85vw;
 	grid-template-rows: 15vh 85vh;
 	grid-template-areas: 	'header header'
 							'menu main';
-}
-header {
+} */
+/* header {
 	grid-area: header;
 	background-size: contain;
-}
-fieldset {
+} */
+/* fieldset {
 	border-radius: 25pt;
-}
+} */
 .action-list-view {
     display: flex;
     flex-direction: column;
@@ -107,31 +96,31 @@ fieldset {
 	display: flex;
 	flex-direction: column;
 }
-.competitors-console {
+/* .competitors-console {
 	height: 100%;
 	display: flex;
 	flex-direction: column;
-}
-.disabled {
+} */
+/* .disabled {
 	color: lightgray;
-}
+} */
 .display-port {
 	grid-area: main;
 	overflow: hidden;
 }
-.entry-buttons {
+/* .entry-buttons {
 	display: grid;
 	grid-auto-flow: column;
 	grid-auto-columns: 1fr;
-}
-.race-entry-view-border {
+} */
+/* .race-entry-view-border {
 	border: solid;
 	border-width: thin;
-}
-.race-entry-view-container {
+} */
+/* .race-entry-view-container {
 	display: flex;
 	align-items: center;
-}
+} */
 .race-entries-view {
     display: flex;
     flex-direction: column;
@@ -153,11 +142,11 @@ fieldset {
 .race-entry-view-scoring-abbreviation {
 	height: fit-content;
 }
-.race-start-console {
+/* .race-start-console {
 	height: 100%;
 	display: flex;
 	flex-direction: column;
-}
+} */
 .select-race {
     display: flex;
     align-items: top;
@@ -166,16 +155,16 @@ fieldset {
     height: 3lh;
     max-width:fit-content;
 }
-.sign-up-form {
+/* .sign-up-form {
     height: 100%;
 	display: flex;
 	flex-direction: column;
-}
-.upcoming-races {
+} */
+/* .upcoming-races {
 	height: 100%;
 	display: flex;
 	flex-direction: column;
-}
+} */
 .hidden {
     display: none;
 }

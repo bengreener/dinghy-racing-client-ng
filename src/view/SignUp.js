@@ -508,7 +508,7 @@ function SignUp({ race }) {
     }
 
     return (
-        <form className="sign-up-form" action="" method="get">
+        <form className="console" action="" method="get">
             <h1>{race.name}</h1>
             <datalist id="competitor-datalist">{competitorOptions}</datalist>
             <div>

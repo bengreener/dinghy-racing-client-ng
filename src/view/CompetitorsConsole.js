@@ -95,7 +95,7 @@ function CompetitorsConsole() {
     };
 
     return (
-        <div className="competitors-console">
+        <div className="console">
             <h1>Competitors</h1>
             <p id="competitor-console-message" className={!message ? "hidden" : ""}>{message}</p>
             {selectedCompetitor ? <form action="" method="post">

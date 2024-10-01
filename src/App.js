@@ -1,20 +1,20 @@
 /*
- * Copyright 2022-2024 BG Information Systems Ltd
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License. 
- */
+* Copyright 2022-2024 BG Information Systems Ltd
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License. 
+*/
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import DinghyClassConsole from './view/DinghyClassConsole';
 import CreateRace from './view/CreateRace';
 import ErrorBoundary from './view/ErrorBoundary';
@@ -32,110 +32,122 @@ import SetTimeForm from './view/SetTimeForm';
 import Clock from './model/domain-classes/clock';
 
 function App({model, controller}) {
-  const [displayPort, setDisplayPort] = React.useState();
-  const [roles, setRoles] = React.useState([]);
-  const [showSetTimeForm, setShowSetTimeForm] = React.useState(false);
-  
-  useEffect(() => {
-    const authorisation = new Authorisation();
-    authorisation.getRoles().then(newRoles => {
-      if (newRoles.toString() !== roles.toString()) {
-        setRoles(newRoles);
-      }
+    const [displayPort, setDisplayPort] = React.useState();
+    const [roles, setRoles] = React.useState([]);
+    const [showSetTimeForm, setShowSetTimeForm] = React.useState(false);
+    const sidebarRef = useRef(null);
+
+    useEffect(() => {
+        const authorisation = new Authorisation();
+        authorisation.getRoles().then(newRoles => {
+            if (newRoles.toString() !== roles.toString()) {
+                setRoles(newRoles);
+            }
+        });
     });
-  });
 
-  function showCreateDinghyClassForm() {
-    setDisplayPort(<DinghyClassConsole key={Date.now()} />);
-  }
+    function showCreateDinghyClassForm() {
+        setDisplayPort(<DinghyClassConsole key={Date.now()} />);
+    }
 
-  function showCreateRaceForm() {
-    setDisplayPort(<CreateRace key={Date.now()} onCreate={controller.createRace} />);
-  }
+    function showCreateRaceForm() {
+        setDisplayPort(<CreateRace key={Date.now()} onCreate={controller.createRace} />);
+    }
 
-  function showUpcomingRaces() {
-    setDisplayPort(<ViewUpcomingRaces key={Date.now()} showSignUpForm={showSignUpForm}/>);
-  }
+    function showUpcomingRaces() {
+        setDisplayPort(<ViewUpcomingRaces key={Date.now()} showSignUpForm={showSignUpForm}/>);
+    }
 
-  function showSignUpForm(race) {
-    setDisplayPort(<SignUp race={race} />)
-  }
+    function showSignUpForm(race) {
+        setDisplayPort(<SignUp race={race} />)
+    }
 
-  function showRaceStartConsole() {
-    setDisplayPort(<RaceStartConsole key={Date.now()}/>);
-  }
+    function showRaceStartConsole() {
+        setDisplayPort(<RaceStartConsole key={Date.now()}/>);
+    }
 
-  function showRaceConsole() {
-    setDisplayPort(<RaceConsole key={Date.now()}/>);
-  }
+    function showRaceConsole() {
+        setDisplayPort(<RaceConsole key={Date.now()}/>);
+    }
 
-  function showCompetitorsConsole() {
-    setDisplayPort(<CompetitorsConsole key={Date.now()}/>);
-  }
+    function showCompetitorsConsole() {
+        setDisplayPort(<CompetitorsConsole key={Date.now()}/>);
+    }
 
-  function showDownloadRaces() {
-    setDisplayPort(<DownloadRacesForm key={Date.now()}/>);
-  }
+    function showDownloadRaces() {
+        setDisplayPort(<DownloadRacesForm key={Date.now()}/>);
+    }
 
-  function handleSynchExternalClockClick() {
-    setShowSetTimeForm(true);
-  }
+    function handleSynchExternalClockClick() {
+        setShowSetTimeForm(true);
+    }
 
-  function closeSetTimeFormDialog() {
-    setShowSetTimeForm(false);
-  }
+    function closeSetTimeFormDialog() {
+        setShowSetTimeForm(false);
+    }
 
-  return (
-    <ModelContext.Provider value={model}>
-    <ControllerContext.Provider value={controller}>
-    <ErrorBoundary>
-      <div className="container-fluid">
-        <header style={{backgroundImage: 'url("./images/home-jumbotron-image.jpg")',}}>
-            <h1 className='display-4'>Dinghy Racing</h1>
-        </header>
-        <div className='list-group'>
-          {roles.includes('ROLE_RACE_SCHEDULER') ? 
-            <button key={0} type='button' className='list-group-item list-group-item-action' onClick={showCreateDinghyClassForm}>Dinghy Classes</button> 
-            : null
-          }
-          {roles.includes('ROLE_RACE_SCHEDULER') ? 
-            <button key={1} type='button' className='list-group-item list-group-item-action' onClick={showCreateRaceForm}>Create Race</button> 
-            : null
-          }
-          <button key={2} type='button' className='list-group-item list-group-item-action' onClick={showUpcomingRaces}>Upcoming Races</button>
-          {roles.includes('ROLE_RACE_OFFICER') ? 
-            <button key={3} type='button' className='list-group-item list-group-item-action' onClick={showRaceStartConsole}>Race Start Console</button>
-            : null
-          }
-          {roles.includes('ROLE_RACE_OFFICER') ? 
-            <button key={4} type='button' className='list-group-item list-group-item-action' onClick={showRaceConsole}>Race Console</button>
-            : null
-          }
-          <button key={5} type='button' className='list-group-item list-group-item-action' onClick={showCompetitorsConsole}>Competitors</button>
-          {roles.includes('ROLE_RACE_OFFICER') ? 
-            <button key={6} type='button' className='list-group-item list-group-item-action' onClick={showDownloadRaces}>Download Races</button>
-            : null
-          }
-          {roles.includes('ROLE_RACE_OFFICER') ? 
-            <button key={7} type='button' className='list-group-item list-group-item-action' onClick={handleSynchExternalClockClick}>Synch External Clock</button>
-            : null
-          }
-          <button key={8} type='button' className='list-group-item list-group-item-action' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
-        </div>
-        <div className="display-port">
-          <ErrorBoundary key={Date.now()}>
-            {displayPort}
-          </ErrorBoundary>
-        </div>
-      </div>
-      <ModalDialog show={showSetTimeForm} onClose={() => setShowSetTimeForm(false)} testid={'synch-external-time-dialog'} >
-        <SetTimeForm setTime={Clock.synchToTime} closeParent={closeSetTimeFormDialog} />
-      </ModalDialog>
-    </ErrorBoundary>
-    </ControllerContext.Provider>
-    </ModelContext.Provider>
-  );
+    function w3_open() {
+        sidebarRef.current.style.display = 'block';
+    }
+
+    function w3_close() {
+        sidebarRef.current.style.display = 'none';
+    }
+
+    return (
+        <ModelContext.Provider value={model}>
+        <ControllerContext.Provider value={controller}>
+        <ErrorBoundary>
+            <div className='w3-row w3-display-container'>
+                <div className='w3-display-container'>
+                    <img className='w3-image' src='/images/dinghy-icon.svg' alt='Dinghy Icon' />
+                    <button className='w3-button w3-xlarge w3-hover-theme w3-display-right' onClick={w3_open}>☰</button>
+                </div>
+                <div ref={sidebarRef} className='w3-sidebar w3-bar-block w3-border-left' style={{display:'none', right:'0'}} >
+                    <button onClick={w3_close} className='w3-bar-item w3-btn w3-hover-theme'>Close &times;</button>
+                    {roles.includes('ROLE_RACE_SCHEDULER') ? 
+                        <button key={0} type='button' className='w3-bar-item w3-btn w3-hover-theme' onClick={showCreateDinghyClassForm}>Dinghy Classes</button>
+                        : null
+                    }
+                    {roles.includes('ROLE_RACE_SCHEDULER') ? 
+                        <button key={1} type='button' className='w3-bar-item w3-btn w3-hover-theme' onClick={showCreateRaceForm}>Create Race</button>
+                        : null
+                    }
+                    <button key={5} type='button' className='w3-bar-item w3-btn w3-hover-theme' onClick={showCompetitorsConsole}>Competitors</button>
+                    {roles.includes('ROLE_RACE_OFFICER') ? 
+                        <button key={6} type='button' className='w3-bar-item w3-btn w3-hover-theme' onClick={showDownloadRaces}>Download Races</button>
+                        : null
+                    }
+                    {roles.includes('ROLE_RACE_OFFICER') ? 
+                        <button key={7} type='button' className='w3-bar-item w3-btn w3-hover-theme' onClick={handleSynchExternalClockClick}>Synch External Clock</button>
+                        : null
+                    }
+                    <button key={8} type='button' className='w3-bar-item w3-btn w3-hover-theme' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
+                </div>
+                <nav className='w3-row w3-bginfosys-display-bottommiddle-m1' >
+                    <button key={2} type='button' className='w3-btn w3-third w3-hover-theme' onClick={showUpcomingRaces}>Upcoming Races</button>
+                    {roles.includes('ROLE_RACE_OFFICER') ? 
+                        <button key={3} type='button' className='w3-btn w3-third w3-hover-theme' onClick={showRaceStartConsole}>Race Start Console</button>
+                        : null
+                    }
+                    {roles.includes('ROLE_RACE_OFFICER') ? 
+                        <button key={4} type='button' className='w3-btn w3-third w3-hover-theme' onClick={showRaceConsole}>Race Console</button>
+                        : null
+                    }
+                </nav>
+            </div>
+            <div className="display-port">
+            <ErrorBoundary key={Date.now()}>
+                {displayPort}
+            </ErrorBoundary>
+            </div>
+            <ModalDialog show={showSetTimeForm} onClose={() => setShowSetTimeForm(false)} testid={'synch-external-time-dialog'} >
+                <SetTimeForm setTime={Clock.synchToTime} closeParent={closeSetTimeFormDialog} />
+            </ModalDialog>
+        </ErrorBoundary>
+        </ControllerContext.Provider>
+        </ModelContext.Provider>
+    );
 }
 
 export default App;
-

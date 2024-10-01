@@ -95,7 +95,7 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
     }
 
     return (
-        <div className="upcoming-races">
+        <div className="console">
             <h1>Upcoming Races</h1>
             <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
             <p id="view-upcoming-races-message" className={!message ? "hidden" : ""}>{message}</p>

@@ -129,7 +129,7 @@ function RaceStartConsole () {
     }
 
     return (
-        <div className="race-start-console">
+        <div className="console">
             <div className="select-race">
                 <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
                 <div>
