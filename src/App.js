@@ -98,7 +98,7 @@ function App({model, controller}) {
         <ModelContext.Provider value={model}>
         <ControllerContext.Provider value={controller}>
         <ErrorBoundary>
-            <div className='w3-row w3-display-container'>
+            <div className='w3-row w3-display-container w3-white' >
                 <div className='w3-display-container'>
                     <img className='w3-image' src='/images/dinghy-icon.svg' alt='Dinghy Icon' />
                     <button className='w3-button w3-xlarge w3-hover-theme w3-display-right' onClick={w3_open}>☰</button>
@@ -136,7 +136,7 @@ function App({model, controller}) {
                     }
                 </nav>
             </div>
-            <div className="display-port">
+            <div className='display-port' >
             <ErrorBoundary key={Date.now()}>
                 {displayPort}
             </ErrorBoundary>

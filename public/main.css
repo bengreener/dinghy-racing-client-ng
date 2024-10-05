@@ -19,6 +19,11 @@
 * {
 	font-family: Helvetica;
 }
+html {
+	margin: 0;
+	height: 100%;
+	overflow: hidden;
+}
 body {
 	margin: 0px;
 }
@@ -92,6 +97,8 @@ td.total {
     overflow: hidden;
 }
 .console {
+	position: absolute;
+	top: 164px;
 	height: 100%;
 	display: flex;
 	flex-direction: column;
@@ -222,4 +229,8 @@ td.total {
 .blue-peter-lowered {
 	padding: 5pt;
 	margin: 0;
+}
+
+@media (min-width:601px) {
+    .console{top: 64px;}
 }
