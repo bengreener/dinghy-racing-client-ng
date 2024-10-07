@@ -107,7 +107,7 @@ td.total {
 	color: lightgray;
 } */
 .display-port {
-	grid-area: main;
+	/* grid-area: main; */
 	overflow: hidden;
 }
 /* .entry-buttons {
