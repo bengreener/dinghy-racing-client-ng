@@ -107,9 +107,9 @@ function RaceConsole() {
     }
 
     return (
-        <form className='w3-container console'>
+        <div className='w3-container console'>
             <h1>Select Races</h1>
-            <div className='w3-container'>
+            <form className='w3-container w3-half'>
                 <div className='w3-container'>
                     <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
                 </div>
@@ -132,16 +132,18 @@ function RaceConsole() {
                     <label htmlFor='race-select' className='w3-left w3-col'  >Select Race</label>
                     <select id='race-select' name='race' multiple={true} className='w3-col' onChange={handleRaceSelect} value={selectedRaces}>{raceOptions}</select>
                 </div>
-            </div>
+            </form>
             <p id='race-console-message' className={!message ? 'hidden' : ''}>{message}</p>
             <CollapsableContainer heading={'Races'}>
+            <div className='w3-content'>
                 {selectedRaces.map(selectedRace => {
-                    const race = raceMap.get(selectedRace);
-                    return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} />
-                })}
+                        const race = raceMap.get(selectedRace);
+                        return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} />
+                    })}
+            </div>
             </CollapsableContainer>
             <RaceEntriesView races={selectedRaces.map(selectedRace => raceMap.get(selectedRace))} />
-        </form>
+        </div>
     );
 }
 
