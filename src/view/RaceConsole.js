@@ -109,7 +109,7 @@ function RaceConsole() {
     return (
         <div className='w3-container console'>
             <h1>Select Races</h1>
-            <form className='w3-container w3-half'>
+            <form className='w3-content'>
                 <div className='w3-container'>
                     <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
                 </div>
