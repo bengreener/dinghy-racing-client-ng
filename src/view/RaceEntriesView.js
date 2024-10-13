@@ -211,17 +211,32 @@ function RaceEntriesView({ races }) {
     }
 
     return (
-        <div className="race-entries-view" >
-            <p id="race-entries-message" className={!message ? "hidden" : ""}>{message}</p>
-            <div>
-                <button onClick={() => setSortOrder('sailNumber')}>By sail number</button>
-                <button onClick={() => setSortOrder('classSailNumber')}>By class & sail number</button>
-                <button onClick={() => setSortOrder('lastThree')}>By last 3</button>
-                <button onClick={() => setSortOrder('classLastThree')}>By class & last 3</button>
-                <button onClick={() => setSortOrder('lapTimes')}>By lap times</button>
-                <button onClick={() => setSortOrder('position')}>By position</button>
+        <div >
+            <p id='race-entries-message' className={!message ? 'hidden' : ''}>{message}</p>
+            <div className='w3-row'>
+                <div className='w3-col m2'>
+                    <button className='w3-btn w3-hover-theme w3-block w3-card' onClick={() => setSortOrder('sailNumber')}>By sail number</button>
+                </div>
+                <div className='w3-col m3' >
+                    <button className='w3-btn w3-hover-theme w3-block w3-card' onClick={() => setSortOrder('classSailNumber')}>By class & sail number</button>
+                </div>
+                <div className='w3-col m3'>
+                    <button className='w3-btn w3-hover-theme w3-block w3-card' onClick={() => setSortOrder('classSailNumber')}>By class & sail number</button>
+                </div>
+                <div className='w3-col m2'>
+                    <button className='w3-btn w3-hover-theme w3-block w3-card' onClick={() => setSortOrder('lastThree')}>By last 3</button>
+                </div>
+                <div className='w3-col m2'>
+                    <button className='w3-btn w3-hover-theme w3-block w3-card' onClick={() => setSortOrder('classLastThree')}>By class & last 3</button>
+                </div>
+                <div className='w3-col m2'>
+                    <button className='w3-btn w3-hover-theme w3-block w3-card' onClick={() => setSortOrder('lapTimes')}>By lap times</button>
+                </div>
+                <div className='w3-col m2'>
+                    <button className='w3-btn w3-hover-theme w3-block w3-card' onClick={() => setSortOrder('position')}>By position</button>
+                </div>
             </div>
-            <div className="scrollable">
+            <div className='scrollable'>
                 {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap} 
                     removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} />)}
             </div>
