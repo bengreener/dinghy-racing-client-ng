@@ -36,7 +36,6 @@ function LapView({value, total, editable = false, keyup, focusout}) {
 
     const [editValue, setEditValue] = useState(Clock.formatDuration(value));
     const textInputRef = useRef(null);
-    // const inner = <input ref={textInputRef} type='text' value={editValue} onChange={handleChange} onKeyUp={keyup} onBlur={focusout}/>;
     const classes = total ? 'total' : null;
 
     useEffect(() => {
@@ -46,8 +45,7 @@ function LapView({value, total, editable = false, keyup, focusout}) {
     });
 
     return (
-        // editable ? <td className={classes} >{inner}</td> : <td className={classes} >{Clock.formatDuration(value)}</td>
-        <div className="race-entry-view-container race-entry-view-border">
+        <div className='w3-cell w3-left w3-padding-small'>
             {editable ? <input ref={textInputRef} className={classes} type='text' value={editValue} onChange={handleChange} onKeyUp={keyup} onBlur={focusout}/> : <output className={classes} >{Clock.formatDuration(value)}</output>}
         </div>
     );
