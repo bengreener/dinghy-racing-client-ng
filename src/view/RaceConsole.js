@@ -108,32 +108,33 @@ function RaceConsole() {
 
     return (
         <div className='w3-container console'>
-            <h1>Select Races</h1>
-            <form className='w3-content'>
-                <div className='w3-container'>
-                    <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
-                </div>
-                <div className='w3-container'>
-                    <fieldset>
-                        <legend>Race Type:</legend>
-                        <div className='w3-cell-row'>
-                            <div className='w3-cell'>
-                                <input id='radio-race-type-fleet' name='race-type' type='radio' value='FLEET' onChange={handleRaceTypeChange} defaultChecked='true'/>
-                                <label htmlFor='radio-race-type-fleet'>Fleet</label>
+            <CollapsableContainer heading={'Select Races'}>
+                <form className='w3-content'>
+                    <div className='w3-container'>
+                        <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
+                    </div>
+                    <div className='w3-container'>
+                        <fieldset>
+                            <legend>Race Type:</legend>
+                            <div className='w3-cell-row'>
+                                <div className='w3-cell'>
+                                    <input id='radio-race-type-fleet' name='race-type' type='radio' value='FLEET' onChange={handleRaceTypeChange} defaultChecked='true'/>
+                                    <label htmlFor='radio-race-type-fleet'>Fleet</label>
+                                </div>
+                                <div className='w3-cell'>
+                                    <input id='radio-race-type-pursuit' name='race-type' type='radio' value='PURSUIT' onChange={handleRaceTypeChange} />
+                                    <label htmlFor='radio-race-type-pursuit'>Pursuit</label>
+                                </div>
                             </div>
-                            <div className='w3-cell'>
-                                <input id='radio-race-type-pursuit' name='race-type' type='radio' value='PURSUIT' onChange={handleRaceTypeChange} />
-                                <label htmlFor='radio-race-type-pursuit'>Pursuit</label>
-                            </div>
-                        </div>
-                    </fieldset>
-                </div>
-                <div className='w3-container'>
-                    <label htmlFor='race-select' className='w3-left w3-col'  >Select Race</label>
-                    <select id='race-select' name='race' multiple={true} className='w3-col' onChange={handleRaceSelect} value={selectedRaces}>{raceOptions}</select>
-                </div>
-            </form>
-            <p id='race-console-message' className={!message ? 'hidden' : ''}>{message}</p>
+                        </fieldset>
+                    </div>
+                    <div className='w3-container'>
+                        <label htmlFor='race-select' className='w3-left w3-col'  >Select Race</label>
+                        <select id='race-select' name='race' multiple={true} className='w3-col' onChange={handleRaceSelect} value={selectedRaces}>{raceOptions}</select>
+                    </div>
+                </form>
+                <p id='race-console-message' className={!message ? 'hidden' : ''}>{message}</p>
+            </CollapsableContainer>
             <CollapsableContainer heading={'Races'}>
             <div className='w3-content'>
                 {selectedRaces.map(selectedRace => {
