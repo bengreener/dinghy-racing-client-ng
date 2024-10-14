@@ -508,27 +508,29 @@ function SignUp({ race }) {
     }
 
     return (
-        <form className='w3-container w3-half console' action='' method='get'>
-            <h1>{race.name}</h1>
+        <div className='w3-container console'>
             <datalist id='competitor-datalist'>{competitorOptions}</datalist>
             <datalist id='dinghy-datalist'>{dinghyOptions}</datalist>
-            <div className='w3-container' >
-                {dinghyClassInput(race)}
-                {buildHelmInput()}
-                {buildCrewInput()}
-                <div className='w3-container w3-row'>
-                    <label htmlFor='sail-number-input' className='w3-col m4' >Sail Number</label>
-                    <input id='sail-number-input' name='sailNumber' className='w3-col w3-half' list='dinghy-datalist' onChange={handleChange} value={sailNumber} />
+            <h1>{race.name}</h1>
+            <form className='w3-content' action='' method='get'>
+                <div className='w3-container' >
+                    {dinghyClassInput(race)}
+                    {buildHelmInput()}
+                    {buildCrewInput()}
+                    <div className='w3-container w3-row'>
+                        <label htmlFor='sail-number-input' className='w3-col m4' >Sail Number</label>
+                        <input id='sail-number-input' name='sailNumber' className='w3-col w3-half' list='dinghy-datalist' onChange={handleChange} value={sailNumber} />
+                    </div>
+                    <button id='entry-update-button' className='w3-right' type='button' onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
+                    {selectedEntry ? <button id='cancel-button' type='button' onClick={clear} >Cancel</button> : null}
                 </div>
-                <button id='entry-update-button' className='w3-right' type='button' onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
-                {selectedEntry ? <button id='cancel-button' type='button' onClick={clear} >Cancel</button> : null}
-            </div>
+            </form>
             <p id='signup-message' className={!message ? 'hidden' : ''}>{message}</p>
             <h3>Signed-up</h3>
             <div className='w3-container scrollable'>
                 {entriesTable}
             </div>
-        </form>
+        </div>
     )
 }
 
