@@ -142,14 +142,6 @@ td.total {
 /* .race-entry-view-scoring-abbreviation {
 	height: fit-content;
 } */
-.select-race {
-    display: flex;
-    align-items: top;
-}
-.select-race > select {
-    height: 3lh;
-    max-width:fit-content;
-}
 .hidden {
     display: none;
 }

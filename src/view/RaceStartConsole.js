@@ -129,20 +129,29 @@ function RaceStartConsole () {
     }
 
     return (
-        <div className="console">
-            <div className="select-race">
+        <div className='w3-container console'>
+            <h1>Start Races</h1>
+            <form className='w3-content'>
+            <div className='w3-container'>
                 <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
+            </div>
                 <div>
                     <fieldset>
                         <legend>Race Type</legend>
-                        <input id="radio-race-type-fleet" name="race-type" type="radio" value="FLEET" onChange={handleRaceTypeChange} defaultChecked="true"/>
-                        <label htmlFor="radio-race-type-fleet">Fleet</label>
-                        <input id="radio-race-type-pursuit" name="race-type" type="radio" value="PURSUIT" onChange={handleRaceTypeChange} />
-                        <label htmlFor="radio-race-type-pursuit">Pursuit</label>
+                        <div className='w3-cell-row'>
+                            <div className='w3-cell'>
+                                <input id='radio-race-type-fleet' name='race-type' type='radio' value='FLEET' onChange={handleRaceTypeChange} defaultChecked='true'/>
+                                <label htmlFor='radio-race-type-fleet'>Fleet</label>
+                            </div>
+                            <div className='w3-cell'>
+                                <input id='radio-race-type-pursuit' name='race-type' type='radio' value='PURSUIT' onChange={handleRaceTypeChange} />
+                                <label htmlFor='radio-race-type-pursuit'>Pursuit</label>
+                            </div>
+                        </div>
                     </fieldset>
                 </div>
-            </div>
-            <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
+            </form>
+            <p id='race-console-message' className={!message ? 'hidden' : ''}>{message}</p>
             <CollapsableContainer heading={'Flags'}>
                 {flagsWithNextAction.map(flag => { return <FlagControl key={flag.flag.name} flag={flag.flag} timeToChange={flag.action ? flag.action.time.valueOf() - Clock.now() : 0} /> })} {/* use Clock.now to get adjusted time when synched to an external clock */}
             </CollapsableContainer>
