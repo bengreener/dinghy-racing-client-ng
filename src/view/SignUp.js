@@ -508,7 +508,7 @@ function SignUp({ race }) {
     }
 
     return (
-        <div className='w3-container console'>
+        <div className='w3-container console' >
             <datalist id='competitor-datalist'>{competitorOptions}</datalist>
             <datalist id='dinghy-datalist'>{dinghyOptions}</datalist>
             <h1>{race.name}</h1>
@@ -520,8 +520,12 @@ function SignUp({ race }) {
                     <label htmlFor='sail-number-input' className='w3-col m2' >Sail Number</label>
                     <input id='sail-number-input' name='sailNumber' className='w3-half' list='dinghy-datalist' onChange={handleChange} value={sailNumber} />
                 </div>
-                <button id='entry-update-button' className='w3-right' type='button' onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
-                {selectedEntry ? <button id='cancel-button' type='button' onClick={clear} >Cancel</button> : null}
+                <div className='w3-row' >
+                    <div className='w3-col m8' >
+                        <button id='entry-update-button' className='w3-right' type='button' onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
+                        {selectedEntry ? <button id='cancel-button' className='w3-right' type='button' onClick={clear} >Cancel</button> : null}
+                    </div>
+                </div>
             </form>
             <p id='signup-message' className={!message ? 'hidden' : ''}>{message}</p>
             <h3>Signed-up</h3>
