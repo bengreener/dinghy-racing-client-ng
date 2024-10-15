@@ -406,8 +406,8 @@ function SignUp({ race }) {
         let dinghyClassInput = null;    
         if (!race.dinghyClass) {
             dinghyClassInput = (
-                <div className='w3-container w3-row'>
-                    <label htmlFor='dinghy-class-select' className='w3-col m4' >Dinghy Class</label>
+                <div className='w3-row'>
+                    <label htmlFor='dinghy-class-select' className='w3-col m2' >Dinghy Class</label>
                     <select id='dinghy-class-select' ref={dinghyClassSelect} name='dinghyClass' className='w3-half' multiple={false} onChange={handleChange} value={dinghyClassName} autoFocus >{dinghyClassOptions}</select>
                 </div>
             );
@@ -422,17 +422,17 @@ function SignUp({ race }) {
     function buildHelmInput() {
         if (race.dinghyClass) {
             return (
-                <div className='w3-container w3-row'>
-                    <label htmlFor='helm-input' className='w3-col m4' >Helm's Name</label>
-                    <input id='helm-input' ref={helmInput} name='helm' className='w3-col w3-half' list='competitor-datalist' onChange={handleChange} value={helmName} autoFocus />
+                <div className='w3-row'>
+                    <label htmlFor='helm-input' className='w3-col m2' >Helm's Name</label>
+                    <input id='helm-input' ref={helmInput} name='helm' className='w3-half' list='competitor-datalist' onChange={handleChange} value={helmName} autoFocus />
                 </div>
             )
         }
         else {
             return (
-                <div className='w3-container w3-row'>
-                    <label htmlFor='helm-input' className='w3-col m4' >Helm's Name</label>
-                    <input id='helm-input' ref={helmInput} name='helm' className='w3-col w3-half' list='competitor-datalist' onChange={handleChange} value={helmName} />
+                <div className='w3-row'>
+                    <label htmlFor='helm-input' className='w3-col m2' >Helm's Name</label>
+                    <input id='helm-input' ref={helmInput} name='helm' className='w3-half' list='competitor-datalist' onChange={handleChange} value={helmName} />
                 </div>
             )
         }
@@ -440,16 +440,16 @@ function SignUp({ race }) {
 
     function buildCrewInput() {
         let crewInput = (
-            <div className='w3-container w3-row'>
-                <label htmlFor='crew-input' className='w3-col m4' >Crew's Name</label>
-                <input id='crew-input' name='crew' className='w3-col w3-half' list='competitor-datalist' onChange={handleChange} value={crewName} disabled />
+            <div className='w3-row'>
+                <label htmlFor='crew-input' className='w3-col m2' >Crew's Name</label>
+                <input id='crew-input' name='crew' className='w3-half' list='competitor-datalist' onChange={handleChange} value={crewName} disabled />
             </div>
         );
         if (dinghyClassHasCrew) {
             crewInput = (
-                <div className='w3-container w3-row'>
-                    <label htmlFor='crew-input' className='w3-col m4' >Crew's Name</label>
-                    <input id='crew-input' name='crew' className='w3-col w3-half' list='competitor-datalist' onChange={handleChange} value={crewName} />
+                <div className='w3-row'>
+                    <label htmlFor='crew-input' className='w3-col m2' >Crew's Name</label>
+                    <input id='crew-input' name='crew' className='w3-half' list='competitor-datalist' onChange={handleChange} value={crewName} />
                 </div>
             );
         }
@@ -512,18 +512,16 @@ function SignUp({ race }) {
             <datalist id='competitor-datalist'>{competitorOptions}</datalist>
             <datalist id='dinghy-datalist'>{dinghyOptions}</datalist>
             <h1>{race.name}</h1>
-            <form className='w3-content' action='' method='get'>
-                <div className='w3-container' >
-                    {dinghyClassInput(race)}
-                    {buildHelmInput()}
-                    {buildCrewInput()}
-                    <div className='w3-container w3-row'>
-                        <label htmlFor='sail-number-input' className='w3-col m4' >Sail Number</label>
-                        <input id='sail-number-input' name='sailNumber' className='w3-col w3-half' list='dinghy-datalist' onChange={handleChange} value={sailNumber} />
-                    </div>
-                    <button id='entry-update-button' className='w3-right' type='button' onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
-                    {selectedEntry ? <button id='cancel-button' type='button' onClick={clear} >Cancel</button> : null}
+            <form className='w3-container' action='' method='get'>
+                {dinghyClassInput(race)}
+                {buildHelmInput()}
+                {buildCrewInput()}
+                <div className='w3-row'>
+                    <label htmlFor='sail-number-input' className='w3-col m2' >Sail Number</label>
+                    <input id='sail-number-input' name='sailNumber' className='w3-half' list='dinghy-datalist' onChange={handleChange} value={sailNumber} />
                 </div>
+                <button id='entry-update-button' className='w3-right' type='button' onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
+                {selectedEntry ? <button id='cancel-button' type='button' onClick={clear} >Cancel</button> : null}
             </form>
             <p id='signup-message' className={!message ? 'hidden' : ''}>{message}</p>
             <h3>Signed-up</h3>

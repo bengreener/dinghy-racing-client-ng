@@ -97,10 +97,8 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
     return (
         <div className='w3-container console'>
             <h1>Upcoming Races</h1>
-            <form className='w3-content'>
-                <div className='w3-container'>
-                    <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
-                </div>
+            <form className='w3-container'>
+                <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
             </form>
             <p id='view-upcoming-races-message' className={!message ? 'hidden' : ''}>{message}</p>
             <div className='scrollable'>

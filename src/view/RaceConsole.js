@@ -109,39 +109,31 @@ function RaceConsole() {
     return (
         <div className='w3-container console'>
             <CollapsableContainer heading={'Select Races'}>
-                <form className='w3-content'>
-                    <div className='w3-container'>
-                        <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
-                    </div>
-                    <div className='w3-container'>
-                        <fieldset>
-                            <legend>Race Type:</legend>
-                            <div className='w3-cell-row'>
-                                <div className='w3-cell'>
-                                    <input id='radio-race-type-fleet' name='race-type' type='radio' value='FLEET' onChange={handleRaceTypeChange} defaultChecked='true'/>
-                                    <label htmlFor='radio-race-type-fleet'>Fleet</label>
-                                </div>
-                                <div className='w3-cell'>
-                                    <input id='radio-race-type-pursuit' name='race-type' type='radio' value='PURSUIT' onChange={handleRaceTypeChange} />
-                                    <label htmlFor='radio-race-type-pursuit'>Pursuit</label>
-                                </div>
+                <form className='w3-container' >
+                    <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
+                    <fieldset className='w3-col w3-third' >
+                        <legend>Race Type:</legend>
+                        <div className='w3-cell-row'>
+                            <div className='w3-cell'>
+                                <input id='radio-race-type-fleet' name='race-type' type='radio' value='FLEET' onChange={handleRaceTypeChange} defaultChecked='true'/>
+                                <label htmlFor='radio-race-type-fleet'>Fleet</label>
                             </div>
-                        </fieldset>
-                    </div>
-                    <div className='w3-container'>
-                        <label htmlFor='race-select' className='w3-left w3-col'  >Select Race</label>
-                        <select id='race-select' name='race' multiple={true} className='w3-col' onChange={handleRaceSelect} value={selectedRaces}>{raceOptions}</select>
-                    </div>
+                            <div className='w3-cell'>
+                                <input id='radio-race-type-pursuit' name='race-type' type='radio' value='PURSUIT' onChange={handleRaceTypeChange} />
+                                <label htmlFor='radio-race-type-pursuit'>Pursuit</label>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <label htmlFor='race-select' className='w3-left w3-col'  >Select Race</label>
+                    <select id='race-select' name='race' multiple={true} className='w3-col w3-third' onChange={handleRaceSelect} value={selectedRaces}>{raceOptions}</select>
                 </form>
                 <p id='race-console-message' className={!message ? 'hidden' : ''}>{message}</p>
             </CollapsableContainer>
             <CollapsableContainer heading={'Races'}>
-            <div className='w3-content'>
                 {selectedRaces.map(selectedRace => {
-                        const race = raceMap.get(selectedRace);
-                        return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} />
-                    })}
-            </div>
+                    const race = raceMap.get(selectedRace);
+                    return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} />
+                })}
             </CollapsableContainer>
             <RaceEntriesView races={selectedRaces.map(selectedRace => raceMap.get(selectedRace))} />
         </div>
