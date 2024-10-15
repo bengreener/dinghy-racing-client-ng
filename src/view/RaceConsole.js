@@ -111,19 +111,21 @@ function RaceConsole() {
             <CollapsableContainer heading={'Select Races'}>
                 <form className='w3-container' >
                     <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
-                    <fieldset className='w3-col w3-third' >
-                        <legend>Race Type:</legend>
-                        <div className='w3-cell-row'>
-                            <div className='w3-cell'>
-                                <input id='radio-race-type-fleet' name='race-type' type='radio' value='FLEET' onChange={handleRaceTypeChange} defaultChecked='true'/>
-                                <label htmlFor='radio-race-type-fleet'>Fleet</label>
+                    <div className='w3-row'>
+                        <fieldset className='w3-third' >
+                            <legend>Race Type:</legend>
+                            <div className='w3-cell-row'>
+                                <div className='w3-cell'>
+                                    <input id='radio-race-type-fleet' name='race-type' type='radio' value='FLEET' onChange={handleRaceTypeChange} defaultChecked='true'/>
+                                    <label htmlFor='radio-race-type-fleet'>Fleet</label>
+                                </div>
+                                <div className='w3-cell'>
+                                    <input id='radio-race-type-pursuit' name='race-type' type='radio' value='PURSUIT' onChange={handleRaceTypeChange} />
+                                    <label htmlFor='radio-race-type-pursuit'>Pursuit</label>
+                                </div>
                             </div>
-                            <div className='w3-cell'>
-                                <input id='radio-race-type-pursuit' name='race-type' type='radio' value='PURSUIT' onChange={handleRaceTypeChange} />
-                                <label htmlFor='radio-race-type-pursuit'>Pursuit</label>
-                            </div>
-                        </div>
-                    </fieldset>
+                        </fieldset>
+                    </div>
                     <label htmlFor='race-select' className='w3-left w3-col'  >Select Race</label>
                     <select id='race-select' name='race' multiple={true} className='w3-col w3-third' onChange={handleRaceSelect} value={selectedRaces}>{raceOptions}</select>
                 </form>
