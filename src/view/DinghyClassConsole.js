@@ -153,21 +153,30 @@ function DinghyClassConsole() {
     };
 
     return (
-        <div className="console">
+        <div className='w3-container console' >
             <h1>Dinghy Classes</h1>
-            <p id="dinghy-class-console-message" className={!message ? "hidden" : ""}>{message}</p>
-            <form action="" method="get">
-                <label htmlFor="dinghy-class-input">Class Name</label>
-                <input id="dinghy-class-input" ref={dinghyClassNameInputRef} name="name" type="text" onChange={handleChange} value={dinghyClass.name} autoFocus />
-                <label htmlFor="crew-size-input">Crew Size</label>
-                <input id="crew-size-input" name="crewSize" type="number" min="1" onChange={handleChange} value={dinghyClass.crewSize} />
-                <label htmlFor="portsmouth-number-input">Portsmouth Number</label>
-                <input id="portsmouth-number-input" name="portsmouthNumber" type="number" onChange={handleChange} value={dinghyClass.portsmouthNumber} />
-                <output id="dinghy-class-message-output" />
-                {selectedDinghyClass ? <button id="dinghy-class-update-button" type="button" onClick={handleUpdate} >Update</button> : <button id="dinghy-class-create-button" type="button" onClick={handleCreate}>Create</button>}
-                <button id="dinghy-class-cancel-button" type="button" onClick={clear}>Cancel</button>
+            <form className='w3-container' action='' method='get'>
+                <div className='w3-row' >
+                    <label htmlFor='dinghy-class-input' className='w3-col m2' >Class Name</label>
+                    <input id='dinghy-class-input' ref={dinghyClassNameInputRef} name='name' className='w3-half' type='text' onChange={handleChange} value={dinghyClass.name} autoFocus />
+                </div>
+                <div className='w3-row' >
+                    <label htmlFor='crew-size-input' className='w3-col m2' >Crew Size</label>
+                    <input id='crew-size-input' name='crewSize' className='w3-half' type='number' min='1' onChange={handleChange} value={dinghyClass.crewSize} />
+                </div>
+                <div className='w3-row' >
+                    <label htmlFor='portsmouth-number-input' className='w3-col m2' >Portsmouth Number</label>
+                    <input id='portsmouth-number-input' name='portsmouthNumber' className='w3-half' type='number' onChange={handleChange} value={dinghyClass.portsmouthNumber} />
+                </div>
+                <div className='w3-row' >
+                    <div className='w3-col m8' >
+                        {selectedDinghyClass ? <button id='dinghy-class-update-button' className='w3-right' type='button' onClick={handleUpdate} >Update</button> : <button id='dinghy-class-create-button' className='w3-right' type='button' onClick={handleCreate}>Create</button>}
+                        <button id='dinghy-class-cancel-button' className='w3-right' type='button' onClick={clear}>Cancel</button>
+                    </div>
+                </div>
             </form>
-            <div className="scrollable">
+            <p id='dinghy-class-console-message' className={!message ? 'hidden' : ''}>{message}</p>
+            <div className='scrollable'>
                 <table>
                     <thead>
                         <tr>
