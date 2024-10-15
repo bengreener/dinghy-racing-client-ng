@@ -266,10 +266,10 @@ describe('when entry has not finished race', () => {
 });
 
 describe('when a scoring abbreviation is not selected', () => {
-    it('only has a class of race-entry-view', () => {
+    it('only has a classes of race-entry-view w3-row', () => {
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
         const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
-        expect(raceEntryView.getAttribute('class')).toMatch(/^race-entry-view$/i);
+        expect(raceEntryView.getAttribute('class')).toMatch(/^race-entry-view w3-row$/i);
     });
 });
 

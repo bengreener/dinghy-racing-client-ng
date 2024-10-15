@@ -35,7 +35,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     const prevLapCount = useRef(entry.laps.length);
     const prevPosition = useRef(entry.position);
     const lapsView = [];
-    let classes = 'w3-row';
+    let classes = 'race-entry-view w3-row';
 
     // gesture tracking variables
     let start = {};
@@ -201,23 +201,23 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     }
 
     if (entry.scoringAbbreviation === 'DNS') {
-        classes = 'w3-row did-not-start';
+        classes = 'race-entry-view w3-row did-not-start';
     }
     else if (entry.scoringAbbreviation === 'DSQ') {
-        classes = 'w3-row disqualified';
+        classes = 'race-entry-view w3-row disqualified';
     }
     else if (entry.scoringAbbreviation === 'RET') {
-        classes = 'w3-row retired';
+        classes = 'race-entry-view w3-row retired';
     }
     else if (entry.onLastLap) {
-        classes = 'w3-row on-last-lap';
+        classes = 'race-entry-view w3-row on-last-lap';
     }
     else if (entry.finishedRace) {
-        classes = 'w3-row finished-race';
+        classes = 'race-entry-view w3-row finished-race';
     }
     if (disabled) {
         if (classes === '') {
-            classes = 'w3-row disabled';
+            classes = 'race-entry-view w3-row disabled';
         }
         else {
             classes += ' disabled';
