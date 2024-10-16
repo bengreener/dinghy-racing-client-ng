@@ -110,9 +110,9 @@ function RaceHeaderView({ race, showInRaceData = true }) {
     };
 
     return (
-        <div>
+        <div className='race-header-view' >
             <div className='w3-row' >
-                <b className='w3-col m2'>{race.name}</b>
+                <label  className='w3-col m2' ><b>{race.name}</b></label>
                 <div className='w3-col m1 s6'>
                     {race.type !== RaceType.PURSUIT ? <label htmlFor={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >Laps</label> : null}
                     {race.type !== RaceType.PURSUIT ? <output id={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{race.plannedLaps}</output> : null}
