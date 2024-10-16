@@ -66,8 +66,9 @@ it('renders', async () => {
     expect(screen.getByLabelText(/fleet/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/fleet/i)).toBeChecked();
     expect(screen.getByLabelText(/pursuit/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', {name: /start races/i})).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: /flags/i})).toBeInTheDocument();
-    expect(screen.getByRole('heading', {name: /races/i})).toBeInTheDocument();
+    expect(screen.getByRole('heading', {name: /^races$/i})).toBeInTheDocument();
 });
 
 it('calls getStartSequence with correct arguments', async () => {
@@ -194,10 +195,6 @@ it('displays time to next flag state change for each flag', async () => {
 });
 
 it('displays race headers for races in session', async () => {
-    // const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
-    // const raceGraduateA = { "name": "Graduate A", "plannedStartTime" : new Date("2021-10-14T14:15:00Z"), "dinghyClass": dinghyClassGraduate, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/7" };
-    // const raceCometA = { "name": "Comet A", "plannedStartTime" : new Date("2021-10-14T14:20:00Z"), "dinghyClass": dinghyClassComet, "duration": 2700000, "plannedLaps": 4, "lapForecast": 4.0, "lastLapTime": null, "averageLapTime": null, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/17" };
-    // const raceHandicapA = { "name": "Handicap A", "plannedStartTime": new Date("2021-10-14T14:25:00Z"), "dinghyClass": null, "duration": 2100000, "plannedLaps": 3, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/8" };
     const races = [raceScorpionA, raceGraduateA, raceCometA, {...raceHandicapA, duration: 2100000, plannedLaps: 3}];
 
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -208,9 +205,10 @@ it('displays race headers for races in session', async () => {
         customRender(<RaceStartConsole />, model, controller);
     });
 
-    const raceHeaders = (screen.getByRole('heading', {name: /races/i})).parentNode;
+    const raceHeaders = (screen.getByRole('heading', {name: /^races$/i})).parentNode;
+
     expect(within(raceHeaders).getByText(/scorpion a/i)).toBeInTheDocument();
-    const raceA = within(raceHeaders).getByText(/scorpion a/i).parentNode;
+    const raceA = within(raceHeaders).getByText(/scorpion a/i).parentNode.parentNode.parentNode;
     expect(within(raceA).getByLabelText(/^laps$/i)).toHaveValue('5');
     expect(within(raceA).getByLabelText(/duration/i)).toHaveValue('45:00');
     expect(within(raceA).getByLabelText(/countdown/i)).toHaveValue('05:00');
@@ -218,7 +216,7 @@ it('displays race headers for races in session', async () => {
     expect(within(raceA).getByRole('button', {name: /start now/i})).toBeInTheDocument();
 
     expect(within(raceHeaders).getByText(/graduate a/i)).toBeInTheDocument();
-    const raceB = within(raceHeaders).getByText(/graduate a/i).parentNode;
+    const raceB = within(raceHeaders).getByText(/graduate a/i).parentNode.parentNode.parentNode;
     expect(within(raceB).getByLabelText(/^laps$/i)).toHaveValue('4');
     expect(within(raceB).getByLabelText(/duration/i)).toHaveValue('45:00');
     expect(within(raceB).getByLabelText(/countdown/i)).toHaveValue('10:00');
@@ -226,7 +224,7 @@ it('displays race headers for races in session', async () => {
     expect(within(raceB).getByRole('button', {name: /start now/i})).toBeInTheDocument();
 
     expect(within(raceHeaders).getByText(/comet a/i)).toBeInTheDocument();
-    const raceC = within(raceHeaders).getByText(/comet a/i).parentNode;
+    const raceC = within(raceHeaders).getByText(/comet a/i).parentNode.parentNode.parentNode;
     expect(within(raceC).getByLabelText(/^laps$/i)).toHaveValue('4');
     expect(within(raceC).getByLabelText(/duration/i)).toHaveValue('45:00');
     expect(within(raceC).getByLabelText(/countdown/i)).toHaveValue('15:00');
@@ -234,7 +232,7 @@ it('displays race headers for races in session', async () => {
     expect(within(raceC).getByRole('button', {name: /start now/i})).toBeInTheDocument();
 
     expect(within(raceHeaders).getByText(/handicap a/i)).toBeInTheDocument();
-    const raceD = within(raceHeaders).getByText(/handicap a/i).parentNode;
+    const raceD = within(raceHeaders).getByText(/handicap a/i).parentNode.parentNode.parentNode;
     expect(within(raceD).getByLabelText(/^laps$/i)).toHaveValue('3');
     expect(within(raceD).getByLabelText(/duration/i)).toHaveValue('35:00');
     expect(within(raceD).getByLabelText(/countdown/i)).toHaveValue('20:00');
@@ -243,7 +241,6 @@ it('displays race headers for races in session', async () => {
 });
 
 it('does not displays in race data in race headers', async () => {
-    // const raceScorpionA = { "name": "Scorpion A", "plannedStartTime": new Date("2021-10-14T14:10:00Z"), "dinghyClass": dinghyClassScorpion, "duration": 2700000, "plannedLaps": 5, "lapForecast": 5.0, "lastLapTime": 0, "averageLapTime": 0, "clock": null, "url": "http://localhost:8081/dinghyracing/api/races/4" };
     const races = [raceScorpionA];
 
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -254,7 +251,7 @@ it('does not displays in race data in race headers', async () => {
         customRender(<RaceStartConsole />, model, controller);
     });
 
-    const raceHeaders = (screen.getByRole('heading', {name: /races/i})).parentNode;
+    const raceHeaders = (screen.getByRole('heading', {name: /^races$/i})).parentNode;
     expect(within(raceHeaders).getByText(/scorpion a/i)).toBeInTheDocument();
     const raceA = within(raceHeaders).getByText(/scorpion a/i).parentNode;
     expect(within(raceA).queryByLabelText(/remaining/i)).not.toBeInTheDocument();
