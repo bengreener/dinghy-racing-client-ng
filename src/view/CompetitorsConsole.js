@@ -95,16 +95,22 @@ function CompetitorsConsole() {
     };
 
     return (
-        <div className="competitors-console">
+        <div className='w3-container console'>
             <h1>Competitors</h1>
-            <p id="competitor-console-message" className={!message ? "hidden" : ""}>{message}</p>
-            {selectedCompetitor ? <form action="" method="post">
-                <label htmlFor="name-input" >Name</label>
-                <input id="name-input" type="text" name="name" value={competitorName} onChange={handleNameChange} />
-                <button type='button' onClick={handleUpdateButtonClick} >Update</button>
-                <button type='button' onClick={clearSelectedCompetitor} >Cancel</button>
+            {selectedCompetitor ? <form className='w3-container' action='' method='post'>
+                <div className='w3-row'>
+                    <label htmlFor='name-input' className='w3-col m2' >Name</label>
+                    <input id='name-input' type='text' name='name' className='w3-half' value={competitorName} onChange={handleNameChange} />
+                </div>
+                <div className='w3-row'>
+                    <div className='w3-col m8' >
+                        <button className='w3-right' type='button' onClick={handleUpdateButtonClick} >Update</button>
+                        <button className='w3-right' type='button' onClick={clearSelectedCompetitor} >Cancel</button>
+                    </div>
+                </div>
             </form> : null}
-            <div className="scrollable">
+            <p id='competitor-console-message' className={!message ? 'hidden' : ''}>{message}</p>
+            <div className='scrollable'>
                 <table>
                     <thead>
                         <tr>

@@ -60,7 +60,7 @@ function ScoringAbbreviation({value = '', onChange}) {
     }
 
     return (
-        <select className="race-entry-view-scoring-abbreviation" value={sc} onClick={handleOnClick} onAuxClick={handleAuxClick} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove}
+        <select value={sc} onClick={handleOnClick} onAuxClick={handleAuxClick} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp} onPointerOut={handlePointerOut} onPointerLeave={handlePointerLeave} onPointerCancel={handleCancel} onChange={handleChange} >
             <option></option>
             <option>DNS</option>

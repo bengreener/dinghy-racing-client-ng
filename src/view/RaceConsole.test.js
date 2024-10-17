@@ -233,8 +233,11 @@ describe('when a race is unselected', () => {
         await act(async () => {
             await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
         });
+
+        const tempRaceHeaderViews = document.getElementsByClassName('race-header-view');
+        const raceHeaderViews = tempRaceHeaderViews[0].parentElement;
         
-        const graduateHeader = await screen.findByText(/graduate a/i, {'selector': 'label'});
+        const graduateHeader = await within(raceHeaderViews).findByText(/graduate a/i);
         expect(graduateHeader).toBeInTheDocument();
         await act(async () => {
             await user.deselectOptions(selectRace, ['Graduate A']);

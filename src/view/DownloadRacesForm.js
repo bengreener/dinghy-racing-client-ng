@@ -73,9 +73,11 @@ function DownloadRacesForm() {
     }, [model, sessionStart, sessionEnd]);
 
     return (
-        <div>
+        <div className='w3-container console' >
             <h1>Download Races</h1>
-            <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
+            <form className='w3-container' action='' method='get'>
+                <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
+            </form>
             <p id="download-races-message" className={!message ? "hidden" : ""}>{message}</p>
             {races.map(race => <DownloadRace key={race.name+race.plannedStartTime.toISOString()} race={race} downloadFunction={handleRaceResultDownloadClick} />)}
         </div>

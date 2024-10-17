@@ -27,13 +27,19 @@ import FlagState from '../model/domain-classes/flag-state';
  */
 function FlagControl({ flag, timeToChange }) {
     return (
-        <div>
-            <label htmlFor={'flag-name-output'}>Flag</label>
-            <output id='flag-name-output'>{flag.name}</output>
-            <label htmlFor={'current-state-output'}>State</label>
-            <output id='current-state-output'>{flag.state === FlagState.LOWERED ? 'Lowered' : 'Raised' }</output>
-            <label htmlFor={'change-in-output'}>Change In</label>
-            <output id='change-in-output'>{Clock.formatDuration(timeToChange)}</output>
+        <div className='w3-row'>
+            <div className='w3-col s4 m3 w3-cell-row'>
+                <label htmlFor={'flag-name-output'} className='w3-cell' >Flag</label>
+                <output id='flag-name-output' className='w3-cell' >{flag.name}</output>
+            </div>
+            <div className='w3-col s4 m2 w3-cell-row'>
+                <label htmlFor={'current-state-output'} className='w3-cell' >State</label>
+                <output id='current-state-output' className='w3-cell' >{flag.state === FlagState.LOWERED ? 'Lowered' : 'Raised' }</output>
+            </div>
+            <div className='w3-col s4 m2 w3-cell-row'>
+                <label htmlFor={'change-in-output'} className='w3-cell' >Change In</label>
+                <output id='change-in-output' className='w3-cell' >{Clock.formatDuration(timeToChange)}</output>
+            </div>
         </div>
     )
 }

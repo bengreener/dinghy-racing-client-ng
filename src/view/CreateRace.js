@@ -42,7 +42,7 @@ function CreateRace({ onCreate }) {
                 let options = [];
                 let map = new Map();
                 // set handicap options
-                options.push(<option key="handicap" value={null}></option> );
+                options.push(<option key='handicap' value={null}></option> );
                 // set dinghy classes
                 result.domainObject.forEach(dinghyClass => {
                     options.push(<option key={dinghyClass.name} value={dinghyClass.name}>{dinghyClass.name}</option>);
@@ -98,30 +98,51 @@ function CreateRace({ onCreate }) {
     }
 
     return (
-        <form action="" method="post">
-            <label htmlFor="race-name-input">Race Name</label>
-            <input id="race-name-input" ref={raceNameInputRef} name="name" type="text" onChange={handleChange} value={race.name} autoFocus />
-            <label htmlFor="race-time-input">Race Time</label>
-            <input id="race-time-input" name="plannedStartTime" type="datetime-local" onChange={handleChange} value={race.plannedStartTime} />
-            <label htmlFor="race-duration-input">Duration</label>
-            <input id="race-duration-input" name="duration" type="number" onChange={handleChange} value={race.duration / 60000} />
-            <label htmlFor="race-laps-input">Laps</label>
-            <input id="race-laps-input" name="plannedLaps" type="number" min="1" onChange={handleChange} value={race.plannedLaps ? race.plannedLaps : ''} />
-            <label htmlFor="race-class-select">Race Class</label>
-            <select id="race-class-select" name="dinghyClass" multiple={false} onChange={handleChange} value={race.dinghyClass ? race.dinghyClass.name : ''} >{dinghyClassOptions}</select>
-            <label htmlFor="race-type-select">Type</label>
-            <select id="race-type-select" name="type" multiple={false} onChange={handleChange} value={race.type} >
-                <option value="FLEET">Fleet</option>
-                <option value="PURSUIT">Pursuit</option>
-            </select>
-            <label htmlFor="race-start-type-select">Start Type</label>
-            <select id="race-start-type-select" name="startType" multiple={false} onChange={handleChange} value={race.startType} >
-                <option value="CSCCLUBSTART">10-5-GO</option>
-                <option value="RRS26">5-4-1-GO</option>
-            </select>
-            <output id="race-message-output" />
-            <button id="race-create-button" type="button" onClick={handleCreate}>Create</button>
-        </form>
+        <div className='w3-container console' >
+            <h1>Create Race</h1>
+            <form className='w3-container' action='' method='post'>
+                <div className='w3-row'>
+                    <label htmlFor='race-name-input' className='w3-col m2' >Race Name</label>
+                    <input id='race-name-input' ref={raceNameInputRef} name='name' className='w3-half' type='text' onChange={handleChange} value={race.name} autoFocus />
+                </div>
+                <div className='w3-row'>
+                    <label htmlFor='race-time-input' className='w3-col m2' >Race Time</label>
+                    <input id='race-time-input' name='plannedStartTime' className='w3-half' type='datetime-local' onChange={handleChange} value={race.plannedStartTime} />
+                </div>
+                <div className='w3-row'>
+                    <label htmlFor='race-duration-input' className='w3-col m2' >Duration</label>
+                    <input id='race-duration-input' name='duration' className='w3-half' type='number' onChange={handleChange} value={race.duration / 60000} />
+                    </div>
+                <div className='w3-row'>
+                    <label htmlFor='race-laps-input' className='w3-col m2' >Laps</label>
+                    <input id='race-laps-input' name='plannedLaps' className='w3-half' type='number' min='1' onChange={handleChange} value={race.plannedLaps ? race.plannedLaps : ''} />
+                </div>
+                <div className='w3-row'>
+                    <label htmlFor='race-class-select' className='w3-col m2' >Race Class</label>
+                    <select id='race-class-select' name='dinghyClass' className='w3-half' multiple={false} onChange={handleChange} value={race.dinghyClass ? race.dinghyClass.name : ''} >{dinghyClassOptions}</select>
+                </div>
+                <div className='w3-row'>
+                    <label htmlFor='race-type-select' className='w3-col m2' >Type</label>
+                    <select id='race-type-select' name='type' className='w3-half' multiple={false} onChange={handleChange} value={race.type} >
+                        <option value='FLEET'>Fleet</option>
+                        <option value='PURSUIT'>Pursuit</option>
+                    </select>
+                </div>
+                <div className='w3-row'>
+                    <label htmlFor='race-start-type-select' className='w3-col m2' >Start Type</label>
+                    <select id='race-start-type-select' name='startType' className='w3-half' multiple={false} onChange={handleChange} value={race.startType} >
+                        <option value='CSCCLUBSTART'>10-5-GO</option>
+                        <option value='RRS26'>5-4-1-GO</option>
+                    </select>
+                </div>
+                <div className='w3-row'>
+                    <div className='w3-col m8' >
+                        <button id='race-create-button' className='w3-right' type='button' onClick={handleCreate}>Create</button>
+                    </div>
+                </div>
+                <output id='race-message-output' />
+            </form>
+        </div>
     );
 }
 

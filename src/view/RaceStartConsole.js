@@ -129,20 +129,28 @@ function RaceStartConsole () {
     }
 
     return (
-        <div className="race-start-console">
-            <div className="select-race">
-                <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
-                <div>
-                    <fieldset>
-                        <legend>Race Type</legend>
-                        <input id="radio-race-type-fleet" name="race-type" type="radio" value="FLEET" onChange={handleRaceTypeChange} defaultChecked="true"/>
-                        <label htmlFor="radio-race-type-fleet">Fleet</label>
-                        <input id="radio-race-type-pursuit" name="race-type" type="radio" value="PURSUIT" onChange={handleRaceTypeChange} />
-                        <label htmlFor="radio-race-type-pursuit">Pursuit</label>
-                    </fieldset>
-                </div>
-            </div>
-            <p id="race-console-message" className={!message ? "hidden" : ""}>{message}</p>
+        <div className='w3-container console'>
+            <CollapsableContainer heading={'Start Races'}>
+                <form className='w3-container' >
+                    <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
+                    <div className='w3-row'>
+                        <fieldset className='w3-third' >
+                            <legend>Race Type</legend>
+                            <div className='w3-cell-row'>
+                                <div className='w3-cell'>
+                                    <input id='radio-race-type-fleet' name='race-type' type='radio' value='FLEET' onChange={handleRaceTypeChange} defaultChecked='true'/>
+                                    <label htmlFor='radio-race-type-fleet'>Fleet</label>
+                                </div>
+                                <div className='w3-cell'>
+                                    <input id='radio-race-type-pursuit' name='race-type' type='radio' value='PURSUIT' onChange={handleRaceTypeChange} />
+                                    <label htmlFor='radio-race-type-pursuit'>Pursuit</label>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                </form>
+                <p id='race-console-message' className={!message ? 'hidden' : ''}>{message}</p>
+            </CollapsableContainer>
             <CollapsableContainer heading={'Flags'}>
                 {flagsWithNextAction.map(flag => { return <FlagControl key={flag.flag.name} flag={flag.flag} timeToChange={flag.action ? flag.action.time.valueOf() - Clock.now() : 0} /> })} {/* use Clock.now to get adjusted time when synched to an external clock */}
             </CollapsableContainer>

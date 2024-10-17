@@ -87,10 +87,14 @@ function SelectSession({ sessionStart, sessionEnd, onSessionStartChange, onSessi
 
     return (
         <div>
-            <label htmlFor="select-session-start">Session Start</label>
-            <input id="select-session-start" name="sessionStartTime" type="datetime-local" onChange={handleSessionStartChange} value={start} />
-            <label htmlFor="select-session-end">Session End</label>
-            <input id="select-session-end" name="sessionEndTime" type="datetime-local" onChange={handleSessionEndChange} value={end} />
+            <div className='w3-row'>
+                <label htmlFor='select-session-start' className='w3-col m2' >Session Start</label>
+                <input id='select-session-start' name='sessionStartTime' type='datetime-local' className='w3-col m3' onChange={handleSessionStartChange} value={start} />
+            </div>
+            <div className='w3-row'>
+                <label htmlFor='select-session-end' className='w3-col m2'>Session End</label>
+                <input id='select-session-end' name='sessionEndTime' type='datetime-local' className='w3-col m3' onChange={handleSessionEndChange} value={end} />
+            </div>
             <p>{message}</p>
         </div>
     )

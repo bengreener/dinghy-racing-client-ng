@@ -261,21 +261,21 @@ function SignUp({ race }) {
                     // build table rows
                     const rows = result.domainObject.map(entry => {
                         return <tr key={entry.helm.name} id={entry.url} onClick={handleEntryRowClick} >
-                            <td key="helm">{entry.helm.name}</td>
-                            <td key="sailNumber">{entry.dinghy.sailNumber}</td>
-                            <td key="dinghyClass">{entry.dinghy.dinghyClass.name}</td>
-                            {(!race.dinghyClass || race.dinghyClass.crewSize > 1) ? <td key="crew">{entry.crew ? entry.crew.name : ''}</td> : null}
-                            <td key="withdrawEntry-button"><button id={entry.url} className="embedded" type="button" onClick={handleWithdrawEntryButtonClick}>X</button></td>
+                            <td key='helm'>{entry.helm.name}</td>
+                            <td key='sailNumber'>{entry.dinghy.sailNumber}</td>
+                            <td key='dinghyClass'>{entry.dinghy.dinghyClass.name}</td>
+                            {(!race.dinghyClass || race.dinghyClass.crewSize > 1) ? <td key='crew'>{entry.crew ? entry.crew.name : ''}</td> : null}
+                            <td key='withdrawEntry-button'><button id={entry.url} className='embedded' type='button' onClick={handleWithdrawEntryButtonClick}>X</button></td>
                         </tr>
                     });
                     setEntriesTable(<table>
                         <thead>
                             <tr>
-                                <th key="helm">Helm</th>
-                                <th key="sailNumber">Sail Number</th>
-                                <th key="dinghyClass">Class</th>
-                                {(!race.dinghyClass || race.dinghyClass.crewSize > 1) ? <th key="crew">Crew</th> : null}
-                                <th key="withdrawEntry-button"></th>
+                                <th key='helm'>Helm</th>
+                                <th key='sailNumber'>Sail Number</th>
+                                <th key='dinghyClass'>Class</th>
+                                {(!race.dinghyClass || race.dinghyClass.crewSize > 1) ? <th key='crew'>Crew</th> : null}
+                                <th key='withdrawEntry-button'></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -406,10 +406,10 @@ function SignUp({ race }) {
         let dinghyClassInput = null;    
         if (!race.dinghyClass) {
             dinghyClassInput = (
-                <>
-                    <label htmlFor="dinghy-class-select">Dinghy Class</label>
-                    <select id="dinghy-class-select" ref={dinghyClassSelect} name="dinghyClass" multiple={false} onChange={handleChange} value={dinghyClassName} autoFocus >{dinghyClassOptions}</select>
-                </>
+                <div className='w3-row'>
+                    <label htmlFor='dinghy-class-select' className='w3-col m2' >Dinghy Class</label>
+                    <select id='dinghy-class-select' ref={dinghyClassSelect} name='dinghyClass' className='w3-half' multiple={false} onChange={handleChange} value={dinghyClassName} autoFocus >{dinghyClassOptions}</select>
+                </div>
             );
         }
         // if race has a specified dinghy class then set for selected dinghy as well
@@ -422,35 +422,35 @@ function SignUp({ race }) {
     function buildHelmInput() {
         if (race.dinghyClass) {
             return (
-                <>
-                    <label htmlFor="helm-input">Helm's Name</label>
-                    <input id="helm-input" ref={helmInput} name="helm" list="competitor-datalist" onChange={handleChange} value={helmName} autoFocus />
-                </>
+                <div className='w3-row'>
+                    <label htmlFor='helm-input' className='w3-col m2' >Helm's Name</label>
+                    <input id='helm-input' ref={helmInput} name='helm' className='w3-half' list='competitor-datalist' onChange={handleChange} value={helmName} autoFocus />
+                </div>
             )
         }
         else {
             return (
-                <>
-                    <label htmlFor="helm-input">Helm's Name</label>
-                    <input id="helm-input" ref={helmInput} name="helm" list="competitor-datalist" onChange={handleChange} value={helmName} />
-                </>
+                <div className='w3-row'>
+                    <label htmlFor='helm-input' className='w3-col m2' >Helm's Name</label>
+                    <input id='helm-input' ref={helmInput} name='helm' className='w3-half' list='competitor-datalist' onChange={handleChange} value={helmName} />
+                </div>
             )
         }
     }
 
     function buildCrewInput() {
         let crewInput = (
-            <>
-                <label htmlFor="crew-input">Crew's Name</label>
-                <input id="crew-input" name="crew" list="competitor-datalist" onChange={handleChange} value={crewName} disabled />
-            </>
+            <div className='w3-row'>
+                <label htmlFor='crew-input' className='w3-col m2' >Crew's Name</label>
+                <input id='crew-input' name='crew' className='w3-half' list='competitor-datalist' onChange={handleChange} value={crewName} disabled />
+            </div>
         );
         if (dinghyClassHasCrew) {
             crewInput = (
-                <>
-                    <label htmlFor="crew-input">Crew's Name</label>
-                    <input id="crew-input" name="crew" list="competitor-datalist" onChange={handleChange} value={crewName} />
-                </>
+                <div className='w3-row'>
+                    <label htmlFor='crew-input' className='w3-col m2' >Crew's Name</label>
+                    <input id='crew-input' name='crew' className='w3-half' list='competitor-datalist' onChange={handleChange} value={crewName} />
+                </div>
             );
         }
         return crewInput;
@@ -508,25 +508,31 @@ function SignUp({ race }) {
     }
 
     return (
-        <form className="sign-up-form" action="" method="get">
+        <div className='w3-container console' >
+            <datalist id='competitor-datalist'>{competitorOptions}</datalist>
+            <datalist id='dinghy-datalist'>{dinghyOptions}</datalist>
             <h1>{race.name}</h1>
-            <datalist id="competitor-datalist">{competitorOptions}</datalist>
-            <div>
+            <form className='w3-container' action='' method='get'>
                 {dinghyClassInput(race)}
                 {buildHelmInput()}
                 {buildCrewInput()}
-                <datalist id="dinghy-datalist">{dinghyOptions}</datalist>
-                <label htmlFor="sail-number-input">Sail Number</label>
-                <input id="sail-number-input" name="sailNumber" list="dinghy-datalist" onChange={handleChange} value={sailNumber} />
-                <button id="entry-update-button" type="button" onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
-                {selectedEntry ? <button id="cancel-button" type="button" onClick={clear} >Cancel</button> : null}
-            </div>
-            <p id="signup-message" className={!message ? "hidden" : ""}>{message}</p>
+                <div className='w3-row'>
+                    <label htmlFor='sail-number-input' className='w3-col m2' >Sail Number</label>
+                    <input id='sail-number-input' name='sailNumber' className='w3-half' list='dinghy-datalist' onChange={handleChange} value={sailNumber} />
+                </div>
+                <div className='w3-row' >
+                    <div className='w3-col m8' >
+                        <button id='entry-update-button' className='w3-right' type='button' onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
+                        {selectedEntry ? <button id='cancel-button' className='w3-right' type='button' onClick={clear} >Cancel</button> : null}
+                    </div>
+                </div>
+            </form>
+            <p id='signup-message' className={!message ? 'hidden' : ''}>{message}</p>
             <h3>Signed-up</h3>
-            <div className="scrollable">
+            <div className='w3-container scrollable'>
                 {entriesTable}
             </div>
-        </form>
+        </div>
     )
 }
 
