@@ -101,37 +101,37 @@ function App({model, controller}) {
             <div className='w3-row w3-display-container w3-white' >
                 <div className='w3-display-container'>
                     <img className='w3-image' src='/images/dinghy-icon.svg' alt='Dinghy Icon' />
-                    <button className='w3-button w3-xlarge w3-hover-theme w3-display-right' onClick={w3_open}>☰</button>
+                    <button className='w3-button w3-xlarge w3-display-right' onClick={w3_open}>☰</button>
                 </div>
                 <div ref={sidebarRef} className='w3-sidebar w3-bar-block w3-border-left' style={{display:'none', right:'0'}} >
-                    <button onClick={w3_close} className='w3-bar-item w3-btn w3-hover-theme'>Close &times;</button>
+                    <button onClick={w3_close} className='w3-bar-item w3-btn'>Close &times;</button>
                     {roles.includes('ROLE_RACE_SCHEDULER') ? 
-                        <button key={0} type='button' className='w3-bar-item w3-btn w3-hover-theme' onClick={showCreateDinghyClassForm}>Dinghy Classes</button>
+                        <button key={0} type='button' className='w3-bar-item w3-btn' onClick={showCreateDinghyClassForm}>Dinghy Classes</button>
                         : null
                     }
                     {roles.includes('ROLE_RACE_SCHEDULER') ? 
-                        <button key={1} type='button' className='w3-bar-item w3-btn w3-hover-theme' onClick={showCreateRaceForm}>Create Race</button>
+                        <button key={1} type='button' className='w3-bar-item w3-btn' onClick={showCreateRaceForm}>Create Race</button>
                         : null
                     }
-                    <button key={5} type='button' className='w3-bar-item w3-btn w3-hover-theme' onClick={showCompetitorsConsole}>Competitors</button>
+                    <button key={5} type='button' className='w3-bar-item w3-btn' onClick={showCompetitorsConsole}>Competitors</button>
                     {roles.includes('ROLE_RACE_OFFICER') ? 
-                        <button key={6} type='button' className='w3-bar-item w3-btn w3-hover-theme' onClick={showDownloadRaces}>Download Races</button>
+                        <button key={6} type='button' className='w3-bar-item w3-btn' onClick={showDownloadRaces}>Download Races</button>
                         : null
                     }
                     {roles.includes('ROLE_RACE_OFFICER') ? 
-                        <button key={7} type='button' className='w3-bar-item w3-btn w3-hover-theme' onClick={handleSynchExternalClockClick}>Synch External Clock</button>
+                        <button key={7} type='button' className='w3-bar-item w3-btn' onClick={handleSynchExternalClockClick}>Synch External Clock</button>
                         : null
                     }
-                    <button key={8} type='button' className='w3-bar-item w3-btn w3-hover-theme' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
+                    <button key={8} type='button' className='w3-bar-item w3-btn' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
                 </div>
                 <nav className='w3-row w3-bginfosys-display-bottommiddle-m1' >
-                    <button key={2} type='button' className='w3-btn w3-third w3-hover-theme w3-card' onClick={showUpcomingRaces}>Upcoming Races</button>
+                    <button key={2} type='button' className='w3-btn w3-third w3-card' onClick={showUpcomingRaces}>Upcoming Races</button>
                     {roles.includes('ROLE_RACE_OFFICER') ? 
-                        <button key={3} type='button' className='w3-btn w3-third w3-hover-theme w3-card' onClick={showRaceStartConsole}>Race Start Console</button>
+                        <button key={3} type='button' className='w3-btn w3-third w3-card' onClick={showRaceStartConsole}>Race Start Console</button>
                         : null
                     }
                     {roles.includes('ROLE_RACE_OFFICER') ? 
-                        <button key={4} type='button' className='w3-btn w3-third w3-hover-theme w3-card' onClick={showRaceConsole}>Race Console</button>
+                        <button key={4} type='button' className='w3-btn w3-third w3-card' onClick={showRaceConsole}>Race Console</button>
                         : null
                     }
                 </nav>

@@ -17,7 +17,6 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import LapView from './LapView';
 import ScoringAbbreviation from './ScoringAbbreviation';
-import { PositionConstant } from './RaceEntriesView';
 
 /**
  * Display the details of a race entry
