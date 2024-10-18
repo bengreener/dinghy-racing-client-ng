@@ -127,7 +127,7 @@ function App({model, controller}) {
                 <nav className='w3-row w3-bginfosys-display-bottommiddle-m1' >
                     <button key={2} type='button' className='w3-btn w3-card' onClick={showUpcomingRaces}>Upcoming Races</button>
                     {roles.includes('ROLE_RACE_OFFICER') ? 
-                        <button key={3} type='button' className='w3-btn w3-card' onClick={showRaceStartConsole}>Race Start Console</button>
+                        <button key={3} type='button' className='w3-btn w3-card' onClick={showRaceStartConsole}>Race Start</button>
                         : null
                     }
                     {roles.includes('ROLE_RACE_OFFICER') ? 
