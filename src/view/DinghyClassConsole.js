@@ -177,7 +177,7 @@ function DinghyClassConsole() {
             </form>
             <p id='dinghy-class-console-message' className={!message ? 'hidden' : ''}>{message}</p>
             <div className='scrollable'>
-                <table>
+                <table className='w3-table'>
                     <thead>
                         <tr>
                             <th>Dinghy Class</th>
