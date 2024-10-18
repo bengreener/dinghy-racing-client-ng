@@ -182,6 +182,9 @@ td.total {
 .finished-race {
 	background-color: palegreen;
 }
+.upcoming-race {
+	cursor: pointer;
+}
 .warning-flag-prepare-raise {
 	padding: 5pt;
 	margin: 0;

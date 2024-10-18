@@ -110,7 +110,7 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
                     </thead>
                     <tbody>
                         {Array.from(raceMap.values()).map(race => 
-                            <tr key={race.url} id={race.url} onClick={handleRowClick} >
+                            <tr className='upcoming-race' key={race.url} id={race.url} onClick={handleRowClick} >
                                 <td>{race.name}</td>
                                 <td>{race.dinghyClass ? race.dinghyClass.name : ''}</td>
                                 <td>{race.plannedStartTime.toLocaleString()}</td>
