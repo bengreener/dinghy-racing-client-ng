@@ -568,7 +568,6 @@ describe('when signing up for a race', () => {
             expect(raceTitle).toBeInTheDocument();
             expect(inputHelm).toHaveValue('');
             expect(inputSailNumber).toHaveValue('');
-            // expect(screen.queryByLabelText(/crew/i)).not.toBeInTheDocument();
             expect(screen.queryByLabelText(/crew/i)).toBeDisabled();
             expect(btnCreate).toBeInTheDocument();
         });
@@ -580,6 +579,17 @@ describe('when signing up for a race', () => {
             expect((await screen.findAllByRole('cell', {'name': /Comet/i}))[0]).toBeInTheDocument();
             expect(await screen.findByRole('cell', {'name': /826/i})).toBeInTheDocument();
             expect((await screen.findAllByRole('button', {name: /x/i}))[0]).toBeInTheDocument();
+        });
+
+        it('shows a count of the number of entries to the race', async () => {
+            jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesHandicapA})});
+            await act(async () => {
+                customRender(<SignUp race={raceCometA}/>, model, controller);
+            });
+            const signUpSummary = document.getElementsByClassName('sign-up-summary');
+            expect(within(signUpSummary[0]).getByText(/Total entries/i)).toBeInTheDocument();
+            expect(within(signUpSummary[0]).getByText(/scorpion/i)).toBeInTheDocument();
+            expect(within(signUpSummary[0]).getByText(/comet/i)).toBeInTheDocument();
         });
     });    
     describe('when race for dinghy class with crew', () => {

@@ -50,6 +50,7 @@ function SignUp({ race }) {
     const [competitorUpdateRequestAt, setCompetitorUpdateRequestAt] = useState(Date.now());
     const [dinghyUpdateRequestAt, setDinghyUpdateRequestAt] = useState(Date.now());
     const [dinghyClassUpdateRequestAt, setDinghyClassUpdateRequestAt] = useState(Date.now());
+    const entriesSummary = useRef(new Map());
 
     const handleRaceUpdate = useCallback(() => {
         setRaceUpdateRequestAt(Date.now());
@@ -249,15 +250,17 @@ function SignUp({ race }) {
     useEffect(() => {
         let ignoreFetch = false; // set to true if SignUp rerendered before fetch completes to avoid using out of date result
         model.getEntriesByRace(race).then(result => {
+            entriesSummary.current = new Map();
             if (!ignoreFetch) {
                 if (result.success) {
                     // populate entries map and register for updates
                     const map = new Map();
                     result.domainObject.map(entry => {
                         model.registerEntryUpdateCallback(entry.url, handleEntryUpdate);
+                        updateEntriesSummary(entry.dinghy.dinghyClass.name);
                         return map.set(entry.url, entry);
                     });
-                    entriesMap.current = map; // tried using setState but was failing tests with entriesMap === null even when entriesTable populated; entriesMap is nt a visual element so useRef may be a better fit anyway
+                    entriesMap.current = map; // tried using setState but was failing tests with entriesMap === null even when entriesTable populated; entriesMap is not a visual element so useRef may be a better fit anyway
                     // build table rows
                     const rows = result.domainObject.map(entry => {
                         return <tr key={entry.helm.name} id={entry.url} onClick={handleEntryRowClick} >
@@ -268,7 +271,7 @@ function SignUp({ race }) {
                             <td key='withdrawEntry-button'><button id={entry.url} className='embedded' type='button' onClick={handleWithdrawEntryButtonClick}>X</button></td>
                         </tr>
                     });
-                    setEntriesTable(<table>
+                    setEntriesTable(<table className='w3-table'>
                         <thead>
                             <tr>
                                 <th key='helm'>Helm</th>
@@ -296,7 +299,7 @@ function SignUp({ race }) {
             });
         }
     }, [race, model, handleEntryRowClick, raceUpdateRequestAt, handleWithdrawEntryButtonClick, entryUpdateRequestAt, handleEntryUpdate]);
-    
+
     // if error display message 
     useEffect(() => {
         if (result && result.success) {
@@ -507,8 +510,50 @@ function SignUp({ race }) {
         }
     }
 
+    function updateEntriesSummary(dinghyClassName) {
+        if (entriesSummary.current.has(dinghyClassName)) {
+            entriesSummary.current.set(dinghyClassName, entriesSummary.current.get(dinghyClassName) + 1);
+        }
+        else {
+            entriesSummary.current.set(dinghyClassName, 1);
+        }
+    }
+
+    function entriesSummaryTable() {
+        const rows = [];
+        let totalEntries = 0;
+
+        for (const [key, value] of entriesSummary.current) {
+            totalEntries += value;
+            rows.push(<tr key={key} >
+                    <td key={`class-${key}`}>{key}</td>
+                    <td key={`no-entries-${key}`}>{value}</td>
+                </tr>
+            );
+        }
+
+        rows.push(<tr key='total' >
+                <td key='total-entries'>Total Entries</td>
+                <td key='total-sum'>{totalEntries}</td>
+            </tr>
+        );
+
+        return (<table className='sign-up-summary w3-table'>
+                <thead>
+                    <tr>
+                        <th key='dinghyClass'>Class</th>
+                        <th key='number'># entries</th>
+                    </tr>
+                </thead>
+                    <tbody>
+                        {rows}
+                    </tbody>
+                    </table>
+        );
+    };
+
     return (
-        <div className='w3-container console' >
+        <div className='sign-up w3-container console' >
             <datalist id='competitor-datalist'>{competitorOptions}</datalist>
             <datalist id='dinghy-datalist'>{dinghyOptions}</datalist>
             <h1>{race.name}</h1>
@@ -531,6 +576,8 @@ function SignUp({ race }) {
             <h3>Signed-up</h3>
             <div className='w3-container scrollable'>
                 {entriesTable}
+                <h4>Summary</h4>
+                    {entriesSummaryTable()}
             </div>
         </div>
     )
