@@ -43,9 +43,9 @@ it('displays menu buttons', async () => {
   });
   const btnCreateDinghyClass = screen.getByRole('button', {name: /dinghy classes\b/i, hidden: true});
   const btnCreateRace = screen.getByRole('button', {name: /create race\b/i, hidden: true});
-  const btnUpcomingRaces = screen.getByRole('button', {name: /upcoming races\b/i, hidden: true});
+  const btnUpcomingRaces = screen.getByRole('button', {name: /Sign-up\b/i, hidden: true});
   const btnRaceStartConsole = screen.getByRole('button', {name: /race start\b/i, hidden: true});
-  const btnRaceConsole = screen.getByRole('button', {name: /race console\b/i, hidden: true});
+  const btnRaceConsole = screen.getByRole('button', {name: /run race\b/i, hidden: true});
   const btnDownloadRaces = screen.getByRole('button', {name: /download races\b/i, hidden: true});
   const btnSynchExternalCloclRaces = screen.getByRole('button', {name: /synch external clock\b/i, hidden: true});
   const btnLogout = screen.getByRole('button', {name: /logout\b/i, hidden: true});
@@ -87,7 +87,7 @@ describe('user roles does not include ROLE_RACE_OFFICER', () => {
     await act(async () => {
       render(<App controller={dinghyRacingController} />);
     });
-    const btnRaceConsole = screen.queryByRole('button', {name: /race console\b/i});
+    const btnRaceConsole = screen.queryByRole('button', {name: /run race\b/i});
     expect(btnRaceConsole).not.toBeInTheDocument();
   });
   it('does not provide option to access race start console', async () => {
@@ -155,7 +155,7 @@ describe('when upcoming races button clicked', () => {
     await act(async () => {
       await user.click(btnMenu);
     });
-    const btnViewUpcomingRaces = await screen.findByRole('button', {name: /upcoming races\b/i});
+    const btnViewUpcomingRaces = await screen.findByRole('button', {name: /sign-up\b/i});
     await act(async () => {
       await user.click(btnViewUpcomingRaces);
     });
@@ -175,7 +175,7 @@ describe('when race console button is clicked', ()  => {
     const dinghyRacingController = new DinghyRacingController(model);
 
     render(<App model={model} controller={dinghyRacingController} />);
-    const btnRaceConsole = await screen.findByRole('button', {name: /race console\b/i});
+    const btnRaceConsole = await screen.findByRole('button', {name: /run race\b/i});
     await act(async () => {
       await user.click(btnRaceConsole);
     });
