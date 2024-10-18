@@ -102,7 +102,7 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
             </form>
             <p id='view-upcoming-races-message' className={!message ? 'hidden' : ''}>{message}</p>
             <div className='scrollable'>
-                <table>
+                <table className='w3-table'>
                     <thead>
                         <tr>
                             <th>Race</th><th>Class</th><th>Start Time</th><th>Type</th><th>Start Type</th>
