@@ -167,6 +167,9 @@ td.total {
 .scrollable {
 	overflow: auto;
 }
+.clickable-table-row {
+	cursor: pointer;
+}
 .did-not-start {
 	background-color: lightgrey;
 }

@@ -102,7 +102,7 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
             </form>
             <p id='view-upcoming-races-message' className={!message ? 'hidden' : ''}>{message}</p>
             <div className='scrollable'>
-                <table>
+                <table className='w3-table'>
                     <thead>
                         <tr>
                             <th>Race</th><th>Class</th><th>Start Time</th><th>Type</th><th>Start Type</th>
@@ -110,7 +110,7 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
                     </thead>
                     <tbody>
                         {Array.from(raceMap.values()).map(race => 
-                            <tr key={race.url} id={race.url} onClick={handleRowClick} >
+                            <tr className='clickable-table-row' key={race.url} id={race.url} onClick={handleRowClick} >
                                 <td>{race.name}</td>
                                 <td>{race.dinghyClass ? race.dinghyClass.name : ''}</td>
                                 <td>{race.plannedStartTime.toLocaleString()}</td>
