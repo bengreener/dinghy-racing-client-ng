@@ -143,7 +143,7 @@ function DinghyClassConsole() {
     function dinghyClassRows() {
         const rows = [];
         dinghyClassMap.forEach((dinghyClass, key) => {
-            rows.push(<tr key={key} id={key} onClick={handleDinghyClassRowClick} >
+            rows.push(<tr key={key} id={key} className='clickable-table-row' onClick={handleDinghyClassRowClick} >
                 <td id={dinghyClass.name} >{dinghyClass.name}</td>
                 <td id={dinghyClass.crewSize} >{dinghyClass.crewSize}</td>
                 <td id={dinghyClass.portsmouthNumber} >{dinghyClass.portsmouthNumber}</td>

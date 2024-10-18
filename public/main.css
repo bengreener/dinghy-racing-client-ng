@@ -167,6 +167,9 @@ td.total {
 .scrollable {
 	overflow: auto;
 }
+.clickable-table-row {
+	cursor: pointer;
+}
 .did-not-start {
 	background-color: lightgrey;
 }
@@ -181,9 +184,6 @@ td.total {
 }
 .finished-race {
 	background-color: palegreen;
-}
-.upcoming-race {
-	cursor: pointer;
 }
 .warning-flag-prepare-raise {
 	padding: 5pt;
