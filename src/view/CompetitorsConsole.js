@@ -89,7 +89,7 @@ function CompetitorsConsole() {
     function competitorRows() {
         const rows = [];
         competitorsMap.forEach((competitor, key) => {
-            rows.push(<tr key={key} id={key} onClick={handleCompetitorRowClick} ><td>{competitor.name}</td></tr>);
+            rows.push(<tr key={key} id={key} className='clickable-table-row' onClick={handleCompetitorRowClick} ><td>{competitor.name}</td></tr>);
         });
         return rows;
     };
@@ -111,7 +111,7 @@ function CompetitorsConsole() {
             </form> : null}
             <p id='competitor-console-message' className={!message ? 'hidden' : ''}>{message}</p>
             <div className='scrollable'>
-                <table>
+                <table className='w3-table' >
                     <thead>
                         <tr>
                             <th>Competitors</th>
