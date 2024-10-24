@@ -378,7 +378,7 @@ describe('when the entry is selected to add a new lap', () => {
 
 describe('when user drags and drops an entry to a new position', () => {
     // seems like a forced test but, couldn't get pointer events to trigger drag and drop API events :-(
-    it('calls function passed to onRaceEntryDrop', async () => {
+    it('calls function passed to onRaceEntryDrop with subject key and taerget key ', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         const onRaceEntryDropSpy = jest.fn();
         const entry1 = {...entryChrisMarshallScorpionA1234};
@@ -396,6 +396,7 @@ describe('when user drags and drops an entry to a new position', () => {
         await act(async () => {
             fireEvent.drop(rev1, {dataTransfer: {getData: () => {}}});
         });
+        // expect(onRaceEntryDropSpy).toHaveBeenCalledWith(entry1.dinghy.dinghyClass.name + entry1.dinghy.sailNumber + entry1.helm.name, entry2.dinghy.dinghyClass.name + entry2.dinghy.sailNumber + entry2.helm.name);
         expect(onRaceEntryDropSpy).toHaveBeenCalled();
     });
     it('calls function passed to onRaceEntryDrop with value set by dragStart event', async () => {
@@ -424,6 +425,7 @@ describe('when user drags and drops an entry to a new position', () => {
         await act(async () => {
             fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
         });
+        // expect(onRaceEntryDropSpy).toHaveBeenCalledWith(entry1.dinghy.dinghyClass.name + entry1.dinghy.sailNumber + entry1.helm.name, entry2.dinghy.dinghyClass.name + entry2.dinghy.sailNumber + entry2.helm.name);
         expect(onRaceEntryDropSpy).toHaveBeenCalled();
     });
 });

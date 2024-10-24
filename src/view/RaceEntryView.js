@@ -176,7 +176,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     function dropHandler(event) {
         event.preventDefault();
         if (onRaceEntryDrop) {
-            onRaceEntryDrop(event.dataTransfer.getData('text/html'), entry.position);
+            onRaceEntryDrop(event.dataTransfer.getData('text/html'), entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
         }
     }
 
