@@ -101,9 +101,9 @@ td.total {
 	display: flex;
 	flex-direction: column;
 }
-/* .disabled {
+.disabled {
 	color: lightgray;
-} */
+}
 .display-port {
 	overflow: hidden;
 	height: 75vh;
