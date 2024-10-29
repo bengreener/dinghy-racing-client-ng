@@ -220,20 +220,26 @@ function RaceEntriesView({ races }) {
         }
         const subjectEntry = entriesMap.get(subjectKey);
         const targetEntry = entriesMap.get(targetKey);
-        // If both entries in same race assign subject position from target position
-        if (subjectEntry.race.name === targetEntry.race.name) { // testiing equality directly on races will fail as different objects
-            updateEntryPosition(subjectEntry, targetEntry.position);
-            return;
-        }
-        // if entries in different races find first entry below target in same race as subject and use that to assign a position to subject
-        else if (subjectEntry.race.name !== targetEntry.race.name) {
-            const sortedEntries = sorted();
-            for (let i = sortedEntries.findIndex(e => e === targetEntry) + 1; i < sortedEntries.length; i++) {
-                if (subjectEntry.race.name === sortedEntries[i].race.name) { // testiing equality directly on races will fail as different objects
-                    updateEntryPosition(subjectEntry, sortedEntries[i].position);
-                    return;
+        if ((subjectEntry.scoringAbbreviation == null || subjectEntry.scoringAbbreviation === '') && (targetEntry.scoringAbbreviation == null || targetEntry.scoringAbbreviation === '')) {
+            // If both entries in same race assign subject position from target position
+            if (subjectEntry.race.name === targetEntry.race.name) { // testiing equality directly on races will fail as different objects
+                updateEntryPosition(subjectEntry, targetEntry.position);
+                return;
+            }
+            // if entries in different races find first entry below target in same race as subject and use that to assign a position to subject
+            else if (subjectEntry.race.name !== targetEntry.race.name) {
+                const sortedEntries = sorted();
+                for (let i = sortedEntries.findIndex(e => e === targetEntry) + 1; i < sortedEntries.length; i++) {
+                    if (subjectEntry.race.name === sortedEntries[i].race.name) { // testiing equality directly on races will fail as different objects
+                        updateEntryPosition(subjectEntry, sortedEntries[i].position);
+                        return;
+                    }
                 }
             }
+        }
+        else {
+            setMessage('Cannot change position of an entry with a scoring abbreviation');
+            return;
         }
     }
 
