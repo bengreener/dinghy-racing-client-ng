@@ -160,8 +160,8 @@ function RaceStartConsole () {
                 })}
             </CollapsableContainer>
             <ActionListView actions={actions} />
-            {audio === 'prepare' ? <audio data-testid='prepare-sound-warning-audio' autoPlay={true} src='./sounds/prepare_alert.mp3' /> : null}
-            {audio === 'act' ? <audio data-testid='act-sound-warning-audio' autoPlay={true} src='./sounds/act_alert.mp3' /> : null}
+            {audio === 'prepare' ? <audio data-testid='prepare-sound-warning-audio' autoPlay={true} preload='auto' src='./sounds/prepare_alert.mp3' /> : null}
+            {audio === 'act' ? <audio data-testid='act-sound-warning-audio' autoPlay={true} preload='auto' src='./sounds/act_alert.mp3' /> : null}
         </div>
     );
 };
