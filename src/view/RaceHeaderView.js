@@ -152,7 +152,7 @@ function RaceHeaderView({ race, showInRaceData = true }) {
                     {elapsedTime < 0 ? <button id='race-start-button' className='w3-col' onClick={handleRaceStartClick}>Start Now</button> : null}
                 </div>
             </div>
-            <p id="race-header-message" className={!message ? "hidden" : ""}>{message}</p>
+            <p id='race-header-message' className={!message ? 'hidden' : ''}>{message}</p>
             <ModalDialog show={showPostponeRace} onClose={() => setShowPostponeRace(false)} testid={'postpone-race-dialog'} >
                 <PostponeRaceForm race={race} onPostpone={controller.postponeRace} closeParent={closePostponeRaceFormDialog} />
             </ModalDialog>
