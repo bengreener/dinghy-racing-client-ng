@@ -223,6 +223,10 @@ td.total {
 	padding: 5pt;
 	margin: 0;
 }
+.console-error-message {
+	color: red;
+	font-weight: bold;
+}
 
 @media (min-width:601px) {
 	.display-port {

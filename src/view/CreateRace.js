@@ -92,6 +92,10 @@ function CreateRace({ onCreate }) {
         }
     }
 
+    function userMessageClasses() {
+        return !message ? 'hidden' : 'console-error-message';
+    }
+
     return (
         <div className='w3-container console' >
             <h1>Create Race</h1>
@@ -136,7 +140,7 @@ function CreateRace({ onCreate }) {
                     </div>
                 </div>
             </form>
-            <p id='race-console-message' className={!message ? 'hidden' : ''}>{message}</p>
+            <p className={userMessageClasses()}>{message}</p>
         </div>
     );
 }

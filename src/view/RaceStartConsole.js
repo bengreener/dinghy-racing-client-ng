@@ -89,8 +89,8 @@ function RaceStartConsole () {
                 else {
                     setAudio('none');
                 }
+                setMessage('');
             }
-            setMessage('');
         });
 
         return () => {
@@ -128,6 +128,10 @@ function RaceStartConsole () {
         setRaceType(RaceType.from(target.value));
     }
 
+    function userMessageClasses() {
+        return !message ? 'hidden' : 'console-error-message';
+    }
+
     return (
         <div className='w3-container console'>
             <CollapsableContainer heading={'Start Races'}>
@@ -149,7 +153,7 @@ function RaceStartConsole () {
                         </fieldset>
                     </div>
                 </form>
-                <p id='race-console-message' className={!message ? 'hidden' : ''}>{message}</p>
+                <p className={userMessageClasses()}>{message}</p>
             </CollapsableContainer>
             <CollapsableContainer heading={'Flags'}>
                 {flagsWithNextAction.map(flag => { return <FlagControl key={flag.flag.name} flag={flag.flag} timeToChange={flag.action ? flag.action.time.valueOf() - Clock.now() : 0} /> })} {/* use Clock.now to get adjusted time when synched to an external clock */}

@@ -103,11 +103,15 @@ function RaceHeaderView({ race, showInRaceData = true }) {
 
     function closePostponeRaceFormDialog() {
         setShowPostponeRace(false);
-    };
+    }
 
     function closeShortenCourseDialog() {
         setShowShortenCourse(false);
-    };
+    }
+
+    function userMessageClasses() {
+        return !message ? 'hidden' : 'console-error-message';
+    }
 
     return (
         <div className='race-header-view' >
@@ -152,7 +156,7 @@ function RaceHeaderView({ race, showInRaceData = true }) {
                     {elapsedTime < 0 ? <button id='race-start-button' className='w3-col' onClick={handleRaceStartClick}>Start Now</button> : null}
                 </div>
             </div>
-            <p id='race-header-message' className={!message ? 'hidden' : ''}>{message}</p>
+            <p className={userMessageClasses()}>{message}</p>
             <ModalDialog show={showPostponeRace} onClose={() => setShowPostponeRace(false)} testid={'postpone-race-dialog'} >
                 <PostponeRaceForm race={race} onPostpone={controller.postponeRace} closeParent={closePostponeRaceFormDialog} />
             </ModalDialog>

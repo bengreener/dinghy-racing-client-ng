@@ -243,9 +243,13 @@ function RaceEntriesView({ races }) {
         }
     }
 
+    function userMessageClasses() {
+        return !message ? 'hidden' : 'console-error-message';
+    }
+
     return (
         <div className='race-entries-view' >
-            <p id='race-entries-message' className={!message ? 'hidden' : ''}>{message}</p>
+            <p className={userMessageClasses()}>{message}</p>
             <div className='w3-row'>
                 <div className='w3-col m2'>
                     <button className='w3-btn w3-block w3-card' onClick={() => setSortOrder('sailNumber')}>By sail number</button>

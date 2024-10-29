@@ -550,7 +550,11 @@ function SignUp({ race }) {
                     </tbody>
                     </table>
         );
-    };
+    }
+
+    function userMessageClasses() {
+        return !message ? 'hidden' : 'console-error-message';
+    }
 
     return (
         <div className='sign-up w3-container console' >
@@ -572,7 +576,7 @@ function SignUp({ race }) {
                     </div>
                 </div>
             </form>
-            <p id='signup-message' className={!message ? 'hidden' : ''}>{message}</p>
+            <p className={userMessageClasses()}>{message}</p>
             <h3>Signed-up</h3>
             <div className='w3-container scrollable'>
                 {entriesTable}
