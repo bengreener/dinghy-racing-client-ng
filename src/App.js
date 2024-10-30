@@ -125,7 +125,7 @@ function App({model, controller}) {
                     <button key={8} type='button' className='w3-bar-item w3-btn' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
                 </div>
                 <nav className='w3-row w3-bginfosys-display-bottommiddle-m1' >
-                    <button key={2} type='button' className='w3-third bginfosys-min-content w3-btn w3-card' onClick={showUpcomingRaces}>Sign-up</button>
+                    <button key={2} type='button' className='w3-third w3-btn w3-card' onClick={showUpcomingRaces}>Registration</button>
                     {roles.includes('ROLE_RACE_OFFICER') ? 
                         <button key={3} type='button' className='w3-third w3-btn w3-card' onClick={showRaceStartConsole}>Race Start</button>
                         : null
