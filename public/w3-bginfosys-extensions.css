@@ -1,3 +1,8 @@
+/* override default font size set by w3.css */
+html,body{
+    font-size: initial;
+}
+
 .bginfosys-min-content {
     min-width: min-content;
 }
