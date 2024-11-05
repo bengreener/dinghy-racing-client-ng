@@ -45,9 +45,20 @@ function RaceStartConsole () {
         return sessionEnd;
     });
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
-    const [audio, setAudio] = useState('none');
     const [raceType, setRaceType] = useState(RaceType.FLEET);
     const startSequence = useRef(null);
+    const prepareAudioRef = useRef(null);
+    if (prepareAudioRef.current === null) {
+        prepareAudioRef.current = new Audio('./sounds/prepare_alert.mp3')
+        prepareAudioRef.current.addEventListener("canplay", () => alert(`Can play prepare audio`));
+        prepareAudioRef.current.addEventListener("canplaythrough", () => alert(`Can play through prepare audio`));
+    }
+    const actAudioRef = useRef(null);
+    if (actAudioRef.current === null) {
+        actAudioRef.current = new Audio('./sounds/act_alert.mp3');
+        actAudioRef.current.addEventListener("canplay", () => alert(`Can play act audio`));
+        actAudioRef.current.addEventListener("canplaythrough", () => alert(`Can play through act audio`));
+    }
 
     const handleRaceUpdate = useCallback(() => {
         setRacesUpdateRequestAt(Date.now());
@@ -56,13 +67,10 @@ function RaceStartConsole () {
     const handleStartSequenceTick = useCallback(() => {
         setFlagsWithNextAction(startSequence.current.getFlags());
         if (startSequence.current.getRaceStartStateChange()) {
-            setAudio('act');
+            actAudioRef.current.play();
         }
         else if (startSequence.current.getPrepareForRaceStartStateChange()) {
-            setAudio('prepare');
-        }
-        else {
-            setAudio('none');
+            prepareAudioRef.current.play();
         }
     }, []);
 
@@ -81,13 +89,10 @@ function RaceStartConsole () {
                 setFlagsWithNextAction(startSequence.current.getFlags());
                 setActions(startSequence.current.getActions());
                 if (startSequence.current.getRaceStartStateChange()) {
-                    setAudio('act');
+                    actAudioRef.current.play();
                 }
                 else if (startSequence.current.getPrepareForRaceStartStateChange()) {
-                    setAudio('prepare');
-                }
-                else {
-                    setAudio('none');
+                    prepareAudioRef.current.play();
                 }
                 setMessage('');
             }
@@ -164,8 +169,6 @@ function RaceStartConsole () {
                 })}
             </CollapsableContainer>
             <ActionListView actions={actions} />
-            {audio === 'prepare' ? <audio data-testid='prepare-sound-warning-audio' autoPlay={true} preload='auto' src='./sounds/prepare_alert.mp3' /> : null}
-            {audio === 'act' ? <audio data-testid='act-sound-warning-audio' autoPlay={true} preload='auto' src='./sounds/act_alert.mp3' /> : null}
         </div>
     );
 };
