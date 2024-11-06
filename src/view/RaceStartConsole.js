@@ -50,14 +50,24 @@ function RaceStartConsole () {
     const prepareAudioRef = useRef(null);
     if (prepareAudioRef.current === null) {
         prepareAudioRef.current = new Audio('./sounds/prepare_alert.mp3')
-        prepareAudioRef.current.addEventListener("canplay", () => alert(`Can play prepare audio`));
-        prepareAudioRef.current.addEventListener("canplaythrough", () => alert(`Can play through prepare audio`));
     }
     const actAudioRef = useRef(null);
     if (actAudioRef.current === null) {
         actAudioRef.current = new Audio('./sounds/act_alert.mp3');
-        actAudioRef.current.addEventListener("canplay", () => alert(`Can play act audio`));
-        actAudioRef.current.addEventListener("canplaythrough", () => alert(`Can play through act audio`));
+    }
+    const audioContext = useRef(null);
+    if (audioContext.current === null) {
+        audioContext.current = new AudioContext();
+    }
+    const actTrack = useRef(null);
+    if (actTrack === null && audioContext != null && actAudioRef != null) {
+        actTrack.current = audioContext.createMediaElementSource(actAudioRef.current);
+        actTrack.current(audioContext.current.destination);
+    }
+    const prepareTrack = useRef(null);
+    if (prepareTrack === null && audioContext != null && prepareAudioRef != null) {
+        prepareTrack.current = audioContext.createMediaElementSource(prepareAudioRef.current);
+        prepareTrack.current(audioContext.current.destination);
     }
 
     const handleRaceUpdate = useCallback(() => {
