@@ -34,7 +34,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     const prevLapCount = useRef(entry.laps.length);
     const prevPosition = useRef(entry.position);
     const lapsView = [];
-    let classes = 'race-entry-view w3-row preserve-whitespace';
+    let classes = 'race-entry-view w3-row w3-border w3-hover-border-blue cursor-pointer preserve-whitespace';
 
     // gesture tracking variables
     let start = {};
@@ -206,19 +206,19 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     }    
 
     if (entry.scoringAbbreviation === 'DNS') {
-        classes = 'race-entry-view w3-row did-not-start';
+        classes += 'did-not-start';
     }
     else if (entry.scoringAbbreviation === 'DSQ') {
-        classes = 'race-entry-view w3-row disqualified';
+        classes += ' disqualified';
     }
     else if (entry.scoringAbbreviation === 'RET') {
-        classes = 'race-entry-view w3-row retired';
+        classes += ' retired';
     }
     else if (entry.onLastLap) {
-        classes = 'race-entry-view w3-row on-last-lap';
+        classes += ' on-last-lap';
     }
     else if (entry.finishedRace) {
-        classes = 'race-entry-view w3-row finished-race';
+        classes += ' finished-race';
     }
     if (disabled) {
         if (classes === '') {
@@ -233,16 +233,16 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         <div className={classes} onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}
             onPointerDown={gestureStart} onPointerMove={gestureMove} onPointerUp={gestureEnd} onPointerOut={gestureEnd}
             onPointerLeave={gestureEnd} onPointerCancel={gestureCancel} onDragStart={dragStartHandler} onDragOver={dragOverHandler} onDrop={dropHandler} draggable >
-            <div className='w3-col m2' >
+            <div className='w3-col m2 w3-padding-small' >
                 <output>{entry.dinghy.dinghyClass.name}</output>
             </div>
-            <div className='w3-col m1' >
+            <div className='w3-col m1 w3-padding-small' >
                 <output className='sail-number'>{entry.dinghy.sailNumber}</output>
             </div>
-            <div className='w3-col m2' >
+            <div className='w3-col m2 w3-padding-small' >
                 <output>{entry.helm.name}</output>
             </div>
-            <div className='w3-col m1' >
+            <div className='w3-col m1 w3-padding-small' >
                 <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'}>{entry.position != null ? entry.position : ' '}</output>
             </div>
             <div className='w3-col m5 w3-hide-small'>
@@ -250,7 +250,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
                     {lapsView}
                 </div>
             </div>
-            <div className='w3-col m1'>
+            <div className='w3-col m1 w3-padding-small'>
                 <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
             </div>
         </div>

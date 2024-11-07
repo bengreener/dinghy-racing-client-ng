@@ -269,7 +269,7 @@ describe('when a scoring abbreviation is not selected', () => {
     it('only has a classes of race-entry-view w3-row', () => {
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
         const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
-        expect(raceEntryView.getAttribute('class')).toMatch(/^race-entry-view w3-row preserve-whitespace$/i);
+        expect(raceEntryView.getAttribute('class')).toMatch(/^race-entry-view w3-row w3-border w3-hover-border-blue cursor-pointer preserve-whitespace$/i);
     });
 });
 

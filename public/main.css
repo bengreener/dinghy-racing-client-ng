@@ -101,6 +101,9 @@ td.total {
 	display: flex;
 	flex-direction: column;
 }
+.cursor-pointer {
+	cursor: pointer;
+}
 .disabled {
 	color: lightgray;
 }
