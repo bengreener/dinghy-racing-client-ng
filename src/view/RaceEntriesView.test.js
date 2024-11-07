@@ -974,7 +974,7 @@ describe('when user drags and drops an entry to a new position', () => {
                     fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
                 });
                 expect(setUpdateEntryPositionSpy).not.toHaveBeenCalled();
-                expect(document.getElementById('Scorpion-1234-Chris Marshall-position')).toHaveValue('');
+                expect(document.getElementById('Scorpion-1234-Chris Marshall-position')).toHaveValue(' ');
             });
         });
     });
