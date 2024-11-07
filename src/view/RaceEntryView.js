@@ -34,7 +34,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     const prevLapCount = useRef(entry.laps.length);
     const prevPosition = useRef(entry.position);
     const lapsView = [];
-    let classes = 'race-entry-view w3-row';
+    let classes = 'race-entry-view w3-row preserve-whitespace';
 
     // gesture tracking variables
     let start = {};
@@ -181,23 +181,29 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     }
 
     let cumulativeLapTimes = 0;
-    for (let i = 0; i < entry.laps.length; i++) {
-        const lap = entry.laps[i];
-        cumulativeLapTimes += lap.time;
-        let lapView;
-        if (i === (entry.laps.length - 1)) {
-            if (editMode) {
-                lapView = <LapView key={lap.number} value={cumulativeLapTimes} editable={true} keyup={handleLastLapCellKeyUp} focusout={handleLastLapCellFocusOut} />
+    if (entry.laps.length === 0) {
+        // insert an 'empty' element to expand containing div and align scoring abbreviation to right
+        lapsView.push(<div key=' ' className='w3-cell w3-left w3-padding-small'><output> </output></div>);
+    }
+    else {
+        for (let i = 0; i < entry.laps.length; i++) {
+            const lap = entry.laps[i];
+            cumulativeLapTimes += lap.time;
+            let lapView;
+            if (i === (entry.laps.length - 1)) {
+                if (editMode) {
+                    lapView = <LapView key={lap.number} value={cumulativeLapTimes} editable={true} keyup={handleLastLapCellKeyUp} focusout={handleLastLapCellFocusOut} />
+                }
+                else {
+                    lapView = <LapView key={lap.number} value={cumulativeLapTimes} editable={false} />
+                }
             }
             else {
                 lapView = <LapView key={lap.number} value={cumulativeLapTimes} editable={false} />
             }
+            lapsView.push(lapView);
         }
-        else {
-            lapView = <LapView key={lap.number} value={cumulativeLapTimes} editable={false} />
-        }
-        lapsView.push(lapView);
-    }
+    }    
 
     if (entry.scoringAbbreviation === 'DNS') {
         classes = 'race-entry-view w3-row did-not-start';
@@ -237,10 +243,10 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
                 <output>{entry.helm.name}</output>
             </div>
             <div className='w3-col m1' >
-                <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'}>{entry.position}</output>
+                <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'}>{entry.position != null ? entry.position : ' '}</output>
             </div>
             <div className='w3-col m5 w3-hide-small'>
-                <div className='w3-cell-row'>
+                <div className='w3-cell-row' >
                     {lapsView}
                 </div>
             </div>

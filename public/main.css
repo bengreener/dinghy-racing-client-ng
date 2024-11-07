@@ -113,6 +113,9 @@ td.total {
 	grid-auto-flow: column;
 	grid-auto-columns: 1fr;
 } */
+ .preserve-whitespace {
+	white-space: pre;
+ }
 /* .race-entry-view-border {
 	border: solid;
 	border-width: thin;
