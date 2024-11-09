@@ -45,9 +45,30 @@ function RaceStartConsole () {
         return sessionEnd;
     });
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
-    const [audio, setAudio] = useState('none');
     const [raceType, setRaceType] = useState(RaceType.FLEET);
     const startSequence = useRef(null);
+    const prepareAudioRef = useRef(null);
+    if (prepareAudioRef.current === null) {
+        prepareAudioRef.current = new Audio('./sounds/prepare_alert.mp3')
+    }
+    const actAudioRef = useRef(null);
+    if (actAudioRef.current === null) {
+        actAudioRef.current = new Audio('./sounds/act_alert.mp3');
+    }
+    const audioContext = useRef(null);
+    if (audioContext.current === null) {
+        audioContext.current = new AudioContext();
+    }
+    const actTrack = useRef(null);
+    if (actTrack === null && audioContext != null && actAudioRef != null) {
+        actTrack.current = audioContext.createMediaElementSource(actAudioRef.current);
+        actTrack.current(audioContext.current.destination);
+    }
+    const prepareTrack = useRef(null);
+    if (prepareTrack === null && audioContext != null && prepareAudioRef != null) {
+        prepareTrack.current = audioContext.createMediaElementSource(prepareAudioRef.current);
+        prepareTrack.current(audioContext.current.destination);
+    }
 
     const handleRaceUpdate = useCallback(() => {
         setRacesUpdateRequestAt(Date.now());
@@ -56,13 +77,10 @@ function RaceStartConsole () {
     const handleStartSequenceTick = useCallback(() => {
         setFlagsWithNextAction(startSequence.current.getFlags());
         if (startSequence.current.getRaceStartStateChange()) {
-            setAudio('act');
+            actAudioRef.current.play();
         }
         else if (startSequence.current.getPrepareForRaceStartStateChange()) {
-            setAudio('prepare');
-        }
-        else {
-            setAudio('none');
+            prepareAudioRef.current.play();
         }
     }, []);
 
@@ -81,16 +99,13 @@ function RaceStartConsole () {
                 setFlagsWithNextAction(startSequence.current.getFlags());
                 setActions(startSequence.current.getActions());
                 if (startSequence.current.getRaceStartStateChange()) {
-                    setAudio('act');
+                    actAudioRef.current.play();
                 }
                 else if (startSequence.current.getPrepareForRaceStartStateChange()) {
-                    setAudio('prepare');
+                    prepareAudioRef.current.play();
                 }
-                else {
-                    setAudio('none');
-                }
+                setMessage('');
             }
-            setMessage('');
         });
 
         return () => {
@@ -128,6 +143,10 @@ function RaceStartConsole () {
         setRaceType(RaceType.from(target.value));
     }
 
+    function userMessageClasses() {
+        return !message ? 'hidden' : 'console-error-message';
+    }
+
     return (
         <div className='w3-container console'>
             <CollapsableContainer heading={'Start Races'}>
@@ -149,7 +168,7 @@ function RaceStartConsole () {
                         </fieldset>
                     </div>
                 </form>
-                <p id='race-console-message' className={!message ? 'hidden' : ''}>{message}</p>
+                <p className={userMessageClasses()}>{message}</p>
             </CollapsableContainer>
             <CollapsableContainer heading={'Flags'}>
                 {flagsWithNextAction.map(flag => { return <FlagControl key={flag.flag.name} flag={flag.flag} timeToChange={flag.action ? flag.action.time.valueOf() - Clock.now() : 0} /> })} {/* use Clock.now to get adjusted time when synched to an external clock */}
@@ -160,8 +179,6 @@ function RaceStartConsole () {
                 })}
             </CollapsableContainer>
             <ActionListView actions={actions} />
-            {audio === 'prepare' ? <audio data-testid='prepare-sound-warning-audio' autoPlay={true} src='./sounds/prepare_alert.mp3' /> : null}
-            {audio === 'act' ? <audio data-testid='act-sound-warning-audio' autoPlay={true} src='./sounds/act_alert.mp3' /> : null}
         </div>
     );
 };

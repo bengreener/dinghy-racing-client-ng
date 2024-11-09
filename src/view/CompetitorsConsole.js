@@ -92,7 +92,11 @@ function CompetitorsConsole() {
             rows.push(<tr key={key} id={key} className='clickable-table-row' onClick={handleCompetitorRowClick} ><td>{competitor.name}</td></tr>);
         });
         return rows;
-    };
+    }
+
+    function userMessageClasses() {
+        return !message ? 'hidden' : 'console-error-message';
+    }
 
     return (
         <div className='w3-container console'>
@@ -109,7 +113,7 @@ function CompetitorsConsole() {
                     </div>
                 </div>
             </form> : null}
-            <p id='competitor-console-message' className={!message ? 'hidden' : ''}>{message}</p>
+            <p className={userMessageClasses()}>{message}</p>
             <div className='scrollable'>
                 <table className='w3-table' >
                     <thead>

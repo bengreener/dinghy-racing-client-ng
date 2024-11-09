@@ -15,7 +15,7 @@
  */
 
 import React from 'react';
-import { useContext, useRef } from 'react';
+import { useContext, useRef, useState } from 'react';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import ModelContext from './ModelContext';
 import RaceType from '../model/domain-classes/race-type';
@@ -27,11 +27,12 @@ function CreateRace({ onCreate }) {
     const [result, setResult] = React.useState({'message': ''});
     const [dinghyClassMap, setDinghyClassMap] = React.useState(new Map());
     const [dinghyClassOptions, setDinghyClassOptions] = React.useState([]);
+    const [message, setMessage] = useState('');
     const raceNameInputRef = useRef(null);
 
     const clear = React.useCallback(() => {
         setRace({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000, 'plannedLaps': 5, type: RaceType.FLEET, startType: StartType.CSCCLUBSTART});
-        showMessage('');
+        setMessage('');
         raceNameInputRef.current.focus();
     }, []);
 
@@ -52,10 +53,9 @@ function CreateRace({ onCreate }) {
                 setDinghyClassOptions(options);
             }
             else {
-                showMessage('Unable to load dinghy classes\n' + result.message);
+                setMessage('Unable to load dinghy classes\n' + result.message);
             }
         });
-
     }, [model]);
 
     React.useEffect(() => {
@@ -63,7 +63,7 @@ function CreateRace({ onCreate }) {
             clear();
         }
         if (result && !result.success) {
-            showMessage(result.message);
+            setMessage(result.message);
         }
     }, [result, clear]);
 
@@ -92,9 +92,8 @@ function CreateRace({ onCreate }) {
         }
     }
 
-    function showMessage(message) {
-        const output = document.getElementById('race-message-output');
-        output.value = message;
+    function userMessageClasses() {
+        return !message ? 'hidden' : 'console-error-message';
     }
 
     return (
@@ -140,8 +139,8 @@ function CreateRace({ onCreate }) {
                         <button id='race-create-button' className='w3-right' type='button' onClick={handleCreate}>Create</button>
                     </div>
                 </div>
-                <output id='race-message-output' />
             </form>
+            <p className={userMessageClasses()}>{message}</p>
         </div>
     );
 }

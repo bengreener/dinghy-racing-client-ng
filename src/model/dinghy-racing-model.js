@@ -19,7 +19,6 @@ import StartSignal from './domain-classes/start-signal';
 import StartSequence from './domain-classes/start-sequence';
 import RaceType from './domain-classes/race-type';
 import StartType from './domain-classes/start-type';
-import { getDefaultNormalizer } from '@testing-library/react';
 
 class DinghyRacingModel {
     httpRootURL;

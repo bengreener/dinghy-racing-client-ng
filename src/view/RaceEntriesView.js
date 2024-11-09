@@ -20,6 +20,12 @@ import RaceEntryView from './RaceEntryView';
 import { sortArray } from '../utilities/array-utilities';
 import ControllerContext from './ControllerContext';
 
+/**
+ * Display race entries
+ * @param {Object} props
+ * @param {Array<Race>} props.raceScorpionA
+ * @returns {HTMLDivElement}
+ */
 function RaceEntriesView({ races }) {
     const model = useContext(ModelContext);
     const controller = useContext(ControllerContext);
@@ -206,13 +212,44 @@ function RaceEntriesView({ races }) {
         }
     }
 
-    function onRaceEntryPositionSetByDrag(entryKey, newPosition) {
-        updateEntryPosition(entriesMap.get(entryKey), newPosition);
+    function onRaceEntryPositionSetByDrag(subjectKey, targetKey) {
+        // can only drag entry to a new position when displayed entries are sorted by position
+        if (sortOrder !== 'position') {
+            setMessage('Entries not sorted by position');
+            return;
+        }
+        const subjectEntry = entriesMap.get(subjectKey);
+        const targetEntry = entriesMap.get(targetKey);
+        if ((subjectEntry.scoringAbbreviation == null || subjectEntry.scoringAbbreviation === '') && (targetEntry.scoringAbbreviation == null || targetEntry.scoringAbbreviation === '')) {
+            // If both entries in same race assign subject position from target position
+            if (subjectEntry.race.name === targetEntry.race.name) { // testiing equality directly on races will fail as different objects
+                updateEntryPosition(subjectEntry, targetEntry.position);
+                return;
+            }
+            // if entries in different races find first entry below target in same race as subject and use that to assign a position to subject
+            else if (subjectEntry.race.name !== targetEntry.race.name) {
+                const sortedEntries = sorted();
+                for (let i = sortedEntries.findIndex(e => e === targetEntry) + 1; i < sortedEntries.length; i++) {
+                    if (subjectEntry.race.name === sortedEntries[i].race.name) { // testiing equality directly on races will fail as different objects
+                        updateEntryPosition(subjectEntry, sortedEntries[i].position);
+                        return;
+                    }
+                }
+            }
+        }
+        else {
+            setMessage('Cannot change position of an entry with a scoring abbreviation');
+            return;
+        }
+    }
+
+    function userMessageClasses() {
+        return !message ? 'hidden' : 'console-error-message';
     }
 
     return (
         <div className='race-entries-view' >
-            <p id='race-entries-message' className={!message ? 'hidden' : ''}>{message}</p>
+            <p className={userMessageClasses()}>{message}</p>
             <div className='w3-row'>
                 <div className='w3-col m2'>
                     <button className='w3-btn w3-block w3-card' onClick={() => setSortOrder('sailNumber')}>By sail number</button>

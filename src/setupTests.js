@@ -17,6 +17,14 @@ class BroadcastChannel {
     }
 }
 
+class AudioContext {
+    
+}
+
 if(!global.BroadcastChannel) {
     global.BroadcastChannel = BroadcastChannel;
+}
+
+if(!global.AudioContext) {
+    global.AudioContext = AudioContext;
 }

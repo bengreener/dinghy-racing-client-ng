@@ -129,7 +129,7 @@ function DinghyClassConsole() {
         setDinghyClass(dinghyClass);
         dinghyClassNameInputRef.current.focus();
         setMessage('');
-    };
+    }
 
     function handleChange({target}) {
         if (target.name === 'crewSize' || target.name === 'portsmouthNumber') {
@@ -150,7 +150,11 @@ function DinghyClassConsole() {
             </tr>);
         });
         return rows;
-    };
+    }
+
+    function userMessageClasses() {
+        return !message ? 'hidden' : 'console-error-message';
+    }
 
     return (
         <div className='w3-container console' >
@@ -175,7 +179,7 @@ function DinghyClassConsole() {
                     </div>
                 </div>
             </form>
-            <p id='dinghy-class-console-message' className={!message ? 'hidden' : ''}>{message}</p>
+            <p className={userMessageClasses()}>{message}</p>
             <div className='scrollable'>
                 <table className='w3-table'>
                     <thead>

@@ -101,9 +101,12 @@ td.total {
 	display: flex;
 	flex-direction: column;
 }
-/* .disabled {
+.cursor-pointer {
+	cursor: pointer;
+}
+.disabled {
 	color: lightgray;
-} */
+}
 .display-port {
 	overflow: hidden;
 	height: 75vh;
@@ -113,6 +116,9 @@ td.total {
 	grid-auto-flow: column;
 	grid-auto-columns: 1fr;
 } */
+ .preserve-whitespace {
+	white-space: pre;
+ }
 /* .race-entry-view-border {
 	border: solid;
 	border-width: thin;
@@ -222,6 +228,10 @@ td.total {
 .blue-peter-lowered {
 	padding: 5pt;
 	margin: 0;
+}
+.console-error-message {
+	color: red;
+	font-weight: bold;
 }
 
 @media (min-width:601px) {

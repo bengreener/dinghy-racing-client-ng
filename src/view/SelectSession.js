@@ -85,6 +85,10 @@ function SelectSession({ sessionStart, sessionEnd, onSessionStartChange, onSessi
         }
     }
 
+    function userMessageClasses() {
+        return !message ? 'hidden' : 'console-error-message';
+    }
+
     return (
         <div>
             <div className='w3-row'>
@@ -95,7 +99,7 @@ function SelectSession({ sessionStart, sessionEnd, onSessionStartChange, onSessi
                 <label htmlFor='select-session-end' className='w3-col m2'>Session End</label>
                 <input id='select-session-end' name='sessionEndTime' type='datetime-local' className='w3-col m3' onChange={handleSessionEndChange} value={end} />
             </div>
-            <p>{message}</p>
+            <p className={userMessageClasses()} >{message}</p>
         </div>
     )
 }
