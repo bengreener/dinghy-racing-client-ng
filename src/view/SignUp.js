@@ -271,7 +271,7 @@ function SignUp({ race }) {
                             <td key='withdrawEntry-button'><button id={entry.url} className='embedded' type='button' onClick={handleWithdrawEntryButtonClick}>X</button></td>
                         </tr>
                     });
-                    setEntriesTable(<table className='w3-table'>
+                    setEntriesTable(<table className='w3-table w3-striped'>
                         <thead>
                             <tr>
                                 <th key='helm'>Helm</th>
@@ -538,7 +538,7 @@ function SignUp({ race }) {
             </tr>
         );
 
-        return (<table className='sign-up-summary w3-table'>
+        return (<table className='sign-up-summary w3-table w3-striped'>
                 <thead>
                     <tr>
                         <th key='dinghyClass'>Class</th>

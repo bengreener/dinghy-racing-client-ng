@@ -87,7 +87,7 @@ function ActionListView({ actions }) {
         <div className="action-list-view">
             <h1>Action List</h1>
             <div className="scrollable">
-                <table>
+                <table className='w3-table w3-striped'>
                     <thead>
                         <tr>
                             <th>Time</th>
