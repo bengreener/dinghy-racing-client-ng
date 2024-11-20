@@ -80,6 +80,13 @@ class DinghyRacingModel {
     }
 
     /**
+     * Provide a blank crew template
+     */
+    static crewTemplate() {
+        return {helm: null, mate: null};
+    }
+
+    /**
      * 
      * @param {String} httpRootURL
      * @param {String} wsRootURL
@@ -821,7 +828,7 @@ class DinghyRacingModel {
         }
         const crews = [];
         for (const crewHAL of crewsHAL) {
-            const crew = {helm: this._convertCompetitorHALToCompetitor(crewHAL.helm), mate: this._convertCompetitorHALToCompetitor(crewHAL.mate) };
+            const crew = {...DinghyRacingModel.crewTemplate(), helm: this._convertCompetitorHALToCompetitor(crewHAL.helm), mate: this._convertCompetitorHALToCompetitor(crewHAL.mate) };
             crews.push(crew);
         }
         return Promise.resolve({'success': true, 'domainObject': crews});
