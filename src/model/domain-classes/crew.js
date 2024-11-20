@@ -17,5 +17,5 @@
 /**
  * @typedef Crew
  * @property {Competitor} helm
- * @property {Competitor} mate
+ * @property {Competitor} [mate]
  */
