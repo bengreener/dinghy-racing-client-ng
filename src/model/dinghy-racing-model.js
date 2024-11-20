@@ -798,6 +798,36 @@ class DinghyRacingModel {
     }
     
     /**
+     * Get all the crews that have sailed a dinghy
+     */
+    async getCrewsByDinghy(dinghy) {
+        let crewsHAL = [];
+        // if race does not have a URL cannot get entries
+        if (!dinghy.url) {
+            return Promise.resolve({'success': false, 'message': 'Cannot retrieve dinghy crews without URL for dinghy.'});
+        }
+        // get crews
+        const resource = this.httpRootURL + '/crews/search/findCrewsByDinghy?dinghy=' + dinghy.url;
+        const result = await this.read(resource);
+        if (!result.success) {
+            return Promise.resolve(result);
+        }
+        if (result.domainObject._embedded) {
+            crewsHAL = result.domainObject._embedded.crews;
+        }
+        if (crewsHAL.length === 0) {
+            // no entries for race
+            return Promise.resolve({'success': true, 'domainObject': []})
+        }
+        const crews = [];
+        for (const crewHAL of crewsHAL) {
+            const crew = {helm: this._convertCompetitorHALToCompetitor(crewHAL.helm), mate: this._convertCompetitorHALToCompetitor(crewHAL.mate) };
+            crews.push(crew);
+        }
+        return Promise.resolve({'success': true, 'domainObject': crews});
+    }
+
+    /**
      * Get dinghy
      * @param {String} url Address of the remote resource
      * @returns {Promise<Result>}

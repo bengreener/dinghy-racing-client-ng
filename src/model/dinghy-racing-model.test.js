@@ -19,6 +19,7 @@ import { httpRootURL, wsRootURL, competitorsCollectionHAL,
     dinghiesCollectionHAL, dinghiesScorpionCollectionHAL, 
     dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghyClassCometHAL, dinghy1234HAL, dinghy2726HAL, dinghy6745HAL,
     raceScorpion_AHAL, raceGraduate_AHAL, raceComet_AHAL, raceHandicap_AHAL,
+    dinghy1234CrewsHAL,
     dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet,
     dinghies, dinghiesScorpion, dinghy1234, dinghy2726, dinghy6745, dinghy826,
     races, racesCollectionHAL, raceScorpionA, raceGraduateA, raceCometA,
@@ -27,7 +28,9 @@ import { httpRootURL, wsRootURL, competitorsCollectionHAL,
     entriesScorpionAHAL, entriesCometAHAL, entryChrisMarshallDinghy1234HAL, entriesHandicapAHAL,
     entriesScorpionA, entriesCometA, entriesHandicapA,
     competitorSarahPascal, raceHandicapA, entryChrisMarshallScorpionA1234, competitorJillMyer, 
-    entrySarahPascalScorpionA6745, entryJillMyerCometA826, entryChrisMarshallHandicapA1234 } from './__mocks__/test-data';
+    entrySarahPascalScorpionA6745, entryJillMyerCometA826, entryChrisMarshallHandicapA1234,
+    dinghy1234Crews
+} from './__mocks__/test-data';
 import {
     findByRaceGraduate_AHAL_bigData, signedUpGraduateAHAL_bigData,
     competitorCarmenWhiting, competitorAjDavis, competitorIvanPlatt, competitorNellPowell, competitorGraceRees, competitorArranAshley, competitorMacySmall,
@@ -5469,9 +5472,90 @@ describe('when retrieving dinghies by sail number', () => {
         const promise = model.getDinghiesBySailNumber('1234');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, 'domainObject': [dinghy1234Scorpion, dinghy1234Graduate]});
+        expect(result).toEqual({'success': true, 'domainObject': [ dinghy1234Scorpion, dinghy1234Graduate ]});
     });
     describe('when no dinghies are found for the provided sail number', () => {
+        it('returns a failed result containing a message explaining the cause of the failure', async () =>{
+            fetch.mockImplementation((resource) => {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404,
+                    statusText: 'Not Found',
+                    json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
+                });
+            });
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = model.getDinghiesBySailNumber('1234');
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
+        });
+    });
+});
+
+describe('when the crews that have sailed a dinghy are requested', () => {
+    it('returns the crews', async () => {
+        fetch.mockImplementation((resource) => {
+            if (resource === 'http://localhost:8081/dinghyracing/api/crews/search/findCrewsByDinghy?dinghy=http://localhost:8081/dinghyracing/api/dinghies/2') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghy1234CrewsHAL)
+                });
+            }
+            else {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404,
+                    statusText: 'Not Found'
+                });
+            }
+        });
+
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = model.getCrewsByDinghy(dinghy1234);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': dinghy1234Crews});
+    });
+    describe('when the dinghy does not have a uri', () => {
+        it('returns a promise that resolves to a result indicating failure', async () => {
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.getCrewsByDinghy({sailNumber:'1234', dinghyClass: dinghyClassScorpion});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'Cannot retrieve dinghy crews without URL for dinghy.'});
+        });
+    })
+    describe('when no crew has sailed in the dinghy', () => {
+        it('returns an empty crews', async () => {
+            const emptyCrewsHAL = {_links: {self: {href: 'http://localhost:8081/dinghyracing/api/crews/search/findCrewsByDinghy?dinghy=http%3A%2F%2Flocalhost%3A8081%2Fdinghyracing%2Fapi%2Fdinghies%2F2'}}};
+            const emptyCrews = [];
+            fetch.mockImplementation((resource) => {
+                if (resource === 'http://localhost:8081/dinghyracing/api/crews/search/findCrewsByDinghy?dinghy=http://localhost:8081/dinghyracing/api/dinghies/2') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(emptyCrewsHAL)
+                    });
+                }
+                else {
+                    return Promise.resolve({
+                        ok: false,
+                        status: 404,
+                        statusText: 'Not Found'
+                    });
+                }
+            });
+
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = model.getCrewsByDinghy(dinghy1234);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, 'domainObject': emptyCrews});
+        });
+    });
+    describe('when the dinghy does not exist', () => {
         it('returns a failed result containing a message explaining the cause of the failure', async () =>{
             fetch.mockImplementation((resource) => {
                 return Promise.resolve({

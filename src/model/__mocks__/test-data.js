@@ -248,7 +248,11 @@ const entryChrisMarshallDinghy1234HAL = {
 		race:{href:'http://localhost:8081/dinghyracing/api/entries/10/race'}, 
 		laps:{href:'http://localhost:8081/dinghyracing/api/entries/10/laps'}
 	}
-}; 
+};
+
+const dinghy1234CrewAHAL = {helm: competitorChrisMarshallHAL, mate: competitorJillMyerHAL};
+const dinghy1234CrewBHAL = {helm: competitorLiuBaoHAL, mate: competitorLouScrewHAL};
+const dinghy1234CrewsHAL = {_embedded: {crews: [dinghy1234CrewAHAL, dinghy1234CrewBHAL]}, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/crews/search/findCrewsByDinghy?dinghy=http%3A%2F%2Flocalhost%3A8081%2Fdinghyracing%2Fapi%2Fdinghies%2F2'}}};
 
 const competitorChrisMarshall = {name:'Chris Marshall',url:'http://localhost:8081/dinghyracing/api/competitors/8'};
 const competitorSarahPascal = {name:'Sarah Pascal',url:'http://localhost:8081/dinghyracing/api/competitors/9'};
@@ -331,6 +335,10 @@ const entryChrisMarshallPursuitA1234 = {
 
 const entriesPursuitA = [ entryChrisMarshallPursuitA1234 ];
 
+const dinghy1234CrewA = {helm: competitorChrisMarshall, mate: competitorJillMyer};
+const dinghy1234CrewB = {helm: competitorLiuBao, mate: competitorLouScrew};
+const dinghy1234Crews = [dinghy1234CrewA, dinghy1234CrewB];
+
 export {
 	httpRootURL, wsRootURL,
 	
@@ -353,6 +361,8 @@ export {
 	
 	entriesHAL, entriesScorpionAHAL, entryChrisMarshallDinghy1234HAL, entriesCometAHAL, entriesHandicapAHAL,
 
+	dinghy1234CrewAHAL, dinghy1234CrewBHAL, dinghy1234CrewsHAL,
+
 	competitorsCollection, competitorChrisMarshall, competitorSarahPascal, competitorJillMyer, competitorLouScrew, 
 	competitorOwainDavies, competitorLiuBao, 
 
@@ -363,5 +373,7 @@ export {
 	races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA, racePursuitA,
 
 	entryChrisMarshallHandicapA1234, entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745, entryJillMyerCometA826, entryChrisMarshallPursuitA1234,
-	entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA, entriesPursuitA
+	entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA, entriesPursuitA,
+
+	dinghy1234Crews
 }
