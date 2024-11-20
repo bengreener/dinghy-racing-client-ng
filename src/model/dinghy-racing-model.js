@@ -873,6 +873,54 @@ class DinghyRacingModel {
     }
 
     /**
+     * Gets all dinghies with the given sail number
+     * @param {String} sailNumber to search for
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
+     * @return {Promise<Result>>} If successful Result.domainObject will be an Array<Dinghy>
+     */
+    async getDinghiesBySailNumber(sailNumber, page, size) {
+        const resource = this.httpRootURL + '/dinghies/search/findBySailNumber?sailNumber=' + sailNumber;
+
+        if (Number.isInteger(page) || Number.isInteger(size)) {
+            if (!dinghyClass) {
+                resource += '?';
+            }
+            else {
+                resource += '&';
+            }
+        }
+        if (Number.isInteger(page)) {
+            resource += 'page=' + page;
+        }
+        if (Number.isInteger(size)) {
+            if (Number.isInteger(page)) {
+                resource += '&';
+            }
+            resource += 'size=' + size;
+        }
+        const result = await this.read(resource);
+        if (result.success) {
+            if (!Number.isInteger(page) && !Number.isInteger(size) && result.domainObject.page.totalElements > result.domainObject.page.size) {
+                return this.getDinghiesBySailNumber(sailNumber, 0, result.domainObject.page.totalElements);
+            }
+            const dinghiesHAL = result.domainObject._embedded.dinghies;
+            const dinghyClassURLs = dinghiesHAL.map(race => race._links.dinghyClass.href);
+            const dinghyClassResults = await Promise.all(dinghyClassURLs.map(url => this.read(url)));
+
+            const dinghies = [];
+            for (let i = 0; i < dinghiesHAL.length; i++  ) {
+                const dinghyClass = dinghyClassResults[i].success ? this._convertDinghyClassHALToDinghyClass(dinghyClassResults[i].domainObject) : null;
+                dinghies.push({'sailNumber': dinghiesHAL[i].sailNumber, 'dinghyClass': dinghyClass, 'url': dinghiesHAL[i]._links.self.href});
+            };
+            return Promise.resolve({'success': true, 'domainObject': dinghies});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
      * Get a dinghy by it's sail number and dinghy class
      * @param {String} sailNumber
      * @param {DinghyClass} dinghyClass

@@ -5417,3 +5417,75 @@ describe('when an entry is requested', () => {
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
     });
 });
+
+describe('when retrieving dinghies by sail number', () => {
+    it('returns a success result containing dinghies with the provided sail number', async () => {
+        const dinghy1234ScorpionHAL = {sailNumber: '1234', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' } } };
+        const dinghy1234GraduateHAL = {sailNumber: '1234', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/6' }, dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/6' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass' } } };
+        const dinghy1234CollectionHAL = {_embedded: {dinghies: [
+            dinghy1234ScorpionHAL, dinghy1234GraduateHAL
+        ]}, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/search/findBySailNumber?sailNumber=1234&page=0&size=20' } }, page: {size: 20, totalElements: 2, totalPages: 1, number: 0 }}
+        const dinghy1234Scorpion = {sailNumber:'1234',dinghyClass: dinghyClassScorpion,url:'http://localhost:8081/dinghyracing/api/dinghies/2'};
+        const dinghy1234Graduate = {sailNumber:'1234',dinghyClass: dinghyClassGraduate,url:'http://localhost:8081/dinghyracing/api/dinghies/6'};
+
+        fetch.mockImplementation((resource) => {
+            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghiesCollectionHAL)
+                });
+            }
+            else if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findBySailNumber?sailNumber=1234') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghy1234CollectionHAL)
+                });
+            }
+            else if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassScorpionHAL)
+                });
+            }
+            else if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassGraduateHAL)
+                });
+            }
+            else {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404,
+                    statusText: 'Not Found'
+                });
+            }
+        });
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = model.getDinghiesBySailNumber('1234');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': [dinghy1234Scorpion, dinghy1234Graduate]});
+    });
+    describe('when no dinghies are found for the provided sail number', () => {
+        it('returns a failed result containing a message explaining the cause of the failure', async () =>{
+            fetch.mockImplementation((resource) => {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404,
+                    statusText: 'Not Found',
+                    json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
+                });
+            });
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = model.getDinghiesBySailNumber('1234');
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
+        });
+    });
+})
