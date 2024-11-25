@@ -19,17 +19,17 @@ import { httpRootURL, wsRootURL, competitorsCollectionHAL,
     dinghiesCollectionHAL, dinghiesScorpionCollectionHAL, 
     dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghyClassCometHAL, dinghy1234HAL, dinghy2726HAL, dinghy6745HAL,
     raceScorpion_AHAL, raceGraduate_AHAL, raceComet_AHAL, raceHandicap_AHAL,
-    dinghy1234CrewsHAL,
-    dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet,
+    dinghyScorpion1234CrewsHAL,
+    dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, 
     dinghies, dinghiesScorpion, dinghy1234, dinghy2726, dinghy6745, dinghy826,
     races, racesCollectionHAL, raceScorpionA, raceGraduateA, raceCometA,
-    competitorChrisMarshallHAL, competitorSarahPascalHAL, competitorJillMyerHAL, 
-    competitorsCollection, competitorChrisMarshall, competitorLouScrew, 
+    competitorChrisMarshallHAL, competitorSarahPascalHAL, competitorJillMyerHAL, competitorLiuBaoHAL, competitorLouScrewHAL,
+    competitorsCollection, competitorChrisMarshall, competitorLouScrew, competitorSarahPascal, competitorLiuBao, 
     entriesScorpionAHAL, entriesCometAHAL, entryChrisMarshallDinghy1234HAL, entriesHandicapAHAL,
     entriesScorpionA, entriesCometA, entriesHandicapA,
-    competitorSarahPascal, raceHandicapA, entryChrisMarshallScorpionA1234, competitorJillMyer, 
+    raceHandicapA, entryChrisMarshallScorpionA1234, competitorJillMyer, 
     entrySarahPascalScorpionA6745, entryJillMyerCometA826, entryChrisMarshallHandicapA1234,
-    dinghy1234Crews
+    dinghyScorpion1234Crews
 } from './__mocks__/test-data';
 import {
     findByRaceGraduate_AHAL_bigData, signedUpGraduateAHAL_bigData,
@@ -5506,7 +5506,7 @@ describe('when the crews that have sailed a dinghy are requested', () => {
                 return Promise.resolve({
                     ok: true,
                     status: 200, 
-                    json: () => Promise.resolve(dinghy1234CrewsHAL)
+                    json: () => Promise.resolve(dinghyScorpion1234CrewsHAL)
                 });
             }
             else {
@@ -5522,7 +5522,40 @@ describe('when the crews that have sailed a dinghy are requested', () => {
         const promise = model.getCrewsByDinghy(dinghy1234);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, 'domainObject': dinghy1234Crews});
+        expect(result).toEqual({'success': true, 'domainObject': dinghyScorpion1234Crews});
+    });
+    describe('when the crew only has a helm', () => {
+        const dinghy1234CrewAHAL = {helm: competitorChrisMarshallHAL, mate: null};
+        const dinghy1234CrewBHAL = {helm: competitorLiuBaoHAL, mate: competitorLouScrewHAL};
+        const dinghy1234CrewsHAL = {_embedded: {crews: [dinghy1234CrewAHAL, dinghy1234CrewBHAL]}, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/crews/search/findCrewsByDinghy?dinghy=http%3A%2F%2Flocalhost%3A8081%2Fdinghyracing%2Fapi%2Fdinghies%2F2'}}};
+        const dinghy1234CrewA = {helm: competitorChrisMarshall, mate: null};
+        const dinghy1234CrewB = {helm: competitorLiuBao, mate: competitorLouScrew};
+        const dinghy1234Crews = [dinghy1234CrewA, dinghy1234CrewB];
+
+        it('returns the crews', async () => {
+            fetch.mockImplementation((resource) => {
+                if (resource === 'http://localhost:8081/dinghyracing/api/crews/search/findCrewsByDinghy?dinghy=http://localhost:8081/dinghyracing/api/dinghies/2') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghy1234CrewsHAL)
+                    });
+                }
+                else {
+                    return Promise.resolve({
+                        ok: false,
+                        status: 404,
+                        statusText: 'Not Found'
+                    });
+                }
+            });
+    
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = model.getCrewsByDinghy(dinghy1234);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, 'domainObject': dinghy1234Crews});
+        });
     });
     describe('when the dinghy does not have a uri', () => {
         it('returns a promise that resolves to a result indicating failure', async () => {
@@ -5532,7 +5565,7 @@ describe('when the crews that have sailed a dinghy are requested', () => {
             expect(promise).toBeInstanceOf(Promise);
             expect(result).toEqual({'success': false, 'message': 'Cannot retrieve dinghy crews without URL for dinghy.'});
         });
-    })
+    });
     describe('when no crew has sailed in the dinghy', () => {
         it('returns an empty crews', async () => {
             const emptyCrewsHAL = {_links: {self: {href: 'http://localhost:8081/dinghyracing/api/crews/search/findCrewsByDinghy?dinghy=http%3A%2F%2Flocalhost%3A8081%2Fdinghyracing%2Fapi%2Fdinghies%2F2'}}};

@@ -250,9 +250,9 @@ const entryChrisMarshallDinghy1234HAL = {
 	}
 };
 
-const dinghy1234CrewAHAL = {helm: competitorChrisMarshallHAL, mate: competitorJillMyerHAL};
-const dinghy1234CrewBHAL = {helm: competitorLiuBaoHAL, mate: competitorLouScrewHAL};
-const dinghy1234CrewsHAL = {_embedded: {crews: [dinghy1234CrewAHAL, dinghy1234CrewBHAL]}, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/crews/search/findCrewsByDinghy?dinghy=http%3A%2F%2Flocalhost%3A8081%2Fdinghyracing%2Fapi%2Fdinghies%2F2'}}};
+const dinghyScorpion1234CrewAHAL = {helm: competitorChrisMarshallHAL, mate: competitorJillMyerHAL};
+const dinghyScorpion1234CrewBHAL = {helm: competitorLiuBaoHAL, mate: competitorLouScrewHAL};
+const dinghyScorpion1234CrewsHAL = {_embedded: {crews: [dinghyScorpion1234CrewAHAL, dinghyScorpion1234CrewBHAL]}, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/crews/search/findCrewsByDinghy?dinghy=http%3A%2F%2Flocalhost%3A8081%2Fdinghyracing%2Fapi%2Fdinghies%2F2'}}};
 
 const competitorChrisMarshall = {name:'Chris Marshall',url:'http://localhost:8081/dinghyracing/api/competitors/8'};
 const competitorSarahPascal = {name:'Sarah Pascal',url:'http://localhost:8081/dinghyracing/api/competitors/9'};
@@ -275,6 +275,8 @@ const dinghy6745 = {sailNumber:'6745',dinghyClass:dinghyClassScorpion,url:'http:
 const dinghy2928 = {sailNumber:'2928',dinghyClass: dinghyClassGraduate,url:'http://localhost:8081/dinghyracing/api/dinghies/7'};
 const dinghy826 = {sailNumber:'826',dinghyClass: dinghyClassComet,url:'http://localhost:8081/dinghyracing/api/dinghies/18'};
 const dinghies = [dinghy1234, dinghy2726, dinghy6745, dinghy2928, dinghy826];
+
+const dinghy1234Graduate = {sailNumber:'1234',dinghyClass: dinghyClassGraduate,url:'http://localhost:8081/dinghyracing/api/dinghies/6'};
 
 const raceScorpionA = { name: 'Scorpion A', plannedStartTime: new Date('2021-10-14T10:30:00Z'), dinghyClass: dinghyClassScorpion, duration: 2700000, type: 'FLEET', plannedLaps: 5, startType: 'CSCCLUBSTART', lapsSailed: 0, lapForecast: 5.0, lastLapTime: 0, averageLapTime: 0, clock: null, startSequenceState: 'NONE', dinghyClasses: [], url: 'http://localhost:8081/dinghyracing/api/races/4' };
 const raceGraduateA = {name: 'Graduate A', plannedStartTime: new Date('2021-10-14T10:35:00Z'), dinghyClass: dinghyClassGraduate, duration: 2700000, type: 'FLEET', plannedLaps: 4,  startType: 'CSCCLUBSTART', lapsSailed: null, lapForecast: 4.0, lastLapTime: null, averageLapTime: null, startSequenceState: 'NONE', clock: null, dinghyClasses: [], url: 'http://localhost:8081/dinghyracing/api/races/7' };
@@ -335,9 +337,11 @@ const entryChrisMarshallPursuitA1234 = {
 
 const entriesPursuitA = [ entryChrisMarshallPursuitA1234 ];
 
-const dinghy1234CrewA = {helm: competitorChrisMarshall, mate: competitorJillMyer};
-const dinghy1234CrewB = {helm: competitorLiuBao, mate: competitorLouScrew};
-const dinghy1234Crews = [dinghy1234CrewA, dinghy1234CrewB];
+const dinghyScorpion1234CrewA = { helm: competitorChrisMarshall, mate: competitorJillMyer };
+const dinghyScorpion1234CrewB = { helm: competitorLiuBao, mate: competitorLouScrew };
+const dinghyScorpion1234Crews = [ dinghyScorpion1234CrewA, dinghyScorpion1234CrewB ];
+const dinghyGraduate1234CrewA = { helm: competitorSarahPascal, mate: competitorOwainDavies };
+const dinghyGraduate1234Crews = [ dinghyGraduate1234CrewA ];
 
 export {
 	httpRootURL, wsRootURL,
@@ -361,19 +365,19 @@ export {
 	
 	entriesHAL, entriesScorpionAHAL, entryChrisMarshallDinghy1234HAL, entriesCometAHAL, entriesHandicapAHAL,
 
-	dinghy1234CrewAHAL, dinghy1234CrewBHAL, dinghy1234CrewsHAL,
+	dinghyScorpion1234CrewAHAL, dinghyScorpion1234CrewBHAL, dinghyScorpion1234CrewsHAL,
 
 	competitorsCollection, competitorChrisMarshall, competitorSarahPascal, competitorJillMyer, competitorLouScrew, 
 	competitorOwainDavies, competitorLiuBao, 
 
 	dinghyClasses, dinghyClassesByNameAsc, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet,
 
-	dinghies, dinghiesScorpion, dinghy1234, dinghy2726, dinghy6745, dinghy2928, dinghy826,
+	dinghies, dinghiesScorpion, dinghy1234, dinghy2726, dinghy6745, dinghy2928, dinghy826, dinghy1234Graduate,
 
 	races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA, racePursuitA,
 
 	entryChrisMarshallHandicapA1234, entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745, entryJillMyerCometA826, entryChrisMarshallPursuitA1234,
 	entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA, entriesPursuitA,
 
-	dinghy1234Crews
+	dinghyScorpion1234Crews, dinghyGraduate1234Crews
 }

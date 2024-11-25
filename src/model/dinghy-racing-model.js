@@ -810,7 +810,7 @@ class DinghyRacingModel {
     async getCrewsByDinghy(dinghy) {
         let crewsHAL = [];
         // if race does not have a URL cannot get entries
-        if (!dinghy.url) {
+        if (!dinghy || !dinghy?.url) {
             return Promise.resolve({'success': false, 'message': 'Cannot retrieve dinghy crews without URL for dinghy.'});
         }
         // get crews
@@ -828,7 +828,9 @@ class DinghyRacingModel {
         }
         const crews = [];
         for (const crewHAL of crewsHAL) {
-            const crew = {...DinghyRacingModel.crewTemplate(), helm: this._convertCompetitorHALToCompetitor(crewHAL.helm), mate: this._convertCompetitorHALToCompetitor(crewHAL.mate) };
+            const crew = {...DinghyRacingModel.crewTemplate()}
+            crew.helm = crewHAL.helm ? this._convertCompetitorHALToCompetitor(crewHAL.helm) : null;
+            crew.mate = crewHAL.mate ? this._convertCompetitorHALToCompetitor(crewHAL.mate) : null;
             crews.push(crew);
         }
         return Promise.resolve({'success': true, 'domainObject': crews});
@@ -917,16 +919,8 @@ class DinghyRacingModel {
      * @return {Promise<Result>>} If successful Result.domainObject will be an Array<Dinghy>
      */
     async getDinghiesBySailNumber(sailNumber, page, size) {
-        const resource = this.httpRootURL + '/dinghies/search/findBySailNumber?sailNumber=' + sailNumber;
+        let resource = this.httpRootURL + '/dinghies/search/findBySailNumber?sailNumber=' + sailNumber;
 
-        if (Number.isInteger(page) || Number.isInteger(size)) {
-            if (!dinghyClass) {
-                resource += '?';
-            }
-            else {
-                resource += '&';
-            }
-        }
         if (Number.isInteger(page)) {
             resource += 'page=' + page;
         }
@@ -1517,7 +1511,7 @@ class DinghyRacingModel {
     }
 
     _convertCompetitorHALToCompetitor(competitorHAL) {
-        return {...DinghyRacingModel.competitorTemplate(), 'name': competitorHAL.name, 'url': competitorHAL._links.self.href};
+        return {...DinghyRacingModel.competitorTemplate(), 'name': competitorHAL?.name, 'url': competitorHAL?._links?.self?.href};
     }
 
     _convertDinghyClassHALToDinghyClass(dinghyClassHAL) {
