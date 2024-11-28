@@ -283,7 +283,7 @@ function SignUp({ race }) {
                     entriesMap.current = map; // tried using setState but was failing tests with entriesMap === null even when entriesTable populated; entriesMap is not a visual element so useRef may be a better fit anyway
                     // build table rows
                     const rows = result.domainObject.map(entry => {
-                        return <tr key={entry.helm.name} id={entry.url} onClick={handleEntryRowClick} >
+                        return <tr key={entry.helm.name} id={entry.url} className='clickable-table-row' onClick={handleEntryRowClick} >
                             <td key='helm'>{entry.helm.name}</td>
                             <td key='sailNumber'>{entry.dinghy.sailNumber}</td>
                             <td key='dinghyClass'>{entry.dinghy.dinghyClass.name}</td>
