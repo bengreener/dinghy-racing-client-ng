@@ -42,7 +42,7 @@ function SignUp({ race }) {
     const [dinghyOptions, setDinghyOptions] = useState([]);
     const [entriesTable, setEntriesTable] = useState([]);
     const [selectedEntry, setSelectedEntry] = useState(null);
-    const [previousEntries, setPreviousEntries] = useState(null);
+    const [previousEntriesMap, setPreviousEntriesMap] = useState(new Map());
     const entriesMap = useRef(new Map());
     const helmInput = useRef(null);
     const dinghyClassSelect = useRef(null);
@@ -93,9 +93,9 @@ function SignUp({ race }) {
         setSelectedEntry(entry);
         setHelmName(entry.helm.name);
         if (entry.crew) {
-            setCrewName(entry.crew.name)
+            setCrewName(entry.crew.name);
         };
-        if ((!race.dinghyClass)){
+        if (!race.dinghyClass){
             setDinghyClassName(entry.dinghy.dinghyClass.name);
         }
         setSailNumber(entry.dinghy.sailNumber);
@@ -123,6 +123,25 @@ function SignUp({ race }) {
         event.stopPropagation();
         withdrawEntry(entriesMap.current.get(event.target.id));
     }, [withdrawEntry]);
+
+    function handlePreviousEntryRowClick({ currentTarget }) {
+        const previousEntry = previousEntriesMap.get(currentTarget.id);
+        setHelmName(previousEntry.crew.helm.name);
+        if (previousEntry.crew.mate) {
+            setCrewName(previousEntry.crew.mate.name);
+        };
+        if(!race.dinghyClass) {
+            setDinghyClassName(previousEntry.dinghy.dinghyClass.name);
+        }
+        setSailNumber(previousEntry.dinghy.sailNumber);
+        if (race.dinghyClass) {
+            helmInput.current.focus();
+        }
+        else {
+            dinghyClassSelect.current.focus();
+        }
+        setMessage('');
+    }
 
     // register on update callback for race
     useEffect(() => {
@@ -402,27 +421,33 @@ function SignUp({ race }) {
     }
 
     async function updatePreviousEntries(sailNumber) {
-        // const previousEntries = [];
-        const previousEntryRows = [];
+        const peMap = new Map();
         const dinghiesResult = await model.getDinghiesBySailNumber(sailNumber);
         if (dinghiesResult.success) {
             for (const dinghy of dinghiesResult.domainObject) {
                 const crewsResult = await model.getCrewsByDinghy(dinghy);
                 if (crewsResult.success) {
-                    // previousEntries.push({dinghy: dinghy, crews: crewsResult.domainObject});
                     for (const crew of crewsResult.domainObject) {
-                        previousEntryRows.push(
-                            <tr key={dinghy.url + crew.helm.url + crew?.mate?.url} >
-                                <td key={dinghy.dinghyClass.url}>{dinghy.dinghyClass.name}</td>
-                                <td key={crew.helm.name}>{crew.helm.name}</td>
-                                <td key={crew?.mate?.name}>{crew?.mate?.name}</td>
-                            </tr>
-                        );
+                        peMap.set(dinghy.url + crew.helm.url + crew.mate.url, {dinghy: dinghy, crew: crew});
                     }
                 }
             }
         }
-        setPreviousEntries(previousEntryRows);
+        setPreviousEntriesMap(peMap);
+    }
+
+    function previousEntriesRows() {
+        const rows = [];
+        previousEntriesMap.forEach((value, key) => {
+            rows.push(
+                <tr key={key} id={key} className='clickable-table-row' onClick={handlePreviousEntryRowClick} >
+                    <td key={value.dinghy.dinghyClass.url}>{value.dinghy.dinghyClass.name}</td>
+                    <td key={value.crew.helm.name}>{value.crew.helm.name}</td>
+                    <td key={value.crew?.mate?.name}>{value.crew?.mate?.name}</td>
+                </tr>
+            );
+        });
+        return rows;
     }
 
     function handleEntryUpdateButtonClick(event) {
@@ -614,7 +639,7 @@ function SignUp({ race }) {
                         </tr>
                         </thead>
                         <tbody>
-                            {previousEntries}
+                            {previousEntriesRows()}
                         </tbody>
                     </table>
                 </div>
