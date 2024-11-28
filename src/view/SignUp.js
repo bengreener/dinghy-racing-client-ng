@@ -40,17 +40,18 @@ function SignUp({ race }) {
     const [dinghyClassOptions, setDinghyClassOptions] = useState([]);
     const [dinghyMap, setDinghyMap] = useState(new Map());
     const [dinghyOptions, setDinghyOptions] = useState([]);
-    const entriesMap = useRef(new Map());
     const [entriesTable, setEntriesTable] = useState([]);
     const [selectedEntry, setSelectedEntry] = useState(null);
+    const [previousEntriesMap, setPreviousEntriesMap] = useState(new Map());
+    const entriesMap = useRef(new Map());
     const helmInput = useRef(null);
     const dinghyClassSelect = useRef(null);
+    const entriesSummary = useRef(new Map());
     const [raceUpdateRequestAt, setRaceUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
     const [entryUpdateRequestAt, setEntryUpdateRequestAt] = useState(Date.now()); // time of last request to fetch an entry from server. change triggers a new fetch; for instance when server notifies an entry has been updated
     const [competitorUpdateRequestAt, setCompetitorUpdateRequestAt] = useState(Date.now());
     const [dinghyUpdateRequestAt, setDinghyUpdateRequestAt] = useState(Date.now());
     const [dinghyClassUpdateRequestAt, setDinghyClassUpdateRequestAt] = useState(Date.now());
-    const entriesSummary = useRef(new Map());
 
     const handleRaceUpdate = useCallback(() => {
         setRaceUpdateRequestAt(Date.now());
@@ -92,9 +93,9 @@ function SignUp({ race }) {
         setSelectedEntry(entry);
         setHelmName(entry.helm.name);
         if (entry.crew) {
-            setCrewName(entry.crew.name)
+            setCrewName(entry.crew.name);
         };
-        if ((!race.dinghyClass)){
+        if (!race.dinghyClass){
             setDinghyClassName(entry.dinghy.dinghyClass.name);
         }
         setSailNumber(entry.dinghy.sailNumber);
@@ -122,6 +123,25 @@ function SignUp({ race }) {
         event.stopPropagation();
         withdrawEntry(entriesMap.current.get(event.target.id));
     }, [withdrawEntry]);
+
+    function handlePreviousEntryRowClick({ currentTarget }) {
+        const previousEntry = previousEntriesMap.get(currentTarget.id);
+        setHelmName(previousEntry.crew.helm.name);
+        if (previousEntry.crew.mate) {
+            setCrewName(previousEntry.crew.mate.name);
+        };
+        if(!race.dinghyClass) {
+            setDinghyClassName(previousEntry.dinghy.dinghyClass.name);
+        }
+        setSailNumber(previousEntry.dinghy.sailNumber);
+        if (race.dinghyClass) {
+            helmInput.current.focus();
+        }
+        else {
+            dinghyClassSelect.current.focus();
+        }
+        setMessage('');
+    }
 
     // register on update callback for race
     useEffect(() => {
@@ -263,7 +283,7 @@ function SignUp({ race }) {
                     entriesMap.current = map; // tried using setState but was failing tests with entriesMap === null even when entriesTable populated; entriesMap is not a visual element so useRef may be a better fit anyway
                     // build table rows
                     const rows = result.domainObject.map(entry => {
-                        return <tr key={entry.helm.name} id={entry.url} onClick={handleEntryRowClick} >
+                        return <tr key={entry.helm.name} id={entry.url} className='clickable-table-row' onClick={handleEntryRowClick} >
                             <td key='helm'>{entry.helm.name}</td>
                             <td key='sailNumber'>{entry.dinghy.sailNumber}</td>
                             <td key='dinghyClass'>{entry.dinghy.dinghyClass.name}</td>
@@ -271,7 +291,7 @@ function SignUp({ race }) {
                             <td key='withdrawEntry-button'><button id={entry.url} className='embedded' type='button' onClick={handleWithdrawEntryButtonClick}>X</button></td>
                         </tr>
                     });
-                    setEntriesTable(<table className='w3-table'>
+                    setEntriesTable(<table className='w3-table w3-striped'>
                         <thead>
                             <tr>
                                 <th key='helm'>Helm</th>
@@ -400,9 +420,43 @@ function SignUp({ race }) {
         }
     }
 
+    async function updatePreviousEntries(sailNumber) {
+        const peMap = new Map();
+        const dinghiesResult = await model.getDinghiesBySailNumber(sailNumber);
+        if (dinghiesResult.success) {
+            for (const dinghy of dinghiesResult.domainObject) {
+                const crewsResult = await model.getCrewsByDinghy(dinghy);
+                if (crewsResult.success) {
+                    for (const crew of crewsResult.domainObject) {
+                        peMap.set(dinghy.url + crew.helm.url + crew.mate.url, {dinghy: dinghy, crew: crew});
+                    }
+                }
+            }
+        }
+        setPreviousEntriesMap(peMap);
+    }
+
+    function previousEntriesRows() {
+        const rows = [];
+        previousEntriesMap.forEach((value, key) => {
+            rows.push(
+                <tr key={key} id={key} className='clickable-table-row' onClick={handlePreviousEntryRowClick} >
+                    <td key={value.dinghy.dinghyClass.url}>{value.dinghy.dinghyClass.name}</td>
+                    <td key={value.crew.helm.name}>{value.crew.helm.name}</td>
+                    <td key={value.crew?.mate?.name}>{value.crew?.mate?.name}</td>
+                </tr>
+            );
+        });
+        return rows;
+    }
+
     function handleEntryUpdateButtonClick(event) {
         event.preventDefault();
         updateEntry();
+    }
+
+    function handleSailNumberBlur(event) {
+        updatePreviousEntries(sailNumber);
     }
 
     function dinghyClassInput(race) {
@@ -538,7 +592,7 @@ function SignUp({ race }) {
             </tr>
         );
 
-        return (<table className='sign-up-summary w3-table'>
+        return (<table className='sign-up-summary w3-table w3-striped'>
                 <thead>
                     <tr>
                         <th key='dinghyClass'>Class</th>
@@ -567,13 +621,27 @@ function SignUp({ race }) {
                 {buildCrewInput()}
                 <div className='w3-row'>
                     <label htmlFor='sail-number-input' className='w3-col m2' >Sail Number</label>
-                    <input id='sail-number-input' name='sailNumber' className='w3-half' list='dinghy-datalist' onChange={handleChange} value={sailNumber} />
+                    <input id='sail-number-input' name='sailNumber' className='w3-half' list='dinghy-datalist' onChange={handleChange} onBlur={handleSailNumberBlur} value={sailNumber} />
                 </div>
                 <div className='w3-row' >
                     <div className='w3-col m8' >
                         <button id='entry-update-button' className='w3-right' type='button' onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
                         {selectedEntry ? <button id='cancel-button' className='w3-right' type='button' onClick={clear} >Cancel</button> : null}
                     </div>
+                </div>
+                <div data-testid='previous-entries'>
+                    <table className='w3-table w3-striped'>
+                        <thead>
+                        <tr>
+                            <th>Class</th>
+                            <th>Helm</th>
+                            <th>Crew</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {previousEntriesRows()}
+                        </tbody>
+                    </table>
                 </div>
             </form>
             <p className={userMessageClasses()}>{message}</p>

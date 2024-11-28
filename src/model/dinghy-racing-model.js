@@ -80,6 +80,13 @@ class DinghyRacingModel {
     }
 
     /**
+     * Provide a blank crew template
+     */
+    static crewTemplate() {
+        return {helm: null, mate: null};
+    }
+
+    /**
      * 
      * @param {String} httpRootURL
      * @param {String} wsRootURL
@@ -798,6 +805,38 @@ class DinghyRacingModel {
     }
     
     /**
+     * Get all the crews that have sailed a dinghy
+     */
+    async getCrewsByDinghy(dinghy) {
+        let crewsHAL = [];
+        // if race does not have a URL cannot get entries
+        if (!dinghy || !dinghy?.url) {
+            return Promise.resolve({'success': false, 'message': 'Cannot retrieve dinghy crews without URL for dinghy.'});
+        }
+        // get crews
+        const resource = this.httpRootURL + '/crews/search/findCrewsByDinghy?dinghy=' + dinghy.url;
+        const result = await this.read(resource);
+        if (!result.success) {
+            return Promise.resolve(result);
+        }
+        if (result.domainObject._embedded) {
+            crewsHAL = result.domainObject._embedded.crews;
+        }
+        if (crewsHAL.length === 0) {
+            // no entries for race
+            return Promise.resolve({'success': true, 'domainObject': []})
+        }
+        const crews = [];
+        for (const crewHAL of crewsHAL) {
+            const crew = {...DinghyRacingModel.crewTemplate()}
+            crew.helm = crewHAL.helm ? this._convertCompetitorHALToCompetitor(crewHAL.helm) : null;
+            crew.mate = crewHAL.mate ? this._convertCompetitorHALToCompetitor(crewHAL.mate) : null;
+            crews.push(crew);
+        }
+        return Promise.resolve({'success': true, 'domainObject': crews});
+    }
+
+    /**
      * Get dinghy
      * @param {String} url Address of the remote resource
      * @returns {Promise<Result>}
@@ -860,6 +899,46 @@ class DinghyRacingModel {
             const dinghyClassURLs = dinghiesHAL.map(race => race._links.dinghyClass.href);
             const dinghyClassResults = await Promise.all(dinghyClassURLs.map(url => this.read(url)));
             
+            const dinghies = [];
+            for (let i = 0; i < dinghiesHAL.length; i++  ) {
+                const dinghyClass = dinghyClassResults[i].success ? this._convertDinghyClassHALToDinghyClass(dinghyClassResults[i].domainObject) : null;
+                dinghies.push({'sailNumber': dinghiesHAL[i].sailNumber, 'dinghyClass': dinghyClass, 'url': dinghiesHAL[i]._links.self.href});
+            };
+            return Promise.resolve({'success': true, 'domainObject': dinghies});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
+     * Gets all dinghies with the given sail number
+     * @param {String} sailNumber to search for
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
+     * @return {Promise<Result>>} If successful Result.domainObject will be an Array<Dinghy>
+     */
+    async getDinghiesBySailNumber(sailNumber, page, size) {
+        let resource = this.httpRootURL + '/dinghies/search/findBySailNumber?sailNumber=' + sailNumber;
+
+        if (Number.isInteger(page)) {
+            resource += 'page=' + page;
+        }
+        if (Number.isInteger(size)) {
+            if (Number.isInteger(page)) {
+                resource += '&';
+            }
+            resource += 'size=' + size;
+        }
+        const result = await this.read(resource);
+        if (result.success) {
+            if (!Number.isInteger(page) && !Number.isInteger(size) && result.domainObject.page.totalElements > result.domainObject.page.size) {
+                return this.getDinghiesBySailNumber(sailNumber, 0, result.domainObject.page.totalElements);
+            }
+            const dinghiesHAL = result.domainObject._embedded.dinghies;
+            const dinghyClassURLs = dinghiesHAL.map(race => race._links.dinghyClass.href);
+            const dinghyClassResults = await Promise.all(dinghyClassURLs.map(url => this.read(url)));
+
             const dinghies = [];
             for (let i = 0; i < dinghiesHAL.length; i++  ) {
                 const dinghyClass = dinghyClassResults[i].success ? this._convertDinghyClassHALToDinghyClass(dinghyClassResults[i].domainObject) : null;
@@ -1432,7 +1511,7 @@ class DinghyRacingModel {
     }
 
     _convertCompetitorHALToCompetitor(competitorHAL) {
-        return {...DinghyRacingModel.competitorTemplate(), 'name': competitorHAL.name, 'url': competitorHAL._links.self.href};
+        return {...DinghyRacingModel.competitorTemplate(), 'name': competitorHAL?.name, 'url': competitorHAL?._links?.self?.href};
     }
 
     _convertDinghyClassHALToDinghyClass(dinghyClassHAL) {

@@ -248,12 +248,28 @@ class DinghyRacingModel {
         return null;
     }
 
+    async getCompetitors() {
+        return Promise.resolve({success: true, domainObject: []});
+    }
+
+    async getCompetitorByName(name) {
+        return null;
+    }
+
+    async getCrewsByDinghy(dinghy) {
+        return null;
+    }
+
     async getDinghy(url) {
         return null;
     }
 
     async getDinghies(dinghyClass) {
         return null;
+    }
+
+    async getDinghiesBySailNumber(sailNumber, page, size) {
+        return Promise.resolve({success: true, domainObject: []});
     }
 
     async getDinghyBySailNumberAndDinghyClass(sailNumber, dinghyClass) {
@@ -313,14 +329,6 @@ class DinghyRacingModel {
     }
 
     async startRace(race, startTime) {
-        return null;
-    }
-
-    async getCompetitors() {
-        return Promise.resolve({success: true, domainObject: []});
-    }
-
-    async getCompetitorByName(name) {
         return null;
     }
 

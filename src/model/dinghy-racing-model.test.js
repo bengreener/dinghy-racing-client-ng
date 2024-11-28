@@ -19,15 +19,18 @@ import { httpRootURL, wsRootURL, competitorsCollectionHAL,
     dinghiesCollectionHAL, dinghiesScorpionCollectionHAL, 
     dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghyClassCometHAL, dinghy1234HAL, dinghy2726HAL, dinghy6745HAL,
     raceScorpion_AHAL, raceGraduate_AHAL, raceComet_AHAL, raceHandicap_AHAL,
-    dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet,
+    dinghyScorpion1234CrewsHAL,
+    dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, 
     dinghies, dinghiesScorpion, dinghy1234, dinghy2726, dinghy6745, dinghy826,
     races, racesCollectionHAL, raceScorpionA, raceGraduateA, raceCometA,
-    competitorChrisMarshallHAL, competitorSarahPascalHAL, competitorJillMyerHAL, 
-    competitorsCollection, competitorChrisMarshall, competitorLouScrew, 
+    competitorChrisMarshallHAL, competitorSarahPascalHAL, competitorJillMyerHAL, competitorLiuBaoHAL, competitorLouScrewHAL,
+    competitorsCollection, competitorChrisMarshall, competitorLouScrew, competitorSarahPascal, competitorLiuBao, 
     entriesScorpionAHAL, entriesCometAHAL, entryChrisMarshallDinghy1234HAL, entriesHandicapAHAL,
     entriesScorpionA, entriesCometA, entriesHandicapA,
-    competitorSarahPascal, raceHandicapA, entryChrisMarshallScorpionA1234, competitorJillMyer, 
-    entrySarahPascalScorpionA6745, entryJillMyerCometA826, entryChrisMarshallHandicapA1234 } from './__mocks__/test-data';
+    raceHandicapA, entryChrisMarshallScorpionA1234, competitorJillMyer, 
+    entrySarahPascalScorpionA6745, entryJillMyerCometA826, entryChrisMarshallHandicapA1234,
+    dinghyScorpion1234Crews
+} from './__mocks__/test-data';
 import {
     findByRaceGraduate_AHAL_bigData, signedUpGraduateAHAL_bigData,
     competitorCarmenWhiting, competitorAjDavis, competitorIvanPlatt, competitorNellPowell, competitorGraceRees, competitorArranAshley, competitorMacySmall,
@@ -3145,6 +3148,12 @@ it('provides a blank template for a lap', () => {
     expect(lap).toEqual({'number': null, 'time': 0});
 });
 
+it('provides a blank template for a crew', () => {
+    const crew = DinghyRacingModel.crewTemplate();
+
+    expect(crew).toEqual({helm: null, mate: null});
+});
+
 describe('when searching for entries by race', () => {
     it('returns a promise that resolves to a result indicating success and containing the entries when entries are found and entries have crew recorded', async () => {
         fetch.mockImplementationOnce(() => {
@@ -5417,3 +5426,189 @@ describe('when an entry is requested', () => {
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
     });
 });
+
+describe('when retrieving dinghies by sail number', () => {
+    it('returns a success result containing dinghies with the provided sail number', async () => {
+        const dinghy1234ScorpionHAL = {sailNumber: '1234', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' } } };
+        const dinghy1234GraduateHAL = {sailNumber: '1234', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/6' }, dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/6' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass' } } };
+        const dinghy1234CollectionHAL = {_embedded: {dinghies: [
+            dinghy1234ScorpionHAL, dinghy1234GraduateHAL
+        ]}, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/search/findBySailNumber?sailNumber=1234&page=0&size=20' } }, page: {size: 20, totalElements: 2, totalPages: 1, number: 0 }}
+        const dinghy1234Scorpion = {sailNumber:'1234',dinghyClass: dinghyClassScorpion,url:'http://localhost:8081/dinghyracing/api/dinghies/2'};
+        const dinghy1234Graduate = {sailNumber:'1234',dinghyClass: dinghyClassGraduate,url:'http://localhost:8081/dinghyracing/api/dinghies/6'};
+
+        fetch.mockImplementation((resource) => {
+            if (resource === 'http://localhost:8081/dinghyracing/api/dinghies') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghiesCollectionHAL)
+                });
+            }
+            else if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findBySailNumber?sailNumber=1234') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghy1234CollectionHAL)
+                });
+            }
+            else if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassScorpionHAL)
+                });
+            }
+            else if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyClassGraduateHAL)
+                });
+            }
+            else {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404,
+                    statusText: 'Not Found'
+                });
+            }
+        });
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = model.getDinghiesBySailNumber('1234');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': [ dinghy1234Scorpion, dinghy1234Graduate ]});
+    });
+    describe('when no dinghies are found for the provided sail number', () => {
+        it('returns a failed result containing a message explaining the cause of the failure', async () =>{
+            fetch.mockImplementation((resource) => {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404,
+                    statusText: 'Not Found',
+                    json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
+                });
+            });
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = model.getDinghiesBySailNumber('1234');
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
+        });
+    });
+});
+
+describe('when the crews that have sailed a dinghy are requested', () => {
+    it('returns the crews', async () => {
+        fetch.mockImplementation((resource) => {
+            if (resource === 'http://localhost:8081/dinghyracing/api/crews/search/findCrewsByDinghy?dinghy=http://localhost:8081/dinghyracing/api/dinghies/2') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(dinghyScorpion1234CrewsHAL)
+                });
+            }
+            else {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404,
+                    statusText: 'Not Found'
+                });
+            }
+        });
+
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = model.getCrewsByDinghy(dinghy1234);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': dinghyScorpion1234Crews});
+    });
+    describe('when the crew only has a helm', () => {
+        const dinghy1234CrewAHAL = {helm: competitorChrisMarshallHAL, mate: null};
+        const dinghy1234CrewBHAL = {helm: competitorLiuBaoHAL, mate: competitorLouScrewHAL};
+        const dinghy1234CrewsHAL = {_embedded: {crews: [dinghy1234CrewAHAL, dinghy1234CrewBHAL]}, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/crews/search/findCrewsByDinghy?dinghy=http%3A%2F%2Flocalhost%3A8081%2Fdinghyracing%2Fapi%2Fdinghies%2F2'}}};
+        const dinghy1234CrewA = {helm: competitorChrisMarshall, mate: null};
+        const dinghy1234CrewB = {helm: competitorLiuBao, mate: competitorLouScrew};
+        const dinghy1234Crews = [dinghy1234CrewA, dinghy1234CrewB];
+
+        it('returns the crews', async () => {
+            fetch.mockImplementation((resource) => {
+                if (resource === 'http://localhost:8081/dinghyracing/api/crews/search/findCrewsByDinghy?dinghy=http://localhost:8081/dinghyracing/api/dinghies/2') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(dinghy1234CrewsHAL)
+                    });
+                }
+                else {
+                    return Promise.resolve({
+                        ok: false,
+                        status: 404,
+                        statusText: 'Not Found'
+                    });
+                }
+            });
+    
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = model.getCrewsByDinghy(dinghy1234);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, 'domainObject': dinghy1234Crews});
+        });
+    });
+    describe('when the dinghy does not have a uri', () => {
+        it('returns a promise that resolves to a result indicating failure', async () => {
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.getCrewsByDinghy({sailNumber:'1234', dinghyClass: dinghyClassScorpion});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'Cannot retrieve dinghy crews without URL for dinghy.'});
+        });
+    });
+    describe('when no crew has sailed in the dinghy', () => {
+        it('returns an empty crews', async () => {
+            const emptyCrewsHAL = {_links: {self: {href: 'http://localhost:8081/dinghyracing/api/crews/search/findCrewsByDinghy?dinghy=http%3A%2F%2Flocalhost%3A8081%2Fdinghyracing%2Fapi%2Fdinghies%2F2'}}};
+            const emptyCrews = [];
+            fetch.mockImplementation((resource) => {
+                if (resource === 'http://localhost:8081/dinghyracing/api/crews/search/findCrewsByDinghy?dinghy=http://localhost:8081/dinghyracing/api/dinghies/2') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(emptyCrewsHAL)
+                    });
+                }
+                else {
+                    return Promise.resolve({
+                        ok: false,
+                        status: 404,
+                        statusText: 'Not Found'
+                    });
+                }
+            });
+
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = model.getCrewsByDinghy(dinghy1234);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, 'domainObject': emptyCrews});
+        });
+    });
+    describe('when the dinghy does not exist', () => {
+        it('returns a failed result containing a message explaining the cause of the failure', async () =>{
+            fetch.mockImplementation((resource) => {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404,
+                    statusText: 'Not Found',
+                    json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
+                });
+            });
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = model.getDinghiesBySailNumber('1234');
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
+        });
+    });
+})

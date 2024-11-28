@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { act, screen, within } from '@testing-library/react';
+import { act, findByLabelText, screen, within } from '@testing-library/react';
 import { customRender } from '../test-utilities/custom-renders';
 import userEvent from '@testing-library/user-event';
 import DinghyRacingModel from '../model/dinghy-racing-model';
@@ -23,12 +23,13 @@ import SignUp from './SignUp';
 import { httpRootURL, wsRootURL, 
     competitorsCollection, competitorChrisMarshall, competitorLouScrew, competitorJillMyer,
     dinghyClasses, dinghyClassScorpion, dinghyClassComet,
-    dinghies, dinghy1234, dinghy826,
+    dinghies, dinghy1234, dinghy826, dinghy1234Graduate,
     raceScorpionA, raceHandicapA, raceCometA,
     entriesScorpionA, entriesCometA, entriesHandicapA, entryJillMyerCometA826,
     competitorSarahPascal,
     dinghy2726,
-    entryChrisMarshallHandicapA1234, entryChrisMarshallScorpionA1234} from '../model/__mocks__/test-data';
+    entryChrisMarshallHandicapA1234, entryChrisMarshallScorpionA1234,
+    dinghyScorpion1234Crews, dinghyGraduate1234Crews } from '../model/__mocks__/test-data';
 
 jest.mock('../model/dinghy-racing-model');
 jest.mock('../controller/dinghy-racing-controller');
@@ -9386,5 +9387,77 @@ describe('when a new dinghy class is created', () => {
             model.handleDinghyClassCreation('http://localhost:8081/dinghyracing/api/dinghyClasses/99');
         });
         expect(await screen.findByRole('option', {name: /avalon/i, hidden: true})).toBeInTheDocument();
+    });
+});
+
+describe('when a sailnumber is entered', () => {
+    it('displays dinghy class and previous crews for boats with that sail number', async () => {
+        const user = userEvent.setup();
+
+        jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234, dinghy1234Graduate ]})});
+        jest.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
+            if (dinghy.url === dinghy1234.url) {
+                return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
+            }
+            else if (dinghy.url === dinghy1234Graduate.url) {
+                return Promise.resolve({success: true, domainObject: dinghyGraduate1234Crews});
+            }
+        });
+        
+        await act(async () => {
+            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+        });
+        // enter sal number
+        const inputSailNumber = screen.getByLabelText(/sail/i);
+        await act(async () => {
+            await user.type(inputSailNumber, '1234');
+            await user.keyboard('{Tab}');
+        });        
+        // get table that is suppossed to contain details of dinghy class and previous crews
+        const previousEntries = within(screen.getByTestId('previous-entries'));
+        // check it contains dinghy classes and previous crews for boats with sail number
+        expect(await previousEntries.findAllByRole('cell', {name: 'Scorpion'})).toHaveLength(2);
+        expect(await previousEntries.findByRole('cell', {name: 'Chris Marshall'})).toBeInTheDocument();
+        expect(await previousEntries.findByRole('cell', {name: 'Jill Myer'})).toBeInTheDocument();
+        expect(await previousEntries.findByRole('cell', {name: 'Graduate'})).toBeInTheDocument();
+        expect(await previousEntries.findByRole('cell', {name: 'Liu Bao'})).toBeInTheDocument();
+        expect(await previousEntries.findByRole('cell', {name: 'Lou Screw'})).toBeInTheDocument();
+        expect(inputSailNumber).not.toHaveFocus();
+    });
+});
+
+describe('when a previous entry is selected', () => {
+    it('populates the signup form with details from the previous entry', async () => {
+        const user = userEvent.setup();
+
+        jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234, dinghy1234Graduate ]})});
+        jest.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
+            if (dinghy.url === dinghy1234.url) {
+                return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
+            }
+            else if (dinghy.url === dinghy1234Graduate.url) {
+                return Promise.resolve({success: true, domainObject: dinghyGraduate1234Crews});
+            }
+        });
+        
+        await act(async () => {
+            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+        });
+        // enter sal number
+        const inputSailNumber = screen.getByLabelText(/sail/i);
+        await act(async () => {
+            await user.type(inputSailNumber, '1234');
+            await user.keyboard('{Tab}');
+        });        
+        // get table that is suppossed to contain details of dinghy class and previous crews
+        const previousEntries = within(screen.getByTestId('previous-entries'));
+        const competitorCell = await previousEntries.findByRole('cell', {name: /chris marshall/i});
+        await act(async () => {
+            await user.click(competitorCell);
+        });
+        expect(await screen.findByLabelText(/helm/i)).toHaveValue('Chris Marshall');
+        expect(await screen.findByLabelText(/crew/i)).toHaveValue('Jill Myer');
+        expect(await screen.findByLabelText(/dinghy class/i)).toHaveValue('Scorpion');
+        expect(await screen.findByLabelText(/sail number/i)).toHaveValue('1234');
     });
 });
