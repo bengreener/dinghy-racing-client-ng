@@ -80,6 +80,7 @@ function SignUp({ race }) {
         setDinghyClassName('');
         setMessage('');
         setSelectedEntry(null);
+        setPreviousEntriesMap(new Map());
         if (race.dinghyClass) {
             helmInput.current.focus();
         }
@@ -431,7 +432,7 @@ function SignUp({ race }) {
                 const crewsResult = await model.getCrewsByDinghy(dinghy);
                 if (crewsResult.success) {
                     for (const crew of crewsResult.domainObject) {
-                        peMap.set(dinghy.url + crew.helm.url + crew.mate.url, {dinghy: dinghy, crew: crew});
+                        peMap.set(dinghy.url + crew.helm.url + crew?.mate?.url, {dinghy: dinghy, crew: crew});
                     }
                 }
             }
