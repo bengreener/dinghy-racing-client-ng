@@ -9460,4 +9460,47 @@ describe('when a previous entry is selected', () => {
         expect(await screen.findByLabelText(/dinghy class/i)).toHaveValue('Scorpion');
         expect(await screen.findByLabelText(/sail number/i)).toHaveValue('1234');
     });
+    it('overwrites any previously entered values removing any value entered for mate if mate in selected record is null', async () => {
+        const user = userEvent.setup();
+
+        jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234, dinghy1234Graduate, dinghy1234Comet ]})});
+        jest.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
+            if (dinghy.url === dinghy1234.url) {
+                return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
+            }
+            else if (dinghy.url === dinghy1234Graduate.url) {
+                return Promise.resolve({success: true, domainObject: dinghyGraduate1234Crews});
+            }
+            else if (dinghy.url === dinghy1234Comet.url) {
+                return Promise.resolve({success: true, domainObject: dinghyComet1234Crews});
+            }
+        });
+        
+        await act(async () => {
+            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+        });
+        // enter sail number
+        const inputHelm = screen.getByLabelText(/helm/i);
+        const inputCrew = screen.getByLabelText(/crew/i);
+        const inputDinghyClass = screen.getByLabelText(/dinghy class/i);
+        const inputSailNumber = screen.getByLabelText(/sail/i);
+        await act(async () => {
+            await user.selectOptions(inputDinghyClass, 'Scorpion');
+            await user.type(inputSailNumber, '7654');
+            await user.type(inputHelm, 'J R Hartley');
+            await user.type(inputCrew, 'Bilbo Baggins');
+        });
+        // await screen.findByText(/bilbo baggins/i);
+        // screen.debug();
+        // get table that is supposed to contain details of dinghy class and previous crews
+        const previousEntries = within(screen.getByTestId('previous-entries'));
+        const competitorCell = await previousEntries.findByRole('cell', {name: /bob hoskins/i});
+        await act(async () => {
+            await user.click(competitorCell);
+        });
+        expect(inputHelm).toHaveValue('Bob Hoskins');
+        expect(inputCrew).toHaveValue('');
+        expect(inputDinghyClass).toHaveValue('Comet');
+        expect(inputSailNumber).toHaveValue('1234');
+    });
 });

@@ -129,6 +129,9 @@ function SignUp({ race }) {
         setHelmName(previousEntry.crew.helm.name);
         if (previousEntry.crew.mate) {
             setCrewName(previousEntry.crew.mate.name);
+        } 
+        else {
+            setCrewName('');
         };
         if(!race.dinghyClass) {
             setDinghyClassName(previousEntry.dinghy.dinghyClass.name);
