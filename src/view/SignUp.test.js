@@ -23,13 +23,13 @@ import SignUp from './SignUp';
 import { httpRootURL, wsRootURL, 
     competitorsCollection, competitorChrisMarshall, competitorLouScrew, competitorJillMyer,
     dinghyClasses, dinghyClassScorpion, dinghyClassComet,
-    dinghies, dinghy1234, dinghy826, dinghy1234Graduate,
+    dinghies, dinghy1234, dinghy826, dinghy1234Graduate, dinghy1234Comet,
     raceScorpionA, raceHandicapA, raceCometA,
     entriesScorpionA, entriesCometA, entriesHandicapA, entryJillMyerCometA826,
     competitorSarahPascal,
     dinghy2726,
     entryChrisMarshallHandicapA1234, entryChrisMarshallScorpionA1234,
-    dinghyScorpion1234Crews, dinghyGraduate1234Crews } from '../model/__mocks__/test-data';
+    dinghyScorpion1234Crews, dinghyGraduate1234Crews, dinghyComet1234Crews } from '../model/__mocks__/test-data';
 
 jest.mock('../model/dinghy-racing-model');
 jest.mock('../controller/dinghy-racing-controller');
