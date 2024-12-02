@@ -547,8 +547,12 @@ describe('when signing up for a race', () => {
         });
         
         it('clears form on success', async () => {
-            const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+            jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                 return Promise.resolve({'success': true});
+            });
+            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
+            jest.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
+                return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
             });
             const user = userEvent.setup();
             customRender(<SignUp race={raceCometA}/>, model, controller);
@@ -559,6 +563,7 @@ describe('when signing up for a race', () => {
             });
             await act(async () => {
                 await user.type(inputSailNumber, '826');
+                await user.keyboard('{Tab}');
             });
             const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
             await act(async () => {
@@ -566,10 +571,12 @@ describe('when signing up for a race', () => {
             });
             const raceTitle = screen.getByRole('heading', {'name': /comet a/i});
             const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
+            const previousEntries = within(screen.getByTestId('previous-entries'));
             expect(raceTitle).toBeInTheDocument();
             expect(inputHelm).toHaveValue('');
             expect(inputSailNumber).toHaveValue('');
             expect(screen.queryByLabelText(/crew/i)).toBeDisabled();
+            expect(previousEntries.getAllByRole('row')).toHaveLength(1);
             expect(btnCreate).toBeInTheDocument();
         });
         
@@ -2059,8 +2066,12 @@ describe('when signing up for a race', () => {
         });
     
         it('clears form on success', async () => {
-            const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+            jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                 return Promise.resolve({'success': true});
+            });
+            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
+            jest.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
+                return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
             });
             const user = userEvent.setup();
             customRender(<SignUp race={raceScorpionA}/>, model, controller);
@@ -2072,6 +2083,7 @@ describe('when signing up for a race', () => {
             });
             await act(async () => {
                 await user.type(inputSailNumber, '1234');
+                await user.keyboard('{Tab}');
             });
             await act(async () => {
                 await user.type(inputCrew, 'Lou Screw');
@@ -2082,10 +2094,12 @@ describe('when signing up for a race', () => {
             });
             const raceTitle = screen.getByRole('heading', {'name': /scorpion a/i});
             const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
+            const previousEntries = within(screen.getByTestId('previous-entries'));
             expect(raceTitle).toBeInTheDocument();
             expect(inputHelm).toHaveValue('');
             expect(inputSailNumber).toHaveValue('');
             expect(inputCrew).toHaveValue('');
+            expect(previousEntries.getAllByRole('row')).toHaveLength(1);
             expect(btnCreate).toBeInTheDocument();
         });
         
@@ -4294,8 +4308,12 @@ describe('when signing up for a race', () => {
         });
     
         it('clears form on success', async () => {
-            const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+            jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                 return Promise.resolve({'success': true});
+            });
+            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
+            jest.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
+                return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
             });
             const user = userEvent.setup();
             customRender(<SignUp race={raceHandicapA}/>, model, controller);
@@ -4312,6 +4330,7 @@ describe('when signing up for a race', () => {
             });
             await act(async () => {
                 await user.type(inputSailNumber, '1234');
+                await user.keyboard('{Tab}');
             });
             await act(async () => {
                 await user.type(inputCrew, 'Lou Screw');
@@ -4322,10 +4341,12 @@ describe('when signing up for a race', () => {
             });
             const raceTitle = screen.getByRole('heading', {'name': /handicap a/i});
             const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
+            const previousEntries = within(screen.getByTestId('previous-entries'));
             expect(raceTitle).toBeInTheDocument();
             expect(inputHelm).toHaveValue('');
             expect(inputSailNumber).toHaveValue('');
             expect(inputCrew).toHaveValue('');
+            expect(previousEntries.getAllByRole('row')).toHaveLength(1);
             expect(btnCreate).toBeInTheDocument();
         });
         
@@ -4938,6 +4959,10 @@ describe('when updating an existing entry', () => {
             jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
                 return Promise.resolve({'success': true});
             });
+            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
+            jest.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
+                return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
+            });
             const user = userEvent.setup();
             customRender(<SignUp race={raceCometA}/>, model, controller);
             const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
@@ -4953,14 +4978,17 @@ describe('when updating an existing entry', () => {
             await act(async () => {
                 await user.clear(inputSailNumber);
                 await user.type(inputSailNumber, '1234');
+                await user.keyboard('{Tab}');
             });
             const updateButton = screen.getByRole('button', {'name': /update/i});
             await act(async () => {
                 await user.click(updateButton);
             });
+            const previousEntries = within(screen.getByTestId('previous-entries'));
             expect(inputHelm).toHaveValue('');
             expect(inputSailNumber).toHaveValue('');
             expect(screen.queryByLabelText(/crew/i)).toBeDisabled();
+            expect(previousEntries.getAllByRole('row')).toHaveLength(1);
             expect(screen.getByRole('button', {'name': /sign-up/i})).toBeInTheDocument();
         });
     });    
@@ -6724,6 +6752,10 @@ describe('when updating an existing entry', () => {
             jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
                 return Promise.resolve({'success': true});
             });
+            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
+            jest.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
+                return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
+            });
             const user = userEvent.setup();
             customRender(<SignUp race={raceScorpionA}/>, model, controller);
             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
@@ -6740,6 +6772,7 @@ describe('when updating an existing entry', () => {
             await act(async () => {
                 await user.clear(inputSailNumber);
                 await user.type(inputSailNumber, '826');
+                await user.keyboard('{Tab}');
             });
             await act(async () => {
                 await user.clear(inputCrew);
@@ -6749,10 +6782,12 @@ describe('when updating an existing entry', () => {
             await act(async () => {
                 await user.click(updateButton);
             });
+            const previousEntries = within(screen.getByTestId('previous-entries'));
             expect(screen.getByRole('heading', {'name': /scorpion a/i})).toBeInTheDocument();
             expect(inputHelm).toHaveValue('');
             expect(inputSailNumber).toHaveValue('');
             expect(inputCrew).toHaveValue('');
+            expect(previousEntries.getAllByRole('row')).toHaveLength(1);
             expect(screen.getByRole('button', {'name': /sign-up/i})).toBeInTheDocument();
         });
     });    
@@ -9215,6 +9250,10 @@ describe('when updating an existing entry', () => {
             jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
                 return Promise.resolve({'success': true});
             });
+            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
+            jest.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
+                return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
+            });
             const user = userEvent.setup();
             customRender(<SignUp race={raceHandicapA}/>, model, controller);
             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
@@ -9236,6 +9275,7 @@ describe('when updating an existing entry', () => {
             await act(async () => {
                 await user.clear(inputSailNumber);
                 await user.type(inputSailNumber, '1234');
+                await user.keyboard('{Tab}');
             });
             await act(async () => {
                 await user.clear(inputCrew);
@@ -9247,10 +9287,12 @@ describe('when updating an existing entry', () => {
             });
             const raceTitle = screen.getByRole('heading', {'name': /handicap a/i});
             const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
+            const previousEntries = within(screen.getByTestId('previous-entries'));
             expect(raceTitle).toBeInTheDocument();
             expect(inputHelm).toHaveValue('');
             expect(inputSailNumber).toHaveValue('');
             expect(inputCrew).toHaveValue('');
+            expect(previousEntries.getAllByRole('row')).toHaveLength(1);
             expect(btnCreate).toBeInTheDocument();
         });
     });
