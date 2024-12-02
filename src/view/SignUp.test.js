@@ -9488,11 +9488,13 @@ describe('when a previous entry is selected', () => {
             await user.selectOptions(inputDinghyClass, 'Scorpion');
             await user.type(inputSailNumber, '7654');
             await user.type(inputHelm, 'J R Hartley');
+        });
+        // seperate entry of crew name to allow check on dinghy class crew size to complete and setup form
+        await act(async () => {
             await user.type(inputCrew, 'Bilbo Baggins');
         });
-        // await screen.findByText(/bilbo baggins/i);
-        // screen.debug();
-        // get table that is supposed to contain details of dinghy class and previous crews
+        // confirm there is a crew value to be replaced
+        expect(inputCrew).toHaveValue('Bilbo Baggins');
         const previousEntries = within(screen.getByTestId('previous-entries'));
         const competitorCell = await previousEntries.findByRole('cell', {name: /bob hoskins/i});
         await act(async () => {
