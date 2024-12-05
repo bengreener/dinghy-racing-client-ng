@@ -124,6 +124,17 @@ function RaceEntriesView({ races }) {
                     return (entry.position && weight === .5) ? entry.position : Date.now() * weight; // if entry doesn't have a position return a large number to put it to the bottom
                 });
                 break;
+            case 'forecast':
+                ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
+                    const weighIfScoringAbbreviation = ['DNS', 'DSQ', 'RET'];
+                    let weight = 1;
+                    if (weighIfScoringAbbreviation.includes(entry.scoringAbbreviation)) {
+                        weight = weight * 2;
+                    }
+                    const lastLapTime = entry.sumOfLapTimes ? entry.sumOfLapTimes : 0;
+                    return (entry.race.plannedStartTime.valueOf() + lastLapTime + ((entry.race.duration / entry.race.plannedLaps) * entry.dinghy.dinghyClass.portsmouthNumber / 1000)) * weight;
+                });
+                break;
             default:
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
                     return [entry.dinghy.dinghyClass.name, Number(entry.dinghy.sailNumber)];
@@ -268,6 +279,9 @@ function RaceEntriesView({ races }) {
                 </div>
                 <div className='w3-col m2'>
                     <button className='w3-btn w3-block w3-card' onClick={() => setSortOrder('position')}>By position</button>
+                </div>
+                <div className='w3-col m2'>
+                    <button className='w3-btn w3-block w3-card' onClick={() => setSortOrder('forecast')}>By forecast</button>
                 </div>
             </div>
             <div className='scrollable' >
