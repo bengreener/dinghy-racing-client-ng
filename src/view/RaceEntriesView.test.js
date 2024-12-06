@@ -807,7 +807,10 @@ describe('when setting a scoring abbreviation', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
         const selectSA = screen.getAllByRole('combobox')[0];
-        await user.selectOptions(selectSA, 'DNS');
+        await act(async() => {
+            await user.selectOptions(selectSA, 'DNS');
+        });
+        
         expect(setScoringAbbreviationSpy).toBeCalledWith(entryChrisMarshallScorpionA1234, 'DNS');
     });
     it('displays a message if there is a problem updating the lap time', async () => {
