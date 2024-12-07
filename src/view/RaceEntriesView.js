@@ -268,12 +268,6 @@ function RaceEntriesView({ races }) {
                 <div className='w3-col m3' >
                     <button className='w3-btn w3-block w3-card' onClick={() => setSortOrder('classSailNumber')}>By class & sail number</button>
                 </div>
-                {/* <div className='w3-col m2'>
-                    <button className='w3-btn w3-block w3-card' onClick={() => setSortOrder('lastThree')}>By last 3</button>
-                </div> */}
-                {/* <div className='w3-col m2'>
-                    <button className='w3-btn w3-block w3-card' onClick={() => setSortOrder('classLastThree')}>By class & last 3</button>
-                </div> */}
                 <div className='w3-col m2'>
                     <button className='w3-btn w3-block w3-card' onClick={() => setSortOrder('lapTimes')}>By lap times</button>
                 </div>
