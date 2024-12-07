@@ -88,17 +88,31 @@ describe('after race has started', () => {
     });
 });
 
-it('calls removeLap callback with entry', async () => {
-    const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-    const entry = {...entryChrisMarshallScorpionA1234};
-    const removeLapCallback = jest.fn((e) => {entry.laps.pop()});
-    render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
-    const SMScorp1234entry = screen.getByText(/1234/i);
-    await act(async () => {
-        await user.keyboard('{Control>}');
-        await user.click(SMScorp1234entry);
+describe('when a lap is removed from an entry', () => {
+    it('calls removeLap callback with entry', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const entry = {...entryChrisMarshallScorpionA1234};
+        const removeLapCallback = jest.fn((e) => {entry.laps.pop()});
+        render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
+        const SMScorp1234entry = screen.getByText(/1234/i);
+        await act(async () => {
+            await user.keyboard('{Control>}');
+            await user.click(SMScorp1234entry);
+        });
+        expect(removeLapCallback).toBeCalledWith(entry);
     });
-    expect(removeLapCallback).toBeCalledWith(entry);
+    it('updates the display to show the delete lap instruction has been sent to the server', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const entry = {...entryChrisMarshallScorpionA1234};
+        const removeLapCallback = jest.fn((e) => {entry.laps.pop()});
+        render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
+        const SMScorp1234entry = screen.getByText(/1234/i);
+        await act(async () => {
+            await user.keyboard('{Control>}');
+            await user.click(SMScorp1234entry);
+        });
+        expect(SMScorp1234entry.parentElement.parentElement.getAttribute('class')).toMatch(/disabled/i);
+    });
 });
 
 it('when secondary mouse button is clicked accepts a new lap time input in the last field of the row', async () => {
@@ -173,6 +187,28 @@ describe('when editing a lap time', () => {
             await user.keyboard('{Enter}');
         });
         expect(updateLapCallback).toBeCalledWith(entry, '15:53');
+    });
+    it('updates the display to show the edited lap time is being sent to the server', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
+            {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, 
+            {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, 
+            {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
+        ]};
+        const updateLapCallback = jest.fn((entry, value) => {});
+        render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
+        const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+        const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
+        await act(async () => {
+            await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+        });
+        const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
+        await act(async () => {
+            await user.clear(lapEntryCellInput);
+            await user.type(lapEntryCellInput, '15:53');
+            await user.keyboard('{Enter}');
+        });
+        expect(raceEntryView.getAttribute('class')).toMatch(/disabled/i);
     });
 });
 
@@ -279,8 +315,20 @@ describe('when a scoring abbreviation is selected', () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
         const selectSA = screen.getByRole('combobox');
-        await user.selectOptions(selectSA, 'DNS');
+        await act(async() => {
+            await user.selectOptions(selectSA, 'DNS');
+        });
         expect(setScoringAbbreviationSpy).toHaveBeenCalledWith(entryChrisMarshallScorpionA1234, 'DNS');
+    });
+    it('updates the display to show a scoring abbreviation is being sent to the server', async () => {
+        const setScoringAbbreviationSpy = jest.fn();
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
+        const selectSA = screen.getByRole('combobox');
+        await act(async () => {
+            await user.selectOptions(selectSA, 'DNS');
+        });
+        expect(selectSA.parentElement.parentElement.getAttribute('class')).toMatch(/disabled/i);
     });
     describe('when entry did not start the race', () => {
         it('has a class of did-not-start', () => {
@@ -428,4 +476,33 @@ describe('when user drags and drops an entry to a new position', () => {
         // expect(onRaceEntryDropSpy).toHaveBeenCalledWith(entry1.dinghy.dinghyClass.name + entry1.dinghy.sailNumber + entry1.helm.name, entry2.dinghy.dinghyClass.name + entry2.dinghy.sailNumber + entry2.helm.name);
         expect(onRaceEntryDropSpy).toHaveBeenCalled();
     });
+    it('updates the display to show the position of the 2 entries are having their positions updates', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const onRaceEntryDropSpy = jest.fn();
+        const entry1 = {...entryChrisMarshallScorpionA1234};
+        const entry2 = {...entrySarahPascalScorpionA6745};
+        const addLapCallback = jest.fn();
+        render(
+            <div>
+                <RaceEntryView entry={entry1} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
+                <RaceEntryView entry={entry2} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
+            </div>
+        );
+        const rev1 = screen.getByText(/chris marshall/i).parentElement.parentElement;
+        const rev2 = screen.getByText(/sarah pascal/i).parentElement.parentElement;
+
+        const dataTransferObject = {
+            data: new Map(), 
+            setData(key, value) {this.data.set(key, value)},
+            getData(key) {this.data.get(key)}
+        };
+        await act(async () => {
+            fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
+        });
+        await act(async () => {
+            fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
+        });
+        // expect(rev1.getAttribute('class')).toMatch(/disabled/i);
+        expect(rev2.getAttribute('class')).toMatch(/disabled/i);
+    })
 });

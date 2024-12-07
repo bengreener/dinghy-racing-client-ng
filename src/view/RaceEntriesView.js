@@ -77,6 +77,9 @@ function RaceEntriesView({ races }) {
         }
     }, [model, races, updateEntries, entriesUpdateRequestAt]);
 
+    function handleRefreshClick() {
+        setEntriesUpdateRequestAt(Date.now());
+    }
     // return array of entries sorted according to selected sort order
     function sorted() {
         let ordered = [];
@@ -122,6 +125,17 @@ function RaceEntriesView({ races }) {
                         weight = weight * 2;
                     }
                     return (entry.position && weight === .5) ? entry.position : Date.now() * weight; // if entry doesn't have a position return a large number to put it to the bottom
+                });
+                break;
+            case 'forecast':
+                ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
+                    const weighIfScoringAbbreviation = ['DNS', 'DSQ', 'RET'];
+                    let weight = 1;
+                    if (weighIfScoringAbbreviation.includes(entry.scoringAbbreviation)) {
+                        weight = weight * 2;
+                    }
+                    const lastLapTime = entry.sumOfLapTimes ? entry.sumOfLapTimes : 0;
+                    return (entry.race.plannedStartTime.valueOf() + lastLapTime + ((entry.race.duration / entry.race.plannedLaps) * entry.dinghy.dinghyClass.portsmouthNumber / 1000)) * weight;
                 });
                 break;
             default:
@@ -258,16 +272,18 @@ function RaceEntriesView({ races }) {
                     <button className='w3-btn w3-block w3-card' onClick={() => setSortOrder('classSailNumber')}>By class & sail number</button>
                 </div>
                 <div className='w3-col m2'>
-                    <button className='w3-btn w3-block w3-card' onClick={() => setSortOrder('lastThree')}>By last 3</button>
-                </div>
-                <div className='w3-col m2'>
-                    <button className='w3-btn w3-block w3-card' onClick={() => setSortOrder('classLastThree')}>By class & last 3</button>
-                </div>
-                <div className='w3-col m2'>
                     <button className='w3-btn w3-block w3-card' onClick={() => setSortOrder('lapTimes')}>By lap times</button>
                 </div>
                 <div className='w3-col m2'>
                     <button className='w3-btn w3-block w3-card' onClick={() => setSortOrder('position')}>By position</button>
+                </div>
+                <div className='w3-col m2'>
+                    <button className='w3-btn w3-block w3-card' onClick={() => setSortOrder('forecast')}>By forecast</button>
+                </div>
+                <div className='w3-col m1'>
+                    <button className='w3-btn w3-block w3-card' title='refresh' onClick={handleRefreshClick}>
+                        <svg xmlns="http://www.w3.org/2000/svg" height=".9em" viewBox="0 -960 960 960" width=".9em" fill="#5f6368"><path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z"/></svg>
+                    </button>
                 </div>
             </div>
             <div className='scrollable' >

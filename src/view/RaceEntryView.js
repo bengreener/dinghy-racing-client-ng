@@ -33,6 +33,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     const [disabled, setDisabled] = useState(false);
     const prevLapCount = useRef(entry.laps.length);
     const prevPosition = useRef(entry.position);
+    const prevSumOfLapTimes = useRef(entry.sumOfLapTimes);
     const lapsView = [];
     let classes = 'race-entry-view w3-row w3-border w3-hover-border-blue cursor-pointer preserve-whitespace';
 
@@ -47,6 +48,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     const handleLastLapCellKeyUp = useCallback((event) => {
         if (event.key === 'Enter') {
             if (updateLap) {
+                setDisabled(true);
                 updateLap(entry, event.target.value);
                 setEditMode(false);
             }
@@ -61,9 +63,11 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     }, []);
 
     useEffect(() => {
-        if (prevLapCount.current !== entry.laps.length || prevPosition !== entry.position) {
+        if (prevLapCount.current !== entry.laps.length || prevPosition.current !== entry.position || prevSumOfLapTimes.current !== entry.sumOfLapTimes) {
             setDisabled(false);
             prevLapCount.current = entry.laps.length;
+            prevPosition.current = entry.position;
+            prevSumOfLapTimes.current = entry.sumOfLapTimes;
         }
     }, [entry]);
 
@@ -71,6 +75,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         if (!editMode && !disabled) {
             if (event.button === 0 && event.ctrlKey) {
                 if (removeLap) {
+                    setDisabled(true);
                     removeLap(entry);
                 }    
             }
@@ -159,6 +164,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
 
     function handleScoringAbbreviationSelection(event) {
         if (setScoringAbbreviation) {
+            setDisabled(true);
             setScoringAbbreviation(entry, event.target.value);
         }
     }
@@ -176,6 +182,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     function dropHandler(event) {
         event.preventDefault();
         if (onRaceEntryDrop) {
+            setDisabled(true);
             onRaceEntryDrop(event.dataTransfer.getData('text/html'), entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
         }
     }
