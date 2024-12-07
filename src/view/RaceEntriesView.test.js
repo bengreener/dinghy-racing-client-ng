@@ -526,7 +526,6 @@ describe('when adding a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
-               
         const entry = await screen.findByText(/1234/i);
         await act(async () => {
             await user.click(entry);
@@ -761,35 +760,35 @@ describe('when updating a lap time', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
+        const clock = {getElapsedTime: () => {return 312568}};
         jest.spyOn(model, 'getEntriesByRace')
             .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
             .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
-        jest.spyOn(controller, 'updateLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true})}).mockImplementationOnce((entry, time) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
+
+        jest.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true, 'domainObject': {}})}).mockImplementationOnce((entry, time) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
+
+        jest.spyOn(controller, 'updateLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true})});
         await act(async () => {
-            customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
+            customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
+        const entry = await screen.findByText(/6745/i);
+        // after render perform update        
+        await act(async () => {
+            await user.click(entry);
+        });
+        expect(await screen.findByText(/oops/i)).toBeInTheDocument();
+        
         let raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
         let lapEntryCellOutput = within(raceEntryView).getByText('00:07');
         await act(async () => {
             await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
         });
+
         // after render perform update
         let lapEntryCellInput = within(raceEntryView).getByRole('textbox', {value: '00:07'});
         await act(async () => { 
             await user.clear(lapEntryCellInput);
             await user.type(lapEntryCellInput, '00:15');
-            await user.keyboard('{Enter}');
-        });
-        expect(await screen.findByText(/oops/i)).toBeInTheDocument();
-        
-        raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
-        lapEntryCellOutput = within(raceEntryView).getByText('00:07');
-        await act(async () => {
-            await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
-        });
-        // after render perform update
-        lapEntryCellInput = within(raceEntryView).getByRole('textbox', {value: '00:15'});
-        await act(async () => { 
             await user.keyboard('{Enter}');
             model.handleEntryUpdate({'body': entriesScorpionA[0].url});
         });
@@ -807,10 +806,9 @@ describe('when setting a scoring abbreviation', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
         const selectSA = screen.getAllByRole('combobox')[0];
-        await act(async() => {
+        await act(async () => {
             await user.selectOptions(selectSA, 'DNS');
         });
-        
         expect(setScoringAbbreviationSpy).toBeCalledWith(entryChrisMarshallScorpionA1234, 'DNS');
     });
     it('displays a message if there is a problem updating the lap time', async () => {
