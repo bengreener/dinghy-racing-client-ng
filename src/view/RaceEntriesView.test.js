@@ -1208,3 +1208,34 @@ describe('when user drags and drops an entry to a new position', () => {
         });
     });
 });
+
+describe('when refresh button clicked', () => {
+    it('refreshes entries', async () => {
+        const user = userEvent.setup();
+        const entriesScorpionAPre = [
+            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 312568, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
+            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'}
+        ];
+        const entriesScorpionAPost = [
+            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}, {'number': 2, 'time': 312568}], 'sumOfLapTimes': 625136, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
+            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'}
+        ];
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const clock = {getElapsedTime: () => {return 312568}};
+        jest.spyOn(model, 'getEntriesByRace')
+            .mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
+            .mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+        await act(async () => {
+            customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
+        });
+               
+        const refreshButton = await screen.findByRole('button', {name: /refresh/i});
+        
+        expect(await screen.queryByText('10:25')).not.toBeInTheDocument();
+        await act(async () => {
+            user.click(refreshButton);
+        });
+        expect(await screen.findByText('10:25')).toBeInTheDocument();
+    });
+});
