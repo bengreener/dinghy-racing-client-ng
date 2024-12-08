@@ -23,13 +23,13 @@ import SignUp from './SignUp';
 import { httpRootURL, wsRootURL, 
     competitorsCollection, competitorChrisMarshall, competitorLouScrew, competitorJillMyer,
     dinghyClasses, dinghyClassScorpion, dinghyClassComet,
-    dinghies, dinghy1234, dinghy826, dinghy1234Graduate,
+    dinghies, dinghy1234, dinghy826, dinghy1234Graduate, dinghy1234Comet,
     raceScorpionA, raceHandicapA, raceCometA,
     entriesScorpionA, entriesCometA, entriesHandicapA, entryJillMyerCometA826,
     competitorSarahPascal,
     dinghy2726,
     entryChrisMarshallHandicapA1234, entryChrisMarshallScorpionA1234,
-    dinghyScorpion1234Crews, dinghyGraduate1234Crews } from '../model/__mocks__/test-data';
+    dinghyScorpion1234Crews, dinghyGraduate1234Crews, dinghyComet1234Crews } from '../model/__mocks__/test-data';
 
 jest.mock('../model/dinghy-racing-model');
 jest.mock('../controller/dinghy-racing-controller');
@@ -547,8 +547,12 @@ describe('when signing up for a race', () => {
         });
         
         it('clears form on success', async () => {
-            const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+            jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                 return Promise.resolve({'success': true});
+            });
+            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
+            jest.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
+                return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
             });
             const user = userEvent.setup();
             customRender(<SignUp race={raceCometA}/>, model, controller);
@@ -559,6 +563,7 @@ describe('when signing up for a race', () => {
             });
             await act(async () => {
                 await user.type(inputSailNumber, '826');
+                await user.keyboard('{Tab}');
             });
             const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
             await act(async () => {
@@ -566,10 +571,12 @@ describe('when signing up for a race', () => {
             });
             const raceTitle = screen.getByRole('heading', {'name': /comet a/i});
             const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
+            const previousEntries = within(screen.getByTestId('previous-entries'));
             expect(raceTitle).toBeInTheDocument();
             expect(inputHelm).toHaveValue('');
             expect(inputSailNumber).toHaveValue('');
             expect(screen.queryByLabelText(/crew/i)).toBeDisabled();
+            expect(previousEntries.getAllByRole('row')).toHaveLength(1);
             expect(btnCreate).toBeInTheDocument();
         });
         
@@ -2059,8 +2066,12 @@ describe('when signing up for a race', () => {
         });
     
         it('clears form on success', async () => {
-            const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+            jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                 return Promise.resolve({'success': true});
+            });
+            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
+            jest.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
+                return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
             });
             const user = userEvent.setup();
             customRender(<SignUp race={raceScorpionA}/>, model, controller);
@@ -2072,6 +2083,7 @@ describe('when signing up for a race', () => {
             });
             await act(async () => {
                 await user.type(inputSailNumber, '1234');
+                await user.keyboard('{Tab}');
             });
             await act(async () => {
                 await user.type(inputCrew, 'Lou Screw');
@@ -2082,10 +2094,12 @@ describe('when signing up for a race', () => {
             });
             const raceTitle = screen.getByRole('heading', {'name': /scorpion a/i});
             const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
+            const previousEntries = within(screen.getByTestId('previous-entries'));
             expect(raceTitle).toBeInTheDocument();
             expect(inputHelm).toHaveValue('');
             expect(inputSailNumber).toHaveValue('');
             expect(inputCrew).toHaveValue('');
+            expect(previousEntries.getAllByRole('row')).toHaveLength(1);
             expect(btnCreate).toBeInTheDocument();
         });
         
@@ -4294,8 +4308,12 @@ describe('when signing up for a race', () => {
         });
     
         it('clears form on success', async () => {
-            const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+            jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
                 return Promise.resolve({'success': true});
+            });
+            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
+            jest.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
+                return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
             });
             const user = userEvent.setup();
             customRender(<SignUp race={raceHandicapA}/>, model, controller);
@@ -4312,6 +4330,7 @@ describe('when signing up for a race', () => {
             });
             await act(async () => {
                 await user.type(inputSailNumber, '1234');
+                await user.keyboard('{Tab}');
             });
             await act(async () => {
                 await user.type(inputCrew, 'Lou Screw');
@@ -4322,10 +4341,12 @@ describe('when signing up for a race', () => {
             });
             const raceTitle = screen.getByRole('heading', {'name': /handicap a/i});
             const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
+            const previousEntries = within(screen.getByTestId('previous-entries'));
             expect(raceTitle).toBeInTheDocument();
             expect(inputHelm).toHaveValue('');
             expect(inputSailNumber).toHaveValue('');
             expect(inputCrew).toHaveValue('');
+            expect(previousEntries.getAllByRole('row')).toHaveLength(1);
             expect(btnCreate).toBeInTheDocument();
         });
         
@@ -4938,6 +4959,10 @@ describe('when updating an existing entry', () => {
             jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
                 return Promise.resolve({'success': true});
             });
+            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
+            jest.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
+                return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
+            });
             const user = userEvent.setup();
             customRender(<SignUp race={raceCometA}/>, model, controller);
             const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
@@ -4953,14 +4978,17 @@ describe('when updating an existing entry', () => {
             await act(async () => {
                 await user.clear(inputSailNumber);
                 await user.type(inputSailNumber, '1234');
+                await user.keyboard('{Tab}');
             });
             const updateButton = screen.getByRole('button', {'name': /update/i});
             await act(async () => {
                 await user.click(updateButton);
             });
+            const previousEntries = within(screen.getByTestId('previous-entries'));
             expect(inputHelm).toHaveValue('');
             expect(inputSailNumber).toHaveValue('');
             expect(screen.queryByLabelText(/crew/i)).toBeDisabled();
+            expect(previousEntries.getAllByRole('row')).toHaveLength(1);
             expect(screen.getByRole('button', {'name': /sign-up/i})).toBeInTheDocument();
         });
     });    
@@ -6724,6 +6752,10 @@ describe('when updating an existing entry', () => {
             jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
                 return Promise.resolve({'success': true});
             });
+            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
+            jest.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
+                return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
+            });
             const user = userEvent.setup();
             customRender(<SignUp race={raceScorpionA}/>, model, controller);
             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
@@ -6740,6 +6772,7 @@ describe('when updating an existing entry', () => {
             await act(async () => {
                 await user.clear(inputSailNumber);
                 await user.type(inputSailNumber, '826');
+                await user.keyboard('{Tab}');
             });
             await act(async () => {
                 await user.clear(inputCrew);
@@ -6749,10 +6782,12 @@ describe('when updating an existing entry', () => {
             await act(async () => {
                 await user.click(updateButton);
             });
+            const previousEntries = within(screen.getByTestId('previous-entries'));
             expect(screen.getByRole('heading', {'name': /scorpion a/i})).toBeInTheDocument();
             expect(inputHelm).toHaveValue('');
             expect(inputSailNumber).toHaveValue('');
             expect(inputCrew).toHaveValue('');
+            expect(previousEntries.getAllByRole('row')).toHaveLength(1);
             expect(screen.getByRole('button', {'name': /sign-up/i})).toBeInTheDocument();
         });
     });    
@@ -9215,6 +9250,10 @@ describe('when updating an existing entry', () => {
             jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
                 return Promise.resolve({'success': true});
             });
+            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
+            jest.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
+                return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
+            });
             const user = userEvent.setup();
             customRender(<SignUp race={raceHandicapA}/>, model, controller);
             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
@@ -9236,6 +9275,7 @@ describe('when updating an existing entry', () => {
             await act(async () => {
                 await user.clear(inputSailNumber);
                 await user.type(inputSailNumber, '1234');
+                await user.keyboard('{Tab}');
             });
             await act(async () => {
                 await user.clear(inputCrew);
@@ -9247,10 +9287,12 @@ describe('when updating an existing entry', () => {
             });
             const raceTitle = screen.getByRole('heading', {'name': /handicap a/i});
             const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
+            const previousEntries = within(screen.getByTestId('previous-entries'));
             expect(raceTitle).toBeInTheDocument();
             expect(inputHelm).toHaveValue('');
             expect(inputSailNumber).toHaveValue('');
             expect(inputCrew).toHaveValue('');
+            expect(previousEntries.getAllByRole('row')).toHaveLength(1);
             expect(btnCreate).toBeInTheDocument();
         });
     });
@@ -9459,5 +9501,50 @@ describe('when a previous entry is selected', () => {
         expect(await screen.findByLabelText(/crew/i)).toHaveValue('Jill Myer');
         expect(await screen.findByLabelText(/dinghy class/i)).toHaveValue('Scorpion');
         expect(await screen.findByLabelText(/sail number/i)).toHaveValue('1234');
+    });
+    it('overwrites any previously entered values removing any value entered for mate if mate in selected record is null', async () => {
+        const user = userEvent.setup();
+
+        jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234, dinghy1234Graduate, dinghy1234Comet ]})});
+        jest.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
+            if (dinghy.url === dinghy1234.url) {
+                return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
+            }
+            else if (dinghy.url === dinghy1234Graduate.url) {
+                return Promise.resolve({success: true, domainObject: dinghyGraduate1234Crews});
+            }
+            else if (dinghy.url === dinghy1234Comet.url) {
+                return Promise.resolve({success: true, domainObject: dinghyComet1234Crews});
+            }
+        });
+        
+        await act(async () => {
+            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+        });
+        // enter sail number
+        const inputHelm = screen.getByLabelText(/helm/i);
+        const inputCrew = screen.getByLabelText(/crew/i);
+        const inputDinghyClass = screen.getByLabelText(/dinghy class/i);
+        const inputSailNumber = screen.getByLabelText(/sail/i);
+        await act(async () => {
+            await user.selectOptions(inputDinghyClass, 'Scorpion');
+            await user.type(inputSailNumber, '7654');
+            await user.type(inputHelm, 'J R Hartley');
+        });
+        // seperate entry of crew name to allow check on dinghy class crew size to complete and setup form
+        await act(async () => {
+            await user.type(inputCrew, 'Bilbo Baggins');
+        });
+        // confirm there is a crew value to be replaced
+        expect(inputCrew).toHaveValue('Bilbo Baggins');
+        const previousEntries = within(screen.getByTestId('previous-entries'));
+        const competitorCell = await previousEntries.findByRole('cell', {name: /bob hoskins/i});
+        await act(async () => {
+            await user.click(competitorCell);
+        });
+        expect(inputHelm).toHaveValue('Bob Hoskins');
+        expect(inputCrew).toHaveValue('');
+        expect(inputDinghyClass).toHaveValue('Comet');
+        expect(inputSailNumber).toHaveValue('1234');
     });
 });

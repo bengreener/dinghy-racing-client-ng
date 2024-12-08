@@ -260,6 +260,7 @@ const competitorJillMyer = {name:'Jill Myer',url:'http://localhost:8081/dinghyra
 const competitorLouScrew = {name: 'Lou Screw',url:'http://localhost:8081/dinghyracing/api/competitors/12'};
 const competitorOwainDavies = {name: 'Owain Davies',url: 'http://localhost:8081/dinghyracing/api/competitors/13'};
 const competitorLiuBao = {name: 'Liu Bao',url: 'http://localhost:8081/dinghyracing/api/competitors/14'};
+const competitorBobHoskins = {name: 'Bob Hoskins',url: 'http://localhost:8081/dinghyracing/api/competitors/15'};
 const competitorsCollection = [competitorChrisMarshall, competitorSarahPascal, competitorJillMyer, competitorLouScrew, competitorOwainDavies, competitorLiuBao];
 
 const dinghyClassScorpion = {name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043, url: 'http://localhost:8081/dinghyracing/api/dinghyclasses/1' };
@@ -277,6 +278,7 @@ const dinghy826 = {sailNumber:'826',dinghyClass: dinghyClassComet,url:'http://lo
 const dinghies = [dinghy1234, dinghy2726, dinghy6745, dinghy2928, dinghy826];
 
 const dinghy1234Graduate = {sailNumber:'1234',dinghyClass: dinghyClassGraduate,url:'http://localhost:8081/dinghyracing/api/dinghies/6'};
+const dinghy1234Comet = {sailNumber:'1234',dinghyClass: dinghyClassComet,url:'http://localhost:8081/dinghyracing/api/dinghies/18'};
 
 const raceScorpionA = { name: 'Scorpion A', plannedStartTime: new Date('2021-10-14T10:30:00Z'), dinghyClass: dinghyClassScorpion, duration: 2700000, type: 'FLEET', plannedLaps: 5, startType: 'CSCCLUBSTART', lapsSailed: 0, lapForecast: 5.0, lastLapTime: 0, averageLapTime: 0, clock: null, startSequenceState: 'NONE', dinghyClasses: [], url: 'http://localhost:8081/dinghyracing/api/races/4' };
 const raceGraduateA = {name: 'Graduate A', plannedStartTime: new Date('2021-10-14T10:35:00Z'), dinghyClass: dinghyClassGraduate, duration: 2700000, type: 'FLEET', plannedLaps: 4,  startType: 'CSCCLUBSTART', lapsSailed: null, lapForecast: 4.0, lastLapTime: null, averageLapTime: null, startSequenceState: 'NONE', clock: null, dinghyClasses: [], url: 'http://localhost:8081/dinghyracing/api/races/7' };
@@ -342,6 +344,8 @@ const dinghyScorpion1234CrewB = { helm: competitorLiuBao, mate: competitorLouScr
 const dinghyScorpion1234Crews = [ dinghyScorpion1234CrewA, dinghyScorpion1234CrewB ];
 const dinghyGraduate1234CrewA = { helm: competitorSarahPascal, mate: competitorOwainDavies };
 const dinghyGraduate1234Crews = [ dinghyGraduate1234CrewA ];
+const dinghyComet1234CrewA = { helm: competitorBobHoskins, mate: null };
+const dinghyComet1234Crews = [ dinghyComet1234CrewA ]
 
 export {
 	httpRootURL, wsRootURL,
@@ -372,12 +376,12 @@ export {
 
 	dinghyClasses, dinghyClassesByNameAsc, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet,
 
-	dinghies, dinghiesScorpion, dinghy1234, dinghy2726, dinghy6745, dinghy2928, dinghy826, dinghy1234Graduate,
+	dinghies, dinghiesScorpion, dinghy1234, dinghy2726, dinghy6745, dinghy2928, dinghy826, dinghy1234Graduate, dinghy1234Comet,
 
 	races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA, racePursuitA,
 
 	entryChrisMarshallHandicapA1234, entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745, entryJillMyerCometA826, entryChrisMarshallPursuitA1234,
 	entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA, entriesPursuitA,
 
-	dinghyScorpion1234Crews, dinghyGraduate1234Crews
+	dinghyScorpion1234Crews, dinghyGraduate1234Crews, dinghyComet1234Crews
 }

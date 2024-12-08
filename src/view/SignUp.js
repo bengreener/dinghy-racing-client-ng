@@ -80,6 +80,7 @@ function SignUp({ race }) {
         setDinghyClassName('');
         setMessage('');
         setSelectedEntry(null);
+        setPreviousEntriesMap(new Map());
         if (race.dinghyClass) {
             helmInput.current.focus();
         }
@@ -129,6 +130,9 @@ function SignUp({ race }) {
         setHelmName(previousEntry.crew.helm.name);
         if (previousEntry.crew.mate) {
             setCrewName(previousEntry.crew.mate.name);
+        } 
+        else {
+            setCrewName('');
         };
         if(!race.dinghyClass) {
             setDinghyClassName(previousEntry.dinghy.dinghyClass.name);
@@ -428,7 +432,7 @@ function SignUp({ race }) {
                 const crewsResult = await model.getCrewsByDinghy(dinghy);
                 if (crewsResult.success) {
                     for (const crew of crewsResult.domainObject) {
-                        peMap.set(dinghy.url + crew.helm.url + crew.mate.url, {dinghy: dinghy, crew: crew});
+                        peMap.set(dinghy.url + crew.helm.url + crew?.mate?.url, {dinghy: dinghy, crew: crew});
                     }
                 }
             }
