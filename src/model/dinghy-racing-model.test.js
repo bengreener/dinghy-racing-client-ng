@@ -3139,7 +3139,7 @@ it('provides a blank template for a race', () => {
 it('provides a blank template for a race entry', () => {
     const entry = DinghyRacingModel.entryTemplate();
 
-    expect(entry).toEqual({race: DinghyRacingModel.raceTemplate(), helm: DinghyRacingModel.competitorTemplate(), crew: null, dinghy: DinghyRacingModel.dinghyTemplate(), laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: ''});
+    expect(entry).toEqual({race: DinghyRacingModel.raceTemplate(), helm: DinghyRacingModel.competitorTemplate(), crew: null, dinghy: DinghyRacingModel.dinghyTemplate(), laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: ''});
 });
 
 it('provides a blank template for a lap', () => {
@@ -3210,7 +3210,7 @@ describe('when searching for entries by race', () => {
                 return Promise.resolve({success: true, domainObject: entryChrisMarshallHandicapA1234});
             }
             if (url === 'http://localhost:8081/dinghyracing/api/entries/21') {
-                return Promise.resolve({success: true, domainObject: {helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
+                return Promise.resolve({success: true, domainObject: {helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
                     position: null, url: 'http://localhost:8081/dinghyracing/api/entries/21'}});
             }
         });
