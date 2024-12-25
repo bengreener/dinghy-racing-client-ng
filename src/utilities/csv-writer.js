@@ -52,9 +52,9 @@ function createHeader(race) {
             return 'HelmName,SailNo,Class,Place,Code,RaceRating\n';
         default:
             if (!race.dinghyClass || race.dinghyClass.crewSize > 1) {
-                return 'HelmName,CrewName,SailNo,Class,Place,Elapsed,Laps,Code,RaceRating\n';
+                return 'HelmName,CrewName,SailNo,Class,Place,Elapsed,Laps,Code,RaceRating,Corrected\n';
             }
-            return 'HelmName,SailNo,Class,Place,Elapsed,Laps,Code,RaceRating\n';
+            return 'HelmName,SailNo,Class,Place,Elapsed,Laps,Code,RaceRating,Corrected\n';
     }
 }
 
@@ -84,7 +84,14 @@ function convertRaceEntriesToCSVArray(race, entries, options) {
             record += entry.laps.length + ',';
         }
         record += (entry.scoringAbbreviation ? entry.scoringAbbreviation : '') + ',';
-        record += (entry.dinghy.dinghyClass.portsmouthNumber ? entry.dinghy.dinghyClass.portsmouthNumber : '') + '\n';
+        if (race.type !== RaceType.PURSUIT) {
+            record += (entry.dinghy.dinghyClass.portsmouthNumber ? entry.dinghy.dinghyClass.portsmouthNumber : '') + ',';
+            record += Math.round(entry.correctedTime / 1000) + '\n';
+        }
+        else {
+            record += (entry.dinghy.dinghyClass.portsmouthNumber ? entry.dinghy.dinghyClass.portsmouthNumber : '') + '\n';
+        }
+        
         return record;
     }));
     return data;
