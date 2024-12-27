@@ -16,6 +16,7 @@
 
 import NameFormat from '../controller/name-format';
 import RaceType from '../model/domain-classes/race-type';
+import Clock from '../model/domain-classes/clock';
 
 /**
  * Write race, entries, and any recorded laps to a CSV file
@@ -80,13 +81,13 @@ function convertRaceEntriesToCSVArray(race, entries, options) {
         record += entry.dinghy.dinghyClass.name + ',';
         record += entry.position + ',';
         if (race.type !== RaceType.PURSUIT) {
-            record += Math.round(entry.sumOfLapTimes / 1000) + ',';
+            record += Clock.formatDurationAsSeconds(entry.sumOfLapTimes) + ',';
             record += entry.laps.length + ',';
         }
         record += (entry.scoringAbbreviation ? entry.scoringAbbreviation : '') + ',';
         if (race.type !== RaceType.PURSUIT) {
             record += (entry.dinghy.dinghyClass.portsmouthNumber ? entry.dinghy.dinghyClass.portsmouthNumber : '') + ',';
-            record += Math.round(entry.correctedTime / 1000) + '\n';
+            record += Clock.formatDurationAsSeconds(entry.correctedTime) + '\n';
         }
         else {
             record += (entry.dinghy.dinghyClass.portsmouthNumber ? entry.dinghy.dinghyClass.portsmouthNumber : '') + '\n';
