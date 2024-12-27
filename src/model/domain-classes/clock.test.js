@@ -107,6 +107,9 @@ describe('when formatting a duration', () => {
     });
     it('converts -1379000ms to -22:59', () => {
         expect(Clock.formatDuration(-1379000)).toBe('-22:59');
+    });    
+    it('converts 5256900ms to 01:27:36', () => {
+        expect(Clock.formatDuration(5256900)).toBe('01:27:36');
     });
 });
 
