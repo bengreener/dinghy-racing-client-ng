@@ -576,7 +576,7 @@ describe('when removing a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
         const entry = await screen.findByText(/1234/i);
-        const lapTime = await screen.findByText('05:13');
+        const lapTime = await screen.findByText('05:12');
         expect(lapTime).toBeInTheDocument();
         await act(async ()=> {
             await user.keyboard('{Control>}');
