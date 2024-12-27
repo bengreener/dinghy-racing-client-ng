@@ -67,6 +67,18 @@ class Clock {
         return (duration < 0 ? '-' : '') + timeFormat.format(d);
     }
 
+    /**
+     * Formats a duration in milliseconds into a string in seconds
+     * Will truncate to the current second
+     * @param {Number} duration Duration in milliseconds
+     * @returns {String}
+     */
+    static formatDurationAsSeconds(duration) {
+        let d = Math.trunc(Math.abs(duration) / 1000);
+
+        return (duration < 0 ? '-' : '') + d.toString();
+    }
+
     static synchToTime(time) {
         Clock._synchOffset = time.valueOf() - Date.now();
         if (!Clock.synchEvent) {
