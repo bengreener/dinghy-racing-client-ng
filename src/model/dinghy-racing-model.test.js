@@ -3139,7 +3139,7 @@ it('provides a blank template for a race', () => {
 it('provides a blank template for a race entry', () => {
     const entry = DinghyRacingModel.entryTemplate();
 
-    expect(entry).toEqual({race: DinghyRacingModel.raceTemplate(), helm: DinghyRacingModel.competitorTemplate(), crew: null, dinghy: DinghyRacingModel.dinghyTemplate(), laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: ''});
+    expect(entry).toEqual({race: DinghyRacingModel.raceTemplate(), helm: DinghyRacingModel.competitorTemplate(), crew: null, dinghy: DinghyRacingModel.dinghyTemplate(), laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: ''});
 });
 
 it('provides a blank template for a lap', () => {
@@ -3210,7 +3210,7 @@ describe('when searching for entries by race', () => {
                 return Promise.resolve({success: true, domainObject: entryChrisMarshallHandicapA1234});
             }
             if (url === 'http://localhost:8081/dinghyracing/api/entries/21') {
-                return Promise.resolve({success: true, domainObject: {helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
+                return Promise.resolve({success: true, domainObject: {helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
                     position: null, url: 'http://localhost:8081/dinghyracing/api/entries/21'}});
             }
         });
@@ -3218,6 +3218,82 @@ describe('when searching for entries by race', () => {
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true, 'domainObject': entriesHandicapA});
+    });    
+    it('converts the value for lastLapTime to the correct value', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: true,
+                status: 200, 
+                json: () => Promise.resolve(entriesScorpionAHAL)
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/10') {
+                return Promise.resolve({success: true, domainObject: entryChrisMarshallScorpionA1234});
+            }
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/11') {
+                return Promise.resolve({success: true, domainObject: entrySarahPascalScorpionA6745});
+            }
+        });
+        const promise = dinghyRacingModel.getEntriesByRace(raceScorpionA);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': entriesScorpionA});
+    });
+    it('converts the value for sumOfLapTimes to the correct value', async () => {
+        const entryHAL = {...entryChrisMarshallDinghy1234HAL, sumOfLapTimes: 'PT11M00S'};
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'read').mockImplementation((resource) => {
+            if (resource === raceScorpionA.url + '/signedUp') {
+                return Promise.resolve({success: true, domainObject: {_embedded: {entries: [entryHAL]}}});
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/entries/10') {
+                return Promise.resolve({success: true, domainObject: entryHAL});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
+                return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
+            }
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
+                return Promise.resolve({success: true, domainObject: competitorLouScrew});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        const promise = dinghyRacingModel.getEntriesByRace(raceScorpionA);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234, sumOfLapTimes: 660000}]});
+    });    
+    it('converts the value for correctedLapTime to the correct value', async () => {
+        const entryHAL = {...entryChrisMarshallDinghy1234HAL, correctedTime: 'PT10M32.790S'};
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'read').mockImplementation((resource) => {
+            if (resource === raceScorpionA.url + '/signedUp') {
+                return Promise.resolve({success: true, domainObject: {_embedded: {entries: [entryHAL]}}});
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/entries/10') {
+                return Promise.resolve({success: true, domainObject: entryHAL});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
+                return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
+            }
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
+                return Promise.resolve({success: true, domainObject: competitorLouScrew});
+            }
+        });
+        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        const promise = dinghyRacingModel.getEntriesByRace(raceScorpionA);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234, correctedTime: 632790}]});
     });
     it('returns a promise that resolves to a result indicating success and containing the entries when entries are found and some entries are on the last lap', async () => {
         const entriesHandicapAHAL_onLastLap = { _embedded : { entries : [

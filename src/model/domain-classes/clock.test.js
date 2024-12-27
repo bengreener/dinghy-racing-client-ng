@@ -108,6 +108,24 @@ describe('when formatting a duration', () => {
     it('converts -1379000ms to -22:59', () => {
         expect(Clock.formatDuration(-1379000)).toBe('-22:59');
     });
+    it('converts 5256900ms to 01:27:36', () => {
+        expect(Clock.formatDuration(5256900)).toBe('01:27:36');
+    });
+});
+
+describe('when formatting a duration in seconds', () => {
+    it('converts 0ms to 0', () => {
+        expect(Clock.formatDurationAsSeconds(0)).toBe('0');
+    });
+    it('converts 5256000ms to 5256', () => {
+        expect(Clock.formatDurationAsSeconds(5256000)).toBe('5256');
+    });
+    it('converts -1379000ms to -1379', () => {
+        expect(Clock.formatDurationAsSeconds(-1379000)).toBe('-1379');
+    });
+    it('converts 5256900ms to 5256', () => {
+        expect(Clock.formatDurationAsSeconds(5256900)).toBe('5256');
+    });
 });
 
 describe('when not synched against an external clocl', () => {

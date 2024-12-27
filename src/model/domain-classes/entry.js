@@ -23,6 +23,7 @@
  * @property {Dinghy} dinghy The dinghy that will be sailed in the race
  * @property {Array<Lap>} laps The laps for this entry in the race
  * @property {Integer} sumOfLapTimes
+ * @property {Integer} correctedTime
  * @property {boolean} onLastLap
  * @property {boolean} finishedRace
  * @property {String} scoringAbbreviation records the scoring abbreviation that identifies an adjustment required to an entries scoring for the race 

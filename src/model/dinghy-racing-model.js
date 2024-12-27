@@ -69,7 +69,7 @@ class DinghyRacingModel {
      */
     static entryTemplate() {
         return {race: DinghyRacingModel.raceTemplate(), helm: DinghyRacingModel.competitorTemplate(), crew: null, 
-        dinghy: DinghyRacingModel.dinghyTemplate(), laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: ''};
+        dinghy: DinghyRacingModel.dinghyTemplate(), laps: [], sumOfLapTimes: 0, correctedTime:0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: ''};
     }
 
     /**
@@ -1519,8 +1519,11 @@ class DinghyRacingModel {
     }
 
     _convertEntryHALtoEntry(entryHAL, race, helm, dinghy, crew, laps) {
+        // include check for corrected time equals 'infinity' indicating a lap has not been completed
         return {...DinghyRacingModel.entryTemplate(), race: race, helm: helm, dinghy: dinghy, laps: laps, crew: crew,
-            sumOfLapTimes: this.convertISO8601DurationToMilliseconds(entryHAL.sumOfLapTimes), onLastLap: entryHAL.onLastLap,
+            sumOfLapTimes: this.convertISO8601DurationToMilliseconds(entryHAL.sumOfLapTimes),
+            correctedTime: entryHAL.correctedTime === 'PT2562047788015215H30M7S' ? 0 : this.convertISO8601DurationToMilliseconds(entryHAL.correctedTime),
+            onLastLap: entryHAL.onLastLap,
             finishedRace: entryHAL.finishedRace, scoringAbbreviation: entryHAL.scoringAbbreviation, position: entryHAL.position, url: entryHAL._links.self.href
         }
     }

@@ -102,6 +102,7 @@ const entriesHAL = {_embedded:{entries:[
 		finishedRace: false,
 		onLastLap: false,
 		sumOfLapTimes: 'PT0S',
+		correctedTime: 'PT2562047788015215H30M7S',
 		lastLapTime: 'PT0S', position: null, _links:{
 		self:{href:'http://localhost:8081/dinghyracing/api/entries/10'},
 		entry:{href:'http://localhost:8081/dinghyracing/api/entries/10'},
@@ -117,6 +118,7 @@ const entriesHAL = {_embedded:{entries:[
 		finishedRace: false,
 		onLastLap: false,
 		sumOfLapTimes: 'PT0S',
+		correctedTime: 'PT2562047788015215H30M7S',
 		lastLapTime: 'PT0S', position: null, _links:{
 		self:{href:'http://localhost:8081/dinghyracing/api/entries/11'},
 		entry:{href:'http://localhost:8081/dinghyracing/api/entries/11'},
@@ -132,6 +134,7 @@ const entriesHAL = {_embedded:{entries:[
 		finishedRace: false,
 		onLastLap: false,
 		sumOfLapTimes: 'PT0S',
+		correctedTime: 'PT2562047788015215H30M7S',
 		lastLapTime: 'PT0S', 
 		position: null, _links:{
 		self:{href:'http://localhost:8081/dinghyracing/api/entries/19'},
@@ -150,6 +153,7 @@ const entriesScorpionAHAL = {_embedded: {entries: [
 		finishedRace: false,
 		lastLapTime: 'PT0S', 
 		sumOfLapTimes: 'PT0S',
+		correctedTime: 'PT2562047788015215H30M7S',
 		onLastLap: false,
 		finishedRace: false, 
 		position: null,
@@ -165,7 +169,8 @@ const entriesScorpionAHAL = {_embedded: {entries: [
 		scoringAbbreviation: null,
 		averageLapTime: 'PT0S', 
 		lastLapTime: 'PT0S', 
-		sumOfLapTimes: 'PT0S', 
+		sumOfLapTimes: 'PT0S',
+		correctedTime: 'PT2562047788015215H30M7S',
 		onLastLap: false,
 		finishedRace: false, 
 		position: null,
@@ -234,6 +239,7 @@ const entryChrisMarshallDinghy1234HAL = {
 	scoringAbbreviation: null,
 	averageLapTime: 'PT0S',
 	sumOfLapTimes: 'PT0S',
+	correctedTime: 'PT2562047788015215H30M7S',
     finishedRace: false,
     onLastLap: false,
     lastLapTime: 'PT0S',
@@ -295,13 +301,14 @@ const entryChrisMarshallScorpionA1234 = {
 	crew: competitorLouScrew,
 	laps: [],
 	sumOfLapTimes: 0,
+	correctedTime: 0,
 	onLastLap: false,
 	finishedRace: false,
 	scoringAbbreviation: null, 
 	position: null,
 	url: 'http://localhost:8081/dinghyracing/api/entries/10'
 };
-const entrySarahPascalScorpionA6745 = {helm: competitorSarahPascal, crew: competitorOwainDavies, race: raceScorpionA, dinghy: dinghy6745, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
+const entrySarahPascalScorpionA6745 = {helm: competitorSarahPascal, crew: competitorOwainDavies, race: raceScorpionA, dinghy: dinghy6745, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
 	position: null, url: 'http://localhost:8081/dinghyracing/api/entries/11'};
 
 const entriesScorpionA = [
@@ -309,19 +316,19 @@ const entriesScorpionA = [
 	entrySarahPascalScorpionA6745
 ];
 const entriesGraduateA = [
-	{helm: competitorJillMyer, crew: null, race: raceGraduateA,dinghy: dinghy2928, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
+	{helm: competitorJillMyer, crew: null, race: raceGraduateA,dinghy: dinghy2928, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
 		position: null, url: 'http://localhost:8081/dinghyracing/api/entries/12'}
 ];
-const entryJillMyerCometA826 = {helm: competitorJillMyer, crew: null, race: raceCometA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
+const entryJillMyerCometA826 = {helm: competitorJillMyer, crew: null, race: raceCometA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
 	position: null, url: 'http://localhost:8081/dinghyracing/api/entries/19'};
 const entriesCometA = [
 	entryJillMyerCometA826
 ];
-const entryChrisMarshallHandicapA1234 = {helm: competitorChrisMarshall, crew: competitorLouScrew, race: raceHandicapA, dinghy: dinghy1234, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
+const entryChrisMarshallHandicapA1234 = {helm: competitorChrisMarshall, crew: competitorLouScrew, race: raceHandicapA, dinghy: dinghy1234, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
 	position: null, url: 'http://localhost:8081/dinghyracing/api/entries/20'};
 const entriesHandicapA = [
 	entryChrisMarshallHandicapA1234, 
-	{helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
+	{helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
 		position: null, url: 'http://localhost:8081/dinghyracing/api/entries/21'}
 ];
 
@@ -330,6 +337,7 @@ const entryChrisMarshallPursuitA1234 = {
 	race: racePursuitA, dinghy: dinghy1234,
 	crew: competitorLouScrew,
 	laps: [], sumOfLapTimes: 0,
+	correctedTime: 0,
 	onLastLap: false,
 	finishedRace: false,
 	scoringAbbreviation: null, 

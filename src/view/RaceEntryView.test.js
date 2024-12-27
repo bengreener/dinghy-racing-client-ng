@@ -51,7 +51,7 @@ it('displays cumulative sum of lap times', async () => {
     render(<RaceEntryView entry={entry} />);
     expect(screen.getByText('00:01')).toBeInTheDocument();
     expect(screen.getByText('00:02')).toBeInTheDocument();
-    expect(screen.getByText('00:04')).toBeInTheDocument();
+    expect(screen.getByText('00:03')).toBeInTheDocument();
 });
 
 it('displays position', () => {
@@ -502,7 +502,6 @@ describe('when user drags and drops an entry to a new position', () => {
         await act(async () => {
             fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
         });
-        // expect(rev1.getAttribute('class')).toMatch(/disabled/i);
         expect(rev2.getAttribute('class')).toMatch(/disabled/i);
     })
 });
