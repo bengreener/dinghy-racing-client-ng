@@ -64,7 +64,7 @@ describe('before race has started', () => {
     it('calls addLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234, race: {...entryChrisMarshallScorpionA1234.race, plannedStartTime: new Date(Date.now() + 60000)}};
-        const addLapCallback = jest.fn((e) => {entry.laps.push({'number': 1, 'time': 1234})});
+        const addLapCallback = jest.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByText(/1234/i);
         await act(async () => {
@@ -78,7 +78,7 @@ describe('after race has started', () => {
     it('calls addLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234};
-        const addLapCallback = jest.fn((e) => {entry.laps.push({'number': 1, 'time': 1234})});
+        const addLapCallback = jest.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByText(/1234/i);
         await act(async () => {
@@ -115,23 +115,42 @@ describe('when a lap is removed from an entry', () => {
     });
 });
 
-it('when secondary mouse button is clicked accepts a new lap time input in the last field of the row', async () => {
-    const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-    const entry = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}], 
-        'sumOfLapTimes': 6000};
-    render(<RaceEntryView entry={entry} />);
-    const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
-    // const lapEntryCellOutput = within(raceEntryView).getByRole('status', {value: {text: '00:06'}}); // want to use this but options does not appear to be working with output element
-    const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
-    await act(async () => {
-        await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+describe('when secondary mouse button is clicked', () => {
+    describe('when a lap has been recorded for the entry', () => {
+        it('accepts a new lap time input in the last field of the row', async () => {
+            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const entry = {...entryChrisMarshallScorpionA1234, laps: [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}], 
+                'sumOfLapTimes': 6000};
+            render(<RaceEntryView entry={entry} />);
+            const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+            const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
+            await act(async () => {
+                await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+            });
+            const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
+            await act(async () => {
+                await user.clear(lapEntryCellInput);
+                await user.type(lapEntryCellInput, '00:15');
+            });
+            expect(lapEntryCellInput).toHaveValue('00:15');
+        });
     });
-    const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
-    await act(async () => {
-        await user.clear(lapEntryCellInput);
-        await user.type(lapEntryCellInput, '00:15');
+    describe('when a lap has not been recorded for the entry', () => {
+        it('does not enter edit mode and accepts a lap time via left click', async () => {
+            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const addLapCallback = jest.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
+            const entry = {...entryChrisMarshallScorpionA1234, laps: []};
+            render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
+            const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+            await act(async () => {
+                await user.pointer({target: raceEntryView, keys: '[MouseRight]'});
+            });
+            await act(async () => {
+                await user.click(raceEntryView);
+            });
+            expect(addLapCallback).toBeCalledWith(entry);
+        });
     });
-    expect(lapEntryCellInput).toHaveValue('00:15');
 });
 
 describe('when editing a lap time', () => {
@@ -152,7 +171,7 @@ describe('when editing a lap time', () => {
     });
     it('does not remove last lap when ctrl+primary button clicked', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234};
+        const entry = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}]};
         const removeLapCallback = jest.fn((e) => {entry.laps.pop()});
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
         const SMScorp1234entry = screen.getByText(/1234/i);
@@ -215,8 +234,8 @@ describe('when editing a lap time', () => {
 describe('when user taps row', () => {
     it('calls addLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234};
-        const addLapCallback = jest.fn((e) => {entry.laps.push({'number': 1, 'time': 1234})});
+        const entry = {...entryChrisMarshallScorpionA1234, laps: []};
+        const addLapCallback = jest.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByText(/1234/i);
         await act(async () => {
@@ -269,7 +288,7 @@ describe('when user swipes left on row', () => {
 
 describe('when entry is on last lap', () => {
     it('has a class of on-last-lap', () => {
-        const entryOnLastLap = {...entryChrisMarshallScorpionA1234, 'onLastLap': true};
+        const entryOnLastLap = {...entryChrisMarshallScorpionA1234, laps: [], 'onLastLap': true};
         render(<RaceEntryView entry={entryOnLastLap} />);
         const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
         expect(raceEntryView.getAttribute('class')).toMatch(/on-last-lap/i);
@@ -370,7 +389,7 @@ describe('when the entry is selected to add a new lap', () => {
     });
     it('does not accept selection to add a new lap time', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234};
+        const entry = {...entryChrisMarshallScorpionA1234, laps: []};
         const addLapCallback = jest.fn();
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByText(/1234/i);
@@ -429,7 +448,7 @@ describe('when user drags and drops an entry to a new position', () => {
     it('calls function passed to onRaceEntryDrop with subject key and taerget key ', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         const onRaceEntryDropSpy = jest.fn();
-        const entry1 = {...entryChrisMarshallScorpionA1234};
+        const entry1 = {...entryChrisMarshallScorpionA1234, laps: []};
         const entry2 = {...entrySarahPascalScorpionA6745};
         const addLapCallback = jest.fn();
         render(
@@ -444,13 +463,12 @@ describe('when user drags and drops an entry to a new position', () => {
         await act(async () => {
             fireEvent.drop(rev1, {dataTransfer: {getData: () => {}}});
         });
-        // expect(onRaceEntryDropSpy).toHaveBeenCalledWith(entry1.dinghy.dinghyClass.name + entry1.dinghy.sailNumber + entry1.helm.name, entry2.dinghy.dinghyClass.name + entry2.dinghy.sailNumber + entry2.helm.name);
         expect(onRaceEntryDropSpy).toHaveBeenCalled();
     });
     it('calls function passed to onRaceEntryDrop with value set by dragStart event', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         const onRaceEntryDropSpy = jest.fn();
-        const entry1 = {...entryChrisMarshallScorpionA1234};
+        const entry1 = {...entryChrisMarshallScorpionA1234, laps: []};
         const entry2 = {...entrySarahPascalScorpionA6745};
         const addLapCallback = jest.fn();
         render(
@@ -473,13 +491,12 @@ describe('when user drags and drops an entry to a new position', () => {
         await act(async () => {
             fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
         });
-        // expect(onRaceEntryDropSpy).toHaveBeenCalledWith(entry1.dinghy.dinghyClass.name + entry1.dinghy.sailNumber + entry1.helm.name, entry2.dinghy.dinghyClass.name + entry2.dinghy.sailNumber + entry2.helm.name);
         expect(onRaceEntryDropSpy).toHaveBeenCalled();
     });
     it('updates the display to show the position of the 2 entries are having their positions updates', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         const onRaceEntryDropSpy = jest.fn();
-        const entry1 = {...entryChrisMarshallScorpionA1234};
+        const entry1 = {...entryChrisMarshallScorpionA1234, laps: []};
         const entry2 = {...entrySarahPascalScorpionA6745};
         const addLapCallback = jest.fn();
         render(
