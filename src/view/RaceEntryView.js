@@ -227,6 +227,9 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     else if (entry.scoringAbbreviation === 'RET') {
         classes += ' retired';
     }
+    else if (entry.scoringAbbreviation === 'DNC') {
+        classes += ' did-not-compete';
+    }
     else if (entry.onLastLap) {
         classes += ' on-last-lap';
     }

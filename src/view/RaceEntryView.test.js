@@ -373,6 +373,14 @@ describe('when a scoring abbreviation is selected', () => {
             expect(raceEntryView.getAttribute('class')).toMatch(/disqualified/i);
         });
     });
+    describe('when entry did not compete in the race', () => {
+        it('has a class of did-not-start', () => {
+            const entryDNC = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DNC'};
+            render(<RaceEntryView entry={entryDNC} />);
+            const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+            expect(raceEntryView.getAttribute('class')).toMatch(/did-not-compete/i);
+        });
+    });
 });
 
 describe('when the entry is selected to add a new lap', () => {
