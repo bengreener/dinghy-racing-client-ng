@@ -90,7 +90,10 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
 
     function handleAuxClick(event) {
         if (!editMode && !disabled) {
-            setEditMode(true);
+            // do not enter edit mode if there is no lap time to edit
+            if (entry.laps.length > 0) {
+                setEditMode(true);
+            }
         }
     }
 
@@ -107,7 +110,10 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         start.y = event.clientY;
         touchTimeoutId = setTimeout(() => {
             if (!editMode && !disabled) {
-                setEditMode(true);
+                // do not enter edit mode if there is no lap time to edit
+                if (entry.laps.length > 0) {
+                    setEditMode(true);
+                }
                 tracking = false;
             }
         }, longTouchTimeout);
