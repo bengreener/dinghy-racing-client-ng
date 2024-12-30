@@ -18,9 +18,10 @@
  * Retirn a shallow copy of an array sorted in ascending order, smallest to largest, based on value returned by getValueFunction
  * @param {Array} array Array to sort
  * @param {Function} getValueFunction Function that returns the value to sort by
+ * @param {Boolean} [reversed=false] Reverse the order of the sorted array; default is false
  * @returns {Array}
  */
-function sortArray(array, getValueFunction) {
+function sortArray(array, getValueFunction, reversed = false) {
     const tempArray = [...array];
     const newArray = [];
     
@@ -31,6 +32,9 @@ function sortArray(array, getValueFunction) {
         newArray.push(tempArray[lowestIndex]);
         // remove item from temp array
         tempArray.splice(lowestIndex, 1);
+    }
+    if (reversed) {
+        newArray.reverse();
     }
     return newArray;
 }
