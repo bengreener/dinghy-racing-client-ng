@@ -82,6 +82,7 @@ function RaceEntriesView({ races }) {
     }
     // return array of entries sorted according to selected sort order
     function sorted() {
+        const weighIfScoringAbbreviation = ['DNS', 'DSQ', 'RET'];
         let ordered = [];
         switch (sortOrder) {
             case 'lastThree':
@@ -112,14 +113,12 @@ function RaceEntriesView({ races }) {
             // sort by the sum of all recorded lap times (sub sort by class and sail number to avoid order changing based on order of returned values from server)
             case 'lapTimes':
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
-                    const weighIfScoringAbbreviation = ['DNS', 'DSQ', 'RET'];
                     const weighting = (entry.finishedRace || weighIfScoringAbbreviation.includes(entry.scoringAbbreviation)) ? Date.now() : 0;
                     return [entry.race.plannedStartTime.getTime() + entry.sumOfLapTimes + weighting, entry.dinghy.dinghyClass.name, isNaN(entry.dinghy.sailNumber) ? entry.dinghy.sailNumber : Number(entry.dinghy.sailNumber)];
                 });
                 break;
             case 'position':
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
-                    const weighIfScoringAbbreviation = ['DNS', 'DSQ', 'RET'];
                     let weight = .5;
                     if (weighIfScoringAbbreviation.includes(entry.scoringAbbreviation)) {
                         weight = weight * 2;
@@ -129,7 +128,6 @@ function RaceEntriesView({ races }) {
                 break;
             case 'forecast':
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
-                    const weighIfScoringAbbreviation = ['DNS', 'DSQ', 'RET'];
                     let weight = 1;
                     if (weighIfScoringAbbreviation.includes(entry.scoringAbbreviation)) {
                         weight = weight * 2;
