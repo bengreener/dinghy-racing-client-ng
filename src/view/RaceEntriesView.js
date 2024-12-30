@@ -110,12 +110,12 @@ function RaceEntriesView({ races }) {
                     return [entry.dinghy.dinghyClass.name, isNaN(entry.dinghy.sailNumber) ? entry.dinghy.sailNumber : Number(entry.dinghy.sailNumber)];
                 });
                 break;
-            // sort by the sum of all recorded lap times (sub sort by class and sail number to avoid order changing based on order of returned values from server)
+            // sort by number of laps and then by time to complete last lap
             case 'lapTimes':
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
-                    const weighting = (entry.finishedRace || weighIfScoringAbbreviation.includes(entry.scoringAbbreviation)) ? Date.now() : 0;
-                    return [entry.race.plannedStartTime.getTime() + entry.sumOfLapTimes + weighting, entry.dinghy.dinghyClass.name, isNaN(entry.dinghy.sailNumber) ? entry.dinghy.sailNumber : Number(entry.dinghy.sailNumber)];
-                });
+                    const weighting = (weighIfScoringAbbreviation.includes(entry.scoringAbbreviation)) ? -Date.now() : 0;
+                    return [entry.laps.length + weighting, -entry.sumOfLapTimes];
+                }, true);
                 break;
             case 'position':
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
