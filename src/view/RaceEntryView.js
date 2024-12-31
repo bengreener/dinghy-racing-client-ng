@@ -224,6 +224,9 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     else if (entry.scoringAbbreviation === 'DSQ') {
         classes += ' disqualified';
     }
+    else if (entry.scoringAbbreviation === 'OCS') {
+        classes += ' on-course-side';
+    }
     else if (entry.scoringAbbreviation === 'RET') {
         classes += ' retired';
     }

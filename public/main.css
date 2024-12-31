@@ -176,6 +176,9 @@ td.total {
 .clickable-table-row {
 	cursor: pointer;
 }
+.on-course-side {
+	background-color: lightgrey;
+}
 .did-not-compete {
 	background-color: darkgrey;
 }

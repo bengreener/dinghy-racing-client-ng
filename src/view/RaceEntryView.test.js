@@ -381,6 +381,14 @@ describe('when a scoring abbreviation is selected', () => {
             expect(raceEntryView.getAttribute('class')).toMatch(/did-not-compete/i);
         });
     });
+    describe('when entry did not finish the race', () => {
+        it('has a class of on-course-side', () => {
+            const entryOCS = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'OCS'};
+            render(<RaceEntryView entry={entryOCS} />);
+            const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+            expect(raceEntryView.getAttribute('class')).toMatch(/on-course-side/i);
+        });
+    });
 });
 
 describe('when the entry is selected to add a new lap', () => {
