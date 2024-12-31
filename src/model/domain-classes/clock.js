@@ -41,16 +41,14 @@ class Clock {
     
     /**
      * Formats a duration in milliseconds into a string; format hh:mm:ss
-     * If fractional seconds is false will round to the nearest second when formatting for display to avoid issues when a countdown traverses from positive to negative; (resolves dispaly of 1, 0, -0, 1 (over 4 seconds) to 1, 0, -1 (over 3 seconds))
-     * Also, compensates for fact that second ticks tend to occur slightly after the second due to processing delays
-     * Would be an issue if formatting actual times as second element would be rounded up so time displayed may not be correct
+     * If fractional seconds is false will truncate to the current second
      * @param {Number} duration Duration in milliseconds
      * @param {boolean} fractionalSeconds true to display fractional seconds to 3 decimal places
      * @returns {String}
      */
     static formatDuration(duration, fractionalSeconds = false) {
         let d = Math.abs(duration);
-        const hours = Math.floor(d / 3600000);
+        const hours = Math.trunc(d / 3600000);
 
         let formatOptions = {
             timeZone: 'UTC',
@@ -63,10 +61,22 @@ class Clock {
             formatOptions = {...formatOptions, fractionalSecondDigits: 3};
         }
         else {
-            d = Math.round(d / 1000) * 1000;
+            d = Math.trunc(d / 1000) * 1000;
         }
         const timeFormat = new Intl.DateTimeFormat('en-GB', formatOptions);
         return (duration < 0 ? '-' : '') + timeFormat.format(d);
+    }
+
+    /**
+     * Formats a duration in milliseconds into a string in seconds
+     * Will truncate to the current second
+     * @param {Number} duration Duration in milliseconds
+     * @returns {String}
+     */
+    static formatDurationAsSeconds(duration) {
+        let d = Math.trunc(Math.abs(duration) / 1000);
+
+        return (duration < 0 ? '-' : '') + d.toString();
     }
 
     static synchToTime(time) {

@@ -21,13 +21,13 @@ import LapView from './LapView';
 describe('when editable is false', () => {
     it('displays value in time format', () => {
         render(<LapView value={1015897} />);
-        screen.getByText('16:56');
+        screen.getByText('16:55');
     });
     it('does not call value passed to keyup', async () => {
         const keyupMock = jest.fn();
         const user = userEvent.setup();
         render(<LapView value={895689} editable={false} keyup={keyupMock} />);
-        screen.getByText('14:56').focus();
+        screen.getByText('14:55').focus();
         await user.keyboard('{Enter}');
         expect(keyupMock).not.toBeCalled();
     });
@@ -36,7 +36,7 @@ describe('when editable is false', () => {
         const focusoutMock = jest.fn();
         const user = userEvent.setup(); 
         render(<LapView value={312568} editable={false} keyup={keyupMock} focusout={focusoutMock} />);
-        const cell = screen.getByText('05:13');
+        const cell = screen.getByText('05:12');
         cell.focus();
         cell.blur();
         expect(focusoutMock).not.toBeCalled();
@@ -44,7 +44,7 @@ describe('when editable is false', () => {
     describe('when cell contains a total', () => {
         it('has class total', () => {
             render(<LapView value={1015897} total={true} />);
-            expect(screen.getByText('16:56').getAttribute('class')).toMatch(/total/i);
+            expect(screen.getByText('16:55').getAttribute('class')).toMatch(/total/i);
         });
     });
 });
@@ -117,7 +117,7 @@ describe('when editable is true', () => {
     describe('when cell contains a total', () => {
         it('has class total', () => {
             render(<LapView value={1015897} total={true} />);
-            expect(screen.getByText('16:56').getAttribute('class')).toMatch(/total/i);
+            expect(screen.getByText('16:55').getAttribute('class')).toMatch(/total/i);
         });
     });
 });

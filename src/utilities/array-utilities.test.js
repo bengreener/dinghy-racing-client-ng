@@ -28,6 +28,12 @@ it('sorts an array', () => {
     expect(sortedArray).toEqual([1, 2, 3, 7, 12]);
 });
 
+it('sorts an array into reverse order', () => {
+    const startArray = [ 2, 7, 3, 12, 1];
+    const sortedArray = sortArray(startArray, (value) => value, true);
+    expect(sortedArray).toEqual([12, 7, 3, 2, 1]);
+});
+
 it('leaves original array unchanged', () => {
     const startArray = [ 2, 7, 3, 12, 1];
     const copyStartArray = [...startArray];

@@ -90,7 +90,10 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
 
     function handleAuxClick(event) {
         if (!editMode && !disabled) {
-            setEditMode(true);
+            // do not enter edit mode if there is no lap time to edit
+            if (entry.laps.length > 0) {
+                setEditMode(true);
+            }
         }
     }
 
@@ -107,7 +110,10 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         start.y = event.clientY;
         touchTimeoutId = setTimeout(() => {
             if (!editMode && !disabled) {
-                setEditMode(true);
+                // do not enter edit mode if there is no lap time to edit
+                if (entry.laps.length > 0) {
+                    setEditMode(true);
+                }
                 tracking = false;
             }
         }, longTouchTimeout);
@@ -218,8 +224,17 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     else if (entry.scoringAbbreviation === 'DSQ') {
         classes += ' disqualified';
     }
+    else if (entry.scoringAbbreviation === 'OCS') {
+        classes += ' on-course-side';
+    }
     else if (entry.scoringAbbreviation === 'RET') {
         classes += ' retired';
+    }
+    else if (entry.scoringAbbreviation === 'DNC') {
+        classes += ' did-not-compete';
+    }
+    else if (entry.scoringAbbreviation === 'DNF') {
+        classes += ' did-not-finish';
     }
     else if (entry.onLastLap) {
         classes += ' on-last-lap';

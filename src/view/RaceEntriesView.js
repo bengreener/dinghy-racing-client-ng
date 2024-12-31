@@ -109,19 +109,17 @@ function RaceEntriesView({ races }) {
                     return [entry.dinghy.dinghyClass.name, isNaN(entry.dinghy.sailNumber) ? entry.dinghy.sailNumber : Number(entry.dinghy.sailNumber)];
                 });
                 break;
-            // sort by the sum of all recorded lap times (sub sort by class and sail number to avoid order changing based on order of returned values from server)
+            // sort by number of laps and then by time to complete last lap
             case 'lapTimes':
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
-                    const weighIfScoringAbbreviation = ['DNS', 'DSQ', 'RET'];
-                    const weighting = (entry.finishedRace || weighIfScoringAbbreviation.includes(entry.scoringAbbreviation)) ? Date.now() : 0;
-                    return [entry.race.plannedStartTime.getTime() + entry.sumOfLapTimes + weighting, entry.dinghy.dinghyClass.name, isNaN(entry.dinghy.sailNumber) ? entry.dinghy.sailNumber : Number(entry.dinghy.sailNumber)];
-                });
+                    const weighting = (!(entry.scoringAbbreviation == null || entry.scoringAbbreviation === '')) ? -Date.now() : 0;
+                    return [entry.laps.length + weighting, -entry.sumOfLapTimes];
+                }, true);
                 break;
             case 'position':
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
-                    const weighIfScoringAbbreviation = ['DNS', 'DSQ', 'RET'];
                     let weight = .5;
-                    if (weighIfScoringAbbreviation.includes(entry.scoringAbbreviation)) {
+                    if (!(entry.scoringAbbreviation == null || entry.scoringAbbreviation === '')) {
                         weight = weight * 2;
                     }
                     return (entry.position && weight === .5) ? entry.position : Date.now() * weight; // if entry doesn't have a position return a large number to put it to the bottom
@@ -129,9 +127,8 @@ function RaceEntriesView({ races }) {
                 break;
             case 'forecast':
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
-                    const weighIfScoringAbbreviation = ['DNS', 'DSQ', 'RET'];
                     let weight = 1;
-                    if (weighIfScoringAbbreviation.includes(entry.scoringAbbreviation)) {
+                    if (!(entry.scoringAbbreviation == null || entry.scoringAbbreviation === '')) {
                         weight = weight * 2;
                     }
                     const lastLapTime = entry.sumOfLapTimes ? entry.sumOfLapTimes : 0;
