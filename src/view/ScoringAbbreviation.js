@@ -66,6 +66,7 @@ function ScoringAbbreviation({value = '', onChange}) {
             <option>OCS</option>
             <option>DNC</option>
             <option>DNS</option>
+            <option>DNF</option>
             <option>DSQ</option>
             <option>RET</option>
         </select>
