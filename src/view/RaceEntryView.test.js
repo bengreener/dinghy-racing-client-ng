@@ -381,12 +381,20 @@ describe('when a scoring abbreviation is selected', () => {
             expect(raceEntryView.getAttribute('class')).toMatch(/did-not-compete/i);
         });
     });
-    describe('when entry did not finish the race', () => {
+    describe('when entry on course side at start of race', () => {
         it('has a class of on-course-side', () => {
             const entryOCS = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'OCS'};
             render(<RaceEntryView entry={entryOCS} />);
             const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
             expect(raceEntryView.getAttribute('class')).toMatch(/on-course-side/i);
+        });
+    });
+    describe('when entry did not finish the race', () => {
+        it('has a class of did-not-finish', () => {
+            const entryDNF = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DNF'};
+            render(<RaceEntryView entry={entryDNF} />);
+            const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+            expect(raceEntryView.getAttribute('class')).toMatch(/did-not-finish/i);
         });
     });
 });

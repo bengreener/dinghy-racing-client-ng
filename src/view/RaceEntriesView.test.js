@@ -352,6 +352,50 @@ describe('when sorting entries', () => {
             expect(within(raceEntryViews[1]).getByText(/1234/)).toBeInTheDocument();
         });
     });
+    describe('when sorting entries that include an entry that was on course side', () => {
+        it('sorts by the total recorded lap times of dinghies in ascending order except for OCS entry which is placed last', async () => {
+            const entriesScorpionA = [
+                {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
+                    {'number': 1, 'time': 2}, {'number': 2, 'time': 2}
+                ], 'sumOfLapTimes': 4, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'},
+                {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'scoringAbbreviation': 'OCS', 'url': 'http://localhost:8081/dinghyracing/api/entries/10'}];
+            const user = userEvent.setup();
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+            await act(async () => {
+                customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
+            });
+            const sortByLapTimeButton = screen.getByRole('button', {'name': /by lap time/i});
+            await act(async () => {
+                await user.click(sortByLapTimeButton);
+            });
+            const raceEntryViews = document.getElementsByClassName('race-entry-view');
+            expect(within(raceEntryViews[0]).getByText(/6745/)).toBeInTheDocument();
+            expect(within(raceEntryViews[1]).getByText(/1234/)).toBeInTheDocument();
+        });
+    });
+    describe('when sorting entries that include an entry that did not finish', () => {
+        it('sorts by the total recorded lap times of dinghies in ascending order except for DNF entry which is placed last', async () => {
+            const entriesScorpionA = [
+                {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
+                    {'number': 1, 'time': 2}, {'number': 2, 'time': 2}
+                ], 'sumOfLapTimes': 4, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'},
+                {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'scoringAbbreviation': 'DNF', 'url': 'http://localhost:8081/dinghyracing/api/entries/10'}];
+            const user = userEvent.setup();
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+            await act(async () => {
+                customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
+            });
+            const sortByLapTimeButton = screen.getByRole('button', {'name': /by lap time/i});
+            await act(async () => {
+                await user.click(sortByLapTimeButton);
+            });
+            const raceEntryViews = document.getElementsByClassName('race-entry-view');
+            expect(within(raceEntryViews[0]).getByText(/6745/)).toBeInTheDocument();
+            expect(within(raceEntryViews[1]).getByText(/1234/)).toBeInTheDocument();
+        });
+    });
 });
 
 describe('when adding a lap time', () => {

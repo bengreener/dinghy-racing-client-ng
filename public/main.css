@@ -185,6 +185,9 @@ td.total {
 .did-not-start {
 	background-color: lightgrey;
 }
+.did-not-finish {
+	background-color: gainsboro;
+}
 .retired {
 	background-color: gainsboro;
 }
