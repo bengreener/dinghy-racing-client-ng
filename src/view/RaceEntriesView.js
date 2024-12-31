@@ -82,7 +82,6 @@ function RaceEntriesView({ races }) {
     }
     // return array of entries sorted according to selected sort order
     function sorted() {
-        const weighIfScoringAbbreviation = ['DNS', 'DSQ', 'RET'];
         let ordered = [];
         switch (sortOrder) {
             case 'lastThree':
@@ -113,14 +112,14 @@ function RaceEntriesView({ races }) {
             // sort by number of laps and then by time to complete last lap
             case 'lapTimes':
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
-                    const weighting = (weighIfScoringAbbreviation.includes(entry.scoringAbbreviation)) ? -Date.now() : 0;
+                    const weighting = (!(entry.scoringAbbreviation == null || entry.scoringAbbreviation === '')) ? -Date.now() : 0;
                     return [entry.laps.length + weighting, -entry.sumOfLapTimes];
                 }, true);
                 break;
             case 'position':
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
                     let weight = .5;
-                    if (weighIfScoringAbbreviation.includes(entry.scoringAbbreviation)) {
+                    if (!(entry.scoringAbbreviation == null || entry.scoringAbbreviation === '')) {
                         weight = weight * 2;
                     }
                     return (entry.position && weight === .5) ? entry.position : Date.now() * weight; // if entry doesn't have a position return a large number to put it to the bottom
@@ -129,7 +128,7 @@ function RaceEntriesView({ races }) {
             case 'forecast':
                 ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
                     let weight = 1;
-                    if (weighIfScoringAbbreviation.includes(entry.scoringAbbreviation)) {
+                    if (!(entry.scoringAbbreviation == null || entry.scoringAbbreviation === '')) {
                         weight = weight * 2;
                     }
                     const lastLapTime = entry.sumOfLapTimes ? entry.sumOfLapTimes : 0;
