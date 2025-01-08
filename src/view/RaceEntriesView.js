@@ -14,7 +14,8 @@
  * limitations under the License. 
  */
 
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+// import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
 import RaceEntryView from './RaceEntryView';
 import { sortArray } from '../utilities/array-utilities';
@@ -33,7 +34,7 @@ function RaceEntriesView({ races }) {
     const [message, setMessage] = useState('');
     const [sortOrder, setSortOrder] = useState('default');
     const [entriesUpdateRequestAt, setEntriesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies an entry has been updated
-    const displayOrder = useRef([]);
+    const [displayOrder, setDisplayOrder] = useState([]);
 
     const updateEntries = useCallback(() => {
         setEntriesUpdateRequestAt(Date.now());
@@ -264,21 +265,22 @@ function RaceEntriesView({ races }) {
     function getEntriesDisplay() {
         // check if entries to display match entries in display order list (every entry should be mapped to position in displayOrder and every position in displayOrder should locate an entry)
         // if not sort entries into a display order according to the sort order selected
-        const entriesInDisplayOrder = Array.from(entriesMap.keys()).every(key => displayOrder.current.includes(key));
-        const displayOrderIncludesEntries = displayOrder.current.every(key => entriesMap.has(key));
+        // running this check here so as not to build dependency on useEffect that fetches entries on sort order; avoid refetching entries from server each time sort order is changed
+        const entriesInDisplayOrder = Array.from(entriesMap.keys()).every(key => displayOrder.includes(key));
+        const displayOrderIncludesEntries = displayOrder.every(key => entriesMap.has(key));
         if (!(entriesInDisplayOrder && displayOrderIncludesEntries)) {
-            displayOrder.current = sorted(Array.from(entriesMap.values()), sortOrder);
+            setDisplayOrder(sorted(Array.from(entriesMap.values()), sortOrder));
         }
 
-        return displayOrder.current.map(key => {
+        return displayOrder.map(key => {
             const entry = entriesMap.get(key);
             return <RaceEntryView key={key} entry={entry} addLap={addLap}
                 removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} />
-            });
+        });
     }
 
     function sortButtonClick(sortOrder) {
-        displayOrder.current = sorted(Array.from(entriesMap.values()), sortOrder);
+        setDisplayOrder(sorted(Array.from(entriesMap.values()), sortOrder));
         setSortOrder(sortOrder);
     }
 

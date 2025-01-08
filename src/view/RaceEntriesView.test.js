@@ -212,6 +212,39 @@ describe('when sorting entries', () => {
         expect(within(raceEntryViews[1]).getByText(/2928/)).toBeInTheDocument();
         expect(within(raceEntryViews[2]).getByText(/6745/)).toBeInTheDocument();
     });
+    it('enables resorting by the same value after entries have been updated', async () => {
+        const entriesScorpionAPre = [
+            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 312568, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
+            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'}
+        ];
+        const entriesScorpionAPost = [
+            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 312568, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
+            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [{'number': 1, 'time': 212568}], 'sumOfLapTimes': 212568, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'}
+        ];
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getEntriesByRace')
+            .mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
+            .mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+        await act(async () => {
+            customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
+        });
+        const sortByLapTimeButton = screen.getByRole('button', {'name': /by lap time/i});
+        await act(async () => {
+            await user.click(sortByLapTimeButton);
+        });
+        const raceEntryViews = document.getElementsByClassName('race-entry-view');
+        await act(async () => {
+            model.handleEntryUpdate({'body': entriesScorpionA[1].url});
+        });
+        expect(within(raceEntryViews[0]).getByText(/1234/)).toBeInTheDocument();
+        expect(within(raceEntryViews[1]).getByText(/6745/)).toBeInTheDocument();
+        await act(async () => {
+            await user.click(sortByLapTimeButton);
+        });
+        expect(within(raceEntryViews[1]).getByText(/1234/)).toBeInTheDocument();
+        expect(within(raceEntryViews[0]).getByText(/6745/)).toBeInTheDocument();
+    });
     describe('when sorting by position', () => {
         it('sorts by position in ascending order', async () => {
             const entries = [
