@@ -17,9 +17,9 @@
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RaceEntryView from './RaceEntryView';
-import { entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745 } from '../model/__mocks__/test-data';
+import { raceScorpionA, entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745 } from '../model/__mocks__/test-data';
 import DinghyRacingModel from '../model/dinghy-racing-model';
-import { PositionConstant } from './RaceEntriesView';
+// import { PositionConstant } from './RaceEntriesView';
 
 const entryRowLastCellLapTimeCellOffset = 4;
 
@@ -517,32 +517,65 @@ describe('when user drags and drops an entry to a new position', () => {
         });
         expect(onRaceEntryDropSpy).toHaveBeenCalled();
     });
-    it('updates the display to show the position of the 2 entries are having their positions updates', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const onRaceEntryDropSpy = jest.fn();
-        const entry1 = {...entryChrisMarshallScorpionA1234, laps: []};
-        const entry2 = {...entrySarahPascalScorpionA6745};
-        const addLapCallback = jest.fn();
-        render(
-            <div>
-                <RaceEntryView entry={entry1} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
-                <RaceEntryView entry={entry2} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
-            </div>
-        );
-        const rev1 = screen.getByText(/chris marshall/i).parentElement.parentElement;
-        const rev2 = screen.getByText(/sarah pascal/i).parentElement.parentElement;
-
-        const dataTransferObject = {
-            data: new Map(), 
-            setData(key, value) {this.data.set(key, value)},
-            getData(key) {this.data.get(key)}
-        };
-        await act(async () => {
-            fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
+    describe('when race is a pursuit race', () => {
+        it('updates the display to show the position of the target entry is being updated', async () => {
+            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const onRaceEntryDropSpy = jest.fn();
+            const raceScorpionAPursuit = {...raceScorpionA, type: 'PURSUIT'};
+            const entry1 = {...entryChrisMarshallScorpionA1234, race: raceScorpionAPursuit, laps: []};
+            const entry2 = {...entrySarahPascalScorpionA6745, race: raceScorpionAPursuit};
+            const addLapCallback = jest.fn();
+            render(
+                <div>
+                    <RaceEntryView entry={entry1} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
+                    <RaceEntryView entry={entry2} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
+                </div>
+            );
+            const subjectREV = screen.getByText(/chris marshall/i).parentElement.parentElement;
+            const targetREV = screen.getByText(/sarah pascal/i).parentElement.parentElement;
+    
+            const dataTransferObject = {
+                data: new Map(), 
+                setData(key, value) {this.data.set(key, value)},
+                getData(key) {this.data.get(key)}
+            };
+            await act(async () => {
+                fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
+            });
+            await act(async () => {
+                fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
+            });
+            expect(targetREV.getAttribute('class')).toMatch(/disabled/i);
         });
-        await act(async () => {
-            fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
+    });
+    describe('when race is not a pursuit race', () => {
+        it('does not update the display to show the position of the target entry is being updated', async () => {
+            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const onRaceEntryDropSpy = jest.fn();
+            const entry1 = {...entryChrisMarshallScorpionA1234, laps: []};
+            const entry2 = {...entrySarahPascalScorpionA6745};
+            const addLapCallback = jest.fn();
+            render(
+                <div>
+                    <RaceEntryView entry={entry1} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
+                    <RaceEntryView entry={entry2} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
+                </div>
+            );
+            const subjectREV = screen.getByText(/chris marshall/i).parentElement.parentElement;
+            const targetREV = screen.getByText(/sarah pascal/i).parentElement.parentElement;
+    
+            const dataTransferObject = {
+                data: new Map(), 
+                setData(key, value) {this.data.set(key, value)},
+                getData(key) {this.data.get(key)}
+            };
+            await act(async () => {
+                fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
+            });
+            await act(async () => {
+                fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
+            });
+            expect(targetREV.getAttribute('class')).not.toMatch(/disabled/i);
         });
-        expect(rev2.getAttribute('class')).toMatch(/disabled/i);
-    })
+    });
 });

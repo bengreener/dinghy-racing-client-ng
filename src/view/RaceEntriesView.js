@@ -20,6 +20,7 @@ import ModelContext from './ModelContext';
 import RaceEntryView from './RaceEntryView';
 import { sortArray } from '../utilities/array-utilities';
 import ControllerContext from './ControllerContext';
+import RaceType from '../model/domain-classes/race-type';
 
 /**
  * Display race entries
@@ -227,34 +228,25 @@ function RaceEntriesView({ races }) {
     }
 
     function onRaceEntryPositionSetByDrag(subjectKey, targetKey) {
-        // can only drag entry to a new position when displayed entries are sorted by position
-        if (sortOrder !== 'position') {
-            setMessage('Entries not sorted by position');
-            return;
-        }
         const subjectEntry = entriesMap.get(subjectKey);
         const targetEntry = entriesMap.get(targetKey);
         if ((subjectEntry.scoringAbbreviation == null || subjectEntry.scoringAbbreviation === '') && (targetEntry.scoringAbbreviation == null || targetEntry.scoringAbbreviation === '')) {
-            // If both entries in same race assign subject position from target position
-            if (subjectEntry.race.name === targetEntry.race.name) { // testiing equality directly on races will fail as different objects
+            // find position of subject and target in display array
+            const subjectIndex = displayOrder.indexOf(subjectKey);
+            const targetIndex = displayOrder.indexOf(targetKey);
+            // remove subject from it currnet position in display order
+            let newDisplayOrder = displayOrder.toSpliced(subjectIndex, 1);
+            // insert subject in new position in display order
+            newDisplayOrder.splice(Math.max(0, targetIndex), 0, subjectKey);
+            // set new display order
+            setDisplayOrder(newDisplayOrder);
+            // If race type is pursuit and both entries in same race assign subject position from target position
+            if (subjectEntry.race.type === RaceType.PURSUIT && subjectEntry.race.name === targetEntry.race.name) { // testiing equality directly on races will fail as different objects
                 updateEntryPosition(subjectEntry, targetEntry.position);
-                return;
-            }
-            // if entries in different races find first entry below target in same race as subject and use that to assign a position to subject
-            else if (subjectEntry.race.name !== targetEntry.race.name) {
-                const sortedEntries = sorted(Array.from(entriesMap.values()), sortOrder);
-                for (let i = sortedEntries.findIndex(e => e === targetEntry.dinghy.dinghyClass.name + targetEntry.dinghy.sailNumber + targetEntry.helm.name) + 1; i < sortedEntries.length; i++) {
-                    const entry = entriesMap.get(sortedEntries[i]);
-                    if (subjectEntry.race.name === entry.race.name) { // testiing equality directly on races will fail as different objects
-                        updateEntryPosition(subjectEntry, entry.position);
-                        return;
-                    }
-                }
             }
         }
         else {
             setMessage('Cannot change position of an entry with a scoring abbreviation');
-            return;
         }
     }
 

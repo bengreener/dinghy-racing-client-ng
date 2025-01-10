@@ -17,6 +17,7 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import LapView from './LapView';
 import ScoringAbbreviation from './ScoringAbbreviation';
+import RaceType from '../model/domain-classes/race-type';
 
 /**
  * Display the details of a race entry
@@ -188,7 +189,9 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     function dropHandler(event) {
         event.preventDefault();
         if (onRaceEntryDrop) {
-            setDisabled(true);
+            if (entry.race.type === RaceType.PURSUIT) {
+                setDisabled(true);
+            }
             onRaceEntryDrop(event.dataTransfer.getData('text/html'), entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
         }
     }
