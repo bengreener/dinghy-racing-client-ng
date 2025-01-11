@@ -469,7 +469,7 @@ describe('when the entry is selected to add a new lap', () => {
 
 describe('when user drags and drops an entry to a new position', () => {
     // seems like a forced test but, couldn't get pointer events to trigger drag and drop API events :-(
-    it('calls function passed to onRaceEntryDrop with subject key and taerget key ', async () => {
+    it('calls function passed to onRaceEntryDrop with subject key and target key ', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         const onRaceEntryDropSpy = jest.fn();
         const entry1 = {...entryChrisMarshallScorpionA1234, laps: []};
@@ -546,6 +546,36 @@ describe('when user drags and drops an entry to a new position', () => {
                 fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
             });
             expect(targetREV.getAttribute('class')).toMatch(/disabled/i);
+        });
+        describe('when entry is dropped on itself', () => {
+            it('does nothing', async () => {
+                const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+                const onRaceEntryDropSpy = jest.fn();
+                const entry1 = {...entryChrisMarshallScorpionA1234, laps: []};
+                const entry2 = {...entrySarahPascalScorpionA6745};
+                const addLapCallback = jest.fn();
+                render(
+                    <div>
+                        <RaceEntryView entry={entry1} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
+                        <RaceEntryView entry={entry2} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
+                    </div>
+                );
+                const subjectREV = screen.getByText(/chris marshall/i).parentElement.parentElement;
+                const targetREV = screen.getByText(/chris marshall/i).parentElement.parentElement;
+
+                const dataTransferObject = {
+                    data: new Map(),
+                    setData(key, value) {this.data.set(key, value)},
+                    getData(key) {return this.data.get(key)}
+                };
+                await act(async () => {
+                    fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
+                });
+                await act(async () => {
+                    fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
+                });
+                expect(onRaceEntryDropSpy).not.toHaveBeenCalled();
+            });
         });
     });
     describe('when race is not a pursuit race', () => {

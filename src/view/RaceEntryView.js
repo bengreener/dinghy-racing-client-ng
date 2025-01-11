@@ -188,7 +188,9 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
 
     function dropHandler(event) {
         event.preventDefault();
-        if (onRaceEntryDrop) {
+        const subjectKey = event.dataTransfer.getData('text/html');
+        const targetKey = entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name;
+        if (onRaceEntryDrop && subjectKey !== targetKey) {
             if (entry.race.type === RaceType.PURSUIT) {
                 setDisabled(true);
             }
