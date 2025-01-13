@@ -22,11 +22,12 @@ import Clock from '../model/domain-classes/clock';
  * @param {Integer} prop.time
  * @param {String} prop.message
  */
-function CountdownDisplayControl({ time, message }) {
+function CountdownDisplayControl({ title, time, message }) {
 
     return (
-        <div class='countdown-display-control' >
-            <p class='clock-display'>{Clock.formatDuration(time)}</p>
+        <div className='countdown-display-control' >
+            <h3>{title}</h3>
+            <p className='clock-display'>{Clock.formatDuration(time)}</p>
             <p>{message}</p>    
         </div>
     )

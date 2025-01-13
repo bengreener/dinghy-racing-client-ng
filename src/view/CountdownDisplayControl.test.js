@@ -18,8 +18,8 @@ import CountdownDisplayControl from './CountdownDisplayControl';
 import { render, screen } from '@testing-library/react';
 
 it('renders', () => {
-    render(<CountdownDisplayControl time={600000} message={'Some Event'} />);
-    screen.debug();
+    render(<CountdownDisplayControl title={'Countdown'} time={600000} message={'Some Event'} />);
+    expect(screen.getByText('Countdown')).toBeInTheDocument();
     expect(screen.getByText('10:00')).toBeInTheDocument();
     expect(screen.getByText(/some event/i)).toBeInTheDocument();
 });
