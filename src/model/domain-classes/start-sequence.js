@@ -19,7 +19,7 @@ import SessionStartSequence from './session-start-sequence';
 
 /**
  * Class to handle the start sequence for a race session
- * Calculates flag states and signals timing for ausio signals to race officers
+ * Calculates flag states and signals timing for audio signals to race officers
  */
 class StartSequence {
 
@@ -93,6 +93,14 @@ class StartSequence {
      */
     getRaces() {
         return this._races;
+    }
+
+    /**
+     * Return the next race to start
+     * @returns {Race}
+     */
+    getNextRaceToStart() {
+        return this._sessionStartSequence.getNextRaceToStart(this._clock.getTime());
     }
 
     /**
