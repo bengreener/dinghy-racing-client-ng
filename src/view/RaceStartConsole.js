@@ -151,7 +151,18 @@ function RaceStartConsole () {
     function buildStartCountdown() {
         if (startSequence.current) {
             const nextRaceToStart = startSequence.current.getNextRaceToStart();
-            return <CountdownDisplayControl title={'Start Countdown'} message={nextRaceToStart.name} time={nextRaceToStart.clock.getElapsedTime()} />
+            let countdown;
+            if (nextRaceToStart) {
+                countdown = <CountdownDisplayControl title={'Start Countdown'} message={nextRaceToStart.name} time={-nextRaceToStart.clock.getElapsedTime()} />;
+            }
+            else {
+                countdown = <CountdownDisplayControl title={'Start Countdown'} message={''} time={0} />;
+            }
+            return (
+                <CollapsableContainer heading={'Start Countdown'}>
+                    {countdown}
+                </CollapsableContainer>
+            )
         }
     }
 

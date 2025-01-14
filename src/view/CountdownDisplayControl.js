@@ -26,9 +26,10 @@ function CountdownDisplayControl({ title, time, message }) {
 
     return (
         <div className='countdown-display-control' >
-            <h3>{title}</h3>
-            <p className='clock-display'>{Clock.formatDuration(time)}</p>
-            <p>{message}</p>    
+            <output className='clock-display'>{Clock.formatDuration(time)}</output>
+            <div>
+                <output>{message}</output>
+            </div>
         </div>
     )
 }

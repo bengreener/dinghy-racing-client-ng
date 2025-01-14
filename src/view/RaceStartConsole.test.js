@@ -56,7 +56,7 @@ it('renders', async () => {
     const controller = new DinghyRacingController(model);
     jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
     
-    await act(async () => {        
+    await act(async () => {
         customRender(<RaceStartConsole />, model, controller);
     });
 
@@ -71,6 +71,29 @@ it('renders', async () => {
     expect(screen.getByRole('heading', {name: /flags/i})).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: /^races$/i})).toBeInTheDocument();
 });
+
+describe('when no races selected', () => {
+    it('renders', async () => {
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence([], model)})});
+
+        await act(async () => {
+            customRender(<RaceStartConsole />, model, controller);
+        });
+
+        const selectSessionStart = screen.getByLabelText(/session start/i);
+        expect(selectSessionStart).toBeInTheDocument();
+        const selectSessionEnd = screen.getByLabelText(/session end/i);
+        expect(selectSessionEnd).toBeInTheDocument();
+        expect(screen.getByLabelText(/fleet/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/fleet/i)).toBeChecked();
+        expect(screen.getByLabelText(/pursuit/i)).toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: /start races/i})).toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: /flags/i})).toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: /^races$/i})).toBeInTheDocument();
+    });
+})
 
 it('calls getStartSequence with correct arguments', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
