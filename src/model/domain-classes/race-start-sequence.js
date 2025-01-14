@@ -34,6 +34,15 @@ class RaceStartSequence {
     }
 
     /**
+     * Return the next race to start on or after time
+     * @param {Date} time
+     * @returns {Race | null | undefined}
+     */
+    getNextRaceToStart(time) {
+        return this._race.plannedStartTime >= time ? this._race : null;
+    }
+
+    /**
      * Get all flags for this race start
      * @returns {Array<Flag>}
      */
