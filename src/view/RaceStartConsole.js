@@ -23,6 +23,7 @@ import CollapsableContainer from './CollapsableContainer';
 import FlagControl from './FlagControl';
 import RaceType from '../model/domain-classes/race-type';
 import Clock from '../model/domain-classes/clock';
+import CountdownDisplayControl from './CountdownDisplayControl';
 
 /**
  * Provide Race Officer with information needed to successfully start races in a session
@@ -147,6 +148,13 @@ function RaceStartConsole () {
         return !message ? 'hidden' : 'console-error-message';
     }
 
+    function buildStartCountdown() {
+        if (startSequence.current) {
+            const nextRaceToStart = startSequence.current.getNextRaceToStart();
+            return <CountdownDisplayControl title={'Start Countdown'} message={nextRaceToStart.name} time={nextRaceToStart.clock.getElapsedTime()} />
+        }
+    }
+
     return (
         <div className='w3-container console'>
             <CollapsableContainer heading={'Start Races'}>
@@ -170,6 +178,7 @@ function RaceStartConsole () {
                 </form>
                 <p className={userMessageClasses()}>{message}</p>
             </CollapsableContainer>
+            {buildStartCountdown()}
             <CollapsableContainer heading={'Flags'}>
                 {flagsWithNextAction.map(flag => { return <FlagControl key={flag.flag.name} flag={flag.flag} timeToChange={flag.action ? flag.action.time.valueOf() - Clock.now() : 0} /> })} {/* use Clock.now to get adjusted time when synched to an external clock */}
             </CollapsableContainer>

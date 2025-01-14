@@ -137,6 +137,22 @@ it('defaults session end to 18:00 of today', async () => {
     expect(selectSessionEnd).toHaveValue(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000).toISOString().substring(0, 16));
 });
 
+it('provides countdown value and message to Countdown control', async () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const controller = new DinghyRacingController(model);
+    jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {
+        return Promise.resolve({'success': true, 'domainObject': new StartSequence([ raceScorpionA ], model)})
+    });
+
+    await act(async () => {
+        customRender(<RaceStartConsole />, model, controller);
+    });
+
+    const countdownControl = screen.getByText('Start Countdown').parentElement;
+    expect(within(countdownControl).getByText(/scorpion a/i)).toBeInTheDocument();
+    expect(within(countdownControl).getByText(/5:00/i)).toBeInTheDocument();
+});
+
 it('displays race names and blue peter', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
@@ -241,7 +257,7 @@ it('displays race headers for races in session', async () => {
     expect(within(raceD).getByRole('button', {name: /start now/i})).toBeInTheDocument();
 });
 
-it('does not displays in race data in race headers', async () => {
+it('does not display in race data in race headers', async () => {
     const races = [raceScorpionA];
 
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -471,13 +487,14 @@ describe('when races within session are changed', () => {
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
-        expect(screen.getByText('Scorpion A')).toBeInTheDocument();
+        expect(screen.getAllByText('Scorpion A')[0]).toBeInTheDocument();
         races_copy[0].name = 'Popeye Special';
+        
         await act(async () => {
-            jest.advanceTimersByTime(1000); // advance time so RaceStartConsole nows it needs to rerender
+            jest.advanceTimersByTime(1000); // advance time so RaceStartConsole knows it needs to rerender
             model.handleRaceUpdate({'body': races_copy[0].url});
         });
-        expect(screen.getByText('Popeye Special')).toBeInTheDocument();
+        expect(screen.getAllByText('Popeye Special')[0]).toBeInTheDocument();
     });
     it('removes a race that has had start time changed so it falls outside session time window', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -490,12 +507,12 @@ describe('when races within session are changed', () => {
         const url = races[races.length -1].url;
         races.pop();
         await act(async () => {
-            jest.advanceTimersByTime(1000); // advance time so RaceStartConsole nows it needs to rerender
+            jest.advanceTimersByTime(1000); // advance time so RaceStartConsole knows it needs to rerender
             model.handleRaceUpdate({'body': url});
         });
         expect(screen.queryByText('Handicap A')).not.toBeInTheDocument();
     });
-})
+});
 
 describe('when 6 minutes 1 second before start of first race', () => {
     // unsure how to test audio using a variable to control audio rather than <audio> element
