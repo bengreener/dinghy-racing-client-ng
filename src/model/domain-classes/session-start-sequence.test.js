@@ -88,6 +88,13 @@ describe('when CSC Club Start for Fleet races', () => {
             expect(flags[1]).toStrictEqual({flag: preparatoryFlag, action: preparatoryFlagRaiseAction});
             expect(flags[2]).toStrictEqual({flag: raceHandicapAWarningFlag, action: raceHandicapAWarningflagRaiseAction});
         });
+        it('returns the next race that will start', () => {
+            const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
+            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
+        
+            const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf() - 660000));
+            expect(race).toStrictEqual(raceScorpionA);
+        });
     });
     describe('when 10 minutes before the start of the first race and 15 minutes before start of second race', () => {
         it('returns correct flags', () => {
@@ -285,6 +292,13 @@ describe('when CSC Club Start for Fleet races', () => {
             expect(flags[1]).toStrictEqual({flag: preparatoryFlag, action: preparatoryFlagLowerAction});
             expect(flags[2]).toStrictEqual({flag: raceHandicapAWarningFlag, action: raceHandicapAWarningflagLowerAction});
         });
+        it('returns the next race that will start', () => {
+            const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
+            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
+        
+            const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf()));
+            expect(race).toStrictEqual(raceScorpionA);
+        });
     });
     describe('when 5 minutes after the start of the first race and 0 minutes before start of second race', () => {
         it('returns correct flags', () => {
@@ -350,6 +364,13 @@ describe('when CSC Club Start for Fleet races', () => {
             expect(flags[0]).toStrictEqual({flag: scorpionAWarningFlag, action: undefined});
             expect(flags[1]).toStrictEqual({flag: preparatoryFlag, action: undefined});
             expect(flags[2]).toStrictEqual({flag: raceHandicapAWarningFlag, action: undefined});
+        });
+        it('returns the next race that will start', () => {
+            const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
+            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
+        
+            const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf() + 300000));
+            expect(race).toStrictEqual(raceHandicapA_newStart);
         });
     });
     it('returns the correct actions', () => {

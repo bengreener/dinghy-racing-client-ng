@@ -20,6 +20,7 @@ import FlagRole from './flag-role';
 import { sortArray } from '../../utilities/array-utilities';
 
 class SessionStartSequence {
+    _races = [];
     _raceStartSequences = [];
     _flags = [];
     _actions = [];
@@ -29,9 +30,26 @@ class SessionStartSequence {
      * @param {Array<Race>} races
      */
     constructor(races, model) {
+        this._races = races;
         this._raceStartSequences = races.map(race => new RaceStartSequence(race, model));
-        // this._actions = this._generateActions();
         ({flags: this._flags, actions: this._actions} = this._generateFlags(this._raceStartSequences));
+    }
+
+    /**
+     * Return the next race to start on or after time
+     * @param {DateTime} time
+     * @returns {Race | null | undefined}
+     */
+    getNextRaceToStart(time) {
+        const upcomingRaces = [];
+        this._raceStartSequences.forEach(rss => {
+            const race = rss.getNextRaceToStart(time);
+            if (race !== null) {
+                upcomingRaces.push(race);
+            }
+        })
+        const sorted = upcomingRaces.toSorted((a, b) => a - b);
+        return sorted[0];
     }
 
     /**
@@ -60,7 +78,7 @@ class SessionStartSequence {
                     fws.state = FlagState.LOWERED;
             }
             for(const action of actions) {
-                if (Math.trunc(action.time.valueOf() / 1000) * 1000 <= truncatedTime ) { // round off to containing second to identify actions occurring within that second
+                if (Math.trunc(action.time.valueOf() / 1000) * 1000 <= truncatedTime) { // round off to containing second to identify actions occurring within that second
                     fws.state = action.afterState;
                 }
                 else {
