@@ -50,7 +50,7 @@ function RaceStartConsole () {
     const startSequence = useRef(null);
     const prepareAudioRef = useRef(null);
     if (prepareAudioRef.current === null) {
-        prepareAudioRef.current = new Audio('./sounds/prepare_alert.mp3')
+        prepareAudioRef.current = new Audio('./sounds/prepare_alert.mp3');
     }
     const actAudioRef = useRef(null);
     if (actAudioRef.current === null) {
@@ -153,7 +153,8 @@ function RaceStartConsole () {
             const nextRaceToStart = startSequence.current.getNextRaceToStart();
             let countdown;
             if (nextRaceToStart) {
-                countdown = <CountdownDisplayControl title={'Start Countdown'} message={nextRaceToStart.name} time={-nextRaceToStart.clock.getElapsedTime()} />;
+                const timeLeft = nextRaceToStart.clock.getElapsedTime();
+                countdown = <CountdownDisplayControl title={'Start Countdown'} message={nextRaceToStart.name} time={timeLeft} />;
             }
             else {
                 countdown = <CountdownDisplayControl title={'Start Countdown'} message={''} time={0} />;
@@ -191,7 +192,7 @@ function RaceStartConsole () {
             </CollapsableContainer>
             {buildStartCountdown()}
             <CollapsableContainer heading={'Flags'}>
-                {flagsWithNextAction.map(flag => { return <FlagControl key={flag.flag.name} flag={flag.flag} timeToChange={flag.action ? flag.action.time.valueOf() - Clock.now() : 0} /> })} {/* use Clock.now to get adjusted time when synched to an external clock */}
+                {flagsWithNextAction.map(flag => { return <FlagControl key={flag.flag.name} flag={flag.flag} timeToChange={flag.action ? Clock.now() - flag.action.time.valueOf() : 0} /> })} {/* use Clock.now to get adjusted time when synched to an external clock */}
             </CollapsableContainer>
             <CollapsableContainer heading={'Races'}>
                 {races.map(race => {

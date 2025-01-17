@@ -69,7 +69,7 @@ function ActionListView({ actions }) {
 
     const actionRows = []
     actionsDescriptionsMap.forEach((actionDescription, timestamp) => {
-        const countdown = Math.max(timestamp - time, 0);
+        const countdown = Math.min(time - timestamp, 0);
         actionRows.push(<tr key={timestamp}>
             <td key='time'>
                 {timeFormat.format(new Date(timestamp))}
@@ -78,7 +78,7 @@ function ActionListView({ actions }) {
                 {actionDescription}
             </td>
             <td key='countdown'>
-                {Clock.formatDuration(countdown)}
+                {Clock.formatDuration(countdown, false, true)}
             </td>
         </tr>);
     });
