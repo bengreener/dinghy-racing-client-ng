@@ -33,7 +33,7 @@ function CountdownDisplayControl({ time, message, beep = false }) {
 
     return (
         <div className='countdown-display-control' >
-            <output className='clock-display'>{Clock.formatDuration(time)}</output>
+            <output className='clock-display'>{Clock.formatDuration(time, false, true)}</output>
             <div>
                 <output>{message}</output>
             </div>
