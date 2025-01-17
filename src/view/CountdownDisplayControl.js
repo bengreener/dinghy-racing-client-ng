@@ -15,14 +15,21 @@
  */
 
 import Clock from '../model/domain-classes/clock';
+import { useRef } from 'react';
 
 /**
  * Display a formatted time and a message
  * @param {Object} prop
  * @param {Integer} prop.time
  * @param {String} prop.message
+ * @param {Boolean} [prop.beep = false]
  */
-function CountdownDisplayControl({ title, time, message }) {
+function CountdownDisplayControl({ time, message, beep = false }) {
+    const beepAudio = useRef(new Audio('./sounds/beep_500Hz_100ms_mono_jahoma_generated.wav'));
+
+    if (beep) {
+        beepAudio.current.play();
+    }
 
     return (
         <div className='countdown-display-control' >

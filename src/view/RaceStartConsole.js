@@ -154,7 +154,8 @@ function RaceStartConsole () {
             let countdown;
             if (nextRaceToStart) {
                 const timeLeft = nextRaceToStart.clock.getElapsedTime();
-                countdown = <CountdownDisplayControl title={'Start Countdown'} message={nextRaceToStart.name} time={timeLeft} />;
+                const playAudio = timeLeft >= -10000 && timeLeft <= 999;
+                countdown = <CountdownDisplayControl title={'Start Countdown'} message={nextRaceToStart.name} time={timeLeft} beep={playAudio} />;
             }
             else {
                 countdown = <CountdownDisplayControl title={'Start Countdown'} message={''} time={0} />;
