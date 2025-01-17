@@ -211,6 +211,15 @@ describe('when 0 minutes before start of first race', () => {
 
         expect(race).toStrictEqual(raceScorpionA);
     });
+    it('provides details for the first race to start up to the end of the second during which the race starts', () => {
+        jest.setSystemTime(new Date('2021-10-14T10:30:00.999Z'));
+    
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const startSequence = new StartSequence(races, model);
+        const race = startSequence.getNextRaceToStart();
+
+        expect(race).toStrictEqual(raceScorpionA);
+    });
 });
 
 describe('when 0 minutes before start of last race', () => {

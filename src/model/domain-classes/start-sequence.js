@@ -100,7 +100,8 @@ class StartSequence {
      * @returns {Race}
      */
     getNextRaceToStart() {
-        return this._sessionStartSequence.getNextRaceToStart(this._clock.getTime());
+        // round time off to second so as to show a race as the next race to start during the second in which it is scheduled to start
+        return this._sessionStartSequence.getNextRaceToStart(new Date(Math.floor(this._clock.getTime().valueOf() / 1000) * 1000));
     }
 
     /**
