@@ -1176,6 +1176,15 @@ describe('when race is postponed', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Please provide details of the race.'});
     });
+    it('returns a promise that resolves to a result indicating failure when race has laps recorded for an entry, and provides a message explaining the cause of failure', async () => {
+        const raceScorpionAWithLaps = {...raceScorpionA, laps: [{number: 1, time: 60000}]};
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+        const promise = dinghyRacingController.postponeRace(raceScorpionAWithLaps, 1800000);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'Cannot postpone start after an entry has sailed a lap.'});
+    });
 });
 
 describe('when setting a scoring abbreviation for an entry', () => {
