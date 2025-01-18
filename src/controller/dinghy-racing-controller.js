@@ -403,7 +403,7 @@ class DinghyRacingController {
     }
 
     /**
-     * Postponse a race
+     * Postpone a race
      * @param {race} race to postpone
      * @param {Number} duration, in milliseconds, by which to delay the race
      */
