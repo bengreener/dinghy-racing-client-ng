@@ -412,7 +412,7 @@ class DinghyRacingController {
         if (!race.url && (!race.name || race.name === '' || !race.plannedStartTime)) {
             return Promise.resolve({'success': false, 'message': 'Please provide details of the race.'});
         }
-        if (race.laps?.length > 0) {
+        if (race?.lapsSailed > 0) {
             return Promise.resolve({'success': false, 'message': 'Cannot postpone start after an entry has sailed a lap.'});
         }
         if (!race.url) {
