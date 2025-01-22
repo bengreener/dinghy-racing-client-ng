@@ -25,7 +25,7 @@ import { useRef } from 'react';
  * @param {Boolean} [prop.beep = false]
  */
 function CountdownDisplayControl({ time, message, beep = false }) {
-    const beepAudio = useRef(new Audio('./sounds/beep_500Hz_100ms_mono_jahoma_generated.wav'));
+    const beepAudio = useRef(new Audio('./sounds/beep_2000hz_100ms_mono.wav'));
 
     if (beep) {
         beepAudio.current.play();
