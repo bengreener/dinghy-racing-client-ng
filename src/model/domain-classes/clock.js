@@ -38,17 +38,18 @@ class Clock {
     _dateNowPerformanceNowDiff; // difference between Date.now() and performance.now() on clock initialisation
     _tickHandler;
     _ticker;
-    
+
     /**
      * Formats a duration in milliseconds into a string; format hh:mm:ss
      * If fractional seconds is false will truncate to the current second
      * @param {Number} duration Duration in milliseconds
-     * @param {boolean} fractionalSeconds true to display fractional seconds to 3 decimal places
+     * @param {boolean} [fractionalSeconds = false] true to display fractional seconds to 3 decimal places
+     * @param {boolean} [countdown = false] true to omit minus sign from the front of a negative duration
      * @returns {String}
      */
-    static formatDuration(duration, fractionalSeconds = false) {
-        let d = Math.abs(duration);
-        const hours = Math.trunc(d / 3600000);
+    static formatDuration(duration, fractionalSeconds = false, countdown = false) {
+        let d = duration;
+        let hours = Math.trunc(duration / 3600000);
 
         let formatOptions = {
             timeZone: 'UTC',
@@ -56,15 +57,15 @@ class Clock {
             second: '2-digit',
         };
 
-        if (hours > 0) formatOptions = {...formatOptions, hour: '2-digit'};
+        if (hours >= 1 || hours <= -1) formatOptions = {...formatOptions, hour: '2-digit'};
         if (fractionalSeconds)  {
             formatOptions = {...formatOptions, fractionalSecondDigits: 3};
         }
         else {
-            d = Math.trunc(d / 1000) * 1000;
+            d = Math.floor(d / 1000) * 1000;
         }
         const timeFormat = new Intl.DateTimeFormat('en-GB', formatOptions);
-        return (duration < 0 ? '-' : '') + timeFormat.format(d);
+        return (duration < 0 && !countdown? '-' : '') + timeFormat.format(Math.abs(d));
     }
 
     /**
@@ -74,9 +75,9 @@ class Clock {
      * @returns {String}
      */
     static formatDurationAsSeconds(duration) {
-        let d = Math.trunc(Math.abs(duration) / 1000);
+        let d = Math.floor(duration / 1000);
 
-        return (duration < 0 ? '-' : '') + d.toString();
+        return d.toString();
     }
 
     static synchToTime(time) {
@@ -183,7 +184,7 @@ class Clock {
     addTickHandler(callback) {
         this._tickHandler = callback;
     }
-    
+
     /**
      * Remove the function handling tick events
      */

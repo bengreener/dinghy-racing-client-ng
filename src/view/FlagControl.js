@@ -38,7 +38,7 @@ function FlagControl({ flag, timeToChange }) {
             </div>
             <div className='w3-col s4 m2 w3-cell-row'>
                 <label htmlFor={'change-in-output'} className='w3-cell' >Change In</label>
-                <output id='change-in-output' className='w3-cell' >{Clock.formatDuration(timeToChange)}</output>
+                <output id='change-in-output' className='w3-cell' >{Clock.formatDuration(timeToChange, false, true)}</output>
             </div>
         </div>
     )

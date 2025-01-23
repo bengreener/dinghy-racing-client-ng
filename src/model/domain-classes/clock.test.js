@@ -95,11 +95,29 @@ it('calls handler on tick', () => {
     }, 10);
 });
 
-describe('when formatting a duration', () => { 
+describe('when formatting a duration as [hh:]mm:ss', () => {
+    it('converts 1000ms to 00:01', () => {
+        expect(Clock.formatDuration(1000)).toBe('00:01');
+    });
+    it('converts 999ms to 00:00', () => {
+        expect(Clock.formatDuration(999)).toBe('00:00');
+    });
+    it('converts 1ms to 00:00', () => {
+        expect(Clock.formatDuration(1)).toBe('00:00');
+    });
     it('converts 0ms to 00:00', () => {
         expect(Clock.formatDuration(0)).toBe('00:00');
     });
-    it('converts 5256000ms to 01:27:36', () => {
+    it('converts -1ms to -00:01', () => {
+        expect(Clock.formatDuration(-1)).toBe('-00:01');
+    });
+    it('converts -1000ms to -00:01', () => {
+        expect(Clock.formatDuration(-1000)).toBe('-00:01');
+    });
+    it('converts -1001ms to be -00:02', () => {
+        expect(Clock.formatDuration(-1001)).toBe('-00:02');
+    });
+    it('converts 5256000ms to be 01:27:36', () => {
         expect(Clock.formatDuration(5256000)).toBe('01:27:36');
     });
     it('converts 43323000ms to 12:02:03', () => {
@@ -108,23 +126,81 @@ describe('when formatting a duration', () => {
     it('converts -1379000ms to -22:59', () => {
         expect(Clock.formatDuration(-1379000)).toBe('-22:59');
     });
-    it('converts 5256900ms to 01:27:36', () => {
-        expect(Clock.formatDuration(5256900)).toBe('01:27:36');
+    it('converts -5256900ms to -01:27:37', () => {
+        expect(Clock.formatDuration(-5256900)).toBe('-01:27:37');
+    });
+    describe('when formatting a negative duration as a countdown', () => {
+        it('omits the minus sign in front of the time', () => {
+            expect(Clock.formatDuration(-1001, false, true)).toBe('00:02');
+        });
+    });
+});
+
+describe('when formatting a duration as [hh:]mm:ss.000', () => {
+    it('converts 1000ms to 00:01.000', () => {
+        expect(Clock.formatDuration(1000, true)).toBe('00:01.000');
+    });
+    it('converts 999ms to 00:00.999', () => {
+        expect(Clock.formatDuration(999, true)).toBe('00:00.999');
+    });
+    it('converts 1ms to 00:00.001', () => {
+        expect(Clock.formatDuration(1, true)).toBe('00:00.001');
+    });
+    it('converts 0ms to 00:00.000', () => {
+        expect(Clock.formatDuration(0, true)).toBe('00:00.000');
+    });
+    it('converts -1ms to 00:00.001', () => {
+        expect(Clock.formatDuration(-1, true)).toBe('-00:00.001');
+    });
+    it('converts -1000ms to -00:01.000', () => {
+        expect(Clock.formatDuration(-1000, true)).toBe('-00:01.000');
+    });
+    it('converts -1001ms to -00:01.001', () => {
+        expect(Clock.formatDuration(-1001, true)).toBe('-00:01.001');
+    });
+    it('converts -1379000ms to -22:59.000', () => {
+        expect(Clock.formatDuration(-1379000, true)).toBe('-22:59.000');
+    });
+    it('converts -5256900ms to 01:27:36.900', () => {
+        expect(Clock.formatDuration(-5256900, true)).toBe('-01:27:36.900');
+    });
+    describe('when formatting a negative duration as a countdown', () => {
+        it('omits the minus sign in front of the time', () => {
+            expect(Clock.formatDuration(-1001, true, true)).toBe('00:01.001');
+        });
     });
 });
 
 describe('when formatting a duration in seconds', () => {
+    it('converts 1000ms to 1', () => {
+        expect(Clock.formatDurationAsSeconds(1000)).toBe('1');
+    });
+    it('converts 999ms to 0', () => {
+        expect(Clock.formatDurationAsSeconds(999)).toBe('0');
+    });
+    it('converts 1ms to 0', () => {
+        expect(Clock.formatDurationAsSeconds(1)).toBe('0');
+    });
     it('converts 0ms to 0', () => {
         expect(Clock.formatDurationAsSeconds(0)).toBe('0');
     });
-    it('converts 5256000ms to 5256', () => {
-        expect(Clock.formatDurationAsSeconds(5256000)).toBe('5256');
+    it('converts -1ms to -1', () => {
+        expect(Clock.formatDurationAsSeconds(-1)).toBe('-1');
+    });
+    it('converts -1000ms to -1', () => {
+        expect(Clock.formatDurationAsSeconds(-1000)).toBe('-1');
+    });
+    it('converts -1001ms to -2', () => {
+        expect(Clock.formatDurationAsSeconds(-1001)).toBe('-2');
     });
     it('converts -1379000ms to -1379', () => {
         expect(Clock.formatDurationAsSeconds(-1379000)).toBe('-1379');
     });
-    it('converts 5256900ms to 5256', () => {
-        expect(Clock.formatDurationAsSeconds(5256900)).toBe('5256');
+    it('converts 5256000ms to 5256', () => {
+        expect(Clock.formatDurationAsSeconds(5256000)).toBe('5256');
+    });
+    it('converts -5256900ms to -5257', () => {
+        expect(Clock.formatDurationAsSeconds(-5256900)).toBe('-5257');
     });
 });
 
@@ -175,4 +251,4 @@ describe('when need to synch with an external clock accepts a time to synch cloc
         Clock.synchToTime(testTime);
         expect(onmessageSpy).toBeCalledWith({message: 'synchToTime', body: testTime});
     });
-})
+});

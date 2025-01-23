@@ -193,4 +193,16 @@ describe('when race is a pursuit race', () => {
             'Chris Marshall,Lou Screw,1234,Scorpion,1,,1043\n'
         ]);
     });
-})
+});
+
+xit('it displays a save file dialog', async () => {
+    // do not know how to test this
+});
+
+xit('it saves the file with the name provided by the save file dialog', async () => {
+    // do not know how to test this
+});
+
+xit('it saves the file in the location selected by the save file dialog', async () => {
+    // do not know how to test this
+});

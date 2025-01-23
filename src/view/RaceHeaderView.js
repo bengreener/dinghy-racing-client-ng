@@ -27,7 +27,7 @@ import RaceType from '../model/domain-classes/race-type';
  * Present summary information ablout a race
  * @param {Object} props
  * @param {Race} race 
- * @param {boolean} [showInRaceData = true] enables or disables display of remaiing duration, estimated laps, last lap time for lead boat, and average lap time for lead boat
+ * @param {boolean} [showInRaceData = true] enables or disables display of remaining duration, estimated laps, last lap time for lead boat, and average lap time for lead boat
  * @returns {HTMLDivElement}
  */
 function RaceHeaderView({ race, showInRaceData = true }) {
@@ -131,7 +131,8 @@ function RaceHeaderView({ race, showInRaceData = true }) {
                 </div>
                 <div className='w3-col m2 s6'>
                     <label htmlFor={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{(elapsedTime < 0) ? 'Countdown' : 'Remaining'}</label>
-                    <output id={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{(elapsedTime < 0) ? Clock.formatDuration(-elapsedTime) : Clock.formatDuration(race.duration - elapsedTime)}</output>
+                    {/** When formatting time remaining adjust elapsed time to prevent formatted time remaining from being one second fast after formatting */}
+                    <output id={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{(elapsedTime < 0) ? Clock.formatDuration(elapsedTime, false, true) : Clock.formatDuration(race.duration - (Math.floor(elapsedTime /1000) * 1000))}</output>
                 </div>
                 <div className='w3-col m1 s6'>
                     {showInRaceData && race.type !== RaceType.PURSUIT && updatedRace.lastLapTime > 0 ? <label htmlFor={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >Laps estimate</label> : null}
@@ -151,6 +152,7 @@ function RaceHeaderView({ race, showInRaceData = true }) {
                 </div>
                 <div className='w3-col m1 s6'>
                     {elapsedTime < 0 ? <button id='race-postpone-button' className='w3-col' onClick={handleRacePostponeClick}>Postpone Start</button> : null}
+                    {(elapsedTime >= 0 && (updatedRace.lapsSailed == null || updatedRace?.lapsSailed < 1)) ? <button id='race-restart-button' className='w3-col' onClick={handleRacePostponeClick}>Restart Race</button> : null}
                 </div>
                 <div className='w3-col m1 s6'>
                     {elapsedTime < 0 ? <button id='race-start-button' className='w3-col' onClick={handleRaceStartClick}>Start Now</button> : null}

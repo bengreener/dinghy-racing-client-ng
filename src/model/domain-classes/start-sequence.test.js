@@ -42,6 +42,15 @@ describe('when 11 minutes and .001 seconds before start of first race', () => {
 
         expect(prepare).toEqual(false);
     });
+    it('provides the details for the first race in the session to start', () => {
+        jest.setSystemTime(new Date('2021-10-14T10:18:59.999Z'));
+    
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const startSequence = new StartSequence(races, model);
+        const race = startSequence.getNextRaceToStart();
+
+        expect(race).toStrictEqual(raceScorpionA);
+    });
 });
 
 describe('when 11 minutes before start of first race', () => {
@@ -193,6 +202,24 @@ describe('when 0 minutes before start of first race', () => {
         expect(flags[1].flag.state).toEqual(FlagState.RAISED);
         expect(flags[2].flag.state).toEqual(FlagState.RAISED);
     });
+    it('provides the details for the first race in the session to start', () => {
+        jest.setSystemTime(new Date('2021-10-14T10:30:00Z'));
+    
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const startSequence = new StartSequence(races, model);
+        const race = startSequence.getNextRaceToStart();
+
+        expect(race).toStrictEqual(raceScorpionA);
+    });
+    it('provides details for the first race to start up to the end of the second during which the race starts', () => {
+        jest.setSystemTime(new Date('2021-10-14T10:30:00.999Z'));
+    
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const startSequence = new StartSequence(races, model);
+        const race = startSequence.getNextRaceToStart();
+
+        expect(race).toStrictEqual(raceScorpionA);
+    });
 });
 
 describe('when 0 minutes before start of last race', () => {
@@ -207,6 +234,15 @@ describe('when 0 minutes before start of last race', () => {
         expect(flags[0].flag.state).toEqual(FlagState.LOWERED);
         expect(flags[1].flag.state).toEqual(FlagState.LOWERED);
         expect(flags[2].flag.state).toEqual(FlagState.LOWERED);
+    });
+    it('provides the details for the last race in the session to start', () => {
+        jest.setSystemTime(new Date('2021-10-14T10:35:00Z'));
+    
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const startSequence = new StartSequence(races, model);
+        const race = startSequence.getNextRaceToStart();
+
+        expect(race).toStrictEqual(raceGraduateA);
     });
 });
 

@@ -23,6 +23,7 @@ import CollapsableContainer from './CollapsableContainer';
 import FlagControl from './FlagControl';
 import RaceType from '../model/domain-classes/race-type';
 import Clock from '../model/domain-classes/clock';
+import CountdownDisplayControl from './CountdownDisplayControl';
 
 /**
  * Provide Race Officer with information needed to successfully start races in a session
@@ -49,7 +50,7 @@ function RaceStartConsole () {
     const startSequence = useRef(null);
     const prepareAudioRef = useRef(null);
     if (prepareAudioRef.current === null) {
-        prepareAudioRef.current = new Audio('./sounds/prepare_alert.mp3')
+        prepareAudioRef.current = new Audio('./sounds/prepare_alert.mp3');
     }
     const actAudioRef = useRef(null);
     if (actAudioRef.current === null) {
@@ -147,6 +148,26 @@ function RaceStartConsole () {
         return !message ? 'hidden' : 'console-error-message';
     }
 
+    function buildStartCountdown() {
+        if (startSequence.current) {
+            const nextRaceToStart = startSequence.current.getNextRaceToStart();
+            let countdown;
+            if (nextRaceToStart) {
+                const timeLeft = nextRaceToStart.clock.getElapsedTime();
+                const playAudio = timeLeft >= -10000 && timeLeft <= 999;
+                countdown = <CountdownDisplayControl title={'Start Countdown'} message={nextRaceToStart.name} time={timeLeft} beep={playAudio} />;
+            }
+            else {
+                countdown = <CountdownDisplayControl title={'Start Countdown'} message={''} time={0} />;
+            }
+            return (
+                <CollapsableContainer heading={'Start Countdown'}>
+                    {countdown}
+                </CollapsableContainer>
+            )
+        }
+    }
+
     return (
         <div className='w3-container console'>
             <CollapsableContainer heading={'Start Races'}>
@@ -170,8 +191,9 @@ function RaceStartConsole () {
                 </form>
                 <p className={userMessageClasses()}>{message}</p>
             </CollapsableContainer>
+            {buildStartCountdown()}
             <CollapsableContainer heading={'Flags'}>
-                {flagsWithNextAction.map(flag => { return <FlagControl key={flag.flag.name} flag={flag.flag} timeToChange={flag.action ? flag.action.time.valueOf() - Clock.now() : 0} /> })} {/* use Clock.now to get adjusted time when synched to an external clock */}
+                {flagsWithNextAction.map(flag => { return <FlagControl key={flag.flag.name} flag={flag.flag} timeToChange={flag.action ? Clock.now() - flag.action.time.valueOf() : 0} /> })} {/* use Clock.now to get adjusted time when synched to an external clock */}
             </CollapsableContainer>
             <CollapsableContainer heading={'Races'}>
                 {races.map(race => {

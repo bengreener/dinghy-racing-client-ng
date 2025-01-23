@@ -11,7 +11,7 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 
 import NameFormat from '../controller/name-format';
@@ -27,16 +27,29 @@ import Clock from '../model/domain-classes/clock';
  */
 function downloadRaceEntriesCSV(race, entries, options) {
     const link = document.createElement('a');
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
             const data = new Blob(convertRaceEntriesToCSVArray(race, entries, options), {'type': 'text/csv'});
-            link.href = window.URL.createObjectURL(data);
-            link.download = race.name + '.csv';
-            link.click();
-            resolve({'success': true});
+            if (supportsFileSystemAccess()) {
+                // Show the file save dialog.
+                const handle = await window.showSaveFilePicker({ suggestedName: race.name + '.csv', types: [{description: 'CSV file', accept: {'text/csv': ['.csv']}}] });
+                // Write the blob to the file.
+                const writable = await handle.createWritable();
+                await writable.write(data);
+                await writable.close();
+                resolve({'success': true});
+            }
+            else {
+                link.href = window.URL.createObjectURL(data);
+                link.download = race.name + '.csv';
+                link.click();
+                resolve({'success': true});
+            }
         }
         catch (error) {
-            resolve({'success': false, 'message': error.message});
+            if (error.name !== 'AbortError') {
+                resolve({'success': false, 'message': error.message});
+            }
         }
         finally {
             window.URL.revokeObjectURL(link.href);
@@ -106,6 +119,17 @@ function _firstnameSurnameToSurnameFirstname(name) {
     const newName = nameArray.join(' ');
 
     return newName;
+}
+
+function supportsFileSystemAccess() {
+    // Feature detection. The API needs to be supported and the app not run in an iframe.
+    return 'showSaveFilePicker' in window && (() => {
+            try {
+                return window.self === window.top;
+            } catch {
+                return false;
+            }
+        })();
 }
 
 // Functions exposed through this object should only be used in tests that confirm they perform as expected

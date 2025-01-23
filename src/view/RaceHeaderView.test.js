@@ -369,6 +369,44 @@ describe('when postpone race button clicked', () => {
     });
 });
 
+describe('when race has started and no entries have sailed a lap', () => {
+    it('displays Restart Race button', () => {
+        jest.setSystemTime(new Date('2021-10-14T10:35:00Z'));
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
+        expect(screen.getByRole('button', {name: /restart/i})).toBeInTheDocument();    
+    });
+});
+
+describe('when race has started and an entry has sailed a lap', () => {
+    it('does not display Restart Race button', async () => {
+        jest.setSystemTime(new Date('2021-10-14T10:35:00Z'));
+        const raceScorpionAWithLaps = {...raceScorpionA, lapsSailed: 1};
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        customRender(<RaceHeaderView race={ {...raceScorpionAWithLaps, 'clock': new Clock()} } />, model, controller);
+        expect(screen.queryByRole('button', {name: /restart/i})).not.toBeInTheDocument();    
+    });
+});
+
+describe('when restart race button clicked', () => {
+    it('displays postpone race dialog', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        jest.setSystemTime(new Date('2021-10-14T10:35:00Z'));
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
+        await act(async () => {
+            await user.click(screen.getByRole('button', {'name': /restart/i}));
+        });
+        const dialog = within(screen.getByTestId('postpone-race-dialog'));
+        expect(dialog.getByRole('spinbutton', {'name': /delay/i, 'hidden': true})).toBeInTheDocument();
+        expect(dialog.getByRole('button', {'name': /cancel/i, 'hidden': true})).toBeInTheDocument();
+        expect(dialog.getByRole('button', {'name': 'Postpone', 'hidden': true})).toBeInTheDocument();
+    });
+});
+
 describe('when start now button clicked', () => {
     it('starts race', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});;

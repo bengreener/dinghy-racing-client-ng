@@ -243,6 +243,10 @@ td.total {
 	font-weight: bold;
 }
 
+.countdown-display-control > .clock-display {
+	font-size: 64pt;
+  }
+
 @media (min-width:601px) {
 	.display-port {
 		height: 94vh;

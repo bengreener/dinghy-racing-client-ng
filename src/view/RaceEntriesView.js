@@ -14,11 +14,13 @@
  * limitations under the License. 
  */
 
+// import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
 import RaceEntryView from './RaceEntryView';
 import { sortArray } from '../utilities/array-utilities';
 import ControllerContext from './ControllerContext';
+import RaceType from '../model/domain-classes/race-type';
 
 /**
  * Display race entries
@@ -33,6 +35,7 @@ function RaceEntriesView({ races }) {
     const [message, setMessage] = useState('');
     const [sortOrder, setSortOrder] = useState('default');
     const [entriesUpdateRequestAt, setEntriesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies an entry has been updated
+    const [displayOrder, setDisplayOrder] = useState([]);
 
     const updateEntries = useCallback(() => {
         setEntriesUpdateRequestAt(Date.now());
@@ -80,44 +83,45 @@ function RaceEntriesView({ races }) {
     function handleRefreshClick() {
         setEntriesUpdateRequestAt(Date.now());
     }
-    // return array of entries sorted according to selected sort order
-    function sorted() {
+	
+    // return array of entry keys sorted according to selected sort order
+    function sorted(entries, order) {
         let ordered = [];
-        switch (sortOrder) {
+        switch (order) {
             case 'lastThree':
-                ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
+                ordered = sortArray(entries, (entry) => {
                     const sn = entry.dinghy.sailNumber;
                     const snEndDigits = sn.substring(sn.length - 3, sn.length);
                     return Number(snEndDigits);
                 });
                 break;
             case 'classLastThree':
-                ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
+                ordered = sortArray(entries, (entry) => {
                     const sn = entry.dinghy.sailNumber;
                     const snEndDigits = sn.substring(sn.length - 3, sn.length);
                     return [entry.dinghy.dinghyClass.name, Number(snEndDigits)];
                 });
                 break;
             case 'sailNumber':
-                ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
+                ordered = sortArray(entries, (entry) => {
                     // some boats have been known to use non-numeric 'sail numbers'
                     return isNaN(entry.dinghy.sailNumber) ? entry.dinghy.sailNumber : Number(entry.dinghy.sailNumber);
                 });
                 break;
             case 'classSailNumber':
-                ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
+                ordered = sortArray(entries, (entry) => {
                     return [entry.dinghy.dinghyClass.name, isNaN(entry.dinghy.sailNumber) ? entry.dinghy.sailNumber : Number(entry.dinghy.sailNumber)];
                 });
                 break;
             // sort by number of laps and then by time to complete last lap
             case 'lapTimes':
-                ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
+                ordered = sortArray(entries, (entry) => {
                     const weighting = (!(entry.scoringAbbreviation == null || entry.scoringAbbreviation === '')) ? -Date.now() : 0;
                     return [entry.laps.length + weighting, -entry.sumOfLapTimes];
                 }, true);
                 break;
             case 'position':
-                ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
+                ordered = sortArray(entries, (entry) => {
                     let weight = .5;
                     if (!(entry.scoringAbbreviation == null || entry.scoringAbbreviation === '')) {
                         weight = weight * 2;
@@ -126,7 +130,7 @@ function RaceEntriesView({ races }) {
                 });
                 break;
             case 'forecast':
-                ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
+                ordered = sortArray(entries, (entry) => {
                     let weight = 1;
                     if (!(entry.scoringAbbreviation == null || entry.scoringAbbreviation === '')) {
                         weight = weight * 2;
@@ -136,11 +140,11 @@ function RaceEntriesView({ races }) {
                 });
                 break;
             default:
-                ordered = sortArray(Array.from(entriesMap.values()), (entry) => {
+                ordered = sortArray(entries, (entry) => {
                     return [entry.dinghy.dinghyClass.name, Number(entry.dinghy.sailNumber)];
                 });
         }
-        return ordered;
+        return ordered.map(entry => entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
     }
 
     async function addLap(entry) {
@@ -224,33 +228,25 @@ function RaceEntriesView({ races }) {
     }
 
     function onRaceEntryPositionSetByDrag(subjectKey, targetKey) {
-        // can only drag entry to a new position when displayed entries are sorted by position
-        if (sortOrder !== 'position') {
-            setMessage('Entries not sorted by position');
-            return;
-        }
         const subjectEntry = entriesMap.get(subjectKey);
         const targetEntry = entriesMap.get(targetKey);
         if ((subjectEntry.scoringAbbreviation == null || subjectEntry.scoringAbbreviation === '') && (targetEntry.scoringAbbreviation == null || targetEntry.scoringAbbreviation === '')) {
-            // If both entries in same race assign subject position from target position
-            if (subjectEntry.race.name === targetEntry.race.name) { // testiing equality directly on races will fail as different objects
+            // find position of subject and target in display array
+            const subjectIndex = displayOrder.indexOf(subjectKey);
+            const targetIndex = displayOrder.indexOf(targetKey);
+            // remove subject from it currnet position in display order
+            let newDisplayOrder = displayOrder.toSpliced(subjectIndex, 1);
+            // insert subject in new position in display order
+            newDisplayOrder.splice(Math.max(0, targetIndex), 0, subjectKey);
+            // set new display order
+            setDisplayOrder(newDisplayOrder);
+            // If race type is pursuit and both entries in same race assign subject position from target position
+            if (subjectEntry.race.type === RaceType.PURSUIT && subjectEntry.race.name === targetEntry.race.name) { // testiing equality directly on races will fail as different objects
                 updateEntryPosition(subjectEntry, targetEntry.position);
-                return;
-            }
-            // if entries in different races find first entry below target in same race as subject and use that to assign a position to subject
-            else if (subjectEntry.race.name !== targetEntry.race.name) {
-                const sortedEntries = sorted();
-                for (let i = sortedEntries.findIndex(e => e === targetEntry) + 1; i < sortedEntries.length; i++) {
-                    if (subjectEntry.race.name === sortedEntries[i].race.name) { // testiing equality directly on races will fail as different objects
-                        updateEntryPosition(subjectEntry, sortedEntries[i].position);
-                        return;
-                    }
-                }
             }
         }
         else {
             setMessage('Cannot change position of an entry with a scoring abbreviation');
-            return;
         }
     }
 
@@ -258,24 +254,46 @@ function RaceEntriesView({ races }) {
         return !message ? 'hidden' : 'console-error-message';
     }
 
+    function getEntriesDisplay() {
+        // check if entries to display match entries in display order list (every entry should be mapped to position in displayOrder and every position in displayOrder should locate an entry)
+        // if not sort entries into a display order according to the sort order selected
+        // running this check here so as not to build dependency on useEffect that fetches entries on sort order; avoid refetching entries from server each time sort order is changed
+        const entriesInDisplayOrder = Array.from(entriesMap.keys()).every(key => displayOrder.includes(key));
+        const displayOrderIncludesEntries = displayOrder.every(key => entriesMap.has(key));
+        if (!(entriesInDisplayOrder && displayOrderIncludesEntries)) {
+            setDisplayOrder(sorted(Array.from(entriesMap.values()), sortOrder));
+        }
+
+        return displayOrder.map(key => {
+            const entry = entriesMap.get(key);
+            return <RaceEntryView key={key} entry={entry} addLap={addLap}
+                removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} />
+        });
+    }
+
+    function sortButtonClick(sortOrder) {
+        setDisplayOrder(sorted(Array.from(entriesMap.values()), sortOrder));
+        setSortOrder(sortOrder);
+    }
+
     return (
         <div className='race-entries-view' >
             <p className={userMessageClasses()}>{message}</p>
             <div className='w3-row'>
                 <div className='w3-col m2'>
-                    <button className='w3-btn w3-block w3-card' onClick={() => setSortOrder('sailNumber')}>By sail number</button>
+                    <button className='w3-btn w3-block w3-card' onClick={() => sortButtonClick('sailNumber')}>By sail number</button>
                 </div>
                 <div className='w3-col m3' >
-                    <button className='w3-btn w3-block w3-card' onClick={() => setSortOrder('classSailNumber')}>By class & sail number</button>
+                    <button className='w3-btn w3-block w3-card' onClick={() => sortButtonClick('classSailNumber')}>By class & sail number</button>
                 </div>
                 <div className='w3-col m2'>
-                    <button className='w3-btn w3-block w3-card' onClick={() => setSortOrder('lapTimes')}>By lap times</button>
+                    <button className='w3-btn w3-block w3-card' onClick={() => sortButtonClick('lapTimes')}>By lap times</button>
                 </div>
                 <div className='w3-col m2'>
-                    <button className='w3-btn w3-block w3-card' onClick={() => setSortOrder('position')}>By position</button>
+                    <button className='w3-btn w3-block w3-card' onClick={() => sortButtonClick('position')}>By position</button>
                 </div>
                 <div className='w3-col m2'>
-                    <button className='w3-btn w3-block w3-card' onClick={() => setSortOrder('forecast')}>By forecast</button>
+                    <button className='w3-btn w3-block w3-card' onClick={() => sortButtonClick('forecast')}>By forecast</button>
                 </div>
                 <div className='w3-col m1'>
                     <button className='w3-btn w3-block w3-card' title='refresh' onClick={handleRefreshClick}>
@@ -284,8 +302,7 @@ function RaceEntriesView({ races }) {
                 </div>
             </div>
             <div className='scrollable' >
-                {sorted().map(entry => <RaceEntryView key={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} entry={entry} addLap={addLap}
-                    removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} />)}
+                {getEntriesDisplay()}
             </div>
         </div>
     );

@@ -22,6 +22,32 @@ import StartSignal from './start-signal';
 import DinghyRacingModel from '../dinghy-racing-model';
 import StartType from './start-type';
 
+describe('when it is 5 minutes before the race start time', () => {
+    it('returns the next race to start', () => {
+        const raceStartSequence = new RaceStartSequence(raceScorpionA);
+        const race = raceStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf() - 36000));
+
+        expect(race).toEqual(raceScorpionA);
+    });
+});
+
+describe('when it is 0 minutes before the race start time', () => {
+    it('returns the next race to start', () => {
+        const raceStartSequence = new RaceStartSequence(raceScorpionA);
+        const race = raceStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf()));
+
+        expect(race).toEqual(raceScorpionA);
+    });
+});
+
+describe('when it is 1 second after the race start time', () => {
+    it('returns the next null as no next race to start', () => {
+        const raceStartSequence = new RaceStartSequence(raceScorpionA);
+        const race = raceStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf() + 1000));
+
+        expect(race).toBeNull();
+    });
+});
 
 describe('when using CSC club start', () => {
     describe('when single dinghy class Fleet race', () => {
