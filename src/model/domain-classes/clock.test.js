@@ -96,6 +96,15 @@ it('calls handler on tick', () => {
 });
 
 describe('when formatting a duration as [hh:]mm:ss', () => {
+    it('converts 86399999ms to 23:59:59', () => {
+        expect(Clock.formatDuration(86399999)).toBe('23:59:59');
+    });
+    it('converts 86400000ms to 24:00:00', () => {
+        expect(Clock.formatDuration(86400000)).toBe('24:00:00');
+    });
+    it('converts 86400999ms to 24:00:00', () => {
+        expect(Clock.formatDuration(86400999)).toBe('24:00:00');
+    });
     it('converts 1000ms to 00:01', () => {
         expect(Clock.formatDuration(1000)).toBe('00:01');
     });
@@ -129,6 +138,15 @@ describe('when formatting a duration as [hh:]mm:ss', () => {
     it('converts -5256900ms to -01:27:37', () => {
         expect(Clock.formatDuration(-5256900)).toBe('-01:27:37');
     });
+    it('converts -86399001ms to -24:00:00', () => {
+        expect(Clock.formatDuration(-86399999)).toBe('-24:00:00');
+    });
+    it('converts -86400000ms to -24:00:00', () => {
+        expect(Clock.formatDuration(-86400000)).toBe('-24:00:00');
+    });
+    it('converts -86400001ms to -24:00:01', () => {
+        expect(Clock.formatDuration(-86400001)).toBe('-24:00:01');
+    });
     describe('when formatting a negative duration as a countdown', () => {
         it('omits the minus sign in front of the time', () => {
             expect(Clock.formatDuration(-1001, false, true)).toBe('00:02');
@@ -137,6 +155,15 @@ describe('when formatting a duration as [hh:]mm:ss', () => {
 });
 
 describe('when formatting a duration as [hh:]mm:ss.000', () => {
+    it('converts 86399999ms to 23:59:59.999', () => {
+        expect(Clock.formatDuration(86399999, true)).toBe('23:59:59.999');
+    });
+    it('converts 86400000ms to 24:00:00.000', () => {
+        expect(Clock.formatDuration(86400000, true)).toBe('24:00:00.000');
+    });
+    it('converts 86400999ms to 24:00:00.999', () => {
+        expect(Clock.formatDuration(86400999, true)).toBe('24:00:00.999');
+    });
     it('converts 1000ms to 00:01.000', () => {
         expect(Clock.formatDuration(1000, true)).toBe('00:01.000');
     });

@@ -48,24 +48,28 @@ class Clock {
      * @returns {String}
      */
     static formatDuration(duration, fractionalSeconds = false, countdown = false) {
-        let d = duration;
-        let hours = Math.trunc(duration / 3600000);
-
-        let formatOptions = {
-            timeZone: 'UTC',
-            minute: '2-digit',
-            second: '2-digit',
-        };
-
-        if (hours >= 1 || hours <= -1) formatOptions = {...formatOptions, hour: '2-digit'};
-        if (fractionalSeconds)  {
-            formatOptions = {...formatOptions, fractionalSecondDigits: 3};
+        let durationSeconds = 0;
+        if (fractionalSeconds) {
+            durationSeconds = Math.abs(Math.trunc(duration / 1000));
         }
         else {
-            d = Math.floor(d / 1000) * 1000;
+            durationSeconds = Math.abs(Math.floor(duration / 1000));
         }
-        const timeFormat = new Intl.DateTimeFormat('en-GB', formatOptions);
-        return (duration < 0 && !countdown? '-' : '') + timeFormat.format(Math.abs(d));
+        const durationMinutes = Math.abs(Math.trunc(durationSeconds / 60));
+        const durationHours = Math.abs(Math.trunc(durationMinutes / 60));
+        let formattedValue = "";
+
+        if (durationHours > 0) {
+            formattedValue = String(durationHours).padStart(2, '0') + ':';
+        }
+            formattedValue = formattedValue + String(durationMinutes - durationHours * 60).padStart(2, '0') + ':' + String(durationSeconds - durationMinutes * 60).padStart(2, '0');
+        if (fractionalSeconds) {
+            formattedValue += '.' + String(Math.abs(duration) - durationSeconds * 1000).padStart(3, '0');
+        }
+        if (duration < 0 && !countdown) {
+            formattedValue = '-' + formattedValue;
+        }
+        return formattedValue;
     }
 
     /**
