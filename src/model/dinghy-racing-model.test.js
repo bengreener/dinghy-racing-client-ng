@@ -3154,6 +3154,12 @@ it('provides a blank template for a crew', () => {
     expect(crew).toEqual({helm: null, mate: null});
 });
 
+it('provides a blank template for a fleet', () => {
+    const fleet = DinghyRacingModel.fleetTemplate();
+
+    expect(fleet).toEqual({name: null});
+});
+
 describe('when searching for entries by race', () => {
     it('returns a promise that resolves to a result indicating success and containing the entries when entries are found and entries have crew recorded', async () => {
         fetch.mockImplementationOnce(() => {

@@ -36,7 +36,7 @@ class DinghyRacingModel {
      * @returns {Competitor}
      */
     static competitorTemplate() {
-        return {'name': '', 'url': ''};
+        return {name: '', url: ''};
     }
 
     /**
@@ -44,7 +44,7 @@ class DinghyRacingModel {
      * @returns {DinghyClass}
      */
     static dinghyClassTemplate() {
-        return {'name': '', 'crewSize': 1, portsmouthNumber: null, 'url': ''};
+        return {name: '', crewSize: 1, portsmouthNumber: null, url: ''};
     }
 
     /**
@@ -52,7 +52,7 @@ class DinghyRacingModel {
      * @returns {Dinghy}
      */
     static dinghyTemplate() {
-        return {'sailNumber': '', 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'url': ''};
+        return {sailNumber: '', dinghyClass: DinghyRacingModel.dinghyClassTemplate(), url: ''};
     }
 
     /**
@@ -76,7 +76,7 @@ class DinghyRacingModel {
      * Provide a blank lap template
      */
     static lapTemplate() {
-        return {'number': null, 'time': 0};
+        return {number: null, time: 0};
     }
 
     /**
@@ -84,6 +84,13 @@ class DinghyRacingModel {
      */
     static crewTemplate() {
         return {helm: null, mate: null};
+    }
+
+    /**
+     * Provide a blank fleet template
+     */
+    static fleetTemplate() {
+        return {name: null};
     }
 
     /**
