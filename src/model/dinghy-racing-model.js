@@ -473,7 +473,6 @@ class DinghyRacingModel {
         }
     }
 
-
     /**
      * Create a new fleet
      * @param {Fleet} fleet
