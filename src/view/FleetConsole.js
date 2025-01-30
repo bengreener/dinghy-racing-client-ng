@@ -28,16 +28,18 @@ function FleetConsole() {
     return(
         <div>
             <h1>Fleets</h1>
-            <div className='w3-row'>
-                <label htmlFor='name-input' className='w3-col m2' >Name</label>
-                <input id='name-input' type='text' name='name' className='w3-half' />
-            </div>
-            <div className='w3-row'>
-                <div className='w3-col m8' >
-                    <button className='w3-right' type='button' >Create</button>
-                    <button className='w3-right' type='button' >Cancel</button>
+            <form className='w3-container' action='' method='post'>
+                <div className='w3-row'>
+                    <label htmlFor='name-input' className='w3-col m2' >Name</label>
+                    <input id='name-input' type='text' name='name' className='w3-half' />
                 </div>
-            </div>
+                <div className='w3-row'>
+                    <div className='w3-col m8' >
+                        <button className='w3-right' type='button' >Create</button>
+                        <button className='w3-right' type='button' >Cancel</button>
+                    </div>
+                </div>
+            </form>
         </div>
     );
 }
