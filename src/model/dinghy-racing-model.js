@@ -473,6 +473,22 @@ class DinghyRacingModel {
         }
     }
 
+
+    /**
+     * Create a new fleet
+     * @param {Fleet} fleet
+     * @returns {Promise<Result>}
+     */
+    async createFleet(fleet) {
+        const result = await this.create('fleet', fleet);
+        if (result.success) {
+            return Promise.resolve({success: true, domainObject: this._convertFleetHALToFleet(result.domainObject)});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
     /**
      * Create a new entry to a race
      * Supplied helm, dinghy, and crew must exist
@@ -1548,6 +1564,12 @@ class DinghyRacingModel {
             startSequenceState: StartSignal.from(raceHAL.startSequenceState),
             dinghyClasses: raceHAL.dinghyClasses,
             url: raceHAL._links.self.href
+        }
+    }
+
+    _convertFleetHALToFleet(fleetHAL) {
+        return {...DinghyRacingModel.fleetTemplate(), name: fleetHAL.name,
+            url: fleetHAL._links.self.href
         }
     }
 }

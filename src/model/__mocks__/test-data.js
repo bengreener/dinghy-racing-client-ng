@@ -1,5 +1,3 @@
-const nextEntityIndex = 23;
-
 const httpRootURL = 'http://localhost:8081/dinghyracing/api';
 const wsRootURL = 'ws://localhost:8081/dinghyracing';
 
@@ -61,10 +59,7 @@ const dinghyClassSchemaALPS = {
 	]}
 };
 
-const dinghiesScorpionCollectionHAL = {_embedded: {dinghies: [
-	{sailNumber: '1234', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' } } },
-	{sailNumber: '6745', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/3' }, dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/3' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass' } } }
-] }, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1&page=0&size=20' } }, page: {size: 20, totalElements: 2, totalPages: 1, number: 0 } };
+const fleetScorpionHAL = { 'name' : 'Scorpion', '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/1' }, 'fleet' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/1' }, 'dinghyClasses' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/1/dinghyClasses' } } };
 
 const dinghy1234HAL = {sailNumber: '1234', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' } } };
 const dinghy2726HAL = {sailNumber: '2726', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/6' }, dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/6' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/6/dinghyClass' } } };
@@ -76,6 +71,12 @@ const dinghySchemaALPS = {alps: {version: '1.0', descriptor: [ {id: 'dinghy-repr
 const dinghiesCollectionHAL = {_embedded: {dinghies: [
 	dinghy1234HAL, dinghy2726HAL, dinghy6745HAL, dinghy2928HAL, dinghy826HAL
 ] }, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies' }, profile: {href: 'http://localhost:8081/dinghyracing/api/profile/dinghies' }, search: {href: 'http://localhost:8081/dinghyracing/api/dinghies/search' } }, page: {size: 20, totalElements: 5, totalPages: 1, number: 0 } };
+
+const dinghiesScorpionCollectionHAL = {_embedded: {dinghies: [
+	dinghy1234HAL, dinghy6745HAL
+] }, _links: {
+	self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1&page=0&size=20' } 
+}, page: {size: 20, totalElements: 2, totalPages: 1, number: 0 } };
 
 const raceScorpion_AHAL = { name : 'Scorpion A', plannedStartTime : '2021-10-14T10:30:00', duration: 'PT45M', type: 'FLEET', plannedLaps: 5, startSequenceState: null, startType: 'CSCCLUBSTART', dinghyClasses: [], lapForecast: 5.0, leadEntry: {scoringAbbreviation: null, lastLapTime: 'PT0S', sumOfLapTimes: 'PT0S', averageLapTime: 'PT0S', finishedRace: false, onLastLap: false, lapsSailed: 0 }, _links : { self : { href : 'http://localhost:8081/dinghyracing/api/races/4' }, race: { href : 'http://localhost:8081/dinghyracing/api/races/4' }, signedUp : { href : 'http://localhost:8081/dinghyracing/api/races/4/signedUp' }, dinghyClass : { href :  'http://localhost:8081/dinghyracing/api/races/4/dinghyClass' } } };
 const raceScorpion_ADinghyClassHAL = dinghyClassScorpionHAL;
@@ -275,6 +276,8 @@ const dinghyClassComet = {name:'Comet', crewSize:1, portsmouthNumber: 1210, url:
 const dinghyClasses = [dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet];
 const dinghyClassesByNameAsc = [dinghyClassComet, dinghyClassGraduate, dinghyClassScorpion];
 
+const fleetScorpion = {name: 'Scorpion', url: 'http://localhost:8081/dinghyracing/api/fleets/1'};
+
 const dinghiesScorpion = [{sailNumber:'1234',dinghyClass:dinghyClassScorpion,url:'http://localhost:8081/dinghyracing/api/dinghies/2'},{sailNumber:'6745',dinghyClass: dinghyClassScorpion,url:'http://localhost:8081/dinghyracing/api/dinghies/3'}];
 const dinghy1234 = {sailNumber:'1234',dinghyClass: dinghyClassScorpion,url:'http://localhost:8081/dinghyracing/api/dinghies/2'};
 const dinghy2726 = {sailNumber:'2726',dinghyClass: dinghyClassGraduate,url:'http://localhost:8081/dinghyracing/api/dinghies/6'};
@@ -366,6 +369,8 @@ export {
 	dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghyClassCometHAL, dinghyClassNotSetHAL, 
 	dinghyClassSchemaJSON, dinghyClassSchemaALPS,
 	
+	fleetScorpionHAL,
+
 	dinghiesCollectionHAL, dinghiesScorpionCollectionHAL, dinghy1234HAL, dinghy2726HAL, dinghy6745HAL, dinghy826HAL,
 	dinghySchemaJSON, dinghySchemaALPS, 
 		
@@ -383,6 +388,8 @@ export {
 	competitorOwainDavies, competitorLiuBao, 
 
 	dinghyClasses, dinghyClassesByNameAsc, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet,
+
+	fleetScorpion,
 
 	dinghies, dinghiesScorpion, dinghy1234, dinghy2726, dinghy6745, dinghy2928, dinghy826, dinghy1234Graduate, dinghy1234Comet,
 
