@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import ModelContext from './ModelContext';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import ControllerContext from './ControllerContext';
@@ -27,6 +27,24 @@ function FleetConsole() {
     const model = useContext(ModelContext);
     const controller = useContext(ControllerContext);
     const [fleet, setFleet] = useState(DinghyRacingModel.fleetTemplate());
+    const [message, setMessage] = useState('');
+    const fleetNameInputRef = useRef(null);
+
+    const clear = useCallback(() => {
+        setFleet(DinghyRacingModel.fleetTemplate());
+        fleetNameInputRef.current.focus();
+        setMessage('');
+    }, []);
+
+    async function createFleet(fleet) {
+        const result = await controller.createFleet(fleet);
+        if (result.success) {
+            clear();
+        }
+        else {
+            setMessage(result.message);
+        }
+    }
 
     function handleChange({ target }) {
         setFleet({...fleet, name: target.value});
@@ -34,7 +52,11 @@ function FleetConsole() {
 
     function handleCreateButtonClick(event) {
         event.preventDefault();
-        controller.createFleet(fleet);
+        createFleet(fleet);
+    }
+
+    function userMessageClasses() {
+        return !message ? 'hidden' : 'console-error-message';
     }
 
     return(
@@ -43,7 +65,7 @@ function FleetConsole() {
             <form className='w3-container' action='' method='post'>
                 <div className='w3-row'>
                     <label htmlFor='name-input' className='w3-col m2' >Fleet Name</label>
-                    <input id='name-input' name='name' className='w3-half' type='text' value={fleet.name} onChange={handleChange} autoFocus />
+                    <input id='name-input' ref={fleetNameInputRef} name='name' className='w3-half' type='text' value={fleet.name} onChange={handleChange} autoFocus />
                 </div>
                 <div className='w3-row'>
                     <div className='w3-col m8' >
@@ -52,6 +74,7 @@ function FleetConsole() {
                     </div>
                 </div>
             </form>
+            <p className={userMessageClasses()}>{message}</p>
         </div>
     );
 }

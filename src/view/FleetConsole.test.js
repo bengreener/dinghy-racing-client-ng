@@ -18,7 +18,7 @@ import { act, screen } from '@testing-library/react';
 import { customRender } from '../test-utilities/custom-renders';
 import userEvent from '@testing-library/user-event';
 import FleetConsole from './FleetConsole';
-import { httpRootURL } from '../model/__mocks__/test-data';
+import { fleetScorpion, httpRootURL } from '../model/__mocks__/test-data';
 import { wsRootURL } from '../model/__mocks__/test-data';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
@@ -79,5 +79,42 @@ describe('when update button clicked', () => {
         });
     
         expect(createFleetSpy).toBeCalledWith({...DinghyRacingModel.fleetTemplate(), name: 'Scorpion'});
+    });
+    it('clears the input on success', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true, domainObject: fleetScorpion})});
+        
+        await act( async () => {
+            customRender(<FleetConsole />, model, controller);
+        });
+        const btnCreate = screen.getByRole('button', {'name': 'Create'});
+        const txtFleetName = await screen.findByLabelText(/fleet name/i);
+        await act(async () => {
+            await user.type(txtFleetName, 'Scorpion');
+            await user.click(btnCreate);
+        });
+    
+        expect(txtFleetName.value).toBe('');
+    });
+    it('displays the failure message on failure', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': false, message: 'That was a bust!'})});
+        
+        await act( async () => {
+            customRender(<FleetConsole />, model, controller);
+        });
+        const btnCreate = screen.getByRole('button', {'name': 'Create'});
+        const txtFleetName = await screen.findByLabelText(/fleet name/i);
+        await act(async () => {
+            await user.type(txtFleetName, 'Scorpion');
+            await user.click(btnCreate);
+        });
+        const message = await screen.findByText('That was a bust!');
+    
+        expect(message).toBeInTheDocument();
     });
 });

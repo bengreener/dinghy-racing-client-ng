@@ -154,7 +154,7 @@ describe('when creating a new dinghy class', () => {
         expect(txtClassName.value).toBe('');
         expect(crewSizeInput.value).toBe('1');
         expect(portsmouthNumberInput.value).toBe('1000');
-    })
+    });
     it('displays the failure message on failure', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
