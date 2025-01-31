@@ -479,7 +479,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async createFleet(fleet) {
-        const result = await this.create('fleet', fleet);
+        const result = await this.create('fleets', fleet);
         if (result.success) {
             return Promise.resolve({success: true, domainObject: this._convertFleetHALToFleet(result.domainObject)});
         }
