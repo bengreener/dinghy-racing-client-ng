@@ -27,6 +27,7 @@ function FleetConsole() {
     const model = useContext(ModelContext);
     const controller = useContext(ControllerContext);
     const [fleet, setFleet] = useState(DinghyRacingModel.fleetTemplate());
+    const [dinghyClassMap, setDinghyClassMap] = useState(new Map());
     const [message, setMessage] = useState('');
     const fleetNameInputRef = useRef(null);
 
@@ -35,6 +36,27 @@ function FleetConsole() {
         fleetNameInputRef.current.focus();
         setMessage('');
     }, []);
+
+    useEffect(() => {
+        let ignoreFetch = false;
+        model.getDinghyClasses().then(result => {
+            if (!ignoreFetch && !result.success) {
+                setMessage('Unable to load dinghy classes\n' + result.message);
+            }
+            else if (!ignoreFetch) {
+                const map = new Map();
+                result.domainObject.forEach(dinghyClass => {
+                    map.set(dinghyClass.url, dinghyClass);
+                });
+                setDinghyClassMap(map);
+            }
+        });
+        // cleanup before effect runs and before form close
+        return () => {
+            ignoreFetch = true;
+            setMessage(''); // clear any previous message
+        }
+    }, [model]);
 
     async function createFleet(fleet) {
         const result = await controller.createFleet(fleet);
@@ -75,6 +97,9 @@ function FleetConsole() {
                 </div>
             </form>
             <p className={userMessageClasses()}>{message}</p>
+            <select multiple={true}>
+                {Array.from(dinghyClassMap.values()).map((dinghyClass) => { return (<option key={dinghyClass.url} value={dinghyClass.url}>{dinghyClass.name}</option>)})}
+            </select>
         </div>
     );
 }

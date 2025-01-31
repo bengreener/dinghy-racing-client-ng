@@ -139,6 +139,7 @@ describe('when fleets button clicked', () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const dinghyRacingController = new DinghyRacingController(model);
+    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
 
     render(<App model={model} controller={dinghyRacingController} />);
     const btnMenu = await screen.findByRole('button', {name: /☰/i})
