@@ -3298,7 +3298,7 @@ it('provides a blank template for a crew', () => {
 it('provides a blank template for a fleet', () => {
     const fleet = DinghyRacingModel.fleetTemplate();
 
-    expect(fleet).toEqual({name: null});
+    expect(fleet).toEqual({name: ''});
 });
 
 describe('when searching for entries by race', () => {

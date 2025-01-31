@@ -14,14 +14,70 @@
  * limitations under the License. 
  */
 
-import { screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import { customRender } from '../test-utilities/custom-renders';
-import FleetConsole from './FleetConsole'; 
+import userEvent from '@testing-library/user-event';
+import FleetConsole from './FleetConsole';
+import { httpRootURL } from '../model/__mocks__/test-data';
+import { wsRootURL } from '../model/__mocks__/test-data';
+import DinghyRacingModel from '../model/dinghy-racing-model';
+import DinghyRacingController from '../controller/dinghy-racing-controller';
 
 it('renders', () => {
     customRender(<FleetConsole />);
     expect(screen.getByRole('heading', {name: 'Fleets'})).toBeInTheDocument();
-    expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/fleet name/i)).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /create/i})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /cancel/i})).toBeInTheDocument();
+});
+
+it('accepts the name of a fleet', async () => {
+    const user = userEvent.setup();
+    
+    await act( async () => {
+        customRender(<FleetConsole />);
+    });
+    const txtFleetName = await screen.findByLabelText(/fleet name/i);
+    await act(async () => {
+        await user.type(txtFleetName, 'Scorpion');
+    })
+    
+    expect(txtFleetName).toHaveValue('Scorpion');
+});
+
+describe('when update button clicked', () => {
+    it('creates fleet', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const createFleetSpy = jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true})});
+        
+        await act( async () => {
+            customRender(<FleetConsole />, model, controller);
+        });
+        const btnCreate = screen.getByRole('button', {'name': 'Create'});
+        await act(async () => {
+            await user.click(btnCreate);
+        });
+    
+        expect(createFleetSpy).toBeCalledTimes(1);
+    });
+    it('calls the controller createDinghyClass with new dinghy class as parameter', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        const createFleetSpy = jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true})});
+        
+        await act( async () => {
+            customRender(<FleetConsole />, model, controller);
+        });
+        const btnCreate = screen.getByRole('button', {'name': 'Create'});
+        const txtFleetName = await screen.findByLabelText(/fleet name/i);
+        await act(async () => {
+            await user.type(txtFleetName, 'Scorpion');
+            await user.click(btnCreate);
+        });
+    
+        expect(createFleetSpy).toBeCalledWith({...DinghyRacingModel.fleetTemplate(), name: 'Scorpion'});
+    });
 });

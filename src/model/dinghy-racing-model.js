@@ -90,7 +90,7 @@ class DinghyRacingModel {
      * Provide a blank fleet template
      */
     static fleetTemplate() {
-        return {name: null};
+        return {name: ''};
     }
 
     /**
