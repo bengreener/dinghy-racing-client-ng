@@ -231,9 +231,18 @@ class DinghyRacingController {
      * @param {Fleet} fleet to add
      * @returns {Promise<Result>}
      */
-    createFleet(fleet) {
+    async createFleet(fleet) {
         if (!fleet || !fleet.name) {
             return Promise.resolve({'success': false, 'message': 'A name is required for a new fleet.'});
+        }
+        if (fleet?.dinghyClasses.length > 0) {
+            const result = await this.model.createFleet(fleet);
+            if (result.success) {
+                return this.model.updateFleet(fleet);
+            }
+            else {
+                return Promise.resolve(result);
+            }
         }
         return this.model.createFleet(fleet);
     }

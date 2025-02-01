@@ -235,6 +235,14 @@ class DinghyRacingModel {
         return null;
     }
 
+    async getFleet(url) {
+        return null;
+    }
+
+    async updateFleet(fleet) {
+        return null;
+    }
+
     async createEntry(race, helm, dinghy) {
         return null;
     }
@@ -296,6 +304,10 @@ class DinghyRacingModel {
     }
 
     async getDinghyClasses() {
+        return null;
+    }
+
+    async getDinghyClassesByUrl() {
         return null;
     }
 

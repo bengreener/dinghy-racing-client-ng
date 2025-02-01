@@ -16,7 +16,7 @@
 
 import DinghyRacingController from './dinghy-racing-controller.js';
 import DinghyRacingModel from '../model/dinghy-racing-model.js';
-import { httpRootURL, wsRootURL, competitorChrisMarshall, dinghyClassScorpion, dinghy1234, raceScorpionA, entryChrisMarshallScorpionA1234, entriesScorpionA, competitorLouScrew } from '../model/__mocks__/test-data.js';
+import { httpRootURL, wsRootURL, competitorChrisMarshall, dinghyClassScorpion, dinghy1234, raceScorpionA, entryChrisMarshallScorpionA1234, entriesScorpionA, competitorLouScrew, fleetHandicap, fleetScorpion } from '../model/__mocks__/test-data.js';
 import StartSignal from '../model/domain-classes/start-signal.js';
 // import { downloadRaceEntriesCSV } from '../utilities/csv-writer.js';
 import * as csvWriter from '../utilities/csv-writer.js';
@@ -34,7 +34,7 @@ describe('when creating a new Dinghy Class', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});
     });
-   it('returns a promise that resolves to a result indicating failure when operation is unsuccessful and provides a message explaining the cause of failure', async () => {
+    it('returns a promise that resolves to a result indicating failure when operation is unsuccessful and provides a message explaining the cause of failure', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         const createDinghyClassSpy = jest.spyOn(dinghyRacingModel, 'createDinghyClass').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
@@ -682,17 +682,59 @@ describe('when updating a competitor', () => {
 });
 
 describe('when creating a new fleet', () => {
-    describe('when operation is successful', () => {
-        it('returns a promise that resolves to a result indicating success', async () => {
-            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            jest.spyOn(dinghyRacingModel, 'createFleet').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
-            const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
-            const promise = dinghyRacingController.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
-            const result = await promise;
-            expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': true});
+    describe('when new fleet has not been assigned dinghy classes', () => {
+        describe('when operation is successful', () => {
+            it('returns a promise that resolves to a result indicating success', async () => {
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+                jest.spyOn(dinghyRacingModel, 'createFleet').mockImplementationOnce(() => {return Promise.resolve({success: true, domainObject: fleetHandicap})});
+                const promise = dinghyRacingController.createFleet(fleetHandicap);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({'success': true, domainObject: fleetHandicap});
+            });
+        });
+        describe('when operation is unsuccessful', () => {
+            it('returns a promise that resolves to a result indicating failure and provides a message explaining the cause of failure', async () => {
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+                jest.spyOn(dinghyRacingModel, 'createFleet').mockImplementationOnce(() => {return Promise.resolve({success: false, message: 'Something went wrong'})});
+                const promise = dinghyRacingController.createFleet(fleetHandicap);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({success: false, message: 'Something went wrong'});
+            });
         });
     });
+    describe('when new fleet has been assigned dinghy classes', () => {
+        describe('when operation is successful', () => {
+            it('returns a promise that resolves to a result indicating success', async () => {
+                const fleetScorpionNoDinghyClasses = {...fleetScorpion, dinghyClasses: []};
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                jest.spyOn(dinghyRacingModel, 'createFleet').mockImplementationOnce(() => {return Promise.resolve({success: true, domainObject: fleetScorpionNoDinghyClasses})});
+                jest.spyOn(dinghyRacingModel, 'updateFleet').mockImplementationOnce(() => {return Promise.resolve({success: true, domainObject: fleetScorpion})});
+                const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+                const promise = dinghyRacingController.createFleet(fleetScorpion);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({success: true, domainObject: fleetScorpion});
+            });
+        });
+        describe('when operation is unsuccessful', () => {
+            it('returns a promise that resolves to a result indicating failure and provides a message explaining the cause of failure', async () => {
+                const fleetScorpionNoDinghyClasses = {...fleetScorpion, dinghyClasses: []};
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+                jest.spyOn(dinghyRacingModel, 'createFleet').mockImplementationOnce(() => {return Promise.resolve({success: true, domainObject: fleetScorpionNoDinghyClasses})});
+                jest.spyOn(dinghyRacingModel, 'updateFleet').mockImplementationOnce(() => {return Promise.resolve({success: false, message: 'Something went wrong'})});
+                const promise = dinghyRacingController.createFleet(fleetScorpion);
+                const result = await promise;
+                expect(promise).toBeInstanceOf(Promise);
+                expect(result).toEqual({success: false, message: 'Something went wrong'});
+            });
+        });
+    });
+    
     describe('when fleet name is not provided', () => {
         it('returns a promise that resolves to a result inficating failure and provides a message explaining the cause of failure', async () => {
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
