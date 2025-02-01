@@ -3287,6 +3287,13 @@ describe('when updating a fleet', () => {
     });
     it('returns a promise that resolves to a result indicating success when fleet dinghy classes are updated with http status 204', async () => {
         fetch.mockImplementation((resource, options) => {
+            if (resource === fleetScorpion.url) {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(fleetScorpionHAL)
+                })
+            }
             if (resource === fleetScorpionHAL._links.dinghyClasses.href && options.method === 'GET') {
                 return Promise.resolve({
                     ok: true,
@@ -3306,7 +3313,7 @@ describe('when updating a fleet', () => {
         const promise = dinghyRacingModel.updateFleet(fleetScorpion);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({success: true, domainObject: {}});
+        expect(result).toEqual({success: true, domainObject: fleetScorpion});
     });
     it('returns a promise that resolves to a result indicating failure when fleet dinghy classes are not updated with http status 400 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {

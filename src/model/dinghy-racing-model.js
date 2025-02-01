@@ -490,6 +490,27 @@ class DinghyRacingModel {
     }
 
     /**
+     * Get a fleet
+     * @param {String} url Address of the remote resource
+     * @returns {Promise<Result>}
+     */
+    async getFleet(url) {
+        const result = await this.read(url);
+        if (result.success) {
+            let dinghyClassesResult = await this.getDinghyClassesByUrl(result.domainObject._links.dinghyClasses.href);
+            if (dinghyClassesResult.success) {
+                return Promise.resolve({success: true, domainObject: this._convertFleetHALToFleet(result.domainObject, dinghyClassesResult.domainObject)});
+            }
+            else {
+                return Promise.resolve(dinghyClassesResult);
+            }
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
      * Update a fleet with dinghy classes
      * @param {fleet} fleet including dinghy classes to be updated
      * @returns {Promise<Result>}
@@ -507,6 +528,9 @@ class DinghyRacingModel {
             else {
                 return Promise.resolve(dinghyClassesResult);
             }
+        }
+        else if (result.success) {
+            return this.getFleet(fleet.url);
         }
         else {
             return Promise.resolve(result);
@@ -1484,10 +1508,10 @@ class DinghyRacingModel {
         const body = JSON.stringify(object); // convert to string so can be serialized into object by receiving service
         return this._processFetch(resource, {method: 'PATCH', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, body: body});
     }
-	
+
 	/**
 	 * Update a to many relationship
-	 * Will over write previous associations.
+	 * Will overwrite previous associations.
 	 * @param {string} resource Address of remote resource
 	 * @param {string} uriList A string formatted as a uri list; one uri per line with \r\n line endings
 	 * @returns {Promise<Result>}
