@@ -18,11 +18,12 @@ import DinghyRacingModel, { SortOrder }  from './dinghy-racing-model';
 import { httpRootURL, wsRootURL, competitorsCollectionHAL, 
     dinghiesCollectionHAL, dinghiesScorpionCollectionHAL, 
     dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghyClassCometHAL, dinghy1234HAL, dinghy2726HAL, dinghy6745HAL,
-    fleetScorpionHAL,
+    fleetScorpionHAL, fleetHandicapHAL,
+    fleetScorpionDinghyClassesHAL,
     raceScorpion_AHAL, raceGraduate_AHAL, raceComet_AHAL, raceHandicap_AHAL,
     dinghyScorpion1234CrewsHAL,
     dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, 
-    fleetScorpion,
+    fleetScorpion, fleetHandicap,
     dinghies, dinghiesScorpion, dinghy1234, dinghy2726, dinghy6745, dinghy826,
     races, racesCollectionHAL, raceScorpionA, raceGraduateA, raceCometA,
     competitorChrisMarshallHAL, competitorSarahPascalHAL, competitorJillMyerHAL, competitorLiuBaoHAL, competitorLouScrewHAL,
@@ -3120,28 +3121,28 @@ describe('when creating a new fleet', () => {
             return Promise.resolve({
                 ok: true,
                 status: 200, 
-                json: () => Promise.resolve(fleetScorpionHAL)
+                json: () => Promise.resolve(fleetHandicapHAL)
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, domainObject: fleetScorpion});
+        expect(result).toEqual({'success': true, domainObject: fleetHandicap});
     });
     it('returns a promise that resolves to a result indicating success when fleet is created with http status 201', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,
                 status: 201, 
-                json: () => Promise.resolve(fleetScorpionHAL)
+                json: () => Promise.resolve(fleetHandicapHAL)
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, domainObject: fleetScorpion});
+        expect(result).toEqual({'success': true, domainObject: fleetHandicap});
     });
     it('returns a promise that resolves to a result indicating failure when fleet is not created with http status 400 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
@@ -3158,7 +3159,7 @@ describe('when creating a new fleet', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Bad Request Message: Some error resulting in HTTP 400'}); 
     });
-    it('returns a promise that resolves to a result indicating failure when competitor is not created with http status 404 and provides a message explaining the cause of failure', async () => {
+    it('returns a promise that resolves to a result indicating failure when fleet is not created with http status 404 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
@@ -3173,7 +3174,7 @@ describe('when creating a new fleet', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'}); 
     });
-    it('returns a promise that resolves to a result indicating failure when competitor is not created with http status 408 and provides a message explaining the cause of failure', async () => {
+    it('returns a promise that resolves to a result indicating failure when fleet is not created with http status 408 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
@@ -3188,7 +3189,7 @@ describe('when creating a new fleet', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 408 Request Timeout Message: Some error resulting in HTTP 408'}); 
     });
-    it('returns a promise that resolves to a result indicating failure when competitor is not created with http status 409 and provides a message explaining the cause of failure', async () => {
+    it('returns a promise that resolves to a result indicating failure when fleet is not created with http status 409 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
@@ -3211,7 +3212,7 @@ describe('when creating a new fleet', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({success: false, message: "HTTP Error: 409 Conflict Message: The fleet 'some name' already exissts; this may be caused by an uppercase/ lowercase differencce between existing record and the value entered."});
     });
-    it('returns a promise that resolves to a result indicating failure when competitor is not created with http status 500 and provides a message explaining the cause of failure', async () => {
+    it('returns a promise that resolves to a result indicating failure when fleet is not created with http status 500 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
@@ -3226,7 +3227,7 @@ describe('when creating a new fleet', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 500 Internal Server Error Message: Some error resulting in HTTP 500'}); 
     });
-    it('returns a promise that resolves to a result indicating failure when competitor is not created with http status 503 and provides a message explaining the cause of failure', async () => {
+    it('returns a promise that resolves to a result indicating failure when fleet is not created with http status 503 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
@@ -3241,7 +3242,7 @@ describe('when creating a new fleet', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 503 Service Unavailable Message: Some error resulting in HTTP 503'}); 
     });
-    it('returns a promise that resolves to a result indicating failure when competitor is not created due to an error that causes fetch to reject; such as a network failure', async () => {
+    it('returns a promise that resolves to a result indicating failure when fleet is not created due to an error that causes fetch to reject; such as a network failure', async () => {
         fetch.mockImplementationOnce(() => {
             throw new TypeError('Failed to fetch');
         });
@@ -3250,6 +3251,77 @@ describe('when creating a new fleet', () => {
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'TypeError: Failed to fetch'});
+    });    
+});
+
+describe('when updating a fleet', () => {
+    it('returns a promise that resolves to a result indicating success when fleet dinghy classes are updated with http status 200', async () => {
+        fetch.mockImplementation((resource, options) => {
+            if (resource === httpRootURL + '/fleets') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 202, 
+                    json: () => Promise.resolve(fleetScorpionHAL)
+                });
+            }
+            if (resource === fleetScorpionHAL._links.dinghyClasses.href && options.method === 'GET') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(fleetScorpionDinghyClassesHAL)
+                });                    
+            }
+            if (resource === fleetScorpionHAL._links.dinghyClasses.href && options.method === 'PUT') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(fleetScorpionHAL)
+                });                    
+            }
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.updateFleet(fleetScorpion);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({success: true, domainObject: fleetScorpion});
+    });
+    it('returns a promise that resolves to a result indicating success when fleet dinghy classes are updated with http status 204', async () => {
+        fetch.mockImplementation((resource, options) => {
+            if (resource === fleetScorpionHAL._links.dinghyClasses.href && options.method === 'GET') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(fleetScorpionDinghyClassesHAL)
+                });                    
+            }
+            if (resource === fleetScorpionHAL._links.dinghyClasses.href && options.method === 'PUT') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 204, 
+                    json: () => {throw new SyntaxError('Unexpected end of JSON input')}
+                });                    
+            }
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.updateFleet(fleetScorpion);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({success: true, domainObject: {}});
+    });
+    it('returns a promise that resolves to a result indicating failure when fleet dinghy classes are not updated with http status 400 and provides a message explaining the cause of failure', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 400,
+                statusText: 'Bad Request',
+                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 400'}, 'message': 'Some error resulting in HTTP 400'})
+            });
+        });
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = dinghyRacingModel.updateFleet(fleetScorpion);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Bad Request Message: Some error resulting in HTTP 400'}); 
     });
 });
 
@@ -3298,7 +3370,7 @@ it('provides a blank template for a crew', () => {
 it('provides a blank template for a fleet', () => {
     const fleet = DinghyRacingModel.fleetTemplate();
 
-    expect(fleet).toEqual({name: ''});
+    expect(fleet).toEqual({name: '', dinghyClasses: [], url: ''});
 });
 
 describe('when searching for entries by race', () => {

@@ -17,4 +17,6 @@
  /**
   * @typedef Fleet
   * @property {string} name of the fleet
+  * @property {Array<DinghyClass>} dinghyClasses
+  * @property {String} url The URL to the remote resource
   */

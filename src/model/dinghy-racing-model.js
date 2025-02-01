@@ -90,7 +90,7 @@ class DinghyRacingModel {
      * Provide a blank fleet template
      */
     static fleetTemplate() {
-        return {name: ''};
+        return {name: '', dinghyClasses: [], url: ''};
     }
 
     /**
@@ -475,6 +475,7 @@ class DinghyRacingModel {
 
     /**
      * Create a new fleet
+     * This method does not associate the fleet with dinghy classes. An additional call to updateFleetDinghyClasses is required to creat association.
      * @param {Fleet} fleet
      * @returns {Promise<Result>}
      */
@@ -482,6 +483,30 @@ class DinghyRacingModel {
         const result = await this.create('fleets', fleet);
         if (result.success) {
             return Promise.resolve({success: true, domainObject: this._convertFleetHALToFleet(result.domainObject)});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
+     * Update a fleet with dinghy classes
+     * @param {fleet} fleet including dinghy classes to be updated
+     * @returns {Promise<Result>}
+     */
+    async updateFleet(fleet) {
+        // get URI list from dinghy classes
+        const uriList = this._convertUriArrayToUriList(fleet.dinghyClasses.map(dinghyClass => dinghyClass.url));
+        const result = await this.updateToManyAssociation(fleet.url + '/dinghyClasses', uriList);
+        // REST server may or may not retrun a body depending on value set for RepositoryRestConfiguration.setReturnBodyOnUpdate(…)
+        if (result.success && result.domainObject?._links?.dinghyClasses?.href) {
+            const dinghyClassesResult = await this.getDinghyClassesByUrl(result.domainObject._links.dinghyClasses.href);
+            if (dinghyClassesResult.success) {
+                return Promise.resolve({success: true, domainObject: this._convertFleetHALToFleet(result.domainObject, dinghyClassesResult.domainObject)});
+            }
+            else {
+                return Promise.resolve(dinghyClassesResult);
+            }
         }
         else {
             return Promise.resolve(result);
@@ -1057,6 +1082,22 @@ class DinghyRacingModel {
     }
 
     /**
+     * Get dinghy classes associated with an entity defined by HAL via the URL provided
+     * @param {String} url
+     * @return {Promise<Result>>} If successful Result.domainObject will be an Array<DinghyClass>
+     */
+    async getDinghyClassesByUrl(url) {
+        const result = await this.read(url);
+        if (result.success) {
+            const dinghyClassCollection = result.domainObject._embedded.dinghyClasses.map(dinghyClassHAL => {return this._convertDinghyClassHALToDinghyClass(dinghyClassHAL)});
+            return Promise.resolve({'success': true, 'domainObject': dinghyClassCollection});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
      * Get entry
      * @param {String} url Address of the remote resource
      * @returns {Promise<Result>}
@@ -1441,8 +1482,19 @@ class DinghyRacingModel {
      */
     async update(resource, object) {
         const body = JSON.stringify(object); // convert to string so can be serialized into object by receiving service
-        return this._processFetch(resource, {method: 'PATCH', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, 'body': body});
+        return this._processFetch(resource, {method: 'PATCH', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, body: body});
     }
+	
+	/**
+	 * Update a to many relationship
+	 * Will over write previous associations.
+	 * @param {string} resource Address of remote resource
+	 * @param {string} uriList A string formatted as a uri list; one uri per line with \r\n line endings
+	 * @returns {Promise<Result>}
+	 */
+	updateToManyAssociation(resource, uriList) {
+		return this._processFetch(resource, {method: 'PUT', headers: {'Content-Type': 'text/uri-list', 'Accept': 'application/hal+json'}, body: uriList});
+	}
 
     /**
      * Delete the reosource
@@ -1470,15 +1522,15 @@ class DinghyRacingModel {
                 }
             }
             if (response.ok) {
-                return Promise.resolve({'success': true, domainObject: json});
+                return Promise.resolve({success: true, domainObject: json});
             }
             else {
                 const message = this._buildClientErrorMessage(response, json);
-                return Promise.resolve({'success': false, 'message': message});
+                return Promise.resolve({success: false, message: message});
             }
         }
         catch (error) {
-            return Promise.resolve({'success': false, 'message': error.toString()});
+            return Promise.resolve({success: false, message: error.toString()});
         }
     }
 
@@ -1505,6 +1557,10 @@ class DinghyRacingModel {
         // additional error details provided by server
         return 'HTTP Error: ' + response.status + ' ' + response.statusText;
     }
+
+    _convertUriArrayToUriList(uriArray) {
+		return uriArray.join('\r\n');
+	}
 
     /**
      * Convert a duration into milliseconds
@@ -1566,8 +1622,8 @@ class DinghyRacingModel {
         }
     }
 
-    _convertFleetHALToFleet(fleetHAL) {
-        return {...DinghyRacingModel.fleetTemplate(), name: fleetHAL.name,
+    _convertFleetHALToFleet(fleetHAL, dinghyClasses = []) {
+        return {...DinghyRacingModel.fleetTemplate(), name: fleetHAL.name, dinghyClasses: dinghyClasses,
             url: fleetHAL._links.self.href
         }
     }
