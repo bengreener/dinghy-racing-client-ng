@@ -32,7 +32,8 @@ import { httpRootURL, wsRootURL, competitorsCollectionHAL,
     entriesScorpionA, entriesCometA, entriesHandicapA,
     raceHandicapA, entryChrisMarshallScorpionA1234, competitorJillMyer, 
     entrySarahPascalScorpionA6745, entryJillMyerCometA826, entryChrisMarshallHandicapA1234,
-    dinghyScorpion1234Crews
+    dinghyScorpion1234Crews,
+    dinghyClassComet
 } from './__mocks__/test-data';
 import {
     findByRaceGraduate_AHAL_bigData, signedUpGraduateAHAL_bigData,
@@ -3251,7 +3252,58 @@ describe('when creating a new fleet', () => {
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'TypeError: Failed to fetch'});
-    });    
+    });
+    describe('when creating a new fleet with associated dinghy classes', () => {
+        it('returns a promise that resolves to a result indicating success when fleet is created with http status 200', async () => {
+            
+            fetch.mockImplementationOnce((resource, options) => {
+                if (resource === httpRootURL + '/fleets' && options.body === '{"name":"Handicap","dinghyClasses":["http://localhost:8081/dinghyracing/api/dinghyclasses/1","http://localhost:8081/dinghyracing/api/dinghyclasses/16"],"url":""}') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(fleetHandicapHAL)
+                    });
+                }
+                else {
+                    return Promise.resolve({
+                        ok: false,
+                        status: 400,
+                        statusText: 'Bad Request',
+                        json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 400'}, 'message': 'Some error resulting in HTTP 400'})
+                    });
+                }
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Handicap', dinghyClasses: [dinghyClassScorpion, dinghyClassComet]});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, domainObject: fleetHandicap});
+        });
+        it('returns a promise that resolves to a result indicating success when fleet is created with http status 201', async () => {
+            fetch.mockImplementationOnce((resource, options) => {
+                if (resource === httpRootURL + '/fleets' && options.body === '{"name":"Handicap","dinghyClasses":["http://localhost:8081/dinghyracing/api/dinghyclasses/1","http://localhost:8081/dinghyracing/api/dinghyclasses/16"],"url":""}') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 201, 
+                        json: () => Promise.resolve(fleetHandicapHAL)
+                    });
+                }
+                else {
+                    return Promise.resolve({
+                        ok: false,
+                        status: 400,
+                        statusText: 'Bad Request',
+                        json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 400'}, 'message': 'Some error resulting in HTTP 400'})
+                    });
+                }
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Handicap', dinghyClasses: [dinghyClassScorpion, dinghyClassComet]});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, domainObject: fleetHandicap});
+        });
+    });
 });
 
 describe('when updating a fleet', () => {

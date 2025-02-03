@@ -475,12 +475,16 @@ class DinghyRacingModel {
 
     /**
      * Create a new fleet
-     * This method does not associate the fleet with dinghy classes. An additional call to updateFleetDinghyClasses is required to creat association.
      * @param {Fleet} fleet
      * @returns {Promise<Result>}
      */
     async createFleet(fleet) {
-        const result = await this.create('fleets', fleet);
+        const tempFleet = {...fleet};
+        // convert dinghy classes collection to form appropriate for creation of dinghy class associations via server API
+        if (fleet.dinghyClasses.length > 0) {
+            tempFleet.dinghyClasses = fleet.dinghyClasses.map(dinghyClass => dinghyClass.url);
+        }
+        const result = await this.create('fleets', tempFleet);
         if (result.success) {
             return Promise.resolve({success: true, domainObject: this._convertFleetHALToFleet(result.domainObject)});
         }
