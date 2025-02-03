@@ -88,12 +88,16 @@ function FleetConsole() {
     }
 
     return(
-        <div>
+        <div className='w3-container console '>
             <h1>Fleets</h1>
             <form className='w3-container' action='' method='post'>
                 <div className='w3-row'>
                     <label htmlFor='name-input' className='w3-col m2' >Fleet Name</label>
                     <input id='name-input' ref={fleetNameInputRef} name='name' className='w3-half' type='text' value={fleet.name} onChange={handleChange} autoFocus />
+                    <label htmlFor='dinghy-class-select' className='w3-left w3-col' >Select Dinghy Class</label>
+                    <select id='dinghy-class-select' name='dinghy-classes' multiple={true} className='w3-col w3-third' onChange={handleDinghyClassSelect} value={fleet.dinghyClasses.map(dc => dc.url)} >
+                        {Array.from(dinghyClassMap.values()).map((dinghyClass) => { return (<option key={dinghyClass.url} value={dinghyClass.url}>{dinghyClass.name}</option>)})}
+                </select>
                 </div>
                 <div className='w3-row'>
                     <div className='w3-col m8' >
@@ -103,12 +107,6 @@ function FleetConsole() {
                 </div>
             </form>
             <p className={userMessageClasses()}>{message}</p>
-            <div>
-                <label htmlFor='dinghy-class-select'>Select Dinghy Class</label>
-                <select id='dinghy-class-select' multiple={true} onChange={handleDinghyClassSelect} value={fleet.dinghyClasses.map(dc => dc.url)} >
-                    {Array.from(dinghyClassMap.values()).map((dinghyClass) => { return (<option key={dinghyClass.url} value={dinghyClass.url}>{dinghyClass.name}</option>)})}
-                </select>
-            </div>
         </div>
     );
 }
