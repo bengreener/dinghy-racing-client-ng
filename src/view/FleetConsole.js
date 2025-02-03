@@ -72,6 +72,12 @@ function FleetConsole() {
         setFleet({...fleet, name: target.value});
     }
 
+    function handleDinghyClassSelect(event) {
+        const options = [...event.target.selectedOptions]; // convert from HTMLCollection to Array; trying to go direct to value results in event.target.selectedOptions.value is not iterable error
+        const selectedDinghyClasses = options.map(option => dinghyClassMap.get(option.value));
+        setFleet({...fleet, dinghyClasses: selectedDinghyClasses});
+    }
+
     function handleCreateButtonClick(event) {
         event.preventDefault();
         createFleet(fleet);
@@ -97,9 +103,12 @@ function FleetConsole() {
                 </div>
             </form>
             <p className={userMessageClasses()}>{message}</p>
-            <select multiple={true}>
-                {Array.from(dinghyClassMap.values()).map((dinghyClass) => { return (<option key={dinghyClass.url} value={dinghyClass.url}>{dinghyClass.name}</option>)})}
-            </select>
+            <div>
+                <label htmlFor='dinghy-class-select'>Select Dinghy Class</label>
+                <select id='dinghy-class-select' multiple={true} onChange={handleDinghyClassSelect} value={fleet.dinghyClasses.map(dc => dc.url)} >
+                    {Array.from(dinghyClassMap.values()).map((dinghyClass) => { return (<option key={dinghyClass.url} value={dinghyClass.url}>{dinghyClass.name}</option>)})}
+                </select>
+            </div>
         </div>
     );
 }

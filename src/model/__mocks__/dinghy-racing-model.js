@@ -79,7 +79,7 @@ class DinghyRacingModel {
      * Provide a blank fleet template
      */
     static fleetTemplate() {
-        return {name: ''};
+        return {name: '', dinghyClasses: [], url: ''};
     }
 
     constructor(httpRootURL, wsRootURL) {
