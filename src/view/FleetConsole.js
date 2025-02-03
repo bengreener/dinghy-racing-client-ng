@@ -98,7 +98,7 @@ function FleetConsole() {
                 <div className='w3-row'>
                     <div className='w3-col m8' >
                         <button className='w3-right' type='button' onClick={handleCreateButtonClick} >Create</button>
-                        <button className='w3-right' type='button' >Cancel</button>
+                        <button className='w3-right' type='button' onClick={clear} >Cancel</button>
                     </div>
                 </div>
             </form>

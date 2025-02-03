@@ -267,3 +267,28 @@ describe('when update button clicked', () => {
         expect(message).toBeInTheDocument();
     });
 });
+
+describe('when cancel button is clicked', () => {
+    it('clears entered data and selections from form', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+        jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true, domainObject: fleetScorpion})});
+        
+        await act( async () => {
+            customRender(<FleetConsole />, model, controller);
+        });
+        const btnCancel = screen.getByRole('button', {'name': /cancel/i});
+        const txtFleetName = await screen.findByLabelText(/fleet name/i);
+        const selectDinghyClass = await screen.findByLabelText(/dinghy class/i);
+        await act(async () => {
+            await user.type(txtFleetName, 'Handicap');
+            await user.selectOptions(selectDinghyClass, ['Scorpion', 'Comet']);
+            await user.click(btnCancel);
+        });
+
+        expect(txtFleetName.value).toBe('');
+        expect(selectDinghyClass.selectedOptions.length).toBe(0);
+    })
+})
