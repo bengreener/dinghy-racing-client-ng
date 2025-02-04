@@ -494,7 +494,7 @@ class DinghyRacingModel {
     }
 
     /**
-     * Get a fleet
+     * Get a fleet by URL
      * @param {String} url Address of the remote resource
      * @returns {Promise<Result>}
      */
@@ -508,6 +508,48 @@ class DinghyRacingModel {
             else {
                 return Promise.resolve(dinghyClassesResult);
             }
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
+     * Get fleets in ascending order by fleet name
+     * If page and/ or size are not provided will return all fleets
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
+     * @returns {Promise<Result>} If successful Result.domainObject will be an Array<Fleet>
+     */
+    async getFleets(page, size) {
+        let resource = this.httpRootURL + '/fleets?';
+        if (Number.isInteger(page)) {
+            resource += 'page=' + page + '&';
+        }
+        if (Number.isInteger(size)) {
+            resource += 'size=' + size + '&';
+        }
+        resource += 'sort=name,asc';
+
+        const result = await this.read(resource);
+        if (result.success) {
+            let tempFleets = result.domainObject._embedded.fleets;
+            // check for additional fleets
+            if (!Number.isInteger(page) && !Number.isInteger(size) && result.domainObject.page.totalElements > result.domainObject.page.size) {
+                return this.getFleets(0, result.domainObject.page.totalElements);
+            }
+            // Get dinghy classes for fleets
+            const dinghyClassResults = await Promise.all(tempFleets.map(fleetHAL => this.getDinghyClassesByUrl(fleetHAL._links.dinghyClasses.href)));
+            const fleetCollection = [];
+            for (let i = 0; i < tempFleets.length; i++ ) {
+                if (dinghyClassResults[i].success) {
+                    fleetCollection.push(this._convertFleetHALToFleet(tempFleets[i], dinghyClassResults[i].domainObject));
+                }
+                else {
+                    return Promise.resolve(dinghyClassResults[i]);
+                }
+            }
+            return Promise.resolve({'success': true, 'domainObject': fleetCollection});
         }
         else {
             return Promise.resolve(result);
