@@ -16,13 +16,13 @@ const competitorsCollectionHAL = {_embedded:{competitors:[
 	self:{href:'http://localhost:8081/dinghyracing/api/competitors'},profile:{href:'http://localhost:8081/dinghyracing/api/profile/competitors'}
 },page:{size:20,totalElements:6,totalPages:1,number:0}};
 
-const dinghyClassScorpionHAL = {name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyclasses/1' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyclasses/1' } } };
-const dinghyClassGraduateHAL = {name: 'Graduate', crewSize: 2, portsmouthNumber: 1110, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyclasses/5' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyclasses/5' } } };
-const dinghyClassCometHAL = {name: 'Comet', crewSize: 1, portsmouthNumber: 1210, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyclasses/16' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyclasses/16' } } };
+const dinghyClassScorpionHAL = {name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/1' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/1' } } };
+const dinghyClassGraduateHAL = {name: 'Graduate', crewSize: 2, portsmouthNumber: 1110, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/5' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/5' } } };
+const dinghyClassCometHAL = {name: 'Comet', crewSize: 1, portsmouthNumber: 1210, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/16' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/16' } } };
 const dinghyClassNotSetHAL = {name:'',crewSize:0,_links:{self:{href:''},dinghyClass:{href:''}}};
 const dinghyClassCollectionHAL = {
 	_embedded: {dinghyClasses: [ dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghyClassCometHAL ] }, _links: {
-		self: {href: 'http://localhost:8081/dinghyracing/api/dinghyclasses' }, profile: {href: 'http://localhost:8081/dinghyracing/api/profile/dinghyclasses' } }, 
+		self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses' }, profile: {href: 'http://localhost:8081/dinghyracing/api/profile/dinghyClasses' } }, 
 		 	page: {size: 20, totalElements: 3, totalPages: 1, number: 0 
 		} 
 };
@@ -37,7 +37,7 @@ const dinghyClassSchemaALPS = {
 	alps: {version: '1.0', descriptor: [
 		{
 			id: 'dinghyClass-representation', 
-			href: 'http://localhost:8081/dinghyracing/api/profile/dinghyclasses', 
+			href: 'http://localhost:8081/dinghyracing/api/profile/dinghyClasses', 
 			descriptor: [
 				{name: 'name', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'identifier' } },
 				{name:'crewSize', type:'SEMANTIC'}
@@ -82,7 +82,7 @@ const fleetHandicapDinghyClassHAL = {
     },
     '_links': {
         'self': {
-            'href': 'http://localhost:8081/dinghyracing/api/fleets/159/dinghyClasses'
+            'href': 'http://localhost:8081/dinghyracing/api/fleets/2/dinghyClasses'
         }
     }
 }
@@ -93,7 +93,7 @@ const dinghy6745HAL = {sailNumber: '6745', _links: {self: {href: 'http://localho
 const dinghy2928HAL = {sailNumber: '2928', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/7' }, dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/7' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/7/dinghyClass' } }};
 const dinghy826HAL = {sailNumber: '826', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/18' }, dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/18' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/18/dinghyClass' } } };
 const dinghySchemaJSON = {title: 'Dinghy', properties: {dinghyClass: {title: 'Dinghy class', readOnly: false, description: 'ToOne', type: 'string', format: 'uri' }, sailNumber: {title: 'Sail number', readOnly: false, description: 'identifier', type: 'string' } }, definitions: { }, type: 'object', $schema: 'http://json-schema.org/draft-04/schema#' };
-const dinghySchemaALPS = {alps: {version: '1.0', descriptor: [ {id: 'dinghy-representation', href: 'http://localhost:8081/dinghyracing/api/profile/dinghies', descriptor: [ {name: 'sailNumber', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'identifier' } }, {name: 'dinghyClass', type: 'SAFE', doc: {format: 'TEXT', value: 'ToOne' }, rt: 'http://localhost:8081/dinghyracing/api/profile/dinghyclasses#dinghyClass-representation' } ] }, {id: 'create-dinghies', name: 'dinghies', type: 'UNSAFE', descriptor: [ ], rt: '#dinghy-representation' }, {id: 'get-dinghies', name: 'dinghies', type: 'SAFE', descriptor: [ {name: 'page', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'The page to return.' } }, {name: 'size', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'The size of the page to return.' } }, {name: 'sort', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'The sorting criteria to use to calculate the content of the page.' } } ], rt: '#dinghy-representation' }, {id: 'delete-dinghy', name: 'dinghy', type: 'IDEMPOTENT', descriptor: [ ], rt: '#dinghy-representation' }, {id: 'update-dinghy', name: 'dinghy', type: 'IDEMPOTENT', descriptor: [ ], rt: '#dinghy-representation' }, {id: 'get-dinghy', name: 'dinghy', type: 'SAFE', descriptor: [ ], rt: '#dinghy-representation' }, {id: 'patch-dinghy', name: 'dinghy', type: 'UNSAFE', descriptor: [ ], rt: '#dinghy-representation' }, {name: 'findByDinghyClass', type: 'SAFE', descriptor: [ {name: 'dinghyclass', type: 'SEMANTIC' } ] } ] } };
+const dinghySchemaALPS = {alps: {version: '1.0', descriptor: [ {id: 'dinghy-representation', href: 'http://localhost:8081/dinghyracing/api/profile/dinghies', descriptor: [ {name: 'sailNumber', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'identifier' } }, {name: 'dinghyClass', type: 'SAFE', doc: {format: 'TEXT', value: 'ToOne' }, rt: 'http://localhost:8081/dinghyracing/api/profile/dinghyClasses#dinghyClass-representation' } ] }, {id: 'create-dinghies', name: 'dinghies', type: 'UNSAFE', descriptor: [ ], rt: '#dinghy-representation' }, {id: 'get-dinghies', name: 'dinghies', type: 'SAFE', descriptor: [ {name: 'page', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'The page to return.' } }, {name: 'size', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'The size of the page to return.' } }, {name: 'sort', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'The sorting criteria to use to calculate the content of the page.' } } ], rt: '#dinghy-representation' }, {id: 'delete-dinghy', name: 'dinghy', type: 'IDEMPOTENT', descriptor: [ ], rt: '#dinghy-representation' }, {id: 'update-dinghy', name: 'dinghy', type: 'IDEMPOTENT', descriptor: [ ], rt: '#dinghy-representation' }, {id: 'get-dinghy', name: 'dinghy', type: 'SAFE', descriptor: [ ], rt: '#dinghy-representation' }, {id: 'patch-dinghy', name: 'dinghy', type: 'UNSAFE', descriptor: [ ], rt: '#dinghy-representation' }, {name: 'findByDinghyClass', type: 'SAFE', descriptor: [ {name: 'dinghyclass', type: 'SEMANTIC' } ] } ] } };
 const dinghiesCollectionHAL = {_embedded: {dinghies: [
 	dinghy1234HAL, dinghy2726HAL, dinghy6745HAL, dinghy2928HAL, dinghy826HAL
 ] }, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies' }, profile: {href: 'http://localhost:8081/dinghyracing/api/profile/dinghies' }, search: {href: 'http://localhost:8081/dinghyracing/api/dinghies/search' } }, page: {size: 20, totalElements: 5, totalPages: 1, number: 0 } };
@@ -101,7 +101,7 @@ const dinghiesCollectionHAL = {_embedded: {dinghies: [
 const dinghiesScorpionCollectionHAL = {_embedded: {dinghies: [
 	dinghy1234HAL, dinghy6745HAL
 ] }, _links: {
-	self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1&page=0&size=20' } 
+	self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyClasses/1&page=0&size=20' } 
 }, page: {size: 20, totalElements: 2, totalPages: 1, number: 0 } };
 
 const raceScorpion_AHAL = { name : 'Scorpion A', plannedStartTime : '2021-10-14T10:30:00', duration: 'PT45M', type: 'FLEET', plannedLaps: 5, startSequenceState: null, startType: 'CSCCLUBSTART', dinghyClasses: [], lapForecast: 5.0, leadEntry: {scoringAbbreviation: null, lastLapTime: 'PT0S', sumOfLapTimes: 'PT0S', averageLapTime: 'PT0S', finishedRace: false, onLastLap: false, lapsSailed: 0 }, _links : { self : { href : 'http://localhost:8081/dinghyracing/api/races/4' }, race: { href : 'http://localhost:8081/dinghyracing/api/races/4' }, signedUp : { href : 'http://localhost:8081/dinghyracing/api/races/4/signedUp' }, dinghyClass : { href :  'http://localhost:8081/dinghyracing/api/races/4/dinghyClass' } } };
@@ -109,7 +109,7 @@ const raceScorpion_ADinghyClassHAL = dinghyClassScorpionHAL;
 const raceScorpion_ASignedUpHAL = {_embedded: {dinghies: [ {sailNumber: '1234', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' } } }, {sailNumber: '6745', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/3' }, dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/3' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass' } } } ] }, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/races/4/signedUp' } } };
 
 const raceGraduate_AHAL = {name: 'Graduate A', plannedStartTime: '2021-10-14T10:35:00', duration: 'PT45M', type: 'FLEET', plannedLaps: 4, startSequenceState: null, startType: 'CSCCLUBSTART', dinghyClasses: [], lapForecast: 4.0, leadEntry: null, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/races/7' }, race: {href: 'http://localhost:8081/dinghyracing/api/races/7' }, signedUp: {href: 'http://localhost:8081/dinghyracing/api/races/7/signedUp' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/races/7/dinghyClass' } } };
-const raceGraduate_ADinghyClassHAL = {name: 'Graduate', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyclasses/5' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyclasses/5' } } };
+const raceGraduate_ADinghyClassHAL = {name: 'Graduate', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/5' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/5' } } };
 const raceGraduate_ASignedUpHAL = {_embedded: {dinghies: [ ] }, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/races/7/signedUp' } } };
 
 const raceComet_AHAL = {name: 'Comet A', plannedStartTime: '2021-10-14T10:40:00', duration: 'PT45M', type: 'FLEET', plannedLaps: 4, startSequenceState: null, startType: 'CSCCLUBSTART', dinghyClasses: [], lapForecast: 4.0, leadEntry: null, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/races/17' }, race: {href: 'http://localhost:8081/dinghyracing/api/races/17' }, signedUp: {href: 'http://localhost:8081/dinghyracing/api/races/17/signedUp' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/races/17/dinghyClass' } } };
@@ -296,9 +296,9 @@ const competitorLiuBao = {name: 'Liu Bao',url: 'http://localhost:8081/dinghyraci
 const competitorBobHoskins = {name: 'Bob Hoskins',url: 'http://localhost:8081/dinghyracing/api/competitors/15'};
 const competitorsCollection = [competitorChrisMarshall, competitorSarahPascal, competitorJillMyer, competitorLouScrew, competitorOwainDavies, competitorLiuBao];
 
-const dinghyClassScorpion = {name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043, url: 'http://localhost:8081/dinghyracing/api/dinghyclasses/1' };
-const dinghyClassGraduate = {name:'Graduate', crewSize: 2, portsmouthNumber: 1110, url:'http://localhost:8081/dinghyracing/api/dinghyclasses/5'};
-const dinghyClassComet = {name:'Comet', crewSize:1, portsmouthNumber: 1210, url:'http://localhost:8081/dinghyracing/api/dinghyclasses/16'}
+const dinghyClassScorpion = {name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043, url: 'http://localhost:8081/dinghyracing/api/dinghyClasses/1' };
+const dinghyClassGraduate = {name:'Graduate', crewSize: 2, portsmouthNumber: 1110, url:'http://localhost:8081/dinghyracing/api/dinghyClasses/5'};
+const dinghyClassComet = {name:'Comet', crewSize:1, portsmouthNumber: 1210, url:'http://localhost:8081/dinghyracing/api/dinghyClasses/16'}
 const dinghyClasses = [dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet];
 const dinghyClassesByNameAsc = [dinghyClassComet, dinghyClassGraduate, dinghyClassScorpion];
 

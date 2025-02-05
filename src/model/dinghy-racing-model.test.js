@@ -94,7 +94,7 @@ describe('when reading a resource from REST', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.read('dinghyclasses?sort=name,asc');
+        const promise = dinghyRacingModel.read('dinghyClasses?sort=name,asc');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true, 'domainObject': dinghyClassCollectionHAL});
@@ -119,7 +119,7 @@ describe('when reading a resource from REST', () => {
             throw new TypeError('Failed to fetch');
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.read('dinghyclasses?sort=name,asc');
+        const promise = dinghyRacingModel.read('dinghyClasses?sort=name,asc');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'TypeError: Failed to fetch'});
@@ -381,7 +381,7 @@ describe('when creating a new race', () => {
     it('if a dinghy class URL is not supplied looks up dinghy class to get URL and returns a promise that resolves to a result indicating success when race is created with http status 200', async () => {
         fetch.mockImplementationOnce((resource, options) => {
             // check format of data passed to fetch to reduce risk of false positive
-            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","type":"FLEET","startType":"CSCCLUBSTART","duration":2700,"plannedLaps":null,"lapsSailed":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"startSequenceState":"NONE","dinghyClasses":[],"url":""}') {
+            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyClasses/1","type":"FLEET","startType":"CSCCLUBSTART","duration":2700,"plannedLaps":null,"lapsSailed":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"startSequenceState":"NONE","dinghyClasses":[],"url":""}') {
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -407,7 +407,7 @@ describe('when creating a new race', () => {
     it('if a dinghy class URL is supplied does not look up dinghy class to get URL and returns a promise that resolves to a result indicating success when race is created with http status 200', async () => {
         fetch.mockImplementationOnce((resource, options) => {
             // check format of data passed to fetch to reduce risk of false positive
-            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","type":"FLEET","startType":"CSCCLUBSTART","duration":2700,"plannedLaps":null,"lapsSailed":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"startSequenceState":"NONE","dinghyClasses":[],"url":""}') {
+            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyClasses/1","type":"FLEET","startType":"CSCCLUBSTART","duration":2700,"plannedLaps":null,"lapsSailed":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"startSequenceState":"NONE","dinghyClasses":[],"url":""}') {
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -432,7 +432,7 @@ describe('when creating a new race', () => {
     it('returns a promise that resolves to a result indicating success when race is created with http status 201', async () => {
         fetch.mockImplementationOnce((resource, options) => {// check format of data passed to fetch to reduce risk of false positive
             // check format of data passed to fetch to reduce risk of false positive
-            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyclasses/1","type":"FLEET","startType":"CSCCLUBSTART","duration":2700,"plannedLaps":null,"lapsSailed":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"startSequenceState":"NONE","dinghyClasses":[],"url":""}') {
+            if(options.body !== '{"name":"Scorpion A","plannedStartTime":"2021-10-14T14:10:00.000Z","dinghyClass":"http://localhost:8081/dinghyracing/api/dinghyClasses/1","type":"FLEET","startType":"CSCCLUBSTART","duration":2700,"plannedLaps":null,"lapsSailed":null,"lapForecast":null,"lastLapTime":null,"averageLapTime":null,"clock":null,"startSequenceState":"NONE","dinghyClasses":[],"url":""}') {
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -575,7 +575,7 @@ describe('when retrieving a list of dinghy classes', () => {
             it('retrieves and returns complete list of dinghy classes', async () => {
                 const dinghyClassCollectionHAL_p0 = {
                     '_embedded' : { 'dinghyClasses' : [ dinghyClassScorpionHAL, dinghyClassGraduateHAL ] }, '_links' : {
-                        'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses' }, 'profile' : { 'href' : 'http://localhost:8081/dinghyracing/api/profile/dinghyclasses' } }, 
+                        'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyClasses' }, 'profile' : { 'href' : 'http://localhost:8081/dinghyracing/api/profile/dinghyClasses' } }, 
                              'page' : { 'size' : 2, 'totalElements' : 3, 'totalPages' : 2, 'number' : 0 
                         } 
                 };
@@ -603,7 +603,7 @@ describe('when retrieving a list of dinghy classes', () => {
             it('returns only a single page of data', async () => {
                 const dinghyClassCollectionHAL_p0 = {
                     '_embedded' : { 'dinghyClasses' : [ dinghyClassScorpionHAL, dinghyClassGraduateHAL ] }, '_links' : {
-                        'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses' }, 'profile' : { 'href' : 'http://localhost:8081/dinghyracing/api/profile/dinghyclasses' } }, 
+                        'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyClasses' }, 'profile' : { 'href' : 'http://localhost:8081/dinghyracing/api/profile/dinghyClasses' } }, 
                              'page' : { 'size' : 2, 'totalElements' : 3, 'totalPages' : 2, 'number' : 0 
                         } 
                 };
@@ -632,7 +632,7 @@ describe('when retrieving a list of dinghy classes', () => {
             it('returns only a single page of data', async () => {
                 const dinghyClassCollectionHAL_p0 = {
                     '_embedded' : { 'dinghyClasses' : [ dinghyClassScorpionHAL, dinghyClassGraduateHAL ] }, '_links' : {
-                        'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses' }, 'profile' : { 'href' : 'http://localhost:8081/dinghyracing/api/profile/dinghyclasses' } }, 
+                        'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyClasses' }, 'profile' : { 'href' : 'http://localhost:8081/dinghyracing/api/profile/dinghyClasses' } }, 
                              'page' : { 'size' : 2, 'totalElements' : 3, 'totalPages' : 2, 'number' : 0 
                         } 
                 };
@@ -661,7 +661,7 @@ describe('when retrieving a list of dinghy classes', () => {
             it('returns only a single page of data', async () => {
                 const dinghyClassCollectionHAL_p0 = {
                     '_embedded' : { 'dinghyClasses' : [ dinghyClassScorpionHAL, dinghyClassGraduateHAL ] }, '_links' : {
-                        'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyclasses' }, 'profile' : { 'href' : 'http://localhost:8081/dinghyracing/api/profile/dinghyclasses' } }, 
+                        'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghyClasses' }, 'profile' : { 'href' : 'http://localhost:8081/dinghyracing/api/profile/dinghyClasses' } }, 
                              'page' : { 'size' : 2, 'totalElements' : 3, 'totalPages' : 2, 'number' : 0 
                         } 
                 };
@@ -2256,7 +2256,7 @@ describe('when updating a dinghy class', () => {
     it('if dinghy class exists and URL provided then updates dinghy class', async () => {
         fetch.mockImplementationOnce((resource, options) => {
             const bodyMatch = {name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215};
-            if ((resource === 'http://localhost:8081/dinghyracing/api/dinghyclasses/1') && (options.body === JSON.stringify(bodyMatch))) {
+            if ((resource === 'http://localhost:8081/dinghyracing/api/dinghyClasses/1') && (options.body === JSON.stringify(bodyMatch))) {
                 return Promise.resolve({
                     ok: true,
                     status: 200,
@@ -2274,7 +2274,7 @@ describe('when updating a dinghy class', () => {
         it('updates only provided value and leaves other values unchanged', async () => {
             fetch.mockImplementationOnce((resource, options) => {
                 const bodyMatch = {name: 'Scorpion Two'};
-                if ((resource === 'http://localhost:8081/dinghyracing/api/dinghyclasses/1') && (options.body === JSON.stringify(bodyMatch))) {
+                if ((resource === 'http://localhost:8081/dinghyracing/api/dinghyClasses/1') && (options.body === JSON.stringify(bodyMatch))) {
                     return Promise.resolve({
                         ok: true,
                         status: 200,
@@ -2293,7 +2293,7 @@ describe('when updating a dinghy class', () => {
         it('updates only provided properties and leaves other values unchanged', async () => {
             fetch.mockImplementationOnce((resource, options) => {
                 const bodyMatch = {crewSize: 3, portsmouthNumber: 1215};
-                if ((resource === 'http://localhost:8081/dinghyracing/api/dinghyclasses/1') && (options.body === JSON.stringify(bodyMatch))) {
+                if ((resource === 'http://localhost:8081/dinghyracing/api/dinghyClasses/1') && (options.body === JSON.stringify(bodyMatch))) {
                     return Promise.resolve({
                         ok: true,
                         status: 200,
@@ -2311,7 +2311,7 @@ describe('when updating a dinghy class', () => {
     it('if dinghy class exists but URL not provided then updates dinghy class', async () => {
         fetch.mockImplementationOnce((resource, options) => {
             const bodyMatch = {name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215};
-            if ((resource === 'http://localhost:8081/dinghyracing/api/dinghyclasses/1') && (options.body === JSON.stringify(bodyMatch))) {
+            if ((resource === 'http://localhost:8081/dinghyracing/api/dinghyClasses/1') && (options.body === JSON.stringify(bodyMatch))) {
                 return Promise.resolve({
                     ok: true,
                     status: 200,
@@ -2467,7 +2467,7 @@ describe('when retrieving a list of dinghies', () => {
                         json: () => Promise.resolve(dinghiesCollectionHAL)
                     });
                 }
-                if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1') {
+                if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyClasses/1') {
                     return Promise.resolve({
                         ok: true,
                         status: 200, 
@@ -2781,7 +2781,7 @@ describe('when retrieving a list of dinghies', () => {
                         json: () => Promise.resolve(dinghiesCollectionHAL)
                     });
                 }
-                if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1') {
+                if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyClasses/1') {
                     return Promise.resolve({
                         ok: true,
                         status: 200, 
@@ -2828,7 +2828,7 @@ describe('when retrieving a list of dinghies', () => {
                 it('returns a success result containing all dinghies for that dinghy class', async () => {
                     const dinghiesScorpionCollectionHAL_p0 = { '_embedded' : { 'dinghies' : [ 
                         { 'sailNumber' : '1234', '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2' }, 'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2' }, 'dinghyClass' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' } } } 
-                    ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1&page=0&size=20' } }, 'page' : { 'size' : 1, 'totalElements' : 2, 'totalPages' : 2, 'number' : 0 } };
+                    ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyClasses/1&page=0&size=20' } }, 'page' : { 'size' : 1, 'totalElements' : 2, 'totalPages' : 2, 'number' : 0 } };
                     fetch.mockImplementation((resource) => {
                         if (resource === 'http://localhost:8081/dinghyracing/api/dinghies') {
                             return Promise.resolve({
@@ -2837,7 +2837,7 @@ describe('when retrieving a list of dinghies', () => {
                                 json: () => Promise.resolve(dinghiesCollectionHAL)
                             });
                         }
-                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1&page=0&size=2') {
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyClasses/1&page=0&size=2') {
                             return Promise.resolve({
                                 ok: true,
                                 status: 200, 
@@ -2880,7 +2880,7 @@ describe('when retrieving a list of dinghies', () => {
                                 json: () => Promise.resolve(dinghiesCollectionHAL)
                             });
                         }
-                        else if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1') {
+                        else if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyClasses/1') {
                             return Promise.resolve({
                                 ok: true,
                                 status: 200, 
@@ -2906,7 +2906,7 @@ describe('when retrieving a list of dinghies', () => {
                 it('returns only a single page of data', async () => {
                     const dinghiesScorpionCollectionHAL_p0 = { '_embedded' : { 'dinghies' : [ 
                         { 'sailNumber' : '1234', '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2' }, 'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2' }, 'dinghyClass' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' } } } 
-                    ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1&page=0&size=20' } }, 'page' : { 'size' : 1, 'totalElements' : 2, 'totalPages' : 2, 'number' : 0 } };
+                    ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyClasses/1&page=0&size=20' } }, 'page' : { 'size' : 1, 'totalElements' : 2, 'totalPages' : 2, 'number' : 0 } };
                     const dinghiesScorpion_p0 = [dinghy1234];
                     fetch.mockImplementation((resource) => {
                         if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?page=0&size=5') {
@@ -2945,7 +2945,7 @@ describe('when retrieving a list of dinghies', () => {
                             });
                         }
                     }).mockImplementationOnce((resource) => {
-                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1&page=0') {
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyClasses/1&page=0') {
                             return Promise.resolve({
                                 ok: true,
                                 status: 200, 
@@ -2971,7 +2971,7 @@ describe('when retrieving a list of dinghies', () => {
                 it('returns only a single page of data', async () => {
                     const dinghiesScorpionCollectionHAL_p0 = { '_embedded' : { 'dinghies' : [ 
                         { 'sailNumber' : '1234', '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2' }, 'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2' }, 'dinghyClass' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' } } } 
-                    ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1&page=0&size=20' } }, 'page' : { 'size' : 1, 'totalElements' : 2, 'totalPages' : 2, 'number' : 0 } };
+                    ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyClasses/1&page=0&size=20' } }, 'page' : { 'size' : 1, 'totalElements' : 2, 'totalPages' : 2, 'number' : 0 } };
                     const dinghiesScorpion_p0 = [dinghy1234];
                     fetch.mockImplementation((resource) => {
                         if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?page=0&size=5') {
@@ -3010,7 +3010,7 @@ describe('when retrieving a list of dinghies', () => {
                             });
                         }
                     }).mockImplementationOnce((resource) => {
-                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1&size=1') {
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyClasses/1&size=1') {
                             return Promise.resolve({
                                 ok: true,
                                 status: 200, 
@@ -3036,7 +3036,7 @@ describe('when retrieving a list of dinghies', () => {
                 it('returns only a single page of data', async () => {
                     const dinghiesScorpionCollectionHAL_p0 = { '_embedded' : { 'dinghies' : [ 
                         { 'sailNumber' : '1234', '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2' }, 'dinghy' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2' }, 'dinghyClass' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' } } } 
-                    ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1&page=0&size=20' } }, 'page' : { 'size' : 1, 'totalElements' : 2, 'totalPages' : 2, 'number' : 0 } };
+                    ] }, '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyClasses/1&page=0&size=20' } }, 'page' : { 'size' : 1, 'totalElements' : 2, 'totalPages' : 2, 'number' : 0 } };
                     const dinghiesScorpion_p0 = [dinghy1234];
                     fetch.mockImplementation((resource) => {
                         if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?page=0&size=5') {
@@ -3075,7 +3075,7 @@ describe('when retrieving a list of dinghies', () => {
                             });
                         }
                     }).mockImplementationOnce((resource) => {
-                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyclasses/1&page=0&size=1') {
+                        if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findByDinghyClass?dinghyClass=http://localhost:8081/dinghyracing/api/dinghyClasses/1&page=0&size=1') {
                             return Promise.resolve({
                                 ok: true,
                                 status: 200, 
@@ -3117,153 +3117,23 @@ describe('when retrieving a list of dinghies', () => {
 });
 
 describe('when creating a new fleet', () => {
-    it('returns a promise that resolves to a result indicating success when fleet is created with http status 200', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: true,
-                status: 200, 
-                json: () => Promise.resolve(fleetHandicapHAL)
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, domainObject: fleetHandicap});
-    });
-    it('returns a promise that resolves to a result indicating success when fleet is created with http status 201', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: true,
-                status: 201, 
-                json: () => Promise.resolve(fleetHandicapHAL)
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, domainObject: fleetHandicap});
-    });
-    it('returns a promise that resolves to a result indicating failure when fleet is not created with http status 400 and provides a message explaining the cause of failure', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: false,
-                status: 400,
-                statusText: 'Bad Request',
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 400'}, 'message': 'Some error resulting in HTTP 400'})
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Bad Request Message: Some error resulting in HTTP 400'}); 
-    });
-    it('returns a promise that resolves to a result indicating failure when fleet is not created with http status 404 and provides a message explaining the cause of failure', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: false,
-                status: 404, 
-                statusText: 'Not Found',
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'}); 
-    });
-    it('returns a promise that resolves to a result indicating failure when fleet is not created with http status 408 and provides a message explaining the cause of failure', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: false,
-                status: 408,
-                statusText: 'Request Timeout',
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 408'}, 'message': 'Some error resulting in HTTP 408'})
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 408 Request Timeout Message: Some error resulting in HTTP 408'}); 
-    });
-    it('returns a promise that resolves to a result indicating failure when fleet is not created with http status 409 and provides a message explaining the cause of failure', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: false,
-                status: 409,
-                statusText: 'Conflict',
-                json: () => Promise.resolve({
-                    "cause": {
-                        "cause": {
-                            "cause": null, "message": "Duplicate entry 'some name' for key 'fleet.UK_fleet_name'"
-                        },
-                        "message": "could not execute statement [Duplicate entry 'some name' for key 'fleet.UK_fleet_name'] [insert into fleet (name,version,id) values (?,?,?)]"
-                    }, 
-                    "message": "could not execute statement [Duplicate entry 'some name' for key 'fleet.UK_fleet_name'] [insert into fleet (name,version,id) values (?,?,?)]; SQL [insert into fleet (name,version,id) values (?,?,?)]; constraint [fleet.UK_fleet_name]"
-                })
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({success: false, message: "HTTP Error: 409 Conflict Message: The fleet 'some name' already exissts; this may be caused by an uppercase/ lowercase differencce between existing record and the value entered."});
-    });
-    it('returns a promise that resolves to a result indicating failure when fleet is not created with http status 500 and provides a message explaining the cause of failure', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: false,
-                status: 500,
-                statusText: 'Internal Server Error',
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 500'}, 'message': 'Some error resulting in HTTP 500'})
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 500 Internal Server Error Message: Some error resulting in HTTP 500'}); 
-    });
-    it('returns a promise that resolves to a result indicating failure when fleet is not created with http status 503 and provides a message explaining the cause of failure', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: false,
-                status: 503,
-                statusText: 'Service Unavailable',
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 503'}, 'message': 'Some error resulting in HTTP 503'})
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 503 Service Unavailable Message: Some error resulting in HTTP 503'}); 
-    });
-    it('returns a promise that resolves to a result indicating failure when fleet is not created due to an error that causes fetch to reject; such as a network failure', async () => {
-        fetch.mockImplementationOnce(() => {
-            throw new TypeError('Failed to fetch');
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'TypeError: Failed to fetch'});
-    });
-    describe('when creating a new fleet with associated dinghy classes', () => {
+    describe('without associated dinghy classes', () => {
         it('returns a promise that resolves to a result indicating success when fleet is created with http status 200', async () => {
-            
-            fetch.mockImplementationOnce((resource, options) => {
-                if (resource === httpRootURL + '/fleets' && options.body === '{"name":"Handicap","dinghyClasses":["http://localhost:8081/dinghyracing/api/dinghyclasses/1","http://localhost:8081/dinghyracing/api/dinghyclasses/16"],"url":""}') {
+            fetch.mockImplementation((resource, options) => {
+                if (resource === httpRootURL + '/fleets' && options.body === '{"name":"Handicap","dinghyClasses":[],"url":""}') {
                     return Promise.resolve({
                         ok: true,
                         status: 200, 
                         json: () => Promise.resolve(fleetHandicapHAL)
                     });
                 }
+                if (resource === 'http://localhost:8081/dinghyracing/api/fleets/2/dinghyClasses') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(fleetHandicapDinghyClassHAL)
+                    });
+                }
                 else {
                     return Promise.resolve({
                         ok: false,
@@ -3274,20 +3144,27 @@ describe('when creating a new fleet', () => {
                 }
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Handicap', dinghyClasses: [dinghyClassScorpion, dinghyClassComet]});
+            const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Handicap', dinghyClasses: []});
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
             expect(result).toEqual({'success': true, domainObject: fleetHandicap});
         });
         it('returns a promise that resolves to a result indicating success when fleet is created with http status 201', async () => {
-            fetch.mockImplementationOnce((resource, options) => {
-                if (resource === httpRootURL + '/fleets' && options.body === '{"name":"Handicap","dinghyClasses":["http://localhost:8081/dinghyracing/api/dinghyclasses/1","http://localhost:8081/dinghyracing/api/dinghyclasses/16"],"url":""}') {
+            fetch.mockImplementation((resource, options) => {
+                if (resource === httpRootURL + '/fleets' && options.body === '{"name":"Handicap","dinghyClasses":[],"url":""}') {
                     return Promise.resolve({
                         ok: true,
                         status: 201, 
                         json: () => Promise.resolve(fleetHandicapHAL)
                     });
                 }
+                if (resource === 'http://localhost:8081/dinghyracing/api/fleets/2/dinghyClasses') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(fleetHandicapDinghyClassHAL)
+                    });
+                }
                 else {
                     return Promise.resolve({
                         ok: false,
@@ -3298,10 +3175,182 @@ describe('when creating a new fleet', () => {
                 }
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Handicap', dinghyClasses: [dinghyClassScorpion, dinghyClassComet]});
+            const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Handicap', dinghyClasses: []});
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
             expect(result).toEqual({'success': true, domainObject: fleetHandicap});
+        });
+        it('returns a promise that resolves to a result indicating failure when fleet is not created with http status 400 and provides a message explaining the cause of failure', async () => {
+            fetch.mockImplementationOnce(() => {
+                return Promise.resolve({
+                    ok: false,
+                    status: 400,
+                    statusText: 'Bad Request',
+                    json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 400'}, 'message': 'Some error resulting in HTTP 400'})
+                });
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 400 Bad Request Message: Some error resulting in HTTP 400'}); 
+        });
+        it('returns a promise that resolves to a result indicating failure when fleet is not created with http status 404 and provides a message explaining the cause of failure', async () => {
+            fetch.mockImplementationOnce(() => {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404, 
+                    statusText: 'Not Found',
+                    json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
+                });
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'}); 
+        });
+        it('returns a promise that resolves to a result indicating failure when fleet is not created with http status 408 and provides a message explaining the cause of failure', async () => {
+            fetch.mockImplementationOnce(() => {
+                return Promise.resolve({
+                    ok: false,
+                    status: 408,
+                    statusText: 'Request Timeout',
+                    json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 408'}, 'message': 'Some error resulting in HTTP 408'})
+                });
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 408 Request Timeout Message: Some error resulting in HTTP 408'}); 
+        });
+        it('returns a promise that resolves to a result indicating failure when fleet is not created with http status 409 and provides a message explaining the cause of failure', async () => {
+            fetch.mockImplementationOnce(() => {
+                return Promise.resolve({
+                    ok: false,
+                    status: 409,
+                    statusText: 'Conflict',
+                    json: () => Promise.resolve({
+                        "cause": {
+                            "cause": {
+                                "cause": null, "message": "Duplicate entry 'some name' for key 'fleet.UK_fleet_name'"
+                            },
+                            "message": "could not execute statement [Duplicate entry 'some name' for key 'fleet.UK_fleet_name'] [insert into fleet (name,version,id) values (?,?,?)]"
+                        }, 
+                        "message": "could not execute statement [Duplicate entry 'some name' for key 'fleet.UK_fleet_name'] [insert into fleet (name,version,id) values (?,?,?)]; SQL [insert into fleet (name,version,id) values (?,?,?)]; constraint [fleet.UK_fleet_name]"
+                    })
+                });
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({success: false, message: "HTTP Error: 409 Conflict Message: The fleet 'some name' already exissts; this may be caused by an uppercase/ lowercase differencce between existing record and the value entered."});
+        });
+        it('returns a promise that resolves to a result indicating failure when fleet is not created with http status 500 and provides a message explaining the cause of failure', async () => {
+            fetch.mockImplementationOnce(() => {
+                return Promise.resolve({
+                    ok: false,
+                    status: 500,
+                    statusText: 'Internal Server Error',
+                    json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 500'}, 'message': 'Some error resulting in HTTP 500'})
+                });
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 500 Internal Server Error Message: Some error resulting in HTTP 500'}); 
+        });
+        it('returns a promise that resolves to a result indicating failure when fleet is not created with http status 503 and provides a message explaining the cause of failure', async () => {
+            fetch.mockImplementationOnce(() => {
+                return Promise.resolve({
+                    ok: false,
+                    status: 503,
+                    statusText: 'Service Unavailable',
+                    json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 503'}, 'message': 'Some error resulting in HTTP 503'})
+                });
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'HTTP Error: 503 Service Unavailable Message: Some error resulting in HTTP 503'}); 
+        });
+        it('returns a promise that resolves to a result indicating failure when fleet is not created due to an error that causes fetch to reject; such as a network failure', async () => {
+            fetch.mockImplementationOnce(() => {
+                throw new TypeError('Failed to fetch');
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, 'message': 'TypeError: Failed to fetch'});
+        });
+    });    
+    describe('with associated dinghy classes', () => {
+        it('returns a promise that resolves to a result indicating success when fleet is created with http status 200', async () => {
+            fetch.mockImplementation((resource, options) => {
+                if (resource === httpRootURL + '/fleets' && options.body === '{"name":"Scorpion","dinghyClasses":["http://localhost:8081/dinghyracing/api/dinghyClasses/1"],"url":""}') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(fleetScorpionHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/fleets/1/dinghyClasses') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(fleetScorpionDinghyClassHAL)
+                    });
+                }
+                else {
+                    return Promise.resolve({
+                        ok: false,
+                        status: 400,
+                        statusText: 'Bad Request',
+                        json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 400'}, 'message': 'Some error resulting in HTTP 400'})
+                    });
+                }
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion', dinghyClasses: [dinghyClassScorpion]});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, domainObject: fleetScorpion});
+        });
+        it('returns a promise that resolves to a result indicating success when fleet is created with http status 201', async () => {
+            fetch.mockImplementation((resource, options) => {
+                if (resource === httpRootURL + '/fleets' && options.body === '{"name":"Scorpion","dinghyClasses":["http://localhost:8081/dinghyracing/api/dinghyClasses/1"],"url":""}') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 201, 
+                        json: () => Promise.resolve(fleetScorpionHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/fleets/1/dinghyClasses') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, 
+                        json: () => Promise.resolve(fleetScorpionDinghyClassHAL)
+                    });
+                }
+                else {
+                    return Promise.resolve({
+                        ok: false,
+                        status: 400,
+                        statusText: 'Bad Request',
+                        json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 400'}, 'message': 'Some error resulting in HTTP 400'})
+                    });
+                }
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion', dinghyClasses: [dinghyClassScorpion]});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, domainObject: fleetScorpion});
         });
     });
 });
@@ -3309,56 +3358,22 @@ describe('when creating a new fleet', () => {
 describe('when updating a fleet', () => {
     it('returns a promise that resolves to a result indicating success when fleet dinghy classes are updated with http status 200', async () => {
         fetch.mockImplementation((resource, options) => {
-            if (resource === httpRootURL + '/fleets') {
+            // if (resource === fleetScorpionHAL._links.self.href && options.method === 'PATCH' && options.body === '{"name":"Scorpion\","dinghyClasses":["' + fleetScorpion.dinghyClasses[0].url + '"],"url":' + fleetScorpion.url + '}') {
+            if (resource === 'http://localhost:8081/dinghyracing/api/fleets/1' 
+                && options.method === 'PATCH' 
+                && options.body === '{"name":"Scorpion","dinghyClasses":["http://localhost:8081/dinghyracing/api/dinghyClasses/1"],"url":"http://localhost:8081/dinghyracing/api/fleets/1\"}') {
                 return Promise.resolve({
                     ok: true,
-                    status: 202, 
+                    status: 200, 
                     json: () => Promise.resolve(fleetScorpionHAL)
+                });                    
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/fleets/1/dinghyClasses') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(fleetScorpionDinghyClassHAL)
                 });
-            }
-            if (resource === fleetScorpionHAL._links.dinghyClasses.href && options.method === 'GET') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(fleetScorpionDinghyClassHAL)
-                });                    
-            }
-            if (resource === fleetScorpionHAL._links.dinghyClasses.href && options.method === 'PUT') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(fleetScorpionHAL)
-                });                    
-            }
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.updateFleet(fleetScorpion);
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({success: true, domainObject: fleetScorpion});
-    });
-    it('returns a promise that resolves to a result indicating success when fleet dinghy classes are updated with http status 204', async () => {
-        fetch.mockImplementation((resource, options) => {
-            if (resource === fleetScorpion.url) {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(fleetScorpionHAL)
-                })
-            }
-            if (resource === fleetScorpionHAL._links.dinghyClasses.href && options.method === 'GET') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(fleetScorpionDinghyClassHAL)
-                });                    
-            }
-            if (resource === fleetScorpionHAL._links.dinghyClasses.href && options.method === 'PUT') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 204, 
-                    json: () => {throw new SyntaxError('Unexpected end of JSON input')}
-                });                    
             }
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);

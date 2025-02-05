@@ -486,7 +486,13 @@ class DinghyRacingModel {
         }
         const result = await this.create('fleets', tempFleet);
         if (result.success) {
-            return Promise.resolve({success: true, domainObject: this._convertFleetHALToFleet(result.domainObject)});
+            let dinghyClassesResult = await this.getDinghyClassesByUrl(result.domainObject._links.dinghyClasses.href);
+            if (dinghyClassesResult.success) {
+                return Promise.resolve({success: true, domainObject: this._convertFleetHALToFleet(result.domainObject, dinghyClassesResult.domainObject)});
+            }
+            else {
+                return Promise.resolve(dinghyClassesResult);
+            }
         }
         else {
             return Promise.resolve(result);
@@ -562,21 +568,20 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async updateFleet(fleet) {
-        // get URI list from dinghy classes
-        const uriList = this._convertUriArrayToUriList(fleet.dinghyClasses.map(dinghyClass => dinghyClass.url));
-        const result = await this.updateToManyAssociation(fleet.url + '/dinghyClasses', uriList);
-        // REST server may or may not retrun a body depending on value set for RepositoryRestConfiguration.setReturnBodyOnUpdate(…)
-        if (result.success && result.domainObject?._links?.dinghyClasses?.href) {
-            const dinghyClassesResult = await this.getDinghyClassesByUrl(result.domainObject._links.dinghyClasses.href);
+        const tempFleet = {...fleet};
+        // convert dinghy classes collection to form appropriate for updating dinghy class associations via server API
+        if (fleet.dinghyClasses.length > 0) {
+            tempFleet.dinghyClasses = fleet.dinghyClasses.map(dinghyClass => dinghyClass.url);
+        }
+        const result = await this.update(fleet.url, tempFleet);
+        if (result.success) {
+            let dinghyClassesResult = await this.getDinghyClassesByUrl(result.domainObject._links.dinghyClasses.href);
             if (dinghyClassesResult.success) {
                 return Promise.resolve({success: true, domainObject: this._convertFleetHALToFleet(result.domainObject, dinghyClassesResult.domainObject)});
             }
             else {
                 return Promise.resolve(dinghyClassesResult);
             }
-        }
-        else if (result.success) {
-            return this.getFleet(fleet.url);
         }
         else {
             return Promise.resolve(result);
