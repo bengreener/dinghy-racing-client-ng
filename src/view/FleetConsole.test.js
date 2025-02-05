@@ -14,11 +14,11 @@
  * limitations under the License. 
  */
 
-import { act, screen } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import { customRender } from '../test-utilities/custom-renders';
 import userEvent from '@testing-library/user-event';
 import FleetConsole from './FleetConsole';
-import { dinghyClassComet, dinghyClassScorpion, fleetScorpion, fleetHandicap, httpRootURL } from '../model/__mocks__/test-data';
+import { dinghyClassComet, dinghyClassScorpion, fleets, fleetScorpion, fleetHandicap, httpRootURL } from '../model/__mocks__/test-data';
 import { wsRootURL } from '../model/__mocks__/test-data';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
@@ -30,6 +30,7 @@ jest.mock('../controller/dinghy-racing-controller');
 it('renders', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
+    jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
     jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
 
     await act(async () => {
@@ -45,14 +46,16 @@ it('renders', async () => {
 it('displays list of dinghy classes', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
+    jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
     jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
 
     await act( async () => {
         customRender(<FleetConsole />, model, controller);
     });
 
-    expect(screen.getByText(/scorpion/i)).toBeInTheDocument();
-    expect(screen.getByText(/comet/i)).toBeInTheDocument();
+    const dinghyClassesSelect = screen.getByRole('listbox');
+    expect(within(dinghyClassesSelect).getByText(/scorpion/i)).toBeInTheDocument();
+    expect(within(dinghyClassesSelect).getByText(/comet/i)).toBeInTheDocument();
 });
 
 describe('when a dinghy class is selected', () => {
@@ -60,6 +63,7 @@ describe('when a dinghy class is selected', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
         jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
 
         await act( async () => {
@@ -71,7 +75,7 @@ describe('when a dinghy class is selected', () => {
         });
 
         expect(selectDinghyClass.selectedOptions.length).toBe(1);
-        expect(selectDinghyClass.value).toBe('http://localhost:8081/dinghyracing/api/dinghyclasses/1');
+        expect(selectDinghyClass.value).toBe('http://localhost:8081/dinghyracing/api/dinghyClasses/1');
     });
 });
 
@@ -80,6 +84,7 @@ describe('when more than one dinghy class is selected', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
         jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
 
         await act( async () => {
@@ -95,8 +100,8 @@ describe('when more than one dinghy class is selected', () => {
             selected.push(selectDinghyClass.selectedOptions[i].value);
         }
         expect(selectDinghyClass.selectedOptions.length).toBe(2);
-        expect(selected).toContain('http://localhost:8081/dinghyracing/api/dinghyclasses/1');
-        expect(selected).toContain('http://localhost:8081/dinghyracing/api/dinghyclasses/16');
+        expect(selected).toContain('http://localhost:8081/dinghyracing/api/dinghyClasses/1');
+        expect(selected).toContain('http://localhost:8081/dinghyracing/api/dinghyClasses/16');
     });
 });
 
@@ -104,6 +109,7 @@ it('accepts the name of a fleet', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
+    jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
     jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
     
     await act( async () => {
@@ -122,6 +128,7 @@ describe('when update button clicked', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
         jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
         const createFleetSpy = jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({success: true})});
         
@@ -140,6 +147,7 @@ describe('when update button clicked', () => {
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
+            jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
             jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
             const createFleetSpy = jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({success: true})});
     
@@ -161,6 +169,7 @@ describe('when update button clicked', () => {
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
+            jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
             jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
             jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true, domainObject: fleetScorpion})});
             
@@ -185,6 +194,7 @@ describe('when update button clicked', () => {
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
+            jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
             jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
             const createFleetSpy = jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({success: true})});
     
@@ -208,6 +218,7 @@ describe('when update button clicked', () => {
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
+            jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
             jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
             jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true, domainObject: fleetScorpion})});
             
@@ -231,6 +242,7 @@ describe('when update button clicked', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
         jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
         const createFleetSpy = jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true})});
         
@@ -250,6 +262,7 @@ describe('when update button clicked', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
         jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
         jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': false, message: 'That was a bust!'})});
         
@@ -273,6 +286,7 @@ describe('when cancel button is clicked', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
         jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
         jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true, domainObject: fleetScorpion})});
         
@@ -291,4 +305,19 @@ describe('when cancel button is clicked', () => {
         expect(txtFleetName.value).toBe('');
         expect(selectDinghyClass.selectedOptions.length).toBe(0);
     })
-})
+});
+
+it('displays existing fleets', async () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const controller = new DinghyRacingController(model);
+    jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+
+    await act( async () => {
+        customRender(<FleetConsole />, model, controller);
+    });
+
+    const fleetTable = screen.getByRole('table');
+    expect(within(fleetTable).getByText(/scorpion/i)).toBeInTheDocument();
+    expect(within(fleetTable).getByText(/handicap/i)).toBeInTheDocument();
+});

@@ -239,6 +239,10 @@ class DinghyRacingModel {
         return null;
     }
 
+    async getFleets(url) {
+        return null;
+    }
+
     async updateFleet(fleet) {
         return null;
     }

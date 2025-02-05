@@ -27,6 +27,7 @@ function FleetConsole() {
     const model = useContext(ModelContext);
     const controller = useContext(ControllerContext);
     const [fleet, setFleet] = useState(DinghyRacingModel.fleetTemplate());
+    const [fleetMap, setFleetMap] = useState(new Map());
     const [dinghyClassMap, setDinghyClassMap] = useState(new Map());
     const [message, setMessage] = useState('');
     const fleetNameInputRef = useRef(null);
@@ -36,6 +37,27 @@ function FleetConsole() {
         fleetNameInputRef.current.focus();
         setMessage('');
     }, []);
+
+    useEffect(() => {
+        let ignoreFetch = false;
+        model.getFleets().then(result => {
+            if (!ignoreFetch && !result.success) {
+                setMessage('Unable to load fleets\n' + result.message);
+            }
+            else if (!ignoreFetch) {
+                const map = new Map();
+                result.domainObject.forEach(fleet => {
+                    map.set(fleet.url, fleet);
+                });
+                setFleetMap(map);
+            }
+        });
+        // cleanup before effect runs and before form close
+        return () => {
+            ignoreFetch = true;
+            setMessage(''); // clear any previous message
+        }
+    }, [model]);
 
     useEffect(() => {
         let ignoreFetch = false;
@@ -87,6 +109,14 @@ function FleetConsole() {
         return !message ? 'hidden' : 'console-error-message';
     }
 
+    function fleetRows() {
+        return Array.from(fleetMap.values()).map(fleet => {return (
+            <tr key={fleet.url} >
+                <td>{fleet.name}</td>
+            </tr>
+        )});
+    }
+
     return(
         <div className='w3-container console '>
             <h1>Fleets</h1>
@@ -107,6 +137,18 @@ function FleetConsole() {
                 </div>
             </form>
             <p className={userMessageClasses()}>{message}</p>
+            <div className='scrollable'>
+                <table className='w3-table w3-striped'>
+                    <thead>
+                        <tr>
+                            <th>Fleet Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {fleetRows()}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }
