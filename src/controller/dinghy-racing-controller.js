@@ -239,6 +239,18 @@ class DinghyRacingController {
     }
 
     /**
+     * Update an exisitng fleet
+     * @param {Fleet} fleet the fleet including the values to update
+     * @returns {Promise<Result>}
+     */
+    async updateFleet(fleet) {
+        if (!fleet || !fleet.name) {
+            return Promise.resolve({'success': false, 'message': 'A name is required for a fleet.'});
+        }
+        return this.model.updateFleet(fleet);
+    }
+
+    /**
      * Create a new race
      * @param {Race} race
      * @returns {Promise<Result>}
