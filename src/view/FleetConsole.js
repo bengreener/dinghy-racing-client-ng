@@ -36,7 +36,7 @@ function FleetConsole() {
 
     const handleFleetUpdate = useCallback(() => {
         setFleetUpdateRequestAt(Date.now());
-    });
+    }, []);
 
     const clear = useCallback(() => {
         setFleet(DinghyRacingModel.fleetTemplate());
