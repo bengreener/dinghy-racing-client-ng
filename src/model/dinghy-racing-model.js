@@ -30,6 +30,8 @@ class DinghyRacingModel {
     dinghyCreationCallbacks = new Set();
     dinghyClassCreationCallbacks = new Set();
     dinghyClassUpdateCallbacks = new Map();
+    fleetCreationCallbacks = new Set();
+    fleetUpdateCallbacks = new Map();
 
     /**
      * Provide a blank competitor template
@@ -106,6 +108,8 @@ class DinghyRacingModel {
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
         this.handleDinghyClassCreation = this.handleDinghyClassCreation.bind(this);
         this.handleDinghyClassUpdate = this.handleDinghyClassUpdate.bind(this);
+        this.handleFleetCreation = this.handleFleetCreation.bind(this);
+        this.handleFleetUpdate = this.handleFleetUpdate.bind(this);
         this.getStartSequence = this.getStartSequence.bind(this);
         if (!httpRootURL) {
             throw new Error('An HTTP root URL is required when creating an instance of DinghyRacingModel');
@@ -125,10 +129,12 @@ class DinghyRacingModel {
             this.stompClient.subscribe('/topic/createCompetitor', this.handleCompetitorCreation);
             this.stompClient.subscribe('/topic/createDinghy', this.handleDinghyCreation);
             this.stompClient.subscribe('/topic/createDinghyClass', this.handleDinghyClassCreation);
+            this.stompClient.subscribe('/topic/createFleet', this.handleFleetCreation);
             this.stompClient.subscribe('/topic/updateRace', this.handleRaceUpdate);
             this.stompClient.subscribe('/topic/updateEntry', this.handleEntryUpdate);
             this.stompClient.subscribe('/topic/deleteEntry', this.handleEntryUpdate);
             this.stompClient.subscribe('/topic/updateDinghyClass', this.handleDinghyClassUpdate);
+            this.stompClient.subscribe('/topic/updateFleet', this.handleFleetUpdate);
         };
         this.stompClient.activate();
     }
@@ -307,6 +313,65 @@ class DinghyRacingModel {
     handleDinghyClassUpdate(message) {
         if (this.dinghyClassUpdateCallbacks.has(message.body)) {
             this.dinghyClassUpdateCallbacks.get(message.body).forEach(cb => cb());
+        }
+    }
+
+    /**
+     * Register a callback for when a new fleet is created
+     * @param {Function} callback
+     */
+    registerFleetCreationCallback(callback) {
+        this.fleetCreationCallbacks.add(callback);
+    }
+
+    /**
+     * Unregister a callback for when a new fleet is created
+     * @param {Function} callback
+     */
+    unregisterFleetCreationCallback(callback) {
+        this.fleetCreationCallbacks.delete(callback);
+    }
+
+    /**
+     * Handle a websocket fleet creation message via the Stomp client
+     * @param {String} message URI of competitor that was created
+     */
+    handleFleetCreation(message) {
+        this.fleetCreationCallbacks.forEach(cb => cb());
+    }
+
+    /**
+     * Register a callback for when a fleet identified by key is updated
+     * @param {String} key URI of the fleet for which the update callback is being registered
+     * @param {Function} callback
+     */
+    registerFleetUpdateCallback(key, callback) {
+        if (this.fleetUpdateCallbacks.has(key)) {
+            this.fleetUpdateCallbacks.get(key).add(callback);
+        }
+        else {
+            this.fleetUpdateCallbacks.set(key, new Set([callback]));
+        }
+    }
+
+    /**
+     * Unregister a callback for when a fleet idenified by key is updated
+     * @param {String} key URI of the fleet for which the update callback is being unregistered
+     * @param {Function} callback
+     */
+    unregisterFleetUpdateCallback(key, callback) {
+        if (this.fleetUpdateCallbacks.has(key)) {
+            this.fleetUpdateCallbacks.get(key).delete(callback);
+        }
+    }
+
+    /**
+     * Handle a websocket fleet update message via the Stomp client
+     * @param {String} message URI of dinghy class that has been updated
+     */
+    handleFleetUpdate(message) {
+        if (this.fleetUpdateCallbacks.has(message.body)) {
+            this.fleetUpdateCallbacks.get(message.body).forEach(cb => cb());
         }
     }
 

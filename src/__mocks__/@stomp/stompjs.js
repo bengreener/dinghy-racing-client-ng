@@ -152,6 +152,9 @@ export class Client {
               if (key === '/topic/createDinghyClass') {
                 value.forEach(cb => cb({body: 'http://localhost:8081/dinghyracing/api/dinghyClasses/99'}));
               }
+              if (key === '/topic/createFleet') {
+                value.forEach(cb => cb({body: 'http://localhost:8081/dinghyracing/api/fleet/1'}));
+              }
               if (key === '/topic/updateRace') {
                 value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/races/4'}));
               }
@@ -163,6 +166,9 @@ export class Client {
               }
               if (key === '/topic/updateDinghyClass') {
                 value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/dinghyClasses/1'}));
+              }
+              if (key === '/topic/updateFleet') {
+                value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/fleet/1'}));
               }
             });
         }

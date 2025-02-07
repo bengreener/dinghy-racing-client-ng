@@ -321,3 +321,220 @@ it('displays existing fleets', async () => {
     expect(within(fleetTable).getByText(/scorpion/i)).toBeInTheDocument();
     expect(within(fleetTable).getByText(/handicap/i)).toBeInTheDocument();
 });
+
+describe('when a fleet is selected', () => {
+    it('displays fleet details for editing', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+        jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+        await act( async () => {
+            customRender(<FleetConsole />, model);
+        });
+        const fleetCell = await screen.findByRole('cell', {name: /scorpion/i});
+        const selectDinghyClass = await screen.findByLabelText(/dinghy class/i);
+        await act(async () => {
+            await user.click(fleetCell);
+        });
+        expect(await screen.findByLabelText(/name/i)).toHaveValue('Scorpion');
+        expect(selectDinghyClass.selectedOptions.length).toBe(1);
+        expect(selectDinghyClass.value).toBe('http://localhost:8081/dinghyracing/api/dinghyClasses/1');
+        expect(screen.getByRole('button', {name: /update/i})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: /cancel/i})).toBeInTheDocument();
+    });
+    it('clears any error message', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+        jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+        jest.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
+        await act( async () => {
+            customRender(<FleetConsole />, model, controller);
+        });
+        const fleetCell = await screen.findByRole('cell', {name: /scorpion/i});
+        await act(async () => {
+            await user.click(fleetCell);
+        });
+        const nameInput = await screen.findByLabelText(/name/i);
+        const updateButton = screen.getByRole('button', {name: 'Update'});
+        await act(async () => {
+            await user.clear(nameInput);
+            await user.type(nameInput, 'Scorp Pro');
+            await user.click(updateButton);
+        });
+        expect(await screen.findByText(/oops/i)).toBeInTheDocument();
+        await act(async () => {
+            await user.click(fleetCell);
+        });
+        expect(screen.queryByText(/oops/i)).not.toBeInTheDocument();
+    });
+    describe('when values are changed', () => {
+        it('displays new values', async () => {
+            const user = userEvent.setup();
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+            jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+            await act( async () => {
+                customRender(<FleetConsole />, model);
+            });
+            const fleetCell = await screen.findByRole('cell', {name: /scorpion/i});
+            await act(async () => {
+                await user.click(fleetCell);
+            });
+            const nameInput = await screen.findByLabelText(/name/i);
+            const selectDinghyClass = await screen.findByLabelText(/dinghy class/i);
+            await act(async () => {
+                await user.clear(nameInput);
+                await user.type(nameInput, 'Scorp Pro');
+                await user.deselectOptions(selectDinghyClass, ['Scorpion']);
+                await user.selectOptions(selectDinghyClass, ['Comet']);
+            });
+            expect(nameInput).toHaveValue('Scorp Pro');expect(selectDinghyClass.selectedOptions.length).toBe(1);
+            expect(selectDinghyClass.value).toBe('http://localhost:8081/dinghyracing/api/dinghyClasses/16');
+        });
+    });
+    describe('when update button clicked', () => {
+        it('updates dinghy class details in system with new values provided', async () => {
+            const user = userEvent.setup();
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const controller = new DinghyRacingController(model);
+            jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+            jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+            const updateFleetSpy = jest.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: true, domainObject: {...fleetScorpion, name: 'Scorp Pro', dinghyClasses: [dinghyClassComet]}})});
+            await act( async () => {
+                customRender(<FleetConsole />, model, controller);
+            });
+            const fleetCell = await screen.findByRole('cell', {name: /scorpion/i});
+            await act(async () => {
+                await user.click(fleetCell);
+            });
+            const nameInput = await screen.findByLabelText(/name/i);
+            const selectDinghyClass = await screen.findByLabelText(/dinghy class/i);
+            const updateButton = screen.getByRole('button', {name: 'Update'});
+            await act(async () => {
+                await user.clear(nameInput);
+                await user.type(nameInput, 'Scorp Pro');
+                await user.deselectOptions(selectDinghyClass, ['Scorpion']);
+                await user.selectOptions(selectDinghyClass, ['Comet']);
+                await user.click(updateButton);
+            });
+
+            expect(updateFleetSpy).toBeCalledWith({...fleetScorpion, name: 'Scorp Pro', dinghyClasses: [dinghyClassComet]});
+        });
+        describe('when update is successful', () => {
+            it('clears input fields', async () => {
+                const user = userEvent.setup();
+                const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const controller = new DinghyRacingController(model);
+                jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+                jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+                jest.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: true, domainObject: {...fleetScorpion, name: 'Scorp Pro', dinghyClasses: [dinghyClassComet]}})});
+                await act( async () => {
+                    customRender(<FleetConsole />, model, controller);
+                });
+                const fleetCell = await screen.findByRole('cell', {name: /scorpion/i});
+                await act(async () => {
+                    await user.click(fleetCell);
+                });
+                const nameInput = await screen.findByLabelText(/name/i);
+                const selectDinghyClass = await screen.findByLabelText(/dinghy class/i);
+                const updateButton = screen.getByRole('button', {name: 'Update'});
+                await act(async () => {
+                    await user.clear(nameInput);
+                    await user.type(nameInput, 'Scorp Pro');
+                    await user.deselectOptions(selectDinghyClass, ['Scorpion']);
+                    await user.selectOptions(selectDinghyClass, ['Comet']);
+                    await user.click(updateButton);
+                });
+                expect(nameInput).toHaveValue('');
+                expect(selectDinghyClass.selectedOptions.length).toBe(0);
+            });
+            it('refreshes fleet list', async () => {
+                const user = userEvent.setup();
+                const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const controller = new DinghyRacingController(model);
+                jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success:true, domainObject: [{...fleets[0], name: 'Scorp Pro', dingyClasses: [dinghyClassComet]}, fleets[1]]})})
+                    .mockImplementationOnce(() => {return Promise.resolve({success: true, domainObject: fleets})});
+                jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+                jest.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: true, domainObject: {...fleetScorpion, name: 'Scorp Pro', dinghyClasses: [dinghyClassComet]}})});
+                await act( async () => {
+                    customRender(<FleetConsole />, model, controller);
+                });
+                const dinghyClassCell = await screen.findByRole('cell', {name: /scorpion/i});
+                await act(async () => {
+                    await user.click(dinghyClassCell);
+                });
+                const fleetCell = await screen.findByRole('cell', {name: /scorpion/i});
+                await act(async () => {
+                    await user.click(fleetCell);
+                });
+                const nameInput = await screen.findByLabelText(/name/i);
+                const selectDinghyClass = await screen.findByLabelText(/dinghy class/i);
+                await act(async () => {
+                    await user.clear(nameInput);
+                    await user.type(nameInput, 'Scorp Pro');
+                    await user.deselectOptions(selectDinghyClass, ['Scorpion']);
+                    await user.selectOptions(selectDinghyClass, ['Comet']);
+                });
+                await act(async () => {
+                    model.handleFleetUpdate({'body': fleets[0].url});
+                });
+    
+                expect(await screen.findByRole('cell', {name: /scorp pro/i})).toBeInTheDocument();
+            });
+        });
+        describe('when there is a problem updating dinghy class', () => {
+            it('provides a message expalining cause of issue', async () => {
+                const user = userEvent.setup();
+                const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const controller = new DinghyRacingController(model);
+                jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+                jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+                jest.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops something went wrong.'})});
+                await act( async () => {
+                    customRender(<FleetConsole />, model, controller);
+                });
+                const fleetCell = await screen.findByRole('cell', {name: /scorpion/i});
+                await act(async () => {
+                    await user.click(fleetCell);
+                });
+                const nameInput = await screen.findByLabelText(/name/i);
+                const updateButton = screen.getByRole('button', {name: 'Update'});
+                await act(async () => {
+                    await user.clear(nameInput);
+                    await user.type(nameInput, 'Scorp Pro');
+                    await user.click(updateButton);
+                });
+
+                expect(await screen.findByText('Oops something went wrong.')).toBeInTheDocument();
+            });
+        })
+    });
+    describe('when cancelled', () => {
+        it('clears input fields', async () => {
+            const user = userEvent.setup();
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const controller = new DinghyRacingController(model);
+            jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+            jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+            await act( async () => {
+                customRender(<FleetConsole />, model, controller);
+            });
+            const fleetCell = await screen.findByRole('cell', {name: /scorpion/i});
+            await act(async () => {
+                await user.click(fleetCell);
+            });
+            const nameInput = await screen.findByLabelText(/name/i);
+            const selectDinghyClass = await screen.findByLabelText(/dinghy class/i);
+            const cancelButton = screen.getByRole('button', {name: 'Cancel'});
+            await act(async () => {
+                await user.clear(nameInput);
+                await user.type(nameInput, 'Scorp Pro');
+                await user.click(cancelButton);
+            });
+            expect(nameInput).toHaveValue('');
+            expect(selectDinghyClass.selectedOptions.length).toBe(0);
+        });
+    });
+})

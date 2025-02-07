@@ -26,6 +26,8 @@ class DinghyRacingModel {
     dinghyCreationCallbacks = new Set();
     dinghyClassCreationCallbacks = new Set();
     dinghyClassUpdateCallbacks = new Map();
+    fleetCreationCallbacks = new Set();
+    fleetUpdateCallbacks = new Map();
 
     /**
      * Provide a blank competitor template
@@ -89,6 +91,8 @@ class DinghyRacingModel {
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
         this.handleDinghyClassCreation = this.handleDinghyClassCreation.bind(this);
         this.handleDinghyClassUpdate = this.handleDinghyClassUpdate.bind(this);
+        this.handleFleetCreation = this.handleFleetCreation.bind(this);
+        this.handleFleetUpdate = this.handleFleetUpdate.bind(this);
         this.getStartSequence = this.getStartSequence.bind(this);
         if (!httpRootURL) {
             throw new Error('An HTTP root URL is required when creating an instance of DinghyRacingModel');
@@ -196,6 +200,39 @@ class DinghyRacingModel {
     handleDinghyClassUpdate(message) {
         if (this.dinghyClassUpdateCallbacks.has(message.body)) {
             this.dinghyClassUpdateCallbacks.get(message.body).forEach(cb => cb());
+        }
+    }
+
+    registerFleetCreationCallback(callback) {
+        this.fleetCreationCallbacks.add(callback);
+    }
+
+    unregisterFleetCreationCallback(callback) {
+        this.fleetCreationCallbacks.delete(callback);
+    }
+
+    handleFleetCreation(message) {
+        this.fleetCreationCallbacks.forEach(cb => cb());
+    }
+    
+    registerFleetUpdateCallback(key, callback) {
+        if (this.fleetUpdateCallbacks.has(key)) {
+            this.fleetUpdateCallbacks.get(key).add(callback);
+        }
+        else {
+            this.fleetUpdateCallbacks.set(key, new Set([callback]));
+        }
+    }
+
+    unregisterFleetUpdateCallback(key, callback) {
+        if (this.fleetUpdateCallbacks.has(key)) {
+            this.fleetUpdateCallbacks.get(key).delete(callback);
+        }
+    }
+
+    handleFleetUpdate(message) {
+        if (this.fleetUpdateCallbacks.has(message.body)) {
+            this.fleetUpdateCallbacks.get(message.body).forEach(cb => cb());
         }
     }
 

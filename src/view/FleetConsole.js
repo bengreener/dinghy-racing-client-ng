@@ -31,12 +31,42 @@ function FleetConsole() {
     const [dinghyClassMap, setDinghyClassMap] = useState(new Map());
     const [message, setMessage] = useState('');
     const fleetNameInputRef = useRef(null);
+    const [updatingFleet, setUpdatingFleet] = useState(false);
+    const [fleetUpdateRequestAt, setFleetUpdateRequestAt] = useState(Date.now());
+
+    const handleFleetUpdate = useCallback(() => {
+        setFleetUpdateRequestAt(Date.now());
+    });
 
     const clear = useCallback(() => {
         setFleet(DinghyRacingModel.fleetTemplate());
+        setUpdatingFleet(false);
         fleetNameInputRef.current.focus();
         setMessage('');
     }, []);
+
+    // register on creation callback for fleets
+    useEffect(() => {
+        model.registerFleetCreationCallback(handleFleetUpdate);
+        // cleanup before effect runs and before form close
+        return () => {
+            model.unregisterFleetCreationCallback(handleFleetUpdate);
+        }
+    }, [model, handleFleetUpdate]);
+
+    // register on update callbacks for fleets
+    useEffect(() => {
+        const fleets = Array.from(fleetMap.values());
+        fleets.forEach(fleet => {
+            model.registerFleetUpdateCallback(fleet.url, handleFleetUpdate);
+        });
+        // cleanup before effect runs and before form close
+        return () => {
+            fleets.forEach(fleet => {
+                model.unregisterFleetUpdateCallback(fleet.url, handleFleetUpdate);
+            });
+        }
+    }, [model, fleetMap, handleFleetUpdate]);
 
     useEffect(() => {
         let ignoreFetch = false;
@@ -57,7 +87,7 @@ function FleetConsole() {
             ignoreFetch = true;
             setMessage(''); // clear any previous message
         }
-    }, [model]);
+    }, [model, fleetUpdateRequestAt]);
 
     useEffect(() => {
         let ignoreFetch = false;
@@ -90,6 +120,16 @@ function FleetConsole() {
         }
     }
 
+    async function updateFleet(fleet) {
+        const result = await controller.updateFleet(fleet);
+        if (result.success) {
+            clear();
+        }
+        else {
+            setMessage(result.message);
+        }
+    }
+
     function handleChange({ target }) {
         setFleet({...fleet, name: target.value});
     }
@@ -105,16 +145,29 @@ function FleetConsole() {
         createFleet(fleet);
     }
 
+    function handleUpdateButtonClick(event) {
+        event.preventDefault();
+        updateFleet(fleet);
+    }
+
     function userMessageClasses() {
         return !message ? 'hidden' : 'console-error-message';
     }
 
     function fleetRows() {
         return Array.from(fleetMap.values()).map(fleet => {return (
-            <tr key={fleet.url} >
+            <tr onClick={handleFleetRowClick} id={fleet.url} key={fleet.url} >
                 <td>{fleet.name}</td>
             </tr>
         )});
+    }
+
+    function handleFleetRowClick({ currentTarget }) {
+        const fleet = {...fleetMap.get(currentTarget.id)};
+        setFleet(fleet);
+        setUpdatingFleet(true);
+        fleetNameInputRef.current.focus();
+        setMessage('');
     }
 
     return(
@@ -131,7 +184,7 @@ function FleetConsole() {
                 </div>
                 <div className='w3-row'>
                     <div className='w3-col m8' >
-                        <button className='w3-right' type='button' onClick={handleCreateButtonClick} >Create</button>
+                        {!updatingFleet ? <button className='w3-right' type='button' onClick={handleCreateButtonClick} >Create</button> : <button className='w3-right' type='button' onClick={handleUpdateButtonClick} >Update</button>}
                         <button className='w3-right' type='button' onClick={clear} >Cancel</button>
                     </div>
                 </div>

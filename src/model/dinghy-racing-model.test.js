@@ -345,7 +345,7 @@ describe('when creating a new dinghy class', () => {
     });
 });
 
-describe('when searcing for a dinghy class by name', () => {
+describe('when searching for a dinghy class by name', () => {
     it('returns a promise that resolves to a result indicating success and containing the dinghy class when dinghy class is found and http status 200', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
@@ -6223,4 +6223,92 @@ describe('when the crews that have sailed a dinghy are requested', () => {
             expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
         });
     });
-})
+});
+
+describe('when a websocket message callback has been set for fleet creation', () => {
+    it('calls the callback', done => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerFleetCreationCallback(callback);
+        // create delay to give time for stomp mock to trigger callback
+        setTimeout(() => {
+            expect(callback).toBeCalled();
+            done();
+        }, 1);
+    });
+    it('does not set another reference to the same callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerFleetCreationCallback(callback);
+        dinghyRacingModel.registerFleetCreationCallback(callback);
+        expect(dinghyRacingModel.fleetCreationCallbacks.size).toBe(1);
+    });
+    it('sets a functionally equivalent but different callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback1 = jest.fn();
+        const callback2 = jest.fn();
+        dinghyRacingModel.registerFleetCreationCallback(callback1);
+        dinghyRacingModel.registerFleetCreationCallback(callback2);
+        expect(dinghyRacingModel.fleetCreationCallbacks.size).toBe(2);
+    });
+    it('removes websocket message when requested', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerFleetCreationCallback(callback);
+        dinghyRacingModel.unregisterFleetCreationCallback(callback);
+        expect(dinghyRacingModel.fleetCreationCallbacks.size).toBe(0);
+    });
+    it('does not remove functionally equivalent but different callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback1 = jest.fn();
+        const callback2 = jest.fn();
+        dinghyRacingModel.registerFleetCreationCallback(callback1);
+        dinghyRacingModel.registerFleetCreationCallback(callback2);
+        dinghyRacingModel.unregisterFleetCreationCallback(callback1);
+        expect(dinghyRacingModel.fleetCreationCallbacks.size).toBe(1);
+    });
+});
+
+describe('when a websocket message callback has been set for dinghy class update', () => {
+    it('calls the callback', done => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback);
+        // create delay to give time for stomp mock to trigger callback
+        setTimeout(() => {
+            expect(callback).toBeCalled();
+            done();
+        }, 1);
+    });
+    it('does not set another reference to the same callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback);
+        dinghyRacingModel.registerFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback);
+        expect(dinghyRacingModel.fleetUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/fleet/1').size).toBe(1);
+    });
+    it('sets a functionally equivalent but different callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback1 = jest.fn();
+        const callback2 = jest.fn();
+        dinghyRacingModel.registerFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback1);
+        dinghyRacingModel.registerFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback2);
+        expect(dinghyRacingModel.fleetUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/fleet/1').size).toBe(2);
+    });
+    it('removes websocket message when requested', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback = jest.fn();
+        dinghyRacingModel.registerFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback);
+        dinghyRacingModel.unregisterFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback);
+        expect(dinghyRacingModel.fleetUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/fleet/1').size).toBe(0);
+    });
+    it('does not remove functionally equivalent but different callback', () => {
+        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const callback1 = jest.fn();
+        const callback2 = jest.fn();
+        dinghyRacingModel.registerFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback1);
+        dinghyRacingModel.registerFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback2);
+        dinghyRacingModel.unregisterFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback1);
+        expect(dinghyRacingModel.fleetUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/fleet/1').size).toBe(1);
+    });
+});
