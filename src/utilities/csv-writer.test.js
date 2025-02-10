@@ -39,7 +39,7 @@ it('returns a promise indicating failure and providing a message with the cause'
     expect(await promise).toEqual({'success': false, 'message': 'Oops!'});
 });
 
-describe('when race is for dinghy class with crew', () => {
+describe('when race is for fleet that includes dinghy classes with crew', () => {
     it('provides a header row that includes crew name header', () => {
         const entriesScorpionA_with_laps = [{...entriesScorpionA[0]}, {...entriesScorpionA[1]}];
         entriesScorpionA_with_laps[0].laps = [{'number': 1, 'time': 1000}, {'number': 2, 'time': 1100}, {'number': 3, 'time': 1200}];
@@ -68,8 +68,8 @@ describe('when race is for dinghy class with crew', () => {
     });
 });
 
-describe('when race is for dinghy class without crew', () => {
-    it('provides a header row that does not include crew name header', () => {
+describe('when race is for fleet that includes only dinghy classes without crew', () => {
+    it('provides a header row without crew name header', () => {
         const entriesCometA_with_laps = entriesCometA;
         entriesCometA_with_laps[0].laps = [{'number': 1, 'time': 1000}, {'number': 2, 'time': 1100}, {'number': 3, 'time': 1200}];
         entriesCometA_with_laps[0].sumOfLapTimes =  3300;

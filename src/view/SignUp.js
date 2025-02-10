@@ -30,8 +30,8 @@ function SignUp({ race }) {
     const [helmName, setHelmName] = useState('');
     const [crewName, setCrewName] = useState('');
     const [sailNumber, setSailNumber] = useState('');
-    const [dinghyClassName, setDinghyClassName] = useState('');
-    const [dinghyClassHasCrew, setDinghyClassHasCrew] = useState(false);
+    const [dinghyClassName, setDinghyClassName] = useState(() => {return race.fleet.dinghyClasses.length === 1 ? race.fleet.dinghyClasses[0].name : ''});
+    // const [dinghyClassHasCrew, setDinghyClassHasCrew] = useState(false);
     const [result, setResult] = useState({'message': ''});
     const [message, setMessage] = useState(''); // feedback to user
     const [competitorMap, setCompetitorMap] = useState(new Map());
@@ -81,13 +81,13 @@ function SignUp({ race }) {
         setMessage('');
         setSelectedEntry(null);
         setPreviousEntriesMap(new Map());
-        if (race.dinghyClass) {
+        if (race.fleet.dinghyClasses.length === 1) {
             helmInput.current.focus();
         }
         else {
             dinghyClassSelect.current.focus();
         }
-    }, [race.dinghyClass]);
+    }, [race.fleet.dinghyClasses]);
 
     const handleEntryRowClick = useCallback(({ currentTarget }) => {
         const entry = entriesMap.current.get(currentTarget.id);
@@ -100,7 +100,7 @@ function SignUp({ race }) {
             setDinghyClassName(entry.dinghy.dinghyClass.name);
         }
         setSailNumber(entry.dinghy.sailNumber);
-        if (race.dinghyClass) {
+        if (race.fleet.dinghyClasses.length === 1) {
             helmInput.current.focus();
         }
         else {
@@ -138,7 +138,7 @@ function SignUp({ race }) {
             setDinghyClassName(previousEntry.dinghy.dinghyClass.name);
         }
         setSailNumber(previousEntry.dinghy.sailNumber);
-        if (race.dinghyClass) {
+        if (race.fleet.dinghyClasses.length === 1) {
             helmInput.current.focus();
         }
         else {
@@ -335,17 +335,28 @@ function SignUp({ race }) {
     }, [result, clear]);
 
     // check if dinghy class has crew
-    useEffect(() => {
-        if (race.dinghyClass) {
-            setDinghyClassHasCrew(race.dinghyClass.crewSize > 1);
+    // useEffect(() => {
+    //     if (dinghyClassName) {
+    //         // set as appropriate for selected dinghy class
+    //         setDinghyClassHasCrew(dinghyClassMap.get(dinghyClassName).crewSize > 1);
+    //     }
+    //     else {
+    //         // default is to not allow entry of crew (reduces risk of crew being entered and then dinghy class set to a class with no crew)
+    //         setDinghyClassHasCrew(false);
+    //     }
+    // }, [race, dinghyClassName, dinghyClassMap]);
+    function dinghyClassHasCrew() {
+        if (race.fleet.dinghyClasses.length === 1) {
+            return race.fleet.dinghyClasses[0].crewSize > 1;
         }
-        else if (dinghyClassName) {
-            setDinghyClassHasCrew(dinghyClassMap.get(dinghyClassName).crewSize > 1);
+        if (dinghyClassName) {
+            return dinghyClassMap.get(dinghyClassName).crewSize > 1;
         }
-        else {
-            setDinghyClassHasCrew(false);
+        if (!race.fleet.dinghyClasses.some(dinghyClass => dinghyClass.crewSize > 1)) {
+            return false;
         }
-    }, [race, dinghyClassName, dinghyClassMap]);
+        return false;
+    }
     
     function handleChange({target}) {
         if (target.name === 'sailNumber') {
@@ -465,17 +476,13 @@ function SignUp({ race }) {
 
     function dinghyClassInput(race) {
         let dinghyClassInput = null;    
-        if (!race.dinghyClass) {
+        if (race.fleet.dinghyClasses.length !== 1) {
             dinghyClassInput = (
                 <div className='w3-row'>
                     <label htmlFor='dinghy-class-select' className='w3-col m2' >Dinghy Class</label>
                     <select id='dinghy-class-select' ref={dinghyClassSelect} name='dinghyClass' className='w3-half' multiple={false} onChange={handleChange} value={dinghyClassName} autoFocus >{dinghyClassOptions}</select>
                 </div>
             );
-        }
-        // if race has a specified dinghy class then set for selected dinghy as well
-        else if (!dinghyClassName) {
-            setDinghyClassName(race.dinghyClass.name);
         }
         return dinghyClassInput;
     }
@@ -506,7 +513,7 @@ function SignUp({ race }) {
                 <input id='crew-input' name='crew' className='w3-half' list='competitor-datalist' onChange={handleChange} value={crewName} disabled />
             </div>
         );
-        if (dinghyClassHasCrew) {
+        if (dinghyClassHasCrew()) {
             crewInput = (
                 <div className='w3-row'>
                     <label htmlFor='crew-input' className='w3-col m2' >Crew's Name</label>

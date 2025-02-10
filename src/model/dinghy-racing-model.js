@@ -19,6 +19,7 @@ import StartSignal from './domain-classes/start-signal';
 import StartSequence from './domain-classes/start-sequence';
 import RaceType from './domain-classes/race-type';
 import StartType from './domain-classes/start-type';
+import { dinghiesCollectionHAL } from './__mocks__/test-data';
 
 class DinghyRacingModel {
     httpRootURL;
@@ -62,7 +63,7 @@ class DinghyRacingModel {
      * @returns {Race}
      */
     static raceTemplate() {
-        return {name: '', plannedStartTime: null, dinghyClass: DinghyRacingModel.dinghyClassTemplate(), type: null, startType: null, duration: 0, plannedLaps: null, lapsSailed: null, lapForecast: null, 
+        return {name: '', plannedStartTime: null, fleet: DinghyRacingModel.fleetTemplate(), type: null, startType: null, duration: 0, plannedLaps: null, lapsSailed: null, lapForecast: null, 
             lastLapTime: null, averageLapTime: null, clock: null, startSequenceState: StartSignal.NONE, dinghyClasses: [], url: ''};
     }
 
@@ -905,39 +906,18 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async createRace(race) {
-        let dinghyClassURL;
-        // if no dinghy class supplied than is a handicap race
-        if (race.dinghyClass !== null && race.dinghyClass.name !== '') {
-            // if not supplied get url for dinghyClass
-            if (!(race.dinghyClass.url)) {
-                const result = await this.getDinghyClassByName(race.dinghyClass.name);
-                if (!result.success) {
-                    return Promise.resolve(result);
-                }
-                dinghyClassURL = result.domainObject.url;
-            } 
-            else {
-                dinghyClassURL = race.dinghyClass.url;
-            }
-        }
-
         // convert local race domain type into format required by REST service
         // REST service will accept a value in ISO 8601 format (time units only PT[n]H[n]M,n]S) or in seconds
-        const newRace = {...race, 'dinghyClass': dinghyClassURL, 'duration': race.duration / 1000};
+        const newRace = {...race, fleet: race.fleet.url, 'duration': race.duration / 1000};
         const result = await this.create('races', newRace);
         if (result.success) {
-            // get dinghyClass
-            let dinghyClassResult = await this.getDinghyClass(result.domainObject._links.dinghyClass.href);
-            // if race is a a handicap it will not have a dinghy class set and REST service will return a 404 not found error so in this case assume 404 error is a 'success' and provide an empty dinghy class
-            const regex404 = /HTTP Error: 404/i;
-            if (!dinghyClassResult.success && regex404.test(dinghyClassResult.message)) {
-                dinghyClassResult = {'success': true, 'domainObject': null};
-            }
-            if (dinghyClassResult.success) {
-                return Promise.resolve({success: true, domainObject: this._convertRaceHALToRace(result.domainObject, dinghyClassResult.domainObject)});
+            // get fleet
+            let fleetResult = await this.getFleet(result.domainObject._links.fleet.href);
+            if (fleetResult.success) {
+                return Promise.resolve({success: true, domainObject: this._convertRaceHALToRace(result.domainObject, fleetResult.domainObject)});
             }
             else {
-                return Promise.resolve(dinghyClassResult);
+                return Promise.resolve(fleetResult);
             }
         }
         else {
@@ -1352,19 +1332,13 @@ class DinghyRacingModel {
     async getRace(url) {
         const result = await this.read(url);
         if (result.success) {
-            // get dinghyClass
-            let dinghyClassResult = await this.getDinghyClass(result.domainObject._links.dinghyClass.href);
-            // if race is a a handicap it will not have a dinghy class set and REST service will return a 404 not found error so in this case assume 404 error is a 
-            // 'success' and provide an empty dinghy class 
-            const regex404 = /HTTP Error: 404/i;
-            if (!dinghyClassResult.success && regex404.test(dinghyClassResult.message)) {
-                dinghyClassResult = {'success': true, 'domainObject': null};
-            }
-            if (dinghyClassResult.success) {
-                return Promise.resolve({'success': true, 'domainObject': this._convertRaceHALToRace(result.domainObject, dinghyClassResult.domainObject)});
+            // get fleet
+            let fleetResult = await this.getFleet(result.domainObject._links.fleet.href);
+            if (fleetResult.success) {
+                return Promise.resolve({'success': true, 'domainObject': this._convertRaceHALToRace(result.domainObject, fleetResult.domainObject)});
             }
             else {
-                return Promise.resolve(dinghyClassResult);
+                return Promise.resolve(fleetResult);
             }
         }
         else {
@@ -1463,14 +1437,12 @@ class DinghyRacingModel {
                 return this.getRacesFromURL(url, 0, result.domainObject.page.totalElements);
             }
             const racesHAL = result.domainObject._embedded.races;
-            const dinghyClassURLs = racesHAL.map(race => race._links.dinghyClass.href);
-            const dinghyClassResults = await Promise.all(dinghyClassURLs.map(url => this.read(url)));
+            const fleetURLs = racesHAL.map(race => race._links.fleet.href);
+            const fleetResults = await Promise.all(fleetURLs.map(url => this.getFleet(url)));
             
             const races = [];
             for (let i = 0; i < racesHAL.length; i++  ) {
-                const dinghyClass = dinghyClassResults[i].success ? this._convertDinghyClassHALToDinghyClass(dinghyClassResults[i].domainObject) : null;
-                // assume time received has been stored in UTC
-                races.push(this._convertRaceHALToRace(racesHAL[i], dinghyClass));
+                races.push(this._convertRaceHALToRace(racesHAL[i], fleetResults[i].domainObject));
             };
             return Promise.resolve({'success': true, 'domainObject': races});
         }
@@ -1746,10 +1718,10 @@ class DinghyRacingModel {
         }
     }
 
-    _convertRaceHALToRace(raceHAL, dinghyClass) {
+    _convertRaceHALToRace(raceHAL, fleet) {
         return {...DinghyRacingModel.raceTemplate(), name: raceHAL.name,
             plannedStartTime: new Date(raceHAL.plannedStartTime + 'Z'),
-            dinghyClass: dinghyClass, duration: this.convertISO8601DurationToMilliseconds(raceHAL.duration),
+            fleet: fleet, duration: this.convertISO8601DurationToMilliseconds(raceHAL.duration),
             type: RaceType.from(raceHAL.type),
             startType: StartType.from(raceHAL.startType),
             plannedLaps: raceHAL.plannedLaps, lapsSailed: raceHAL.leadEntry ? raceHAL.leadEntry.lapsSailed : null,

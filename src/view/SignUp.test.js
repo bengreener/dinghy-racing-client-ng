@@ -60,7 +60,7 @@ beforeEach(() => {
 });
 
 describe('when signing up for a race', () => {
-    describe('when race for dinghy class with no crew', () => {
+    describe('when race for a fleet that includes only dinghy classes with no crew', () => {
         it('renders', async () => {
             await act(async () => {
                 customRender(<SignUp race={raceCometA}/>, model, controller);
@@ -600,7 +600,7 @@ describe('when signing up for a race', () => {
             expect(within(signUpSummary[0]).getByText(/comet/i)).toBeInTheDocument();
         });
     });    
-    describe('when race for dinghy class with crew', () => {
+    describe('when race for a fleet that includes dinghy classes with crew', () => {
         it('renders', async () => {
             await act(async () => {
                 customRender(<SignUp race={raceScorpionA}/>, model, controller);
@@ -4366,7 +4366,7 @@ describe('when signing up for a race', () => {
 });
 
 describe('when updating an existing entry', () => {
-    describe('when race for dinghy class with no crew', () => {
+    describe('when race for a fleet that includes only dinghy classes with no crew', () => {
         it('displays details for selected entry', async () => {
             const user = userEvent.setup();
             await act(async () => {
@@ -4992,7 +4992,7 @@ describe('when updating an existing entry', () => {
             expect(screen.getByRole('button', {'name': /sign-up/i})).toBeInTheDocument();
         });
     });    
-    describe('when race for dinghy class with crew', () => {
+    describe('when race for a fleet that includes dinghy classes with crew', () => {
         it('displays details for selected entry', async () => {
             const user = userEvent.setup();
             await act(async () => {

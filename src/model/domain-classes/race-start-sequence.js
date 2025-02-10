@@ -136,12 +136,13 @@ class RaceStartSequence {
 
         if (race.type === RaceType.FLEET) {
             let warningFlag;
-            if (race.dinghyClass) {
-                warningFlag = {name: race.dinghyClass.name + ' Class Flag', role: FlagRole.WARNING, actions: []};
-            }
-            else {
+            if (race.fleet.name === 'Handicap') {
                 warningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, actions: []};
             }
+            else {
+                warningFlag = {name: race.fleet.name + ' Class Flag', role: FlagRole.WARNING, actions: []};
+            }
+            
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
 
             const warningFlagRaiseAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + warningFlagOffsets.raise), afterState: FlagState.RAISED};

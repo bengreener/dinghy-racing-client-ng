@@ -190,7 +190,7 @@ it('displays races that start within the time window specified', async () => {
         timeStyle: 'medium',
         hour12: false
     }).format(new Date('2021-10-14T10:30:00Z')))).toBeInTheDocument();
-    expect(screen.getByText(/^comet$/i)).toBeInTheDocument();
+    expect(screen.getByText(/comet a/i)).toBeInTheDocument();
     expect(screen.getByText(/handicap a/i)).toBeInTheDocument();
 });
 

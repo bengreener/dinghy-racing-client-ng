@@ -60,12 +60,12 @@ function downloadRaceEntriesCSV(race, entries, options) {
 function createHeader(race) {
     switch (race.type) {
         case RaceType.PURSUIT:
-            if (!race.dinghyClass || race.dinghyClass.crewSize > 1) {
+            if (race.fleet.dinghyClasses.length === 0 || race.fleet.dinghyClasses.some(dinghyClass => dinghyClass.crewSize > 1)) {
                 return 'HelmName,CrewName,SailNo,Class,Place,Code,RaceRating\n';
             }
             return 'HelmName,SailNo,Class,Place,Code,RaceRating\n';
         default:
-            if (!race.dinghyClass || race.dinghyClass.crewSize > 1) {
+            if (race.fleet.dinghyClasses.length === 0 || race.fleet.dinghyClasses.some(dinghyClass => dinghyClass.crewSize > 1)) {
                 return 'HelmName,CrewName,SailNo,Class,Place,Elapsed,Laps,Code,RaceRating,Corrected\n';
             }
             return 'HelmName,SailNo,Class,Place,Elapsed,Laps,Code,RaceRating,Corrected\n';
@@ -86,7 +86,7 @@ function convertRaceEntriesToCSVArray(race, entries, options) {
                 break;
             default:
                 record += entry.helm.name + ',';
-                if (!race.dinghyClass || race.dinghyClass.crewSize > 1) {
+                if (race.fleet.dinghyClasses.length === 0 || race.fleet.dinghyClasses.some(dinghyClass => dinghyClass.crewSize > 1)) {
                     record += entry.crew ? entry.crew.name + ',' : ',';
                 }
         }
