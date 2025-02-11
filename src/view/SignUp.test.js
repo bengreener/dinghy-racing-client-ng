@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { act, findByLabelText, screen, within } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import { customRender } from '../test-utilities/custom-renders';
 import userEvent from '@testing-library/user-event';
 import DinghyRacingModel from '../model/dinghy-racing-model';
@@ -29,7 +29,8 @@ import { httpRootURL, wsRootURL,
     competitorSarahPascal,
     dinghy2726,
     entryChrisMarshallHandicapA1234, entryChrisMarshallScorpionA1234,
-    dinghyScorpion1234Crews, dinghyGraduate1234Crews, dinghyComet1234Crews } from '../model/__mocks__/test-data';
+    dinghyScorpion1234Crews, dinghyGraduate1234Crews, dinghyComet1234Crews, 
+    dinghyClassGraduate} from '../model/__mocks__/test-data';
 
 jest.mock('../model/dinghy-racing-model');
 jest.mock('../controller/dinghy-racing-controller');
@@ -60,6 +61,15 @@ beforeEach(() => {
 });
 
 describe('when signing up for a race', () => {
+    it('only provides the option to select dinghy classes that are allowed for the race', async () => {
+        const fleetHandicap = {name: 'Handicap', dinghyClasses: [dinghyClassScorpion, dinghyClassGraduate], url: 'http://localhost:8081/dinghyracing/api/fleets/2'};
+        await act(async () => {
+            customRender(<SignUp race={{...raceHandicapA, fleet: fleetHandicap}}/>, model, controller);
+        });
+        const inputDinghyClass = screen.getByLabelText(/class/i);
+        const options = within(inputDinghyClass).getAllByRole('option');
+        expect(options.length).toBe(3);
+    });
     describe('when race for a fleet that includes only dinghy classes with no crew', () => {
         it('renders', async () => {
             await act(async () => {
@@ -2117,21 +2127,22 @@ describe('when signing up for a race', () => {
             expect((await screen.findAllByRole('button', {name: /x/i}))[0]).toBeInTheDocument();
         });
     });    
-    describe('when race is a handicap', () => {
+    describe('when race is an open handicap', () => {
         it('renders', async () => {
             await act(async () => {
                 customRender(<SignUp race={raceHandicapA}/>, model, controller);
             });
             const raceTitle = screen.getByRole('heading', {'name': /Handicap A/i});
             const inputHelm = screen.getByLabelText(/helm/i);
+            const inputDinghyClass = screen.getByLabelText(/class/i);
             const inputSailNumber = screen.getByLabelText(/sail/i);
             const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
             expect(raceTitle).toBeInTheDocument();
             expect(inputHelm).toBeInTheDocument();
+            expect(inputDinghyClass).toBeInTheDocument();
             expect(inputSailNumber).toBeInTheDocument();
             expect(btnCreate).toBeInTheDocument();
         });
-    
         describe('when helm name is entered then ', () => {
             it('displays helm name', async () => {
                 const user = userEvent.setup();

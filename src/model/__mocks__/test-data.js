@@ -136,7 +136,6 @@ const raceScorpion_AHAL = {
 			fleet : { href :  'http://localhost:8081/dinghyracing/api/races/4/fleet' }
 		} 
 };
-// const raceScorpion_ADinghyClassHAL = dinghyClassScorpionHAL;
 const raceScorpion_ASignedUpHAL = {_embedded: {dinghies: [ {sailNumber: '1234', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' } } }, {sailNumber: '6745', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/3' }, dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/3' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass' } } } ] }, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/races/4/signedUp' } } };
 
 const raceGraduate_AHAL = {
@@ -148,7 +147,6 @@ const raceGraduate_AHAL = {
 		fleet: {href: 'http://localhost:8081/dinghyracing/api/races/7/fleet' } 
 	} 
 };
-// const raceGraduate_ADinghyClassHAL = {name: 'Graduate', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/5' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/5' } } };
 const raceGraduate_ASignedUpHAL = {_embedded: {dinghies: [ ] }, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/races/7/signedUp' } } };
 
 const raceComet_AHAL = {

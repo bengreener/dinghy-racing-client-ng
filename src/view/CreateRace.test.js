@@ -296,4 +296,4 @@ describe('when creating a new race', () => {
     
         expect(message).toBeInTheDocument();
     })
-})
+});

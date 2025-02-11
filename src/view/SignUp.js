@@ -211,33 +211,42 @@ function SignUp({ race }) {
 
     // get dinghy classes
     useEffect(() => {
-        let ignoreFetch = false; // set to true if SignUp rerendered before fetch completes to avoid using out of date result
-        model.getDinghyClasses().then(result => {
-            if (!ignoreFetch) {
-                if (result.success) {
-                    // build dinghy class options
-                    let options = [];
-                    let map = new Map();
-                    // set handicap options
-                    options.push(<option key={''} value={''}></option> );
-                    // set dinghy classes
-                    result.domainObject.forEach(dinghyClass => {
-                        options.push(<option key={dinghyClass.name} value={dinghyClass.name}>{dinghyClass.name}</option>);
-                        map.set(dinghyClass.name, dinghyClass);
-                    });
-                    setDinghyClassMap(map);
-                    setDinghyClassOptions(options);
-                }
-                else {
-                    setMessage('Unable to load dinghy classes\n' + result.message);
-                }
-            }
-        });
+        const buildDinghyClassOptions = (dinghyClasses) => {
+            // build dinghy class options
+            let options = [];
+            let map = new Map();
+            // set handicap options
+            options.push(<option key={''} value={''}></option> );
+            // set dinghy classes
+            dinghyClasses.forEach(dinghyClass => {
+                options.push(<option key={dinghyClass.name} value={dinghyClass.name}>{dinghyClass.name}</option>);
+                map.set(dinghyClass.name, dinghyClass);
+            });
+            setDinghyClassMap(map);
+            setDinghyClassOptions(options);
+        }
 
+        let ignoreFetch = false; // set to true if SignUp rerendered before fetch completes to avoid using out of date result
+        // if Race has a fleet with a restricted set of dinghy classes then use those dinghy classes otherwise get all dinghy classes
+        if (race.fleet.dinghyClasses.length > 0) {
+            buildDinghyClassOptions(race.fleet.dinghyClasses);
+        }
+        else {
+            model.getDinghyClasses().then(result => {
+                if (!ignoreFetch) {
+                    if (result.success) {
+                        buildDinghyClassOptions(result.domainObject);
+                    }
+                    else {
+                        setMessage('Unable to load dinghy classes\n' + result.message);
+                    }
+                }
+            });
+        }
         return () => {
             ignoreFetch = true;
         }
-    }, [model, dinghyClassUpdateRequestAt]);
+    }, [model, dinghyClassUpdateRequestAt, race.fleet.dinghyClasses]);
 
     // get dinghies
     useEffect(() => {
@@ -335,16 +344,6 @@ function SignUp({ race }) {
     }, [result, clear]);
 
     // check if dinghy class has crew
-    // useEffect(() => {
-    //     if (dinghyClassName) {
-    //         // set as appropriate for selected dinghy class
-    //         setDinghyClassHasCrew(dinghyClassMap.get(dinghyClassName).crewSize > 1);
-    //     }
-    //     else {
-    //         // default is to not allow entry of crew (reduces risk of crew being entered and then dinghy class set to a class with no crew)
-    //         setDinghyClassHasCrew(false);
-    //     }
-    // }, [race, dinghyClassName, dinghyClassMap]);
     function dinghyClassHasCrew() {
         if (race.fleet.dinghyClasses.length === 1) {
             return race.fleet.dinghyClasses[0].crewSize > 1;
