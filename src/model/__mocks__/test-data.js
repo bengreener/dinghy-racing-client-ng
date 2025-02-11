@@ -233,7 +233,6 @@ const entriesScorpionAHAL = {_embedded: {entries: [
 	{
 		scoringAbbreviation: null,
 		averageLapTime: 'PT0S',
-		finishedRace: false,
 		lastLapTime: 'PT0S', 
 		sumOfLapTimes: 'PT0S',
 		correctedTime: 'PT2562047788015215H30M7S',
@@ -323,7 +322,6 @@ const entryChrisMarshallDinghy1234HAL = {
 	averageLapTime: 'PT0S',
 	sumOfLapTimes: 'PT0S',
 	correctedTime: 'PT2562047788015215H30M7S',
-    finishedRace: false,
     onLastLap: false,
     lastLapTime: 'PT0S',
 	finishedRace: false, 
