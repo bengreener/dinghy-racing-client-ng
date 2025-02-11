@@ -64,7 +64,7 @@ const fleetHandicapHAL = { 'name' : 'Handicap', '_links' : { 'self' : { 'href' :
 const fleetGraduateHAL = { 'name' : 'Graduate', '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/3' }, 'fleet' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/3' }, 'dinghyClasses' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/3/dinghyClasses' } } };
 const fleetCometHAL = { 'name' : 'Comet', '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/4' }, 'fleet' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/4' }, 'dinghyClasses' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/4/dinghyClasses' } } };
 
-const fleetsHAL = { '_embedded': { 'fleets': [ fleetScorpionHAL, fleetHandicapHAL ] }, '_links': { 'self': { 'href': 'http://localhost:8081/dinghyracing/api/fleets?page=0&size=20' }, 'profile': {
+const fleetsHAL = { '_embedded': { 'fleets': [ fleetCometHAL, fleetGraduateHAL, fleetHandicapHAL, fleetScorpionHAL ] }, '_links': { 'self': { 'href': 'http://localhost:8081/dinghyracing/api/fleets?page=0&size=20' }, 'profile': {
 	'href': 'http://localhost:8081/dinghyracing/api/profile/fleets'
 }}, 'page': { 'size': 20, 'totalElements': 1, 'totalPages': 1, 'number': 0 } };
 
@@ -361,7 +361,7 @@ const fleetHandicap = {name: 'Handicap', dinghyClasses: [], url: 'http://localho
 const fleetGraduate = {name: 'Graduate', dinghyClasses: [dinghyClassGraduate], url: 'http://localhost:8081/dinghyracing/api/fleets/3'}
 const fleetComet = {name: 'Comet', dinghyClasses: [dinghyClassComet], url: 'http://localhost:8081/dinghyracing/api/fleets/4'}
 
-const fleets = [ fleetScorpion, fleetHandicap ];
+const fleets = [ fleetComet, fleetGraduate, fleetHandicap, fleetScorpion ];
 
 const dinghiesScorpion = [{sailNumber:'1234',dinghyClass:dinghyClassScorpion,url:'http://localhost:8081/dinghyracing/api/dinghies/2'},{sailNumber:'6745',dinghyClass: dinghyClassScorpion,url:'http://localhost:8081/dinghyracing/api/dinghies/3'}];
 const dinghy1234 = {sailNumber:'1234',dinghyClass: dinghyClassScorpion,url:'http://localhost:8081/dinghyracing/api/dinghies/2'};

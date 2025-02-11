@@ -160,7 +160,7 @@ describe('when create race button clicked', () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const dinghyRacingController = new DinghyRacingController(model);
-    jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve(dinghyClasses)});
+    jest.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve(fleets)});
 
     render(<App model={model} controller={dinghyRacingController} />);
     const btnMenu = await screen.findByRole('button', {name: /☰/i})

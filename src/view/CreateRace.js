@@ -25,8 +25,8 @@ function CreateRace({ onCreate }) {
     const model = useContext(ModelContext);
     const [race, setRace] = React.useState({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000, 'plannedLaps': 5, type: RaceType.FLEET, startType: StartType.CSCCLUBSTART});
     const [result, setResult] = React.useState({'message': ''});
-    const [dinghyClassMap, setDinghyClassMap] = React.useState(new Map());
-    const [dinghyClassOptions, setDinghyClassOptions] = React.useState([]);
+    const [fleetMap, setFleetMap] = React.useState(new Map());
+    const [fleetOptions, setFleetOptions] = React.useState([]);
     const [message, setMessage] = useState('');
     const raceNameInputRef = useRef(null);
 
@@ -37,23 +37,23 @@ function CreateRace({ onCreate }) {
     }, []);
 
     React.useEffect(() => {
-        model.getDinghyClasses().then(result => {
+        model.getFleets().then(result => {
             if (result.success) {
-                // build dinghy class options
+                // build fleet options
                 let options = [];
                 let map = new Map();
-                // set handicap options
-                options.push(<option key='handicap' value={null}></option> );
-                // set dinghy classes
-                result.domainObject.forEach(dinghyClass => {
-                    options.push(<option key={dinghyClass.name} value={dinghyClass.name}>{dinghyClass.name}</option>);
-                    map.set(dinghyClass.name, dinghyClass);
+                // set a blank option for default and to clear input fields
+			    options.push(<option key='blank' value={null}></option> );
+                // set fleets
+                result.domainObject.forEach(fleet => {
+                    options.push(<option key={fleet.name} value={fleet.name}>{fleet.name}</option>);
+                    map.set(fleet.name, fleet);
                 });
-                setDinghyClassMap(map);
-                setDinghyClassOptions(options);
+                setFleetMap(map);
+                setFleetOptions(options);
             }
             else {
-                setMessage('Unable to load dinghy classes\n' + result.message);
+                setMessage('Unable to load fleets\n' + result.message);
             }
         });
     }, [model]);
@@ -69,16 +69,16 @@ function CreateRace({ onCreate }) {
 
     async function handleCreate(event) {
         event.preventDefault();
-        const domainRace = {...race, 'plannedStartTime': new Date(race.plannedStartTime)};
-        setResult(await onCreate(domainRace));
+        const newRace = {...race, 'plannedStartTime': new Date(race.plannedStartTime)};
+        setResult(await onCreate(newRace));
     }
 
     function handleChange({target}) {
-        if (target.name === 'dinghyClass') {
+        if (target.name === 'fleet') {
             if (target.value === '') {
-                setRace({...race, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate()});
+                setRace({...race, 'fleet': DinghyRacingModel.fleetTemplate()});
             } else {
-                setRace({...race, 'dinghyClass': dinghyClassMap.get(target.value)});
+                setRace({...race, 'fleet': fleetMap.get(target.value)});
             }
         }
         else if (target.name === 'duration') {
@@ -117,8 +117,8 @@ function CreateRace({ onCreate }) {
                     <input id='race-laps-input' name='plannedLaps' className='w3-half' type='number' min='1' onChange={handleChange} value={race.plannedLaps ? race.plannedLaps : ''} />
                 </div>
                 <div className='w3-row'>
-                    <label htmlFor='race-class-select' className='w3-col m2' >Race Class</label>
-                    <select id='race-class-select' name='dinghyClass' className='w3-half' multiple={false} onChange={handleChange} value={race.dinghyClass ? race.dinghyClass.name : ''} >{dinghyClassOptions}</select>
+                    <label htmlFor='race-fleet-select' className='w3-col m2' >Race Fleet</label>
+                    <select id='race-fleet-select' name='fleet' className='w3-half' multiple={false} onChange={handleChange} value={race.fleet ? race.fleet.name : ''} >{fleetOptions}</select>
                 </div>
                 <div className='w3-row'>
                     <label htmlFor='race-type-select' className='w3-col m2' >Type</label>

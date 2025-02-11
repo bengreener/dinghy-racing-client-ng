@@ -3509,20 +3509,69 @@ describe('when retrieving a list of fleets', () => {
                     json: () => Promise.resolve(fleetsHAL)
                 });
             };
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/4/fleet') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(fleetScorpionHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/7/fleet') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(fleetGraduateHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/17/fleet') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(fleetCometHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/races/8/fleet') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(fleetHandicapHAL)
+                });
+            }
             if (resource === 'http://localhost:8081/dinghyracing/api/fleets/1/dinghyClasses') {
                 return Promise.resolve({
                     ok: true,
                     status: 200, 
                     json: () => Promise.resolve(fleetScorpionDinghyClassHAL)
                 });
-            };
+            }
             if (resource === 'http://localhost:8081/dinghyracing/api/fleets/2/dinghyClasses') {
                 return Promise.resolve({
                     ok: true,
                     status: 200, 
                     json: () => Promise.resolve(fleetHandicapDinghyClassHAL)
                 });
-            };
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/fleets/3/dinghyClasses') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(fleetGraduateDinghyClassHAL)
+                });
+            }
+            if (resource === 'http://localhost:8081/dinghyracing/api/fleets/4/dinghyClasses') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, 
+                    json: () => Promise.resolve(fleetCometDinghyClassHAL)
+                });
+            }
+            else {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404,
+                    statusText: 'Not Found'
+                });
+            }
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const promise = dinghyRacingModel.getFleets();
@@ -3554,20 +3603,69 @@ describe('when retrieving a list of fleets', () => {
                             json: () => Promise.resolve(fleetsHAL)
                         });
                     };
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/4/fleet') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetScorpionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/7/fleet') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetGraduateHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/17/fleet') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetCometHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/8/fleet') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetHandicapHAL)
+                        });
+                    }
                     if (resource === 'http://localhost:8081/dinghyracing/api/fleets/1/dinghyClasses') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, 
                             json: () => Promise.resolve(fleetScorpionDinghyClassHAL)
                         });
-                    };
+                    }
                     if (resource === 'http://localhost:8081/dinghyracing/api/fleets/2/dinghyClasses') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, 
                             json: () => Promise.resolve(fleetHandicapDinghyClassHAL)
                         });
-                    };
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/fleets/3/dinghyClasses') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetGraduateDinghyClassHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/fleets/4/dinghyClasses') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetCometDinghyClassHAL)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404,
+                            statusText: 'Not Found'
+                        });
+                    }
                 });
                 const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
                 const promise = dinghyRacingModel.getFleets();
@@ -3600,20 +3698,69 @@ describe('when retrieving a list of fleets', () => {
                             json: () => Promise.resolve(fleetsHAL)
                         });
                     };
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/4/fleet') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetScorpionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/7/fleet') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetGraduateHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/17/fleet') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetCometHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/8/fleet') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetHandicapHAL)
+                        });
+                    }
                     if (resource === 'http://localhost:8081/dinghyracing/api/fleets/1/dinghyClasses') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, 
                             json: () => Promise.resolve(fleetScorpionDinghyClassHAL)
                         });
-                    };
+                    }
                     if (resource === 'http://localhost:8081/dinghyracing/api/fleets/2/dinghyClasses') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, 
                             json: () => Promise.resolve(fleetHandicapDinghyClassHAL)
                         });
-                    };
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/fleets/3/dinghyClasses') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetGraduateDinghyClassHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/fleets/4/dinghyClasses') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetCometDinghyClassHAL)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404,
+                            statusText: 'Not Found'
+                        });
+                    }
                 });
                 const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
                 const promise = dinghyRacingModel.getFleets(1);
@@ -3646,20 +3793,69 @@ describe('when retrieving a list of fleets', () => {
                             json: () => Promise.resolve(fleetsHAL)
                         });
                     };
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/4/fleet') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetScorpionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/7/fleet') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetGraduateHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/17/fleet') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetCometHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/8/fleet') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetHandicapHAL)
+                        });
+                    }
                     if (resource === 'http://localhost:8081/dinghyracing/api/fleets/1/dinghyClasses') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, 
                             json: () => Promise.resolve(fleetScorpionDinghyClassHAL)
                         });
-                    };
+                    }
                     if (resource === 'http://localhost:8081/dinghyracing/api/fleets/2/dinghyClasses') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, 
                             json: () => Promise.resolve(fleetHandicapDinghyClassHAL)
                         });
-                    };
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/fleets/3/dinghyClasses') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetGraduateDinghyClassHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/fleets/4/dinghyClasses') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetCometDinghyClassHAL)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404,
+                            statusText: 'Not Found'
+                        });
+                    }
                 });
                 const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
                 const promise = dinghyRacingModel.getFleets(null, 2);
@@ -3692,20 +3888,69 @@ describe('when retrieving a list of fleets', () => {
                             json: () => Promise.resolve(fleetsHAL)
                         });
                     };
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/4/fleet') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetScorpionHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/7/fleet') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetGraduateHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/17/fleet') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetCometHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/8/fleet') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetHandicapHAL)
+                        });
+                    }
                     if (resource === 'http://localhost:8081/dinghyracing/api/fleets/1/dinghyClasses') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, 
                             json: () => Promise.resolve(fleetScorpionDinghyClassHAL)
                         });
-                    };
+                    }
                     if (resource === 'http://localhost:8081/dinghyracing/api/fleets/2/dinghyClasses') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, 
                             json: () => Promise.resolve(fleetHandicapDinghyClassHAL)
                         });
-                    };
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/fleets/3/dinghyClasses') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetGraduateDinghyClassHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/fleets/4/dinghyClasses') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetCometDinghyClassHAL)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404,
+                            statusText: 'Not Found'
+                        });
+                    }
                 });
                 const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
                 const promise = dinghyRacingModel.getFleets(0, 2);
