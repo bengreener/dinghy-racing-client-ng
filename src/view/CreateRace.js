@@ -105,7 +105,7 @@ function CreateRace({ onCreate }) {
                     <input id='race-name-input' ref={raceNameInputRef} name='name' className='w3-half' type='text' onChange={handleChange} value={race.name} autoFocus />
                 </div>
                 <div className='w3-row'>
-                    <label htmlFor='race-time-input' className='w3-col m2' >Race Time</label>
+                    <label htmlFor='race-time-input' className='w3-col m2' >Start Time</label>
                     <input id='race-time-input' name='plannedStartTime' className='w3-half' type='datetime-local' onChange={handleChange} value={race.plannedStartTime} />
                 </div>
                 <div className='w3-row'>
@@ -117,7 +117,7 @@ function CreateRace({ onCreate }) {
                     <input id='race-laps-input' name='plannedLaps' className='w3-half' type='number' min='1' onChange={handleChange} value={race.plannedLaps ? race.plannedLaps : ''} />
                 </div>
                 <div className='w3-row'>
-                    <label htmlFor='race-fleet-select' className='w3-col m2' >Race Fleet</label>
+                    <label htmlFor='race-fleet-select' className='w3-col m2' >Fleet</label>
                     <select id='race-fleet-select' name='fleet' className='w3-half' multiple={false} onChange={handleChange} value={race.fleet ? race.fleet.name : ''} >{fleetOptions}</select>
                 </div>
                 <div className='w3-row'>
@@ -128,7 +128,7 @@ function CreateRace({ onCreate }) {
                     </select>
                 </div>
                 <div className='w3-row'>
-                    <label htmlFor='race-start-type-select' className='w3-col m2' >Start Type</label>
+                    <label htmlFor='race-start-type-select' className='w3-col m2' >Start Sequence</label>
                     <select id='race-start-type-select' name='startType' className='w3-half' multiple={false} onChange={handleChange} value={race.startType} >
                         <option value='CSCCLUBSTART'>10-5-GO</option>
                         <option value='RRS26'>5-4-1-GO</option>
