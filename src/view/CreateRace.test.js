@@ -39,7 +39,7 @@ it('renders', async () => {
     const inputFleet = screen.getByLabelText(/fleet/i);
     const inputLaps = screen.getByLabelText(/laps/i);
     const inputType = screen.getByLabelText(/^type/i);
-    const inputStartType = screen.getByLabelText(/start type/i);
+    const inputStartType = screen.getByLabelText(/type/i);
     expect(inputName).toHaveValue('');
     expect(inputTime).toHaveValue(new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16));
     expect(inputDuration).toHaveValue(45);
@@ -113,7 +113,7 @@ it('accepts the fleet for the race', async () => {
     await act(async () => {
         customRender(<CreateRace />, model);
     });
-    const selectFleet = screen.getByLabelText('Race Fleet');
+    const selectFleet = screen.getByLabelText('Fleet');
     await screen.findAllByRole('option');
     await act(async () => {
         await user.selectOptions(selectFleet, 'Scorpion');
@@ -180,7 +180,7 @@ it('accepts the start type for the race', async () => {
     await act(async () => {
         customRender(<CreateRace />, model);
     });
-    const inputStartType = screen.getByLabelText(/start type/i);
+    const inputStartType = screen.getByLabelText(/start sequence/i);
     await act(async () => {
         await user.selectOptions(inputStartType, '5-4-1-GO');
     });
@@ -258,7 +258,7 @@ describe('when creating a new race', () => {
         const inputFleet = screen.getByLabelText(/fleet/i);
         const inputLaps = screen.getByLabelText(/laps/i);
         const inputType = screen.getByLabelText(/^type/i);
-        const inputStartType = screen.getByLabelText(/start type/i);
+        const inputStartType = screen.getByLabelText(/start sequence/i);
         const btnCreate = screen.getByRole('button', {'name': 'Create'});
         await act(async () => {
             await user.type(inputName, 'Scorpion A');

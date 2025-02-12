@@ -148,7 +148,7 @@ function RaceHeaderView({ race, showInRaceData = true }) {
                 </div>
                 <div className='w3-col m1 s6'>
                     {showInRaceData && race.type !== RaceType.PURSUIT && updatedRace.lapsSailed < updatedRace.plannedLaps - 1 ? <button id='shorten-course-button' className='w3-col' onClick={handleShortenCourseClick}>Shorten Course</button> : null}
-                    {!showInRaceData && race.type !== RaceType.PURSUIT ? <button id='adjust-course-button' className='w3-col' onClick={handleShortenCourseClick}>Adjust Course</button> : null}
+                    {!showInRaceData && race.type !== RaceType.PURSUIT ? <button id='adjust-course-button' className='w3-col' onClick={handleShortenCourseClick}>Adjust Laps</button> : null}
                 </div>
                 <div className='w3-col m1 s6'>
                     {elapsedTime < 0 ? <button id='race-postpone-button' className='w3-col' onClick={handleRacePostponeClick}>Postpone Start</button> : null}
