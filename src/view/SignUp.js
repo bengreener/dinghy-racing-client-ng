@@ -436,7 +436,6 @@ function SignUp({ race }) {
 
     async function updatePreviousEntries(sailNumber) {
         const peMap = new Map();
-        // const dinghiesResult = await model.getDinghiesBySailNumber(sailNumber);
         let dinghies = [];
         if (race.fleet.dinghyClasses.length === 0) {
             dinghies = (await model.getDinghiesBySailNumber(sailNumber)).domainObject;
@@ -447,17 +446,18 @@ function SignUp({ race }) {
                 if (dinghyResult.success) {
                     dinghies.push(dinghyResult.domainObject);
                 }
-            })
+            });
         }
-        dinghies.forEach(async dinghy => {
-            const crewsResult = await model.getCrewsByDinghy(dinghy);
-            if (crewsResult.success) {
-                for (const crew of crewsResult.domainObject) {
-                    peMap.set(dinghy.url + crew.helm.url + crew?.mate?.url, {dinghy: dinghy, crew: crew});
+        const crewResults = await Promise.all(dinghies.map(dinghy => {
+            return model.getCrewsByDinghy(dinghy);
+        }));
+        for (let i = 0; i < dinghies.length; i++) {
+            if (crewResults[i].success) {
+                for (const crew of crewResults[i].domainObject) {
+                    peMap.set(dinghies[i].url + crew.helm.url + crew?.mate?.url, {dinghy: dinghies[i], crew: crew});
                 }
             }
-        })
-
+        };
         setPreviousEntriesMap(peMap);
     }
 
