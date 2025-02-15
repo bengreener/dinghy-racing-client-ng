@@ -436,17 +436,28 @@ function SignUp({ race }) {
 
     async function updatePreviousEntries(sailNumber) {
         const peMap = new Map();
-        const dinghiesResult = await model.getDinghiesBySailNumber(sailNumber);
-        if (dinghiesResult.success) {
-            for (const dinghy of dinghiesResult.domainObject) {
-                const crewsResult = await model.getCrewsByDinghy(dinghy);
-                if (crewsResult.success) {
-                    for (const crew of crewsResult.domainObject) {
-                        peMap.set(dinghy.url + crew.helm.url + crew?.mate?.url, {dinghy: dinghy, crew: crew});
-                    }
+        // const dinghiesResult = await model.getDinghiesBySailNumber(sailNumber);
+        let dinghies = [];
+        if (race.fleet.dinghyClasses.length === 0) {
+            dinghies = (await model.getDinghiesBySailNumber(sailNumber)).domainObject;
+        }
+        else {
+            const dinghiesResults = await Promise.all(race.fleet.dinghyClasses.map(dinghyClass => model.getDinghyBySailNumberAndDinghyClass(sailNumber, dinghyClass)));
+            dinghiesResults.forEach(dinghyResult => {
+                if (dinghyResult.success) {
+                    dinghies.push(dinghyResult.domainObject);
+                }
+            })
+        }
+        dinghies.forEach(async dinghy => {
+            const crewsResult = await model.getCrewsByDinghy(dinghy);
+            if (crewsResult.success) {
+                for (const crew of crewsResult.domainObject) {
+                    peMap.set(dinghy.url + crew.helm.url + crew?.mate?.url, {dinghy: dinghy, crew: crew});
                 }
             }
-        }
+        })
+
         setPreviousEntriesMap(peMap);
     }
 

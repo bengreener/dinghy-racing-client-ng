@@ -58,6 +58,15 @@ beforeEach(() => {
             return Promise.resolve({success: false, message: 'Race not found.'});
         }
     });
+    jest.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234 })});
+    jest.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
+        if (dinghy.url === dinghy1234.url) {
+            return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
+        }
+        else if (dinghy.url === dinghy1234Graduate.url) {
+            return Promise.resolve({success: true, domainObject: dinghyGraduate1234Crews});
+        }
+    });
 });
 
 describe('when signing up for a race', () => {
@@ -9456,9 +9465,45 @@ describe('when a sailnumber is entered', () => {
                 return Promise.resolve({success: true, domainObject: dinghyGraduate1234Crews});
             }
         });
-        
+
         await act(async () => {
             customRender(<SignUp race={raceHandicapA}/>, model, controller);
+        });
+        // enter sal number
+        const inputSailNumber = screen.getByLabelText(/sail/i);
+        await act(async () => {
+            await user.type(inputSailNumber, '1234');
+            await user.keyboard('{Tab}');
+        });
+        // get table that is suppossed to contain details of dinghy class and previous crews
+        const previousEntries = within(screen.getByTestId('previous-entries'));
+        // check it contains dinghy classes and previous crews for boats with sail number
+        expect(await previousEntries.findAllByRole('cell', {name: 'Scorpion'})).toHaveLength(2);
+        expect(await previousEntries.findByRole('cell', {name: 'Chris Marshall'})).toBeInTheDocument();
+        expect(await previousEntries.findByRole('cell', {name: 'Jill Myer'})).toBeInTheDocument();
+        expect(await previousEntries.findByRole('cell', {name: 'Graduate'})).toBeInTheDocument();
+        expect(await previousEntries.findByRole('cell', {name: 'Liu Bao'})).toBeInTheDocument();
+        expect(await previousEntries.findByRole('cell', {name: 'Lou Screw'})).toBeInTheDocument();
+        expect(await previousEntries.findByRole('cell', {name: 'Sarah Pascal'})).toBeInTheDocument();
+        expect(await previousEntries.findByRole('cell', {name: 'Owain Davies'})).toBeInTheDocument();
+        expect(inputSailNumber).not.toHaveFocus();
+    });
+    it('only displays entries that are eligible to sail based on the fleet for the race', async () => {
+        const user = userEvent.setup();
+
+        jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234, dinghy1234Graduate ]})});
+        jest.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234 })});
+        jest.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
+            if (dinghy.url === dinghy1234.url) {
+                return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
+            }
+            else if (dinghy.url === dinghy1234Graduate.url) {
+                return Promise.resolve({success: true, domainObject: dinghyGraduate1234Crews});
+            }
+        });
+        
+        await act(async () => {
+            customRender(<SignUp race={raceScorpionA}/>, model, controller);
         });
         // enter sal number
         const inputSailNumber = screen.getByLabelText(/sail/i);
@@ -9472,11 +9517,13 @@ describe('when a sailnumber is entered', () => {
         expect(await previousEntries.findAllByRole('cell', {name: 'Scorpion'})).toHaveLength(2);
         expect(await previousEntries.findByRole('cell', {name: 'Chris Marshall'})).toBeInTheDocument();
         expect(await previousEntries.findByRole('cell', {name: 'Jill Myer'})).toBeInTheDocument();
-        expect(await previousEntries.findByRole('cell', {name: 'Graduate'})).toBeInTheDocument();
+        expect(await previousEntries.queryByRole('cell', {name: 'Graduate'})).not.toBeInTheDocument();
         expect(await previousEntries.findByRole('cell', {name: 'Liu Bao'})).toBeInTheDocument();
         expect(await previousEntries.findByRole('cell', {name: 'Lou Screw'})).toBeInTheDocument();
+        expect(await previousEntries.queryByRole('cell', {name: 'Sarah Pascal'})).not.toBeInTheDocument();
+        expect(await previousEntries.queryByRole('cell', {name: 'Owain Davies'})).not.toBeInTheDocument();
         expect(inputSailNumber).not.toHaveFocus();
-    });
+    })
 });
 
 describe('when a previous entry is selected', () => {
