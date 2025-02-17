@@ -437,14 +437,33 @@ function SignUp({ race }) {
     async function updatePreviousEntries(sailNumber) {
         const peMap = new Map();
         let dinghies = [];
+        let success = true;
+        let message = '';
         if (race.fleet.dinghyClasses.length === 0) {
-            dinghies = (await model.getDinghiesBySailNumber(sailNumber)).domainObject;
+            const dinghiesResults = await model.getDinghiesBySailNumber(sailNumber);
+            if (dinghiesResults.success) {
+                dinghies = dinghies.concat(dinghiesResults.domainObject);
+            }
+            else {
+                success = false;
+                if (message) {
+                    message += '/n'
+                }
+                message += 'Unable to retrieve previous entries\n' + dinghiesResults.message;
+            }
         }
         else {
             const dinghiesResults = await Promise.all(race.fleet.dinghyClasses.map(dinghyClass => model.getDinghyBySailNumberAndDinghyClass(sailNumber, dinghyClass)));
             dinghiesResults.forEach(dinghyResult => {
                 if (dinghyResult.success) {
                     dinghies.push(dinghyResult.domainObject);
+                }
+                else {
+                    success = false;
+                    if (message) {
+                        message += '/n'
+                    }
+                    message += 'Unable to retrieve previous entries\n' + dinghyResult.message;
                 }
             });
         }
@@ -457,8 +476,20 @@ function SignUp({ race }) {
                     peMap.set(dinghies[i].url + crew.helm.url + crew?.mate?.url, {dinghy: dinghies[i], crew: crew});
                 }
             }
+            else {
+                success = false;
+                if (message) {
+                    message += '/n'
+                }
+                message += 'Unable to retrieve previous entries\n' + crewResults[i].message;
+            }
         };
-        setPreviousEntriesMap(peMap);
+        if (success) {
+            setPreviousEntriesMap(peMap);
+        }
+        else {
+            setMessage(message);
+        }
     }
 
     function previousEntriesRows() {

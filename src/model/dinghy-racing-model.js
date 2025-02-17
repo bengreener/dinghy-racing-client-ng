@@ -971,7 +971,10 @@ class DinghyRacingModel {
     }
     
     /**
-     * Get all the crews that have sailed a dinghy
+     * Get all the crews that have sailed a dinghy.
+     * Result.domainObject is an array of crews. If no crews have been recorded for dinghy the array will be empty.
+     * @param {Dinghy} dinghy
+     * @returns {Promise<Result>}
      */
     async getCrewsByDinghy(dinghy) {
         let crewsHAL = [];
@@ -1079,10 +1082,11 @@ class DinghyRacingModel {
 
     /**
      * Gets all dinghies with the given sail number
+     * If successful Result.domainObject will be an Array<Dinghy>
      * @param {String} sailNumber to search for
      * @param {Integer} [page] number to return (0 indexed)
      * @param {Integer} [size] number of elements to return per page
-     * @return {Promise<Result>>} If successful Result.domainObject will be an Array<Dinghy>
+     * @returns {Promise<Result>} 
      */
     async getDinghiesBySailNumber(sailNumber, page, size) {
         let resource = this.httpRootURL + '/dinghies/search/findBySailNumber?sailNumber=' + sailNumber;
@@ -1119,6 +1123,7 @@ class DinghyRacingModel {
 
     /**
      * Get a dinghy by it's sail number and dinghy class
+     * If successful Result.domainObject will be a Dinghy
      * @param {String} sailNumber
      * @param {DinghyClass} dinghyClass
      * @returns {Promise<Result>}

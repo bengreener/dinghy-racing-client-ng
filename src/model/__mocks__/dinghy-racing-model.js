@@ -317,7 +317,7 @@ class DinghyRacingModel {
     }
 
     async getCrewsByDinghy(dinghy) {
-        return null;
+        return Promise.resolve({success: true, domainObject: []});
     }
 
     async getDinghy(url) {
