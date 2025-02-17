@@ -486,6 +486,7 @@ function SignUp({ race }) {
         };
         if (success) {
             setPreviousEntriesMap(peMap);
+            setMessage('');
         }
         else {
             setMessage(message);

@@ -58,7 +58,9 @@ beforeEach(() => {
             return Promise.resolve({success: false, message: 'Race not found.'});
         }
     });
-    jest.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234 })});
+    jest.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => {
+        return Promise.resolve({success: true, domainObject: dinghy1234 })
+    });
     jest.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
         if (dinghy.url === dinghy1234.url) {
             return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
@@ -9548,14 +9550,14 @@ describe('when a sailnumber is entered', () => {
         
                 jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
                 jest.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!' })});
-                jest.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
-                    if (dinghy.url === dinghy1234.url) {
-                        return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
-                    }
-                    else if (dinghy.url === dinghy1234Graduate.url) {
-                        return Promise.resolve({success: true, domainObject: dinghyGraduate1234Crews});
-                    }
-                });
+                // jest.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
+                //     if (dinghy.url === dinghy1234.url) {
+                //         return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
+                //     }
+                //     else if (dinghy.url === dinghy1234Graduate.url) {
+                //         return Promise.resolve({success: true, domainObject: dinghyGraduate1234Crews});
+                //     }
+                // });
                 
                 await act(async () => {
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
@@ -9568,6 +9570,40 @@ describe('when a sailnumber is entered', () => {
                 })
                 expect(await screen.findByText(/oops!/i)).toBeInTheDocument();
             });
+        });
+        it('clears error message on success', async () => {
+            const user = userEvent.setup();
+        
+            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementationOnce(() => {return Promise.resolve({success: false, message: 'Oops!'})});
+            jest.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementationOnce(() => {return Promise.resolve({success: false, message: 'Oops!' })});
+            // jest.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
+            //     if (dinghy.url === dinghy1234.url) {
+            //         return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
+            //     }
+            //     else if (dinghy.url === dinghy1234Graduate.url) {
+            //         return Promise.resolve({success: true, domainObject: dinghyGraduate1234Crews});
+            //     }
+            // });
+            
+            await act(async () => {
+                customRender(<SignUp race={raceScorpionA}/>, model, controller);
+            });
+            // enter sail number
+            const inputSailNumber = screen.getByLabelText(/sail/i);
+            await act(async () => {
+                await user.type(inputSailNumber, '1234');
+                await user.keyboard('{Tab}');
+            });
+            expect(await screen.findByText(/oops!/i)).toBeInTheDocument();
+            
+            await act(async () => {
+                await user.type(inputSailNumber, '1234');
+                await user.keyboard('{Tab}');
+            });            
+            // get table that is suppossed to contain details of dinghy class and previous crews
+            const previousEntries = within(screen.getByTestId('previous-entries'));
+            // check it contains dinghy classes and previous crews for boats with sail number
+            expect(screen.queryByText(/oops!/i)).not.toBeInTheDocument();
         });
     });
     
