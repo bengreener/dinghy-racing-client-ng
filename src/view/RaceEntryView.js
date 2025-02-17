@@ -260,20 +260,20 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         <div className={classes} onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}
             onPointerDown={gestureStart} onPointerMove={gestureMove} onPointerUp={gestureEnd} onPointerOut={gestureEnd}
             onPointerLeave={gestureEnd} onPointerCancel={gestureCancel} onDragStart={dragStartHandler} onDragOver={dragOverHandler} onDrop={dropHandler} draggable >
-            <div className='w3-col m2 w3-padding-small' >
+            <div className='w3-col m2 w3-padding-small bgis-cell' >
                 <output>{entry.dinghy.dinghyClass.name}</output>
             </div>
-            <div className='w3-col m1 w3-padding-small' >
+            <div className='w3-col m1 w3-padding-small bgis-cell' >
                 <output className='sail-number'>{entry.dinghy.sailNumber}</output>
             </div>
-            <div className='w3-col m2 w3-padding-small' >
+            <div className='w3-col m2 w3-padding-small bgis-cell' >
                 <output>{entry.helm.name}</output>
             </div>
             <div className='w3-col m1 w3-padding-small' >
                 <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'}>{entry.position != null ? entry.position : ' '}</output>
             </div>
             <div className='w3-col m5 w3-hide-small'>
-                <div className='w3-cell-row' >
+                <div className='w3-cell-row bgis-cell' >
                     {lapsView}
                 </div>
             </div>
