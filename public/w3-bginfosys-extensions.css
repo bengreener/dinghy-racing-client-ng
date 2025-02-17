@@ -9,6 +9,10 @@ html,body{
     min-width: min-content;
 }
 
+.bgis-cell {
+    overflow: hidden;
+}
+
 @media (min-width:601px) {
     .w3-bginfosys-display-bottommiddle-m1{position:absolute;left:50%;bottom:0;transform:translate(-50%,0%)}
 }

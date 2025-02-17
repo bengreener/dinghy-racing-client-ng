@@ -260,13 +260,13 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         <div className={classes} onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}
             onPointerDown={gestureStart} onPointerMove={gestureMove} onPointerUp={gestureEnd} onPointerOut={gestureEnd}
             onPointerLeave={gestureEnd} onPointerCancel={gestureCancel} onDragStart={dragStartHandler} onDragOver={dragOverHandler} onDrop={dropHandler} draggable >
-            <div className='w3-col m2 w3-padding-small' >
+            <div className='w3-col m2 w3-padding-small bgis-cell' >
                 <output>{entry.dinghy.dinghyClass.name}</output>
             </div>
-            <div className='w3-col m1 w3-padding-small' >
+            <div className='w3-col m1 w3-padding-small bgis-cell' >
                 <output className='sail-number'>{entry.dinghy.sailNumber}</output>
             </div>
-            <div className='w3-col m2 w3-padding-small' >
+            <div className='w3-col m2 w3-padding-small bgis-cell' >
                 <output>{entry.helm.name}</output>
             </div>
             <div className='w3-col m1 w3-padding-small' >
