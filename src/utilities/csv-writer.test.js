@@ -62,8 +62,8 @@ describe('when race is for fleet that includes dinghy classes with crew', () => 
         entriesScorpionA_with_laps[1].position = 2;
         const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceScorpionA, entriesScorpionA_with_laps);
         expect(data.slice(1)).toEqual([
-            'Chris Marshall,Lou Screw,1234,Scorpion,1,2753,3,,1043,0\n',
-            'Sarah Pascal,Owain Davies,6745,Scorpion,2,2880,3,,1043,0\n'
+            'Chris Marshall,Lou Screw,1234,SCORPION,1,2753,3,,1043,0\n',
+            'Sarah Pascal,Owain Davies,6745,SCORPION,2,2880,3,,1043,0\n'
         ]);
     });
 });
@@ -112,7 +112,7 @@ describe('when race is a handicap race', () => {
         entriesHandicapA_with_laps[1].position =  2;
         const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceHandicapA, entriesHandicapA_with_laps);
         expect(data.slice(1)).toEqual([
-            'Chris Marshall,Lou Screw,1234,Scorpion,1,3177,3,,1043,0\n',
+            'Chris Marshall,Lou Screw,1234,SCORPION,1,3177,3,,1043,0\n',
             'Jill Myer,,826,Comet,2,3721,3,,1210,0\n'
         ]);
     });
@@ -130,8 +130,8 @@ describe('when an entry has a scoring abbreviation set', () => {
         entriesScorpionA_with_laps[1].position =  2;
         const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceScorpionA, entriesScorpionA_with_laps);
         expect(data.slice(1)).toEqual([
-            'Chris Marshall,Lou Screw,1234,Scorpion,1,3,3,,1043,0\n',
-            'Sarah Pascal,Owain Davies,6745,Scorpion,2,0,0,DNS,1043,0\n'
+            'Chris Marshall,Lou Screw,1234,SCORPION,1,3,3,,1043,0\n',
+            'Sarah Pascal,Owain Davies,6745,SCORPION,2,0,0,DNS,1043,0\n'
         ]);
     });
 });
@@ -148,8 +148,8 @@ describe('when download options are provided', () => {
             entriesScorpionA_with_laps[1].position = 2;
             const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceScorpionA, entriesScorpionA_with_laps, {nameFormat: NameFormat.FIRSTNAMESURNAME});
             expect(data.slice(1)).toEqual([
-                'Chris Marshall,Lou Screw,1234,Scorpion,1,2753,3,,1043,0\n',
-                'Sarah Pascal,Owain Davies,6745,Scorpion,2,2880,3,,1043,0\n'
+                'Chris Marshall,Lou Screw,1234,SCORPION,1,2753,3,,1043,0\n',
+                'Sarah Pascal,Owain Davies,6745,SCORPION,2,2880,3,,1043,0\n'
             ]);
         });
     });
@@ -164,8 +164,8 @@ describe('when download options are provided', () => {
             entriesScorpionA_with_laps[1].position = 2;
             const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceScorpionA, entriesScorpionA_with_laps, {nameFormat: NameFormat.SURNAMEFIRSTNAME});
             expect(data.slice(1)).toEqual([
-                '"Marshall, Chris","Screw, Lou",1234,Scorpion,1,2753,3,,1043,0\n',
-                '"Pascal, Sarah","Davies, Owain",6745,Scorpion,2,2880,3,,1043,0\n'
+                '"Marshall, Chris","Screw, Lou",1234,SCORPION,1,2753,3,,1043,0\n',
+                '"Pascal, Sarah","Davies, Owain",6745,SCORPION,2,2880,3,,1043,0\n'
             ]);
         });
     });
@@ -190,7 +190,7 @@ describe('when race is a pursuit race', () => {
         entriesPursuitA_with_laps[0].position = 1;
         const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(racePursuitA, entriesPursuitA_with_laps);
         expect(data.slice(1)).toEqual([
-            'Chris Marshall,Lou Screw,1234,Scorpion,1,,1043\n'
+            'Chris Marshall,Lou Screw,1234,SCORPION,1,,1043\n'
         ]);
     });
 });

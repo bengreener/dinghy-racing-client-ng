@@ -91,7 +91,7 @@ function convertRaceEntriesToCSVArray(race, entries, options) {
                 }
         }
         record += entry.dinghy.sailNumber + ',';
-        record += entry.dinghy.dinghyClass.name + ',';
+        record += ((entry.dinghy.dinghyClass.externalName == null || entry.dinghy.dinghyClass.externalName === '') ? entry.dinghy.dinghyClass.name : entry.dinghy.dinghyClass.externalName) + ',';
         record += entry.position + ',';
         if (race.type !== RaceType.PURSUIT) {
             record += Clock.formatDurationAsSeconds(entry.sumOfLapTimes) + ',';
