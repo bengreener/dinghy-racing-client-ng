@@ -46,7 +46,7 @@ class DinghyRacingModel {
      * @returns {DinghyClass}
      */
     static dinghyClassTemplate() {
-        return {name: '', crewSize: 1, portsmouthNumber: null, externalName: null, url: ''};
+        return {name: '', crewSize: 1, portsmouthNumber: null, externalName: '', url: ''};
     }
 
     /**
@@ -1676,11 +1676,13 @@ class DinghyRacingModel {
     }
 
     _convertCompetitorHALToCompetitor(competitorHAL) {
-        return {...DinghyRacingModel.competitorTemplate(), 'name': competitorHAL?.name, 'url': competitorHAL?._links?.self?.href};
+        return {...DinghyRacingModel.competitorTemplate(), name: competitorHAL?.name, url: competitorHAL?._links?.self?.href};
     }
 
     _convertDinghyClassHALToDinghyClass(dinghyClassHAL) {
-        return {...DinghyRacingModel.dinghyClassTemplate(), name: dinghyClassHAL.name, crewSize: dinghyClassHAL.crewSize, portsmouthNumber: dinghyClassHAL.portsmouthNumber, externalName: dinghyClassHAL.externalName, url: dinghyClassHAL._links.self.href};
+        return {...DinghyRacingModel.dinghyClassTemplate(), name: dinghyClassHAL.name, crewSize: dinghyClassHAL.crewSize, portsmouthNumber: dinghyClassHAL.portsmouthNumber, 
+            externalName: (dinghyClassHAL.externalName == null) ? '' : dinghyClassHAL.externalName, 
+            url: dinghyClassHAL._links.self.href};
     }
 
     _convertEntryHALtoEntry(entryHAL, race, helm, dinghy, crew, laps) {

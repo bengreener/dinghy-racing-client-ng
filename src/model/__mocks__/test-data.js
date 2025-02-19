@@ -16,7 +16,7 @@ const competitorsCollectionHAL = {_embedded:{competitors:[
 	self:{href:'http://localhost:8081/dinghyracing/api/competitors'},profile:{href:'http://localhost:8081/dinghyracing/api/profile/competitors'}
 },page:{size:20,totalElements:6,totalPages:1,number:0}};
 
-const dinghyClassScorpionHAL = {name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043, externalName: null, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/1' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/1' } } };
+const dinghyClassScorpionHAL = {name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043, externalName: 'SCORPION', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/1' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/1' } } };
 const dinghyClassGraduateHAL = {name: 'Graduate', crewSize: 2, portsmouthNumber: 1110, externalName: null, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/5' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/5' } } };
 const dinghyClassCometHAL = {name: 'Comet', crewSize: 1, portsmouthNumber: 1210, externalName: null, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/16' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/16' } } };
 // const dinghyClassNotSetHAL = {name:'',crewSize:0,_links:{self:{href:''},dinghyClass:{href:''}}};
@@ -348,9 +348,9 @@ const competitorLiuBao = {name: 'Liu Bao',url: 'http://localhost:8081/dinghyraci
 const competitorBobHoskins = {name: 'Bob Hoskins',url: 'http://localhost:8081/dinghyracing/api/competitors/15'};
 const competitorsCollection = [competitorChrisMarshall, competitorSarahPascal, competitorJillMyer, competitorLouScrew, competitorOwainDavies, competitorLiuBao];
 
-const dinghyClassScorpion = {name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043, externalName: null, url: 'http://localhost:8081/dinghyracing/api/dinghyClasses/1' };
-const dinghyClassGraduate = {name:'Graduate', crewSize: 2, portsmouthNumber: 1110, externalName: null, url:'http://localhost:8081/dinghyracing/api/dinghyClasses/5'};
-const dinghyClassComet = {name:'Comet', crewSize:1, portsmouthNumber: 1210, externalName: null, url:'http://localhost:8081/dinghyracing/api/dinghyClasses/16'}
+const dinghyClassScorpion = {name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043, externalName: 'SCORPION', url: 'http://localhost:8081/dinghyracing/api/dinghyClasses/1' };
+const dinghyClassGraduate = {name:'Graduate', crewSize: 2, portsmouthNumber: 1110, externalName: '', url:'http://localhost:8081/dinghyracing/api/dinghyClasses/5'};
+const dinghyClassComet = {name:'Comet', crewSize:1, portsmouthNumber: 1210, externalName: '', url:'http://localhost:8081/dinghyracing/api/dinghyClasses/16'}
 const dinghyClasses = [dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet];
 const dinghyClassesByNameAsc = [dinghyClassComet, dinghyClassGraduate, dinghyClassScorpion];
 

@@ -2355,20 +2355,20 @@ describe('when updating a competitor', () => {
 describe('when updating a dinghy class', () => {
     it('if dinghy class exists and URL provided then updates dinghy class', async () => {
         fetch.mockImplementationOnce((resource, options) => {
-            const bodyMatch = {...dinghyClassScorpion, name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215, externalName: null};
+            const bodyMatch = {...dinghyClassScorpion, name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215, externalName: 'SCORPION TWO'};
             if ((resource === 'http://localhost:8081/dinghyracing/api/dinghyClasses/1') && (options.body === JSON.stringify(bodyMatch))) {
                 return Promise.resolve({
                     ok: true,
                     status: 200,
-                    json: () => Promise.resolve({...dinghyClassScorpionHAL, name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215})
+                    json: () => Promise.resolve({...dinghyClassScorpionHAL, name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215, externalName: 'SCORPION TWO'})
                 });
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.updateDinghyClass({...dinghyClassScorpion, name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215});
+        const promise = dinghyRacingModel.updateDinghyClass({...dinghyClassScorpion, name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215, externalName: 'SCORPION TWO'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, domainObject: {...dinghyClassScorpion, name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215}});
+        expect(result).toEqual({'success': true, domainObject: {...dinghyClassScorpion, name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215, externalName: 'SCORPION TWO'}});
     });
     it('if dinghy class does not exist returns message explaining issue', async () => {
         fetch.mockImplementationOnce(() => {
@@ -3923,7 +3923,7 @@ it('provides a blank template for a competitor', () => {
 it('provides a blank template for a dinghy class', () => {
     const dinghyClass = DinghyRacingModel.dinghyClassTemplate();
 
-    expect(dinghyClass).toEqual({'name': '', 'crewSize': 1, portsmouthNumber: null, externalName: null, 'url': ''});
+    expect(dinghyClass).toEqual({'name': '', 'crewSize': 1, portsmouthNumber: null, externalName: '', 'url': ''});
 });
 
 it('provides a blank template for a dinghy', () => {
