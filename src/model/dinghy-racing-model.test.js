@@ -19,7 +19,7 @@ import { httpRootURL, wsRootURL, competitorsCollectionHAL,
     dinghiesCollectionHAL, dinghiesScorpionCollectionHAL, 
     dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghyClassCometHAL, dinghy1234HAL, dinghy2726HAL, dinghy6745HAL,
     fleetsHAL, fleetScorpionHAL, fleetHandicapHAL, fleetGraduateHAL, fleetCometHAL,
-    raceScorpion_AHAL, raceGraduate_AHAL, raceComet_AHAL, raceHandicap_AHAL,
+    raceScorpion_AHAL, raceGraduate_AHAL, // raceComet_AHAL, raceHandicap_AHAL,
     dinghyScorpion1234CrewsHAL,
     dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, 
     fleets, fleetScorpion, fleetHandicap, fleetScorpionDinghyClassHAL, fleetHandicapDinghyClassHAL, fleetGraduateDinghyClassHAL, fleetCometDinghyClassHAL,
@@ -2355,7 +2355,7 @@ describe('when updating a competitor', () => {
 describe('when updating a dinghy class', () => {
     it('if dinghy class exists and URL provided then updates dinghy class', async () => {
         fetch.mockImplementationOnce((resource, options) => {
-            const bodyMatch = {name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215};
+            const bodyMatch = {...dinghyClassScorpion, name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215, externalName: null};
             if ((resource === 'http://localhost:8081/dinghyracing/api/dinghyClasses/1') && (options.body === JSON.stringify(bodyMatch))) {
                 return Promise.resolve({
                     ok: true,
@@ -2365,85 +2365,12 @@ describe('when updating a dinghy class', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.updateDinghyClass(dinghyClassScorpion, 'Scorpion Two', 3, 1215);
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, domainObject: {...dinghyClassScorpion, name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215}});
-    });
-    describe('when only one property provided to update', () => {
-        it('updates only provided value and leaves other values unchanged', async () => {
-            fetch.mockImplementationOnce((resource, options) => {
-                const bodyMatch = {name: 'Scorpion Two'};
-                if ((resource === 'http://localhost:8081/dinghyracing/api/dinghyClasses/1') && (options.body === JSON.stringify(bodyMatch))) {
-                    return Promise.resolve({
-                        ok: true,
-                        status: 200,
-                        json: () => Promise.resolve({...dinghyClassScorpionHAL, name: 'Scorpion Two'})
-                    });
-                };
-            });
-            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const promise = dinghyRacingModel.updateDinghyClass(dinghyClassScorpion, 'Scorpion Two');
-            const result = await promise;
-            expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': true, domainObject: {...dinghyClassScorpion, name: 'Scorpion Two'}});
-        });
-    });
-    describe('when two properties provided to update', () => {
-        it('updates only provided properties and leaves other values unchanged', async () => {
-            fetch.mockImplementationOnce((resource, options) => {
-                const bodyMatch = {crewSize: 3, portsmouthNumber: 1215};
-                if ((resource === 'http://localhost:8081/dinghyracing/api/dinghyClasses/1') && (options.body === JSON.stringify(bodyMatch))) {
-                    return Promise.resolve({
-                        ok: true,
-                        status: 200,
-                        json: () => Promise.resolve({...dinghyClassScorpionHAL, crewSize: 3, portsmouthNumber: 1215})
-                    });
-                };
-            });
-            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const promise = dinghyRacingModel.updateDinghyClass(dinghyClassScorpion, null, 3, 1215);
-            const result = await promise;
-            expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': true, domainObject: {...dinghyClassScorpion, crewSize: 3, portsmouthNumber: 1215}});
-        });
-    });
-    it('if dinghy class exists but URL not provided then updates dinghy class', async () => {
-        fetch.mockImplementationOnce((resource, options) => {
-            const bodyMatch = {name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215};
-            if ((resource === 'http://localhost:8081/dinghyracing/api/dinghyClasses/1') && (options.body === JSON.stringify(bodyMatch))) {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200,
-                    json: () => Promise.resolve({...dinghyClassScorpionHAL, name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215})
-                });
-            };
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation((name) => {
-            if (name === 'Scorpion') {
-                return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion});
-            }
-            else {
-                return Promise.resolve({'success': false, 'message': `Dinghy class not found: ${name}`});
-            }
-        });
-        const promise = dinghyRacingModel.updateDinghyClass({...dinghyClassScorpion, url: undefined}, 'Scorpion Two', 3, 1215);
+        const promise = dinghyRacingModel.updateDinghyClass({...dinghyClassScorpion, name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true, domainObject: {...dinghyClassScorpion, name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215}});
     });
     it('if dinghy class does not exist returns message explaining issue', async () => {
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation((name) => {
-            return Promise.resolve({'success': false, 'message': `Dinghy class not found: ${name}`});
-        });
-        const promise = dinghyRacingModel.updateDinghyClass({...dinghyClassScorpion, url: undefined}, 'Scorpion Two', 3, 1215);
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'Dinghy class not found: Scorpion'});
-    });
-    it('if update fails returns failed indicator and message explaining cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
@@ -3996,7 +3923,7 @@ it('provides a blank template for a competitor', () => {
 it('provides a blank template for a dinghy class', () => {
     const dinghyClass = DinghyRacingModel.dinghyClassTemplate();
 
-    expect(dinghyClass).toEqual({'name': '', 'crewSize': 1, portsmouthNumber: null, 'url': ''});
+    expect(dinghyClass).toEqual({'name': '', 'crewSize': 1, portsmouthNumber: null, externalName: null, 'url': ''});
 });
 
 it('provides a blank template for a dinghy', () => {

@@ -16,48 +16,48 @@ const competitorsCollectionHAL = {_embedded:{competitors:[
 	self:{href:'http://localhost:8081/dinghyracing/api/competitors'},profile:{href:'http://localhost:8081/dinghyracing/api/profile/competitors'}
 },page:{size:20,totalElements:6,totalPages:1,number:0}};
 
-const dinghyClassScorpionHAL = {name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/1' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/1' } } };
-const dinghyClassGraduateHAL = {name: 'Graduate', crewSize: 2, portsmouthNumber: 1110, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/5' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/5' } } };
-const dinghyClassCometHAL = {name: 'Comet', crewSize: 1, portsmouthNumber: 1210, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/16' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/16' } } };
-const dinghyClassNotSetHAL = {name:'',crewSize:0,_links:{self:{href:''},dinghyClass:{href:''}}};
+const dinghyClassScorpionHAL = {name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043, externalName: null, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/1' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/1' } } };
+const dinghyClassGraduateHAL = {name: 'Graduate', crewSize: 2, portsmouthNumber: 1110, externalName: null, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/5' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/5' } } };
+const dinghyClassCometHAL = {name: 'Comet', crewSize: 1, portsmouthNumber: 1210, externalName: null, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/16' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/16' } } };
+// const dinghyClassNotSetHAL = {name:'',crewSize:0,_links:{self:{href:''},dinghyClass:{href:''}}};
 const dinghyClassCollectionHAL = {
 	_embedded: {dinghyClasses: [ dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghyClassCometHAL ] }, _links: {
 		self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses' }, profile: {href: 'http://localhost:8081/dinghyracing/api/profile/dinghyClasses' } }, 
 		 	page: {size: 20, totalElements: 3, totalPages: 1, number: 0 
 		} 
 };
-const dinghyClassSchemaJSON = {
-	title: 'Dinghy class', 
-	properties: { 
-		name: {title: 'Name', readOnly: false, description: 'identifier', type: 'string' },
-		crewSize: {title: 'Crew size', readOnly: false, type: 'integer'} 
-	}, definitions: { }, type: 'object', $schema: 'http://json-schema.org/draft-04/schema#' 
-};
-const dinghyClassSchemaALPS = { 
-	alps: {version: '1.0', descriptor: [
-		{
-			id: 'dinghyClass-representation', 
-			href: 'http://localhost:8081/dinghyracing/api/profile/dinghyClasses', 
-			descriptor: [
-				{name: 'name', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'identifier' } },
-				{name:'crewSize', type:'SEMANTIC'}
-			]
-		}, 
-		{id: 'create-dinghyClasses', name: 'dinghyClasses', type: 'UNSAFE', descriptor: [ ], rt: '#dinghyClass-representation' }, 
-		{
-			id: 'get-dinghyClasses', name: 'dinghyClasses', type: 'SAFE', descriptor: [
-				{name: 'page', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'The page to return.'} }, 
-				{name: 'size', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'The size of the page to return.' } }, 
-				{name: 'sort', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'The sorting criteria to use to calculate the content of the page.' } } 
-			], 
-			rt: '#dinghyClass-representation' 
-		}, 
-		{id: 'delete-dinghyClass', name: 'dinghyClass', type: 'IDEMPOTENT', descriptor: [ ], rt: '#dinghyClass-representation'}, 
-		{id: 'update-dinghyClass', name: 'dinghyClass', type: 'IDEMPOTENT', descriptor: [ ], rt: '#dinghyClass-representation'}, 
-		{id: 'get-dinghyClass', name: 'dinghyClass', type: 'SAFE', descriptor: [ ], rt: '#dinghyClass-representation'}, 
-		{id: 'patch-dinghyClass', name: 'dinghyClass', type: 'UNSAFE', descriptor: [ ], rt: '#dinghyClass-representation'}
-	]}
-};
+// const dinghyClassSchemaJSON = {
+// 	title: 'Dinghy class', 
+// 	properties: { 
+// 		name: {title: 'Name', readOnly: false, description: 'identifier', type: 'string' },
+// 		crewSize: {title: 'Crew size', readOnly: false, type: 'integer'} 
+// 	}, definitions: { }, type: 'object', $schema: 'http://json-schema.org/draft-04/schema#' 
+// };
+// const dinghyClassSchemaALPS = { 
+// 	alps: {version: '1.0', descriptor: [
+// 		{
+// 			id: 'dinghyClass-representation', 
+// 			href: 'http://localhost:8081/dinghyracing/api/profile/dinghyClasses', 
+// 			descriptor: [
+// 				{name: 'name', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'identifier' } },
+// 				{name:'crewSize', type:'SEMANTIC'}
+// 			]
+// 		}, 
+// 		{id: 'create-dinghyClasses', name: 'dinghyClasses', type: 'UNSAFE', descriptor: [ ], rt: '#dinghyClass-representation' }, 
+// 		{
+// 			id: 'get-dinghyClasses', name: 'dinghyClasses', type: 'SAFE', descriptor: [
+// 				{name: 'page', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'The page to return.'} }, 
+// 				{name: 'size', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'The size of the page to return.' } }, 
+// 				{name: 'sort', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'The sorting criteria to use to calculate the content of the page.' } } 
+// 			], 
+// 			rt: '#dinghyClass-representation' 
+// 		}, 
+// 		{id: 'delete-dinghyClass', name: 'dinghyClass', type: 'IDEMPOTENT', descriptor: [ ], rt: '#dinghyClass-representation'}, 
+// 		{id: 'update-dinghyClass', name: 'dinghyClass', type: 'IDEMPOTENT', descriptor: [ ], rt: '#dinghyClass-representation'}, 
+// 		{id: 'get-dinghyClass', name: 'dinghyClass', type: 'SAFE', descriptor: [ ], rt: '#dinghyClass-representation'}, 
+// 		{id: 'patch-dinghyClass', name: 'dinghyClass', type: 'UNSAFE', descriptor: [ ], rt: '#dinghyClass-representation'}
+// 	]}
+// };
 
 const fleetScorpionHAL = { 'name' : 'Scorpion', '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/1' }, 'fleet' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/1' }, 'dinghyClasses' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/1/dinghyClasses' } } };
 const fleetHandicapHAL = { 'name' : 'Handicap', '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/2' }, 'fleet' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/2' }, 'dinghyClasses' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/2/dinghyClasses' } } };
@@ -348,9 +348,9 @@ const competitorLiuBao = {name: 'Liu Bao',url: 'http://localhost:8081/dinghyraci
 const competitorBobHoskins = {name: 'Bob Hoskins',url: 'http://localhost:8081/dinghyracing/api/competitors/15'};
 const competitorsCollection = [competitorChrisMarshall, competitorSarahPascal, competitorJillMyer, competitorLouScrew, competitorOwainDavies, competitorLiuBao];
 
-const dinghyClassScorpion = {name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043, url: 'http://localhost:8081/dinghyracing/api/dinghyClasses/1' };
-const dinghyClassGraduate = {name:'Graduate', crewSize: 2, portsmouthNumber: 1110, url:'http://localhost:8081/dinghyracing/api/dinghyClasses/5'};
-const dinghyClassComet = {name:'Comet', crewSize:1, portsmouthNumber: 1210, url:'http://localhost:8081/dinghyracing/api/dinghyClasses/16'}
+const dinghyClassScorpion = {name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043, externalName: null, url: 'http://localhost:8081/dinghyracing/api/dinghyClasses/1' };
+const dinghyClassGraduate = {name:'Graduate', crewSize: 2, portsmouthNumber: 1110, externalName: null, url:'http://localhost:8081/dinghyracing/api/dinghyClasses/5'};
+const dinghyClassComet = {name:'Comet', crewSize:1, portsmouthNumber: 1210, externalName: null, url:'http://localhost:8081/dinghyracing/api/dinghyClasses/16'}
 const dinghyClasses = [dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet];
 const dinghyClassesByNameAsc = [dinghyClassComet, dinghyClassGraduate, dinghyClassScorpion];
 
@@ -449,15 +449,15 @@ export {
 	competitorsCollectionHAL, competitorChrisMarshallHAL, competitorSarahPascalHAL, competitorJillMyerHAL, competitorLouScrewHAL, 
 	competitorOwainDaviesHAL, competitorLiuBaoHAL,
 	
-	dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghyClassCometHAL, dinghyClassNotSetHAL, 
-	dinghyClassSchemaJSON, dinghyClassSchemaALPS,
+	dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghyClassCometHAL, // dinghyClassNotSetHAL, 
+	// dinghyClassSchemaJSON, dinghyClassSchemaALPS,
 	
 	fleetsHAL, fleetScorpionHAL, fleetGraduateHAL, fleetCometHAL, fleetHandicapHAL,
 
 	fleetScorpionDinghyClassHAL, fleetHandicapDinghyClassHAL, fleetGraduateDinghyClassHAL, fleetCometDinghyClassHAL,
 
 	dinghiesCollectionHAL, dinghiesScorpionCollectionHAL, dinghy1234HAL, dinghy2726HAL, dinghy6745HAL, dinghy826HAL,
-	dinghySchemaJSON, dinghySchemaALPS, 
+	// dinghySchemaJSON, dinghySchemaALPS, 
 		
 	racesCollectionHAL, 
 	raceScorpion_AHAL, // raceScorpion_ADinghyClassHAL,

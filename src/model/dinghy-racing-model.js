@@ -46,7 +46,7 @@ class DinghyRacingModel {
      * @returns {DinghyClass}
      */
     static dinghyClassTemplate() {
-        return {name: '', crewSize: 1, portsmouthNumber: null, url: ''};
+        return {name: '', crewSize: 1, portsmouthNumber: null, externalName: null, url: ''};
     }
 
     /**
@@ -507,29 +507,8 @@ class DinghyRacingModel {
      * @param {Integer} [portsmouthNumber]
      * @returns {Promise<Result>}
      */
-    async updateDinghyClass(dinghyClass, name, crewSize, portsmouthNumber) {
-        let dinghyClassURL = dinghyClass.url;
-        if (!dinghyClass.url) {
-            const result = await this.getDinghyClassByName(dinghyClass.name);
-            if (result.success) {
-                dinghyClassURL = result.domainObject.url;
-            }
-            else {
-                return Promise.resolve(result);
-            }
-        }
-        const updateObject = {};
-        if (name) {
-            updateObject.name = name;
-        }
-        if(crewSize) {
-            updateObject.crewSize = crewSize;
-        }
-        if (portsmouthNumber) {
-            updateObject.portsmouthNumber = portsmouthNumber;
-        }
-
-        const result = await this.update(dinghyClassURL, updateObject);
+    async updateDinghyClass(dinghyClass) {
+        const result = await this.update(dinghyClass.url, dinghyClass);
         if (result.success) {
             return Promise.resolve({'success': true, 'domainObject': this._convertDinghyClassHALToDinghyClass(result.domainObject)});
         }
@@ -1162,15 +1141,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async getDinghyClassByName(name) {
-        const resource = this.httpRootURL + '/dinghyClasses/search/findByName?name=' + name;
-
-        const result = await this.read(resource);
-        if(result.success) {
-            return Promise.resolve({'success': true, 'domainObject': this._convertDinghyClassHALToDinghyClass(result.domainObject)});
-        }
-        else {
-            return Promise.resolve(result);
-        }
+        return this.getDinghyClass(this.httpRootURL + '/dinghyClasses/search/findByName?name=' + name);
     }
 
     /**
@@ -1709,7 +1680,7 @@ class DinghyRacingModel {
     }
 
     _convertDinghyClassHALToDinghyClass(dinghyClassHAL) {
-        return {...DinghyRacingModel.dinghyClassTemplate(), name: dinghyClassHAL.name, crewSize: dinghyClassHAL.crewSize, portsmouthNumber: dinghyClassHAL.portsmouthNumber, url: dinghyClassHAL._links.self.href};
+        return {...DinghyRacingModel.dinghyClassTemplate(), name: dinghyClassHAL.name, crewSize: dinghyClassHAL.crewSize, portsmouthNumber: dinghyClassHAL.portsmouthNumber, externalName: dinghyClassHAL.externalName, url: dinghyClassHAL._links.self.href};
     }
 
     _convertEntryHALtoEntry(entryHAL, race, helm, dinghy, crew, laps) {
