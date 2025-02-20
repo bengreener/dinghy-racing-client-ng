@@ -3923,7 +3923,7 @@ it('provides a blank template for a competitor', () => {
 it('provides a blank template for a dinghy class', () => {
     const dinghyClass = DinghyRacingModel.dinghyClassTemplate();
 
-    expect(dinghyClass).toEqual({'name': '', 'crewSize': 1, portsmouthNumber: null, externalName: '', 'url': ''});
+    expect(dinghyClass).toEqual({'name': '', 'crewSize': 1, portsmouthNumber: 1000, externalName: '', 'url': ''});
 });
 
 it('provides a blank template for a dinghy', () => {
