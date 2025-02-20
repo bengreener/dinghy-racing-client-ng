@@ -379,20 +379,43 @@ class DinghyRacingController {
      * @returns {Promise<Result>}
      */
     updateEntry(entry, helm, dinghy, crew = null) {
+        let validEntry = true;
+        let message = '';
         // check valid race, competitor, and dinghy provided
         if (!entry.url) {
-            return Promise.resolve({'success': false, 'message': 'Please provide an existing race entry.'});
+            validEntry = false;
+            if (message) {
+                message += '/n';
+            }
+            message += 'Please provide an existing race entry.';
         }
         if (!helm.name || helm.name === '') {
-            return Promise.resolve({'success': false, 'message': 'Please provide details for the helm.'});
+            validEntry = false;
+            if (message) {
+                message += '/n';
+            }
+            message += 'Please provide details for the helm.';
         }
         if (!dinghy.sailNumber || dinghy.sailNumber === '' || !dinghy.dinghyClass || !dinghy.dinghyClass.name || dinghy.dinghyClass.name === '') {
-            return Promise.resolve({'success': false, 'message': 'Please provide details for the dinghy.'});
+            validEntry = false;
+            if (message) {
+                message += '/n';
+            }
+            message += 'Please provide details for the dinghy.';
         }
         if (crew && (!crew.name || crew.name === '')) {
-            return Promise.resolve({'success': false, 'message': 'Please provide details for the crew.'});
+            validEntry = false;
+            if (message) {
+                message += '/n';
+            }
+            message += 'Please provide details for the crew.';
         }
-        return this.model.updateEntry(entry, helm, dinghy, crew);
+        if (validEntry) {
+            return this.model.updateEntry(entry, helm, dinghy, crew);
+        }
+        else {
+            return Promise.resolve({success: false, message: message});
+        }
     }
 
     /**
