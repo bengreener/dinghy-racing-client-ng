@@ -362,6 +362,13 @@ class DinghyRacingController {
             }
             message += 'Please provide details for the crew.';
         }
+        if (dinghy.dinghyClass.crewSize > 1 && !crew) {
+            validEntry = false;
+            if (message) {
+                message += '/n';
+            }
+            message += 'You have selected a dinghy with a crew. Please select a crew.';
+        }
         if (validEntry) {
             return this.model.createEntry(race, helm, dinghy, crew);
         }
