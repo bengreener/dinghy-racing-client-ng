@@ -209,21 +209,21 @@ class DinghyRacingController {
             if (message !== '') {
                 message += '/n';
             }
-            return Promise.resolve({'success': false, 'message': 'A name is required for a new dinghy class.'});
+            message += 'A name is required for a new dinghy class.';
         }
         if (!(typeof dinghyClass.crewSize === 'number')) {
             validDinghyClass = false;
             if (message !== '') {
                 message += '/n';
             }
-            return Promise.resolve({'success': false, 'message': 'A numeric crew size is required for a new dinghy class.'});
+            message += 'A numeric crew size is required for a new dinghy class.';
         }
         if (!(typeof dinghyClass.portsmouthNumber === 'number')) {
             validDinghyClass = false;
             if (message !== '') {
                 message += '/n';
             }
-            return Promise.resolve({'success': false, 'message': 'A numeric portsmouth number is required for a new dinghy class.'});
+            message += 'A numeric portsmouth number is required for a new dinghy class.';
         }
         if (validDinghyClass) {
             return this.model.createDinghyClass(dinghyClass);
@@ -242,10 +242,6 @@ class DinghyRacingController {
         let validDinghyClass = true;
         let message = '';
         if (!dinghyClass) {
-            validDinghyClass = false;
-            if (message !== '') {
-                message += '/n';
-            }
             return Promise.resolve({'success': false, 'message': 'A dinghy class to update is required.'});
         }
         if (!dinghyClass?.url) {
@@ -253,21 +249,28 @@ class DinghyRacingController {
             if (message !== '') {
                 message += '/n';
             }
-            return Promise.resolve({'success': false, 'message': 'The url of an existing dinghy class is required to update a dinghy class.'});
+            message += 'The url of an existing dinghy class is required to update a dinghy class.';
         }
         if (dinghyClass?.name == null || dinghyClass.name === '') {
             validDinghyClass = false;
             if (message !== '') {
                 message += '/n';
             }
-            return Promise.resolve({'success': false, 'message': 'A name is required for a dinghy class.'});
+            message += 'A name is required for a dinghy class.';
         }
         if (!(typeof dinghyClass?.crewSize === 'number')) {
             validDinghyClass = false;
             if (message !== '') {
                 message += '/n';
             }
-            return Promise.resolve({'success': false, 'message': 'A numeric crew size is required for a dinghy class.'});
+            message += 'A numeric crew size is required for a dinghy class.';
+        }
+        if (!(typeof dinghyClass?.portsmouthNumber === 'number')) {
+            validDinghyClass = false;
+            if (message !== '') {
+                message += '/n';
+            }
+            message += 'A numeric portsmouth number is required for a new dinghy class.';
         }
         if (validDinghyClass) {
             return this.model.updateDinghyClass(dinghyClass);

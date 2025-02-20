@@ -29,7 +29,7 @@ describe('when creating a new Dinghy Class', () => {
         it('returns a message that a name is required for a dinghy class', async () => {
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
             const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
-            const promise = dinghyRacingController.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), name: null});
+            const promise = dinghyRacingController.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), name: null, portsmouthNumber: 1000});
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
             expect(result).toEqual({'success': false, message: 'A name is required for a new dinghy class.'});
@@ -168,6 +168,26 @@ describe('when updating a dinghy class', () => {
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
             expect(result).toEqual({'success': false, message: 'A numeric crew size is required for a dinghy class.'});
+        });
+    });
+    describe('when a portsmouth number not supplied for a new dinghy class', () => {
+        it('returns a message that a name is required for a dinghy class', async () => {
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+            const promise = dinghyRacingController.updateDinghyClass({...dinghyClassScorpion, portsmouthNumber: null});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, message: 'A numeric portsmouth number is required for a new dinghy class.'});
+        });
+    });
+    describe('when a non-numeric portsmouth number is supplied for a new dinghy class', () => {
+        it('returns a message that a name is required for a dinghy class', async () => {
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+            const promise = dinghyRacingController.updateDinghyClass({...dinghyClassScorpion, portsmouthNumber: 'One Thousand'});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, message: 'A numeric portsmouth number is required for a new dinghy class.'});
         });
     });
     describe('when operation is successful', () => {
