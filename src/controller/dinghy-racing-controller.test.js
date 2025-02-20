@@ -65,11 +65,31 @@ describe('when creating a new Dinghy Class', () => {
             expect(result).toEqual({'success': false, message: 'A numeric crew size is required for a new dinghy class.'});
         });
     });
+    describe('when a portsmouth number not supplied for a new dinghy class', () => {
+        it('returns a message that a name is required for a dinghy class', async () => {
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+            const promise = dinghyRacingController.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), name: 'Dinghy Class', crewSize: 1, portsmouthNumber: null});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, message: 'A numeric portsmouth number is required for a new dinghy class.'});
+        });
+    });
+    describe('when a non-numeric portsmouth number is supplied for a new dinghy class', () => {
+        it('returns a message that a name is required for a dinghy class', async () => {
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
+            const promise = dinghyRacingController.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), name: 'Dinghy Class', crewSize: 1, portsmouthNumber: 'One Thousand'});
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': false, message: 'A numeric portsmouth number is required for a new dinghy class.'});
+        });
+    });
     it('returns a promise that resolves to a result indicating success when operation is successful', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         const createDinghyClassSpy = jest.spyOn(dinghyRacingModel, 'createDinghyClass').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
-        const promise = dinghyRacingController.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), name: 'Scorpion', crewSize: 2});
+        const promise = dinghyRacingController.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), name: 'Scorpion', crewSize: 2, portsmouthNumber: 1000});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': true});
@@ -78,7 +98,7 @@ describe('when creating a new Dinghy Class', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         const createDinghyClassSpy = jest.spyOn(dinghyRacingModel, 'createDinghyClass').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
-        const promise = dinghyRacingController.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion'});
+        const promise = dinghyRacingController.createDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Scorpion', portsmouthNumber: 1000});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Something went wrong'});

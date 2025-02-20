@@ -218,6 +218,13 @@ class DinghyRacingController {
             }
             return Promise.resolve({'success': false, 'message': 'A numeric crew size is required for a new dinghy class.'});
         }
+        if (!(typeof dinghyClass.portsmouthNumber === 'number')) {
+            validDinghyClass = false;
+            if (message !== '') {
+                message += '/n';
+            }
+            return Promise.resolve({'success': false, 'message': 'A numeric portsmouth number is required for a new dinghy class.'});
+        }
         if (validDinghyClass) {
             return this.model.createDinghyClass(dinghyClass);
         }
