@@ -331,20 +331,43 @@ class DinghyRacingController {
      * @returns {Promise<Result>}
      */
     signupToRace(race, helm, dinghy, crew = null) {
+        let validEntry = true;
+        let message = '';
         // check valid race, competitor, and dinghy provided
         if (!race.name || race.name === '' || !race.plannedStartTime) {
-            return Promise.resolve({'success': false, 'message': 'Please provide details of the race.'});
+            validEntry = false;
+            if (message) {
+                message += '/n';
+            }
+            message += 'Please provide details of the race.';
         }
         if (!helm.name || helm.name === '') {
-            return Promise.resolve({'success': false, 'message': 'Please provide details for the helm.'});
+            validEntry = false;
+            if (message) {
+                message += '/n';
+            }
+            message += 'Please provide details for the helm.';
         }
         if (!dinghy.sailNumber || dinghy.sailNumber === '' || !dinghy.dinghyClass || !dinghy.dinghyClass.name || dinghy.dinghyClass.name === '') {
-            return Promise.resolve({'success': false, 'message': 'Please provide details for the dinghy.'});
+            validEntry = false;
+            if (message) {
+                message += '/n';
+            }
+            message += 'Please provide details for the dinghy.';
         }
         if (crew && (!crew.name || crew.name === '')) {
-            return Promise.resolve({'success': false, 'message': 'Please provide details for the crew.'});
+            validEntry = false;
+            if (message) {
+                message += '/n';
+            }
+            message += 'Please provide details for the crew.';
         }
-        return this.model.createEntry(race, helm, dinghy, crew);
+        if (validEntry) {
+            return this.model.createEntry(race, helm, dinghy, crew);
+        }
+        else {
+            return Promise.resolve({success: false, message: message});
+        }
     }
 
     /**
