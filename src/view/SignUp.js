@@ -458,13 +458,21 @@ function SignUp({ race }) {
                 if (dinghyResult.success) {
                     dinghies.push(dinghyResult.domainObject);
                 }
-                else {
+                // ignore not found messages as they are liekly valid results especially for fleest with a broad class membership
+                else if (!(/404/.test(dinghyResult.message))) {
                     success = false;
                     if (message) {
                         message += '/n'
                     }
                     message += 'Unable to retrieve previous entries\n' + dinghyResult.message;
                 }
+                // else {
+                //     success = false;
+                //     if (message) {
+                //         message += '/n'
+                //     }
+                //     message += 'Unable to retrieve previous entries\n' + dinghyResult.message;
+                // }
             });
         }
         const crewResults = await Promise.all(dinghies.map(dinghy => {

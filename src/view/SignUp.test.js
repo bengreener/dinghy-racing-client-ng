@@ -9549,15 +9549,14 @@ describe('when a sailnumber is entered', () => {
                 const user = userEvent.setup();
         
                 jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
-                jest.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!' })});
-                // jest.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
-                //     if (dinghy.url === dinghy1234.url) {
-                //         return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
-                //     }
-                //     else if (dinghy.url === dinghy1234Graduate.url) {
-                //         return Promise.resolve({success: true, domainObject: dinghyGraduate1234Crews});
-                //     }
-                // });
+                jest.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => {
+                    return Promise.resolve(
+                        {
+                            success: false, 
+                            message: 'HTTP Error: 404 Message: JSON.parse: unexpected end of data at line 1 column 1 of the JSON data/nUnable to retrieve previous entries HTTP Error: 404 Message: JSON.parse: unexpected end of data at line 1 column 1 of the JSON data' 
+                        }
+                    )
+                });
                 
                 await act(async () => {
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
@@ -9568,7 +9567,12 @@ describe('when a sailnumber is entered', () => {
                     await user.type(inputSailNumber, '1234');
                     await user.keyboard('{Tab}');
                 })
-                expect(await screen.findByText(/oops!/i)).toBeInTheDocument();
+                expect(screen.queryByText(/HTTP Error: 404 Message/i)).not.toBeInTheDocument();
+            });
+            describe('when an entry with that sail number cannot be found for a partucular dinghy class', () => {
+                it('silently ignores the response as it is highly likely a specific combination of dinghy class and sail number will not exist expecially if the fleet has a large number of classes', async () => {
+                    
+                })
             });
         });
         it('clears error message on success', async () => {
