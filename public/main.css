@@ -105,7 +105,13 @@ td.total {
 	cursor: pointer;
 }
 .disabled {
+	/* applies to disabled race entries (HTML class applied through code/ html) */
 	color: lightgray;
+}
+:disabled {
+	/* applies to disabled input elements via disabled HTML element attribute */
+	/* class used to indicate elemnt is disabled while processing takes place; e.g. updating server and waiting for response */
+	background-color: lightGray;
 }
 .display-port {
 	overflow: hidden;
