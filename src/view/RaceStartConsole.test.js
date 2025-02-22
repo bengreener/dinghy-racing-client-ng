@@ -22,7 +22,6 @@ import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 import { httpRootURL, wsRootURL, races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet } from '../model/__mocks__/test-data';
 import StartSequence from '../model/domain-classes/start-sequence';
-import StartSignal from '../model/domain-classes/start-signal';
 import RaceType from '../model/domain-classes/race-type';
 
 

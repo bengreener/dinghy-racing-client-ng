@@ -16,11 +16,9 @@
 
 import SessionStartSequence from './session-start-sequence';
 
-import { httpRootURL, wsRootURL, raceScorpionA, raceHandicapA } from '../__mocks__/test-data';
+import { raceScorpionA, raceHandicapA } from '../__mocks__/test-data';
 import FlagRole from './flag-role';
 import FlagState from './flag-state';
-import StartSignal from './start-signal';
-import DinghyRacingModel from '../dinghy-racing-model';
 
 describe('when CSC Club Start for Fleet races', () => {
     describe('when 11 minutes before the start of the first race and 16 minutes before start of second race', () => {

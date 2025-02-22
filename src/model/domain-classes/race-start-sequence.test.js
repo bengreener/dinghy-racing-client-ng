@@ -15,11 +15,9 @@
  */
 
 import RaceStartSequence from './race-start-sequence';
-import { httpRootURL, wsRootURL, raceScorpionA, raceHandicapA, racePursuitA } from '../__mocks__/test-data';
+import { raceScorpionA, raceHandicapA, racePursuitA } from '../__mocks__/test-data';
 import FlagRole from './flag-role';
 import FlagState from './flag-state';
-import StartSignal from './start-signal';
-import DinghyRacingModel from '../dinghy-racing-model';
 import StartType from './start-type';
 
 describe('when it is 5 minutes before the race start time', () => {

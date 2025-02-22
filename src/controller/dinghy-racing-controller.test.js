@@ -18,7 +18,6 @@ import DinghyRacingController from './dinghy-racing-controller.js';
 import DinghyRacingModel from '../model/dinghy-racing-model.js';
 import { httpRootURL, wsRootURL, competitorChrisMarshall, dinghyClassScorpion, dinghy1234, dinghy826, raceScorpionA, raceCometA, 
     entryChrisMarshallScorpionA1234, entryJillMyerCometA826, entriesScorpionA, competitorLouScrew, fleetHandicap, fleetScorpion } from '../model/__mocks__/test-data.js';
-import StartSignal from '../model/domain-classes/start-signal.js';
 // import { downloadRaceEntriesCSV } from '../utilities/csv-writer.js';
 import * as csvWriter from '../utilities/csv-writer.js';
 import NameFormat from './name-format.js';

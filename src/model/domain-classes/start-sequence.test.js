@@ -18,7 +18,6 @@ import StartSequence from './start-sequence';
 import { httpRootURL, wsRootURL, raceScorpionA, raceGraduateA } from '../__mocks__/test-data';
 import FlagState from './flag-state';
 import DinghyRacingModel from '../dinghy-racing-model';
-import StartSignal from './start-signal';
 import FlagRole from './flag-role';
 
 beforeEach(() => {success: true

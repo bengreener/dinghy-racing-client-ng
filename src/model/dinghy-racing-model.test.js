@@ -52,7 +52,6 @@ import {
 
     entriesGraduateA_bigData
 } from './__mocks__/test-data-more-data';
-import StartSignal from './domain-classes/start-signal';
 import FlagState from './domain-classes/flag-state';
 import RaceType from './domain-classes/race-type';
 import FlagRole from './domain-classes/flag-role';

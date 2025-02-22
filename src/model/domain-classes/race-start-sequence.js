@@ -16,7 +16,6 @@
 
 import FlagRole from './flag-role';
 import FlagState from './flag-state';
-import StartSignal from './start-signal';
 import { sortArray } from '../../utilities/array-utilities';
 import RaceType from './race-type';
 import StartType from './start-type';
