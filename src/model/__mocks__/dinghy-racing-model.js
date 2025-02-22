@@ -380,10 +380,6 @@ class DinghyRacingModel {
         return null;
     }
 
-    async updateRaceStartSequenceState(race, stage) {
-        return null;
-    }
-
     async updateRacePlannedLaps(race, plannedLaps) {
         return null;
     }

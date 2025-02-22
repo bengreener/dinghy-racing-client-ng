@@ -127,7 +127,7 @@ const dinghiesScorpionCollectionHAL = {_embedded: {dinghies: [
 }, page: {size: 20, totalElements: 2, totalPages: 1, number: 0 } };
 
 const raceScorpion_AHAL = { 
-	name : 'Scorpion A', plannedStartTime : '2021-10-14T10:30:00', duration: 'PT45M', type: 'FLEET', plannedLaps: 5, startSequenceState: null, startType: 'CSCCLUBSTART', 
+	name : 'Scorpion A', plannedStartTime : '2021-10-14T10:30:00', duration: 'PT45M', type: 'FLEET', plannedLaps: 5, startType: 'CSCCLUBSTART', 
 		dinghyClasses: [], lapForecast: 5.0, leadEntry: {scoringAbbreviation: null, lastLapTime: 'PT0S', sumOfLapTimes: 'PT0S', averageLapTime: 'PT0S', finishedRace: false, 
 		onLastLap: false, lapsSailed: 0 }, _links : { 
 			self : { href : 'http://localhost:8081/dinghyracing/api/races/4' }, 
@@ -139,7 +139,7 @@ const raceScorpion_AHAL = {
 const raceScorpion_ASignedUpHAL = {_embedded: {dinghies: [ {sailNumber: '1234', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' } } }, {sailNumber: '6745', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/3' }, dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/3' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass' } } } ] }, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/races/4/signedUp' } } };
 
 const raceGraduate_AHAL = {
-	name: 'Graduate A', plannedStartTime: '2021-10-14T10:35:00', duration: 'PT45M', type: 'FLEET', plannedLaps: 4, startSequenceState: null, startType: 'CSCCLUBSTART', 
+	name: 'Graduate A', plannedStartTime: '2021-10-14T10:35:00', duration: 'PT45M', type: 'FLEET', plannedLaps: 4, startType: 'CSCCLUBSTART', 
 	dinghyClasses: [], lapForecast: 4.0, leadEntry: null, _links: {
 		self: {href: 'http://localhost:8081/dinghyracing/api/races/7' }, 
 		race: {href: 'http://localhost:8081/dinghyracing/api/races/7' }, 
@@ -150,7 +150,7 @@ const raceGraduate_AHAL = {
 const raceGraduate_ASignedUpHAL = {_embedded: {dinghies: [ ] }, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/races/7/signedUp' } } };
 
 const raceComet_AHAL = {
-	name: 'Comet A', plannedStartTime: '2021-10-14T10:40:00', duration: 'PT45M', type: 'FLEET', plannedLaps: 4, startSequenceState: null, startType: 'CSCCLUBSTART', 
+	name: 'Comet A', plannedStartTime: '2021-10-14T10:40:00', duration: 'PT45M', type: 'FLEET', plannedLaps: 4, startType: 'CSCCLUBSTART', 
 	dinghyClasses: [], lapForecast: 4.0, leadEntry: null, _links: {
 		self: {href: 'http://localhost:8081/dinghyracing/api/races/17' }, 
 		race: {href: 'http://localhost:8081/dinghyracing/api/races/17' }, 
@@ -159,7 +159,7 @@ const raceComet_AHAL = {
 	} 
 };
 const raceHandicap_AHAL = {
-	name: 'Handicap A', plannedStartTime:'2021-10-14T10:45:00', duration: 'PT45M', type: 'FLEET', plannedLaps: 5, startSequenceState: null, startType: 'CSCCLUBSTART', 
+	name: 'Handicap A', plannedStartTime:'2021-10-14T10:45:00', duration: 'PT45M', type: 'FLEET', plannedLaps: 5, startType: 'CSCCLUBSTART', 
 	dinghyClasses: [], lapForecast: 5.0, leadEntry: {scoringAbbreviation: null, lastLapTime: 'PT0S', sumOfLapTimes: 'PT0S', averageLapTime: 'PT0S', finishedRace: false, 
 	onLastLap: false, lapsSailed: null }, _links:{
 		self:{href:'http://localhost:8081/dinghyracing/api/races/8'},
@@ -169,12 +169,9 @@ const raceHandicap_AHAL = {
 	}
 };
 
-const racePursuit_AHAL = {name: 'Pursuit A', plannedStartTime:'2021-10-14T10:45:00', duration: 'PT45M', type: 'PURSUIT', plannedLaps: 5, startSequenceState: null, startType: 'RRS26', dinghyClasses: [], lapForecast: 5.0, leadEntry: {scoringAbbreviation: null, lastLapTime: 'PT0S', sumOfLapTimes: 'PT0S', averageLapTime: 'PT0S', finishedRace: false, onLastLap: false, lapsSailed: null }, _links:{self:{href:'http://localhost:8081/dinghyracing/api/races/9'},race:{href:'http://localhost:8081/dinghyracing/api/races/9'},signedUp:{href:'http://localhost:8081/dinghyracing/api/races/9/signedUp'},fleet:{href:'http://localhost:8081/dinghyracing/api/fleets/2'}}};
+const racePursuit_AHAL = {name: 'Pursuit A', plannedStartTime:'2021-10-14T10:45:00', duration: 'PT45M', type: 'PURSUIT', plannedLaps: 5, startType: 'RRS26', dinghyClasses: [], lapForecast: 5.0, leadEntry: {scoringAbbreviation: null, lastLapTime: 'PT0S', sumOfLapTimes: 'PT0S', averageLapTime: 'PT0S', finishedRace: false, onLastLap: false, lapsSailed: null }, _links:{self:{href:'http://localhost:8081/dinghyracing/api/races/9'},race:{href:'http://localhost:8081/dinghyracing/api/races/9'},signedUp:{href:'http://localhost:8081/dinghyracing/api/races/9/signedUp'},fleet:{href:'http://localhost:8081/dinghyracing/api/fleets/2'}}};
 
 const racesCollectionHAL = {_embedded:{races:[raceScorpion_AHAL, raceGraduate_AHAL, raceComet_AHAL, raceHandicap_AHAL]},_links:{self:{href:'http://localhost:8081/dinghyracing/api/races'},profile:{href:'http://localhost:8081/dinghyracing/api/profile/races'}},page:{size:20,totalElements:4,totalPages:1,number:0}};
-
-// const raceSchemaJSON = {title: 'Race', properties: {duration: {title: 'Duration', readOnly: false, type: 'string', format: 'date-time' }, signedUp: {title: 'Signed up', readOnly: false, description: 'ToMany', type: 'string', format: 'uri' }, dinghyClass: {title: 'Dinghy class', readOnly: false, description: 'ToOne', type: 'string', format: 'uri' }, plannedStartTime: {title: 'Planned start time', readOnly: false, type: 'string', format: 'date-time' }, name: {title: 'Name', readOnly: false, description: 'identifier', type: 'string' }, plannedLaps: {title: 'Planned laps', readOnly: false, type: 'integer' } }, definitions: { }, type: 'object', $schema: 'http://json-schema.org/draft-04/schema#' };
-// const raceSchemaALPS = {alps: {version: '1.0', descriptor: [ {id: 'race-representation', href: 'http://localhost:8081/dinghyracing/api/profile/races', descriptor: [ {name: 'name', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'identifier' } }, {name: 'plannedStartTime', type: 'SEMANTIC' }, {name: 'duration', type: 'SEMANTIC' }, {name: 'plannedLaps', type: 'SEMANTIC' }, {name: 'signedUp', type: 'SAFE', doc: {format: 'TEXT', value: 'ToMany' }, rt: 'http://localhost:8081/dinghyracing/api/profile/entries#entry-representation' }, {name: 'dinghyClass', type: 'SAFE', doc: {format: 'TEXT', value: 'ToOne' }, rt: 'http://localhost:8081/dinghyracing/api/profile/dinghyClasses#dinghyClass-representation' } ] }, {id: 'get-races', name: 'races', type: 'SAFE', descriptor: [ {name: 'page', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'The page to return.' } }, {name: 'size', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'The size of the page to return.' } }, {name: 'sort', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'The sorting criteria to use to calculate the content of the page.' } } ], rt: '#race-representation' }, {id: 'create-races', name: 'races', type: 'UNSAFE', descriptor: [ ], rt: '#race-representation' }, {id: 'update-race', name: 'race', type: 'IDEMPOTENT', descriptor: [ ], rt: '#race-representation' }, {id: 'patch-race', name: 'race', type: 'UNSAFE', descriptor: [ ], rt: '#race-representation' }, {id: 'delete-race', name: 'race', type: 'IDEMPOTENT', descriptor: [ ], rt: '#race-representation' }, {id: 'get-race', name: 'race', type: 'SAFE', descriptor: [ ], rt: '#race-representation' }, {name: 'findByNameAndPlannedStartTime', type: 'SAFE', descriptor: [ {name: 'name', type: 'SEMANTIC' }, {name: 'time', type: 'SEMANTIC' } ] }, {name: 'findByPlannedStartTimeGreaterThanEqual', type: 'SAFE', descriptor: [ {name: 'time', type: 'SEMANTIC' } ] } ] } };
 
 const entriesHAL = {_embedded:{entries:[
 	{
@@ -372,11 +369,11 @@ const dinghies = [dinghy1234, dinghy2726, dinghy6745, dinghy2928, dinghy826];
 const dinghy1234Graduate = {sailNumber:'1234',dinghyClass: dinghyClassGraduate,url:'http://localhost:8081/dinghyracing/api/dinghies/6'};
 const dinghy1234Comet = {sailNumber:'1234',dinghyClass: dinghyClassComet,url:'http://localhost:8081/dinghyracing/api/dinghies/18'};
 
-const raceScorpionA = { name: 'Scorpion A', plannedStartTime: new Date('2021-10-14T10:30:00Z'), fleet: fleetScorpion, duration: 2700000, type: 'FLEET', plannedLaps: 5, startType: 'CSCCLUBSTART', lapsSailed: 0, lapForecast: 5.0, lastLapTime: 0, averageLapTime: 0, clock: null, startSequenceState: 'NONE', dinghyClasses: [], url: 'http://localhost:8081/dinghyracing/api/races/4' };
-const raceGraduateA = {name: 'Graduate A', plannedStartTime: new Date('2021-10-14T10:35:00Z'), fleet: fleetGraduate, duration: 2700000, type: 'FLEET', plannedLaps: 4,  startType: 'CSCCLUBSTART', lapsSailed: null, lapForecast: 4.0, lastLapTime: null, averageLapTime: null, startSequenceState: 'NONE', clock: null, dinghyClasses: [], url: 'http://localhost:8081/dinghyracing/api/races/7' };
-const raceCometA = {name: 'Comet A', plannedStartTime: new Date('2021-10-14T10:40:00Z'), fleet: fleetComet, duration: 2700000, type: 'FLEET', plannedLaps: 4, startType: 'CSCCLUBSTART', lapsSailed: null, lapForecast: 4.0, lastLapTime: null, averageLapTime: null, clock: null, startSequenceState: 'NONE', dinghyClasses: [], url: 'http://localhost:8081/dinghyracing/api/races/17' };
-const raceHandicapA = {name: 'Handicap A', plannedStartTime: new Date('2021-10-14T10:45:00Z'), fleet: fleetHandicap, duration: 2700000, type: 'FLEET', plannedLaps: 5, startType: 'CSCCLUBSTART', lapsSailed: null, lapForecast: 5.0, lastLapTime: 0, averageLapTime: 0, clock: null, startSequenceState: 'NONE', dinghyClasses: [], url: 'http://localhost:8081/dinghyracing/api/races/8' };
-const racePursuitA = {name: 'Pursuit A', plannedStartTime: new Date('2021-10-14T10:45:00Z'), fleet: fleetHandicap, duration: 2700000, type: 'PURSUIT', plannedLaps: 5, startType: 'RRS26', lapsSailed: null, lapForecast: 5.0, lastLapTime: 0, averageLapTime: 0, clock: null, startSequenceState: 'NONE', dinghyClasses: [], url: 'http://localhost:8081/dinghyracing/api/races/9' };
+const raceScorpionA = { name: 'Scorpion A', plannedStartTime: new Date('2021-10-14T10:30:00Z'), fleet: fleetScorpion, duration: 2700000, type: 'FLEET', plannedLaps: 5, startType: 'CSCCLUBSTART', lapsSailed: 0, lapForecast: 5.0, lastLapTime: 0, averageLapTime: 0, clock: null, dinghyClasses: [], url: 'http://localhost:8081/dinghyracing/api/races/4' };
+const raceGraduateA = {name: 'Graduate A', plannedStartTime: new Date('2021-10-14T10:35:00Z'), fleet: fleetGraduate, duration: 2700000, type: 'FLEET', plannedLaps: 4,  startType: 'CSCCLUBSTART', lapsSailed: null, lapForecast: 4.0, lastLapTime: null, averageLapTime: null, clock: null, dinghyClasses: [], url: 'http://localhost:8081/dinghyracing/api/races/7' };
+const raceCometA = {name: 'Comet A', plannedStartTime: new Date('2021-10-14T10:40:00Z'), fleet: fleetComet, duration: 2700000, type: 'FLEET', plannedLaps: 4, startType: 'CSCCLUBSTART', lapsSailed: null, lapForecast: 4.0, lastLapTime: null, averageLapTime: null, clock: null, dinghyClasses: [], url: 'http://localhost:8081/dinghyracing/api/races/17' };
+const raceHandicapA = {name: 'Handicap A', plannedStartTime: new Date('2021-10-14T10:45:00Z'), fleet: fleetHandicap, duration: 2700000, type: 'FLEET', plannedLaps: 5, startType: 'CSCCLUBSTART', lapsSailed: null, lapForecast: 5.0, lastLapTime: 0, averageLapTime: 0, clock: null, dinghyClasses: [], url: 'http://localhost:8081/dinghyracing/api/races/8' };
+const racePursuitA = {name: 'Pursuit A', plannedStartTime: new Date('2021-10-14T10:45:00Z'), fleet: fleetHandicap, duration: 2700000, type: 'PURSUIT', plannedLaps: 5, startType: 'RRS26', lapsSailed: null, lapForecast: 5.0, lastLapTime: 0, averageLapTime: 0, clock: null, dinghyClasses: [], url: 'http://localhost:8081/dinghyracing/api/races/9' };
 
 const races = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA];
 

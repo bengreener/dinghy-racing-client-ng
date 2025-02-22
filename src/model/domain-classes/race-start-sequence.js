@@ -214,42 +214,6 @@ class RaceStartSequence {
         }
         return {flags: flags, actions: actions};
     }
-
-    /**
-     * Update the start status of the race in the underlying model
-     * @param {Date} time at which to calculate the start status
-     */
-    updateRaceState(time) {
-        let warningSignalOffset;
-        let preparatorySignalOffset;
-        const oneMinuteSignalOffset = -60000;
-        const startingSignalOffset = 0;
-
-        switch (this._race.startType) {
-            case StartType.CSCCLUBSTART:
-                warningSignalOffset = -600000;
-                preparatorySignalOffset = -300000;
-                break;
-            default:
-                warningSignalOffset = -300000;
-                preparatorySignalOffset = -240000;
-        }
-
-        if (time.valueOf() === this._race.plannedStartTime.valueOf() + warningSignalOffset) {
-            this._model.updateRaceStartSequenceState(this._race, StartSignal.WARNINGSIGNAL);
-        }
-        else if (time.valueOf() === this._race.plannedStartTime.valueOf() + preparatorySignalOffset) {
-            this._model.updateRaceStartSequenceState(this._race, StartSignal.PREPARATORYSIGNAL);
-        }
-        else if (time.valueOf() === this._race.plannedStartTime.valueOf() + oneMinuteSignalOffset) {
-            if (this._race.startType !== StartType.CSCCLUBSTART) {
-                this._model.updateRaceStartSequenceState(this._race, StartSignal.ONEMINUTE);
-            }
-        }
-        else if (time.valueOf() === this._race.plannedStartTime.valueOf()+ startingSignalOffset) {
-            this._model.updateRaceStartSequenceState(this._race, StartSignal.STARTINGSIGNAL);
-        }
-    }
 }
 
 export default RaceStartSequence;

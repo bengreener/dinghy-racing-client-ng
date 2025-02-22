@@ -63,7 +63,7 @@ class DinghyRacingModel {
      */
     static raceTemplate() {
         return {name: '', plannedStartTime: null, fleet: DinghyRacingModel.fleetTemplate(), type: null, startType: null, duration: 0, plannedLaps: null, lapsSailed: null, lapForecast: null, 
-            lastLapTime: null, averageLapTime: null, clock: null, startSequenceState: StartSignal.NONE, dinghyClasses: [], url: ''};
+            lastLapTime: null, averageLapTime: null, clock: null, dinghyClasses: [], url: ''};
     }
 
     /**
@@ -1439,27 +1439,6 @@ class DinghyRacingModel {
     }
 
     /**
-     * Update the start sequence for a race
-     * @param {Race} race to update
-     * @param {StartSignal} stage of the starting sequence reached
-     */
-    async updateRaceStartSequenceState(race, stage) {
-        let result;
-        if (!race.url) {
-            result = await this.getRaceByNameAndPlannedStartTime(race.name, race.plannedStartTime);
-        }
-        else {
-            result = {'success': true, 'domainObject': race};
-        }
-        if (result.success) {
-            return this.update(result.domainObject.url, {'startSequenceState': stage});
-        }
-        else {
-            return result;
-        }
-    }
-
-    /**
      * Update the planned laps for a race
      * @param {Race} race to update
      * @param {Integer} plannedLaps of the starting sequence reached
@@ -1705,7 +1684,6 @@ class DinghyRacingModel {
             lapForecast: raceHAL.lapForecast,
             lastLapTime: raceHAL.leadEntry ? this.convertISO8601DurationToMilliseconds(raceHAL.leadEntry.lastLapTime) : null,
             averageLapTime: raceHAL.leadEntry ? this.convertISO8601DurationToMilliseconds(raceHAL.leadEntry.averageLapTime) : null,
-            startSequenceState: StartSignal.from(raceHAL.startSequenceState),
             dinghyClasses: raceHAL.dinghyClasses,
             url: raceHAL._links.self.href
         }

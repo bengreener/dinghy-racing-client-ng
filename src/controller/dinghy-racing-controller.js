@@ -476,23 +476,6 @@ class DinghyRacingController {
     /**
      * Update the start sequence state of a race
      * @param {Race} race to start
-     * @param {StartSequence} stage of the starting sequence reached
-     * @return {Promise<Result>}
-     */
-    updateRaceStartSequenceState(race, stage) {
-        // check valid race (a URL is sufficient, otherwise a name and start time is required)
-        if (!race.url && (!race.name || race.name === '' || !race.plannedStartTime)) {
-            return Promise.resolve({'success': false, 'message': 'Please provide details of the race.'});
-        }
-        if (!stage || !Object.keys(StartSequence).includes(stage.toUpperCase())) {
-            return Promise.resolve({'success': false, 'message': 'Please provide a valid start sequence stage.'});
-        }
-        return this.model.updateRaceStartSequenceState(race, stage);
-    }
-
-    /**
-     * Update the start sequence state of a race
-     * @param {Race} race to start
      * @param {Integer} plannedLaps new value for the number of laps to be completed
      * @return {Promise<Result>}
      */

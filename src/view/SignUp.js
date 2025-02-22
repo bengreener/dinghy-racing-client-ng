@@ -466,13 +466,6 @@ function SignUp({ race }) {
                     }
                     message += 'Unable to retrieve previous entries\n' + dinghyResult.message;
                 }
-                // else {
-                //     success = false;
-                //     if (message) {
-                //         message += '/n'
-                //     }
-                //     message += 'Unable to retrieve previous entries\n' + dinghyResult.message;
-                // }
             });
         }
         const crewResults = await Promise.all(dinghies.map(dinghy => {

@@ -254,58 +254,6 @@ describe('when using CSC club start', () => {
             expect(actions[2]).toStrictEqual(preparatoryFlagRaiseAction);
             expect(actions[3]).toStrictEqual(preparatoryFlagLowerAction);
         });
-        describe('when updating the race start state', () => {
-            describe('when 11 minutes before the start of the race', () => {
-                it('does not update the model', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence(raceScorpionA, model);
-                
-                    raceStartSequence.updateRaceState(new Date(raceScorpionA.plannedStartTime.valueOf() - 660000));
-                    expect(updateRaceStartSequenceStateSpy).not.toHaveBeenCalled();
-                });
-            });
-            describe('when 10 minutes before the start of the race', () => {
-                it('updates the remote model to show warning signal given', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence(raceScorpionA, model);
-                
-                    raceStartSequence.updateRaceState(new Date(raceScorpionA.plannedStartTime.valueOf() - 600000))
-                    expect(updateRaceStartSequenceStateSpy).toHaveBeenCalledWith(raceScorpionA, StartSignal.WARNINGSIGNAL);
-                });
-            });
-            describe('when 5 minutes before the start of the race', () => {
-                it('updates the remote model to show preparatory signal given', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence(raceScorpionA, model);
-                
-                    raceStartSequence.updateRaceState(new Date(raceScorpionA.plannedStartTime.valueOf() - 300000))
-                    expect(updateRaceStartSequenceStateSpy).toHaveBeenCalledWith(raceScorpionA, StartSignal.PREPARATORYSIGNAL);
-                });
-            });
-            describe('when 1 minutes before the start of the race', () => {
-                it('does not update the model', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence(raceScorpionA, model);
-                
-                    raceStartSequence.updateRaceState(new Date(raceScorpionA.plannedStartTime.valueOf() - 60000));
-                    expect(updateRaceStartSequenceStateSpy).not.toHaveBeenCalled();
-                });
-            });
-            describe('when 0 minutes before the start of the race', () => {
-                it('updates the remote model to show start signal given', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence(raceScorpionA, model);
-                
-                    raceStartSequence.updateRaceState(new Date(raceScorpionA.plannedStartTime.valueOf()))
-                    expect(updateRaceStartSequenceStateSpy).toHaveBeenCalledWith(raceScorpionA, StartSignal.STARTINGSIGNAL);
-                });
-            });
-        });
     });
     describe('when Fleet handicap race', () => {
         describe('when 11 minutes before the start of the race', () => {
@@ -936,58 +884,6 @@ describe('when using CSC club start', () => {
             expect(actions[2]).toStrictEqual(preparatoryFlagRaiseAction);
             expect(actions[3]).toStrictEqual(preparatoryFlagLowerAction);
         });
-        describe('when updating the race start state', () => {
-            describe('when 11 minutes before the start of the race', () => {
-                it('does not update the model', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence({...racePursuitA, startType: StartType.CSCCLUBSTART}, model);
-                
-                    raceStartSequence.updateRaceState(new Date(racePursuitA.plannedStartTime.valueOf() - 660000));
-                    expect(updateRaceStartSequenceStateSpy).not.toHaveBeenCalled();
-                });
-            });
-            describe('when 10 minutes before the start of the race', () => {
-                it('updates the remote model to show warning signal given', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence({...racePursuitA, startType: StartType.CSCCLUBSTART}, model);
-                
-                    raceStartSequence.updateRaceState(new Date(racePursuitA.plannedStartTime.valueOf() - 600000))
-                    expect(updateRaceStartSequenceStateSpy).toHaveBeenCalledWith({...racePursuitA, startType: StartType.CSCCLUBSTART}, StartSignal.WARNINGSIGNAL);
-                });
-            });
-            describe('when 5 minutes before the start of the race', () => {
-                it('updates the remote model to show preparatory signal given', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence({...racePursuitA, startType: StartType.CSCCLUBSTART}, model);
-                
-                    raceStartSequence.updateRaceState(new Date(racePursuitA.plannedStartTime.valueOf() - 300000))
-                    expect(updateRaceStartSequenceStateSpy).toHaveBeenCalledWith({...racePursuitA, startType: StartType.CSCCLUBSTART}, StartSignal.PREPARATORYSIGNAL);
-                });
-            });
-            describe('when 1 minutes before the start of the race', () => {
-                it('does not update the model', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence({...racePursuitA, startType: StartType.CSCCLUBSTART}, model);
-                
-                    raceStartSequence.updateRaceState(new Date(racePursuitA.plannedStartTime.valueOf() - 60000));
-                    expect(updateRaceStartSequenceStateSpy).not.toHaveBeenCalled();
-                });
-            });
-            describe('when 0 minutes before the start of the race', () => {
-                it('updates the remote model to show start signal given', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence({...racePursuitA, startType: StartType.CSCCLUBSTART}, model);
-                
-                    raceStartSequence.updateRaceState(new Date(racePursuitA.plannedStartTime.valueOf()))
-                    expect(updateRaceStartSequenceStateSpy).toHaveBeenCalledWith({...racePursuitA, startType: StartType.CSCCLUBSTART}, StartSignal.STARTINGSIGNAL);
-                });
-            });
-        });
     });
 });
 
@@ -1195,58 +1091,6 @@ describe('when using RRS26 start', () => {
             expect(actions[1]).toStrictEqual(warningflagLowerAction);
             expect(actions[2]).toStrictEqual(preparatoryFlagRaiseAction);
             expect(actions[3]).toStrictEqual(preparatoryFlagLowerAction);
-        });
-        describe('when updating the race start state', () => {
-            describe('when 6 minutes before the start of the race', () => {
-                it('does not update the model', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence({...raceScorpionA, startType: StartType.RRS26}, model);
-                
-                    raceStartSequence.updateRaceState(new Date(raceScorpionA.plannedStartTime.valueOf() - 360000));
-                    expect(updateRaceStartSequenceStateSpy).not.toHaveBeenCalled();
-                });
-            });
-            describe('when 5 minutes before the start of the race', () => {
-                it('updates the remote model to show warning signal given', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence({...raceScorpionA, startType: StartType.RRS26}, model);
-                
-                    raceStartSequence.updateRaceState(new Date(raceScorpionA.plannedStartTime.valueOf() - 300000))
-                    expect(updateRaceStartSequenceStateSpy).toHaveBeenCalledWith({...raceScorpionA, startType: StartType.RRS26}, StartSignal.WARNINGSIGNAL);
-                });
-            });
-            describe('when 4 minutes before the start of the race', () => {
-                it('updates the remote model to show preparatory signal given', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence({...raceScorpionA, startType: StartType.RRS26}, model);
-                
-                    raceStartSequence.updateRaceState(new Date(raceScorpionA.plannedStartTime.valueOf() - 240000))
-                    expect(updateRaceStartSequenceStateSpy).toHaveBeenCalledWith({...raceScorpionA, startType: StartType.RRS26}, StartSignal.PREPARATORYSIGNAL);
-                });
-            });
-            describe('when 1 minutes before the start of the race', () => {
-                it('updates the remote model to show one minute signal given', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence({...raceScorpionA, startType: StartType.RRS26}, model);
-                
-                    raceStartSequence.updateRaceState(new Date(raceScorpionA.plannedStartTime.valueOf() - 60000))
-                    expect(updateRaceStartSequenceStateSpy).toHaveBeenCalledWith({...raceScorpionA, startType: StartType.RRS26}, StartSignal.ONEMINUTE);
-                });
-            });
-            describe('when 0 minutes before the start of the race', () => {
-                it('updates the remote model to show start signal given', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence({...raceScorpionA, startType: StartType.RRS26}, model);
-                
-                    raceStartSequence.updateRaceState(new Date(raceScorpionA.plannedStartTime.valueOf()))
-                    expect(updateRaceStartSequenceStateSpy).toHaveBeenCalledWith({...raceScorpionA, startType: StartType.RRS26}, StartSignal.STARTINGSIGNAL);
-                });
-            });
         });
     });
     describe('when Fleet handicap race', () => {
@@ -1945,58 +1789,6 @@ describe('when using RRS26 start', () => {
             expect(actions[1]).toStrictEqual(warningflagLowerAction);
             expect(actions[2]).toStrictEqual(preparatoryFlagRaiseAction);
             expect(actions[3]).toStrictEqual(preparatoryFlagLowerAction);
-        });
-        describe('when updating the race start state', () => {
-            describe('when 6 minutes before the start of the race', () => {
-                it('does not update the model', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence({...racePursuitA, startType: StartType.RRS26}, model);
-                
-                    raceStartSequence.updateRaceState(new Date(racePursuitA.plannedStartTime.valueOf() - 360000));
-                    expect(updateRaceStartSequenceStateSpy).not.toHaveBeenCalled();
-                });
-            });
-            describe('when 5 minutes before the start of the race', () => {
-                it('updates the remote model to show warning signal given', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence({...racePursuitA, startType: StartType.RRS26}, model);
-                
-                    raceStartSequence.updateRaceState(new Date(racePursuitA.plannedStartTime.valueOf() - 300000))
-                    expect(updateRaceStartSequenceStateSpy).toHaveBeenCalledWith(racePursuitA, StartSignal.WARNINGSIGNAL);
-                });
-            });
-            describe('when 4 minutes before the start of the race', () => {
-                it('updates the remote model to show preparatory signal given', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence({...racePursuitA, startType: StartType.RRS26}, model);
-                
-                    raceStartSequence.updateRaceState(new Date(racePursuitA.plannedStartTime.valueOf() - 240000))
-                    expect(updateRaceStartSequenceStateSpy).toHaveBeenCalledWith(racePursuitA, StartSignal.PREPARATORYSIGNAL);
-                });
-            });
-            describe('when 1 minutes before the start of the race', () => {
-                it('updates the remote model to show one minute signal given', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence({...racePursuitA, startType: StartType.RRS26}, model);
-                
-                    raceStartSequence.updateRaceState(new Date(racePursuitA.plannedStartTime.valueOf() - 60000));
-                    expect(updateRaceStartSequenceStateSpy).toHaveBeenCalledWith(racePursuitA, StartSignal.ONEMINUTE);
-                });
-            });
-            describe('when 0 minutes before the start of the race', () => {
-                it('updates the remote model to show start signal given', () => {
-                    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-                    const raceStartSequence = new RaceStartSequence({...racePursuitA, startType: StartType.RRS26}, model);
-                
-                    raceStartSequence.updateRaceState(new Date(racePursuitA.plannedStartTime.valueOf()))
-                    expect(updateRaceStartSequenceStateSpy).toHaveBeenCalledWith(racePursuitA, StartSignal.STARTINGSIGNAL);
-                });
-            });
         });
     });
 });

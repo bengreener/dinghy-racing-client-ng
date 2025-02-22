@@ -257,16 +257,6 @@ describe('when time passes', () => {
         jest.advanceTimersByTime(1000);
         expect(tickCallbackSpy).toHaveBeenCalled();
     });
-    it('updates the remote model when the state of a race in the start sequence changes', () => {
-        jest.setSystemTime(new Date('2021-10-14T10:29:59Z'));
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const updateRaceStartSequenceStateSpy = jest.spyOn(model, 'updateRaceStartSequenceState');
-        const startSequence = new StartSequence(races, model);
-        startSequence.startClock();
-
-        jest.advanceTimersByTime(1000);
-        expect(updateRaceStartSequenceStateSpy).toHaveBeenCalled();
-    });
     describe('when ticks to 1 minute before a race start state change', () => {
         it('prepare for race state start change flag is true', async () => {
             jest.setSystemTime(new Date('2021-10-14T10:23:59Z'));
@@ -279,7 +269,7 @@ describe('when time passes', () => {
             expect(startSequence.getPrepareForRaceStartStateChange()).toBeTruthy();
         });
         it('race state start change flag is false', async () => {
-            const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, {...raceGraduateA}];
+            const races = [{...raceScorpionA}, {...raceGraduateA}];
             jest.setSystemTime(new Date('2021-10-14T10:23:59Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const startSequence = new StartSequence(races, model);
@@ -303,7 +293,7 @@ describe('when time passes', () => {
     });
     describe('when ticks to a race start state change', () => {
         it('race state start change flag is true', async () => {
-            const races =[{...raceScorpionA, startSequenceState: 'WARNINGSIGNAL'}, {...raceGraduateA}];
+            const races =[{...raceScorpionA}, {...raceGraduateA}];
             jest.setSystemTime(new Date('2021-10-14T10:24:59Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const startSequence = new StartSequence(races, model);
@@ -325,7 +315,7 @@ describe('when time passes', () => {
     })
     describe('when ticks to 1 second after a race start state change', () => {
         it('race state start change flag is true', async () => {
-            const races =[{...raceScorpionA, startSequenceState: 'PREPARATORYSIGNAL'}, {...raceGraduateA, startSequenceState: 'WARNINGSIGNAL'}];
+            const races =[{...raceScorpionA}, {...raceGraduateA}];
             jest.setSystemTime(new Date('2021-10-14T10:25:00Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const startSequence = new StartSequence(races, model);
