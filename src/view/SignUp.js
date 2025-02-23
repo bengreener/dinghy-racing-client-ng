@@ -31,7 +31,6 @@ function SignUp({ race }) {
     const [crewName, setCrewName] = useState('');
     const [sailNumber, setSailNumber] = useState('');
     const [dinghyClassName, setDinghyClassName] = useState(() => {return race.fleet.dinghyClasses.length === 1 ? race.fleet.dinghyClasses[0].name : ''});
-    // const [dinghyClassHasCrew, setDinghyClassHasCrew] = useState(false);
     const [result, setResult] = useState({'message': ''});
     const [message, setMessage] = useState(''); // feedback to user
     const [competitorMap, setCompetitorMap] = useState(new Map());
