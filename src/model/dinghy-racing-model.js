@@ -1614,7 +1614,7 @@ class DinghyRacingModel {
             const regex = /(could not execute statement \[)(Duplicate entry)( ')([\w -]+)(' for key ')(\w+)(.+)/;
             const regexResult = regex.exec(json.message);
             if (regexResult && regexResult[2] === 'Duplicate entry') {
-                return `HTTP Error: 409 Conflict Message: The ${regexResult[6]} '${regexResult[4]}' already exissts; this may be caused by an uppercase/ lowercase differencce between existing record and the value entered.`;
+                return `HTTP Error: 409 Conflict Message: The ${regexResult[6]} '${regexResult[4]}' already exists; this may be caused by an uppercase/ lowercase difference between existing record and the value entered.`;
             }
             // no mapping to user message found
             return 'HTTP Error: ' + response.status + ' ' + response.statusText + ' Message: ' + json.message;

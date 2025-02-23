@@ -2237,7 +2237,7 @@ describe('when creating a new competitor', () => {
         const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({success: false, message: "HTTP Error: 409 Conflict Message: The competitor 'some name' already exissts; this may be caused by an uppercase/ lowercase differencce between existing record and the value entered."});
+        expect(result).toEqual({success: false, message: "HTTP Error: 409 Conflict Message: The competitor 'some name' already exists; this may be caused by an uppercase/ lowercase difference between existing record and the value entered."});
     });
     it('returns a promise that resolves to a result indicating failure when competitor is not created with http status 500 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
@@ -2453,7 +2453,7 @@ describe('when creating a new dinghy', () => {
         const promise = dinghyRacingModel.createCompetitor({...DinghyRacingModel.competitorTemplate(), 'name': 'Chris Marshall'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({success: false, message: "HTTP Error: 409 Conflict Message: The dinghy '102-None' already exissts; this may be caused by an uppercase/ lowercase differencce between existing record and the value entered."});
+        expect(result).toEqual({success: false, message: "HTTP Error: 409 Conflict Message: The dinghy '102-None' already exists; this may be caused by an uppercase/ lowercase difference between existing record and the value entered."});
     });
     it('returns a promise that resolves to a result indicating failure when request is rejected by REST service', async () => {
         fetch.mockImplementationOnce(() => {
@@ -3272,7 +3272,7 @@ describe('when creating a new fleet', () => {
             const promise = dinghyRacingModel.createFleet({...DinghyRacingModel.fleetTemplate(), 'name': 'Scorpion'});
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({success: false, message: "HTTP Error: 409 Conflict Message: The fleet 'some name' already exissts; this may be caused by an uppercase/ lowercase differencce between existing record and the value entered."});
+            expect(result).toEqual({success: false, message: "HTTP Error: 409 Conflict Message: The fleet 'some name' already exists; this may be caused by an uppercase/ lowercase difference between existing record and the value entered."});
         });
         it('returns a promise that resolves to a result indicating failure when fleet is not created with http status 500 and provides a message explaining the cause of failure', async () => {
             fetch.mockImplementationOnce(() => {
