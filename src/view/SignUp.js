@@ -191,8 +191,8 @@ function SignUp({ race }) {
                     const competitorMap = new Map();
                     const options = [];
                     result.domainObject.forEach(competitor => {
-                    competitorMap.set(competitor.name, competitor);
-                    options.push(<option key={competitor.name} value={competitor.name}>{competitor.name}</option>);
+                        competitorMap.set(competitor.name, competitor);
+                        options.push(<option key={competitor.name} value={competitor.name}>{competitor.name}</option>);
                     });
                     setCompetitorMap(competitorMap);
                     setCompetitorOptions(options);
@@ -376,7 +376,7 @@ function SignUp({ race }) {
 
     async function updateEntry() {
         const creationPromises = [];
-        // handle creation of 
+        // handle creation of new competitors or dinghy
         if (!competitorMap.has(helmName)) {
             creationPromises.push(controller.createCompetitor({'name': helmName, 'url': ''}));
         }
@@ -407,26 +407,43 @@ function SignUp({ race }) {
                 message += result.message;
             }
         });
+        // create new entry
         if (success) {
-            const helm = competitorMap.has(helmName) ? competitorMap.get(helmName) : {'name': helmName, 'url': ''};
-            const dinghy = dinghyMap.has(sailNumber) ? dinghyMap.get(sailNumber) : {'sailNumber': sailNumber, 'dinghyClass': dinghyClassMap.get(dinghyClassName), 'url': ''};
-            const crew = crewName ? (competitorMap.has(crewName) ? competitorMap.get(crewName) : {'name': crewName, 'url': ''}) : null;
+            const helm = competitorMap.has(helmName) ? competitorMap.get(helmName) : {name: helmName, url: ''};
+            const dinghy = dinghyMap.has(sailNumber) ? dinghyMap.get(sailNumber) : {sailNumber: sailNumber, dinghyClass: dinghyClassMap.get(dinghyClassName), url: ''};
+            const crew = crewName ? (competitorMap.has(crewName) ? competitorMap.get(crewName) : {name: crewName, url: ''}) : null;
+            let result;
+            // new entry
             if (!selectedEntry) {
                 if (crew) {
-                    setResult(await controller.signupToRace(race, helm, dinghy, crew));
+                    result = await controller.signupToRace(race, helm, dinghy, crew);
                 }
                 else {
-                    setResult(await controller.signupToRace(race, helm, dinghy));
+                    result = await controller.signupToRace(race, helm, dinghy);
                 }
             }
+            // update existing entry
             if (selectedEntry) {
                 if (crew) {
-                    setResult(await controller.updateEntry(selectedEntry, helm, dinghy, crew));
+                    result = await controller.updateEntry(selectedEntry, helm, dinghy, crew);
                 }
                 else {
-                    setResult(await controller.updateEntry(selectedEntry, helm, dinghy));
+                    result = await controller.updateEntry(selectedEntry, helm, dinghy);
                 }
-            }            
+            }
+            if (result.success) {
+                setResult(result);
+            }
+            else {
+                // If entry is a duplicate then display of id values is confusing to competitor so remove them
+                if (/HTTP Error: 409.+([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2}).+/.test(result.message)) {
+                    const newMessage = result.message.replace(/ '([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})' /, ' ');
+                    setResult({...result, message: newMessage});
+                }
+                else {
+                    setResult(result);
+                }
+            }
         }
         else {
             setResult({'success': false, 'message': message});

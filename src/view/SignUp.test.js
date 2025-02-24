@@ -140,7 +140,7 @@ describe('when signing up for a race', () => {
             const inputCrew = screen.getByLabelText(/crew/i);
             expect(inputCrew).toBeDisabled();
         });
-    
+
         describe('when helm and dinghy exist', () => {
             it('displays sign-up button', async () => {
                 const user = userEvent.setup();
@@ -155,7 +155,7 @@ describe('when signing up for a race', () => {
                 });
                 expect(screen.getByRole('button', {'name': /^sign-up(?!.)/i}));
             });
-            
+
             describe('when sign-up button clicked', () => {
                 it('creates entry with values entered into form and dinghy class set per race', async () => {
                     const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -177,7 +177,6 @@ describe('when signing up for a race', () => {
                     });
                     expect(onSignupToRaceSpy).toHaveBeenCalledWith(raceCometA, competitorJillMyer, dinghy826);
                 });
-            
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -201,7 +200,33 @@ describe('when signing up for a race', () => {
                         expect(inputHelm).toHaveValue('Jill Myer');
                         expect(inputSailNumber).toHaveValue('826');
                     });
-                });	
+                });
+                describe('when entry is a duplicate of an exisiting entry', () =>{
+                    it('provides the dinghy class, sail number, and helm name', async () => {
+                        jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                            return Promise.resolve({
+                                success: false, 
+                                message: "HTTP Error: 409 Conflict Message: The entry '15-7-17' already exists; this may be caused by an uppercase/ lowercase difference between existing record and the value entered."});
+                        });
+                        const user = userEvent.setup();
+                        customRender(<SignUp race={raceCometA}/>, model, controller);
+                        const inputHelm = screen.getByLabelText(/helm/i);
+                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        await act(async () => {
+                            await user.type(inputHelm, 'Jill Myer');
+                        });
+                        await act(async () => {
+                            await user.type(inputSailNumber, '826');
+                        });
+                        const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
+                        await act(async () => {
+                            await user.click(buttonCreate);
+                        });
+                        expect(screen.getByText('HTTP Error: 409 Conflict Message: The entry already exists; this may be caused by an uppercase/ lowercase difference between existing record and the value entered.')).toBeInTheDocument();
+                        expect(inputHelm).toHaveValue('Jill Myer');
+                        expect(inputSailNumber).toHaveValue('826');
+                    });
+                });
             });
         });
     
