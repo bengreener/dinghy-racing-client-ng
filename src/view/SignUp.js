@@ -696,7 +696,7 @@ function SignUp({ race }) {
                 <div className='w3-row' >
                     <div className='w3-col m8' >
                         <button id='entry-update-button' className='w3-right' type='button' onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
-                        {selectedEntry ? <button id='cancel-button' className='w3-right' type='button' onClick={clear} >Cancel</button> : null}
+                        {<button id='cancel-button' className='w3-right' type='button' onClick={clear} >Cancel</button>}
                     </div>
                 </div>
                 <div data-testid='previous-entries'>

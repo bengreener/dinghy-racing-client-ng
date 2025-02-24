@@ -659,11 +659,14 @@ describe('when signing up for a race', () => {
             const inputSailNumber = screen.getByLabelText(/sail/i);
             const inputCrew = screen.getByLabelText(/crew/i);
             const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
+            const btnCancel = screen.getByRole('button', {'name': /cancel/i});
             expect(raceTitle).toBeInTheDocument();
             expect(inputHelm).toBeInTheDocument();
             expect(inputSailNumber).toBeInTheDocument();
             expect(inputCrew).toBeInTheDocument();
             expect(btnCreate).toBeInTheDocument();
+            expect(btnCancel).toBeInTheDocument();
+
         });
     
         describe('when helm name is entered', () => {
@@ -2176,11 +2179,13 @@ describe('when signing up for a race', () => {
             const inputDinghyClass = screen.getByLabelText(/class/i);
             const inputSailNumber = screen.getByLabelText(/sail/i);
             const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
+            const btnCancel = screen.getByRole('button', {'name': /cancel/i});
             expect(raceTitle).toBeInTheDocument();
             expect(inputHelm).toBeInTheDocument();
             expect(inputDinghyClass).toBeInTheDocument();
             expect(inputSailNumber).toBeInTheDocument();
             expect(btnCreate).toBeInTheDocument();
+            expect(btnCancel).toBeInTheDocument();
         });
         describe('when helm name is entered then ', () => {
             it('displays helm name', async () => {
@@ -4409,6 +4414,29 @@ describe('when signing up for a race', () => {
             expect(await screen.findByRole('cell', {'name': /826/i})).toBeInTheDocument();
             expect((await screen.findAllByRole('button', {name: /x/i}))[0]).toBeInTheDocument();
         });
+    });
+    it('has an option to cancel update that clears selected entry values to allow new entry to sign up', async () => {
+        const user = userEvent.setup();
+        await act(async () => {
+            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+        });
+
+        const inputDinghyClass = screen.getByLabelText(/class/i);
+        const inputHelm = screen.getByLabelText(/helm/i);
+        const inputSailNumber = screen.getByLabelText(/sail/i);
+        const inputCrew = screen.getByLabelText(/crew/i);
+        await act(async () => {
+            await user.type(inputHelm, 'Chris Marshall');
+            await user.type(inputSailNumber, '1234');
+            await user.keyboard('{Tab}');
+            await user.type(inputCrew, 'Lou Screw');
+        });
+        await act(async () => {
+            await user.click(screen.getByRole('button', {name: /cancel/i}));
+        });
+        expect(inputHelm).toHaveValue('');
+        expect(inputCrew).toHaveValue('');
+        expect(inputSailNumber).toHaveValue('');
     });
 });
 
