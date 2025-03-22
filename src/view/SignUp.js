@@ -547,7 +547,7 @@ function SignUp({ race }) {
     }
 
     function buildHelmInput() {
-        if (race.dinghyClass) {
+        if (race.fleet.dinghyClasses.length === 1) {
             return (
                 <div className='w3-row'>
                     <label htmlFor='helm-input' className='w3-col m2' >Helm's Name</label>
