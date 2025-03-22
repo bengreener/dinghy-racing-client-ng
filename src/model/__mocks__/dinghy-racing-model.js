@@ -26,13 +26,15 @@ class DinghyRacingModel {
     dinghyCreationCallbacks = new Set();
     dinghyClassCreationCallbacks = new Set();
     dinghyClassUpdateCallbacks = new Map();
+    fleetCreationCallbacks = new Set();
+    fleetUpdateCallbacks = new Map();
 
     /**
      * Provide a blank competitor template
      * @returns {Competitor}
      */
     static competitorTemplate() {
-        return {'name': '', 'url': ''};
+        return {name: '', url: ''};
     }
 
     /**
@@ -40,7 +42,7 @@ class DinghyRacingModel {
      * @returns {DinghyClass}
      */
     static dinghyClassTemplate() {
-        return {'name': '', 'crewSize': 1, portsmouthNumber: null, 'url': ''};
+        return {name: '', crewSize: 1, portsmouthNumber: 1000, externalName: '', url: ''};
     }
 
     /**
@@ -48,7 +50,7 @@ class DinghyRacingModel {
      * @returns {Dinghy}
      */
     static dinghyTemplate() {
-        return {'sailNumber': '', 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'url': ''};
+        return {sailNumber: '', dinghyClass: DinghyRacingModel.dinghyClassTemplate(), url: ''};
     }
 
     /**
@@ -56,23 +58,30 @@ class DinghyRacingModel {
      * @returns {Race}
      */
     static raceTemplate() {
-        return {'name': '', 'plannedStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'duration': 0, 'plannedLaps': null, 'lapForecast': null, 
-            'lastLapTime': null, 'averageLapTime': null, 'clock': null, 'url': ''};
+        return {name: '', plannedStartTime: null, dinghyClass: DinghyRacingModel.dinghyClassTemplate(), duration: 0, plannedLaps: null, lapForecast: null, 
+            lastLapTime: null, averageLapTime: null, clock: null, url: ''};
     }
 
     /**
      * Provide a blank entry template
      */
     static entryTemplate() {
-        return {'race': DinghyRacingModel.raceTemplate(), 'helm': DinghyRacingModel.competitorTemplate(), 'crew': null, 
-        'dinghy': DinghyRacingModel.dinghyTemplate(), 'laps': [], 'sumOfLapTimes': 0, 'onLastLap': false, 'url': ''};
+        return {race: DinghyRacingModel.raceTemplate(), helm: DinghyRacingModel.competitorTemplate(), crew: null, 
+        dinghy: DinghyRacingModel.dinghyTemplate(), laps: [], sumOfLapTimes: 0, onLastLap: false, url: ''};
     }
 
     /**
      * Provide a blank lap template
      */
     static lapTemplate() {
-        return {'number': null, 'time': 0};
+        return {number: null, time: 0};
+    }
+
+    /**
+     * Provide a blank fleet template
+     */
+    static fleetTemplate() {
+        return {name: '', dinghyClasses: [], url: ''};
     }
 
     constructor(httpRootURL, wsRootURL) {
@@ -82,6 +91,8 @@ class DinghyRacingModel {
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
         this.handleDinghyClassCreation = this.handleDinghyClassCreation.bind(this);
         this.handleDinghyClassUpdate = this.handleDinghyClassUpdate.bind(this);
+        this.handleFleetCreation = this.handleFleetCreation.bind(this);
+        this.handleFleetUpdate = this.handleFleetUpdate.bind(this);
         this.getStartSequence = this.getStartSequence.bind(this);
         if (!httpRootURL) {
             throw new Error('An HTTP root URL is required when creating an instance of DinghyRacingModel');
@@ -192,6 +203,39 @@ class DinghyRacingModel {
         }
     }
 
+    registerFleetCreationCallback(callback) {
+        this.fleetCreationCallbacks.add(callback);
+    }
+
+    unregisterFleetCreationCallback(callback) {
+        this.fleetCreationCallbacks.delete(callback);
+    }
+
+    handleFleetCreation(message) {
+        this.fleetCreationCallbacks.forEach(cb => cb());
+    }
+    
+    registerFleetUpdateCallback(key, callback) {
+        if (this.fleetUpdateCallbacks.has(key)) {
+            this.fleetUpdateCallbacks.get(key).add(callback);
+        }
+        else {
+            this.fleetUpdateCallbacks.set(key, new Set([callback]));
+        }
+    }
+
+    unregisterFleetUpdateCallback(key, callback) {
+        if (this.fleetUpdateCallbacks.has(key)) {
+            this.fleetUpdateCallbacks.get(key).delete(callback);
+        }
+    }
+
+    handleFleetUpdate(message) {
+        if (this.fleetUpdateCallbacks.has(message.body)) {
+            this.fleetUpdateCallbacks.get(message.body).forEach(cb => cb());
+        }
+    }
+
     async addLap(entry, time) {
         return null;
     }
@@ -221,6 +265,22 @@ class DinghyRacingModel {
     }
 
     async updateDinghyClass(dinghyClass, name, crewSize, portsmouthNumber) {
+        return null;
+    }
+
+    async createFleet(fleet) {
+        return null;
+    }
+
+    async getFleet(url) {
+        return null;
+    }
+
+    async getFleets(url) {
+        return null;
+    }
+
+    async updateFleet(fleet) {
         return null;
     }
 
@@ -257,7 +317,7 @@ class DinghyRacingModel {
     }
 
     async getCrewsByDinghy(dinghy) {
-        return null;
+        return Promise.resolve({success: true, domainObject: []});
     }
 
     async getDinghy(url) {
@@ -288,6 +348,10 @@ class DinghyRacingModel {
         return null;
     }
 
+    async getDinghyClassesByUrl() {
+        return null;
+    }
+
     async getEntriesByRace(race) {
         return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
     }
@@ -313,10 +377,6 @@ class DinghyRacingModel {
     }
 
     async getRaceByNameAndPlannedStartTime(name, time) {
-        return null;
-    }
-
-    async updateRaceStartSequenceState(race, stage) {
         return null;
     }
 

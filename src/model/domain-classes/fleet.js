@@ -14,9 +14,9 @@
  * limitations under the License. 
  */
 
-/**
- * @typedef Result
- * @property {boolean} success Indicates the success or failure of the operation
- * @property {String} [message] Provides additional information on the outcome of the operation; such as the cause of failure
- * @property {Object} [domainObject] The domain object returned by the operation
- */
+ /**
+  * @typedef Fleet
+  * @property {string} name of the fleet
+  * @property {Array<DinghyClass>} dinghyClasses
+  * @property {String} url The URL to the remote resource
+  */

@@ -130,7 +130,7 @@ function RaceConsole() {
                             </div>
                         </fieldset>
                     </div>
-                    <label htmlFor='race-select' className='w3-left w3-col'  >Select Race</label>
+                    <label htmlFor='race-select' className='w3-left w3-col' >Select Race</label>
                     <select id='race-select' name='race' multiple={true} className='w3-col w3-third' onChange={handleRaceSelect} value={selectedRaces}>{raceOptions}</select>
                 </form>
                 <p className={userMessageClasses()}>{message}</p>

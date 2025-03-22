@@ -30,8 +30,7 @@ function SignUp({ race }) {
     const [helmName, setHelmName] = useState('');
     const [crewName, setCrewName] = useState('');
     const [sailNumber, setSailNumber] = useState('');
-    const [dinghyClassName, setDinghyClassName] = useState('');
-    const [dinghyClassHasCrew, setDinghyClassHasCrew] = useState(false);
+    const [dinghyClassName, setDinghyClassName] = useState(() => {return race.fleet.dinghyClasses.length === 1 ? race.fleet.dinghyClasses[0].name : ''});
     const [result, setResult] = useState({'message': ''});
     const [message, setMessage] = useState(''); // feedback to user
     const [competitorMap, setCompetitorMap] = useState(new Map());
@@ -81,13 +80,13 @@ function SignUp({ race }) {
         setMessage('');
         setSelectedEntry(null);
         setPreviousEntriesMap(new Map());
-        if (race.dinghyClass) {
+        if (race.fleet.dinghyClasses.length === 1) {
             helmInput.current.focus();
         }
         else {
             dinghyClassSelect.current.focus();
         }
-    }, [race.dinghyClass]);
+    }, [race.fleet.dinghyClasses]);
 
     const handleEntryRowClick = useCallback(({ currentTarget }) => {
         const entry = entriesMap.current.get(currentTarget.id);
@@ -100,7 +99,7 @@ function SignUp({ race }) {
             setDinghyClassName(entry.dinghy.dinghyClass.name);
         }
         setSailNumber(entry.dinghy.sailNumber);
-        if (race.dinghyClass) {
+        if (race.fleet.dinghyClasses.length === 1) {
             helmInput.current.focus();
         }
         else {
@@ -138,7 +137,7 @@ function SignUp({ race }) {
             setDinghyClassName(previousEntry.dinghy.dinghyClass.name);
         }
         setSailNumber(previousEntry.dinghy.sailNumber);
-        if (race.dinghyClass) {
+        if (race.fleet.dinghyClasses.length === 1) {
             helmInput.current.focus();
         }
         else {
@@ -192,8 +191,8 @@ function SignUp({ race }) {
                     const competitorMap = new Map();
                     const options = [];
                     result.domainObject.forEach(competitor => {
-                    competitorMap.set(competitor.name, competitor);
-                    options.push(<option key={competitor.name} value={competitor.name}>{competitor.name}</option>);
+                        competitorMap.set(competitor.name, competitor);
+                        options.push(<option key={competitor.name} value={competitor.name}>{competitor.name}</option>);
                     });
                     setCompetitorMap(competitorMap);
                     setCompetitorOptions(options);
@@ -211,33 +210,42 @@ function SignUp({ race }) {
 
     // get dinghy classes
     useEffect(() => {
-        let ignoreFetch = false; // set to true if SignUp rerendered before fetch completes to avoid using out of date result
-        model.getDinghyClasses().then(result => {
-            if (!ignoreFetch) {
-                if (result.success) {
-                    // build dinghy class options
-                    let options = [];
-                    let map = new Map();
-                    // set handicap options
-                    options.push(<option key={''} value={''}></option> );
-                    // set dinghy classes
-                    result.domainObject.forEach(dinghyClass => {
-                        options.push(<option key={dinghyClass.name} value={dinghyClass.name}>{dinghyClass.name}</option>);
-                        map.set(dinghyClass.name, dinghyClass);
-                    });
-                    setDinghyClassMap(map);
-                    setDinghyClassOptions(options);
-                }
-                else {
-                    setMessage('Unable to load dinghy classes\n' + result.message);
-                }
-            }
-        });
+        const buildDinghyClassOptions = (dinghyClasses) => {
+            // build dinghy class options
+            let options = [];
+            let map = new Map();
+            // set handicap options
+            options.push(<option key={''} value={''}></option> );
+            // set dinghy classes
+            dinghyClasses.forEach(dinghyClass => {
+                options.push(<option key={dinghyClass.name} value={dinghyClass.name}>{dinghyClass.name}</option>);
+                map.set(dinghyClass.name, dinghyClass);
+            });
+            setDinghyClassMap(map);
+            setDinghyClassOptions(options);
+        }
 
+        let ignoreFetch = false; // set to true if SignUp rerendered before fetch completes to avoid using out of date result
+        // if Race has a fleet with a restricted set of dinghy classes then use those dinghy classes otherwise get all dinghy classes
+        if (race.fleet.dinghyClasses.length > 0) {
+            buildDinghyClassOptions(race.fleet.dinghyClasses);
+        }
+        else {
+            model.getDinghyClasses().then(result => {
+                if (!ignoreFetch) {
+                    if (result.success) {
+                        buildDinghyClassOptions(result.domainObject);
+                    }
+                    else {
+                        setMessage('Unable to load dinghy classes\n' + result.message);
+                    }
+                }
+            });
+        }
         return () => {
             ignoreFetch = true;
         }
-    }, [model, dinghyClassUpdateRequestAt]);
+    }, [model, dinghyClassUpdateRequestAt, race.fleet.dinghyClasses]);
 
     // get dinghies
     useEffect(() => {
@@ -335,17 +343,18 @@ function SignUp({ race }) {
     }, [result, clear]);
 
     // check if dinghy class has crew
-    useEffect(() => {
-        if (race.dinghyClass) {
-            setDinghyClassHasCrew(race.dinghyClass.crewSize > 1);
+    function dinghyClassHasCrew() {
+        if (race.fleet.dinghyClasses.length === 1) {
+            return race.fleet.dinghyClasses[0].crewSize > 1;
         }
-        else if (dinghyClassName) {
-            setDinghyClassHasCrew(dinghyClassMap.get(dinghyClassName).crewSize > 1);
+        if (dinghyClassName) {
+            return dinghyClassMap.get(dinghyClassName).crewSize > 1;
         }
-        else {
-            setDinghyClassHasCrew(false);
+        if (!race.fleet.dinghyClasses.some(dinghyClass => dinghyClass.crewSize > 1)) {
+            return false;
         }
-    }, [race, dinghyClassName, dinghyClassMap]);
+        return false;
+    }
     
     function handleChange({target}) {
         if (target.name === 'sailNumber') {
@@ -367,7 +376,7 @@ function SignUp({ race }) {
 
     async function updateEntry() {
         const creationPromises = [];
-        // handle creation of 
+        // handle creation of new competitors or dinghy
         if (!competitorMap.has(helmName)) {
             creationPromises.push(controller.createCompetitor({'name': helmName, 'url': ''}));
         }
@@ -398,26 +407,43 @@ function SignUp({ race }) {
                 message += result.message;
             }
         });
+        // create new entry
         if (success) {
-            const helm = competitorMap.has(helmName) ? competitorMap.get(helmName) : {'name': helmName, 'url': ''};
-            const dinghy = dinghyMap.has(sailNumber) ? dinghyMap.get(sailNumber) : {'sailNumber': sailNumber, 'dinghyClass': dinghyClassMap.get(dinghyClassName), 'url': ''};
-            const crew = crewName ? (competitorMap.has(crewName) ? competitorMap.get(crewName) : {'name': crewName, 'url': ''}) : null;
+            const helm = competitorMap.has(helmName) ? competitorMap.get(helmName) : {name: helmName, url: ''};
+            const dinghy = dinghyMap.has(sailNumber) ? dinghyMap.get(sailNumber) : {sailNumber: sailNumber, dinghyClass: dinghyClassMap.get(dinghyClassName), url: ''};
+            const crew = crewName ? (competitorMap.has(crewName) ? competitorMap.get(crewName) : {name: crewName, url: ''}) : null;
+            let result;
+            // new entry
             if (!selectedEntry) {
                 if (crew) {
-                    setResult(await controller.signupToRace(race, helm, dinghy, crew));
+                    result = await controller.signupToRace(race, helm, dinghy, crew);
                 }
                 else {
-                    setResult(await controller.signupToRace(race, helm, dinghy));
+                    result = await controller.signupToRace(race, helm, dinghy);
                 }
             }
+            // update existing entry
             if (selectedEntry) {
                 if (crew) {
-                    setResult(await controller.updateEntry(selectedEntry, helm, dinghy, crew));
+                    result = await controller.updateEntry(selectedEntry, helm, dinghy, crew);
                 }
                 else {
-                    setResult(await controller.updateEntry(selectedEntry, helm, dinghy));
+                    result = await controller.updateEntry(selectedEntry, helm, dinghy);
                 }
-            }            
+            }
+            if (result.success) {
+                setResult(result);
+            }
+            else {
+                // If entry is a duplicate then display of id values is confusing to competitor so remove them
+                if (/HTTP Error: 409.+([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2}).+/.test(result.message)) {
+                    const newMessage = result.message.replace(/ '([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})' /, ' ');
+                    setResult({...result, message: newMessage});
+                }
+                else {
+                    setResult(result);
+                }
+            }
         }
         else {
             setResult({'success': false, 'message': message});
@@ -426,18 +452,62 @@ function SignUp({ race }) {
 
     async function updatePreviousEntries(sailNumber) {
         const peMap = new Map();
-        const dinghiesResult = await model.getDinghiesBySailNumber(sailNumber);
-        if (dinghiesResult.success) {
-            for (const dinghy of dinghiesResult.domainObject) {
-                const crewsResult = await model.getCrewsByDinghy(dinghy);
-                if (crewsResult.success) {
-                    for (const crew of crewsResult.domainObject) {
-                        peMap.set(dinghy.url + crew.helm.url + crew?.mate?.url, {dinghy: dinghy, crew: crew});
-                    }
+        let dinghies = [];
+        let success = true;
+        let message = '';
+        if (race.fleet.dinghyClasses.length === 0) {
+            const dinghiesResults = await model.getDinghiesBySailNumber(sailNumber);
+            if (dinghiesResults.success) {
+                dinghies = dinghies.concat(dinghiesResults.domainObject);
+            }
+            else {
+                success = false;
+                if (message) {
+                    message += '/n'
                 }
+                message += 'Unable to retrieve previous entries\n' + dinghiesResults.message;
             }
         }
-        setPreviousEntriesMap(peMap);
+        else {
+            const dinghiesResults = await Promise.all(race.fleet.dinghyClasses.map(dinghyClass => model.getDinghyBySailNumberAndDinghyClass(sailNumber, dinghyClass)));
+            dinghiesResults.forEach(dinghyResult => {
+                if (dinghyResult.success) {
+                    dinghies.push(dinghyResult.domainObject);
+                }
+                // ignore not found messages as they are liekly valid results especially for fleest with a broad class membership
+                else if (!(/404/.test(dinghyResult.message))) {
+                    success = false;
+                    if (message) {
+                        message += '/n'
+                    }
+                    message += 'Unable to retrieve previous entries\n' + dinghyResult.message;
+                }
+            });
+        }
+        const crewResults = await Promise.all(dinghies.map(dinghy => {
+            return model.getCrewsByDinghy(dinghy);
+        }));
+        for (let i = 0; i < dinghies.length; i++) {
+            if (crewResults[i].success) {
+                for (const crew of crewResults[i].domainObject) {
+                    peMap.set(dinghies[i].url + crew.helm.url + crew?.mate?.url, {dinghy: dinghies[i], crew: crew});
+                }
+            }
+            else {
+                success = false;
+                if (message) {
+                    message += '/n'
+                }
+                message += 'Unable to retrieve previous entries\n' + crewResults[i].message;
+            }
+        };
+        if (success) {
+            setPreviousEntriesMap(peMap);
+            setMessage('');
+        }
+        else {
+            setMessage(message);
+        }
     }
 
     function previousEntriesRows() {
@@ -465,7 +535,7 @@ function SignUp({ race }) {
 
     function dinghyClassInput(race) {
         let dinghyClassInput = null;    
-        if (!race.dinghyClass) {
+        if (race.fleet.dinghyClasses.length !== 1) {
             dinghyClassInput = (
                 <div className='w3-row'>
                     <label htmlFor='dinghy-class-select' className='w3-col m2' >Dinghy Class</label>
@@ -473,15 +543,11 @@ function SignUp({ race }) {
                 </div>
             );
         }
-        // if race has a specified dinghy class then set for selected dinghy as well
-        else if (!dinghyClassName) {
-            setDinghyClassName(race.dinghyClass.name);
-        }
         return dinghyClassInput;
     }
 
     function buildHelmInput() {
-        if (race.dinghyClass) {
+        if (race.fleet.dinghyClasses.length === 1) {
             return (
                 <div className='w3-row'>
                     <label htmlFor='helm-input' className='w3-col m2' >Helm's Name</label>
@@ -506,7 +572,7 @@ function SignUp({ race }) {
                 <input id='crew-input' name='crew' className='w3-half' list='competitor-datalist' onChange={handleChange} value={crewName} disabled />
             </div>
         );
-        if (dinghyClassHasCrew) {
+        if (dinghyClassHasCrew()) {
             crewInput = (
                 <div className='w3-row'>
                     <label htmlFor='crew-input' className='w3-col m2' >Crew's Name</label>
@@ -630,7 +696,7 @@ function SignUp({ race }) {
                 <div className='w3-row' >
                     <div className='w3-col m8' >
                         <button id='entry-update-button' className='w3-right' type='button' onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
-                        {selectedEntry ? <button id='cancel-button' className='w3-right' type='button' onClick={clear} >Cancel</button> : null}
+                        {<button id='cancel-button' className='w3-right' type='button' onClick={clear} >Cancel</button>}
                     </div>
                 </div>
                 <div data-testid='previous-entries'>

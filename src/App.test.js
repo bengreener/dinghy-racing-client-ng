@@ -19,7 +19,7 @@ import userEvent from '@testing-library/user-event';
 import App from './App';
 import DinghyRacingController from './controller/dinghy-racing-controller';
 import DinghyRacingModel from './model/dinghy-racing-model';
-import { httpRootURL, wsRootURL, dinghyClasses, races, entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA, competitorsCollection } from './model/__mocks__/test-data';
+import { httpRootURL, wsRootURL, dinghyClasses, fleets, races, entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA, competitorsCollection } from './model/__mocks__/test-data';
 import Authorisation from './controller/authorisation';
 
 jest.mock('./controller/dinghy-racing-controller');
@@ -43,6 +43,7 @@ it('displays menu buttons', async () => {
   });
   const btnCreateDinghyClass = screen.getByRole('button', {name: /dinghy classes\b/i, hidden: true});
   const btnCreateRace = screen.getByRole('button', {name: /create race\b/i, hidden: true});
+  const btnFleets = screen.getByRole('button', {name: /fleets/i, hidden: true});
   const btnUpcomingRaces = screen.getByRole('button', {name: /enrolment\b/i, hidden: true});
   const btnRaceStartConsole = screen.getByRole('button', {name: /race start\b/i, hidden: true});
   const btnRaceConsole = screen.getByRole('button', {name: /run race\b/i, hidden: true});
@@ -51,6 +52,7 @@ it('displays menu buttons', async () => {
   const btnLogout = screen.getByRole('button', {name: /logout\b/i, hidden: true});
   expect(btnCreateDinghyClass).toBeInTheDocument();
   expect(btnCreateRace).toBeInTheDocument();
+  expect(btnFleets).toBeInTheDocument();
   expect(btnUpcomingRaces).toBeInTheDocument();
   expect(btnRaceStartConsole).toBeInTheDocument();
   expect(btnRaceConsole).toBeInTheDocument();
@@ -77,6 +79,16 @@ describe('user roles does not include ROLE_RACE_SCHEDULER', () => {
     });
     const btnCreateRace = screen.queryByRole('button', {name: /create race\b/i});
     expect(btnCreateRace).not.toBeInTheDocument();
+  });
+  
+  it('does not provide option to display fleets console', async () => {
+    const dinghyRacingController = new DinghyRacingController(new DinghyRacingModel(httpRootURL, wsRootURL));
+    jest.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
+    await act(async () => {
+      render(<App controller={dinghyRacingController} />);
+    });
+    const btnFleets = screen.queryByRole('button', {name: /fleets\b/i});
+    expect(btnFleets).not.toBeInTheDocument();
   });
 });
 
@@ -122,12 +134,33 @@ describe('when dinghy classes button clicked', () => {
   })
 });
 
+describe('when fleets button clicked', () => {
+  it('displays fleet console', async () => {
+    const user = userEvent.setup();
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const dinghyRacingController = new DinghyRacingController(model);
+    jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+
+    render(<App model={model} controller={dinghyRacingController} />);
+    const btnMenu = await screen.findByRole('button', {name: /☰/i})
+    await act(async () => {
+      await user.click(btnMenu);
+    });
+    const btnFleets = await screen.findByRole('button', {name: /fleets\b/i});
+    await act(async () => {
+      await user.click(btnFleets);
+    });
+    expect(await screen.findByRole('heading', {name: /fleet/i})).toBeInTheDocument();
+  })
+});
+
 describe('when create race button clicked', () => {
   it('displays create race form', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const dinghyRacingController = new DinghyRacingController(model);
-    jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve(dinghyClasses)});
+    jest.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve(fleets)});
 
     render(<App model={model} controller={dinghyRacingController} />);
     const btnMenu = await screen.findByRole('button', {name: /☰/i})
@@ -161,7 +194,7 @@ describe('when upcoming races button clicked', () => {
     });
     const timeCheck = new Date('2021-10-14T10:30:00Z').toLocaleString();
     expect(await screen.findByText('Scorpion A')).toBeInTheDocument();
-    expect(await screen.findByText('Graduate')).toBeInTheDocument();
+    expect(await screen.findByText('Graduate A')).toBeInTheDocument();
     expect(await screen.findByText(timeCheck)).toBeInTheDocument();
   })
 });

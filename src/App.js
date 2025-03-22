@@ -30,6 +30,7 @@ import CompetitorsConsole from './view/CompetitorsConsole';
 import ModalDialog from './view/ModalDialog';
 import SetTimeForm from './view/SetTimeForm';
 import Clock from './model/domain-classes/clock';
+import FleetConsole from './view/FleetConsole';
 
 function App({model, controller}) {
     const [displayPort, setDisplayPort] = React.useState();
@@ -48,6 +49,10 @@ function App({model, controller}) {
 
     function showCreateDinghyClassForm() {
         setDisplayPort(<DinghyClassConsole key={Date.now()} />);
+    }
+
+    function showFleetsForm() {
+        setDisplayPort(<FleetConsole key={Date.now()} />);
     }
 
     function showCreateRaceForm() {
@@ -108,30 +113,33 @@ function App({model, controller}) {
                     {roles.includes('ROLE_RACE_SCHEDULER') ? 
                         <button key={0} type='button' className='w3-bar-item w3-btn' onClick={showCreateDinghyClassForm}>Dinghy Classes</button>
                         : null
+                    }{roles.includes('ROLE_RACE_SCHEDULER') ? 
+                        <button key={1} type='button' className='w3-bar-item w3-btn' onClick={showFleetsForm}>Fleets</button>
+                        : null
                     }
                     {roles.includes('ROLE_RACE_SCHEDULER') ? 
-                        <button key={1} type='button' className='w3-bar-item w3-btn' onClick={showCreateRaceForm}>Create Race</button>
+                        <button key={2} type='button' className='w3-bar-item w3-btn' onClick={showCreateRaceForm}>Create Race</button>
                         : null
                     }
-                    <button key={5} type='button' className='w3-bar-item w3-btn' onClick={showCompetitorsConsole}>Competitors</button>
+                    <button key={6} type='button' className='w3-bar-item w3-btn' onClick={showCompetitorsConsole}>Competitors</button>
                     {roles.includes('ROLE_RACE_OFFICER') ? 
-                        <button key={6} type='button' className='w3-bar-item w3-btn' onClick={showDownloadRaces}>Download Races</button>
+                        <button key={7} type='button' className='w3-bar-item w3-btn' onClick={showDownloadRaces}>Download Races</button>
                         : null
                     }
                     {roles.includes('ROLE_RACE_OFFICER') ? 
-                        <button key={7} type='button' className='w3-bar-item w3-btn' onClick={handleSynchExternalClockClick}>Synch External Clock</button>
+                        <button key={8} type='button' className='w3-bar-item w3-btn' onClick={handleSynchExternalClockClick}>Synch External Clock</button>
                         : null
                     }
-                    <button key={8} type='button' className='w3-bar-item w3-btn' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
+                    <button key={9} type='button' className='w3-bar-item w3-btn' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
                 </div>
                 <nav className='w3-row w3-bginfosys-display-bottommiddle-m1' >
-                    <button key={2} type='button' className='w3-third bginfosys-min-content w3-btn w3-card' onClick={showUpcomingRaces}>Enrolment</button>
+                    <button key={3} type='button' className='w3-third bgis-min-content w3-btn w3-card' onClick={showUpcomingRaces}>Enrolment</button>
                     {roles.includes('ROLE_RACE_OFFICER') ? 
-                        <button key={3} type='button' className='w3-third w3-btn w3-card' onClick={showRaceStartConsole}>Race Start</button>
+                        <button key={4} type='button' className='w3-third w3-btn w3-card' onClick={showRaceStartConsole}>Race Start</button>
                         : null
                     }
                     {roles.includes('ROLE_RACE_OFFICER') ? 
-                        <button key={4} type='button' className='w3-third w3-btn w3-card' onClick={showRaceConsole}>Run Race</button>
+                        <button key={5} type='button' className='w3-third w3-btn w3-card' onClick={showRaceConsole}>Run Race</button>
                         : null
                     }
                 </nav>

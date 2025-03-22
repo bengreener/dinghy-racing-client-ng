@@ -60,12 +60,12 @@ function downloadRaceEntriesCSV(race, entries, options) {
 function createHeader(race) {
     switch (race.type) {
         case RaceType.PURSUIT:
-            if (!race.dinghyClass || race.dinghyClass.crewSize > 1) {
+            if (race.fleet.dinghyClasses.length === 0 || race.fleet.dinghyClasses.some(dinghyClass => dinghyClass.crewSize > 1)) {
                 return 'HelmName,CrewName,SailNo,Class,Place,Code,RaceRating\n';
             }
             return 'HelmName,SailNo,Class,Place,Code,RaceRating\n';
         default:
-            if (!race.dinghyClass || race.dinghyClass.crewSize > 1) {
+            if (race.fleet.dinghyClasses.length === 0 || race.fleet.dinghyClasses.some(dinghyClass => dinghyClass.crewSize > 1)) {
                 return 'HelmName,CrewName,SailNo,Class,Place,Elapsed,Laps,Code,RaceRating,Corrected\n';
             }
             return 'HelmName,SailNo,Class,Place,Elapsed,Laps,Code,RaceRating,Corrected\n';
@@ -86,12 +86,12 @@ function convertRaceEntriesToCSVArray(race, entries, options) {
                 break;
             default:
                 record += entry.helm.name + ',';
-                if (!race.dinghyClass || race.dinghyClass.crewSize > 1) {
+                if (race.fleet.dinghyClasses.length === 0 || race.fleet.dinghyClasses.some(dinghyClass => dinghyClass.crewSize > 1)) {
                     record += entry.crew ? entry.crew.name + ',' : ',';
                 }
         }
         record += entry.dinghy.sailNumber + ',';
-        record += entry.dinghy.dinghyClass.name + ',';
+        record += ((entry.dinghy.dinghyClass.externalName == null || entry.dinghy.dinghyClass.externalName === '') ? entry.dinghy.dinghyClass.name : entry.dinghy.dinghyClass.externalName) + ',';
         record += entry.position + ',';
         if (race.type !== RaceType.PURSUIT) {
             record += Clock.formatDurationAsSeconds(entry.sumOfLapTimes) + ',';

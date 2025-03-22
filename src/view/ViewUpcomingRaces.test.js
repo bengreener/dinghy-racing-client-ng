@@ -79,7 +79,7 @@ it('displays the details of upcoming races', async () => {
 
     const timeCheck = new Date('2021-10-14T10:30:00Z').toLocaleString();
     expect(cellValues).toContain('Scorpion A');
-    expect(cellValues).toContain('Graduate');
+    expect(cellValues).toContain('Graduate A');
     expect(cellValues).toContain(timeCheck);
     expect(cellValues).toContain('Fleet');
     expect(cellValues).toContain('10-5-Go');

@@ -116,8 +116,8 @@ function RaceEntriesView({ races }) {
             // sort by number of laps and then by time to complete last lap
             case 'lapTimes':
                 ordered = sortArray(entries, (entry) => {
-                    const weighting = (!(entry.scoringAbbreviation == null || entry.scoringAbbreviation === '')) ? -Date.now() : 0;
-                    return [entry.laps.length + weighting, -entry.sumOfLapTimes];
+                    const weighting = (!(entry.scoringAbbreviation == null || entry.scoringAbbreviation === '')) ? - Date.now() : 0;
+                    return [entry.laps.length + weighting, - entry.sumOfLapTimes];
                 }, true);
                 break;
             case 'position':

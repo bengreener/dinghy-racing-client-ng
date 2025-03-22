@@ -5,7 +5,7 @@ html,body{
 
 .w3-striped tbody tr:nth-child(even){background-color:lightgray}
 
-.bginfosys-min-content {
+.bgis-min-content {
     min-width: min-content;
 }
 

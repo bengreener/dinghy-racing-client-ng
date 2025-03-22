@@ -15,7 +15,6 @@
  */
 
 import { Client } from '@stomp/stompjs';
-import StartSignal from './domain-classes/start-signal';
 import StartSequence from './domain-classes/start-sequence';
 import RaceType from './domain-classes/race-type';
 import StartType from './domain-classes/start-type';
@@ -30,13 +29,15 @@ class DinghyRacingModel {
     dinghyCreationCallbacks = new Set();
     dinghyClassCreationCallbacks = new Set();
     dinghyClassUpdateCallbacks = new Map();
+    fleetCreationCallbacks = new Set();
+    fleetUpdateCallbacks = new Map();
 
     /**
      * Provide a blank competitor template
      * @returns {Competitor}
      */
     static competitorTemplate() {
-        return {'name': '', 'url': ''};
+        return {name: '', url: ''};
     }
 
     /**
@@ -44,7 +45,7 @@ class DinghyRacingModel {
      * @returns {DinghyClass}
      */
     static dinghyClassTemplate() {
-        return {'name': '', 'crewSize': 1, portsmouthNumber: null, 'url': ''};
+        return {name: '', crewSize: 1, portsmouthNumber: 1000, externalName: '', url: ''};
     }
 
     /**
@@ -52,7 +53,7 @@ class DinghyRacingModel {
      * @returns {Dinghy}
      */
     static dinghyTemplate() {
-        return {'sailNumber': '', 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'url': ''};
+        return {sailNumber: '', dinghyClass: DinghyRacingModel.dinghyClassTemplate(), url: ''};
     }
 
     /**
@@ -60,8 +61,8 @@ class DinghyRacingModel {
      * @returns {Race}
      */
     static raceTemplate() {
-        return {name: '', plannedStartTime: null, dinghyClass: DinghyRacingModel.dinghyClassTemplate(), type: null, startType: null, duration: 0, plannedLaps: null, lapsSailed: null, lapForecast: null, 
-            lastLapTime: null, averageLapTime: null, clock: null, startSequenceState: StartSignal.NONE, dinghyClasses: [], url: ''};
+        return {name: '', plannedStartTime: null, fleet: DinghyRacingModel.fleetTemplate(), type: null, startType: null, duration: 0, plannedLaps: null, lapsSailed: null, lapForecast: null, 
+            lastLapTime: null, averageLapTime: null, clock: null, dinghyClasses: [], url: ''};
     }
 
     /**
@@ -76,7 +77,7 @@ class DinghyRacingModel {
      * Provide a blank lap template
      */
     static lapTemplate() {
-        return {'number': null, 'time': 0};
+        return {number: null, time: 0};
     }
 
     /**
@@ -84,6 +85,13 @@ class DinghyRacingModel {
      */
     static crewTemplate() {
         return {helm: null, mate: null};
+    }
+
+    /**
+     * Provide a blank fleet template
+     */
+    static fleetTemplate() {
+        return {name: '', dinghyClasses: [], url: ''};
     }
 
     /**
@@ -99,6 +107,8 @@ class DinghyRacingModel {
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
         this.handleDinghyClassCreation = this.handleDinghyClassCreation.bind(this);
         this.handleDinghyClassUpdate = this.handleDinghyClassUpdate.bind(this);
+        this.handleFleetCreation = this.handleFleetCreation.bind(this);
+        this.handleFleetUpdate = this.handleFleetUpdate.bind(this);
         this.getStartSequence = this.getStartSequence.bind(this);
         if (!httpRootURL) {
             throw new Error('An HTTP root URL is required when creating an instance of DinghyRacingModel');
@@ -118,10 +128,12 @@ class DinghyRacingModel {
             this.stompClient.subscribe('/topic/createCompetitor', this.handleCompetitorCreation);
             this.stompClient.subscribe('/topic/createDinghy', this.handleDinghyCreation);
             this.stompClient.subscribe('/topic/createDinghyClass', this.handleDinghyClassCreation);
+            this.stompClient.subscribe('/topic/createFleet', this.handleFleetCreation);
             this.stompClient.subscribe('/topic/updateRace', this.handleRaceUpdate);
             this.stompClient.subscribe('/topic/updateEntry', this.handleEntryUpdate);
             this.stompClient.subscribe('/topic/deleteEntry', this.handleEntryUpdate);
             this.stompClient.subscribe('/topic/updateDinghyClass', this.handleDinghyClassUpdate);
+            this.stompClient.subscribe('/topic/updateFleet', this.handleFleetUpdate);
         };
         this.stompClient.activate();
     }
@@ -304,6 +316,65 @@ class DinghyRacingModel {
     }
 
     /**
+     * Register a callback for when a new fleet is created
+     * @param {Function} callback
+     */
+    registerFleetCreationCallback(callback) {
+        this.fleetCreationCallbacks.add(callback);
+    }
+
+    /**
+     * Unregister a callback for when a new fleet is created
+     * @param {Function} callback
+     */
+    unregisterFleetCreationCallback(callback) {
+        this.fleetCreationCallbacks.delete(callback);
+    }
+
+    /**
+     * Handle a websocket fleet creation message via the Stomp client
+     * @param {String} message URI of competitor that was created
+     */
+    handleFleetCreation(message) {
+        this.fleetCreationCallbacks.forEach(cb => cb());
+    }
+
+    /**
+     * Register a callback for when a fleet identified by key is updated
+     * @param {String} key URI of the fleet for which the update callback is being registered
+     * @param {Function} callback
+     */
+    registerFleetUpdateCallback(key, callback) {
+        if (this.fleetUpdateCallbacks.has(key)) {
+            this.fleetUpdateCallbacks.get(key).add(callback);
+        }
+        else {
+            this.fleetUpdateCallbacks.set(key, new Set([callback]));
+        }
+    }
+
+    /**
+     * Unregister a callback for when a fleet idenified by key is updated
+     * @param {String} key URI of the fleet for which the update callback is being unregistered
+     * @param {Function} callback
+     */
+    unregisterFleetUpdateCallback(key, callback) {
+        if (this.fleetUpdateCallbacks.has(key)) {
+            this.fleetUpdateCallbacks.get(key).delete(callback);
+        }
+    }
+
+    /**
+     * Handle a websocket fleet update message via the Stomp client
+     * @param {String} message URI of dinghy class that has been updated
+     */
+    handleFleetUpdate(message) {
+        if (this.fleetUpdateCallbacks.has(message.body)) {
+            this.fleetUpdateCallbacks.get(message.body).forEach(cb => cb());
+        }
+    }
+
+    /**
      * Add a lap to race entry
      * @param {Entry} entry
      * @param {Number} time The lap time duration in milliseconds
@@ -435,31 +506,125 @@ class DinghyRacingModel {
      * @param {Integer} [portsmouthNumber]
      * @returns {Promise<Result>}
      */
-    async updateDinghyClass(dinghyClass, name, crewSize, portsmouthNumber) {
-        let dinghyClassURL = dinghyClass.url;
-        if (!dinghyClass.url) {
-            const result = await this.getDinghyClassByName(dinghyClass.name);
-            if (result.success) {
-                dinghyClassURL = result.domainObject.url;
-            }
-            else {
-                return Promise.resolve(result);
-            }
-        }
-        const updateObject = {};
-        if (name) {
-            updateObject.name = name;
-        }
-        if(crewSize) {
-            updateObject.crewSize = crewSize;
-        }
-        if (portsmouthNumber) {
-            updateObject.portsmouthNumber = portsmouthNumber;
-        }
-
-        const result = await this.update(dinghyClassURL, updateObject);
+    async updateDinghyClass(dinghyClass) {
+        const result = await this.update(dinghyClass.url, dinghyClass);
         if (result.success) {
             return Promise.resolve({'success': true, 'domainObject': this._convertDinghyClassHALToDinghyClass(result.domainObject)});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
+     * Create a new fleet
+     * @param {Fleet} fleet
+     * @returns {Promise<Result>}
+     */
+    async createFleet(fleet) {
+        const tempFleet = {...fleet};
+        // convert dinghy classes collection to form appropriate for creation of dinghy class associations via server API
+        if (fleet.dinghyClasses.length > 0) {
+            tempFleet.dinghyClasses = fleet.dinghyClasses.map(dinghyClass => dinghyClass.url);
+        }
+        const result = await this.create('fleets', tempFleet);
+        if (result.success) {
+            let dinghyClassesResult = await this.getDinghyClassesByUrl(result.domainObject._links.dinghyClasses.href);
+            if (dinghyClassesResult.success) {
+                return Promise.resolve({success: true, domainObject: this._convertFleetHALToFleet(result.domainObject, dinghyClassesResult.domainObject)});
+            }
+            else {
+                return Promise.resolve(dinghyClassesResult);
+            }
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
+     * Get a fleet by URL
+     * @param {String} url Address of the remote resource
+     * @returns {Promise<Result>}
+     */
+    async getFleet(url) {
+        const result = await this.read(url);
+        if (result.success) {
+            let dinghyClassesResult = await this.getDinghyClassesByUrl(result.domainObject._links.dinghyClasses.href);
+            if (dinghyClassesResult.success) {
+                return Promise.resolve({success: true, domainObject: this._convertFleetHALToFleet(result.domainObject, dinghyClassesResult.domainObject)});
+            }
+            else {
+                return Promise.resolve(dinghyClassesResult);
+            }
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
+     * Get fleets in ascending order by fleet name
+     * If page and/ or size are not provided will return all fleets
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
+     * @returns {Promise<Result>} If successful Result.domainObject will be an Array<Fleet>
+     */
+    async getFleets(page, size) {
+        let resource = this.httpRootURL + '/fleets?';
+        if (Number.isInteger(page)) {
+            resource += 'page=' + page + '&';
+        }
+        if (Number.isInteger(size)) {
+            resource += 'size=' + size + '&';
+        }
+        resource += 'sort=name,asc';
+
+        const result = await this.read(resource);
+        if (result.success) {
+            let tempFleets = result.domainObject._embedded.fleets;
+            // check for additional fleets
+            if (!Number.isInteger(page) && !Number.isInteger(size) && result.domainObject.page.totalElements > result.domainObject.page.size) {
+                return this.getFleets(0, result.domainObject.page.totalElements);
+            }
+            // Get dinghy classes for fleets
+            const dinghyClassResults = await Promise.all(tempFleets.map(fleetHAL => this.getDinghyClassesByUrl(fleetHAL._links.dinghyClasses.href)));
+            const fleetCollection = [];
+            for (let i = 0; i < tempFleets.length; i++ ) {
+                if (dinghyClassResults[i].success) {
+                    fleetCollection.push(this._convertFleetHALToFleet(tempFleets[i], dinghyClassResults[i].domainObject));
+                }
+                else {
+                    return Promise.resolve(dinghyClassResults[i]);
+                }
+            }
+            return Promise.resolve({'success': true, 'domainObject': fleetCollection});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
+     * Update a fleet with dinghy classes
+     * @param {fleet} fleet including dinghy classes to be updated
+     * @returns {Promise<Result>}
+     */
+    async updateFleet(fleet) {
+        const tempFleet = {...fleet};
+        // convert dinghy classes collection to form appropriate for updating dinghy class associations via server API
+        if (fleet.dinghyClasses.length > 0) {
+            tempFleet.dinghyClasses = fleet.dinghyClasses.map(dinghyClass => dinghyClass.url);
+        }
+        const result = await this.update(fleet.url, tempFleet);
+        if (result.success) {
+            let dinghyClassesResult = await this.getDinghyClassesByUrl(result.domainObject._links.dinghyClasses.href);
+            if (dinghyClassesResult.success) {
+                return Promise.resolve({success: true, domainObject: this._convertFleetHALToFleet(result.domainObject, dinghyClassesResult.domainObject)});
+            }
+            else {
+                return Promise.resolve(dinghyClassesResult);
+            }
         }
         else {
             return Promise.resolve(result);
@@ -718,39 +883,18 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async createRace(race) {
-        let dinghyClassURL;
-        // if no dinghy class supplied than is a handicap race
-        if (race.dinghyClass !== null && race.dinghyClass.name !== '') {
-            // if not supplied get url for dinghyClass
-            if (!(race.dinghyClass.url)) {
-                const result = await this.getDinghyClassByName(race.dinghyClass.name);
-                if (!result.success) {
-                    return Promise.resolve(result);
-                }
-                dinghyClassURL = result.domainObject.url;
-            } 
-            else {
-                dinghyClassURL = race.dinghyClass.url;
-            }
-        }
-
         // convert local race domain type into format required by REST service
         // REST service will accept a value in ISO 8601 format (time units only PT[n]H[n]M,n]S) or in seconds
-        const newRace = {...race, 'dinghyClass': dinghyClassURL, 'duration': race.duration / 1000};
+        const newRace = {...race, fleet: race.fleet.url, 'duration': race.duration / 1000};
         const result = await this.create('races', newRace);
         if (result.success) {
-            // get dinghyClass
-            let dinghyClassResult = await this.getDinghyClass(result.domainObject._links.dinghyClass.href);
-            // if race is a a handicap it will not have a dinghy class set and REST service will return a 404 not found error so in this case assume 404 error is a 'success' and provide an empty dinghy class
-            const regex404 = /HTTP Error: 404/i;
-            if (!dinghyClassResult.success && regex404.test(dinghyClassResult.message)) {
-                dinghyClassResult = {'success': true, 'domainObject': null};
-            }
-            if (dinghyClassResult.success) {
-                return Promise.resolve({success: true, domainObject: this._convertRaceHALToRace(result.domainObject, dinghyClassResult.domainObject)});
+            // get fleet
+            let fleetResult = await this.getFleet(result.domainObject._links.fleet.href);
+            if (fleetResult.success) {
+                return Promise.resolve({success: true, domainObject: this._convertRaceHALToRace(result.domainObject, fleetResult.domainObject)});
             }
             else {
-                return Promise.resolve(dinghyClassResult);
+                return Promise.resolve(fleetResult);
             }
         }
         else {
@@ -805,7 +949,10 @@ class DinghyRacingModel {
     }
     
     /**
-     * Get all the crews that have sailed a dinghy
+     * Get all the crews that have sailed a dinghy.
+     * Result.domainObject is an array of crews. If no crews have been recorded for dinghy the array will be empty.
+     * @param {Dinghy} dinghy
+     * @returns {Promise<Result>}
      */
     async getCrewsByDinghy(dinghy) {
         let crewsHAL = [];
@@ -913,10 +1060,11 @@ class DinghyRacingModel {
 
     /**
      * Gets all dinghies with the given sail number
+     * If successful Result.domainObject will be an Array<Dinghy>
      * @param {String} sailNumber to search for
      * @param {Integer} [page] number to return (0 indexed)
      * @param {Integer} [size] number of elements to return per page
-     * @return {Promise<Result>>} If successful Result.domainObject will be an Array<Dinghy>
+     * @returns {Promise<Result>} 
      */
     async getDinghiesBySailNumber(sailNumber, page, size) {
         let resource = this.httpRootURL + '/dinghies/search/findBySailNumber?sailNumber=' + sailNumber;
@@ -953,6 +1101,7 @@ class DinghyRacingModel {
 
     /**
      * Get a dinghy by it's sail number and dinghy class
+     * If successful Result.domainObject will be a Dinghy
      * @param {String} sailNumber
      * @param {DinghyClass} dinghyClass
      * @returns {Promise<Result>}
@@ -991,15 +1140,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async getDinghyClassByName(name) {
-        const resource = this.httpRootURL + '/dinghyClasses/search/findByName?name=' + name;
-
-        const result = await this.read(resource);
-        if(result.success) {
-            return Promise.resolve({'success': true, 'domainObject': this._convertDinghyClassHALToDinghyClass(result.domainObject)});
-        }
-        else {
-            return Promise.resolve(result);
-        }
+        return this.getDinghyClass(this.httpRootURL + '/dinghyClasses/search/findByName?name=' + name);
     }
 
     /**
@@ -1027,6 +1168,22 @@ class DinghyRacingModel {
                 return this.getDinghyClasses(0, result.domainObject.page.totalElements);
             }
             const dinghyClassCollection = collection.map(dinghyClassHAL => {return this._convertDinghyClassHALToDinghyClass(dinghyClassHAL)});
+            return Promise.resolve({'success': true, 'domainObject': dinghyClassCollection});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
+     * Get dinghy classes associated with an entity defined by HAL via the URL provided
+     * @param {String} url
+     * @return {Promise<Result>>} If successful Result.domainObject will be an Array<DinghyClass>
+     */
+    async getDinghyClassesByUrl(url) {
+        const result = await this.read(url);
+        if (result.success) {
+            const dinghyClassCollection = result.domainObject._embedded.dinghyClasses.map(dinghyClassHAL => {return this._convertDinghyClassHALToDinghyClass(dinghyClassHAL)});
             return Promise.resolve({'success': true, 'domainObject': dinghyClassCollection});
         }
         else {
@@ -1149,19 +1306,13 @@ class DinghyRacingModel {
     async getRace(url) {
         const result = await this.read(url);
         if (result.success) {
-            // get dinghyClass
-            let dinghyClassResult = await this.getDinghyClass(result.domainObject._links.dinghyClass.href);
-            // if race is a a handicap it will not have a dinghy class set and REST service will return a 404 not found error so in this case assume 404 error is a 
-            // 'success' and provide an empty dinghy class 
-            const regex404 = /HTTP Error: 404/i;
-            if (!dinghyClassResult.success && regex404.test(dinghyClassResult.message)) {
-                dinghyClassResult = {'success': true, 'domainObject': null};
-            }
-            if (dinghyClassResult.success) {
-                return Promise.resolve({'success': true, 'domainObject': this._convertRaceHALToRace(result.domainObject, dinghyClassResult.domainObject)});
+            // get fleet
+            let fleetResult = await this.getFleet(result.domainObject._links.fleet.href);
+            if (fleetResult.success) {
+                return Promise.resolve({'success': true, 'domainObject': this._convertRaceHALToRace(result.domainObject, fleetResult.domainObject)});
             }
             else {
-                return Promise.resolve(dinghyClassResult);
+                return Promise.resolve(fleetResult);
             }
         }
         else {
@@ -1260,14 +1411,12 @@ class DinghyRacingModel {
                 return this.getRacesFromURL(url, 0, result.domainObject.page.totalElements);
             }
             const racesHAL = result.domainObject._embedded.races;
-            const dinghyClassURLs = racesHAL.map(race => race._links.dinghyClass.href);
-            const dinghyClassResults = await Promise.all(dinghyClassURLs.map(url => this.read(url)));
+            const fleetURLs = racesHAL.map(race => race._links.fleet.href);
+            const fleetResults = await Promise.all(fleetURLs.map(url => this.getFleet(url)));
             
             const races = [];
             for (let i = 0; i < racesHAL.length; i++  ) {
-                const dinghyClass = dinghyClassResults[i].success ? this._convertDinghyClassHALToDinghyClass(dinghyClassResults[i].domainObject) : null;
-                // assume time received has been stored in UTC
-                races.push(this._convertRaceHALToRace(racesHAL[i], dinghyClass));
+                races.push(this._convertRaceHALToRace(racesHAL[i], fleetResults[i].domainObject));
             };
             return Promise.resolve({'success': true, 'domainObject': races});
         }
@@ -1286,27 +1435,6 @@ class DinghyRacingModel {
         const resource = this.rootUrl + 'races/search?name=' + name + '&time='+ time.toISOString();
 
         return this.getRace(resource);
-    }
-
-    /**
-     * Update the start sequence for a race
-     * @param {Race} race to update
-     * @param {StartSignal} stage of the starting sequence reached
-     */
-    async updateRaceStartSequenceState(race, stage) {
-        let result;
-        if (!race.url) {
-            result = await this.getRaceByNameAndPlannedStartTime(race.name, race.plannedStartTime);
-        }
-        else {
-            result = {'success': true, 'domainObject': race};
-        }
-        if (result.success) {
-            return this.update(result.domainObject.url, {'startSequenceState': stage});
-        }
-        else {
-            return result;
-        }
     }
 
     /**
@@ -1419,8 +1547,19 @@ class DinghyRacingModel {
      */
     async update(resource, object) {
         const body = JSON.stringify(object); // convert to string so can be serialized into object by receiving service
-        return this._processFetch(resource, {method: 'PATCH', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, 'body': body});
+        return this._processFetch(resource, {method: 'PATCH', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, body: body});
     }
+
+	/**
+	 * Update a to many relationship
+	 * Will overwrite previous associations.
+	 * @param {string} resource Address of remote resource
+	 * @param {string} uriList A string formatted as a uri list; one uri per line with \r\n line endings
+	 * @returns {Promise<Result>}
+	 */
+	updateToManyAssociation(resource, uriList) {
+		return this._processFetch(resource, {method: 'PUT', headers: {'Content-Type': 'text/uri-list', 'Accept': 'application/hal+json'}, body: uriList});
+	}
 
     /**
      * Delete the reosource
@@ -1448,15 +1587,15 @@ class DinghyRacingModel {
                 }
             }
             if (response.ok) {
-                return Promise.resolve({'success': true, domainObject: json});
+                return Promise.resolve({success: true, domainObject: json});
             }
             else {
                 const message = this._buildClientErrorMessage(response, json);
-                return Promise.resolve({'success': false, 'message': message});
+                return Promise.resolve({success: false, message: message});
             }
         }
         catch (error) {
-            return Promise.resolve({'success': false, 'message': error.toString()});
+            return Promise.resolve({success: false, message: error.toString()});
         }
     }
 
@@ -1475,7 +1614,7 @@ class DinghyRacingModel {
             const regex = /(could not execute statement \[)(Duplicate entry)( ')([\w -]+)(' for key ')(\w+)(.+)/;
             const regexResult = regex.exec(json.message);
             if (regexResult && regexResult[2] === 'Duplicate entry') {
-                return `HTTP Error: 409 Conflict Message: The ${regexResult[6]} '${regexResult[4]}' already exissts; this may be caused by an uppercase/ lowercase differencce between existing record and the value entered.`;
+                return `HTTP Error: 409 Conflict Message: The ${regexResult[6]} '${regexResult[4]}' already exists; this may be caused by an uppercase/ lowercase difference between existing record and the value entered.`;
             }
             // no mapping to user message found
             return 'HTTP Error: ' + response.status + ' ' + response.statusText + ' Message: ' + json.message;
@@ -1483,6 +1622,10 @@ class DinghyRacingModel {
         // additional error details provided by server
         return 'HTTP Error: ' + response.status + ' ' + response.statusText;
     }
+
+    _convertUriArrayToUriList(uriArray) {
+		return uriArray.join('\r\n');
+	}
 
     /**
      * Convert a duration into milliseconds
@@ -1511,11 +1654,13 @@ class DinghyRacingModel {
     }
 
     _convertCompetitorHALToCompetitor(competitorHAL) {
-        return {...DinghyRacingModel.competitorTemplate(), 'name': competitorHAL?.name, 'url': competitorHAL?._links?.self?.href};
+        return {...DinghyRacingModel.competitorTemplate(), name: competitorHAL?.name, url: competitorHAL?._links?.self?.href};
     }
 
     _convertDinghyClassHALToDinghyClass(dinghyClassHAL) {
-        return {...DinghyRacingModel.dinghyClassTemplate(), name: dinghyClassHAL.name, crewSize: dinghyClassHAL.crewSize, portsmouthNumber: dinghyClassHAL.portsmouthNumber, url: dinghyClassHAL._links.self.href};
+        return {...DinghyRacingModel.dinghyClassTemplate(), name: dinghyClassHAL.name, crewSize: dinghyClassHAL.crewSize, portsmouthNumber: dinghyClassHAL.portsmouthNumber, 
+            externalName: (dinghyClassHAL.externalName == null) ? '' : dinghyClassHAL.externalName, 
+            url: dinghyClassHAL._links.self.href};
     }
 
     _convertEntryHALtoEntry(entryHAL, race, helm, dinghy, crew, laps) {
@@ -1528,19 +1673,24 @@ class DinghyRacingModel {
         }
     }
 
-    _convertRaceHALToRace(raceHAL, dinghyClass) {
+    _convertRaceHALToRace(raceHAL, fleet) {
         return {...DinghyRacingModel.raceTemplate(), name: raceHAL.name,
             plannedStartTime: new Date(raceHAL.plannedStartTime + 'Z'),
-            dinghyClass: dinghyClass, duration: this.convertISO8601DurationToMilliseconds(raceHAL.duration),
+            fleet: fleet, duration: this.convertISO8601DurationToMilliseconds(raceHAL.duration),
             type: RaceType.from(raceHAL.type),
             startType: StartType.from(raceHAL.startType),
             plannedLaps: raceHAL.plannedLaps, lapsSailed: raceHAL.leadEntry ? raceHAL.leadEntry.lapsSailed : null,
             lapForecast: raceHAL.lapForecast,
             lastLapTime: raceHAL.leadEntry ? this.convertISO8601DurationToMilliseconds(raceHAL.leadEntry.lastLapTime) : null,
             averageLapTime: raceHAL.leadEntry ? this.convertISO8601DurationToMilliseconds(raceHAL.leadEntry.averageLapTime) : null,
-            startSequenceState: StartSignal.from(raceHAL.startSequenceState),
             dinghyClasses: raceHAL.dinghyClasses,
             url: raceHAL._links.self.href
+        }
+    }
+
+    _convertFleetHALToFleet(fleetHAL, dinghyClasses = []) {
+        return {...DinghyRacingModel.fleetTemplate(), name: fleetHAL.name, dinghyClasses: dinghyClasses,
+            url: fleetHAL._links.self.href
         }
     }
 }

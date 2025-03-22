@@ -16,7 +16,6 @@
 
 import FlagRole from './flag-role';
 import FlagState from './flag-state';
-import StartSignal from './start-signal';
 import { sortArray } from '../../utilities/array-utilities';
 import RaceType from './race-type';
 import StartType from './start-type';
@@ -136,12 +135,13 @@ class RaceStartSequence {
 
         if (race.type === RaceType.FLEET) {
             let warningFlag;
-            if (race.dinghyClass) {
-                warningFlag = {name: race.dinghyClass.name + ' Class Flag', role: FlagRole.WARNING, actions: []};
-            }
-            else {
+            if (race.fleet.name === 'Handicap') {
                 warningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, actions: []};
             }
+            else {
+                warningFlag = {name: race.fleet.name + ' Class Flag', role: FlagRole.WARNING, actions: []};
+            }
+            
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
 
             const warningFlagRaiseAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + warningFlagOffsets.raise), afterState: FlagState.RAISED};
@@ -212,42 +212,6 @@ class RaceStartSequence {
             }
         }
         return {flags: flags, actions: actions};
-    }
-
-    /**
-     * Update the start status of the race in the underlying model
-     * @param {Date} time at which to calculate the start status
-     */
-    updateRaceState(time) {
-        let warningSignalOffset;
-        let preparatorySignalOffset;
-        const oneMinuteSignalOffset = -60000;
-        const startingSignalOffset = 0;
-
-        switch (this._race.startType) {
-            case StartType.CSCCLUBSTART:
-                warningSignalOffset = -600000;
-                preparatorySignalOffset = -300000;
-                break;
-            default:
-                warningSignalOffset = -300000;
-                preparatorySignalOffset = -240000;
-        }
-
-        if (time.valueOf() === this._race.plannedStartTime.valueOf() + warningSignalOffset) {
-            this._model.updateRaceStartSequenceState(this._race, StartSignal.WARNINGSIGNAL);
-        }
-        else if (time.valueOf() === this._race.plannedStartTime.valueOf() + preparatorySignalOffset) {
-            this._model.updateRaceStartSequenceState(this._race, StartSignal.PREPARATORYSIGNAL);
-        }
-        else if (time.valueOf() === this._race.plannedStartTime.valueOf() + oneMinuteSignalOffset) {
-            if (this._race.startType !== StartType.CSCCLUBSTART) {
-                this._model.updateRaceStartSequenceState(this._race, StartSignal.ONEMINUTE);
-            }
-        }
-        else if (time.valueOf() === this._race.plannedStartTime.valueOf()+ startingSignalOffset) {
-            this._model.updateRaceStartSequenceState(this._race, StartSignal.STARTINGSIGNAL);
-        }
     }
 }
 

@@ -22,7 +22,6 @@ import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 import { httpRootURL, wsRootURL, races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet } from '../model/__mocks__/test-data';
 import StartSequence from '../model/domain-classes/start-sequence';
-import StartSignal from '../model/domain-classes/start-signal';
 import RaceType from '../model/domain-classes/race-type';
 
 
@@ -408,7 +407,7 @@ describe('when clock ticks', () => {
     describe('when ticks to 1 minute before a race start state change', () => {
         // unsure how to test audio using a variable to control audio rather than <audio> element
         xit('prepare for race start state change audio is present in document', async () => {
-            const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, raceGraduateA];
+            const races = [{...raceScorpionA}, raceGraduateA];
             jest.setSystemTime(new Date('2021-10-14T10:23:59Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
@@ -428,7 +427,7 @@ describe('when clock ticks', () => {
     describe('when ticks to 59 seconds before a race start state change', () => {
         // unsure how to test audio using a variable to control audio rather than <audio> element
         xit('prepare for race start state change audio is not present in document', async () => {
-            const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, raceGraduateA];
+            const races = [{...raceScorpionA}, raceGraduateA];
             jest.setSystemTime(new Date('2021-10-14T10:24:00Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
@@ -448,7 +447,7 @@ describe('when clock ticks', () => {
     describe('when ticks to time for a race start state change', () => {
         // unsure how to test audio using a variable to control audio rather than <audio> element
         xit('race start state change audio is present in document', async () => {
-            const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, {...raceGraduateA, startSequenceState: StartSignal.NONE}];
+            const races = [{...raceScorpionA}, {...raceGraduateA}];
             jest.setSystemTime(new Date('2021-10-14T10:24:59Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
@@ -467,7 +466,7 @@ describe('when clock ticks', () => {
     describe('when ticks to 1 second after a race start state change', () => {
         // unsure how to test audio using a variable to control audio rather than <audio> element
         xit('race start state change audio is not present in document', async () => {
-            const races = [{...raceScorpionA, startSequenceState: StartSignal.PREPARATORYSIGNAL}, {...raceGraduateA, startSequenceState: StartSignal.WARNINGSIGNAL}];
+            const races = [{...raceScorpionA}, {...raceGraduateA}];
             jest.setSystemTime(new Date('2021-10-14T10:25:00Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
@@ -540,7 +539,7 @@ describe('when races within session are changed', () => {
 describe('when 6 minutes 1 second before start of first race', () => {
     // unsure how to test audio using a variable to control audio rather than <audio> element
     xit('prepare for race start state change audio is not present in document', async () => {
-        const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, raceGraduateA];
+        const races = [{...raceScorpionA}, raceGraduateA];
         jest.setSystemTime(new Date('2021-10-14T10:23:59Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -558,7 +557,7 @@ describe('when 6 minutes 1 second before start of first race', () => {
 describe('when 6 minutes before start of first race', () => {
     // unsure how to test audio using a variable to control audio rather than <audio> element
     xit('prepare for race start state change audio is present in document', async () => {
-        const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, raceGraduateA];
+        const races = [{...raceScorpionA}, raceGraduateA];
         jest.setSystemTime(new Date('2021-10-14T10:24:00Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -576,7 +575,7 @@ describe('when 6 minutes before start of first race', () => {
 describe('when 5 minutes 59 second before start of first race', () => {
     // unsure how to test audio using a variable to control audio rather than <audio> element
     xit('prepare for race start state change audio is not present in document', async () => {
-        const races = [{...raceScorpionA, startSequenceState: StartSignal.WARNINGSIGNAL}, raceGraduateA];
+        const races = [{...raceScorpionA}, raceGraduateA];
         jest.setSystemTime(new Date('2021-10-14T10:24:01Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -594,7 +593,7 @@ describe('when 5 minutes 59 second before start of first race', () => {
 describe('when 1 second before start of first race', () => {
     // unsure how to test audio using a variable to control audio rather than <audio> element
     xit('race start state change audio is not present in document', async () => {
-        const races = [{...raceScorpionA, startSequenceState: StartSignal.PREPARATORYSIGNAL}, {...raceGraduateA, startSequenceState: StartSignal.WARNINGSIGNAL}];
+        const races = [{...raceScorpionA}, {...raceGraduateA}];
         jest.setSystemTime(new Date('2021-10-14T10:29:59Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -612,7 +611,7 @@ describe('when 1 second before start of first race', () => {
 describe('when start of first race', () => {
     // unsure how to test audio using a variable to control audio rather than <audio> element
     xit('race start state change audio is present in document', async () => {
-        const races = [{...raceScorpionA, startSequenceState: StartSignal.PREPARATORYSIGNAL}, {...raceGraduateA, startSequenceState: StartSignal.WARNINGSIGNAL}];
+        const races = [{...raceScorpionA}, {...raceGraduateA}];
         jest.setSystemTime(new Date('2021-10-14T10:20:00Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -630,7 +629,7 @@ describe('when start of first race', () => {
 describe('when 1 second after start of first race', () => {
     // unsure how to test audio using a variable to control audio rather than <audio> element
     xit('prepare for race start state change audio is not present in document', async () => {
-        const races = [{...raceScorpionA, startSequenceState: StartSignal.STARTINGSIGNAL}, {...raceGraduateA, startSequenceState: StartSignal.PREPARATORYSIGNAL}];
+        const races = [{...raceScorpionA}, {...raceGraduateAq}];
         jest.setSystemTime(new Date('2021-10-14T10:30:01Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);

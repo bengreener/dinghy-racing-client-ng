@@ -14,7 +14,6 @@
  * limitations under the License. 
  */
 
-import StartSequence from '../model/domain-classes/start-signal';
 import { downloadRaceEntriesCSV } from '../utilities/csv-writer'
 class DinghyRacingController {
 
@@ -202,28 +201,106 @@ class DinghyRacingController {
      * @returns {Promise<Result>}
      */
     createDinghyClass(dinghyClass) {
-        if (dinghyClass.name === null || dinghyClass.name === '') {
-            return Promise.resolve({'success': false, 'message': 'A name is required for a new dinghy class.'});
+        let validDinghyClass = true;
+        let message = '';
+        if (dinghyClass.name == null || dinghyClass.name === '') {
+            validDinghyClass = false;
+            if (message !== '') {
+                message += '/n';
+            }
+            message += 'A name is required for a new dinghy class.';
         }
-        return this.model.createDinghyClass(dinghyClass);
+        if (!(typeof dinghyClass.crewSize === 'number')) {
+            validDinghyClass = false;
+            if (message !== '') {
+                message += '/n';
+            }
+            message += 'A numeric crew size is required for a new dinghy class.';
+        }
+        if (!(typeof dinghyClass.portsmouthNumber === 'number')) {
+            validDinghyClass = false;
+            if (message !== '') {
+                message += '/n';
+            }
+            message += 'A numeric portsmouth number is required for a new dinghy class.';
+        }
+        if (validDinghyClass) {
+            return this.model.createDinghyClass(dinghyClass);
+        }
+        else {
+            return Promise.resolve({'success': false, 'message': message});
+        }
     }
 
     /**
      * Update an exisiting dinghy class
      * @param {DinghyClass} dinghyClass to update
-     * @param {String} name
-     * @param {Integer} [crewSize]
-     * @param {Integer} [portsmouthNumber]
      * @returns {Promise<Result>}
      */
-    updateDinghyClass(dinghyClass, name, crewSize, portsmouthNumber) {
+    updateDinghyClass(dinghyClass) {
+        let validDinghyClass = true;
+        let message = '';
         if (!dinghyClass) {
-            return Promise.resolve({'success': false, 'message': 'An exisiting dinghy class to update is required.'});
+            return Promise.resolve({'success': false, 'message': 'A dinghy class to update is required.'});
         }
-        if (!name && !crewSize && !portsmouthNumber) {
-            return Promise.resolve({'success': false, 'message': 'A new name, crew size, or portsmouth number value is required.'});
+        if (!dinghyClass?.url) {
+            validDinghyClass = false;
+            if (message !== '') {
+                message += '/n';
+            }
+            message += 'The url of an existing dinghy class is required to update a dinghy class.';
         }
-        return this.model.updateDinghyClass(dinghyClass, name, crewSize, portsmouthNumber);
+        if (dinghyClass?.name == null || dinghyClass.name === '') {
+            validDinghyClass = false;
+            if (message !== '') {
+                message += '/n';
+            }
+            message += 'A name is required for a dinghy class.';
+        }
+        if (!(typeof dinghyClass?.crewSize === 'number')) {
+            validDinghyClass = false;
+            if (message !== '') {
+                message += '/n';
+            }
+            message += 'A numeric crew size is required for a dinghy class.';
+        }
+        if (!(typeof dinghyClass?.portsmouthNumber === 'number')) {
+            validDinghyClass = false;
+            if (message !== '') {
+                message += '/n';
+            }
+            message += 'A numeric portsmouth number is required for a new dinghy class.';
+        }
+        if (validDinghyClass) {
+            return this.model.updateDinghyClass(dinghyClass);
+        }
+        else {
+            return Promise.resolve({'success': false, 'message': message});
+        }
+    }
+
+    /**
+     * Add a new fleet
+     * @param {Fleet} fleet to add
+     * @returns {Promise<Result>}
+     */
+    async createFleet(fleet) {
+        if (!fleet || !fleet.name) {
+            return Promise.resolve({'success': false, 'message': 'A name is required for a new fleet.'});
+        }
+        return this.model.createFleet(fleet);
+    }
+
+    /**
+     * Update an exisitng fleet
+     * @param {Fleet} fleet the fleet including the values to update
+     * @returns {Promise<Result>}
+     */
+    async updateFleet(fleet) {
+        if (!fleet || !fleet.name) {
+            return Promise.resolve({'success': false, 'message': 'A name is required for a fleet.'});
+        }
+        return this.model.updateFleet(fleet);
     }
 
     /**
@@ -253,20 +330,50 @@ class DinghyRacingController {
      * @returns {Promise<Result>}
      */
     signupToRace(race, helm, dinghy, crew = null) {
+        let validEntry = true;
+        let message = '';
         // check valid race, competitor, and dinghy provided
         if (!race.name || race.name === '' || !race.plannedStartTime) {
-            return Promise.resolve({'success': false, 'message': 'Please provide details of the race.'});
+            validEntry = false;
+            if (message) {
+                message += '/n';
+            }
+            message += 'Please provide details of the race.';
         }
         if (!helm.name || helm.name === '') {
-            return Promise.resolve({'success': false, 'message': 'Please provide details for the helm.'});
+            validEntry = false;
+            if (message) {
+                message += '/n';
+            }
+            message += 'Please provide details for the helm.';
         }
         if (!dinghy.sailNumber || dinghy.sailNumber === '' || !dinghy.dinghyClass || !dinghy.dinghyClass.name || dinghy.dinghyClass.name === '') {
-            return Promise.resolve({'success': false, 'message': 'Please provide details for the dinghy.'});
+            validEntry = false;
+            if (message) {
+                message += '/n';
+            }
+            message += 'Please provide details for the dinghy.';
         }
         if (crew && (!crew.name || crew.name === '')) {
-            return Promise.resolve({'success': false, 'message': 'Please provide details for the crew.'});
+            validEntry = false;
+            if (message) {
+                message += '/n';
+            }
+            message += 'Please provide details for the crew.';
         }
-        return this.model.createEntry(race, helm, dinghy, crew);
+        if (dinghy.dinghyClass.crewSize > 1 && !crew) {
+            validEntry = false;
+            if (message) {
+                message += '/n';
+            }
+            message += 'You have selected a dinghy with a crew. Please select a crew.';
+        }
+        if (validEntry) {
+            return this.model.createEntry(race, helm, dinghy, crew);
+        }
+        else {
+            return Promise.resolve({success: false, message: message});
+        }
     }
 
     /**
@@ -278,20 +385,50 @@ class DinghyRacingController {
      * @returns {Promise<Result>}
      */
     updateEntry(entry, helm, dinghy, crew = null) {
+        let validEntry = true;
+        let message = '';
         // check valid race, competitor, and dinghy provided
         if (!entry.url) {
-            return Promise.resolve({'success': false, 'message': 'Please provide an existing race entry.'});
+            validEntry = false;
+            if (message) {
+                message += '/n';
+            }
+            message += 'Please provide an existing race entry.';
         }
         if (!helm.name || helm.name === '') {
-            return Promise.resolve({'success': false, 'message': 'Please provide details for the helm.'});
+            validEntry = false;
+            if (message) {
+                message += '/n';
+            }
+            message += 'Please provide details for the helm.';
         }
         if (!dinghy.sailNumber || dinghy.sailNumber === '' || !dinghy.dinghyClass || !dinghy.dinghyClass.name || dinghy.dinghyClass.name === '') {
-            return Promise.resolve({'success': false, 'message': 'Please provide details for the dinghy.'});
+            validEntry = false;
+            if (message) {
+                message += '/n';
+            }
+            message += 'Please provide details for the dinghy.';
         }
         if (crew && (!crew.name || crew.name === '')) {
-            return Promise.resolve({'success': false, 'message': 'Please provide details for the crew.'});
+            validEntry = false;
+            if (message) {
+                message += '/n';
+            }
+            message += 'Please provide details for the crew.';
         }
-        return this.model.updateEntry(entry, helm, dinghy, crew);
+        if (dinghy.dinghyClass.crewSize > 1 && !crew) {
+            validEntry = false;
+            if (message) {
+                message += '/n';
+            }
+            message += 'You have selected a dinghy with a crew. Please select a crew.';
+        }
+        if (validEntry) {
+            return this.model.updateEntry(entry, helm, dinghy, crew);
+        }
+        else {
+            return Promise.resolve({success: false, message: message});
+        }
     }
 
     /**
@@ -333,23 +470,6 @@ class DinghyRacingController {
             return Promise.resolve({success: false, message: message});
         }
         return this.model.updateEntryPosition(entry, newPosition);
-    }
-
-    /**
-     * Update the start sequence state of a race
-     * @param {Race} race to start
-     * @param {StartSequence} stage of the starting sequence reached
-     * @return {Promise<Result>}
-     */
-    updateRaceStartSequenceState(race, stage) {
-        // check valid race (a URL is sufficient, otherwise a name and start time is required)
-        if (!race.url && (!race.name || race.name === '' || !race.plannedStartTime)) {
-            return Promise.resolve({'success': false, 'message': 'Please provide details of the race.'});
-        }
-        if (!stage || !Object.keys(StartSequence).includes(stage.toUpperCase())) {
-            return Promise.resolve({'success': false, 'message': 'Please provide a valid start sequence stage.'});
-        }
-        return this.model.updateRaceStartSequenceState(race, stage);
     }
 
     /**

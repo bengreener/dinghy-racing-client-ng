@@ -179,14 +179,6 @@ class SessionStartSequence {
         }
         return {flags: newFlags, actions: newActions};
     }
-
-    /**
-     * Update the start status of the races in the underlying model
-     * @param {Date} time at which to calculate the start status
-     */
-    updateRaceState(time) {
-        this._raceStartSequences.forEach(rss => rss.updateRaceState(time));
-    }
 }
 
 export default SessionStartSequence;

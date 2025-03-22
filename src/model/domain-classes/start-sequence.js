@@ -62,7 +62,6 @@ class StartSequence {
     }
 
     _handleTick() {
-        this._sessionStartSequence.updateRaceState(this._clock.getTime());
         // call any external tick handlers set against this StartSequence
         this._tickHandlers.forEach((value) => {
             value();

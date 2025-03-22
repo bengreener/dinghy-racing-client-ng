@@ -100,7 +100,7 @@ function DinghyClassConsole() {
     }
 
     async function updateDinghyClass() {
-        const result = await controller.updateDinghyClass(selectedDinghyClass, dinghyClass.name, dinghyClass.crewSize, dinghyClass.portsmouthNumber);
+        const result = await controller.updateDinghyClass(dinghyClass);
         if (result.success) {
             clear();
         }
@@ -147,6 +147,7 @@ function DinghyClassConsole() {
                 <td id={dinghyClass.name} >{dinghyClass.name}</td>
                 <td id={dinghyClass.crewSize} >{dinghyClass.crewSize}</td>
                 <td id={dinghyClass.portsmouthNumber} >{dinghyClass.portsmouthNumber}</td>
+                <td id={dinghyClass.externalName} >{dinghyClass.externalName}</td>
             </tr>);
         });
         return rows;
@@ -173,6 +174,10 @@ function DinghyClassConsole() {
                     <input id='portsmouth-number-input' name='portsmouthNumber' className='w3-half' type='number' onChange={handleChange} value={dinghyClass.portsmouthNumber} />
                 </div>
                 <div className='w3-row' >
+                    <label htmlFor='external-name-input' className='w3-col m2' >External Name</label>
+                    <input id='external-name-input' name='externalName' className='w3-half' type='text' onChange={handleChange} value={dinghyClass.externalName} />
+                </div>
+                <div className='w3-row' >
                     <div className='w3-col m8' >
                         {selectedDinghyClass ? <button id='dinghy-class-update-button' className='w3-right' type='button' onClick={handleUpdate} >Update</button> : <button id='dinghy-class-create-button' className='w3-right' type='button' onClick={handleCreate}>Create</button>}
                         <button id='dinghy-class-cancel-button' className='w3-right' type='button' onClick={clear}>Cancel</button>
@@ -187,6 +192,7 @@ function DinghyClassConsole() {
                             <th>Dinghy Class</th>
                             <th>Crew Size</th>
                             <th>Portsmouth Number</th>
+                            <th>External Name</th>
                         </tr>
                     </thead>
                     <tbody>

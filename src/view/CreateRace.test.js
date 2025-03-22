@@ -20,7 +20,7 @@ import { customRender } from '../test-utilities/custom-renders';
 import { act } from 'react-dom/test-utils';
 import CreateRace from './CreateRace';
 import DinghyRacingModel from '../model/dinghy-racing-model';
-import { httpRootURL, wsRootURL, dinghyClasses, dinghyClassScorpion, dinghyClassesByNameAsc } from '../model/__mocks__/test-data';
+import { httpRootURL, wsRootURL, dinghyClasses, fleetScorpion, fleets } from '../model/__mocks__/test-data';
 import RaceType from '../model/domain-classes/race-type';
 import StartType from '../model/domain-classes/start-type';
 
@@ -28,7 +28,7 @@ jest.mock('../model/dinghy-racing-model');
 
 it('renders', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClasses})});
+    jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
     await act(async () => {
         customRender(<CreateRace />, model);
     });
@@ -36,37 +36,35 @@ it('renders', async () => {
     const inputName = screen.getByLabelText(/name/i);
     const inputTime = screen.getByLabelText(/time/i);
     const inputDuration = screen.getByLabelText(/duration/i);
-    const inputDinghyClass = screen.getByLabelText(/class/i);
+    const inputFleet = screen.getByLabelText(/fleet/i);
     const inputLaps = screen.getByLabelText(/laps/i);
     const inputType = screen.getByLabelText(/^type/i);
-    const selectRaceClass = screen.getByLabelText(/class/i);
-    const inputStartType = screen.getByLabelText(/start type/i);
+    const inputStartType = screen.getByLabelText(/type/i);
     expect(inputName).toHaveValue('');
     expect(inputTime).toHaveValue(new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16));
     expect(inputDuration).toHaveValue(45);
-    expect(inputDinghyClass).toHaveValue('');
+    expect(inputFleet).toHaveValue('');
     expect(inputType).toHaveValue('FLEET');
     expect(inputLaps).toHaveValue(5);
-    expect(selectRaceClass).toBeInTheDocument();
     expect(inputStartType).toBeInTheDocument();
 })
 
-it('displays the available dinghyClasses and handicap option', async () => {
+it('displays the available fleets', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
+    jest.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
     await act(async () => {
         customRender(<CreateRace />, model);
     });
     
-    const inputDinghyClass = screen.getByLabelText(/class/i);
-    const options = await within(inputDinghyClass).findAllByRole('option');
+    const inputFleet = screen.getByLabelText(/fleet/i);
+    const options = await within(inputFleet).findAllByRole('option');
     const optionsAvailable = options.map(element => {return {'text': element.text, 'value': element.value}});
-    expect(optionsAvailable).toEqual([{'text': '', 'value': ''}, {'text': 'Comet', 'value': 'Comet'}, {'text': 'Graduate', 'value': 'Graduate'}, {'text': 'Scorpion', 'value': 'Scorpion'}]);
+    expect(optionsAvailable).toEqual([{'text': '', 'value': ''}, {'text': 'Comet', 'value': 'Comet'}, {'text': 'Graduate', 'value': 'Graduate'}, {'text': 'Handicap', 'value': 'Handicap'}, {'text': 'Scorpion', 'value': 'Scorpion'}]);
 })
 
 it('provides a default option of 5 for the number of laps for the race', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
+    jest.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
     await act(async () => {
         customRender(<CreateRace />, model);
     });
@@ -79,7 +77,7 @@ it('accepts the name for a race', async () => {
     const user = userEvent.setup();
     
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve(dinghyClasses)});
+    jest.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve(dinghyClasses)});
     await act(async () => {
         customRender(<CreateRace />, model);
     });
@@ -95,7 +93,7 @@ it('accepts the time for the race', async () => {
     const user = userEvent.setup();
 
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve(dinghyClasses)});
+    jest.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve(dinghyClasses)});
     await act(async () => {
         customRender(<CreateRace />, model);
     });
@@ -107,28 +105,28 @@ it('accepts the time for the race', async () => {
     expect(inputTime).toHaveValue('2020-05-12T12:30');
 })
 
-it('accepts the class for the race', async () => {
+it('accepts the fleet for the race', async () => {
     const user = userEvent.setup();
 
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
+    jest.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
     await act(async () => {
         customRender(<CreateRace />, model);
     });
-    const selectRaceClass = screen.getByLabelText('Race Class');
+    const selectFleet = screen.getByLabelText('Fleet');
     await screen.findAllByRole('option');
     await act(async () => {
-        await user.selectOptions(selectRaceClass, 'Scorpion');
+        await user.selectOptions(selectFleet, 'Scorpion');
     });
     
-    expect(selectRaceClass).toHaveValue('Scorpion');
+    expect(selectFleet).toHaveValue('Scorpion');
 })
 
 it('accepts the duration of the race', async () => {
     const user = userEvent.setup();
 
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
+    jest.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
     await act(async () => {
         customRender(<CreateRace />, model);
     });
@@ -145,7 +143,7 @@ it('accepts the number of laps for the race', async () => {
     const user = userEvent.setup();
 
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
+    jest.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
     await act(async () => {
         customRender(<CreateRace />, model);
     });
@@ -162,7 +160,7 @@ it('accepts the type for the race', async () => {
     const user = userEvent.setup();
 
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
+    jest.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
     await act(async () => {
         customRender(<CreateRace />, model);
     });
@@ -178,11 +176,11 @@ it('accepts the start type for the race', async () => {
     const user = userEvent.setup();
 
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
+    jest.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
     await act(async () => {
         customRender(<CreateRace />, model);
     });
-    const inputStartType = screen.getByLabelText(/start type/i);
+    const inputStartType = screen.getByLabelText(/start sequence/i);
     await act(async () => {
         await user.selectOptions(inputStartType, '5-4-1-GO');
     });
@@ -192,10 +190,10 @@ it('accepts the start type for the race', async () => {
 
 it('calls the function passed in to onCreate prop', async () => {
     const user = userEvent.setup();
-    const fnOnCreate = jest.fn((race) => {return Promise.resolve({'success': true})});
+    const fnOnCreate = jest.fn((fleet) => {return Promise.resolve({'success': true})});
     
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
+    jest.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
     await act(async () => {
         customRender(<CreateRace onCreate={fnOnCreate} />, model);
     });
@@ -208,38 +206,13 @@ it('calls the function passed in to onCreate prop', async () => {
     expect(fnOnCreate).toBeCalledTimes(1);
 });
 
-describe('when empty value selected for dinghy class', () => {
-    it('calls the function passed in to onCreate prop with a blank dinghy class value', async () => {
-        const user = userEvent.setup();
-        const fnOnCreate = jest.fn((race) => {return Promise.resolve({'success': true})});
-
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
-        await act(async () => {
-            customRender(<CreateRace onCreate={fnOnCreate} />, model);
-        });
-
-        const btnCreate = screen.getByRole('button', {'name': 'Create'});
-        const selectRaceClass = screen.getByLabelText('Race Class');
-        await screen.findAllByRole('option');
-        await act(async () => {
-            await user.selectOptions(selectRaceClass, '');
-        });
-        await act(async () => {
-            await user.click(btnCreate);
-        });
-
-        expect(fnOnCreate).toBeCalledWith({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Math.trunc(Date.now() / 60000) * 60000), 'duration': 2700000, 'plannedLaps': 5, type: RaceType.FLEET, startType: StartType.CSCCLUBSTART});
-    });
-})
-
 it('calls the function passed in to onCreate prop with new race as parameter', async () => {
     
     const user = userEvent.setup();
-    const fnOnCreate = jest.fn((race) => {return Promise.resolve({'success': true})});
+    const fnOnCreate = jest.fn((fleet) => {return Promise.resolve({'success': true})});
     
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
+    jest.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
     await act(async () => {
         customRender(<CreateRace onCreate={fnOnCreate} />, model);
     });
@@ -247,7 +220,7 @@ it('calls the function passed in to onCreate prop with new race as parameter', a
     const inputTime = screen.getByLabelText(/time/i);
     const inputDuration = screen.getByLabelText(/duration/i);
     const inputLaps = screen.getByLabelText(/laps/i);
-    const selectRaceClass = screen.getByLabelText(/class/i);
+    const selectFleet = screen.getByLabelText(/fleet/i);
     const inputType = screen.getByLabelText(/^type/i);
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
     await screen.findAllByRole('option'); // wait for dinghy class options to be built
@@ -259,12 +232,12 @@ it('calls the function passed in to onCreate prop with new race as parameter', a
         await user.type(inputDuration, '65');
         await user.clear(inputLaps);
         await user.type(inputLaps, '7');
-        await user.selectOptions(selectRaceClass, 'Scorpion');
+        await user.selectOptions(selectFleet, 'Scorpion');
         await user.selectOptions(inputType, 'Pursuit');
         await user.click(btnCreate);
     });
 
-    expect(fnOnCreate).toBeCalledWith({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2020-05-12T12:30'), 'dinghyClass': dinghyClassScorpion, 'plannedLaps': 7, 'duration': 3900000, type: RaceType.PURSUIT, startType: StartType.CSCCLUBSTART});
+    expect(fnOnCreate).toBeCalledWith({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2020-05-12T12:30'), 'fleet': fleetScorpion, 'plannedLaps': 7, 'duration': 3900000, type: RaceType.PURSUIT, startType: StartType.CSCCLUBSTART});
 });
 
 describe('when creating a new race', () => {
@@ -273,7 +246,7 @@ describe('when creating a new race', () => {
         const fnOnCreate = jest.fn(() => {return Promise.resolve({'success': true})});
         
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
+        jest.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
         jest.spyOn(DinghyRacingModel, 'dinghyClassTemplate').mockImplementation(() => {return Promise.resolve({'name': '', 'url': ''})});
         jest.spyOn(DinghyRacingModel, 'raceTemplate').mockImplementation(() => {return {'name': '', 'plannedStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'url': ''}});
             await act(async () => {
@@ -282,17 +255,17 @@ describe('when creating a new race', () => {
         const inputName = screen.getByLabelText(/name/i);
         const inputTime = screen.getByLabelText(/time/i);
         const inputDuration = screen.getByLabelText(/duration/i);
-        const inputDinghyClass = screen.getByLabelText(/class/i);
+        const inputFleet = screen.getByLabelText(/fleet/i);
         const inputLaps = screen.getByLabelText(/laps/i);
         const inputType = screen.getByLabelText(/^type/i);
-        const inputStartType = screen.getByLabelText(/start type/i);
+        const inputStartType = screen.getByLabelText(/start sequence/i);
         const btnCreate = screen.getByRole('button', {'name': 'Create'});
         await act(async () => {
             await user.type(inputName, 'Scorpion A');
             await user.type(inputTime, '2020-05-12T12:30');
             await user.clear(inputDuration);
             await user.type(inputDuration, '65');
-            await user.type(inputDinghyClass, 'Scorpion');
+            await user.type(inputFleet, 'Scorpion');
             await user.selectOptions(inputType, 'Pursuit');
             await user.selectOptions(inputStartType, '5-4-1-GO');
             await user.click(btnCreate);
@@ -301,7 +274,7 @@ describe('when creating a new race', () => {
         expect(inputName).toHaveValue('');
         expect(inputTime).toHaveValue(new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16));
         expect(inputDuration).toHaveValue(45);
-        expect(inputDinghyClass).toHaveValue('');
+        expect(inputFleet).toHaveValue('');
         expect(inputType).toHaveValue('FLEET');
         expect(inputLaps).toHaveValue(5);
         expect(inputStartType).toHaveValue('CSCCLUBSTART');
@@ -311,7 +284,7 @@ describe('when creating a new race', () => {
         const fnOnCreate = jest.fn(() => {return Promise.resolve({'success': false, 'message': 'That was a bust!'})});
         
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(model, 'getDinghyClasses').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassesByNameAsc})});
+        jest.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
         await act(async () => {
             customRender(<CreateRace onCreate={fnOnCreate} />, model);
         });
@@ -323,4 +296,4 @@ describe('when creating a new race', () => {
     
         expect(message).toBeInTheDocument();
     })
-})
+});
