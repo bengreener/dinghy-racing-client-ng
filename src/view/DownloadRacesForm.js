@@ -83,7 +83,9 @@ function DownloadRacesForm() {
                 <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
             </form>
             <p className={userMessageClasses()}>{message}</p>
-            {races.map(race => <DownloadRace key={race.name+race.plannedStartTime.toISOString()} race={race} downloadFunction={handleRaceResultDownloadClick} />)}
+            <div className='scrollable'>
+                {races.map(race => <DownloadRace key={race.name+race.plannedStartTime.toISOString()} race={race} downloadFunction={handleRaceResultDownloadClick} />)}
+            </div>
         </div>
     );
 }
