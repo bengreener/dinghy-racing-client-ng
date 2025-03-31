@@ -76,7 +76,7 @@ function SignUp({ race }) {
         setHelmName('');
         setCrewName('');
         setSailNumber('');
-        setDinghyClassName('');
+        setDinghyClassName(race.fleet.dinghyClasses.length === 1 ? race.fleet.dinghyClasses[0].name : '');
         setMessage('');
         setSelectedEntry(null);
         setPreviousEntriesMap(new Map());

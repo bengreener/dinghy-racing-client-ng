@@ -9736,3 +9736,40 @@ describe('when a previous entry is selected', () => {
         expect(inputSailNumber).toHaveValue('1234');
     });
 });
+
+describe('when race is for a fleet with a single class', () => {
+    describe('when display has been cleared', () => {
+        it('allows a new dinghy to be created', async () => {
+            const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                return Promise.resolve({'success': true});
+            });
+            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation((dinghy) => {
+                if (!dinghy || !dinghy.sailNumber) {
+                    return Promise.resolve({'success': false, 'message': 'A sail number is required for a new dinghy.'});
+                }
+                if (!dinghy.dinghyClass || !dinghy.dinghyClass.name) {
+                    return Promise.resolve({'success': false, 'message': 'A dinghy class is required for a new dinghy.'});
+                }
+                return Promise.resolve({'success': true});
+            });
+            const user = userEvent.setup();
+            customRender(<SignUp race={raceCometA}/>, model, controller);
+            await act(async () => {
+                await user.click(screen.getByRole('button', {name: /cancel/i})); // clear form
+            });
+            const inputHelm = screen.getByLabelText(/helm/i);
+            const inputSailNumber = screen.getByLabelText(/sail/i);
+            await act(async () => {
+                await user.type(inputHelm, 'Jill Myer');
+                await user.type(inputSailNumber, 'g6754i');
+            });
+            const createButton = screen.getByRole('button', {'name': /add dinghy & sign-up/i});
+            await act(async () => {
+                await user.click(createButton);
+            });
+            expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url':''});
+            expect(signupToRaceSpy).toHaveBeenCalledWith(raceCometA, competitorJillMyer,
+                {'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
+        });
+    });
+})
