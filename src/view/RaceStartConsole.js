@@ -192,6 +192,7 @@ function RaceStartConsole () {
                 <p className={userMessageClasses()}>{message}</p>
             </CollapsableContainer>
             {buildStartCountdown()}
+            <div className='scrollable'>
             <CollapsableContainer heading={'Flags'}>
                 {flagsWithNextAction.map(flag => { return <FlagControl key={flag.flag.name} flag={flag.flag} timeToChange={flag.action ? Clock.now() - flag.action.time.valueOf() : 0} /> })} {/* use Clock.now to get adjusted time when synched to an external clock */}
             </CollapsableContainer>
@@ -201,6 +202,7 @@ function RaceStartConsole () {
                 })}
             </CollapsableContainer>
             <ActionListView actions={actions} />
+            </div>
         </div>
     );
 };
