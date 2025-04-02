@@ -130,7 +130,7 @@ class SessionStartSequence {
         // warning flags should be specific to each race
         // the preparatrory flag needs to use the earliest raise action and the last lower action from all race sessions
         // also want all warning flag actions to reference the same instance of flag (doesn't matter which one ;-))
-        const newFlags = [];
+        const newFlags = new Map();
         const newActions = [];
         let preparatoryFlag;
         let firstPreparatoryFlagRaise;
@@ -139,33 +139,38 @@ class SessionStartSequence {
             switch (flag.role) {
                 case FlagRole.PREPARATORY:
                     if (!preparatoryFlag) {
-                        // preparatoryFlag = {...flag, actions: []};
                         preparatoryFlag = flag;
                         preparatoryFlag.actions = [];
-                        newFlags.push(preparatoryFlag);
+                        newFlags.set(preparatoryFlag.name, preparatoryFlag);
                     }
                     break;
                 default:
-                    // newFlags.push({...flag});
-                    newFlags.push(flag);
+                    // add flag to nw flags if it is a new flag
+                    if (!newFlags.has(flag.name)) {
+                        newFlags.set(flag.name, flag);
+                    }
+                    else {
+                        // amalgamate actions for both versions of flag
+                        const masterFlag = newFlags.get(flag.name);
+                        // reset flag on actions of 'duplicate' flag
+                        flag.actions.forEach(action => action.flag = masterFlag);
+                        masterFlag.actions = masterFlag.actions.concat(flag.actions);
+                    }
             }
         });
         actions.forEach(action => {
             switch (action.flag.role) {
                 case FlagRole.PREPARATORY:
                     if (action.afterState === FlagState.RAISED && (!firstPreparatoryFlagRaise || action.time < firstPreparatoryFlagRaise.time)) {
-                        // firstPreparatoryFlagRaise = {...action, flag: preparatoryFlag};
                         firstPreparatoryFlagRaise = action;
                         firstPreparatoryFlagRaise.flag = preparatoryFlag;
                     }
                     else if (action.afterState === FlagState.LOWERED && (!lastPreparatoryFlagLower || action.time > lastPreparatoryFlagLower.time)) {
-                        // lastPreparatoryFlagLower = {...action, flag: preparatoryFlag};
                         lastPreparatoryFlagLower = action;
                         lastPreparatoryFlagLower.flag = preparatoryFlag;
                     }
                     break;
                 default:
-                    // newActions.push({...action});
                     newActions.push(action);
             }
         });
@@ -177,7 +182,7 @@ class SessionStartSequence {
             preparatoryFlag.actions.push(lastPreparatoryFlagLower);
             newActions.push(lastPreparatoryFlagLower);
         }
-        return {flags: newFlags, actions: newActions};
+        return {flags: Array.from(newFlags.values()), actions: newActions};
     }
 }
 

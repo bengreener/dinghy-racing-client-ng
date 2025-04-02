@@ -21,5 +21,5 @@ import FlagRole from './flag-role';
  * @property {String} name of the flag
  * @property {FlagRole} role of the flag
  * @property {FlagState} [state] of the flag
- * @property {Array<Action>} [actions] to chamge the state of the flag
+ * @property {Array<Action>} [actions] to change the state of the flag
  */
