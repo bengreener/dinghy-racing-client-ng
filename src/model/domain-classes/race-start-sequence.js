@@ -142,10 +142,10 @@ class RaceStartSequence {
             
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
 
-            const warningFlagRaiseAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + warningFlagOffsets.raise), afterState: FlagState.RAISED};
-            const warningFlagLowerAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + warningFlagOffsets.lower), afterState: FlagState.LOWERED};
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(race.plannedStartTime.valueOf() + preparatoryFlagOffsets.raise), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date (race.plannedStartTime.valueOf() + preparatoryFlagOffsets.lower), afterState: FlagState.LOWERED};
+            const warningFlagRaiseAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + warningFlagOffsets.raise), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const warningFlagLowerAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + warningFlagOffsets.lower), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(race.plannedStartTime.valueOf() + preparatoryFlagOffsets.raise), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date (race.plannedStartTime.valueOf() + preparatoryFlagOffsets.lower), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
 
             warningFlag.actions.push(warningFlagRaiseAction);
             warningFlag.actions.push(warningFlagLowerAction);
@@ -175,10 +175,10 @@ class RaceStartSequence {
                     const warningFlag = {name: sortedDinghyClasses[i].name + ' Class Flag', role: FlagRole.WARNING, actions: []};
                     const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
 
-                    const warningFlagRaiseAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + warningFlagOffsets.raise), afterState: FlagState.RAISED};
-                    const warningFlagLowerAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + warningFlagOffsets.lower), afterState: FlagState.LOWERED};
-                    const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(race.plannedStartTime.valueOf() + preparatoryFlagOffsets.raise), afterState: FlagState.RAISED};
-                    const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(race.plannedStartTime.valueOf() + preparatoryFlagOffsets.lower), afterState: FlagState.LOWERED};
+                    const warningFlagRaiseAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + warningFlagOffsets.raise), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                    const warningFlagLowerAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + warningFlagOffsets.lower), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                    const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(race.plannedStartTime.valueOf() + preparatoryFlagOffsets.raise), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                    const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(race.plannedStartTime.valueOf() + preparatoryFlagOffsets.lower), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
 
                     warningFlag.actions.push(warningFlagRaiseAction);
                     warningFlag.actions.push(warningFlagLowerAction);
@@ -198,8 +198,8 @@ class RaceStartSequence {
 
                     let offset = Math.ceil((baseDuration - ((baseDuration * sortedDinghyClasses[i].portsmouthNumber) / basePN)) / 1000) * 1000; // round to the nearest second as this is the precision we are working with
 
-                    const warningFlagRaiseAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + offset - 60000), afterState: FlagState.RAISED};
-                    const warningFlagLowerAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + offset), afterState: FlagState.LOWERED};
+                    const warningFlagRaiseAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + offset - 60000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                    const warningFlagLowerAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + offset), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
 
                     warningFlag.actions.push(warningFlagRaiseAction);
                     warningFlag.actions.push(warningFlagLowerAction);

@@ -336,14 +336,14 @@ it('returns list of actions for the 2 races', () => {
     const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
     const graduateAWarningFlag = {name: 'Graduate Class Flag', role: FlagRole.WARNING, actions: []};
 
-    const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-    const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+    const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+    const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
-    const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-    const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceGraduateA.plannedStartTime, afterState: FlagState.LOWERED};
+    const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+    const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceGraduateA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
-    const graduateAWarningflagRaiseAction = {flag: graduateAWarningFlag, time: new Date(raceGraduateA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-    const graduateAWarningflagLowerAction = {flag: graduateAWarningFlag, time: raceGraduateA.plannedStartTime, afterState: FlagState.LOWERED};
+    const graduateAWarningflagRaiseAction = {flag: graduateAWarningFlag, time: new Date(raceGraduateA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+    const graduateAWarningflagLowerAction = {flag: graduateAWarningFlag, time: raceGraduateA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
 
     scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
     scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);

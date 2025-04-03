@@ -108,7 +108,7 @@ class StartSequence {
         const now = this._clock.getTime();
         let prepareForRaceStartStateChange = false;
         for (let action of this._sessionStartSequence.getActions()) {
-            if (Math.trunc(action.time.valueOf() / 1000) === Math.trunc((now.valueOf() + 60000) / 1000)) {
+            if (action.signalPrepareRaceStartStateChange && Math.trunc(action.time.valueOf() / 1000) === Math.trunc((now.valueOf() + 60000) / 1000)) {
                 prepareForRaceStartStateChange = true;
                 break;
             }
@@ -125,7 +125,7 @@ class StartSequence {
         const now = this._clock.getTime();
         let raceStartStateChange = false;
         for (let action of this._sessionStartSequence.getActions()) {
-            if (Math.trunc(action.time.valueOf() / 1000) === Math.trunc(now.valueOf() / 1000)) {
+            if (action.signalRaceStartStateChange && Math.trunc(action.time.valueOf() / 1000) === Math.trunc(now.valueOf() / 1000)) {
                 raceStartStateChange = true;
                 break;
             }

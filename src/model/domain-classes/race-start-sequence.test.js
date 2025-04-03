@@ -55,10 +55,10 @@ describe('when using CSC club start', () => {
         
             const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, actions: []};
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
-            const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+            const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
             warningFlag.actions.push(warningflagRaiseAction);
             warningFlag.actions.push(warningflagLowerAction);
@@ -74,10 +74,10 @@ describe('when using CSC club start', () => {
             
                 const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -92,10 +92,10 @@ describe('when using CSC club start', () => {
             
                 const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -115,10 +115,10 @@ describe('when using CSC club start', () => {
             
                 const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -133,10 +133,10 @@ describe('when using CSC club start', () => {
             
                 const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -156,10 +156,10 @@ describe('when using CSC club start', () => {
             
                 const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.RAISED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -174,10 +174,10 @@ describe('when using CSC club start', () => {
             
                 const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.RAISED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -197,10 +197,10 @@ describe('when using CSC club start', () => {
             
                 const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -215,10 +215,10 @@ describe('when using CSC club start', () => {
             
                 const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -237,10 +237,10 @@ describe('when using CSC club start', () => {
             
             const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, actions: []};
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
-            const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+            const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
             warningFlag.actions.push(warningflagRaiseAction);
             warningFlag.actions.push(warningflagLowerAction);
@@ -261,10 +261,10 @@ describe('when using CSC club start', () => {
             
                 const warningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -281,10 +281,10 @@ describe('when using CSC club start', () => {
             
                 const warningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -300,10 +300,10 @@ describe('when using CSC club start', () => {
             
                 const warningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.RAISED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -319,10 +319,10 @@ describe('when using CSC club start', () => {
             
                 const warningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -338,10 +338,10 @@ describe('when using CSC club start', () => {
             
             const warningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, actions: []};
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
-            const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
+            const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
             warningFlag.actions.push(warningflagRaiseAction);
             warningFlag.actions.push(warningflagLowerAction);
@@ -367,14 +367,14 @@ describe('when using CSC club start', () => {
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
             const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, actions: []};
             const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, actions: []};
-            const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-            const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-            const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-            const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-            const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
+            const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
             baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
             baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -402,14 +402,14 @@ describe('when using CSC club start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -436,14 +436,14 @@ describe('when using CSC club start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -478,14 +478,14 @@ describe('when using CSC club start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -512,14 +512,14 @@ describe('when using CSC club start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -554,14 +554,14 @@ describe('when using CSC club start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.RAISED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -588,14 +588,14 @@ describe('when using CSC club start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.RAISED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -630,14 +630,14 @@ describe('when using CSC club start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -664,14 +664,14 @@ describe('when using CSC club start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -706,14 +706,14 @@ describe('when using CSC club start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -740,14 +740,14 @@ describe('when using CSC club start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -782,14 +782,14 @@ describe('when using CSC club start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -816,14 +816,14 @@ describe('when using CSC club start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -858,14 +858,14 @@ describe('when using CSC club start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -892,14 +892,14 @@ describe('when using CSC club start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -932,10 +932,10 @@ describe('when using CSC club start', () => {
             
             const warningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, actions: []};
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
-            const warningflagRaiseAction = {flag: warningFlag, time: new Date(racePursuitA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const warningflagLowerAction = {flag: warningFlag, time: racePursuitA.plannedStartTime, afterState: FlagState.LOWERED};
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(racePursuitA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: racePursuitA.plannedStartTime, afterState: FlagState.LOWERED};
+            const warningflagRaiseAction = {flag: warningFlag, time: new Date(racePursuitA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const warningflagLowerAction = {flag: warningFlag, time: racePursuitA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(racePursuitA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: racePursuitA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
             warningFlag.actions.push(warningflagRaiseAction);
             warningFlag.actions.push(warningflagLowerAction);
@@ -958,10 +958,10 @@ describe('when using RRS26 start', () => {
         
             const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, actions: []};
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
-            const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+            const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
             warningFlag.actions.push(warningflagRaiseAction);
             warningFlag.actions.push(warningflagLowerAction);
@@ -977,10 +977,10 @@ describe('when using RRS26 start', () => {
             
                 const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -995,10 +995,10 @@ describe('when using RRS26 start', () => {
             
                 const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -1018,10 +1018,10 @@ describe('when using RRS26 start', () => {
             
                 const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -1036,10 +1036,10 @@ describe('when using RRS26 start', () => {
             
                 const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -1059,10 +1059,10 @@ describe('when using RRS26 start', () => {
             
                 const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.RAISED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -1077,10 +1077,10 @@ describe('when using RRS26 start', () => {
             
                 const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.RAISED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -1100,10 +1100,10 @@ describe('when using RRS26 start', () => {
             
                 const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -1118,10 +1118,10 @@ describe('when using RRS26 start', () => {
             
                 const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -1140,10 +1140,10 @@ describe('when using RRS26 start', () => {
             
             const warningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, actions: []};
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
-            const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+            const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const warningflagLowerAction = {flag: warningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
             warningFlag.actions.push(warningflagRaiseAction);
             warningFlag.actions.push(warningflagLowerAction);
@@ -1164,10 +1164,10 @@ describe('when using RRS26 start', () => {
             
                 const warningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -1184,10 +1184,10 @@ describe('when using RRS26 start', () => {
             
                 const warningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -1203,10 +1203,10 @@ describe('when using RRS26 start', () => {
             
                 const warningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.RAISED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -1222,10 +1222,10 @@ describe('when using RRS26 start', () => {
             
                 const warningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 warningFlag.actions.push(warningflagRaiseAction);
                 warningFlag.actions.push(warningflagLowerAction);
@@ -1241,10 +1241,10 @@ describe('when using RRS26 start', () => {
             
             const warningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, actions: []};
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
-            const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+            const warningflagRaiseAction = {flag: warningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const warningflagLowerAction = {flag: warningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
             warningFlag.actions.push(warningflagRaiseAction);
             warningFlag.actions.push(warningflagLowerAction);
@@ -1270,14 +1270,14 @@ describe('when using RRS26 start', () => {
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
             const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, actions: []};
             const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, actions: []};
-            const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-            const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-            const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-            const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-            const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+            const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
             baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
             baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -1305,14 +1305,14 @@ describe('when using RRS26 start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -1339,14 +1339,14 @@ describe('when using RRS26 start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -1381,14 +1381,14 @@ describe('when using RRS26 start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -1415,14 +1415,14 @@ describe('when using RRS26 start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -1457,14 +1457,14 @@ describe('when using RRS26 start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.RAISED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -1491,14 +1491,14 @@ describe('when using RRS26 start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.RAISED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -1533,14 +1533,14 @@ describe('when using RRS26 start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -1567,14 +1567,14 @@ describe('when using RRS26 start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -1609,14 +1609,14 @@ describe('when using RRS26 start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -1643,14 +1643,14 @@ describe('when using RRS26 start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -1685,14 +1685,14 @@ describe('when using RRS26 start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -1719,14 +1719,14 @@ describe('when using RRS26 start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -1761,14 +1761,14 @@ describe('when using RRS26 start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -1795,14 +1795,14 @@ describe('when using RRS26 start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -1837,14 +1837,14 @@ describe('when using RRS26 start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -1871,14 +1871,14 @@ describe('when using RRS26 start', () => {
                 const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
                 const topperWarningFlag = {name: 'Topper Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
                 const laserWarningFlag = {name: 'Laser Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED};
-                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED};
-                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED};
-                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED};
-                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED};
-                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+                const baseWarningFlagRaiseAction = {flag: baseWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const baseWarningFlagLowerAction = {flag: baseWarningFlag, time: raceWithDinghyClasses.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagRaiseAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 682000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const topperWarningFlagLowerAction = {flag: topperWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagRaiseAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000 + 1075000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const laserWarningFlagLowerAction = {flag: laserWarningFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
                 baseWarningFlag.actions.push(baseWarningFlagRaiseAction);
                 baseWarningFlag.actions.push(baseWarningFlagLowerAction);
@@ -1911,10 +1911,10 @@ describe('when using RRS26 start', () => {
             
             const warningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, actions: []};
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
-            const warningflagRaiseAction = {flag: warningFlag, time: new Date(racePursuitA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const warningflagLowerAction = {flag: warningFlag, time: racePursuitA.plannedStartTime, afterState: FlagState.LOWERED};
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(racePursuitA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(racePursuitA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED};
+            const warningflagRaiseAction = {flag: warningFlag, time: new Date(racePursuitA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const warningflagLowerAction = {flag: warningFlag, time: racePursuitA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(racePursuitA.plannedStartTime.valueOf() - 240000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(racePursuitA.plannedStartTime.valueOf() - 60000), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
             warningFlag.actions.push(warningflagRaiseAction);
             warningFlag.actions.push(warningflagLowerAction);

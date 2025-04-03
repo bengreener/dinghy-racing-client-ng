@@ -5824,20 +5824,20 @@ describe('when a StartSequence is requested', () => {
         const cometAWarningFlag = {name: 'Comet Class Flag', role: FlagRole.WARNING, actions: []};
         const handicapAWarningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, actions: []};
     
-        const scorpionAWarningFlagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-        const scorpionAWarningFlagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+        const scorpionAWarningFlagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        const scorpionAWarningFlagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
         
-        const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-        const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
+        const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
         
-        const graduateAWarningFlagRaiseAction = {flag: graduateAWarningFlag, time: new Date(raceGraduateA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-        const graduateAWarningFlagLowerAction = {flag: graduateAWarningFlag, time: raceGraduateA.plannedStartTime, afterState: FlagState.LOWERED};
+        const graduateAWarningFlagRaiseAction = {flag: graduateAWarningFlag, time: new Date(raceGraduateA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        const graduateAWarningFlagLowerAction = {flag: graduateAWarningFlag, time: raceGraduateA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
 
-        const cometAWarningFlagRaiseAction = {flag: cometAWarningFlag, time: new Date(raceCometA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-        const cometAWarningFlagLowerAction = {flag: cometAWarningFlag, time: raceCometA.plannedStartTime, afterState: FlagState.LOWERED};
+        const cometAWarningFlagRaiseAction = {flag: cometAWarningFlag, time: new Date(raceCometA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        const cometAWarningFlagLowerAction = {flag: cometAWarningFlag, time: raceCometA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
 
-        const handicapAWarningFlagRaiseAction = {flag: handicapAWarningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-        const handicapAWarningFlagLowerAction = {flag: handicapAWarningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
+        const handicapAWarningFlagRaiseAction = {flag: handicapAWarningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        const handicapAWarningFlagLowerAction = {flag: handicapAWarningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
     
         scorpionAWarningFlag.actions.push(scorpionAWarningFlagRaiseAction);
         scorpionAWarningFlag.actions.push(scorpionAWarningFlagLowerAction);
@@ -5935,8 +5935,8 @@ describe('when a StartSequence is requested', () => {
                 const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
 
                 const cometWarningFlag = {name: 'Comet Class Flag', role: FlagRole.WARNING, actions: []};
-                const cometWarningFlagRaiseAction = {flag: cometWarningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-                const cometWarningFlagLowerAction = {flag: cometWarningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
+                const cometWarningFlagRaiseAction = {flag: cometWarningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                const cometWarningFlagLowerAction = {flag: cometWarningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
                 cometWarningFlag.actions.push(cometWarningFlagRaiseAction);
                 cometWarningFlag.actions.push(cometWarningFlagLowerAction);
 

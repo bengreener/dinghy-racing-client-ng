@@ -20,4 +20,6 @@
  * @property {Flag} flag the action relates to
  * @property {Date} time of the action
  * @property {FlagState} afterState state of the flag after the action
+ * @property {boolean} signalPrepareRaceStartStateChange whether to signal a prepare for start state change for this action
+ * @property {boolean} signalRaceStartStateChange whether to signal a start state change for this action
  */
