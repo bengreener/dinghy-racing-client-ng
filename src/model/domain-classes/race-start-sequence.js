@@ -160,8 +160,6 @@ class RaceStartSequence {
             actions.push(preparatoryFlagLowerAction);
         }
         else if (race.type === RaceType.PURSUIT) {
-            const combineStartOffset = 15000; // offset between starts that if less than or equal to combine the starts (constant set to ease transition to making optional and allowing to be specified for each race)
-            let lastStartOffset = 0; // the offset from the start of the race of the last start. Updated each time a start is calculated for a class. 
             // get dinghy classes of boats signed up to race and sort in PN order
             const sortedDinghyClasses = sortArray(race.dinghyClasses, (dinghyClass => dinghyClass.portsmouthNumber), true);
             // first flag for the race is going to be for the slowest class in the races fleet
@@ -173,7 +171,6 @@ class RaceStartSequence {
             const baseDuration = race.duration;
             for(let i = 0; i < sortedDinghyClasses.length; i++) {
                 if (i === 0) {
-                    lastStartOffset = 0; // offset of 1st class to start is 0
                     // setup starting flags for first dinghy class
                     const warningFlag = {name: sortedDinghyClasses[i].name + ' Class Flag', role: FlagRole.WARNING, actions: []};
                     const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
@@ -200,12 +197,6 @@ class RaceStartSequence {
                     const warningFlag = {name: sortedDinghyClasses[i].name + ' Class Flag', role: FlagRole.WARNING, actions: []};
 
                     let offset = Math.ceil((baseDuration - ((baseDuration * sortedDinghyClasses[i].portsmouthNumber) / basePN)) / 1000) * 1000; // round to the nearest second as this is the precision we are working with
-
-                    if (combineStartOffset && (offset - combineStartOffset) <= lastStartOffset) {
-                        offset = lastStartOffset;
-                    } else {
-                        lastStartOffset = offset;
-                    }
 
                     const warningFlagRaiseAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + offset - 60000), afterState: FlagState.RAISED};
                     const warningFlagLowerAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + offset), afterState: FlagState.LOWERED};
