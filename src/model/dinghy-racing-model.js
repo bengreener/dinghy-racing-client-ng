@@ -1470,7 +1470,7 @@ class DinghyRacingModel {
         const result = await this.getRacesBetweenTimesForType(startTime, endTime, type, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
 
         if (result.success) {
-            const startSequence = new StartSequence(result.domainObject, this);
+            const startSequence = new StartSequence(result.domainObject);
             return Promise.resolve({success: true, domainObject: startSequence});
         }
         else {

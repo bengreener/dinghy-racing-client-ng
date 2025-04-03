@@ -4893,6 +4893,14 @@ describe('when starting a race', () => {
             expect(result).toEqual({'success': false, 'message': 'Something went wrong'});
         });
     });
+    describe('when race is a pursuit race', () => {
+        describe('when race is an open handicap', () => {
+            it('provides the base class to be used for the fleet when calculating start offsets', async () => {
+                // open handicap is defined as a fleet with no explicit classes set and RaceStartSequence needs a base class to caclculate offsets so additional action is required by DinghyRacingModel to supply this class
+                expect(false).toBeTruthy();
+            });
+        });
+    });
 });
 
 describe('when provided with a duration in ISO 8601 format', () => {

@@ -24,7 +24,6 @@ import SessionStartSequence from './session-start-sequence';
 class StartSequence {
 
     _races = [];
-    _model;
     _clock;
     _sessionStartSequence;
 
@@ -33,9 +32,8 @@ class StartSequence {
     /**
      * Create an instance of StartSequence
      * @param {Array<Race>} races to start
-     * @param {DinghyRacingModel} model to use to update underlying data
      */
-    constructor(races, model) {
+    constructor(races) {
         this._handleTick = this._handleTick.bind(this);
         this.getPrepareForRaceStartStateChange = this.getPrepareForRaceStartStateChange.bind(this);
         this.getRaceStartStateChange = this.getRaceStartStateChange.bind(this);
@@ -47,7 +45,6 @@ class StartSequence {
         this.dispose = this.dispose.bind(this);
 
         this._races = races;
-        this._model = model;
         this._races.forEach(race => {
             race.clock = new Clock(race.plannedStartTime);
         });
@@ -58,7 +55,7 @@ class StartSequence {
             this._clock = new Clock(new Date());
         }
         this._clock.addTickHandler(this._handleTick);
-        this._sessionStartSequence = new SessionStartSequence(races, model);
+        this._sessionStartSequence = new SessionStartSequence(races);
     }
 
     _handleTick() {
@@ -153,7 +150,7 @@ class StartSequence {
 
     /**
      * Start clock
-     * Starting clock automatically was causing issues when useEffect in referencing componenet was cancelled before asynch feth returned
+     * Starting clock automatically was causing issues when useEffect in referencing componenet was cancelled before asynch fetch returned
      */
     startClock() {
         this._clock.start();

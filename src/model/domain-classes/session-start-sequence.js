@@ -29,9 +29,9 @@ class SessionStartSequence {
      * Create a new instance of SessionStartSequence
      * @param {Array<Race>} races
      */
-    constructor(races, model) {
+    constructor(races) {
         this._races = races;
-        this._raceStartSequences = races.map(race => new RaceStartSequence(race, model));
+        this._raceStartSequences = races.map(race => new RaceStartSequence(race));
         ({flags: this._flags, actions: this._actions} = this._generateFlags(this._raceStartSequences));
     }
 

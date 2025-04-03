@@ -24,11 +24,9 @@ class RaceStartSequence {
     _race;
     _flags = [];
     _actions = [];
-    _model;
 
-    constructor(race, model) {
+    constructor(race) {
         this._race = race;
-        this._model = model;
         ({flags: this._flags, actions: this._actions} = this._generateFlags(race));
     }
 
@@ -165,10 +163,11 @@ class RaceStartSequence {
             const combineStartOffset = 15000; // offset between starts that if less than or equal to combine the starts (constant set to ease transition to making optional and allowing to be specified for each race)
             let lastStartOffset = 0; // the offset from the start of the race of the last start. Updated each time a start is calculated for a class. 
             // get dinghy classes of boats signed up to race and sort in PN order
-            const sortedDinghyClasses = sortArray(race.dinghyClasses, (dinghyClass => dinghyClass.portsmouthNumber)).reverse();
-            // first flag for the race is going to be the base class for the race (start with assumption this is a Club Optimist)
-            if (!sortedDinghyClasses.some(dc => dc.name === "Optimist (Club)")) {
-                sortedDinghyClasses.unshift({name: "Optimist (Club)", crewSize: 1, portsmouthNumber: 1831});
+            const sortedDinghyClasses = sortArray(race.dinghyClasses, (dinghyClass => dinghyClass.portsmouthNumber), true);
+            // first flag for the race is going to be for the slowest class in the races fleet
+            const baseClass = sortArray(race.fleet.dinghyClasses, (dinghyClass => dinghyClass.portsmouthNumber), true)[0];
+            if (!sortedDinghyClasses.some(dc => dc.name === baseClass.name)) {
+                sortedDinghyClasses.unshift(baseClass);
             };
             const basePN = sortedDinghyClasses[0].portsmouthNumber;
             const baseDuration = race.duration;

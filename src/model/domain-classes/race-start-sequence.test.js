@@ -356,7 +356,11 @@ describe('when using CSC club start', () => {
     });
     describe('when Pursuit race', () => {
         it('returns flags', () => {
-            const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
+            const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                name: 'Handicap', 
+                dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+            }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
             const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
         
             const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, actions: []};
@@ -387,7 +391,11 @@ describe('when using CSC club start', () => {
         });
         describe('when 11 minutes before the start of the race', () => {
             it('returns correct flags', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -417,7 +425,11 @@ describe('when using CSC club start', () => {
                 expect(flags).toEqual([baseWarningFlag, preparatoryFlag, topperWarningFlag, laserWarningFlag]);
             });
             it('returns correct flags with correct next action', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -455,7 +467,11 @@ describe('when using CSC club start', () => {
         });
         describe('when 10 minutes before the start of the race', () => {
             it('returns correct flags', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
@@ -485,7 +501,11 @@ describe('when using CSC club start', () => {
                 expect(flags).toEqual([baseWarningFlag, preparatoryFlag, topperWarningFlag, laserWarningFlag]);
             });
             it('returns correct flags with correct next action', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
@@ -523,7 +543,11 @@ describe('when using CSC club start', () => {
         });
         describe('when 5 minutes before the start of the race', () => {
             it('returns correct flags', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
@@ -553,7 +577,11 @@ describe('when using CSC club start', () => {
                 expect(flags).toEqual([baseWarningFlag, preparatoryFlag, topperWarningFlag, laserWarningFlag]);
             });
             it('returns correct flags with correct next action', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
@@ -591,7 +619,11 @@ describe('when using CSC club start', () => {
         });
         describe('when 0 minutes before the start of the race', () => {
             it('returns correct flags', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -621,7 +653,11 @@ describe('when using CSC club start', () => {
                 expect(flags).toEqual([baseWarningFlag, preparatoryFlag, topperWarningFlag, laserWarningFlag]);
             });
             it('returns correct flags with correct next action', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -659,7 +695,11 @@ describe('when using CSC club start', () => {
         });
         describe('when 11 minutes after the start of the race', () => {
             it('returns correct flags', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -689,7 +729,11 @@ describe('when using CSC club start', () => {
                 expect(flags).toEqual([baseWarningFlag, preparatoryFlag, topperWarningFlag, laserWarningFlag]);
             });
             it('returns correct flags with correct next action', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -727,7 +771,11 @@ describe('when using CSC club start', () => {
         });
         describe('when 17 minutes after the start of the race', () => {
             it('returns correct flags', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -757,7 +805,11 @@ describe('when using CSC club start', () => {
                 expect(flags).toEqual([baseWarningFlag, preparatoryFlag, topperWarningFlag, laserWarningFlag]);
             });
             it('returns correct flags with correct next action', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -795,7 +847,11 @@ describe('when using CSC club start', () => {
         });
         describe('when 17 minutes 55 seconds after the start of the race', () => {
             it('returns correct flags', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -825,7 +881,11 @@ describe('when using CSC club start', () => {
                 expect(flags).toEqual([baseWarningFlag, preparatoryFlag, topperWarningFlag, laserWarningFlag]);
             });
             it('returns correct flags with correct next action', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -862,7 +922,12 @@ describe('when using CSC club start', () => {
             });
         });
         it('returns the correct actions', () => {
-            const raceStartSequence = new RaceStartSequence({...racePursuitA, startType: StartType.CSCCLUBSTART});
+            const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                name: 'Handicap', 
+                dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+            }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
+            const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             const actions = raceStartSequence.getActions();
             
             const warningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, actions: []};
@@ -1194,7 +1259,11 @@ describe('when using RRS26 start', () => {
     });
     describe('when Pursuit race', () => {
         it('returns flags', () => {
-            const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
+            const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                name: 'Handicap', 
+                dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+            }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
             const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
         
             const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, actions: []};
@@ -1225,7 +1294,11 @@ describe('when using RRS26 start', () => {
         });
         describe('when 6 minutes before the start of the race', () => {
             it('returns correct flags', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -1255,7 +1328,11 @@ describe('when using RRS26 start', () => {
                 expect(flags).toEqual([baseWarningFlag, preparatoryFlag, topperWarningFlag, laserWarningFlag]);
             });
             it('returns correct flags with correct next action', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -1293,7 +1370,11 @@ describe('when using RRS26 start', () => {
         });
         describe('when 5 minutes before the start of the race', () => {
             it('returns correct flags', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
@@ -1323,7 +1404,11 @@ describe('when using RRS26 start', () => {
                 expect(flags).toEqual([baseWarningFlag, preparatoryFlag, topperWarningFlag, laserWarningFlag]);
             });
             it('returns correct flags with correct next action', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
@@ -1361,7 +1446,11 @@ describe('when using RRS26 start', () => {
         });
         describe('when 4 minutes before the start of the race', () => {
             it('returns correct flags', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
@@ -1391,7 +1480,11 @@ describe('when using RRS26 start', () => {
                 expect(flags).toEqual([baseWarningFlag, preparatoryFlag, topperWarningFlag, laserWarningFlag]);
             });
             it('returns correct flags with correct next action', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
@@ -1429,7 +1522,11 @@ describe('when using RRS26 start', () => {
         });
         describe('when 1 minutes before the start of the race', () => {
             it('returns correct flags', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
@@ -1459,7 +1556,11 @@ describe('when using RRS26 start', () => {
                 expect(flags).toEqual([baseWarningFlag, preparatoryFlag, topperWarningFlag, laserWarningFlag]);
             });
             it('returns correct flags with correct next action', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
@@ -1497,7 +1598,11 @@ describe('when using RRS26 start', () => {
         });
         describe('when 0 minutes before the start of the race', () => {
             it('returns correct flags', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -1527,7 +1632,11 @@ describe('when using RRS26 start', () => {
                 expect(flags).toEqual([baseWarningFlag, preparatoryFlag, topperWarningFlag, laserWarningFlag]);
             });
             it('returns correct flags with correct next action', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -1565,7 +1674,11 @@ describe('when using RRS26 start', () => {
         });
         describe('when 11 minutes after the start of the race', () => {
             it('returns correct flags', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -1595,7 +1708,11 @@ describe('when using RRS26 start', () => {
                 expect(flags).toEqual([baseWarningFlag, preparatoryFlag, topperWarningFlag, laserWarningFlag]);
             });
             it('returns correct flags with correct next action', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -1633,7 +1750,11 @@ describe('when using RRS26 start', () => {
         });
         describe('when 17 minutes after the start of the race', () => {
             it('returns correct flags', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -1663,7 +1784,11 @@ describe('when using RRS26 start', () => {
                 expect(flags).toEqual([baseWarningFlag, preparatoryFlag, topperWarningFlag, laserWarningFlag]);
             });
             it('returns correct flags with correct next action', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -1701,7 +1826,11 @@ describe('when using RRS26 start', () => {
         });
         describe('when 17 minutes 55 seconds after the start of the race', () => {
             it('returns correct flags', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                    name: 'Handicap', 
+                    dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                    url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+                }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -1731,7 +1860,11 @@ describe('when using RRS26 start', () => {
                 expect(flags).toEqual([baseWarningFlag, preparatoryFlag, topperWarningFlag, laserWarningFlag]);
             });
             it('returns correct flags with correct next action', () => {
-                const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
+                const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                name: 'Handicap', 
+                dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+            }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
                 const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             
                 const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
@@ -1768,7 +1901,12 @@ describe('when using RRS26 start', () => {
             });
         });
         it('returns the correct actions', () => {
-            const raceStartSequence = new RaceStartSequence({...racePursuitA, startType: StartType.RRS26});
+            const raceWithDinghyClasses = {...racePursuitA, fleet: {
+                name: 'Handicap', 
+                dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+                url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+            }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
+            const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
             const actions = raceStartSequence.getActions();
             
             const warningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, actions: []};
@@ -1793,7 +1931,12 @@ describe('when using RRS26 start', () => {
 
 describe('when race is a pursuit race', () => {
     it('combines starts that are 15 seconds or less after the last start', () => {
-        const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Cadet', crewSize: 1, portsmouthNumber: 1455}, {name: 'RS Tera', crewSize: 1, portsmouthNumber: 1445}, {name: 'Topper 4.2', crewSize: 1, portsmouthNumber: 1440}], startType: StartType.RRS26};
+        // const raceWithDinghyClasses = {...racePursuitA, dinghyClasses: [{name: 'Cadet', crewSize: 1, portsmouthNumber: 1455}, {name: 'RS Tera', crewSize: 1, portsmouthNumber: 1445}, {name: 'Topper 4.2', crewSize: 1, portsmouthNumber: 1440}], startType: StartType.RRS26};
+        const raceWithDinghyClasses = {...racePursuitA, fleet: {
+            name: 'Handicap', 
+            dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
+            url: 'http://localhost:8081/dinghyracing/api/fleets/2'
+        }, dinghyClasses: [{name: 'Cadet', crewSize: 1, portsmouthNumber: 1455}, {name: 'RS Tera', crewSize: 1, portsmouthNumber: 1445}, {name: 'Topper 4.2', crewSize: 1, portsmouthNumber: 1440}], startType: StartType.RRS26};
         const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
     
         const baseWarningFlag = {name: 'Optimist (Club) Class Flag', role: FlagRole.WARNING, actions: []};
