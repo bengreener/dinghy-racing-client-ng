@@ -1144,6 +1144,14 @@ class DinghyRacingModel {
     }
 
     /**
+     * Get the slowest dinghy class
+     * @returns {Promise<Result>}
+     */
+    async getSlowestDinghyClass() {
+        return this.getDinghyClass(this.httpRootURL + '/dinghyClasses/search/findTopByOrderByPortsmouthNumberDesc');
+    }
+
+    /**
      * Get dinghy classes in ascending order by class name
      * If page and/ or size are not provided will return all dinghy classes
      * @param {Integer} [page] number to return (0 indexed)
@@ -1470,6 +1478,23 @@ class DinghyRacingModel {
         const result = await this.getRacesBetweenTimesForType(startTime, endTime, type, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
 
         if (result.success) {
+            let slowestDinghyClass;
+            if (type === RaceType.PURSUIT && result.domainObject.some(race => race.fleet.dinghyClasses.length === 0)) {
+                const slowestDinghyClassResult = await this.getSlowestDinghyClass();
+                if (slowestDinghyClassResult.success) {
+                    slowestDinghyClass = slowestDinghyClassResult.domainObject;
+                }
+                else {
+                    return Promise.resolve(slowestDinghyClassResult);
+                }
+            }
+            if (slowestDinghyClass) {
+                result.domainObject.forEach(race => {
+                    if (race.fleet.dinghyClasses.length === 0) {
+                        race.fleet.dinghyClasses = [slowestDinghyClass];
+                    }
+                })
+            }
             const startSequence = new StartSequence(result.domainObject);
             return Promise.resolve({success: true, domainObject: startSequence});
         }

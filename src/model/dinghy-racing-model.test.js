@@ -19,7 +19,7 @@ import { httpRootURL, wsRootURL, competitorsCollectionHAL,
     dinghiesCollectionHAL, dinghiesScorpionCollectionHAL, 
     dinghyClassCollectionHAL, dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghyClassCometHAL, dinghy1234HAL, dinghy2726HAL, dinghy6745HAL,
     fleetsHAL, fleetScorpionHAL, fleetHandicapHAL, fleetGraduateHAL, fleetCometHAL,
-    raceScorpion_AHAL, raceGraduate_AHAL, // raceComet_AHAL, raceHandicap_AHAL,
+    raceScorpion_AHAL, raceGraduate_AHAL, raceHandicap_AHAL,
     dinghyScorpion1234CrewsHAL,
     dinghyClasses, dinghyClassScorpion, dinghyClassGraduate, 
     fleets, fleetScorpion, fleetHandicap, fleetScorpionDinghyClassHAL, fleetHandicapDinghyClassHAL, fleetGraduateDinghyClassHAL, fleetCometDinghyClassHAL,
@@ -4893,14 +4893,6 @@ describe('when starting a race', () => {
             expect(result).toEqual({'success': false, 'message': 'Something went wrong'});
         });
     });
-    describe('when race is a pursuit race', () => {
-        describe('when race is an open handicap', () => {
-            it('provides the base class to be used for the fleet when calculating start offsets', async () => {
-                // open handicap is defined as a fleet with no explicit classes set and RaceStartSequence needs a base class to caclculate offsets so additional action is required by DinghyRacingModel to supply this class
-                expect(false).toBeTruthy();
-            });
-        });
-    });
 });
 
 describe('when provided with a duration in ISO 8601 format', () => {
@@ -5898,6 +5890,68 @@ describe('when a StartSequence is requested', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
     });
+    describe('when race is a pursuit race', () => {
+        describe('when race is an open handicap', () => {
+            it('provides the base class to be used for the fleet when calculating start offsets', async () => {
+                // open handicap is defined as a fleet with no explicit classes set and RaceStartSequence needs a base class to caclculate offsets so additional action is required by DinghyRacingModel to supply this class
+                jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
+                fetch.mockImplementation((resource) => {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&type=PURSUIT&sort=plannedStartTime,ASC') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200,
+                            json: () => Promise.resolve({...racesCollectionHAL, _embedded: {races:[{...raceHandicap_AHAL, type: RaceType.PURSUIT}]}})
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/races/8/fleet') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetHandicapHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/fleets/2/dinghyClasses') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200, 
+                            json: () => Promise.resolve(fleetHandicapDinghyClassHAL)
+                        });
+                    }
+                    if (resource === 'http://localhost:8081/dinghyracing/api/dinghyClasses/search/findTopByOrderByPortsmouthNumberDesc') {
+                        return Promise.resolve({
+                            ok: true,
+                            status: 200,
+                            json: () => Promise.resolve(dinghyClassCometHAL)
+                        });
+                    }
+                    else {
+                        return Promise.resolve({
+                            ok: false,
+                            status: 404,
+                            statusText: 'Not Found'
+                        });
+                    }
+                });
+                const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+
+                const cometWarningFlag = {name: 'Comet Class Flag', role: FlagRole.WARNING, actions: []};
+                const cometWarningFlagRaiseAction = {flag: cometWarningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
+                const cometWarningFlagLowerAction = {flag: cometWarningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED};
+                cometWarningFlag.actions.push(cometWarningFlagRaiseAction);
+                cometWarningFlag.actions.push(cometWarningFlagLowerAction);
+
+                const result = await dinghyRacingModel.getStartSequence(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), RaceType.PURSUIT);
+                const actions = result.domainObject.getActions();
+
+                expect(actions).toHaveLength(4);
+                expect(actions[0]).toStrictEqual(cometWarningFlagRaiseAction);
+                expect(actions[1]).toStrictEqual(cometWarningFlagLowerAction);
+                        
+                jest.runOnlyPendingTimers();
+                jest.useRealTimers();
+            });
+        });
+    });
 });
 
 describe('when updating the plannedLaps for a race', () => {
@@ -6539,3 +6593,22 @@ describe('when a websocket message callback has been set for dinghy class update
         expect(dinghyRacingModel.fleetUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/fleet/1').size).toBe(1);
     });
 });
+
+describe('when the slowest dinghy class is requested', () => {
+    it('returns the dinghy class', async () => {
+        fetch.mockImplementation((resource) => {
+            if (resource === 'http://localhost:8081/dinghyracing/api/dinghyClasses/search/findTopByOrderByPortsmouthNumberDesc') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    json: () => Promise.resolve(dinghyClassCometHAL)
+                });
+            }
+        });
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const promise = model.getSlowestDinghyClass();
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({success: true, domainObject: dinghyClassComet});
+    })
+})

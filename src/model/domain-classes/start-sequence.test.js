@@ -22,7 +22,7 @@ import FlagRole from './flag-role';
 
 beforeEach(() => {success: true
     jest.useFakeTimers();
-})
+});
 
 afterEach(() => {
     jest.runOnlyPendingTimers();
