@@ -198,7 +198,7 @@ class RaceStartSequence {
 
                     let offset = Math.ceil((baseDuration - ((baseDuration * sortedDinghyClasses[i].portsmouthNumber) / basePN)) / 1000) * 1000; // round to the nearest second as this is the precision we are working with
 
-                    const warningFlagRaiseAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + offset - 60000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+                    const warningFlagRaiseAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + offset - 60000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: false, signalRaceStartStateChange: false};
                     const warningFlagLowerAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + offset), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
 
                     warningFlag.actions.push(warningFlagRaiseAction);

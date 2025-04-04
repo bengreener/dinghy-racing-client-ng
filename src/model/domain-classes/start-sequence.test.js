@@ -15,10 +15,11 @@
  */
 
 import StartSequence from './start-sequence';
-import { httpRootURL, wsRootURL, raceScorpionA, raceGraduateA } from '../__mocks__/test-data';
+import { httpRootURL, wsRootURL, raceScorpionA, raceGraduateA, raceHandicapA, dinghyClassComet, dinghyClassScorpion, dinghyClassGraduate } from '../__mocks__/test-data';
 import FlagState from './flag-state';
 import DinghyRacingModel from '../dinghy-racing-model';
 import FlagRole from './flag-role';
+import RaceType from './race-type';
 
 beforeEach(() => {success: true
     jest.useFakeTimers();
@@ -371,4 +372,43 @@ it('returns the races included in the race session', () => {
     const returnedRaces = startSequence.getRaces();
 
     expect(returnedRaces).toEqual(races);
+});
+
+describe('when race is a pursuit race', () => {
+    it('does not return prepare for race start state change indication for raise flag events that start classes after the main race start', () => {
+        const races = [{...raceHandicapA, fleet: {name: 'Handicap', dinghyClasses: [dinghyClassComet, dinghyClassScorpion], url: 'http://localhost:8081/dinghyracing/api/fleets/2'}, type: RaceType.PURSUIT, dinghyClasses: [dinghyClassComet, dinghyClassScorpion]}];
+        jest.setSystemTime(new Date('2021-10-14T10:49:13Z'));
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const startSequence = new StartSequence(races, model);
+        startSequence.startClock();
+
+        expect(startSequence.getPrepareForRaceStartStateChange()).toBeFalsy();
+    });
+    it('does not return action race start state change indication for raise flag events that start classes after the main race start', () => {
+        const races = [{...raceHandicapA, fleet: {name: 'Handicap', dinghyClasses: [dinghyClassComet, dinghyClassScorpion], url: 'http://localhost:8081/dinghyracing/api/fleets/2'}, type: RaceType.PURSUIT, dinghyClasses: [dinghyClassComet, dinghyClassScorpion]}];
+        jest.setSystemTime(new Date('2021-10-14T10:50:13Z'));
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const startSequence = new StartSequence(races, model);
+        startSequence.startClock();
+
+        expect(startSequence.getRaceStartStateChange()).toBeFalsy();
+    });
+    it('returns prepare for race start state change indication for lower flag events that start classes after the main race start', () => {
+        const races = [{...raceHandicapA, fleet: {name: 'Handicap', dinghyClasses: [dinghyClassComet, dinghyClassScorpion], url: 'http://localhost:8081/dinghyracing/api/fleets/2'}, type: RaceType.PURSUIT, dinghyClasses: [dinghyClassComet, dinghyClassScorpion]}];
+        jest.setSystemTime(new Date('2021-10-14T10:50:13Z'));
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const startSequence = new StartSequence(races, model);
+        startSequence.startClock();
+
+        expect(startSequence.getPrepareForRaceStartStateChange()).toBeTruthy();
+    });
+    it('returns action race start state change indication for lower flag events that start classes after the main race start', () => {
+        const races = [{...raceHandicapA, fleet: {name: 'Handicap', dinghyClasses: [dinghyClassComet, dinghyClassScorpion], url: 'http://localhost:8081/dinghyracing/api/fleets/2'}, type: RaceType.PURSUIT, dinghyClasses: [dinghyClassComet, dinghyClassScorpion]}];
+        jest.setSystemTime(new Date('2021-10-14T10:51:13Z'));
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const startSequence = new StartSequence(races, model);
+        startSequence.startClock();
+
+        expect(startSequence.getRaceStartStateChange()).toBeTruthy();
+    });
 });
