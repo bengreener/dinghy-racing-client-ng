@@ -84,9 +84,9 @@ function ActionListView({ actions }) {
     });
 
     return (
-        <div className="action-list-view">
+        <div className='action-list-view'>
             <h1>Action List</h1>
-            <div className="scrollable">
+            <div className='scrollable'>
                 <table className='w3-table w3-striped'>
                     <thead>
                         <tr>

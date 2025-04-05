@@ -344,6 +344,10 @@ class DinghyRacingModel {
         return null;
     }
 
+    async getSlowestDinghyClass() {
+        return null;
+    }
+
     async getDinghyClasses() {
         return null;
     }

@@ -20,7 +20,7 @@ import userEvent from '@testing-library/user-event';
 import RaceStartConsole from './RaceStartConsole';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
-import { httpRootURL, wsRootURL, races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet } from '../model/__mocks__/test-data';
+import { httpRootURL, wsRootURL, races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet, racePursuitA, fleetHandicap } from '../model/__mocks__/test-data';
 import StartSequence from '../model/domain-classes/start-sequence';
 import RaceType from '../model/domain-classes/race-type';
 
@@ -533,6 +533,43 @@ describe('when races within session are changed', () => {
             model.handleRaceUpdate({'body': url});
         });
         expect(screen.queryByText('Handicap A')).not.toBeInTheDocument();
+    });
+});
+
+it('registers an interest in fleet updates for races in session', async () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const controller = new DinghyRacingController(model);
+    // jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})}); // ???? works when run in debug or as lone test. When run as part of larger test run order of last 2 calls keeps being revesed so never correct
+    jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence([raceScorpionA, raceGraduateA, raceCometA, raceHandicapA], model)})});
+    const registerFleetUpdateCallbackSpy = jest.spyOn(model, 'registerFleetUpdateCallback');
+
+    customRender(<RaceStartConsole />, model, controller);
+    await screen.findAllByText(/scorpion a/i);
+
+    expect(registerFleetUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/fleets/1', expect.any(Function));
+    expect(registerFleetUpdateCallbackSpy).toHaveBeenNthCalledWith(2, 'http://localhost:8081/dinghyracing/api/fleets/3', expect.any(Function));
+    expect(registerFleetUpdateCallbackSpy).toHaveBeenNthCalledWith(3, 'http://localhost:8081/dinghyracing/api/fleets/4', expect.any(Function));
+    expect(registerFleetUpdateCallbackSpy).toHaveBeenNthCalledWith(4, 'http://localhost:8081/dinghyracing/api/fleets/2', expect.any(Function));
+});
+
+describe('when the fleet associated with the race is changed', () => {
+    it('displays updated start sequence', async () => {
+        const fleet = {...fleetHandicap, dinghyClasses: [dinghyClassComet, dinghyClassScorpion]};
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence([{...racePursuitA, fleet: fleet, dinghyClasses: [dinghyClassScorpion]}], model)})});
+        await act(async () => {
+            customRender(<RaceStartConsole />, model, controller);
+        });
+        expect(screen.queryAllByText(/comet/i)[0]).toBeInTheDocument();
+
+        fleet.dinghyClasses = [dinghyClassScorpion];
+        await act(async () => {
+            jest.advanceTimersByTime(1000); // advance time so RaceStartConsole knows it needs to rerender
+            model.handleFleetUpdate({'body': fleet.url});
+        });
+        
+        expect(screen.queryAllByText(/comet/i)).toHaveLength(0);
     });
 });
 

@@ -30,14 +30,14 @@ describe('when CSC Club Start for Fleet races', () => {
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
             const raceHandicapAWarningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
 
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
 
             scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
             scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
@@ -62,14 +62,14 @@ describe('when CSC Club Start for Fleet races', () => {
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
             const raceHandicapAWarningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
 
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
 
             scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
             scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
@@ -103,14 +103,14 @@ describe('when CSC Club Start for Fleet races', () => {
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
             const raceHandicapAWarningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
 
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
 
             scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
             scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
@@ -135,14 +135,14 @@ describe('when CSC Club Start for Fleet races', () => {
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
             const raceHandicapAWarningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
 
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
 
             scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
             scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
@@ -169,14 +169,14 @@ describe('when CSC Club Start for Fleet races', () => {
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.RAISED, actions: []};
             const raceHandicapAWarningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
 
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
             scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
             scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
@@ -201,14 +201,14 @@ describe('when CSC Club Start for Fleet races', () => {
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.RAISED, actions: []};
             const raceHandicapAWarningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
 
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
 
             scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
             scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
@@ -234,14 +234,14 @@ describe('when CSC Club Start for Fleet races', () => {
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.RAISED, actions: []};
             const raceHandicapAWarningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
 
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
 
             scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
             scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
@@ -266,14 +266,14 @@ describe('when CSC Club Start for Fleet races', () => {
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.RAISED, actions: []};
             const raceHandicapAWarningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
 
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
 
             scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
             scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
@@ -307,14 +307,14 @@ describe('when CSC Club Start for Fleet races', () => {
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
             const raceHandicapAWarningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
 
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
 
             scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
             scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
@@ -339,14 +339,14 @@ describe('when CSC Club Start for Fleet races', () => {
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
             const raceHandicapAWarningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
 
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
             
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
 
             scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
             scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
@@ -379,14 +379,14 @@ describe('when CSC Club Start for Fleet races', () => {
         const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
         const raceHandicapAWarningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, actions: []};
 
-        const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-        const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED};
+        const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
         
-        const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED};
-        const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+        const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
         
-        const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED};
-        const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED};
+        const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
 
         scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
         scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
@@ -407,3 +407,73 @@ describe('when CSC Club Start for Fleet races', () => {
         expect(actions[5]).toStrictEqual(preparatoryFlagLowerAction);
     });
 });
+
+describe('when two races in the start sequence use the same flag', () => {
+    it('returns a single instance of the flag', () => {
+        const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
+        const raceHandicapB = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T11:35:00Z')};
+        const sessionStartSequence = new SessionStartSequence([raceHandicapA_newStart, raceHandicapB]);
+    
+        const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
+        const handicapWarningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
+
+        const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapB.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        
+        const raceHandicapAWarningflagRaiseAction = {flag: handicapWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        const raceHandicapAWarningflagLowerAction = {flag: handicapWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+
+        const raceHandicapBWarningflagRaiseAction = {flag: handicapWarningFlag, time: new Date(raceHandicapB.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        const raceHandicapBWarningflagLowerAction = {flag: handicapWarningFlag, time: raceHandicapB.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        
+        preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
+        preparatoryFlag.actions.push(preparatoryFlagLowerAction);
+        
+        handicapWarningFlag.actions.push(raceHandicapAWarningflagRaiseAction);
+        handicapWarningFlag.actions.push(raceHandicapAWarningflagLowerAction);
+
+        handicapWarningFlag.actions.push(raceHandicapBWarningflagRaiseAction);
+        handicapWarningFlag.actions.push(raceHandicapBWarningflagLowerAction);
+
+        const flags = sessionStartSequence.getFlagsAtTime(new Date(raceScorpionA.plannedStartTime.valueOf() - 660000));
+    
+        expect(flags).toHaveLength(2);
+        expect(flags[0]).toStrictEqual(handicapWarningFlag);
+        expect(flags[1]).toStrictEqual(preparatoryFlag);
+    });
+    it('combines the actions for both races into a single actions list', () => {
+        const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
+        const raceHandicapB = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T11:35:00Z')};
+        const sessionStartSequence = new SessionStartSequence([raceHandicapA_newStart, raceHandicapB]);
+    
+        const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
+        const handicapWarningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, actions: []};
+
+        const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapB.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        
+        const raceHandicapAWarningflagRaiseAction = {flag: handicapWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        const raceHandicapAWarningflagLowerAction = {flag: handicapWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+
+        const raceHandicapBWarningflagRaiseAction = {flag: handicapWarningFlag, time: new Date(raceHandicapB.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        const raceHandicapBWarningflagLowerAction = {flag: handicapWarningFlag, time: raceHandicapB.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        
+        preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
+        preparatoryFlag.actions.push(preparatoryFlagLowerAction);
+        
+        handicapWarningFlag.actions.push(raceHandicapAWarningflagRaiseAction);
+        handicapWarningFlag.actions.push(raceHandicapAWarningflagLowerAction);
+
+        handicapWarningFlag.actions.push(raceHandicapBWarningflagRaiseAction);
+        handicapWarningFlag.actions.push(raceHandicapBWarningflagLowerAction);
+
+        const actions = sessionStartSequence.getActions();
+
+        expect(actions[0]).toStrictEqual(raceHandicapAWarningflagRaiseAction);
+        expect(actions[1]).toStrictEqual(raceHandicapAWarningflagLowerAction);
+        expect(actions[2]).toStrictEqual(raceHandicapBWarningflagRaiseAction);
+        expect(actions[3]).toStrictEqual(raceHandicapBWarningflagLowerAction);
+        expect(actions[4]).toStrictEqual(preparatoryFlagRaiseAction);
+        expect(actions[5]).toStrictEqual(preparatoryFlagLowerAction);
+    });
+})

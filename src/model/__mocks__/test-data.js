@@ -347,7 +347,7 @@ const competitorsCollection = [competitorChrisMarshall, competitorSarahPascal, c
 
 const dinghyClassScorpion = {name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043, externalName: 'SCORPION', url: 'http://localhost:8081/dinghyracing/api/dinghyClasses/1' };
 const dinghyClassGraduate = {name:'Graduate', crewSize: 2, portsmouthNumber: 1110, externalName: '', url:'http://localhost:8081/dinghyracing/api/dinghyClasses/5'};
-const dinghyClassComet = {name:'Comet', crewSize:1, portsmouthNumber: 1210, externalName: '', url:'http://localhost:8081/dinghyracing/api/dinghyClasses/16'}
+const dinghyClassComet = {name:'Comet', crewSize:1, portsmouthNumber: 1210, externalName: '', url:'http://localhost:8081/dinghyracing/api/dinghyClasses/16'};
 const dinghyClasses = [dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet];
 const dinghyClassesByNameAsc = [dinghyClassComet, dinghyClassGraduate, dinghyClassScorpion];
 

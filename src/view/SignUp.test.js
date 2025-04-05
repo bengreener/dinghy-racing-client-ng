@@ -30,7 +30,8 @@ import { httpRootURL, wsRootURL,
     dinghy2726,
     entryChrisMarshallHandicapA1234, entryChrisMarshallScorpionA1234,
     dinghyScorpion1234Crews, dinghyGraduate1234Crews, dinghyComet1234Crews, 
-    dinghyClassGraduate} from '../model/__mocks__/test-data';
+    dinghyClassGraduate,
+    fleetHandicap} from '../model/__mocks__/test-data';
 
 jest.mock('../model/dinghy-racing-model');
 jest.mock('../controller/dinghy-racing-controller');
@@ -9734,5 +9735,75 @@ describe('when a previous entry is selected', () => {
         expect(inputCrew).toHaveValue('');
         expect(inputDinghyClass).toHaveValue('Comet');
         expect(inputSailNumber).toHaveValue('1234');
+    });
+});
+
+describe('when race is for a fleet with a single class', () => {
+    describe('when display has been cleared', () => {
+        it('allows a new dinghy to be created', async () => {
+            const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                return Promise.resolve({'success': true});
+            });
+            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation((dinghy) => {
+                if (!dinghy || !dinghy.sailNumber) {
+                    return Promise.resolve({'success': false, 'message': 'A sail number is required for a new dinghy.'});
+                }
+                if (!dinghy.dinghyClass || !dinghy.dinghyClass.name) {
+                    return Promise.resolve({'success': false, 'message': 'A dinghy class is required for a new dinghy.'});
+                }
+                return Promise.resolve({'success': true});
+            });
+            const user = userEvent.setup();
+            customRender(<SignUp race={raceCometA}/>, model, controller);
+            await act(async () => {
+                await user.click(screen.getByRole('button', {name: /cancel/i})); // clear form
+            });
+            const inputHelm = screen.getByLabelText(/helm/i);
+            const inputSailNumber = screen.getByLabelText(/sail/i);
+            await act(async () => {
+                await user.type(inputHelm, 'Jill Myer');
+                await user.type(inputSailNumber, 'g6754i');
+            });
+            const createButton = screen.getByRole('button', {'name': /add dinghy & sign-up/i});
+            await act(async () => {
+                await user.click(createButton);
+            });
+            expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url':''});
+            expect(signupToRaceSpy).toHaveBeenCalledWith(raceCometA, competitorJillMyer,
+                {'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
+        });
+    });
+});
+
+it('registers an interest in fleet updates for races in session', async () => {
+    jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})}); // ???? works when run in debug or as lone test. When run as part of larger test run order of last 2 calls keeps being revesed so never correct
+    // jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence([raceScorpionA, raceGraduateA, raceCometA, raceHandicapA], model)})});
+    const registerFleetUpdateCallbackSpy = jest.spyOn(model, 'registerFleetUpdateCallback');
+    const fleet = {...fleetHandicap, dinghyClasses: [dinghyClassComet, dinghyClassGraduate]};
+
+    await act(async () => {
+        customRender(<SignUp race={{...raceHandicapA, fleet: fleet}}/>, model, controller);
+    });
+    
+    expect(registerFleetUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/fleets/2', expect.any(Function));
+});
+
+describe('when the fleet associated with the race is changed', () => {
+    it('updates the list of dinghy classes', async () => {
+        const fleet = {...fleetHandicap, dinghyClasses: [dinghyClassComet, dinghyClassGraduate, dinghyClassScorpion]};
+        jest.spyOn(model, 'getFleet').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': {...fleetHandicap, dinghyClasses: [dinghyClassGraduate, dinghyClassScorpion]}})});
+
+        await act(async () => {
+            customRender(<SignUp race={{...raceHandicapA, fleet: fleet}}/>, model, controller);
+        });
+        const inputDinghyClass = screen.getByLabelText(/class/i);
+        let options = within(inputDinghyClass).getAllByRole('option');
+        expect(options.length).toBe(4);
+
+        await act(async () => {
+            model.handleFleetUpdate({'body': fleet.url});
+        });
+        options = within(inputDinghyClass).getAllByRole('option');
+        expect(options.length).toBe(3);
     });
 });

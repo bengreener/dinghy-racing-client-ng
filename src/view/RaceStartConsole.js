@@ -46,6 +46,7 @@ function RaceStartConsole () {
         return sessionEnd;
     });
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
+    const [fleetUpdateRequestAt, setFleetUpdateRequestAt] = useState(Date.now()); // time of last request to fetch fleet from server. change triggers calculation of a new start sequence
     const [raceType, setRaceType] = useState(RaceType.FLEET);
     const startSequence = useRef(null);
     const prepareAudioRef = useRef(null);
@@ -74,6 +75,11 @@ function RaceStartConsole () {
     const handleRaceUpdate = useCallback(() => {
         setRacesUpdateRequestAt(Date.now());
     }, []);
+
+    const handleFleetUpdate = useCallback(() => {
+        setFleetUpdateRequestAt(Date.now());
+    }, []);
+    
 
     const handleStartSequenceTick = useCallback(() => {
         setFlagsWithNextAction(startSequence.current.getFlags());
@@ -117,7 +123,7 @@ function RaceStartConsole () {
                 startSequence.current = null;
             }
         }
-    }, [model, sessionStart, sessionEnd, raceType, racesUpdateRequestAt, handleStartSequenceTick]);
+    }, [model, sessionStart, sessionEnd, raceType, racesUpdateRequestAt, fleetUpdateRequestAt, handleStartSequenceTick]);
 
     // register on update callbacks for races
     useEffect(() => {
@@ -131,6 +137,19 @@ function RaceStartConsole () {
             });
         }
     }, [model, races, handleRaceUpdate])
+
+    // register on update callbacks for fleet
+    useEffect(() => {
+        races.forEach(race => {
+            model.registerFleetUpdateCallback(race.fleet.url, handleFleetUpdate);
+        });
+        // cleanup before effect runs and before form close
+        return () => {
+            races.forEach(race => {
+                model.unregisterFleetUpdateCallback(race.fleet.url, handleFleetUpdate);
+            });
+        }
+    }, [model, races, handleFleetUpdate])
 
     function handlesessionStartInputChange(date) {
         setSessionStart(date);
@@ -192,6 +211,7 @@ function RaceStartConsole () {
                 <p className={userMessageClasses()}>{message}</p>
             </CollapsableContainer>
             {buildStartCountdown()}
+            <div className='scrollable'>
             <CollapsableContainer heading={'Flags'}>
                 {flagsWithNextAction.map(flag => { return <FlagControl key={flag.flag.name} flag={flag.flag} timeToChange={flag.action ? Clock.now() - flag.action.time.valueOf() : 0} /> })} {/* use Clock.now to get adjusted time when synched to an external clock */}
             </CollapsableContainer>
@@ -201,6 +221,7 @@ function RaceStartConsole () {
                 })}
             </CollapsableContainer>
             <ActionListView actions={actions} />
+            </div>
         </div>
     );
 };
