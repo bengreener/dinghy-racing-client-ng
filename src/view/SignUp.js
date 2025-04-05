@@ -51,6 +51,7 @@ function SignUp({ race }) {
     const [competitorUpdateRequestAt, setCompetitorUpdateRequestAt] = useState(Date.now());
     const [dinghyUpdateRequestAt, setDinghyUpdateRequestAt] = useState(Date.now());
     const [dinghyClassUpdateRequestAt, setDinghyClassUpdateRequestAt] = useState(Date.now());
+    const [fleetUpdateRequestAt, setFleetUpdateRequestAt] = useState(0); // time of last request to fetch fleet from server. change triggers calculation of a new start sequence
 
     const handleRaceUpdate = useCallback(() => {
         setRaceUpdateRequestAt(Date.now());
@@ -70,6 +71,10 @@ function SignUp({ race }) {
 
     const handleDinghyClassUpdate = useCallback(() => {
         setDinghyClassUpdateRequestAt(Date.now());
+    }, []);
+
+    const handleFleetUpdate = useCallback(() => {
+        setFleetUpdateRequestAt(Date.now());
     }, []);
 
     const clear = React.useCallback(() => {
@@ -182,6 +187,15 @@ function SignUp({ race }) {
         }
     }, [model, handleDinghyClassUpdate]);
 
+    // register on update callbacks for fleet
+    useEffect(() => {
+        model.registerFleetUpdateCallback(race.fleet.url, handleFleetUpdate);
+        // cleanup before effect runs and before form close
+        return () => {
+            model.unregisterFleetUpdateCallback(race.fleet.url, handleFleetUpdate);
+        }
+    }, [model, race, handleFleetUpdate])
+
     // get competitors
     useEffect(() => {
         let ignoreFetch = false; // set to true if SignUp rerendered before fetch completes to avoid using out of date result
@@ -246,6 +260,28 @@ function SignUp({ race }) {
             ignoreFetch = true;
         }
     }, [model, dinghyClassUpdateRequestAt, race.fleet.dinghyClasses]);
+
+    // manage update to race fleets
+    useEffect(() => {
+        let ignoreFetch = false; // set to true if SignUp rerendered before fetch completes to avoid using out of date result
+        // don't load fleet data on first render; assume race list of fleet dinghy classes is correct initially
+        if (fleetUpdateRequestAt && !ignoreFetch) {
+            model.getFleet(race.fleet.url).then(result => {
+                if (!ignoreFetch) {
+                    if (result.success) {
+                        race.fleet = result.domainObject;
+                        setDinghyClassUpdateRequestAt(Date.now()); // trigger refresh of dinghy options (updating fleet alone wasn't doing it)
+                    }
+                    else {
+                        setMessage('Unable to load fleet on fleet update\n' + result.message);
+                    }
+                }
+            });
+        }
+        return () => {
+            ignoreFetch = true;
+        }
+    }, [model, race, fleetUpdateRequestAt]);
 
     // get dinghies
     useEffect(() => {
