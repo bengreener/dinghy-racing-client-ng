@@ -472,7 +472,7 @@ function SignUp({ race }) {
             }
             else {
                 // If entry is a duplicate then display of id values is confusing to competitor so remove them
-                if (/HTTP Error: 409.+([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2}).+/.test(result.message)) {
+                if (/HTTP Error: 409.+(\d+)-(\d+)-(\d+).+/.test(result.message)) {
                     const newMessage = result.message.replace(/ '([0-9]{1,2})-([0-9]{1,2})-([0-9]{1,2})' /, ' ');
                     setResult({...result, message: newMessage});
                 }
