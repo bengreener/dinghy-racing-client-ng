@@ -92,7 +92,7 @@ function convertRaceEntriesToCSVArray(race, entries, options) {
         }
         record += entry.dinghy.sailNumber + ',';
         record += ((entry.dinghy.dinghyClass.externalName == null || entry.dinghy.dinghyClass.externalName === '') ? entry.dinghy.dinghyClass.name : entry.dinghy.dinghyClass.externalName) + ',';
-        record += entry.position + ',';
+        record += (entry.scoringAbbreviation ? '' : entry.position) + ',';
         if (race.type !== RaceType.PURSUIT) {
             record += Clock.formatDurationAsSeconds(entry.sumOfLapTimes) + ',';
             record += entry.laps.length + ',';

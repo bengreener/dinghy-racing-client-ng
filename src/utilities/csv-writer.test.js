@@ -131,7 +131,7 @@ describe('when an entry has a scoring abbreviation set', () => {
         const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceScorpionA, entriesScorpionA_with_laps);
         expect(data.slice(1)).toEqual([
             'Chris Marshall,Lou Screw,1234,SCORPION,1,3,3,,1043,0\n',
-            'Sarah Pascal,Owain Davies,6745,SCORPION,2,0,0,DNS,1043,0\n'
+            'Sarah Pascal,Owain Davies,6745,SCORPION,,0,0,DNS,1043,0\n'
         ]);
     });
 });
