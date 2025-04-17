@@ -46,8 +46,6 @@ it('renders', async () => {
     });
     expect(screen.getByRole('button', {name: /by sail number/i})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /by class & sail number/i})).toBeInTheDocument();
-    // expect(screen.getByRole('button', {name: /by last 3/i})).toBeInTheDocument();
-    // expect(screen.getByRole('button', {name: /by class & last 3/i})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /by lap times/i})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /by position/i})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /by forecast/i})).toBeInTheDocument();

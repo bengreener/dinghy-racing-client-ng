@@ -42,55 +42,6 @@ button.embedded {
     cursor: pointer;
     background-color: inherit;
 }
-/* fieldset {
-	display: inline;
-}
-input {
-    border-radius: 25pt;
-    padding: 5pt;
-}
-input[disabled] {
-	background-color: lightgrey;
-} */
-/* select {
-	border-width: 2px;
-	border-radius: 25pt;
-	padding: 5pt;
-}
-label {
-	padding: 5pt;
-	font-weight: bold;
-}
-table {
-    border-collapse: collapse;
-	margin: 5px;
-}
-th.sail-number {
-	text-align: right;
-} */
-/* td, th {
-    border: 1px solid #999;
-    padding: 0.5em;
-    text-align: left;
-	white-space: pre;
-}
-td.total {
-	border: 2px solid black;
-} */
-/* .container-fluid {
-	display: grid;
-	grid-template-columns: 15vw 85vw;
-	grid-template-rows: 15vh 85vh;
-	grid-template-areas: 	'header header'
-							'menu main';
-} */
-/* header {
-	grid-area: header;
-	background-size: contain;
-} */
-/* fieldset {
-	border-radius: 25pt;
-} */
 .action-list-view {
     display: flex;
     flex-direction: column;
@@ -117,43 +68,14 @@ td.total {
 	overflow: hidden;
 	height: 75vh;
 }
-/* .entry-buttons {
-	display: grid;
-	grid-auto-flow: column;
-	grid-auto-columns: 1fr;
-} */
  .preserve-whitespace {
 	white-space: pre;
  }
-/* .race-entry-view-border {
-	border: solid;
-	border-width: thin;
-} */
-/* .race-entry-view-container {
-	display: flex;
-	align-items: center;
-} */
 .race-entries-view {
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
-/* .race-entry-view {
-	display: grid;
-	grid-template-columns: 6% 6% 10% 3% 50% 5% 20%;
-	vertical-align: middle;
-	border: solid;
-	border-width: thin;
-} */
-/* .race-entry-view-laps {
-	display: grid;
-	grid-auto-flow: column;
-	grid-auto-columns: 10%;
-	justify-content: left;
-} */
-/* .race-entry-view-scoring-abbreviation {
-	height: fit-content;
-} */
 .hidden {
     display: none;
 }
