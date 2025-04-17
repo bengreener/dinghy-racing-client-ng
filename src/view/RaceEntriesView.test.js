@@ -51,7 +51,7 @@ it('renders', async () => {
     expect(screen.getByRole('button', {name: /by lap times/i})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /by position/i})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /by forecast/i})).toBeInTheDocument();
-    expect(screen.getByText(/1234/i)).toBeInTheDocument();
+    expect(screen.getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
     expect(screen.getAllByText(/Scorpion/i)[0]).toBeInTheDocument();
     expect(screen.getByText(/Chris marshaLL/i)).toBeInTheDocument();
 });
@@ -63,9 +63,9 @@ it('displays entries for selected races', async () => {
     await act(async () => {
         customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
     });
-    const entry1 = await screen.findByText(/1234/i);
-    const entry2 = await screen.findByText(/6745/i);
-    const entry3 = await screen.findByText(/2928/i);
+    const entry1 = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
+    const entry2 = await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'});
+    const entry3 = await screen.findByRole('status', {name: (content, node) => node.textContent === '2928'});
     expect(entry1).toBeInTheDocument();
     expect(entry2).toBeInTheDocument();
     expect(entry3).toBeInTheDocument();
@@ -124,9 +124,9 @@ describe('when sorting entries', () => {
             await user.click(sortBySailNumber);
         });
         const raceEntryViews = document.getElementsByClassName('race-entry-view');
-        expect(within(raceEntryViews[0]).getByText(/1234/)).toBeInTheDocument();
-        expect(within(raceEntryViews[1]).getByText(/2928/)).toBeInTheDocument();
-        expect(within(raceEntryViews[2]).getByText(/6745/)).toBeInTheDocument();
+        expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
+        expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '2928'})).toBeInTheDocument();
+        expect(within(raceEntryViews[2]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
     });
     it('sorts by the dinghy class and sail number', async () => {
         const entriesScorpionA = [
@@ -152,9 +152,9 @@ describe('when sorting entries', () => {
             await user.click(sortByClassAndSailNumber);
         });
         const raceEntryViews = document.getElementsByClassName('race-entry-view');
-        expect(within(raceEntryViews[0]).getByText(/2928/)).toBeInTheDocument();
-        expect(within(raceEntryViews[1]).getByText(/1234/)).toBeInTheDocument();
-        expect(within(raceEntryViews[2]).getByText(/6745/)).toBeInTheDocument();
+        expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '2928'})).toBeInTheDocument();
+        expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
+        expect(within(raceEntryViews[2]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
     });
     it('sorts by the number of laps and then race start time of dinghies in descending order', async () => {
         const entries = [
@@ -180,10 +180,10 @@ describe('when sorting entries', () => {
             await user.click(sortByLapTimeButton);
         });
         const raceEntryViews = document.getElementsByClassName('race-entry-view');
-        expect(within(raceEntryViews[0]).getByText(/1234/)).toBeInTheDocument();
-        expect(within(raceEntryViews[1]).getByText(/2928/)).toBeInTheDocument();
-        expect(within(raceEntryViews[2]).getByText(/6745/)).toBeInTheDocument();
-        expect(within(raceEntryViews[3]).getByText(/2726/)).toBeInTheDocument();
+        expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
+        expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '2928'})).toBeInTheDocument();
+        expect(within(raceEntryViews[2]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
+        expect(within(raceEntryViews[3]).getByRole('status', {name: (content, node) => node.textContent === '2726'})).toBeInTheDocument();
     });
     it('sorts by estimation of next lap finish time', async () => {
         const entriesScorpionA = [
@@ -208,9 +208,9 @@ describe('when sorting entries', () => {
             await user.click(sortByForecast);
         });
         const raceEntryViews = document.getElementsByClassName('race-entry-view');
-        expect(within(raceEntryViews[0]).getByText(/1234/)).toBeInTheDocument();
-        expect(within(raceEntryViews[1]).getByText(/2928/)).toBeInTheDocument();
-        expect(within(raceEntryViews[2]).getByText(/6745/)).toBeInTheDocument();
+        expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
+        expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '2928'})).toBeInTheDocument();
+        expect(within(raceEntryViews[2]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
     });
     it('enables resorting by the same value after entries have been updated', async () => {
         const entriesScorpionAPre = [
@@ -237,13 +237,13 @@ describe('when sorting entries', () => {
         await act(async () => {
             model.handleEntryUpdate({'body': entriesScorpionA[1].url});
         });
-        expect(within(raceEntryViews[0]).getByText(/1234/)).toBeInTheDocument();
-        expect(within(raceEntryViews[1]).getByText(/6745/)).toBeInTheDocument();
+        expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
+        expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
         await act(async () => {
             await user.click(sortByLapTimeButton);
         });
-        expect(within(raceEntryViews[1]).getByText(/1234/)).toBeInTheDocument();
-        expect(within(raceEntryViews[0]).getByText(/6745/)).toBeInTheDocument();
+        expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
+        expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
     });
     describe('when sorting by position', () => {
         it('sorts by position in ascending order', async () => {
@@ -273,11 +273,11 @@ describe('when sorting entries', () => {
                 await user.click(sortByPositionButton);
             });
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
-            expect(within(raceEntryViews[0]).getByText(/1234/)).toBeInTheDocument();
-            expect(within(raceEntryViews[1]).getByText(/2928/)).toBeInTheDocument();
-            expect(within(raceEntryViews[2]).getByText(/6745/)).toBeInTheDocument();
-            expect(within(raceEntryViews[3]).getByText(/9999/)).toBeInTheDocument();
-            expect(within(raceEntryViews[4]).getByText(/8888/)).toBeInTheDocument();
+            expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
+            expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '2928'})).toBeInTheDocument();
+            expect(within(raceEntryViews[2]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
+            expect(within(raceEntryViews[3]).getByRole('status', {name: (content, node) => node.textContent === '9999'})).toBeInTheDocument();
+            expect(within(raceEntryViews[4]).getByRole('status', {name: (content, node) => node.textContent === '8888'})).toBeInTheDocument();
         });
         it('sorts entries with a scoring abbreviation below other entries', async ()=> {
             const entries = [
@@ -314,11 +314,11 @@ describe('when sorting entries', () => {
                 await user.click(sortByPositionButton);
             });
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
-            expect(within(raceEntryViews[0]).getByText(/1234/)).toBeInTheDocument();
-            expect(within(raceEntryViews[1]).getByText(/6745/)).toBeInTheDocument();
-            expect(within(raceEntryViews[2]).getByText(/9999/)).toBeInTheDocument();
-            expect(within(raceEntryViews[3]).getByText(/8888/)).toBeInTheDocument();
-            expect(within(raceEntryViews[4]).getByText(/2928/)).toBeInTheDocument();
+            expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
+            expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
+            expect(within(raceEntryViews[2]).getByRole('status', {name: (content, node) => node.textContent === '9999'})).toBeInTheDocument();
+            expect(within(raceEntryViews[3]).getByRole('status', {name: (content, node) => node.textContent === '8888'})).toBeInTheDocument();
+            expect(within(raceEntryViews[4]).getByRole('status', {name: (content, node) => node.textContent === '2928'})).toBeInTheDocument();
         });
     });    
     describe('when sorting entries that include an entry that did not start', () => {
@@ -337,8 +337,8 @@ describe('when sorting entries', () => {
                 await user.click(sortByLapTimeButton);
             });
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
-            expect(within(raceEntryViews[0]).getByText(/6745/)).toBeInTheDocument();
-            expect(within(raceEntryViews[1]).getByText(/1234/)).toBeInTheDocument();
+            expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
+            expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
         });
     });
     describe('when sorting entries that include an entry that retired', () => {
@@ -359,8 +359,8 @@ describe('when sorting entries', () => {
                 await user.click(sortByLapTimeButton);
             });
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
-            expect(within(raceEntryViews[0]).getByText(/6745/)).toBeInTheDocument();
-            expect(within(raceEntryViews[1]).getByText(/1234/)).toBeInTheDocument();
+            expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
+            expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
         });
     });
     describe('when sorting entries that include an entry that has been disqualified', () => {
@@ -381,8 +381,8 @@ describe('when sorting entries', () => {
                 await user.click(sortByLapTimeButton);
             });
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
-            expect(within(raceEntryViews[0]).getByText(/6745/)).toBeInTheDocument();
-            expect(within(raceEntryViews[1]).getByText(/1234/)).toBeInTheDocument();
+            expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
+            expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
         });
     });
     describe('when sorting entries that include an entry that was on course side', () => {
@@ -403,8 +403,8 @@ describe('when sorting entries', () => {
                 await user.click(sortByLapTimeButton);
             });
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
-            expect(within(raceEntryViews[0]).getByText(/6745/)).toBeInTheDocument();
-            expect(within(raceEntryViews[1]).getByText(/1234/)).toBeInTheDocument();
+            expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
+            expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
         });
     });
     describe('when sorting entries that include an entry that did not finish', () => {
@@ -425,8 +425,8 @@ describe('when sorting entries', () => {
                 await user.click(sortByLapTimeButton);
             });
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
-            expect(within(raceEntryViews[0]).getByText(/6745/)).toBeInTheDocument();
-            expect(within(raceEntryViews[1]).getByText(/1234/)).toBeInTheDocument();
+            expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
+            expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
         });
     });
 });
@@ -447,7 +447,7 @@ describe('when adding a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
-        const entry = await screen.findByText(/6745/i);
+        const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'});
         await act(async () => {
             await user.click(entry);
         });
@@ -465,7 +465,7 @@ describe('when adding a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
                
-        const entry = await screen.findByText(/1234/i);
+        const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
             await user.click(entry);
         });        
@@ -490,7 +490,7 @@ describe('when adding a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
                
-        const entry = await screen.findByText(/1234/i);
+        const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
         
         expect(await screen.queryByText('10:25')).not.toBeInTheDocument();
         await act(async () => {
@@ -512,7 +512,7 @@ describe('when adding a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
                
-        const entry = await screen.findByText(/1234/i);
+        const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
             await user.click(entry);
         });
@@ -534,7 +534,7 @@ describe('when adding a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
-        const entry = await screen.findByText(/1234/i);
+        const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
             await user.click(entry);
         });
@@ -561,7 +561,7 @@ describe('when removing a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });        
-        const entry = await screen.findByText(/1234/i);
+        const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
             await user.keyboard('{Control>}');
             await user.click(entry);
@@ -583,7 +583,7 @@ describe('when removing a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
-        const entry = await screen.findByText(/1234/i);
+        const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
         const lapTime = await screen.findByText('05:12');
         expect(lapTime).toBeInTheDocument();
         await act(async ()=> {
@@ -614,7 +614,7 @@ describe('when removing a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
                
-        const entry = await screen.findByText(/1234/i);
+        const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
             await user.keyboard('{Control>}');
             await user.click(entry);
@@ -642,7 +642,7 @@ describe('when removing a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
                
-        const entry = await screen.findByText(/1234/i);
+        const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
             await user.keyboard('{Control>}');
             await user.click(entry);
@@ -674,7 +674,7 @@ describe('when updating a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
-        const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+        const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:07');
         // render updated components
         await act(async () => {
@@ -708,7 +708,7 @@ describe('when updating a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
-        const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+        const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:14');
         // render updated components
         await act(async () => {
@@ -743,7 +743,7 @@ describe('when updating a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
-        const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+        const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:07');
         await act(async () => {
             await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
@@ -779,14 +779,14 @@ describe('when updating a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
-        const entry = await screen.findByText(/6745/i);
+        const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'});
         // after render perform update        
         await act(async () => {
             await user.click(entry);
         });
         expect(await screen.findByText(/oops/i)).toBeInTheDocument();
         
-        let raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+        let raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         let lapEntryCellOutput = within(raceEntryView).getByText('00:07');
         await act(async () => {
             await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
@@ -868,10 +868,10 @@ describe('when user drags and drops an entry to a new position', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
         const raceEntryViews = document.getElementsByClassName('race-entry-view');
-        expect(within(raceEntryViews[0]).getByText(/1234/)).toBeInTheDocument();
-        expect(within(raceEntryViews[1]).getByText(/6745/)).toBeInTheDocument();
-        const targetREV = screen.getByText(/1234/i).parentElement.parentElement;
-        const subjectREV = screen.getByText(/6745/i).parentElement.parentElement;
+        expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
+        expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
+        const targetREV = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+        const subjectREV = screen.getByRole('status', {name: (content, node) => node.textContent === '6745'}).parentElement.parentElement;
 
         const dataTransferObject = {
             data: new Map(), 
@@ -884,8 +884,8 @@ describe('when user drags and drops an entry to a new position', () => {
         await act(async () => {
             fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
         });
-        expect(within(raceEntryViews[0]).getByText(/6745/)).toBeInTheDocument();
-        expect(within(raceEntryViews[1]).getByText(/1234/)).toBeInTheDocument();
+        expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
+        expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
     });
     describe('when race is a pursuit race', () => {
         describe('when dropped on a target entry in the same race that has a position', () => {

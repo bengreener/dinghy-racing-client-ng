@@ -263,8 +263,8 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
             <div className='w3-col m2 w3-padding-small bgis-cell' >
                 <output>{entry.dinghy.dinghyClass.name}</output>
             </div>
-            <div className='w3-col m1 w3-padding-small bgis-cell' >
-                <output className='sail-number'>{entry.dinghy.sailNumber}</output>
+            <div className='w3-col m1 w3-padding-small bgis-cell w3-right-align' >
+                <output className='sail-number'>{entry.dinghy.sailNumber.slice(0, Math.max(0, entry.dinghy.sailNumber.length - 3))}<b>{entry.dinghy.sailNumber.slice(-3)}</b></output>
             </div>
             <div className='w3-col m2 w3-padding-small bgis-cell' >
                 <output>{entry.helm.name}</output>
