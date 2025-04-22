@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
-
-import { entriesScorpionA } from './test-data';
+import StartSequence from '../domain-classes/start-sequence';
 
 class DinghyRacingModel {
     httpRootURL;
@@ -357,7 +356,7 @@ class DinghyRacingModel {
     }
 
     async getEntriesByRace(race) {
-        return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+        return Promise.resolve({'success': true, 'domainObject': []});
     }
 
     async getLaps(url) {
@@ -388,8 +387,8 @@ class DinghyRacingModel {
         return null;
     }
 
-    async getStartSequence(startTime, endTime) {
-        return null;
+    async getStartSequence(races, type) {
+        return Promise.resolve({'success': true, 'domainObject': new StartSequence(races)});
     }
 
     async startRace(race, startTime) {
@@ -426,4 +425,13 @@ class DinghyRacingModel {
     }
 }
 
+/**
+ * Class providng enumeration of SortOrder options for SortObject type
+ */
+class SortOrder {
+    static ASCENDING = 'ASC';
+    static DESCENDING = 'DESC';
+}
+
 export default DinghyRacingModel;
+export { SortOrder };

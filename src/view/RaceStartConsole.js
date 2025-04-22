@@ -24,6 +24,7 @@ import FlagControl from './FlagControl';
 import RaceType from '../model/domain-classes/race-type';
 import Clock from '../model/domain-classes/clock';
 import CountdownDisplayControl from './CountdownDisplayControl';
+import { SortOrder } from '../model/dinghy-racing-model';
 
 /**
  * Provide Race Officer with information needed to successfully start races in a session
@@ -31,7 +32,8 @@ import CountdownDisplayControl from './CountdownDisplayControl';
  */
 function RaceStartConsole () {
     const model = useContext(ModelContext);
-    const [races, setRaces] = useState([]);
+    const [selectedRaces, setSelectedRaces] = useState([]); // selection of race names made by user
+    const [raceMap, setRaceMap] = useState(new Map()); // map of race names to races
     const [flagsWithNextAction, setFlagsWithNextAction] = useState([]);
     const [actions, setActions] = useState([]);
     const [message, setMessage] = useState(''); // feedback to user
@@ -91,10 +93,44 @@ function RaceStartConsole () {
         }
     }, []);
 
+    // get races for selected session
+    useEffect(() => {
+        let ignoreFetch = false; // set to true if RaceStartConsole rerendered before fetch completes to avoid using out of date result
+        model.getRacesBetweenTimesForType(new Date(sessionStart), new Date(sessionEnd), raceType, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING}).then(result => {
+            if (!ignoreFetch && !result.success) {
+                setMessage('Unable to load races\n' + result.message);
+            }
+            else if (!ignoreFetch) {
+                const map = new Map();
+                const options = []; // html option elements
+                const optionsRaceNames = []; // just the names of the races to match with previously selected races
+                result.domainObject.forEach(race => {
+                    race.clock = new Clock(race.plannedStartTime);
+                    map.set(race.name, race);
+                    options.push(<option key={race.name + race.plannedStartTime.toISOString()} value={race.name} >{race.name}</option>);
+                    optionsRaceNames.push(race.name);
+                });
+                setRaceMap(map);
+                if (selectedRaces.length === 0) {
+                    // if no races selected then select all the races as default
+                    setSelectedRaces(optionsRaceNames);
+                }
+                else {
+                    setSelectedRaces(s => s.filter(selectedRaceName => optionsRaceNames.includes(selectedRaceName))); // remove any previously selected races that are no longer available from race selectedRaces
+                }
+            }
+        });
+
+        return () => {
+            ignoreFetch = true;
+            setMessage('');
+        }
+    }, [model, sessionStart, sessionEnd, raceType, racesUpdateRequestAt, selectedRaces.length]);
+
     // get start sequence for selected session
     useEffect(() => {
         let ignoreFetch = false; // set to true if RaceStartConsole rerendered before fetch completes to avoid using out of date result
-        model.getStartSequence(new Date(sessionStart), new Date(sessionEnd), raceType).then(result => {
+        model.getStartSequence(selectedRaces.map(raceName => raceMap.get(raceName)), raceType).then(result => {
             if (!ignoreFetch && !result.success) {
                 setMessage('Unable to load start sequence\n' + result.message);
             }
@@ -102,7 +138,6 @@ function RaceStartConsole () {
                 startSequence.current = result.domainObject;
                 startSequence.current.addTickHandler(handleStartSequenceTick);
                 startSequence.current.startClock();
-                setRaces(startSequence.current.getRaces());
                 setFlagsWithNextAction(startSequence.current.getFlags());
                 setActions(startSequence.current.getActions());
                 if (startSequence.current.getRaceStartStateChange()) {
@@ -123,10 +158,11 @@ function RaceStartConsole () {
                 startSequence.current = null;
             }
         }
-    }, [model, sessionStart, sessionEnd, raceType, racesUpdateRequestAt, fleetUpdateRequestAt, handleStartSequenceTick]);
+    }, [model, selectedRaces, raceType, raceMap, racesUpdateRequestAt, fleetUpdateRequestAt, handleStartSequenceTick]);
 
     // register on update callbacks for races
     useEffect(() => {
+        const races = Array.from(raceMap.values());
         races.forEach(race => {
             model.registerRaceUpdateCallback(race.url, handleRaceUpdate);
         });
@@ -136,10 +172,11 @@ function RaceStartConsole () {
                 model.unregisterRaceUpdateCallback(race.url, handleRaceUpdate);
             });
         }
-    }, [model, races, handleRaceUpdate])
+    }, [model, raceMap, handleRaceUpdate])
 
     // register on update callbacks for fleet
     useEffect(() => {
+        const races = Array.from(raceMap.values());
         races.forEach(race => {
             model.registerFleetUpdateCallback(race.fleet.url, handleFleetUpdate);
         });
@@ -149,7 +186,12 @@ function RaceStartConsole () {
                 model.unregisterFleetUpdateCallback(race.fleet.url, handleFleetUpdate);
             });
         }
-    }, [model, races, handleFleetUpdate])
+    }, [model, raceMap, handleFleetUpdate])
+
+    function handleRaceSelect(event) {
+        const options = [...event.target.selectedOptions]; // convert from HTMLCollection to Array; trying to go direct to value results in event.target.selectedOptions.value is not iterable error
+        setSelectedRaces(options.map(option => option.value));
+    }
 
     function handlesessionStartInputChange(date) {
         setSessionStart(date);
@@ -206,6 +248,8 @@ function RaceStartConsole () {
                                 </div>
                             </div>
                         </fieldset>
+                    <label htmlFor='race-select' className='w3-left w3-col' >Select Race</label>
+                    <select id='race-select' name='race' multiple={true} className='w3-col w3-third' onChange={handleRaceSelect} value={selectedRaces}>{Array.from(raceMap.values()).map(race => <option key={race.name + race.plannedStartTime.toISOString()} value={race.name} >{race.name}</option>)}</select>
                     </div>
                 </form>
                 <p className={userMessageClasses()}>{message}</p>
@@ -216,7 +260,8 @@ function RaceStartConsole () {
                 {flagsWithNextAction.map(flag => { return <FlagControl key={flag.flag.name} flag={flag.flag} timeToChange={flag.action ? Clock.now() - flag.action.time.valueOf() : 0} /> })} {/* use Clock.now to get adjusted time when synched to an external clock */}
             </CollapsableContainer>
             <CollapsableContainer heading={'Races'}>
-                {races.map(race => {
+                {selectedRaces.map(raceName => {
+                    const race = raceMap.get(raceName);
                     return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} showInRaceData={false} />
                 })}
             </CollapsableContainer>
