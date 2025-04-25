@@ -144,8 +144,8 @@ describe('when a race is selected', () => {
             await user.selectOptions(selectRace, 'Scorpion A');
         });
         
-        const entry1 = await screen.findByText(/1234/i);
-        const entry2 = await screen.findByText(/6745/i);
+        const entry1 = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
+        const entry2 = await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'});
         expect(entry1).toBeInTheDocument();
         expect(entry2).toBeInTheDocument();
     });
@@ -203,9 +203,9 @@ describe('when more than one race is selected', () => {
             await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
         });
         
-        const entry1 = await screen.findByText(/1234/i);
-        const entry2 = await screen.findByText(/6745/i);
-        const entry3 = await screen.findByText(/2928/i)
+        const entry1 = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
+        const entry2 = await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'});
+        const entry3 = await screen.findByRole('status', {name: (content, node) => node.textContent === '2928'})
         expect(entry1).toBeInTheDocument();
         expect(entry2).toBeInTheDocument();
         expect(entry3).toBeInTheDocument();

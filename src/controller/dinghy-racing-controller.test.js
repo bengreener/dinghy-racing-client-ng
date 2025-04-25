@@ -1267,6 +1267,7 @@ describe('when writing race entries to a CSV file', () => {
         global.URL.revokeObjectURL = jest.fn(); // function does not exist in jsdom
         const downloadRaceEntriesCSVSpy = jest.spyOn(csvWriter, 'downloadRaceEntriesCSV');
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(dinghyRacingModel, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         const promise = dinghyRacingController.downloadRaceResults(raceScorpionA, {nameFormat: NameFormat.FIRSTNAMESURNAME});
         const result = await promise;

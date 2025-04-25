@@ -1469,38 +1469,30 @@ class DinghyRacingModel {
     /**
      * Get a start sequence for starting races during a session
      * Only one type of race can be included in the start sequence
-     * @param {Date} startTime The start time of the first race
-     * @param {Date} endTime The start time of the last race
-     * @param {RaceType} type The type of race to include in the start sequence
+     * @param {Array<Race>} races Races to build the start sequence for
+     * @param {RaceType} type The type of races included in the start sequence
      * @returns {Promise<Result>} If successful result domainObject will be StartSequence
      */
-    async getStartSequence(startTime, endTime, type) {
-        const result = await this.getRacesBetweenTimesForType(startTime, endTime, type, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
-
-        if (result.success) {
-            let slowestDinghyClass;
-            if (type === RaceType.PURSUIT && result.domainObject.some(race => race.fleet.dinghyClasses.length === 0)) {
-                const slowestDinghyClassResult = await this.getSlowestDinghyClass();
-                if (slowestDinghyClassResult.success) {
-                    slowestDinghyClass = slowestDinghyClassResult.domainObject;
-                }
-                else {
-                    return Promise.resolve(slowestDinghyClassResult);
-                }
+    async getStartSequence(races, type) {
+        let slowestDinghyClass;
+        if (type === RaceType.PURSUIT && races.some(race => race.fleet.dinghyClasses.length === 0)) {
+            const slowestDinghyClassResult = await this.getSlowestDinghyClass();
+            if (slowestDinghyClassResult.success) {
+                slowestDinghyClass = slowestDinghyClassResult.domainObject;
             }
-            if (slowestDinghyClass) {
-                result.domainObject.forEach(race => {
-                    if (race.fleet.dinghyClasses.length === 0) {
-                        race.fleet.dinghyClasses = [slowestDinghyClass];
-                    }
-                })
+            else {
+                return Promise.resolve(slowestDinghyClassResult);
             }
-            const startSequence = new StartSequence(result.domainObject);
-            return Promise.resolve({success: true, domainObject: startSequence});
         }
-        else {
-            return Promise.resolve(result);
+        if (slowestDinghyClass) {
+            races.forEach(race => {
+                if (race.fleet.dinghyClasses.length === 0) {
+                    race.fleet.dinghyClasses = [slowestDinghyClass];
+                }
+            })
         }
+        const startSequence = new StartSequence(races);
+        return Promise.resolve({success: true, domainObject: startSequence});
     }
 
     /**

@@ -35,7 +35,7 @@ afterEach(() => {
 
 it('renders', () => {
     render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
-    const SMScorp1234entry = screen.getByText(/1234/i);
+    const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
     expect(SMScorp1234entry).toBeInTheDocument();
 });
 
@@ -66,7 +66,8 @@ describe('before race has started', () => {
         const entry = {...entryChrisMarshallScorpionA1234, race: {...entryChrisMarshallScorpionA1234.race, plannedStartTime: new Date(Date.now() + 60000)}};
         const addLapCallback = jest.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
-        const SMScorp1234entry = screen.getByText(/1234/i);
+        // const SMScorp1234entry = screen.getByText(/1234/i);
+        const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
             await user.click(SMScorp1234entry);
         });
@@ -80,7 +81,7 @@ describe('after race has started', () => {
         const entry = {...entryChrisMarshallScorpionA1234};
         const addLapCallback = jest.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
-        const SMScorp1234entry = screen.getByText(/1234/i);
+        const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
             await user.click(SMScorp1234entry);
         });
@@ -94,7 +95,7 @@ describe('when a lap is removed from an entry', () => {
         const entry = {...entryChrisMarshallScorpionA1234};
         const removeLapCallback = jest.fn((e) => {entry.laps.pop()});
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
-        const SMScorp1234entry = screen.getByText(/1234/i);
+        const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
             await user.keyboard('{Control>}');
             await user.click(SMScorp1234entry);
@@ -106,7 +107,7 @@ describe('when a lap is removed from an entry', () => {
         const entry = {...entryChrisMarshallScorpionA1234};
         const removeLapCallback = jest.fn((e) => {entry.laps.pop()});
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
-        const SMScorp1234entry = screen.getByText(/1234/i);
+        const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
             await user.keyboard('{Control>}');
             await user.click(SMScorp1234entry);
@@ -122,7 +123,7 @@ describe('when secondary mouse button is clicked', () => {
             const entry = {...entryChrisMarshallScorpionA1234, laps: [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}], 
                 'sumOfLapTimes': 6000};
             render(<RaceEntryView entry={entry} />);
-            const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
             await act(async () => {
                 await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
@@ -141,7 +142,7 @@ describe('when secondary mouse button is clicked', () => {
             const addLapCallback = jest.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
             const entry = {...entryChrisMarshallScorpionA1234, laps: []};
             render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
-            const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             await act(async () => {
                 await user.pointer({target: raceEntryView, keys: '[MouseRight]'});
             });
@@ -159,7 +160,7 @@ describe('when editing a lap time', () => {
         const entry = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}]};
         const addLapCallback = jest.fn();
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
-        const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+        const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
         await act(async () => {
             await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
@@ -174,7 +175,7 @@ describe('when editing a lap time', () => {
         const entry = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}]};
         const removeLapCallback = jest.fn((e) => {entry.laps.pop()});
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
-        const SMScorp1234entry = screen.getByText(/1234/i);
+        const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         const lastCell = SMScorp1234entry.parentElement.lastChild;
         await act(async () => {
             await user.pointer({target: lastCell, keys: '[MouseRight]'});
@@ -194,7 +195,7 @@ describe('when editing a lap time', () => {
         ]};
         const updateLapCallback = jest.fn((entry, value) => {});
         render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
-        const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+        const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
         await act(async () => {
             await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
@@ -216,7 +217,7 @@ describe('when editing a lap time', () => {
         ]};
         const updateLapCallback = jest.fn((entry, value) => {});
         render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
-        const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+        const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
         await act(async () => {
             await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
@@ -237,7 +238,7 @@ describe('when user taps row', () => {
         const entry = {...entryChrisMarshallScorpionA1234, laps: []};
         const addLapCallback = jest.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
-        const SMScorp1234entry = screen.getByText(/1234/i);
+        const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
             await user.pointer([{keys: '[TouchA]', target: SMScorp1234entry}]);
         });
@@ -251,7 +252,7 @@ describe('when user taps and holds on row', () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}]};
         render(<RaceEntryView entry={entry} />);
-        const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+        const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         await act(async () => {
             await user.pointer({target: raceEntryView, keys: '[TouchA>]'});
         });
@@ -275,7 +276,7 @@ describe('when user swipes left on row', () => {
         const entry = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}]};
         const removeLapCallback = jest.fn((e) => {entry.laps.pop()});
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
-        const SMScorp1234entry = screen.getByText(/1234/i);
+        const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         const position1 = SMScorp1234entry.parentElement.children[3];
         const position2 = SMScorp1234entry.parentElement.children[2];
         await act(async () => {
@@ -290,7 +291,7 @@ describe('when entry is on last lap', () => {
     it('has a class of on-last-lap', () => {
         const entryOnLastLap = {...entryChrisMarshallScorpionA1234, laps: [], 'onLastLap': true};
         render(<RaceEntryView entry={entryOnLastLap} />);
-        const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+        const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         expect(raceEntryView.getAttribute('class')).toMatch(/on-last-lap/i);
     });
 });
@@ -298,7 +299,7 @@ describe('when entry is on last lap', () => {
 describe('when entry is not on last lap', () => {
     it('does not have a class of on-last-lap', () => {
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
-        const SMScorp1234entry = screen.getByText(/1234/i).parentElement;
+        const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement;
         expect(SMScorp1234entry.getAttribute('class')).not.toMatch(/on-last-lap/i);
     });
 });
@@ -307,7 +308,7 @@ describe('when entry has finished race', () => {
     it('has a class of finished-race', () => {
         const entryOnLastLap = {...entryChrisMarshallScorpionA1234, 'finishedRace': true};
         render(<RaceEntryView entry={entryOnLastLap} />);
-        const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+        const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         expect(raceEntryView.getAttribute('class')).toMatch(/finished-race/i);
     });
 });
@@ -315,7 +316,7 @@ describe('when entry has finished race', () => {
 describe('when entry has not finished race', () => {
     it('does not have a class of finished-race', () => {
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
-        const SMScorp1234entry = screen.getByText(/1234/i).parentElement;
+        const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement;
         expect(SMScorp1234entry.getAttribute('class')).not.toMatch(/finished-race/i);
     });
 });
@@ -323,7 +324,7 @@ describe('when entry has not finished race', () => {
 describe('when a scoring abbreviation is not selected', () => {
     it('only has a classes of race-entry-view w3-row', () => {
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
-        const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+        const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         expect(raceEntryView.getAttribute('class')).toMatch(/^race-entry-view w3-row w3-border w3-hover-border-blue cursor-pointer preserve-whitespace$/i);
     });
 });
@@ -353,7 +354,7 @@ describe('when a scoring abbreviation is selected', () => {
         it('has a class of did-not-start', () => {
             const entryDNS = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DNS'};
             render(<RaceEntryView entry={entryDNS} />);
-            const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             expect(raceEntryView.getAttribute('class')).toMatch(/did-not-start/i);
         });
     });
@@ -361,7 +362,7 @@ describe('when a scoring abbreviation is selected', () => {
         it('has a class of retired', () => {
             const entryRET = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'RET'};
             render(<RaceEntryView entry={entryRET} />);
-            const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             expect(raceEntryView.getAttribute('class')).toMatch(/retired/i);
         });
     });
@@ -369,7 +370,7 @@ describe('when a scoring abbreviation is selected', () => {
         it('has a class of disqualified', () => {
             const entryRET = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DSQ'};
             render(<RaceEntryView entry={entryRET} />);
-            const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             expect(raceEntryView.getAttribute('class')).toMatch(/disqualified/i);
         });
     });
@@ -377,7 +378,7 @@ describe('when a scoring abbreviation is selected', () => {
         it('has a class of did-not-start', () => {
             const entryDNC = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DNC'};
             render(<RaceEntryView entry={entryDNC} />);
-            const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             expect(raceEntryView.getAttribute('class')).toMatch(/did-not-compete/i);
         });
     });
@@ -385,7 +386,7 @@ describe('when a scoring abbreviation is selected', () => {
         it('has a class of on-course-side', () => {
             const entryOCS = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'OCS'};
             render(<RaceEntryView entry={entryOCS} />);
-            const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             expect(raceEntryView.getAttribute('class')).toMatch(/on-course-side/i);
         });
     });
@@ -393,7 +394,7 @@ describe('when a scoring abbreviation is selected', () => {
         it('has a class of did-not-finish', () => {
             const entryDNF = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DNF'};
             render(<RaceEntryView entry={entryDNF} />);
-            const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             expect(raceEntryView.getAttribute('class')).toMatch(/did-not-finish/i);
         });
     });
@@ -405,7 +406,7 @@ describe('when the entry is selected to add a new lap', () => {
         const entry = {...entryChrisMarshallScorpionA1234};
         const addLapCallback = jest.fn();
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
-        const raceEntryView = screen.getByText(/1234/i).parentElement.parentElement;
+        const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         await act(async () => {
             await user.click(raceEntryView);
         });
@@ -416,7 +417,7 @@ describe('when the entry is selected to add a new lap', () => {
         const entry = {...entryChrisMarshallScorpionA1234, laps: []};
         const addLapCallback = jest.fn();
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
-        const SMScorp1234entry = screen.getByText(/1234/i);
+        const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
             await user.click(SMScorp1234entry);
         });
@@ -451,7 +452,7 @@ describe('when the entry is selected to add a new lap', () => {
             const entry = {...entryChrisMarshallScorpionA1234, laps: []};
             const addLapCallback = jest.fn();
             const { rerender } = render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
-            const SMScorp1234entry = screen.getByText(/1234/i);
+            const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
             await act(async () => {
                 await user.click(SMScorp1234entry);
             });

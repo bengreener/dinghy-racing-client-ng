@@ -5743,79 +5743,6 @@ describe('when a StartSequence is requested', () => {
     it('returns a promise that resolves to a success containing a StartSequence for the races between the start and end times', async () => {
         jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
 
-        fetch.mockImplementation((resource) => {
-            if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&type=FLEET&sort=plannedStartTime,ASC') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200,
-                    json: () => Promise.resolve(racesCollectionHAL)
-                });
-            }
-            if (resource === 'http://localhost:8081/dinghyracing/api/races/4/fleet') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(fleetScorpionHAL)
-                });
-            }
-            if (resource === 'http://localhost:8081/dinghyracing/api/races/7/fleet') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(fleetGraduateHAL)
-                });
-            }
-            if (resource === 'http://localhost:8081/dinghyracing/api/races/17/fleet') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(fleetCometHAL)
-                });
-            }
-            if (resource === 'http://localhost:8081/dinghyracing/api/races/8/fleet') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(fleetHandicapHAL)
-                });
-            }
-            if (resource === 'http://localhost:8081/dinghyracing/api/fleets/1/dinghyClasses') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(fleetScorpionDinghyClassHAL)
-                });
-            }
-            if (resource === 'http://localhost:8081/dinghyracing/api/fleets/2/dinghyClasses') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(fleetHandicapDinghyClassHAL)
-                });
-            }
-            if (resource === 'http://localhost:8081/dinghyracing/api/fleets/3/dinghyClasses') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(fleetGraduateDinghyClassHAL)
-                });
-            }
-            if (resource === 'http://localhost:8081/dinghyracing/api/fleets/4/dinghyClasses') {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, 
-                    json: () => Promise.resolve(fleetCometDinghyClassHAL)
-                });
-            }
-            else {
-                return Promise.resolve({
-                    ok: false,
-                    status: 404,
-                    statusText: 'Not Found'
-                });
-            }
-        });
-
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
 
         const scorpionAWarningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, actions: []};
@@ -5855,7 +5782,7 @@ describe('when a StartSequence is requested', () => {
         handicapAWarningFlag.actions.push(handicapAWarningFlagLowerAction);
 
 
-        const promise = dinghyRacingModel.getStartSequence(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), RaceType.FLEET);
+        const promise = dinghyRacingModel.getStartSequence(races, RaceType.FLEET);
         const result = await promise;
         const actions = result.domainObject.getActions();
 
@@ -5874,22 +5801,7 @@ describe('when a StartSequence is requested', () => {
 
         jest.runOnlyPendingTimers();
         jest.useRealTimers();
-    });
-    it('returns a promise that resolves to a result indicating failure and providing a message indicating cause when a problem is encountered', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: false,
-                status: 404,
-                statusText: 'Not Found',
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.getStartSequence(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), RaceType.FLEET);
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404'});
-    });
+    });    
     describe('when race is a pursuit race', () => {
         describe('when race is an open handicap', () => {
             it('provides the base class to be used for the fleet when calculating start offsets', async () => {
@@ -5940,7 +5852,7 @@ describe('when a StartSequence is requested', () => {
                 cometWarningFlag.actions.push(cometWarningFlagRaiseAction);
                 cometWarningFlag.actions.push(cometWarningFlagLowerAction);
 
-                const result = await dinghyRacingModel.getStartSequence(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), RaceType.PURSUIT);
+                const result = await dinghyRacingModel.getStartSequence([{...raceHandicapA, type: RaceType.PURSUIT}], RaceType.PURSUIT);
                 const actions = result.domainObject.getActions();
 
                 expect(actions).toHaveLength(4);
