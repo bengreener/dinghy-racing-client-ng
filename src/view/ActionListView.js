@@ -74,7 +74,7 @@ function ActionListView({ actions }) {
             <td key='time'>
                 {timeFormat.format(new Date(timestamp))}
             </td>
-            <td key='action'>
+            <td key='action'className='preserve-whitespace'>
                 {actionDescription}
             </td>
             <td key='countdown'>
