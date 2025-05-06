@@ -324,7 +324,7 @@ it('provides option to select start time for first race', async () => {
 it('provides option to select end time for first race', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-    jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     
     await act(async () => {        
         customRender(<RaceConsole />, model);
@@ -340,7 +340,9 @@ it('registers an interest in race updates for races in session', async () => {
     jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     const registerRaceUpdateCallbackSpy = jest.spyOn(model, 'registerRaceUpdateCallback');
 
-    customRender(<RaceConsole />, model, controller);
+    await act(async () => {
+        customRender(<RaceConsole />, model, controller);
+    });
     await screen.findAllByRole('option');
     
     expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/races/4', expect.any(Function));
