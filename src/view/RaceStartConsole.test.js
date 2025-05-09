@@ -236,7 +236,7 @@ it('displays race names and blue peter', async () => {
     expect(within(flagIndicators).getByText(/scorpion class/i)).toBeInTheDocument();
     expect(within(flagIndicators).getByText(/blue peter/i)).toBeInTheDocument();
     expect(within(flagIndicators).getByText(/graduate class/i)).toBeInTheDocument();
-    expect(within(flagIndicators).getByText(/club burgee/i)).toBeInTheDocument();
+    expect(within(flagIndicators).getByText(/handicap class/i)).toBeInTheDocument();
     expect(within(flagIndicators).getByText(/comet class/i)).toBeInTheDocument();
 });
 
@@ -770,7 +770,7 @@ describe('when selected races changed', () => {
         expect(within(flagIndicators).queryByText(/scorpion class/i)).not.toBeInTheDocument();
         expect(within(flagIndicators).getByText(/blue peter/i)).toBeInTheDocument();
         expect(within(flagIndicators).getByText(/graduate class/i)).toBeInTheDocument();
-        expect(within(flagIndicators).getByText(/club burgee/i)).toBeInTheDocument();
+        expect(within(flagIndicators).getByText(/handicap class/i)).toBeInTheDocument();
         expect(within(flagIndicators).getByText(/comet class/i)).toBeInTheDocument();
     });
     it('displays actions to start races in session', async () => {
