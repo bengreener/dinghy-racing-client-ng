@@ -86,8 +86,27 @@ it('updates action countdowns every second', async () => {
         jest.advanceTimersByTime(1000);
     });
     const actionRows = screen.getAllByRole('row');
-    expect(actionRows).toHaveLength(4);
-    expect(await within(actionRows[1]).findByText(/00:00/i)).toBeInTheDocument();
-    expect(await within(actionRows[2]).findByText(/04:59/i)).toBeInTheDocument();
-    expect(await within(actionRows[3]).findByText(/09:59/i)).toBeInTheDocument();
+    expect(actionRows).toHaveLength(3);
+    expect(await within(actionRows[1]).findByText(/04:59/i)).toBeInTheDocument();
+    expect(await within(actionRows[2]).findByText(/09:59/i)).toBeInTheDocument();
+});
+
+it('does not display actions that have expired', async() => {
+    const now = Date.now();
+    const actions = [
+        {flag: {name: 'A Class Flag', role: FlagRole.WARNING}, time: new Date(now - 600000), afterState: FlagState.RAISED},
+        {flag: {name: 'P Flag', role: FlagRole.PREPARATORY}, time: new Date(now - 300000), afterState: FlagState.RAISED},
+        {flag: {name: 'B Class Flag', role: FlagRole.WARNING}, time: new Date(now - 300000), afterState: FlagState.RAISED},
+        {flag: {name: 'A Class Flag', role: FlagRole.WARNING}, time: new Date(now), afterState: FlagState.LOWERED}
+    ];
+    render(<ActionListView actions={actions}/>);
+    const actionRows = screen.getAllByRole('row');
+    expect(actionRows).toHaveLength(2);
+    expect(within(actionRows[1]).queryByText(timeFormat.format(new Date(now - 600000)))).not.toBeInTheDocument();
+    expect(within(actionRows[1]).queryByText(/raise a class flag/i)).not.toBeInTheDocument();
+    expect(within(actionRows[1]).queryByText(timeFormat.format(new Date(now - 300000)))).not.toBeInTheDocument();
+    expect(within(actionRows[1]).queryByText(/raise p flag.+raise b class flag/i)).not.toBeInTheDocument();
+    expect(within(actionRows[1]).getByText(timeFormat.format(new Date(now)))).toBeInTheDocument();
+    expect(within(actionRows[1]).getByText(/lower a class flag/i)).toBeInTheDocument();
+    expect(within(actionRows[1]).getByText(/00:00/i)).toBeInTheDocument();
 });

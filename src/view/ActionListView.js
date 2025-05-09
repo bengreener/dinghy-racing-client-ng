@@ -68,19 +68,22 @@ function ActionListView({ actions }) {
     });
 
     const actionRows = []
+    const now = Date.now();
     actionsDescriptionsMap.forEach((actionDescription, timestamp) => {
-        const countdown = Math.min(time - timestamp, 0);
-        actionRows.push(<tr key={timestamp}>
-            <td key='time'>
-                {timeFormat.format(new Date(timestamp))}
-            </td>
-            <td key='action'className='preserve-whitespace'>
-                {actionDescription}
-            </td>
-            <td key='countdown'>
-                {Clock.formatDuration(countdown, false, true)}
-            </td>
-        </tr>);
+        if (timestamp >= now - 999) { // allow for imprecision; will probably not be exactly on the second and want display to briefly show zero value 
+            const countdown = Math.min(time - timestamp, 0);
+            actionRows.push(<tr key={timestamp}>
+                <td key='time'>
+                    {timeFormat.format(new Date(timestamp))}
+                </td>
+                <td key='action'className='preserve-whitespace'>
+                    {actionDescription}
+                </td>
+                <td key='countdown'>
+                    {Clock.formatDuration(countdown, false, true)}
+                </td>
+            </tr>);
+        }
     });
 
     return (
