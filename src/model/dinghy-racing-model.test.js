@@ -5749,7 +5749,7 @@ describe('when a StartSequence is requested', () => {
         const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
         const graduateAWarningFlag = {name: 'Graduate Class Flag', role: FlagRole.WARNING, actions: []};
         const cometAWarningFlag = {name: 'Comet Class Flag', role: FlagRole.WARNING, actions: []};
-        const handicapAWarningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, actions: []};
+        const handicapAWarningFlag = {name: 'Handicap Class Flag', role: FlagRole.WARNING, actions: []};
     
         const scorpionAWarningFlagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
         const scorpionAWarningFlagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};

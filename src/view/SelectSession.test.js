@@ -125,3 +125,75 @@ describe('when session end is set to an invalid date', () => {
         expect(onSessionEndChangeSpy).toHaveBeenCalledTimes(0);
     });
 });
+
+describe('when session start is set to value greater than session end', () => {
+    it('updates session end to the same as session start', async () => {
+        const user = userEvent.setup();
+        const onSessionStartChangeSpy = jest.fn();
+        const onSessionEndChangeSpy = jest.fn();
+
+        const sessionStart = new Date('2024', '11', '25', 8, 0);
+        const sessionEnd = new Date('2024', '11', '25', 18, 0);
+        render(<SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={onSessionStartChangeSpy} onSessionEndChange={onSessionEndChangeSpy} />);
+
+        const sessionStartInput = screen.getByLabelText(/session start/i);
+        const sessionEndInput = screen.getByLabelText(/session end/i);
+        await act(async () => {
+            await user.clear(sessionStartInput); // clear input to avoid errors when typing in new value
+            await user.type(sessionStartInput, '2025-12-13T09:00');
+        });
+        expect(sessionEndInput).toHaveValue('2025-12-13T09:00');
+    });
+    it('calls session end change handler with date set', async () => {
+        const user = userEvent.setup();
+        const onSessionStartChangeSpy = jest.fn();
+        const onSessionEndChangeSpy = jest.fn();
+
+        const sessionStart = new Date('2024', '11', '25', 8, 0);
+        const sessionEnd = new Date('2024', '11', '25', 18, 0);
+        render(<SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={onSessionStartChangeSpy} onSessionEndChange={onSessionEndChangeSpy} />);
+
+        const sessionStartInput = screen.getByLabelText(/session start/i);
+        await act(async () => {
+            await user.clear(sessionStartInput); // clear input to avoid errors when typing in new value
+            await user.type(sessionStartInput, '2025-12-13T09:00');
+        });
+        expect(onSessionEndChangeSpy).toBeCalledWith(new Date('2025-12-13T09:00'));
+    });
+});
+
+describe('when session start is set to value greater than session end', () => {
+    it('updates session end to the same as session start', async () => {
+        const user = userEvent.setup();
+        const onSessionStartChangeSpy = jest.fn();
+        const onSessionEndChangeSpy = jest.fn();
+
+        const sessionStart = new Date('2024', '11', '25', 8, 0);
+        const sessionEnd = new Date('2024', '11', '25', 18, 0);
+        render(<SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={onSessionStartChangeSpy} onSessionEndChange={onSessionEndChangeSpy} />);
+
+        const sessionStartInput = screen.getByLabelText(/session start/i);
+        const sessionEndInput = screen.getByLabelText(/session end/i);
+        await act(async () => {
+            await user.clear(sessionEndInput); // clear input to avoid errors when typing in new value
+            await user.type(sessionEndInput, '2024-10-13T09:00');
+        });
+        expect(sessionStartInput).toHaveValue('2024-10-13T09:00');
+    });
+    it('updates session start change handler with date set', async() => {
+        const user = userEvent.setup();
+        const onSessionStartChangeSpy = jest.fn();
+        const onSessionEndChangeSpy = jest.fn();
+
+        const sessionStart = new Date('2024', '11', '25', 8, 0);
+        const sessionEnd = new Date('2024', '11', '25', 18, 0);
+        render(<SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={onSessionStartChangeSpy} onSessionEndChange={onSessionEndChangeSpy} />);
+
+        const sessionEndInput = screen.getByLabelText(/session end/i);
+        await act(async () => {
+            await user.clear(sessionEndInput); // clear input to avoid errors when typing in new value
+            await user.type(sessionEndInput, '2024-10-13T09:00');
+        });
+        expect(onSessionStartChangeSpy).toBeCalledWith(new Date('2024-10-13T09:00'));
+    });
+});

@@ -133,12 +133,7 @@ class RaceStartSequence {
 
         if (race.type === RaceType.FLEET) {
             let warningFlag;
-            if (race.fleet.name === 'Handicap') {
-                warningFlag = {name: 'Club Burgee', role: FlagRole.WARNING, actions: []};
-            }
-            else {
-                warningFlag = {name: race.fleet.name + ' Class Flag', role: FlagRole.WARNING, actions: []};
-            }
+            warningFlag = {name: race.fleet.name + ' Class Flag', role: FlagRole.WARNING, actions: []};
             
             const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
 

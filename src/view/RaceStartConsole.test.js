@@ -43,8 +43,6 @@ const timeFormat = new Intl.DateTimeFormat('utc', formatOptions);
 
 beforeEach(() => {
     jest.clearAllMocks();
-    // jest.restoreAllMocks();
-    // jest.resetAllMocks();
     jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:25:00Z'));
     jest.spyOn(global, 'setTimeout');
 });
@@ -238,7 +236,7 @@ it('displays race names and blue peter', async () => {
     expect(within(flagIndicators).getByText(/scorpion class/i)).toBeInTheDocument();
     expect(within(flagIndicators).getByText(/blue peter/i)).toBeInTheDocument();
     expect(within(flagIndicators).getByText(/graduate class/i)).toBeInTheDocument();
-    expect(within(flagIndicators).getByText(/club burgee/i)).toBeInTheDocument();
+    expect(within(flagIndicators).getByText(/handicap class/i)).toBeInTheDocument();
     expect(within(flagIndicators).getByText(/comet class/i)).toBeInTheDocument();
 });
 
@@ -350,20 +348,17 @@ it('displays actions to start races in session', async () => {
         customRender(<RaceStartConsole />, model, controller);
     });
     const actionRows = screen.getAllByRole('row');
-    expect(actionRows).toHaveLength(5);
-    expect(within(actionRows[1]).getByText(timeFormat.format(new Date('2021-10-14T10:20:00Z')))).toBeInTheDocument();
-    expect(within(actionRows[1]).getByText(/raise scorpion class flag/i)).toBeInTheDocument();
+    expect(actionRows).toHaveLength(4);
+    expect(within(actionRows[1]).getByText(timeFormat.format(new Date('2021-10-14T10:25:00Z')))).toBeInTheDocument();
+    expect(within(actionRows[1]).getByText(/raise blue peter/i)).toBeInTheDocument();
+    expect(within(actionRows[1]).getByText(/raise graduate class flag/i)).toBeInTheDocument();
     expect(within(actionRows[1]).getByText(/00:00/i)).toBeInTheDocument();
-    expect(within(actionRows[2]).getByText(timeFormat.format(new Date('2021-10-14T10:25:00Z')))).toBeInTheDocument();
-    expect(within(actionRows[2]).getByText(/raise blue peter/i)).toBeInTheDocument();
-    expect(within(actionRows[2]).getByText(/raise graduate class flag/i)).toBeInTheDocument();
-    expect(within(actionRows[2]).getByText(/00:00/i)).toBeInTheDocument();
-    expect(within(actionRows[3]).getByText(timeFormat.format(new Date('2021-10-14T10:30:00Z')))).toBeInTheDocument();
-    expect(within(actionRows[3]).getByText(/lower scorpion class flag/i)).toBeInTheDocument();
-    expect(within(actionRows[3]).getByText(/05:00/i)).toBeInTheDocument();
-    expect(within(actionRows[4]).getByText(timeFormat.format(new Date('2021-10-14T10:35:00Z')))).toBeInTheDocument();
-    expect(within(actionRows[4]).getByText(/lower graduate class flag/i)).toBeInTheDocument();
-    expect(within(actionRows[4]).getByText(/10:00/i)).toBeInTheDocument();
+    expect(within(actionRows[2]).getByText(timeFormat.format(new Date('2021-10-14T10:30:00Z')))).toBeInTheDocument();
+    expect(within(actionRows[2]).getByText(/lower scorpion class flag/i)).toBeInTheDocument();
+    expect(within(actionRows[2]).getByText(/05:00/i)).toBeInTheDocument();
+    expect(within(actionRows[3]).getByText(timeFormat.format(new Date('2021-10-14T10:35:00Z')))).toBeInTheDocument();
+    expect(within(actionRows[3]).getByText(/lower graduate class flag/i)).toBeInTheDocument();
+    expect(within(actionRows[3]).getByText(/10:00/i)).toBeInTheDocument();
 });
 
 describe('when clock ticks', () => {
@@ -407,7 +402,6 @@ describe('when clock ticks', () => {
         });
     });
     it('updates countdown for actions', async () => {
-        jest.setSystemTime(new Date('2021-10-14T10:25:00Z'));
         const races = [raceScorpionA, raceGraduateA];
 
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -423,20 +417,13 @@ describe('when clock ticks', () => {
         });
 
         const actionRows = screen.getAllByRole('row');
-        expect(actionRows).toHaveLength(5);
-        expect(within(actionRows[1]).getByText(timeFormat.format(new Date('2021-10-14T10:20:00Z')))).toBeInTheDocument();
-        expect(within(actionRows[1]).getByText(/raise scorpion class flag/i)).toBeInTheDocument();
-        expect(within(actionRows[1]).getByText(/00:00/i)).toBeInTheDocument();
-        expect(within(actionRows[2]).getByText(timeFormat.format(new Date('2021-10-14T10:25:00Z')))).toBeInTheDocument();
-        expect(within(actionRows[2]).getByText(/raise blue peter/i)).toBeInTheDocument();
-        expect(within(actionRows[2]).getByText(/raise graduate class flag/i)).toBeInTheDocument();
-        expect(within(actionRows[2]).getByText(/00:00/i)).toBeInTheDocument();
-        expect(within(actionRows[3]).getByText(timeFormat.format(new Date('2021-10-14T10:30:00Z')))).toBeInTheDocument();
-        expect(within(actionRows[3]).getByText(/lower scorpion class flag/i)).toBeInTheDocument();
-        expect(within(actionRows[3]).getByText(/04:59/i)).toBeInTheDocument();
-        expect(within(actionRows[4]).getByText(timeFormat.format(new Date('2021-10-14T10:35:00Z')))).toBeInTheDocument();
-        expect(within(actionRows[4]).getByText(/lower graduate class flag/i)).toBeInTheDocument();
-        expect(within(actionRows[4]).getByText(/09:59/i)).toBeInTheDocument();
+        expect(actionRows).toHaveLength(3);
+        expect(within(actionRows[1]).getByText(timeFormat.format(new Date('2021-10-14T10:30:00Z')))).toBeInTheDocument();
+        expect(within(actionRows[1]).getByText(/lower scorpion class flag/i)).toBeInTheDocument();
+        expect(within(actionRows[1]).getByText(/04:59/i)).toBeInTheDocument();
+        expect(within(actionRows[2]).getByText(timeFormat.format(new Date('2021-10-14T10:35:00Z')))).toBeInTheDocument();
+        expect(within(actionRows[2]).getByText(/lower graduate class flag/i)).toBeInTheDocument();
+        expect(within(actionRows[2]).getByText(/09:59/i)).toBeInTheDocument();
     });
     describe('when ticks to 1 minute before a race start state change', () => {
         // unsure how to test audio using a variable to control audio rather than <audio> element
@@ -783,7 +770,7 @@ describe('when selected races changed', () => {
         expect(within(flagIndicators).queryByText(/scorpion class/i)).not.toBeInTheDocument();
         expect(within(flagIndicators).getByText(/blue peter/i)).toBeInTheDocument();
         expect(within(flagIndicators).getByText(/graduate class/i)).toBeInTheDocument();
-        expect(within(flagIndicators).getByText(/club burgee/i)).toBeInTheDocument();
+        expect(within(flagIndicators).getByText(/handicap class/i)).toBeInTheDocument();
         expect(within(flagIndicators).getByText(/comet class/i)).toBeInTheDocument();
     });
     it('displays actions to start races in session', async () => {

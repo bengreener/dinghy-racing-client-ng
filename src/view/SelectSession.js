@@ -18,7 +18,7 @@ import { useState } from 'react';
 
 /**
  * Select the time window for a set of races.
- * Converts values dates passed as session start and session end times to loval equivalents for display.
+ * Converts values dates passed as session start and session end times to local equivalents for display.
  * Converst values entered back into UTC date values when calling onSessionStartChange and onSessionEndChange.
  * @param {Object} props
  * @param {Date} props.sessionStart date
@@ -48,38 +48,43 @@ function SelectSession({ sessionStart, sessionEnd, onSessionStartChange, onSessi
     function handleSessionStartChange(event) {
         if (!isNaN(Date.parse(event.target.value))) {
             const newTime = new Date(event.target.value);
-            if (end === '' || newTime < new Date(end)) {
-                setStart(event.target.value);
-                setMessage('');
-                if (onSessionStartChange) {
-                    onSessionStartChange(newTime);
-                }
+            setStart(event.target.value);
+            setMessage('');
+            if (onSessionStartChange) {
+                onSessionStartChange(newTime);
             }
-            else {
-                setMessage('Session start must be before session end.')
+            if (end === '' || newTime > new Date(end)) {
+                setEnd(event.target.value);
+                if (onSessionEndChange) {
+                    onSessionEndChange(newTime);
+                }
             }
         }
         else {
+            // update date time value so user can continue to set date and time
             setStart(event.target.value);
-            setMessage('');
+		    setMessage('');
         }
     }
 
     function handleSessionEndChange(event) {
         if (!isNaN(Date.parse(event.target.value))) {
             const newTime = new Date(event.target.value);
-            if (start === '' || new Date(start) < newTime) {
-                setEnd(event.target.value);
-                setMessage('');
-                if (onSessionEndChange) {
-                    onSessionEndChange(newTime);
-                }
+            setEnd(event.target.value);
+            setMessage('');
+            if (onSessionEndChange) {
+                onSessionEndChange(newTime);
             }
-            else {
-                setMessage('Session end must be after session start.')
+            if (start === '' || newTime < new Date(start)) {
+                setStart(event.target.value);
+                setMessage('');
+                if (onSessionStartChange) {
+                    onSessionStartChange(newTime);
+                }
             }
         }
         else {
+            // update date time value so user can continue to set date and time
             setEnd(event.target.value);
             setMessage('');
         }
