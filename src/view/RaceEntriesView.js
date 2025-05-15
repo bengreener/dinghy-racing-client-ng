@@ -35,7 +35,7 @@ function RaceEntriesView({ races }) {
     const [message, setMessage] = useState('');
     const [sortOrder, setSortOrder] = useState('default');
     const [entriesUpdateRequestAt, setEntriesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies an entry has been updated
-    const [displayOrder, setDisplayOrder] = useState([]);
+    const [displayOrder, setDisplayOrder] = useState([]); // holds entriesMap keys in the order they are to be displayed
 
     const updateEntries = useCallback(() => {
         setEntriesUpdateRequestAt(Date.now());
@@ -234,7 +234,7 @@ function RaceEntriesView({ races }) {
             // find position of subject and target in display array
             const subjectIndex = displayOrder.indexOf(subjectKey);
             const targetIndex = displayOrder.indexOf(targetKey);
-            // remove subject from it currnet position in display order
+            // remove subject from it current position in display order
             let newDisplayOrder = displayOrder.toSpliced(subjectIndex, 1);
             // insert subject in new position in display order
             newDisplayOrder.splice(Math.max(0, targetIndex), 0, subjectKey);

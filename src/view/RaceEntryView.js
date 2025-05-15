@@ -27,9 +27,10 @@ import RaceType from '../model/domain-classes/race-type';
  * @param {function} props.updateLap
  * @param {function} props.setScoringAbbreviation
  * @param {function} props.onRaceEntryDrop
+ * @param {function} [props.onFastGroup]
  * @returns {HTMLTableRowElement}
  */
-function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, onRaceEntryDrop}) {
+function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, onRaceEntryDrop, onFastGroup}) {
     const [editMode, setEditMode] = useState(false);
     const [disabled, setDisabled] = useState(false);
     const prevLapCount = useRef(entry.laps.length);
@@ -280,6 +281,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
             <div className='w3-col m1 w3-padding-small'>
                 <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
             </div>
+            {onFastGroup ? <div className='w3-col m1 w3-padding-small'><input type='checkbox' onClick={onFastGroup} /></div> : null}
         </div>
     )
 }
