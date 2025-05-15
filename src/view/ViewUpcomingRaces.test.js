@@ -54,7 +54,7 @@ it('defaults start time for race selection to now', async () => {
     expect(screen.getByLabelText(/session start/i)).toHaveValue(now.toISOString().substring(0, 16));
 });
 
-it('defaults end time for race selection to 18:00 today', async () => {
+it('defaults end time for race selection to 20:00 today', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
     jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': []})});
@@ -62,7 +62,7 @@ it('defaults end time for race selection to 18:00 today', async () => {
         await customRender(<ViewUpcomingRaces />, model);
     });
     
-    expect(screen.getByLabelText(/session end/i)).toHaveValue(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000).toISOString().substring(0, 16));
+    expect(screen.getByLabelText(/session end/i)).toHaveValue(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000).toISOString().substring(0, 16));
 });
 
 // test could be affected by date time local settings
