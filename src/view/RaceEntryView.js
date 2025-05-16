@@ -177,6 +177,13 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         }
     }
 
+    function handleFastGroupClick(event) {
+        event.stopPropagation();
+        if (onFastGroup) {
+            onFastGroup(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
+        }
+    }
+
     function dragStartHandler(event) {
         event.dataTransfer.setData('text/html', entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
         event.dataTransfer.dropEffect = 'move';
@@ -270,7 +277,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
             <div className='w3-col m2 w3-padding-small bgis-cell' >
                 <output>{entry.helm.name}</output>
             </div>
-            <div className='w3-col m1 w3-padding-small' >
+            <div className='w3-col m1-half w3-padding-small' >
                 <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'}>{entry.position != null ? entry.position : ' '}</output>
             </div>
             <div className='w3-col m5 w3-hide-small'>
@@ -281,7 +288,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
             <div className='w3-col m1 w3-padding-small'>
                 <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
             </div>
-            {onFastGroup ? <div className='w3-col m1 w3-padding-small'><input type='checkbox' onClick={onFastGroup} /></div> : null}
+            {onFastGroup ? <div className='w3-col m1-half w3-padding-small'><input type='checkbox' onClick={handleFastGroupClick} /></div> : null}
         </div>
     )
 }

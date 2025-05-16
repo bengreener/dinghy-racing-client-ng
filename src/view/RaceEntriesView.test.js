@@ -429,6 +429,71 @@ describe('when sorting entries', () => {
     });
 });
 
+describe('when fast grouping entries', () => {
+    it('moves first entry selected for fast group to top of entries list', async () => {
+        const entriesScorpionA = [
+            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'},
+            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'}
+        ];
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+            if (race.name === 'Scorpion A') {
+                return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+            }
+            else if (race.name === 'Graduate A') {
+                return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
+            }    
+        });
+        await act(async () => {
+            customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
+        });
+        const entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'})).parentElement.parentElement;
+        const onFastGroupButton = within(entry).getByRole('checkbox');
+        await act(async () => {
+            await user.click(onFastGroupButton);
+        });
+        const raceEntryViews = document.getElementsByClassName('race-entry-view');
+        expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
+        expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
+    });
+});
+
+describe('when removing an entry from fast group', () => {
+    it('moves entry to below fast group', async () => {
+        const entriesScorpionA = [
+            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'},
+            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'}
+        ];
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+            if (race.name === 'Scorpion A') {
+                return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+            }
+            else if (race.name === 'Graduate A') {
+                return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
+            }    
+        });
+        await act(async () => {
+            customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
+        });
+        const entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'})).parentElement.parentElement;
+        const onFastGroupButton = within(entry).getByRole('checkbox');
+        // check fast group
+        await act(async () => {
+            await user.click(onFastGroupButton);
+        });
+        // uncheck fast group
+        await act(async () => {
+            await user.click(onFastGroupButton);
+        });
+        const raceEntryViews = document.getElementsByClassName('race-entry-view');
+        expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
+        expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
+    });
+});
+
 describe('when adding a lap time', () => {
     it('calls controller add lap function with value of time sailed', async () => {
         const entrySarahPascalScorpionA6745 = {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [

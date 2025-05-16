@@ -631,7 +631,7 @@ describe('when handler set for onFastGroup', () => {
 
         expect(fastGroupButton).toBeChecked();
     });
-    it('calls handler when fast group option is checked', async () => {
+    it('calls handler with key for entry when fast group option is checked', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         const onFastGroupHandlerSpy = jest.fn();
 
@@ -641,7 +641,7 @@ describe('when handler set for onFastGroup', () => {
             user.click(fastGroupButton);
         });
 
-        expect(onFastGroupHandlerSpy).toHaveBeenCalled();
+        expect(onFastGroupHandlerSpy).toHaveBeenCalledWith('Scorpion1234Chris Marshall');
     });
 });
 

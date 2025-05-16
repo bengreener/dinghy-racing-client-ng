@@ -36,6 +36,7 @@ function RaceEntriesView({ races }) {
     const [sortOrder, setSortOrder] = useState('default');
     const [entriesUpdateRequestAt, setEntriesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies an entry has been updated
     const [displayOrder, setDisplayOrder] = useState([]); // holds entriesMap keys in the order they are to be displayed
+    const [fastGroup, setFastGroup] = useState([]); // holds the entriesMap keys of entries that have been fast grouped
 
     const updateEntries = useCallback(() => {
         setEntriesUpdateRequestAt(Date.now());
@@ -141,7 +142,7 @@ function RaceEntriesView({ races }) {
                 break;
             default:
                 ordered = sortArray(entries, (entry) => {
-                    return [entry.dinghy.dinghyClass.name, Number(entry.dinghy.sailNumber)];
+                    return [entry.dinghy.dinghyClass.name, isNaN(entry.dinghy.sailNumber) ? entry.dinghy.sailNumber : Number(entry.dinghy.sailNumber)];
                 });
         }
         return ordered.map(entry => entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
@@ -179,6 +180,25 @@ function RaceEntriesView({ races }) {
             setMessage(result.message);
         }
     }
+
+    function onFastGroup(entryKey) {
+        if (fastGroup.includes(entryKey)) {
+            // remove entry from fastGroup and current position in display order
+            setFastGroup(fastGroup.toSpliced(fastGroup.indexOf(entryKey), 1));
+            const newDisplayOrder = displayOrder.toSpliced(displayOrder.indexOf(entryKey), 1);
+            // move entry to new position in display order
+            setDisplayOrder(newDisplayOrder); // getEntriesDisplay will put entry back where it should be based on the current sort
+        }
+        else {
+            // remove entry from it current position in display order
+            const subjectIndex = displayOrder.indexOf(entryKey);
+            const newDisplayOrder = displayOrder.toSpliced(subjectIndex, 1);
+            // insert subject in new position in display order
+            newDisplayOrder.splice(fastGroup.length, 0, entryKey);
+            setFastGroup(fastGroup.toSpliced(fastGroup.length, 0, entryKey));
+            setDisplayOrder(newDisplayOrder);
+        }
+    };
 
     function getLastEntryPosition() {
         let lowestPosition = 0;
@@ -235,7 +255,7 @@ function RaceEntriesView({ races }) {
             const subjectIndex = displayOrder.indexOf(subjectKey);
             const targetIndex = displayOrder.indexOf(targetKey);
             // remove subject from it current position in display order
-            let newDisplayOrder = displayOrder.toSpliced(subjectIndex, 1);
+            const newDisplayOrder = displayOrder.toSpliced(subjectIndex, 1);
             // insert subject in new position in display order
             newDisplayOrder.splice(Math.max(0, targetIndex), 0, subjectKey);
             // set new display order
@@ -261,13 +281,28 @@ function RaceEntriesView({ races }) {
         const entriesInDisplayOrder = Array.from(entriesMap.keys()).every(key => displayOrder.includes(key));
         const displayOrderIncludesEntries = displayOrder.every(key => entriesMap.has(key));
         if (!(entriesInDisplayOrder && displayOrderIncludesEntries)) {
-            setDisplayOrder(sorted(Array.from(entriesMap.values()), sortOrder));
+            const displayOrder = sorted(Array.from(entriesMap.values()), sortOrder);
+            // ensure fast group containes only entries still included in selected races
+            const tempFastGroup = [];
+            fastGroup.forEach((entryKey) => {
+                if (displayOrder.includes(entryKey)) {
+                    tempFastGroup.push(entryKey);
+                }
+            });
+            tempFastGroup.forEach((entryKey) => {
+                if (displayOrder.includes(entryKey)) {
+                    displayOrder.splice(displayOrder.indexOf(entryKey), 1);
+                    displayOrder.splice(tempFastGroup.indexOf(entryKey), 0, entryKey);
+                }
+            });
+            setFastGroup(tempFastGroup);
+            setDisplayOrder(displayOrder);
         }
 
         return displayOrder.map(key => {
             const entry = entriesMap.get(key);
             return <RaceEntryView key={key} entry={entry} addLap={addLap}
-                removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} />
+                removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} onFastGroup={onFastGroup} />
         });
     }
 
