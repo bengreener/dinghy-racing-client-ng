@@ -30,7 +30,7 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
     const model = useContext(ModelContext);
     const [sessionStart, setSessionStart] = useState(new Date());
     const [sessionEnd, setSessionEnd] = useState(() => {
-        const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000); // create as 18:00 UTC intially
+        const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000); // create as 20:00 UTC intially
         sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
         return sessionEnd;
     });
