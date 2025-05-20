@@ -281,28 +281,35 @@ function RaceEntriesView({ races }) {
         const entriesInDisplayOrder = Array.from(entriesMap.keys()).every(key => displayOrder.includes(key));
         const displayOrderIncludesEntries = displayOrder.every(key => entriesMap.has(key));
         if (!(entriesInDisplayOrder && displayOrderIncludesEntries)) {
-            const displayOrder = sorted(Array.from(entriesMap.values()), sortOrder);
+            const tempDisplayOrder = sorted(Array.from(entriesMap.values()), sortOrder);
             // ensure fast group containes only entries still included in selected races
             const tempFastGroup = [];
             fastGroup.forEach((entryKey) => {
-                if (displayOrder.includes(entryKey)) {
+                if (tempDisplayOrder.includes(entryKey)) {
                     tempFastGroup.push(entryKey);
                 }
             });
             tempFastGroup.forEach((entryKey) => {
-                if (displayOrder.includes(entryKey)) {
-                    displayOrder.splice(displayOrder.indexOf(entryKey), 1);
-                    displayOrder.splice(tempFastGroup.indexOf(entryKey), 0, entryKey);
+                if (tempDisplayOrder.includes(entryKey)) {
+                    tempDisplayOrder.splice(tempDisplayOrder.indexOf(entryKey), 1);
+                    tempDisplayOrder.splice(tempFastGroup.indexOf(entryKey), 0, entryKey);
                 }
             });
             setFastGroup(tempFastGroup);
-            setDisplayOrder(displayOrder);
+            setDisplayOrder(tempDisplayOrder);
         }
 
         return displayOrder.map(key => {
             const entry = entriesMap.get(key);
-            return <RaceEntryView key={key} entry={entry} addLap={addLap}
-                removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} onFastGroup={onFastGroup} />
+            if (!entry) return null; // allow for display keys that map to a non existent entry after a race is removed from the selection; fixed by next render
+            if (entry.race.type === RaceType.FLEET) {
+                return <RaceEntryView key={key} entry={entry} addLap={addLap}
+                    removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} onFastGroup={onFastGroup} />
+            }
+            else {
+                return <RaceEntryView key={key} entry={entry} addLap={addLap}
+                    removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} />
+            }
         });
     }
 

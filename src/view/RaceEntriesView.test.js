@@ -22,10 +22,11 @@ import RaceEntriesView from './RaceEntriesView';
 import { httpRootURL, wsRootURL, 
     competitorSarahPascal, competitorChrisMarshall, competitorJillMyer,
     dinghy6745, dinghy1234, dinghy2928, dinghy2726,
-    raceScorpionA, raceGraduateA, raceCometA,
-    entriesScorpionA, entriesGraduateA,
+    raceScorpionA, raceGraduateA, racePursuitA,
+    entriesScorpionA, entriesGraduateA, entriesPursuitA,
     entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745, entryJillMyerCometA826,
     competitorLouScrew} from '../model/__mocks__/test-data';
+import { entriesGraduateA_bigData } from '../model/__mocks__/test-data-more-data';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 
 jest.mock('../model/dinghy-racing-model');
@@ -456,6 +457,37 @@ describe('when fast grouping entries', () => {
         const raceEntryViews = document.getElementsByClassName('race-entry-view');
         expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
         expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
+    });
+    it('shows entries in order selected with first entry selected at the top', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+            if (race.name === 'Graduate A') {
+                return Promise.resolve({'success': true, 'domainObject': entriesGraduateA_bigData});
+            }
+        });
+        await act(async () => {
+            customRender(<RaceEntriesView races={[raceGraduateA]} />, model);
+        });
+        let entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '2928'})).parentElement.parentElement;
+        let onFastGroupButton = within(entry).getByRole('checkbox');
+        await act(async () => {
+            await user.click(onFastGroupButton);
+        });
+        entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '2009'})).parentElement.parentElement;
+        onFastGroupButton = within(entry).getByRole('checkbox');
+        await act(async () => {
+            await user.click(onFastGroupButton);
+        });
+        entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '2373'})).parentElement.parentElement;
+        onFastGroupButton = within(entry).getByRole('checkbox');
+        await act(async () => {
+            await user.click(onFastGroupButton);
+        });
+        const raceEntryViews = document.getElementsByClassName('race-entry-view');
+        expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '2928'})).toBeInTheDocument();
+        expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '2009'})).toBeInTheDocument();
+        expect(within(raceEntryViews[2]).getByRole('status', {name: (content, node) => node.textContent === '2373'})).toBeInTheDocument();
     });
 });
 
@@ -1342,5 +1374,23 @@ describe('when refresh button clicked', () => {
             user.click(refreshButton);
         });
         expect(await screen.findByText('10:25')).toBeInTheDocument();
+    });
+});
+
+describe('when race is a pursuit race', () => {
+    it('does not show option to fast group entries', async () => {
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+            if (race.name === 'Pursuit A') {
+                return Promise.resolve({'success': true, 'domainObject': entriesPursuitA});
+            }
+        });
+        await act(async () => {
+            customRender(<RaceEntriesView races={[racePursuitA]} />, model);
+        });
+        const entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'})).parentElement.parentElement;        
+        expect(within(entry).queryByRole('checkbox')).not.toBeInTheDocument();
+        
     });
 });
