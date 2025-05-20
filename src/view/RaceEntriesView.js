@@ -304,7 +304,7 @@ function RaceEntriesView({ races }) {
             if (!entry) return null; // allow for display keys that map to a non existent entry after a race is removed from the selection; fixed by next render
             if (entry.race.type === RaceType.FLEET) {
                 return <RaceEntryView key={key} entry={entry} addLap={addLap}
-                    removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} onFastGroup={onFastGroup} />
+                    removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} onFastGroup={onFastGroup} inFastGroup={fastGroup.includes(key)} />
             }
             else {
                 return <RaceEntryView key={key} entry={entry} addLap={addLap}
@@ -314,6 +314,7 @@ function RaceEntriesView({ races }) {
     }
 
     function sortButtonClick(sortOrder) {
+        setFastGroup([]);
         setDisplayOrder(sorted(Array.from(entriesMap.values()), sortOrder));
         setSortOrder(sortOrder);
     }

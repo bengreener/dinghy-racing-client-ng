@@ -619,17 +619,26 @@ describe('when handler set for onFastGroup', () => {
         const fastGroupButton = screen.getByRole('checkbox');
         expect(fastGroupButton).toBeInTheDocument();
     });
-    it('displays as checked when clicked by user', async () => {
+    it('fast group option shows selected when inFastGroup prop is true', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         const onFastGroupHandlerSpy = jest.fn();
 
-        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} />);
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} inFastGroup={true} />);
         const fastGroupButton = screen.getByRole('checkbox');
-        await act(async () => {
-            user.click(fastGroupButton);
-        });
+        // await act(async () => {
+        //     user.click(fastGroupButton);
+        // });
 
         expect(fastGroupButton).toBeChecked();
+    });
+    it('fast group option shows unselected when inFastGroup prop is false', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const onFastGroupHandlerSpy = jest.fn();
+
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} inFastGroup={false} />);
+        const fastGroupButton = screen.getByRole('checkbox');
+
+        expect(fastGroupButton).not.toBeChecked();
     });
     it('calls handler with key for entry when fast group option is checked', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});

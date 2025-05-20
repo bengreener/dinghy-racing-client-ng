@@ -28,9 +28,10 @@ import RaceType from '../model/domain-classes/race-type';
  * @param {function} props.setScoringAbbreviation
  * @param {function} props.onRaceEntryDrop
  * @param {function} [props.onFastGroup]
+ * @param {boolean} [props.inFastGroup = false]
  * @returns {HTMLTableRowElement}
  */
-function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, onRaceEntryDrop, onFastGroup}) {
+function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, onRaceEntryDrop, onFastGroup, inFastGroup = false}) {
     const [editMode, setEditMode] = useState(false);
     const [disabled, setDisabled] = useState(false);
     const prevLapCount = useRef(entry.laps.length);
@@ -178,7 +179,10 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     }
 
     function handleFastGroupClick(event) {
-        event.stopPropagation();
+        event.stopPropagation(); // do not want to call add lap
+    }
+
+    function handleFastGroupChange(event) {
         if (onFastGroup) {
             onFastGroup(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
         }
@@ -288,7 +292,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
             <div className='w3-col m1 w3-padding-small'>
                 <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
             </div>
-            {onFastGroup ? <div className='w3-col m1-half w3-padding-small'><input type='checkbox' onClick={handleFastGroupClick} /></div> : null}
+            {onFastGroup ? <div className='w3-col m1-half w3-padding-small'><input type='checkbox' onClick={handleFastGroupClick} onChange={handleFastGroupChange} checked={inFastGroup} /></div> : null}
         </div>
     )
 }
