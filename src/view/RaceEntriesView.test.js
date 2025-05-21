@@ -22,8 +22,8 @@ import RaceEntriesView from './RaceEntriesView';
 import { httpRootURL, wsRootURL, 
     competitorSarahPascal, competitorChrisMarshall, competitorJillMyer,
     dinghy6745, dinghy1234, dinghy2928, dinghy2726,
-    raceScorpionA, raceGraduateA, racePursuitA,
-    entriesScorpionA, entriesGraduateA, entriesPursuitA,
+    raceScorpionA, raceGraduateA, raceCometA, racePursuitA,
+    entriesScorpionA, entriesGraduateA, entriesCometA, entriesPursuitA,
     entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745, entryJillMyerCometA826,
     competitorLouScrew} from '../model/__mocks__/test-data';
 import { entriesGraduateA_bigData } from '../model/__mocks__/test-data-more-data';
@@ -589,6 +589,74 @@ describe('when fast grouping entries', () => {
         expect(within(raceEntryViews[0]).getByRole('checkbox')).toBeChecked();
         expect(within(raceEntryViews[1]).getByRole('checkbox')).toBeChecked();
         expect(within(raceEntryViews[2]).getByRole('checkbox')).not.toBeChecked();
+    });
+    describe('when an additional race is selected', () => {
+        it('shows fast grouped entries at top of display order', async () => {
+            const user = userEvent.setup();
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            let render;
+            jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+                if (race.name === 'Scorpion A') {
+                    return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+                }
+                else if (race.name === 'Comet A') {
+                    return Promise.resolve({'success': true, 'domainObject': entriesCometA});
+                }
+            });
+            await act(async () => {
+                render = customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
+            });
+            // fast group entries
+            const entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'})).parentElement.parentElement;
+            const onFastGroupButton = within(entry).getByRole('checkbox');
+            await act(async () => {
+                await user.click(onFastGroupButton);
+            });
+            // select additional race
+            await act(async () => {
+                render.rerender(<RaceEntriesView races={[raceScorpionA, raceCometA]} />, model);
+            });
+            const raceEntryViews = document.getElementsByClassName('race-entry-view');
+            expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
+            expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '826'})).toBeInTheDocument();
+            expect(within(raceEntryViews[2]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
+        });
+    });
+    describe('when a race is deselected', () => {
+        it('shows fast grouped entries at top of display order', async () => {
+            const user = userEvent.setup();
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            let render;
+            jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+                if (race.name === 'Scorpion A') {
+                    return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+                }
+                else if (race.name === 'Comet A') {
+                    return Promise.resolve({'success': true, 'domainObject': entriesCometA});
+                }
+            });
+            await act(async () => {
+                render = customRender(<RaceEntriesView races={[raceScorpionA, raceCometA]} />, model);
+            });
+            // fast group entries
+            let entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '826'})).parentElement.parentElement;
+            let onFastGroupButton = within(entry).getByRole('checkbox');
+            await act(async () => {
+                await user.click(onFastGroupButton);
+            });
+            entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'})).parentElement.parentElement;
+            onFastGroupButton = within(entry).getByRole('checkbox');
+            await act(async () => {
+                await user.click(onFastGroupButton);
+            });
+            // deselect race
+            await act(async () => {
+                render.rerender(<RaceEntriesView races={[raceScorpionA]} />, model);
+            });
+            const raceEntryViews = document.getElementsByClassName('race-entry-view');
+            expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
+            expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
+        });
     });
 });
 
