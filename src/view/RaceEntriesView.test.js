@@ -561,10 +561,8 @@ describe('when fast grouping entries', () => {
         expect(within(raceEntryViews[0]).getByRole('checkbox')).toBeChecked();
         expect(within(raceEntryViews[1]).getByRole('checkbox')).toBeChecked();
         expect(within(raceEntryViews[2]).getByRole('checkbox')).not.toBeChecked();
-    })
+    });
 });
-
-
 
 describe('when removing an entry from fast group', () => {
     it('moves entry to below fast group', async () => {
@@ -1417,6 +1415,155 @@ describe('when user drags and drops an entry to a new position', () => {
             });
             expect(setUpdateEntryPositionSpy).not.toBeCalled();
             expect(await screen.findByText(/cannot change position of an entry with a scoring abbreviation/i)).toBeInTheDocument();
+        });
+    });
+    describe('when a non-fast grouped entry is dropped onto a fast grouped entry', () => {
+        it('inserts dropped entry into fast group at location of target and treats dropped entry as fast grouped', async () => {
+            const entriesScorpionA = [
+                {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'},
+                {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'}
+            ];
+            const user = userEvent.setup();
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+                if (race.name === 'Scorpion A') {
+                    return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+                }
+                else if (race.name === 'Graduate A') {
+                    return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
+                }    
+            });
+            await act(async () => {
+                customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
+            });
+            // select entry into fast group
+            const entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'})).parentElement.parentElement;
+            const onFastGroupButton = within(entry).getByRole('checkbox');
+            await act(async () => {
+                await user.click(onFastGroupButton);
+            });
+            // drag and drop entry into fast group
+            const raceEntryViews = document.getElementsByClassName('race-entry-view');
+            const targetREV = screen.getByRole('status', {name: (content, node) => node.textContent === '6745'}).parentElement.parentElement;
+            const subjectREV = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+
+            const dataTransferObject = {
+                data: new Map(), 
+                setData(key, value) {this.data.set(key, value)},
+                getData(key) {return this.data.get(key)}
+            };
+            await act(async () => {
+                fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
+            });
+            await act(async () => {
+                fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
+            });
+
+            expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
+            expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
+            expect(within(raceEntryViews[0]).getByRole('checkbox')).toBeChecked();
+            expect(within(raceEntryViews[1]).getByRole('checkbox')).toBeChecked();
+        });
+    });
+    describe('when a fast grouped entry is dragged onto a non-fast grouped entry', () => {
+        it('inserts dropped entry into display at location of target and removes dropped entry from fast group', async () => {
+            const entriesScorpionA = [
+                {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'},
+                {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'}
+            ];
+            const user = userEvent.setup();
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+                if (race.name === 'Scorpion A') {
+                    return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+                }
+                else if (race.name === 'Graduate A') {
+                    return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
+                }    
+            });
+            await act(async () => {
+                customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
+            });
+            // select entry into fast group
+            const entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'})).parentElement.parentElement;
+            const onFastGroupButton = within(entry).getByRole('checkbox');
+            await act(async () => {
+                await user.click(onFastGroupButton);
+            });
+            // drag and drop entry into fast group
+            const raceEntryViews = document.getElementsByClassName('race-entry-view');
+            const targetREV = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+            const subjectREV = screen.getByRole('status', {name: (content, node) => node.textContent === '6745'}).parentElement.parentElement;
+
+            const dataTransferObject = {
+                data: new Map(), 
+                setData(key, value) {this.data.set(key, value)},
+                getData(key) {return this.data.get(key)}
+            };
+            await act(async () => {
+                fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
+            });
+            await act(async () => {
+                fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
+            });
+
+            expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
+            expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
+            expect(within(raceEntryViews[0]).getByRole('checkbox')).not.toBeChecked();
+            expect(within(raceEntryViews[1]).getByRole('checkbox')).not.toBeChecked();
+        });
+    });
+    describe('when a fast grouped entry is dragged onto a fast grouped entry', () => {
+        it('inserts dropped entry into fast group at location of target and treats dropped entry as fast grouped', async () => {
+            const entriesScorpionA = [
+                {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'},
+                {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'}
+            ];
+            const user = userEvent.setup();
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+                if (race.name === 'Scorpion A') {
+                    return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+                }
+                else if (race.name === 'Graduate A') {
+                    return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
+                }    
+            });
+            await act(async () => {
+                customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
+            });
+            // select entry into fast group
+            let entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'})).parentElement.parentElement;
+            let onFastGroupButton = within(entry).getByRole('checkbox');
+            await act(async () => {
+                await user.click(onFastGroupButton);
+            });
+            entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'})).parentElement.parentElement;
+            onFastGroupButton = within(entry).getByRole('checkbox');
+            await act(async () => {
+                await user.click(onFastGroupButton);
+            });
+            // drag and drop entry into fast group
+            const raceEntryViews = document.getElementsByClassName('race-entry-view');
+            const targetREV = screen.getByRole('status', {name: (content, node) => node.textContent === '6745'}).parentElement.parentElement;
+            const subjectREV = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+
+            const dataTransferObject = {
+                data: new Map(), 
+                setData(key, value) {this.data.set(key, value)},
+                getData(key) {return this.data.get(key)}
+            };
+            await act(async () => {
+                fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
+            });
+            await act(async () => {
+                fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
+            });
+
+            expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
+            expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
+            expect(within(raceEntryViews[0]).getByRole('checkbox')).toBeChecked();
+            expect(within(raceEntryViews[1]).getByRole('checkbox')).toBeChecked();
         });
     });
 });

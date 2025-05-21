@@ -250,15 +250,32 @@ function RaceEntriesView({ races }) {
     function onRaceEntryPositionSetByDrag(subjectKey, targetKey) {
         const subjectEntry = entriesMap.get(subjectKey);
         const targetEntry = entriesMap.get(targetKey);
+        let newDisplayOrder = [];
+        let newFastGroup = [];
+
         if ((subjectEntry.scoringAbbreviation == null || subjectEntry.scoringAbbreviation === '') && (targetEntry.scoringAbbreviation == null || targetEntry.scoringAbbreviation === '')) {
-            // find position of subject and target in display array
-            const subjectIndex = displayOrder.indexOf(subjectKey);
-            const targetIndex = displayOrder.indexOf(targetKey);
+            // adjust fast group
+            if (fastGroup.includes(subjectKey) && !fastGroup.includes(targetKey)) {
+                // remove subject from fast group
+                newFastGroup = fastGroup.toSpliced(fastGroup.indexOf(subjectKey), 1);
+            }
+            else if (!fastGroup.includes(subjectKey) && fastGroup.includes(targetKey)) {
+                // add subject to fastGroup
+                newFastGroup = fastGroup.toSpliced(Math.max(0, fastGroup.indexOf(targetKey)), 0, subjectKey);
+            }
+            else if (fastGroup.includes(subjectKey) && fastGroup.includes(targetKey)) {
+                // remove subject from it current position in fast group
+                newFastGroup = fastGroup.toSpliced(fastGroup.indexOf(subjectKey), 1);
+                // insert subject in new position in fast group
+                newFastGroup.splice(Math.max(0, fastGroup.indexOf(targetKey)), 0, subjectKey);
+            }
+            // adjust display order
             // remove subject from it current position in display order
-            const newDisplayOrder = displayOrder.toSpliced(subjectIndex, 1);
+            newDisplayOrder = displayOrder.toSpliced(displayOrder.indexOf(subjectKey), 1);
             // insert subject in new position in display order
-            newDisplayOrder.splice(Math.max(0, targetIndex), 0, subjectKey);
+            newDisplayOrder.splice(Math.max(0, displayOrder.indexOf(targetKey)), 0, subjectKey);
             // set new display order
+            setFastGroup(newFastGroup);
             setDisplayOrder(newDisplayOrder);
             // If race type is pursuit and both entries in same race assign subject position from target position
             if (subjectEntry.race.type === RaceType.PURSUIT && subjectEntry.race.name === targetEntry.race.name) { // testiing equality directly on races will fail as different objects
