@@ -48,9 +48,8 @@ describe('when hide button clicked', () => {
         const buttonHide = screen.getByRole('button', {'name': /hide/i});
         await act(async () => {
             await user.click(buttonHide);
-        });
-        expect(screen.queryByText(/hello/i)).not.toBeInTheDocument();
-        expect(screen.queryByText(/world/i)).not.toBeInTheDocument();
+        });expect(screen.queryByText(/hello/i, {hidden: true})).not.toBeVisible();
+        expect(screen.queryByText(/world/i, {hidden: true})).not.toBeVisible();
     });
     it('changes label on hide button to show', async () => {
         const user = userEvent.setup();
@@ -70,8 +69,8 @@ describe('when show button clicked', () => {
         await act(async () => {
             await user.click(screen.getByRole('button', {'name': /hide/i}));
         });
-        expect(screen.queryByText(/hello/i)).not.toBeInTheDocument();
-        expect(screen.queryByText(/world/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/hello/i)).not.toBeVisible();
+        expect(screen.queryByText(/world/i)).not.toBeVisible();
         await act(async () => {
             await user.click(screen.getByRole('button', {'name': /show/i}));
         });
