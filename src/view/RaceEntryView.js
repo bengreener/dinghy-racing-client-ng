@@ -290,9 +290,9 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
                         {lapsView}
                     </div>
                 </div>
-            </div>
-            <div className='w3-col m1 w3-padding-small'>
-                <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
+                <div className='w3-col m1 w3-padding-small'>
+                    <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
+                </div>
             </div>
             {onFastGroup ? <div className='w3-col m1-half w3-padding-small'><input type='checkbox' onClick={handleFastGroupClick} onChange={handleFastGroupChange} checked={inFastGroup} /></div> : null}
         </div>

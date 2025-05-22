@@ -447,12 +447,12 @@ describe('when sorting entries', () => {
             customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
         });
         // fast group entries
-        let entry = (await screen.findByText((content, node) => /^Scorpion6745Sarah Pascal  OCSDNCDNSDNFDSQRET$/.test(node.textContent)));
+        let entry = (await screen.findByText((content, node) => /^Scorpion6745Sarah Pascal  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')));
         let onFastGroupButton = within(entry).getByRole('checkbox');
         await act(async () => {
             await user.click(onFastGroupButton);
         });
-        entry = (await screen.findByText((content, node) => /^Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET$/.test(node.textContent)));
+        entry = (await screen.findByText((content, node) => /^Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')));
         onFastGroupButton = within(entry).getByRole('checkbox');
         await act(async () => {
             await user.click(onFastGroupButton);
@@ -484,7 +484,7 @@ describe('when fast grouping entries', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
         });
-        let entry = (await screen.findByText((content, node) => /^Scorpion6745Sarah Pascal  OCSDNCDNSDNFDSQRET$/.test(node.textContent)));
+        let entry = (await screen.findByText((content, node) => /^Scorpion6745Sarah Pascal  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')));
         const onFastGroupButton = within(entry).getByRole('checkbox');
         await act(async () => {
             await user.click(onFastGroupButton);
@@ -1602,19 +1602,19 @@ describe('when user drags and drops an entry to a new position', () => {
                 customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
             });
             // select entry into fast group
-            let entry = (await screen.findByText((content, node) => /^Scorpion6745Sarah Pascal  OCSDNCDNSDNFDSQRET$/.test(node.textContent)));
+            let entry = (await screen.findByText((content, node) => /^Scorpion6745Sarah Pascal  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')));
             let onFastGroupButton = within(entry).getByRole('checkbox');
             await act(async () => {
                 await user.click(onFastGroupButton);
             });
-            entry = (await screen.findByText((content, node) => /^Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET$/.test(node.textContent)));
+            entry = (await screen.findByText((content, node) => /^Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')));
             onFastGroupButton = within(entry).getByRole('checkbox');
             await act(async () => {
                 await user.click(onFastGroupButton);
             });
             // drag and drop entry into fast group
-            const targetREV = screen.getByText((content, node) => /^Scorpion6745Sarah Pascal  OCSDNCDNSDNFDSQRET$/.test(node.textContent));
-            const subjectREV = screen.getByText((content, node) => /^Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET$/.test(node.textContent));
+            const targetREV = screen.getByText((content, node) => /^Scorpion6745Sarah Pascal  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view'));
+            const subjectREV = screen.getByText((content, node) => /^Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view'));
 
             const dataTransferObject = {
                 data: new Map(), 

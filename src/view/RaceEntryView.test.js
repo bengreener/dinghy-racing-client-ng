@@ -350,7 +350,7 @@ describe('when a scoring abbreviation is selected', () => {
         await act(async () => {
             await user.selectOptions(selectSA, 'DNS');
         });
-        expect(selectSA.parentElement.parentElement.getAttribute('class')).toMatch(/disabled/i);
+        expect(screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).toMatch(/disabled/i);
     });
     describe('when entry did not start the race', () => {
         it('has a class of did-not-start', () => {
