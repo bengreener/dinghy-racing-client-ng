@@ -38,7 +38,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     const prevPosition = useRef(entry.position);
     const prevSumOfLapTimes = useRef(entry.sumOfLapTimes);
     const lapsView = [];
-    let classes = 'race-entry-view w3-row w3-border w3-hover-border-blue cursor-pointer preserve-whitespace';
+    let classes = 'race-entry-view w3-row w3-border w3-hover-border-blue';
 
     // gesture tracking variables
     let start = {};
@@ -269,24 +269,26 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     }
 
     return (
-        <div className={classes} onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}
-            onPointerDown={gestureStart} onPointerMove={gestureMove} onPointerUp={gestureEnd} onPointerOut={gestureEnd}
-            onPointerLeave={gestureEnd} onPointerCancel={gestureCancel} onDragStart={dragStartHandler} onDragOver={dragOverHandler} onDrop={dropHandler} draggable >
-            <div className='w3-col m2 w3-padding-small bgis-cell' >
-                <output>{entry.dinghy.dinghyClass.name}</output>
-            </div>
-            <div className='w3-col m1 w3-padding-small bgis-cell w3-right-align' >
-                <output className='sail-number'>{entry.dinghy.sailNumber.slice(0, Math.max(0, entry.dinghy.sailNumber.length - 3))}<b>{entry.dinghy.sailNumber.slice(-3)}</b></output>
-            </div>
-            <div className='w3-col m2 w3-padding-small bgis-cell' >
-                <output>{entry.helm.name}</output>
-            </div>
-            <div className='w3-col m1-half w3-padding-small' >
-                <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'}>{entry.position != null ? entry.position : ' '}</output>
-            </div>
-            <div className='w3-col m5 w3-hide-small'>
-                <div className='w3-cell-row bgis-cell' >
-                    {lapsView}
+        <div className={classes} onDragStart={dragStartHandler} onDragOver={dragOverHandler} onDrop={dropHandler} draggable >
+            <div className='cursor-pointer preserve-whitespace' onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}
+                onPointerDown={gestureStart} onPointerMove={gestureMove} onPointerUp={gestureEnd} onPointerOut={gestureEnd}
+                onPointerLeave={gestureEnd} onPointerCancel={gestureCancel} >
+                <div className='w3-col m2 w3-padding-small bgis-cell' >
+                    <output>{entry.dinghy.dinghyClass.name}</output>
+                </div>
+                <div className='w3-col m1 w3-padding-small bgis-cell w3-right-align' >
+                    <output className='sail-number'>{entry.dinghy.sailNumber.slice(0, Math.max(0, entry.dinghy.sailNumber.length - 3))}<b>{entry.dinghy.sailNumber.slice(-3)}</b></output>
+                </div>
+                <div className='w3-col m2 w3-padding-small bgis-cell' >
+                    <output>{entry.helm.name}</output>
+                </div>
+                <div className='w3-col m1-half w3-padding-small' >
+                    <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'}>{entry.position != null ? entry.position : ' '}</output>
+                </div>
+                <div className='w3-col m5 w3-hide-small'>
+                    <div className='w3-cell-row bgis-cell' >
+                        {lapsView}
+                    </div>
                 </div>
             </div>
             <div className='w3-col m1 w3-padding-small'>

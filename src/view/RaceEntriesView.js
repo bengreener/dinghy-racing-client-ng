@@ -182,21 +182,27 @@ function RaceEntriesView({ races }) {
     }
 
     function onFastGroup(entryKey) {
-        if (fastGroup.includes(entryKey)) {
-            // remove entry from fastGroup and current position in display order
-            setFastGroup(fastGroup.toSpliced(fastGroup.indexOf(entryKey), 1));
-            const newDisplayOrder = displayOrder.toSpliced(displayOrder.indexOf(entryKey), 1);
-            // move entry to new position in display order
-            setDisplayOrder(newDisplayOrder); // getEntriesDisplay will put entry back where it should be based on the current sort
+        const entry = entriesMap.get(entryKey);
+        if (entry.scoringAbbreviation == null || entry.scoringAbbreviation === '') {
+            if (fastGroup.includes(entryKey)) {
+                // remove entry from fastGroup and current position in display order
+                setFastGroup(fastGroup.toSpliced(fastGroup.indexOf(entryKey), 1));
+                const newDisplayOrder = displayOrder.toSpliced(displayOrder.indexOf(entryKey), 1);
+                // move entry to new position in display order
+                setDisplayOrder(newDisplayOrder); // getEntriesDisplay will put entry back where it should be based on the current sort
+            }
+            else {
+                // remove entry from it current position in display order
+                const subjectIndex = displayOrder.indexOf(entryKey);
+                const newDisplayOrder = displayOrder.toSpliced(subjectIndex, 1);
+                // insert subject in new position in display order
+                newDisplayOrder.splice(fastGroup.length, 0, entryKey);
+                setFastGroup(fastGroup.toSpliced(fastGroup.length, 0, entryKey));
+                setDisplayOrder(newDisplayOrder);
+            }
         }
         else {
-            // remove entry from it current position in display order
-            const subjectIndex = displayOrder.indexOf(entryKey);
-            const newDisplayOrder = displayOrder.toSpliced(subjectIndex, 1);
-            // insert subject in new position in display order
-            newDisplayOrder.splice(fastGroup.length, 0, entryKey);
-            setFastGroup(fastGroup.toSpliced(fastGroup.length, 0, entryKey));
-            setDisplayOrder(newDisplayOrder);
+            setMessage('Cannot fast group an entry with a scoring abbreviation');
         }
     };
 
