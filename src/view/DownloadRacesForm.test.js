@@ -48,7 +48,7 @@ it('provides option to select start time and end time for session', async () => 
 it('sets start and end time to defaults', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const expectedStartTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000).toISOString().substring(0, 16);
-    const expectedEndTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000).toISOString().substring(0, 16);
+    const expectedEndTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 75600000).toISOString().substring(0, 16);
 
     await act(async () => {
         await customRender(<DownloadRacesForm />, model);
@@ -94,7 +94,7 @@ it('calls model get races between times with values set for start and end of win
     const getRacesBetweenTimesSpy = jest.spyOn(model, 'getRacesBetweenTimes');
     const startTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000);
     startTime.setMinutes(startTime.getMinutes() + startTime.getTimezoneOffset());
-    const endTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000);
+    const endTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 75600000);
     endTime.setMinutes(endTime.getMinutes() + endTime.getTimezoneOffset());
     await act(async () => {
         await customRender(<DownloadRacesForm />, model);
@@ -110,7 +110,7 @@ describe('when start time for races window chnages', () => {
         const getRacesBetweenTimesSpy = jest.spyOn(model, 'getRacesBetweenTimes');
         const startTime = new Date('2020-02-12T12:10');
         startTime.setMinutes(startTime.getMinutes() + startTime.getTimezoneOffset());
-        const endTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000);
+        const endTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 75600000);
         endTime.setMinutes(endTime.getMinutes() + endTime.getTimezoneOffset());
         await act(async () => {
             await customRender(<DownloadRacesForm />, model);
