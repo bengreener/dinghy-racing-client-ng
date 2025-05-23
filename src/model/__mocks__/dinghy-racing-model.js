@@ -20,6 +20,7 @@ class DinghyRacingModel {
     wsRootURL;
     stompClient;
     raceUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
+    raceEntryLapsUpdateCallbacks = new Map();
     entryUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
     competitorCreationCallbacks = new Set();
     dinghyCreationCallbacks = new Set();
@@ -87,6 +88,7 @@ class DinghyRacingModel {
         this.handleCompetitorCreation = this.handleCompetitorCreation.bind(this);
         this.handleDinghyCreation = this.handleDinghyCreation.bind(this);
         this.handleRaceUpdate = this.handleRaceUpdate.bind(this);
+        this.handleRaceEntryLapsUpdate = this.handleRaceEntryLapsUpdate.bind(this);
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
         this.handleDinghyClassCreation = this.handleDinghyClassCreation.bind(this);
         this.handleDinghyClassUpdate = this.handleDinghyClassUpdate.bind(this);
@@ -145,6 +147,27 @@ class DinghyRacingModel {
     handleRaceUpdate(message) {
         if (this.raceUpdateCallbacks.has(message.body)) {
             this.raceUpdateCallbacks.get(message.body).forEach(cb => cb());
+        }
+    }
+
+    registerRaceEntryLapsUpdateCallback(key, callback) {
+        if (this.raceEntryLapsUpdateCallbacks.has(key)) {
+            this.raceEntryLapsUpdateCallbacks.get(key).add(callback);
+        }
+        else {
+            this.raceEntryLapsUpdateCallbacks.set(key, new Set([callback]));
+        }
+    }
+
+    unregisterRaceEntryLapsUpdateCallback(key, callback) {
+        if (this.raceEntryLapsUpdateCallbacks.has(key)) {
+            this.raceEntryLapsUpdateCallbacks.get(key).delete(callback);
+        }
+    }
+
+    handleRaceEntryLapsUpdate(message) {
+        if (this.raceEntryLapsUpdateCallbacks.has(message.body)) {
+            this.raceEntryLapsUpdateCallbacks.get(message.body).forEach(cb => cb());
         }
     }
 

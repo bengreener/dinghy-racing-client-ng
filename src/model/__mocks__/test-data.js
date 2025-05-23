@@ -399,7 +399,7 @@ const entriesScorpionA = [
 	entrySarahPascalScorpionA6745
 ];
 const entriesGraduateA = [
-	{helm: competitorJillMyer, crew: null, race: raceGraduateA,dinghy: dinghy2928, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
+	{helm: competitorJillMyer, crew: null, race: raceGraduateA, dinghy: dinghy2928, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null,
 		position: null, url: 'http://localhost:8081/dinghyracing/api/entries/12'}
 ];
 const entryJillMyerCometA826 = {helm: competitorJillMyer, crew: null, race: raceCometA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 

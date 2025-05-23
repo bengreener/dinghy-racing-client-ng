@@ -27,16 +27,18 @@ import RaceType from '../model/domain-classes/race-type';
  * @param {function} props.updateLap
  * @param {function} props.setScoringAbbreviation
  * @param {function} props.onRaceEntryDrop
+ * @param {function} [props.onFastGroup]
+ * @param {boolean} [props.inFastGroup = false]
  * @returns {HTMLTableRowElement}
  */
-function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, onRaceEntryDrop}) {
+function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, onRaceEntryDrop, onFastGroup, inFastGroup = false}) {
     const [editMode, setEditMode] = useState(false);
     const [disabled, setDisabled] = useState(false);
     const prevLapCount = useRef(entry.laps.length);
     const prevPosition = useRef(entry.position);
     const prevSumOfLapTimes = useRef(entry.sumOfLapTimes);
     const lapsView = [];
-    let classes = 'race-entry-view w3-row w3-border w3-hover-border-blue cursor-pointer preserve-whitespace';
+    let classes = 'race-entry-view w3-row w3-border w3-hover-border-blue';
 
     // gesture tracking variables
     let start = {};
@@ -176,6 +178,16 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         }
     }
 
+    function handleFastGroupClick(event) {
+        event.stopPropagation(); // do not want to call add lap
+    }
+
+    function handleFastGroupChange(event) {
+        if (onFastGroup) {
+            onFastGroup(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
+        }
+    }
+
     function dragStartHandler(event) {
         event.dataTransfer.setData('text/html', entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
         event.dataTransfer.dropEffect = 'move';
@@ -257,29 +269,32 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     }
 
     return (
-        <div className={classes} onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}
-            onPointerDown={gestureStart} onPointerMove={gestureMove} onPointerUp={gestureEnd} onPointerOut={gestureEnd}
-            onPointerLeave={gestureEnd} onPointerCancel={gestureCancel} onDragStart={dragStartHandler} onDragOver={dragOverHandler} onDrop={dropHandler} draggable >
-            <div className='w3-col m2 w3-padding-small bgis-cell' >
-                <output>{entry.dinghy.dinghyClass.name}</output>
-            </div>
-            <div className='w3-col m1 w3-padding-small bgis-cell w3-right-align' >
-                <output className='sail-number'>{entry.dinghy.sailNumber.slice(0, Math.max(0, entry.dinghy.sailNumber.length - 3))}<b>{entry.dinghy.sailNumber.slice(-3)}</b></output>
-            </div>
-            <div className='w3-col m2 w3-padding-small bgis-cell' >
-                <output>{entry.helm.name}</output>
-            </div>
-            <div className='w3-col m1 w3-padding-small' >
-                <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'}>{entry.position != null ? entry.position : ' '}</output>
-            </div>
-            <div className='w3-col m5 w3-hide-small'>
-                <div className='w3-cell-row bgis-cell' >
-                    {lapsView}
+        <div className={classes} onDragStart={dragStartHandler} onDragOver={dragOverHandler} onDrop={dropHandler} draggable >
+            <div className='cursor-pointer preserve-whitespace' onClick={handleClick} onAuxClick={handleAuxClick} onContextMenu={handleContextMenu}
+                onPointerDown={gestureStart} onPointerMove={gestureMove} onPointerUp={gestureEnd} onPointerOut={gestureEnd}
+                onPointerLeave={gestureEnd} onPointerCancel={gestureCancel} >
+                <div className='w3-col m2 w3-padding-small bgis-cell' >
+                    <output>{entry.dinghy.dinghyClass.name}</output>
+                </div>
+                <div className='w3-col m1 w3-padding-small bgis-cell w3-right-align' >
+                    <output className='sail-number'>{entry.dinghy.sailNumber.slice(0, Math.max(0, entry.dinghy.sailNumber.length - 3))}<b>{entry.dinghy.sailNumber.slice(-3)}</b></output>
+                </div>
+                <div className='w3-col m2 w3-padding-small bgis-cell' >
+                    <output>{entry.helm.name}</output>
+                </div>
+                <div className='w3-col m1-half w3-padding-small' >
+                    <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'}>{entry.position != null ? entry.position : ' '}</output>
+                </div>
+                <div className='w3-col m5 w3-hide-small'>
+                    <div className='w3-cell-row bgis-cell' >
+                        {lapsView}
+                    </div>
+                </div>
+                <div className='w3-col m1 w3-padding-small'>
+                    <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
                 </div>
             </div>
-            <div className='w3-col m1 w3-padding-small'>
-                <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
-            </div>
+            {onFastGroup ? <div className='w3-col m1-half w3-padding-small'><input type='checkbox' onClick={handleFastGroupClick} onChange={handleFastGroupChange} checked={inFastGroup} /></div> : null}
         </div>
     )
 }

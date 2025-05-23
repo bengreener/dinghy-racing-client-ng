@@ -1,6 +1,6 @@
 {
   "name": "dinghy-racing-client-ng",
-  "version": "2025.5.2",
+  "version": "2025.5.3.dev",
   "private": true,
   "homepage": ".",
   "dependencies": {
@@ -10,7 +10,7 @@
     "@testing-library/user-event": "^14",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^5.0.1",
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {

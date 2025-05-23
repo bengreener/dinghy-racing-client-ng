@@ -36,7 +36,7 @@ function RaceConsole() {
         return sessionStart;
     });
     const [sessionEnd, setSessionEnd] = useState(() => {
-        const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 64800000); // create as 18:00 UTC intially
+        const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000); // create as 18:00 UTC intially
         sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
         return sessionEnd;
     });
@@ -80,11 +80,13 @@ function RaceConsole() {
         const races = Array.from(raceMap.values());
         races.forEach(race => {
             model.registerRaceUpdateCallback(race.url, handleRaceUpdate);
+            model.registerRaceEntryLapsUpdateCallback(race.url, handleRaceUpdate); // refetch all races to avoid writing new code to fetch details for a single race and inserting it into raceMap
         });
         // cleanup before effect runs and before form close
         return () => {
             races.forEach(race => {
                 model.unregisterRaceUpdateCallback(race.url, handleRaceUpdate);
+                model.unregisterRaceEntryLapsUpdateCallback(race.url, handleRaceUpdate);
             });
         }
     }, [model, raceMap, handleRaceUpdate]);

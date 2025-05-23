@@ -35,7 +35,8 @@ function RaceEntriesView({ races }) {
     const [message, setMessage] = useState('');
     const [sortOrder, setSortOrder] = useState('default');
     const [entriesUpdateRequestAt, setEntriesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies an entry has been updated
-    const [displayOrder, setDisplayOrder] = useState([]);
+    const [displayOrder, setDisplayOrder] = useState([]); // holds entriesMap keys in the order they are to be displayed
+    const [fastGroup, setFastGroup] = useState([]); // holds the entriesMap keys of entries that have been fast grouped
 
     const updateEntries = useCallback(() => {
         setEntriesUpdateRequestAt(Date.now());
@@ -141,7 +142,7 @@ function RaceEntriesView({ races }) {
                 break;
             default:
                 ordered = sortArray(entries, (entry) => {
-                    return [entry.dinghy.dinghyClass.name, Number(entry.dinghy.sailNumber)];
+                    return [entry.dinghy.dinghyClass.name, isNaN(entry.dinghy.sailNumber) ? entry.dinghy.sailNumber : Number(entry.dinghy.sailNumber)];
                 });
         }
         return ordered.map(entry => entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
@@ -179,6 +180,31 @@ function RaceEntriesView({ races }) {
             setMessage(result.message);
         }
     }
+
+    function onFastGroup(entryKey) {
+        const entry = entriesMap.get(entryKey);
+        if (entry.scoringAbbreviation == null || entry.scoringAbbreviation === '') {
+            if (fastGroup.includes(entryKey)) {
+                // remove entry from fastGroup and current position in display order
+                setFastGroup(fastGroup.toSpliced(fastGroup.indexOf(entryKey), 1));
+                const newDisplayOrder = displayOrder.toSpliced(displayOrder.indexOf(entryKey), 1);
+                // move entry to new position in display order
+                setDisplayOrder(newDisplayOrder); // getEntriesDisplay will put entry back where it should be based on the current sort
+            }
+            else {
+                // remove entry from it current position in display order
+                const subjectIndex = displayOrder.indexOf(entryKey);
+                const newDisplayOrder = displayOrder.toSpliced(subjectIndex, 1);
+                // insert subject in new position in display order
+                newDisplayOrder.splice(fastGroup.length, 0, entryKey);
+                setFastGroup(fastGroup.toSpliced(fastGroup.length, 0, entryKey));
+                setDisplayOrder(newDisplayOrder);
+            }
+        }
+        else {
+            setMessage('Cannot fast group an entry with a scoring abbreviation');
+        }
+    };
 
     function getLastEntryPosition() {
         let lowestPosition = 0;
@@ -230,15 +256,32 @@ function RaceEntriesView({ races }) {
     function onRaceEntryPositionSetByDrag(subjectKey, targetKey) {
         const subjectEntry = entriesMap.get(subjectKey);
         const targetEntry = entriesMap.get(targetKey);
+        let newDisplayOrder = [];
+        let newFastGroup = [];
+
         if ((subjectEntry.scoringAbbreviation == null || subjectEntry.scoringAbbreviation === '') && (targetEntry.scoringAbbreviation == null || targetEntry.scoringAbbreviation === '')) {
-            // find position of subject and target in display array
-            const subjectIndex = displayOrder.indexOf(subjectKey);
-            const targetIndex = displayOrder.indexOf(targetKey);
-            // remove subject from it currnet position in display order
-            let newDisplayOrder = displayOrder.toSpliced(subjectIndex, 1);
+            // adjust fast group
+            if (fastGroup.includes(subjectKey) && !fastGroup.includes(targetKey)) {
+                // remove subject from fast group
+                newFastGroup = fastGroup.toSpliced(fastGroup.indexOf(subjectKey), 1);
+            }
+            else if (!fastGroup.includes(subjectKey) && fastGroup.includes(targetKey)) {
+                // add subject to fastGroup
+                newFastGroup = fastGroup.toSpliced(Math.max(0, fastGroup.indexOf(targetKey)), 0, subjectKey);
+            }
+            else if (fastGroup.includes(subjectKey) && fastGroup.includes(targetKey)) {
+                // remove subject from it current position in fast group
+                newFastGroup = fastGroup.toSpliced(fastGroup.indexOf(subjectKey), 1);
+                // insert subject in new position in fast group
+                newFastGroup.splice(Math.max(0, fastGroup.indexOf(targetKey)), 0, subjectKey);
+            }
+            // adjust display order
+            // remove subject from it current position in display order
+            newDisplayOrder = displayOrder.toSpliced(displayOrder.indexOf(subjectKey), 1);
             // insert subject in new position in display order
-            newDisplayOrder.splice(Math.max(0, targetIndex), 0, subjectKey);
+            newDisplayOrder.splice(Math.max(0, displayOrder.indexOf(targetKey)), 0, subjectKey);
             // set new display order
+            setFastGroup(newFastGroup);
             setDisplayOrder(newDisplayOrder);
             // If race type is pursuit and both entries in same race assign subject position from target position
             if (subjectEntry.race.type === RaceType.PURSUIT && subjectEntry.race.name === targetEntry.race.name) { // testiing equality directly on races will fail as different objects
@@ -261,17 +304,40 @@ function RaceEntriesView({ races }) {
         const entriesInDisplayOrder = Array.from(entriesMap.keys()).every(key => displayOrder.includes(key));
         const displayOrderIncludesEntries = displayOrder.every(key => entriesMap.has(key));
         if (!(entriesInDisplayOrder && displayOrderIncludesEntries)) {
-            setDisplayOrder(sorted(Array.from(entriesMap.values()), sortOrder));
+            const tempDisplayOrder = sorted(Array.from(entriesMap.values()), sortOrder);
+            // ensure fast group containes only entries still included in selected races
+            const tempFastGroup = [];
+            fastGroup.forEach((entryKey) => {
+                if (tempDisplayOrder.includes(entryKey)) {
+                    tempFastGroup.push(entryKey);
+                }
+            });
+            tempFastGroup.forEach((entryKey) => {
+                if (tempDisplayOrder.includes(entryKey)) {
+                    tempDisplayOrder.splice(tempDisplayOrder.indexOf(entryKey), 1);
+                    tempDisplayOrder.splice(tempFastGroup.indexOf(entryKey), 0, entryKey);
+                }
+            });
+            setFastGroup(tempFastGroup);
+            setDisplayOrder(tempDisplayOrder);
         }
 
         return displayOrder.map(key => {
             const entry = entriesMap.get(key);
-            return <RaceEntryView key={key} entry={entry} addLap={addLap}
-                removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} />
+            if (!entry) return null; // allow for display keys that map to a non existent entry after a race is removed from the selection; fixed by next render
+            if (entry.race.type === RaceType.FLEET) {
+                return <RaceEntryView key={key} entry={entry} addLap={addLap}
+                    removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} onFastGroup={onFastGroup} inFastGroup={fastGroup.includes(key)} />
+            }
+            else {
+                return <RaceEntryView key={key} entry={entry} addLap={addLap}
+                    removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} />
+            }
         });
     }
 
     function sortButtonClick(sortOrder) {
+        setFastGroup([]);
         setDisplayOrder(sorted(Array.from(entriesMap.values()), sortOrder));
         setSortOrder(sortOrder);
     }

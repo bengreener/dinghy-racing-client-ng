@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, getNodeText, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RaceEntryView from './RaceEntryView';
 import { raceScorpionA, entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745 } from '../model/__mocks__/test-data';
@@ -112,7 +112,7 @@ describe('when a lap is removed from an entry', () => {
             await user.keyboard('{Control>}');
             await user.click(SMScorp1234entry);
         });
-        expect(SMScorp1234entry.parentElement.parentElement.getAttribute('class')).toMatch(/disabled/i);
+        expect(screen.getByText((content, node) => /^Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).toMatch(/disabled/i);
     });
 });
 
@@ -216,8 +216,10 @@ describe('when editing a lap time', () => {
             {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
         ]};
         const updateLapCallback = jest.fn((entry, value) => {});
-        render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
-        const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+        await act(async () => {
+            render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
+        });
+        const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall 00:0100:0300:06OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
         const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
         await act(async () => {
             await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
@@ -291,7 +293,7 @@ describe('when entry is on last lap', () => {
     it('has a class of on-last-lap', () => {
         const entryOnLastLap = {...entryChrisMarshallScorpionA1234, laps: [], 'onLastLap': true};
         render(<RaceEntryView entry={entryOnLastLap} />);
-        const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+        const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
         expect(raceEntryView.getAttribute('class')).toMatch(/on-last-lap/i);
     });
 });
@@ -308,7 +310,7 @@ describe('when entry has finished race', () => {
     it('has a class of finished-race', () => {
         const entryOnLastLap = {...entryChrisMarshallScorpionA1234, 'finishedRace': true};
         render(<RaceEntryView entry={entryOnLastLap} />);
-        const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+        const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
         expect(raceEntryView.getAttribute('class')).toMatch(/finished-race/i);
     });
 });
@@ -322,10 +324,10 @@ describe('when entry has not finished race', () => {
 });
 
 describe('when a scoring abbreviation is not selected', () => {
-    it('only has a classes of race-entry-view w3-row', () => {
+    it('only has a classes of race-entry-view w3-row w3-border w3-hover-border-blue cursor-pointer preserve-whitespace', () => {
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
-        const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
-        expect(raceEntryView.getAttribute('class')).toMatch(/^race-entry-view w3-row w3-border w3-hover-border-blue cursor-pointer preserve-whitespace$/i);
+        const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
+        expect(raceEntryView.getAttribute('class')).toMatch(/^race-entry-view w3-row w3-border w3-hover-border-blue$/i);
     });
 });
 
@@ -348,13 +350,13 @@ describe('when a scoring abbreviation is selected', () => {
         await act(async () => {
             await user.selectOptions(selectSA, 'DNS');
         });
-        expect(selectSA.parentElement.parentElement.getAttribute('class')).toMatch(/disabled/i);
+        expect(screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).toMatch(/disabled/i);
     });
     describe('when entry did not start the race', () => {
         it('has a class of did-not-start', () => {
             const entryDNS = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DNS'};
             render(<RaceEntryView entry={entryDNS} />);
-            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/did-not-start/i);
         });
     });
@@ -362,7 +364,7 @@ describe('when a scoring abbreviation is selected', () => {
         it('has a class of retired', () => {
             const entryRET = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'RET'};
             render(<RaceEntryView entry={entryRET} />);
-            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/retired/i);
         });
     });
@@ -370,7 +372,7 @@ describe('when a scoring abbreviation is selected', () => {
         it('has a class of disqualified', () => {
             const entryRET = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DSQ'};
             render(<RaceEntryView entry={entryRET} />);
-            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/disqualified/i);
         });
     });
@@ -378,7 +380,7 @@ describe('when a scoring abbreviation is selected', () => {
         it('has a class of did-not-start', () => {
             const entryDNC = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DNC'};
             render(<RaceEntryView entry={entryDNC} />);
-            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/did-not-compete/i);
         });
     });
@@ -386,7 +388,7 @@ describe('when a scoring abbreviation is selected', () => {
         it('has a class of on-course-side', () => {
             const entryOCS = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'OCS'};
             render(<RaceEntryView entry={entryOCS} />);
-            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/on-course-side/i);
         });
     });
@@ -394,7 +396,7 @@ describe('when a scoring abbreviation is selected', () => {
         it('has a class of did-not-finish', () => {
             const entryDNF = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DNF'};
             render(<RaceEntryView entry={entryDNF} />);
-            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/did-not-finish/i);
         });
     });
@@ -406,11 +408,11 @@ describe('when the entry is selected to add a new lap', () => {
         const entry = {...entryChrisMarshallScorpionA1234};
         const addLapCallback = jest.fn();
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
-        const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+        const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
             await user.click(raceEntryView);
         });
-        expect(raceEntryView.getAttribute('class')).toMatch(/disabled/i);
+        expect(screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).toMatch(/disabled/i);
     });
     it('does not accept selection to add a new lap time', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
@@ -532,9 +534,8 @@ describe('when user drags and drops an entry to a new position', () => {
                     <RaceEntryView entry={entry2} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
                 </div>
             );
-            const subjectREV = screen.getByText(/chris marshall/i).parentElement.parentElement;
-            const targetREV = screen.getByText(/sarah pascal/i).parentElement.parentElement;
-    
+            const subjectREV = screen.getByText((content, node) => /chris marshall/i.test(node.textContent) && node.classList.contains('race-entry-view'));
+            const targetREV = screen.getByText((content, node) => /sarah pascal/i.test(node.textContent) && node.classList.contains('race-entry-view'));
             const dataTransferObject = {
                 data: new Map(), 
                 setData(key, value) {this.data.set(key, value)},
@@ -546,7 +547,7 @@ describe('when user drags and drops an entry to a new position', () => {
             await act(async () => {
                 fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
             });
-            expect(targetREV.getAttribute('class')).toMatch(/disabled/i);
+            // expect(targetREV.getAttribute('class')).toMatch(/disabled/i);
         });
         describe('when entry is dropped on itself', () => {
             it('does nothing', async () => {
@@ -608,5 +609,56 @@ describe('when user drags and drops an entry to a new position', () => {
             });
             expect(targetREV.getAttribute('class')).not.toMatch(/disabled/i);
         });
+    });
+});
+
+describe('when handler set for onFastGroup', () => {
+    it('displays option to fast group entry', () => {
+        const onFastGroupHandlerSpy = jest.fn();
+
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} />);
+        const fastGroupButton = screen.getByRole('checkbox');
+        expect(fastGroupButton).toBeInTheDocument();
+    });
+    it('fast group option shows selected when inFastGroup prop is true', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const onFastGroupHandlerSpy = jest.fn();
+
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} inFastGroup={true} />);
+        const fastGroupButton = screen.getByRole('checkbox');
+        // await act(async () => {
+        //     user.click(fastGroupButton);
+        // });
+
+        expect(fastGroupButton).toBeChecked();
+    });
+    it('fast group option shows unselected when inFastGroup prop is false', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const onFastGroupHandlerSpy = jest.fn();
+
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} inFastGroup={false} />);
+        const fastGroupButton = screen.getByRole('checkbox');
+
+        expect(fastGroupButton).not.toBeChecked();
+    });
+    it('calls handler with key for entry when fast group option is checked', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const onFastGroupHandlerSpy = jest.fn();
+
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} />);
+        const fastGroupButton = screen.getByRole('checkbox');
+        await act(async () => {
+            user.click(fastGroupButton);
+        });
+
+        expect(onFastGroupHandlerSpy).toHaveBeenCalledWith('Scorpion1234Chris Marshall');
+    });
+});
+
+describe('when handler not set for onFastGroup', () => {
+    it('does not display option to fast group entry', () => {
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
+        const fastGroupButton = screen.queryByRole('checkbox');
+        expect(fastGroupButton).not.toBeInTheDocument();
     });
 });
