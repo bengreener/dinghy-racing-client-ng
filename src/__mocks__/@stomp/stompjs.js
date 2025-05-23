@@ -158,6 +158,9 @@ export class Client {
               if (key === '/topic/updateRace') {
                 value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/races/4'}));
               }
+              if (key === '/topic/updateRaceEntryLaps') {
+                value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/races/4'}));
+              }
               if (key === '/topic/updateEntry') {
                 value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/entries/10'}));
               }

@@ -24,6 +24,7 @@ class DinghyRacingModel {
     wsRootURL;
     stompClient;
     raceUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
+    raceEntryLapsUpdateCallbacks = new Map();
     entryUpdateCallbacks = new Map(); // each key identifies an array of callbacks for the entry identified by the URI used as the key
     competitorCreationCallbacks = new Set();
     dinghyCreationCallbacks = new Set();
@@ -104,6 +105,7 @@ class DinghyRacingModel {
         this.handleCompetitorCreation = this.handleCompetitorCreation.bind(this);
         this.handleDinghyCreation = this.handleDinghyCreation.bind(this);
         this.handleRaceUpdate = this.handleRaceUpdate.bind(this);
+        this.handleRaceEntryLapsUpdate = this.handleRaceEntryLapsUpdate.bind(this);
         this.handleEntryUpdate = this.handleEntryUpdate.bind(this);
         this.handleDinghyClassCreation = this.handleDinghyClassCreation.bind(this);
         this.handleDinghyClassUpdate = this.handleDinghyClassUpdate.bind(this);
@@ -130,6 +132,7 @@ class DinghyRacingModel {
             this.stompClient.subscribe('/topic/createDinghyClass', this.handleDinghyClassCreation);
             this.stompClient.subscribe('/topic/createFleet', this.handleFleetCreation);
             this.stompClient.subscribe('/topic/updateRace', this.handleRaceUpdate);
+            this.stompClient.subscribe('/topic/updateRaceEntryLaps', this.handleRaceEntryLapsUpdate);
             this.stompClient.subscribe('/topic/updateEntry', this.handleEntryUpdate);
             this.stompClient.subscribe('/topic/deleteEntry', this.handleEntryUpdate);
             this.stompClient.subscribe('/topic/updateDinghyClass', this.handleDinghyClassUpdate);
@@ -218,6 +221,41 @@ class DinghyRacingModel {
     handleRaceUpdate(message) {
         if (this.raceUpdateCallbacks.has(message.body)) {
             this.raceUpdateCallbacks.get(message.body).forEach(cb => cb());
+        }
+    }
+
+    /**
+     * Register a callback for when the laps for an entry in a race identified by key is updated
+     * @param {String} key URI of the race for which the update callback is being registered
+     * @param {Function} callback
+     */
+    registerRaceEntryLapsUpdateCallback(key, callback) {
+        if (this.raceEntryLapsUpdateCallbacks.has(key)) {
+            this.raceEntryLapsUpdateCallbacks.get(key).add(callback);
+        }
+        else {
+            this.raceEntryLapsUpdateCallbacks.set(key, new Set([callback]));
+        }
+    }
+
+    /**
+     * Unregister a callback for when the laps for an entry in a raceidenified by key is updated
+     * @param {String} key URI of the race for which the update callback is being unregistered
+     * @param {Function} callback
+     */
+    unregisterRaceEntryLapsUpdateCallback(key, callback) {
+        if (this.raceEntryLapsUpdateCallbacks.has(key)) {
+            this.raceEntryLapsUpdateCallbacks.get(key).delete(callback);
+        }
+    }
+
+    /**
+     * Handle a websocket race entry laps update message via the Stomp client
+     * @param {String} message URI of race that has been updated
+     */
+    handleRaceEntryLapsUpdate(message) {
+        if (this.raceEntryLapsUpdateCallbacks.has(message.body)) {
+            this.raceEntryLapsUpdateCallbacks.get(message.body).forEach(cb => cb());
         }
     }
 
