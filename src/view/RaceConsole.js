@@ -80,11 +80,13 @@ function RaceConsole() {
         const races = Array.from(raceMap.values());
         races.forEach(race => {
             model.registerRaceUpdateCallback(race.url, handleRaceUpdate);
+            model.registerRaceEntryLapsUpdateCallback(race.url, handleRaceUpdate); // refetch all races to avoid writing new code to fetch details for a single race and inserting it into raceMap
         });
         // cleanup before effect runs and before form close
         return () => {
             races.forEach(race => {
                 model.unregisterRaceUpdateCallback(race.url, handleRaceUpdate);
+                model.unregisterRaceEntryLapsUpdateCallback(race.url, handleRaceUpdate);
             });
         }
     }, [model, raceMap, handleRaceUpdate]);

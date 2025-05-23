@@ -369,15 +369,16 @@ describe('when races within session are changed', () => {
         expect(screen.getByText('Popeye Special')).toBeInTheDocument();
     });
     it('removes a race that has had start time changed so it falls outside session time window', async () => {
+        const races_local = [...races];
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-        jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races_local})});
         await act(async () => {        
             customRender(<RaceConsole />, model);
         });
         expect(screen.getByText('Handicap A')).toBeInTheDocument();
-        const url = races[races.length -1].url;
-        races.pop();
+        const url = races_local[races_local.length -1].url;
+        races_local.pop();
         await act(async () => {
             model.handleRaceUpdate({'body': url});
         });
@@ -449,5 +450,43 @@ describe('when new value set for race type', () => {
         });
     
         expect(getRacesBetweenTimesForTypeSpy).toHaveBeenCalledWith(sessionStart, sessionEnd, RaceType.PURSUIT);
+    });
+});
+
+it('registers an interest in race entry laps updates for races in session', async () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const controller = new DinghyRacingController(model);
+    jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    const registerRaceEntryLapsUpdateCallbackSpy = jest.spyOn(model, 'registerRaceEntryLapsUpdateCallback');
+
+    await act(async () => {
+        customRender(<RaceConsole />, model, controller);
+    });
+    await screen.findAllByRole('option');
+
+    expect(registerRaceEntryLapsUpdateCallbackSpy).toHaveBeenCalledTimes(4);
+    expect(registerRaceEntryLapsUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/races/4', expect.any(Function));
+    expect(registerRaceEntryLapsUpdateCallbackSpy).toHaveBeenNthCalledWith(2, 'http://localhost:8081/dinghyracing/api/races/7', expect.any(Function));
+    expect(registerRaceEntryLapsUpdateCallbackSpy).toHaveBeenNthCalledWith(3, 'http://localhost:8081/dinghyracing/api/races/17', expect.any(Function));
+    expect(registerRaceEntryLapsUpdateCallbackSpy).toHaveBeenNthCalledWith(4, 'http://localhost:8081/dinghyracing/api/races/8', expect.any(Function));
+});
+
+// ensure up to date information is displayed if someone switchees the selected races in the session
+describe('when a lap is added to an entry in a race in session', () => {
+    it('updates recorded details', async () => {
+        const races_copy = [...races];
+        races_copy[0] = {...races[0]};
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+        jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races_copy})});
+        await act(async () => {
+            customRender(<RaceConsole />, model);
+        });
+        expect(screen.getByText('Scorpion A')).toBeInTheDocument();
+        races_copy[0].name = 'Popeye Special';
+        await act(async () => {
+            model.handleRaceEntryLapsUpdate({'body': races_copy[0].url});
+        });
+        expect(screen.getByText('Popeye Special')).toBeInTheDocument();
     });
 });
