@@ -40,7 +40,7 @@ function RaceHeaderView({ race, showInRaceData = true }) {
     const [showPostponeRace, setShowPostponeRace] = useState(false);
     const [showShortenCourse, setShowShortenCourse] = useState(false);
 
-    const handleEntryUpdate = useCallback(() => {
+    const handleRaceEntryLapsUpdate = useCallback(() => {
         model.getRace(race.url).then(result => {
             if (!result.success) {
                 setMessage('Unable to update race\n' + result.message);
@@ -67,29 +67,17 @@ function RaceHeaderView({ race, showInRaceData = true }) {
         race.clock.start();
     }, [race]);
 
-    // fetching all the entries for the race just to set a callback in case they change. A race update triggered from server would be more effecient use of network, memory, and time.
     useEffect(() => {
         let ignoreFetch = false; // set to true if RaceEntriewView rerendered before fetch completes to avoid using out of date result
-        let entries = []; // entries for race that have an update callback set. Used to clear up on rerender/ disposal
-        model.getEntriesByRace(race).then(result => {
-            if (!ignoreFetch && !result.success) {
-                setMessage('Unable to load entries\n' + result.message);
-            }
-            else if (!ignoreFetch) {
-                entries = result.domainObject;
-                entries.forEach(entry => {
-                    model.registerEntryUpdateCallback(entry.url, handleEntryUpdate);
-                });
-            }
-        });
+        if (!ignoreFetch) {
+            model.registerRaceEntryLapsUpdateCallback(race.url, handleRaceEntryLapsUpdate);
+        }
         // cleanup before effect runs and before form close
         return () => {
             ignoreFetch = true;
-            entries.forEach(entry => {
-                model.unregisterEntryUpdateCallback(entry.url, handleEntryUpdate);
-            });
+            model.unregisterEntryUpdateCallback(race.url, handleRaceEntryLapsUpdate);
         }
-    }, [model, race, handleEntryUpdate]);
+    }, [model, race, handleRaceEntryLapsUpdate]);
 
     useEffect(() => {
         if (previousRace.current && previousRace.current.clock) {
