@@ -16,6 +16,12 @@
 
 import Clock from './clock';
 
+jest.useFakeTimers();
+
+afterEach(() => {
+    jest.runOnlyPendingTimers();
+})
+
 it('returns the correct time', () => {
     jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
     const clock = new Clock(new Date(Date.now() + 10000));
@@ -39,11 +45,9 @@ describe('when started without providing a start time', () => {
     it('returns elapsed time from when clock was started', () => {
         const clock = new Clock();
         clock.start();
-        // sleep thread and then check time is as expected
-        setTimeout(() => {
-            const elapsed = clock.getElapsedTime();
+        jest.advanceTimersByTime(1000);
+        const elapsed = clock.getElapsedTime();
         expect(Math.round(elapsed)).toBe(1000);
-        }, 1000);
     });    
 });
 
@@ -53,47 +57,72 @@ describe('when clock already started and start instruction given', () => {
         clock.start();
         const startTime = clock._startTime;
         // sleep thread and then check time is as expected
-        setTimeout(() => {
-            clock.start();
-            const elapsed = clock.getElapsedTime();
-            expect(clock._startTime).toBe(startTime);
-            expect(Math.round(elapsed)).toBe(1000);    
-        }, 1000);
+        jest.advanceTimersByTime(1000);
+        clock.start();
+        const elapsed = clock.getElapsedTime();
+        expect(clock._startTime).toBe(startTime);
+        expect(Math.round(elapsed)).toBe(1000);
     });
 });
 
-it('stops', () => { 
-    const clock = new Clock();
-    clock.start();
-    setTimeout(() => {
-        clock.stop();
-        const elapsed = clock.getElapsedTime();
-    }, 1000);
-    setTimeout(() => {
-        expect(clock.getElapsedTime()).toBe(elapsed);
-    }, 10);
-});
-
-it('resets', () => {
-    const clock = new Clock();
-    clock.start();
-    setTimeout(() => {
-        clock.stop();
-    }, 1000);
-    clock.reset();
-    expect(Math.round(clock.getElapsedTime())).toBe(0);
-});
-
-it('calls handler on tick', () => {
+it('stops', () => {
     const handler = jest.fn();
-
     const clock = new Clock();
     clock.addTickHandler(handler);
     clock.start();
-    setTimeout(() => {
-        expect(handler).toBeCalledTimes(10);
-    }, 10);
+    jest.runOnlyPendingTimers();
+    expect(handler).toBeCalledTimes(1);
+    clock.stop();
+    jest.advanceTimersByTime(10000);
+    expect(handler).toBeCalledTimes(1);
 });
+
+describe('when clock ticks', () => {
+    it('calls tick handler', () => {
+        const handler = jest.fn();
+    
+        const clock = new Clock();
+        clock.addTickHandler(handler);
+        clock.start();
+        for(let i = 0; i < 10; i++) {
+            jest.runOnlyPendingTimers();
+        };
+        expect(handler).toBeCalledTimes(10);
+    });
+    it('calls tick handlers', () => {
+        const handler1 = jest.fn();
+        const handler2 = jest.fn();
+    
+        const clock = new Clock();
+        clock.addTickHandler(handler1);
+        clock.addTickHandler(handler2);
+        clock.start();
+        for(let i = 0; i < 10; i++) {
+            jest.runOnlyPendingTimers();
+        }
+        
+        expect(handler1).toBeCalledTimes(10);
+        expect(handler2).toBeCalledTimes(10);
+    });
+});
+
+it('removes a tick handler', () => {
+    const handler1 = jest.fn();
+    const handler2 = jest.fn();
+
+    const clock = new Clock();
+    clock.addTickHandler(handler1);
+    clock.addTickHandler(handler2);
+    clock.removeTickHandler(handler1);
+    clock.start();
+    for(let i = 0; i < 10; i++) {
+        jest.runOnlyPendingTimers();
+    }
+    
+    expect(handler1).not.toBeCalled();
+    expect(handler2).toBeCalledTimes(10);
+});
+
 
 describe('when formatting a duration as [hh:]mm:ss', () => {
     it('converts 86399999ms to 23:59:59', () => {

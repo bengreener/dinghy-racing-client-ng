@@ -36,7 +36,7 @@ class Clock {
     _startTime
     _performanceTimerStartTime; // when the race is due to start based on the value of performance.now() when clock was initialised
     _dateNowPerformanceNowDiff; // difference between Date.now() and performance.now() on clock initialisation
-    _tickHandler;
+    _tickHandlers = new Map();
     _ticker;
 
     /**
@@ -120,8 +120,10 @@ class Clock {
             // this approach results in an average interval of ~1000 milliseconds
             const setNextTick = (recursiveCallback) => {
                 this._ticker = setTimeout(() => {
-                    if (this._tickHandler) {
-                        this._tickHandler();
+                    if (this._tickHandlers.size > 0) {
+                        this._tickHandlers.forEach(callback => {
+                           callback(); 
+                        });
                     };
                     recursiveCallback(recursiveCallback);
                 }, 1000 - Date.now() % 1000);
@@ -139,15 +141,6 @@ class Clock {
         if (this._ticker) {
             clearTimeout(this._ticker);
             this._ticker = null;
-        }
-    }
-    
-    /**
-     * Reset clock start time to now
-     */
-    reset() {
-        if (this._startTime) {
-            this._startTime = Date.now();
         }
     }
     
@@ -182,18 +175,18 @@ class Clock {
     }
     
     /**
-     * Add a function to handle tick events 
+     * Add a function to handle tick events
      * @param {callback} callback 
      */
     addTickHandler(callback) {
-        this._tickHandler = callback;
+        this._tickHandlers.set(callback, callback);
     }
 
     /**
      * Remove the function handling tick events
      */
-    removeTickHandler() {
-        this._tickHandler = null;
+    removeTickHandler(callback) {
+        this._tickHandlers.delete(callback);
     }
 }
 
