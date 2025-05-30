@@ -161,7 +161,7 @@ class StartSequence {
      */
     dispose() {
         this._clock.stop();
-        this._clock.removeTickHandler();
+        this._clock.removeTickHandler(this._handleTick);
     }
 }
 
