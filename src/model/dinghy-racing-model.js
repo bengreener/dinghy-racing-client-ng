@@ -18,6 +18,7 @@ import { Client } from '@stomp/stompjs';
 import StartSequence from './domain-classes/start-sequence';
 import RaceType from './domain-classes/race-type';
 import StartType from './domain-classes/start-type';
+import Clock from './domain-classes/clock';
 
 class DinghyRacingModel {
     httpRootURL;
@@ -32,6 +33,7 @@ class DinghyRacingModel {
     dinghyClassUpdateCallbacks = new Map();
     fleetCreationCallbacks = new Set();
     fleetUpdateCallbacks = new Map();
+    clock = new Clock();
 
     /**
      * Provide a blank competitor template
@@ -1019,6 +1021,14 @@ class DinghyRacingModel {
             crews.push(crew);
         }
         return Promise.resolve({'success': true, 'domainObject': crews});
+    }
+
+    /**
+     * Get the clock
+     * @returns {Clock}
+     */
+    getClock() {
+        return this.clock;
     }
 
     /**

@@ -55,6 +55,7 @@ import {
 import FlagState from './domain-classes/flag-state';
 import RaceType from './domain-classes/race-type';
 import FlagRole from './domain-classes/flag-role';
+import Clock from './domain-classes/clock';
 
 global.fetch = jest.fn();
 
@@ -6567,4 +6568,9 @@ describe('when the slowest dinghy class is requested', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({success: true, domainObject: dinghyClassComet});
     })
-})
+});
+
+it('provides a clcok', () => {
+    const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+    expect(dinghyRacingModel.getClock()).toBeInstanceOf(Clock);
+});
