@@ -14,20 +14,19 @@
  * limitations under the License. 
  */
 
-import FlagRole from './flag-role';
 import FlagState from './flag-state';
 import { sortArray } from '../../utilities/array-utilities';
 import RaceType from './race-type';
 import StartType from './start-type';
+import Signal from './signal';
 
 class RaceStartSequence {
     _race;
-    _flags = [];
-    _actions = [];
+    _signals = [];
 
     constructor(race) {
         this._race = race;
-        ({flags: this._flags, actions: this._actions} = this._generateFlags(race));
+        this._signals = this._generateSignals(race);
     }
 
     /**
@@ -40,121 +39,49 @@ class RaceStartSequence {
     }
 
     /**
-     * Get all flags for this race start
-     * @returns {Array<Flag>}
+     * Get all signals for this race start
+     * @returns {Array<Signal>}
      */
-    getFlags() {
-        return this._flags;
+    getSignals() {
+        return this._signals;
     }
 
     /**
-     * Get all flags for this race start with their state at the specified time
-     * Calculation is to a precison of 1 second and picks up actions that fall within the second.
-     * So a time value of 456 will pick up flags with an action.time in the range 0-999
-     * @param {Date} time
-     * @returns {Array<Flag>}
-     */
-    getFlagsAtTime(time) {
-        const truncatedTime = Math.trunc(time.valueOf() / 1000) * 1000;
-        const flagsWithState = this._flags.map(flag => {
-            const fws = flag;
-            const actions = sortArray(fws.actions, action => action.time);
-            switch (actions[0].afterState) {
-                case FlagState.LOWERED:
-                    fws.state = FlagState.RAISED;
-                    break;
-                default:
-                    fws.state = FlagState.LOWERED;
-            }
-            for(const action of actions) {
-                if (Math.trunc(action.time.valueOf() / 1000) * 1000 <= truncatedTime ) { // round off to containing second to identify actions occurring within that second
-                    fws.state = action.afterState;
-                }
-                else {
-                    break;
-                }
-            }
-            return fws;
-        });
-        return flagsWithState;
-    }
-
-    /**
-     * Get the flags required to start the race with the next action that needs to be performed for that flag
-     * Calculation is to a precison of 1 second and picks up actions that fall within the second.
-     * So a time value of 456 will pick up flags with an action.time in the range 0-999
-     * Objects returned have a property flag of type Flag and a property action of type Action
-     * @param {Date} time
-     * @returns {Array<Object>}
-     */
-    getFlagsAtTimeWithNextAction(time) {
-        const truncatedTime = Math.trunc(time.valueOf() / 1000) * 1000;
-        const flagsWithNextAction = this.getFlagsAtTime(time).map(flag => {
-            const futureActions = [];
-            this._actions.forEach(action => {
-                if (action.flag.name === flag.name && Math.trunc(action.time.valueOf() / 1000) * 1000 > truncatedTime) { // round off to containing second to identify actions occurring within that second
-                    futureActions.push(action);
-                }
-            });
-            return {flag: flag, action: sortArray(futureActions, (action) => action.time)[0]};
-        });
-        return flagsWithNextAction;
-    }
-
-    /**
-     * Get the actions required to start the race
-     * @returns {Array<Action>}
-     */
-    getActions() {
-        return this._actions;
-    }
-
-    /**
-     * Identify flags and corresponding actions required to start race  
-     * Returns an object with two properties flags, an array of flags, and actions, an array of actions
+     * Identify signals required to start race
      * @param {Race} race 
-     * @returns {Object}
+     * @returns {Array<Signal}
      */
-    _generateFlags(race) {
-        const flags = [];
-        const actions = [];
-        let warningFlagOffsets;
-        let preparatoryFlagOffsets;
+    _generateSignals(race) {
+        const signals = [];
+        let classSignalOffsets;
+        let preparatorySignalOffsets;
+        let preparatorySignalLowerMeaning;
+        let preparatorySignalLowerSoundSignal;
 
         switch (race.startType) {
             case StartType.CSCCLUBSTART:
-                warningFlagOffsets = {raise: -600000, lower: 0};
-                preparatoryFlagOffsets = {raise: -300000, lower: 0};
+                classSignalOffsets = {raise: -600000, lower: 0};
+                preparatorySignalOffsets = {raise: -300000, lower: 0};
+                preparatorySignalLowerMeaning = 'Start sequence finished';
+                preparatorySignalLowerSoundSignal = null;
                 break;
             default:
-                warningFlagOffsets = {raise: -300000, lower: 0};
-                preparatoryFlagOffsets = {raise: -240000, lower: -60000};
+                classSignalOffsets = {raise: -300000, lower: 0};
+                preparatorySignalOffsets = {raise: -240000, lower: -60000};
+                preparatorySignalLowerMeaning = 'One minute';
+                preparatorySignalLowerSoundSignal = {description: 'One long'};
         }
 
-        if (race.type === RaceType.FLEET) {
-            let warningFlag;
-            warningFlag = {name: race.fleet.name + ' Class Flag', role: FlagRole.WARNING, actions: []};
-            
-            const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
+        // if (race.type === RaceType.FLEET) {
+            const warningFlag = {name: race.fleet.name + ' Class Flag'};
+            const preparatoryFlag = {name: 'Blue Peter'};
 
-            const warningFlagRaiseAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + warningFlagOffsets.raise), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const warningFlagLowerAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + warningFlagOffsets.lower), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(race.plannedStartTime.valueOf() + preparatoryFlagOffsets.raise), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date (race.plannedStartTime.valueOf() + preparatoryFlagOffsets.lower), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-
-            warningFlag.actions.push(warningFlagRaiseAction);
-            warningFlag.actions.push(warningFlagLowerAction);
-            preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
-            preparatoryFlag.actions.push(preparatoryFlagLowerAction);
-            flags.push(warningFlag);
-            flags.push(preparatoryFlag);
-
-            actions.push(warningFlagRaiseAction);
-            actions.push(warningFlagLowerAction);
-            actions.push(preparatoryFlagRaiseAction);
-            actions.push(preparatoryFlagLowerAction);
-        }
-        else if (race.type === RaceType.PURSUIT) {
+            signals.push({meaning: 'Warning signal', time: new Date(race.plannedStartTime.valueOf() + classSignalOffsets.raise), soundSignal: {description: 'One'}, visualSignal: {flags: [warningFlag], flagsState: FlagState.RAISED}});
+            signals.push({meaning: 'Preparatory signal', time: new Date(race.plannedStartTime.valueOf() + preparatorySignalOffsets.raise), soundSignal: {description: 'One'}, visualSignal: {flags: [preparatoryFlag], flagsState: FlagState.RAISED}});
+            signals.push({meaning: preparatorySignalLowerMeaning, time: new Date(race.plannedStartTime.valueOf() + preparatorySignalOffsets.lower), soundSignal: preparatorySignalLowerSoundSignal, visualSignal: {flags: [preparatoryFlag], flagsState: FlagState.LOWERED}});
+            signals.push({meaning: 'Starting signal', time: new Date(race.plannedStartTime.valueOf()), soundSignal: {description: 'One'}, visualSignal: {flags: [warningFlag], flagsState: FlagState.LOWERED}});
+        // }
+        if (race.type === RaceType.PURSUIT) {
             // get dinghy classes of boats signed up to race and sort in PN order
             const sortedDinghyClasses = sortArray(race.dinghyClasses, (dinghyClass => dinghyClass.portsmouthNumber), true);
             // first flag for the race is going to be for the slowest class in the races fleet
@@ -164,48 +91,14 @@ class RaceStartSequence {
             };
             const basePN = sortedDinghyClasses[0].portsmouthNumber;
             const baseDuration = race.duration;
-            for(let i = 0; i < sortedDinghyClasses.length; i++) {
-                if (i === 0) {
-                    // setup starting flags for first dinghy class
-                    const warningFlag = {name: sortedDinghyClasses[i].name + ' Class Flag', role: FlagRole.WARNING, actions: []};
-                    const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
+            for(let i = 1; i < sortedDinghyClasses.length; i++) {
+                // set up start signals for subsequent dinghy classes
+                let offset = Math.ceil((baseDuration - ((baseDuration * sortedDinghyClasses[i].portsmouthNumber) / basePN)) / 1000) * 1000; // round to the nearest second as this is the precision we are working with
 
-                    const warningFlagRaiseAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + warningFlagOffsets.raise), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-                    const warningFlagLowerAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + warningFlagOffsets.lower), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-                    const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(race.plannedStartTime.valueOf() + preparatoryFlagOffsets.raise), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-                    const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: new Date(race.plannedStartTime.valueOf() + preparatoryFlagOffsets.lower), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-
-                    warningFlag.actions.push(warningFlagRaiseAction);
-                    warningFlag.actions.push(warningFlagLowerAction);
-                    preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
-                    preparatoryFlag.actions.push(preparatoryFlagLowerAction);
-                    flags.push(warningFlag);
-                    flags.push(preparatoryFlag);
-
-                    actions.push(warningFlagRaiseAction);
-                    actions.push(warningFlagLowerAction);
-                    actions.push(preparatoryFlagRaiseAction);
-                    actions.push(preparatoryFlagLowerAction);
-                }
-                else {
-                    // set up start signals for subsequent dinghy classes
-                    const warningFlag = {name: sortedDinghyClasses[i].name + ' Class Flag', role: FlagRole.WARNING, actions: []};
-
-                    let offset = Math.ceil((baseDuration - ((baseDuration * sortedDinghyClasses[i].portsmouthNumber) / basePN)) / 1000) * 1000; // round to the nearest second as this is the precision we are working with
-
-                    const warningFlagRaiseAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + offset - 60000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: false, signalRaceStartStateChange: false};
-                    const warningFlagLowerAction = {flag: warningFlag, time: new Date(race.plannedStartTime.valueOf() + offset), afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-
-                    warningFlag.actions.push(warningFlagRaiseAction);
-                    warningFlag.actions.push(warningFlagLowerAction);
-                    flags.push(warningFlag);
-
-                    actions.push(warningFlagRaiseAction);
-                    actions.push(warningFlagLowerAction);
-                }
+                signals.push({meaning: sortedDinghyClasses[i].name + ' start', time: new Date(race.plannedStartTime.valueOf() + offset), soundSignal: {description: 'One'}});
             }
         }
-        return {flags: flags, actions: actions};
+        return signals;
     }
 }
 

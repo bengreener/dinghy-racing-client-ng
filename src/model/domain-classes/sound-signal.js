@@ -18,5 +18,3 @@
  * @typedef SoundSignal
  * @property {String} description of the sound signal
  */
-
-export default SoundSignal;

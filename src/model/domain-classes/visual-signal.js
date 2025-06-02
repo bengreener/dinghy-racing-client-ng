@@ -21,5 +21,3 @@ import FlagState from './flag-state';
  * @property {Array<Flag>} flags
  * @property {FlagState} flagsState
  */
-
-export default VisualSignal;

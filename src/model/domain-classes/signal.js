@@ -19,8 +19,8 @@ import VisualSignal from './visual-signal';
 
 /**
  * @typedef Signal
+ * @property {String} meaning of the signal
+ * @property {Date} time of the signal
  * @property {SoundSignal} soundSignal
  * @property {VisualSignal} visualSignal
  */
-
-export default Signal;
