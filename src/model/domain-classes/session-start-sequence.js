@@ -22,8 +22,7 @@ import { sortArray } from '../../utilities/array-utilities';
 class SessionStartSequence {
     _races = [];
     _raceStartSequences = [];
-    _flags = [];
-    _actions = [];
+    _signals = [];
 
     /**
      * Create a new instance of SessionStartSequence
@@ -32,7 +31,7 @@ class SessionStartSequence {
     constructor(races) {
         this._races = races;
         this._raceStartSequences = races.map(race => new RaceStartSequence(race));
-        ({flags: this._flags, actions: this._actions} = this._generateFlags(this._raceStartSequences));
+        this._signals = this._generateSignals(this._raceStartSequences);
     }
 
     /**
@@ -53,136 +52,93 @@ class SessionStartSequence {
     }
 
     /**
-     * Get all flags for this race start
-     * @returns {Array<Flag>}
+     * Get all signals for this session start
+     * @returns {Array<Signal>}
      */
-    getFlags() {
-        return this._flags;
+    getSignals() {
+        return this._signals;
     }
 
     /**
-     * Get all flags for this session with their state at the specified time
-     * @param {Date} time
-     * @returns {Array<Flag>}
+     * Identify signals required to start races in the session
+     * @param {Array<RaceStartSequence>} raceStartSequences
+     * @returns {Array<Signal>}
      */
-    getFlagsAtTime(time) {
-        const truncatedTime = Math.trunc(time.valueOf() / 1000) * 1000;
-        const flagsWithState = this._flags.map(flag => {
-            const fws = flag;
-            const actions = sortArray(fws.actions, action => action.time);
-            switch (actions[0].afterState) {
-                case FlagState.LOWERED:
-                    fws.state = FlagState.RAISED;
-                    break;
-                default:
-                    fws.state = FlagState.LOWERED;
-            }
-            for(const action of actions) {
-                if (Math.trunc(action.time.valueOf() / 1000) * 1000 <= truncatedTime) { // round off to containing second to identify actions occurring within that second
-                    fws.state = action.afterState;
-                }
-                else {
-                    break;
-                }
-            }
-            return fws;
-        });
-        return flagsWithState;
-    }
-
-    /**
-     * Get the flags required to start the race with the next action that needs to be performed for that flag
-     * Objects returned have a property flag of type Flag and a property action of type Action
-     * @param {Date} time
-     * @returns {Array<Object>}
-     */
-    getFlagsAtTimeWithNextAction(time) {
-        const truncatedTime = Math.trunc(time.valueOf() / 1000) * 1000;
-        const flagsWithNextAction = this.getFlagsAtTime(time).map(flag => {
-            const futureActions = [];
-            this._actions.forEach(action => {
-                if (action.flag.name === flag.name && Math.trunc(action.time.valueOf() / 1000) * 1000 > truncatedTime) { // round off to containing second to identify actions occurring within that second
-                    futureActions.push(action);
-                }
-            });
-            return {flag: flag, action: sortArray(futureActions, (action) => action.time)[0]};
-        });
-        return flagsWithNextAction;
-    }
-
-    /**
-     * Get the actions required to start races in the session
-     * @returns {Array<Action>}
-     */
-    getActions() {
-        return this._actions;
-    }
-
-    /**
-     * Identify flags and corresponding actions required to start race  
-     * Returns an object with two properties flags, an array of flags, and actions, an array of actions
-     * @param {Array<RaceStartSequence} raceStartSequences 
-     * @returns {Object}
-     */
-    _generateFlags() {
-        const flags = this._raceStartSequences.flatMap(rss => rss.getFlags());
-        const actions = this._raceStartSequences.flatMap(rss => rss.getActions());
-        // warning flags should be specific to each race
-        // the preparatrory flag needs to use the earliest raise action and the last lower action from all race sessions
-        // also want all warning flag actions to reference the same instance of flag (doesn't matter which one ;-))
-        const newFlags = new Map();
-        const newActions = [];
-        let preparatoryFlag;
-        let firstPreparatoryFlagRaise;
-        let lastPreparatoryFlagLower;
-        flags.forEach(flag => {
-            switch (flag.role) {
-                case FlagRole.PREPARATORY:
-                    if (!preparatoryFlag) {
-                        preparatoryFlag = flag;
-                        preparatoryFlag.actions = [];
-                        newFlags.set(preparatoryFlag.name, preparatoryFlag);
-                    }
-                    break;
-                default:
-                    // add flag to nw flags if it is a new flag
-                    if (!newFlags.has(flag.name)) {
-                        newFlags.set(flag.name, flag);
+    _generateSignals(raceStartSequences) {
+        const sessionSignals = [];
+        const flagsMap = new Map();
+        // generate a key to avaoid issues with matching by reference
+        const generateFlagsKey = (flags) => {
+            const flagNames = flags.map(flag => flag.name);
+            flagNames.sort();
+            return flagNames.join('');
+        }
+        // collect signals from all races and remove any signals that cannot be made because of conflict with an earlier signal (signals cannot raise flags that are already raised and cannot lower flags that are still required to be raised by another signal)
+        raceStartSequences.forEach(rss => {
+            rss.getSignals().forEach(signal => {
+                // signals with a visual signal need to be checked for conflict between time and flag state for signals using the same flags in the same session
+                if (signal.visualSignal) {
+                    const flagsKey = generateFlagsKey(signal.visualSignal.flags);
+                    if (flagsMap.has(flagsKey)) {
+                        flagsMap.get(flagsKey).push(signal);
                     }
                     else {
-                        // amalgamate actions for both versions of flag
-                        const masterFlag = newFlags.get(flag.name);
-                        // reset flag on actions of 'duplicate' flag
-                        flag.actions.forEach(action => action.flag = masterFlag);
-                        masterFlag.actions = masterFlag.actions.concat(flag.actions);
+                        flagsMap.set(flagsKey, [signal]);
                     }
+                }
+                else {
+                    // audio only signals are not expected to conflict
+                    sessionSignals.push(signal);
+                }
+            })
+        });
+        flagsMap.forEach((signals, key) => {
+            if (signals.length > 2) {
+                // sort array in ascending order by signal.time and remove conflicting visual signal raise events
+                signals.sort((a, b) => {
+                    const timeDiff = a.time - b.time;
+                    if (timeDiff === 0) {
+                        // split a draw
+                        if (a.visualSignal.flagsState === FlagState.RAISED) {
+                            return -1;
+                        }
+                        else {
+                            return 1;
+                        }
+                    }
+                    return timeDiff;
+                });
+                for (let i = 0; i < signals.length; i++) {
+                    if (signals[i].visualSignal.flagsState === FlagState.RAISED && signals[i + 1].visualSignal.flagsState === FlagState.RAISED) {
+                        signals.splice(i + 1, 1);
+                    }
+                }
+                // sort array in descending order by signal.time and remove conflicting visual signal lower events
+                signals = signals.sort((a, b) => {
+                    const timeDiff = b.time - a.time;
+                    if (timeDiff === 0) {
+                        // split a draw
+                        if (a.visualSignal.flagsState === FlagState.LOWERED) {
+                            return -1;
+                        }
+                        else {
+                            return 1;
+                        }
+                    }
+                    return timeDiff;
+                });
+                for (let i = 0; i < signals.length; i++) {
+                    if (signals[i].visualSignal.flagsState === FlagState.LOWERED && signals[i + 1].visualSignal.flagsState === FlagState.LOWERED) {
+                        signals.splice(i + 1, 1);
+                    }
+                }
             }
         });
-        actions.forEach(action => {
-            switch (action.flag.role) {
-                case FlagRole.PREPARATORY:
-                    if (action.afterState === FlagState.RAISED && (!firstPreparatoryFlagRaise || action.time < firstPreparatoryFlagRaise.time)) {
-                        firstPreparatoryFlagRaise = action;
-                        firstPreparatoryFlagRaise.flag = preparatoryFlag;
-                    }
-                    else if (action.afterState === FlagState.LOWERED && (!lastPreparatoryFlagLower || action.time > lastPreparatoryFlagLower.time)) {
-                        lastPreparatoryFlagLower = action;
-                        lastPreparatoryFlagLower.flag = preparatoryFlag;
-                    }
-                    break;
-                default:
-                    newActions.push(action);
-            }
+        // push confirmed signals into session signals list
+        flagsMap.forEach(signals => {
+            signals.forEach(signal => sessionSignals.push(signal));
         });
-        if (firstPreparatoryFlagRaise) {
-            preparatoryFlag.actions.push(firstPreparatoryFlagRaise);
-            newActions.push(firstPreparatoryFlagRaise);
-        }
-        if (lastPreparatoryFlagLower) {
-            preparatoryFlag.actions.push(lastPreparatoryFlagLower);
-            newActions.push(lastPreparatoryFlagLower);
-        }
-        return {flags: Array.from(newFlags.values()), actions: newActions};
+        return sessionSignals.sort((a, b) => a.time - b.time);
     }
 }
 
