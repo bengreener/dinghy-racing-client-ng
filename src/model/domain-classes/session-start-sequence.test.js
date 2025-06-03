@@ -15,16 +15,25 @@
  */
 
 import SessionStartSequence from './session-start-sequence';
+import Clock from './clock';
 
 import { raceScorpionA, raceHandicapA } from '../__mocks__/test-data';
 import FlagRole from './flag-role';
 import FlagState from './flag-state';
 import StartType from './start-type';
 
+jest.useFakeTimers();
+
+afterEach(() => {
+    jest.runOnlyPendingTimers();
+});
+
 describe('when using CSC club start', () => {
     it('returns correct signals', () => {
         const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-        const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
+        const clock = new Clock();
+        clock.start();
+        const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart], clock);
     
         const scorpionClassFlag = {name: 'Scorpion Class Flag'};
         const preparatoryFlag = {name: 'Blue Peter'};
@@ -52,7 +61,9 @@ describe('when using CSC club start', () => {
     describe('when 11 minutes before the start of the first race and 16 minutes before start of second race', () => {
         it('returns the next race that will start', () => {
             const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
+            const clock = new Clock();
+            clock.start();
+            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart], clock);
         
             const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf() - 660000));
             expect(race).toStrictEqual(raceScorpionA);
@@ -61,7 +72,9 @@ describe('when using CSC club start', () => {
     describe('when 0 minutes before the start of the first race and 5 minutes before start of second race', () => {
         it('returns the next race that will start', () => {
             const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
+            const clock = new Clock();
+            clock.start();
+            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart], clock);
         
             const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf()));
             expect(race).toStrictEqual(raceScorpionA);
@@ -70,7 +83,9 @@ describe('when using CSC club start', () => {
     describe('when 5 minutes after the start of the first race and 0 minutes before start of second race', () => {
         it('returns the next race that will start', () => {
             const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
+            const clock = new Clock();
+            clock.start();
+            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart], clock);
         
             const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf() + 300000));
             expect(race).toStrictEqual(raceHandicapA_newStart);
@@ -82,7 +97,9 @@ describe('when using RRS26 start', () => {
     it('returns correct signals', () => {
         const raceScorpionA_rrs26 = {...raceScorpionA, startType: StartType.RRS26};
         const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z'), startType: StartType.RRS26};
-        const sessionStartSequence = new SessionStartSequence([raceScorpionA_rrs26, raceHandicapA_newStart]);
+        const clock = new Clock();
+        clock.start();
+        const sessionStartSequence = new SessionStartSequence([raceScorpionA_rrs26, raceHandicapA_newStart], clock);
     
         const scorpionClassFlag = {name: 'Scorpion Class Flag'};
         const preparatoryFlag = {name: 'Blue Peter'};
@@ -113,7 +130,9 @@ describe('when using RRS26 start', () => {
         it('returns the next race that will start', () => {
             const raceScorpionA_rrs26 = {...raceScorpionA, startType: StartType.RRS26};
             const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z'), startType: StartType.RRS26};
-            const sessionStartSequence = new SessionStartSequence([raceScorpionA_rrs26, raceHandicapA_newStart]);
+            const clock = new Clock();
+            clock.start();
+            const sessionStartSequence = new SessionStartSequence([raceScorpionA_rrs26, raceHandicapA_newStart], clock);
         
             const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA_rrs26.plannedStartTime.valueOf() - 360000));
             expect(race).toStrictEqual(raceScorpionA_rrs26);
@@ -123,7 +142,9 @@ describe('when using RRS26 start', () => {
         it('returns the next race that will start', () => {
             const raceScorpionA_rrs26 = {...raceScorpionA, startType: StartType.RRS26};
             const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z'), startType: StartType.RRS26};
-            const sessionStartSequence = new SessionStartSequence([raceScorpionA_rrs26, raceHandicapA_newStart]);
+            const clock = new Clock();
+            clock.start();
+            const sessionStartSequence = new SessionStartSequence([raceScorpionA_rrs26, raceHandicapA_newStart], clock);
         
             const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA_rrs26.plannedStartTime.valueOf()));
             expect(race).toStrictEqual(raceScorpionA_rrs26);
@@ -133,10 +154,82 @@ describe('when using RRS26 start', () => {
         it('returns the next race that will start', () => {
             const raceScorpionA_rrs26 = {...raceScorpionA, startType: StartType.RRS26};
             const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-            const sessionStartSequence = new SessionStartSequence([raceScorpionA_rrs26, raceHandicapA_newStart]);
+            const clock = new Clock();
+            clock.start();
+            const sessionStartSequence = new SessionStartSequence([raceScorpionA_rrs26, raceHandicapA_newStart], clock);
         
             const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA_rrs26.plannedStartTime.valueOf() + 300000));
             expect(race).toStrictEqual(raceHandicapA_newStart);
         });
     });
+});
+
+describe('when time to prepare for race start signal', () => {
+    it('notifies observers', () => {
+        jest.setSystemTime(new Date("2021-10-14T10:23:59Z"));
+        const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
+        const handler1 = jest.fn();
+        const handler2 = jest.fn();
+        const clock = new Clock();
+        clock.start();
+        const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart], clock);
+        sessionStartSequence.addPrepareForRaceStartSignalHandler(handler1);
+        sessionStartSequence.addPrepareForRaceStartSignalHandler(handler2);
+
+        jest.advanceTimersByTime(1251);
+        expect(handler1).toBeCalledTimes(2);
+        expect(handler2).toBeCalledTimes(2);
+    });
+});
+
+it('removes registration of an observer from prepare for race start events', () => {
+    const handler1 = jest.fn();
+    const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
+        jest.setSystemTime(new Date("2021-10-14T10:23:59Z"));
+        const handler2 = jest.fn();
+        const clock = new Clock();
+        clock.start();
+        const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart], clock);
+        sessionStartSequence.addPrepareForRaceStartSignalHandler(handler1);
+        sessionStartSequence.addPrepareForRaceStartSignalHandler(handler2);
+        sessionStartSequence.removePrepareForRaceStartSignalHandler(handler1);
+        jest.advanceTimersByTime(1899);
+        expect(handler1).toBeCalledTimes(0);
+        expect(handler2).toBeCalledTimes(2);
+});
+
+describe('when time to make race start signal', () => {
+    it('notifies observers', () => {
+        jest.setSystemTime(new Date("2021-10-14T10:29:59Z"));
+        const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
+        const handler1 = jest.fn();
+        const handler2 = jest.fn();
+        const clock = new Clock();
+        clock.start();
+
+        const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart], clock);
+        sessionStartSequence.addMakeRaceStartSignalHandler(handler1);
+        sessionStartSequence.addMakeRaceStartSignalHandler(handler2);
+
+        jest.advanceTimersByTime(1095);
+        expect(handler1).toBeCalledTimes(2);
+        expect(handler2).toBeCalledTimes(2);
+    });
+});
+
+it('removes registration of an observer from make race start signal events', () => {
+    jest.setSystemTime(new Date("2021-10-14T10:29:59Z"));
+    const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
+    const handler1 = jest.fn();
+    const handler2 = jest.fn();
+    const clock = new Clock();
+    clock.start();
+
+    const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart], clock);
+    sessionStartSequence.addMakeRaceStartSignalHandler(handler1);
+    sessionStartSequence.addMakeRaceStartSignalHandler(handler2);
+    sessionStartSequence.removeMakeRaceStartSignalHandler(handler1);
+    jest.advanceTimersByTime(1000);
+    expect(handler1).toBeCalledTimes(0);
+    expect(handler2).toBeCalledTimes(2);
 });

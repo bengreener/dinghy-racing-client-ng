@@ -23,15 +23,66 @@ class SessionStartSequence {
     _races = [];
     _raceStartSequences = [];
     _signals = [];
+    _prepareForRaceStartSignalHandlers = new Map();
+    _makeRaceStartSignalHandlers = new Map();
 
     /**
      * Create a new instance of SessionStartSequence
      * @param {Array<Race>} races
      */
-    constructor(races) {
+    constructor(races, clock) {
+        this.prepareForRaceStartSignalHandler = this.prepareForRaceStartSignalHandler.bind(this);
+        this.makeRaceStartSignalHandler = this.makeRaceStartSignalHandler.bind(this);
         this._races = races;
-        this._raceStartSequences = races.map(race => new RaceStartSequence(race));
+        this._raceStartSequences = races.map(race => {
+            const rss = new RaceStartSequence(race, clock);
+            rss.addPrepareForRaceStartSignalHandler(this.prepareForRaceStartSignalHandler);
+            rss.addMakeRaceStartSignalHandler(this.makeRaceStartSignalHandler);
+            return rss;
+        });
         this._signals = this._generateSignals(this._raceStartSequences);
+    }
+
+    prepareForRaceStartSignalHandler() {
+        if (this._prepareForRaceStartSignalHandlers.size > 0) {
+            this._prepareForRaceStartSignalHandlers.forEach(callback => callback());
+        }
+    }
+
+    makeRaceStartSignalHandler() {
+        if (this._makeRaceStartSignalHandlers.size > 0) {
+            this._makeRaceStartSignalHandlers.forEach(callback => callback());
+        }
+    }
+
+    /**
+     * Add a function to handle prepareForRaceStartSignal events
+     * @param {callback} callback
+     */
+    addPrepareForRaceStartSignalHandler(callback) {
+        this._prepareForRaceStartSignalHandlers.set(callback, callback);
+    }
+
+    /**
+     * Remove a function handling prepareForRaceStartSignal events
+     */
+    removePrepareForRaceStartSignalHandler(callback) {
+        this._prepareForRaceStartSignalHandlers.delete(callback);
+    }
+
+    /**
+     * Add a function to handle makeRaceStartSignal events
+     * @param {callback} callback
+     */
+    addMakeRaceStartSignalHandler(callback) {
+        this._makeRaceStartSignalHandlers.set(callback, callback);
+    }
+
+    /**
+     * Remove a function handling makeRaceStartSignal events
+     */
+    removeMakeRaceStartSignalHandler(callback) {
+        this._makeRaceStartSignalHandlers.delete(callback);
     }
 
     /**
@@ -139,6 +190,17 @@ class SessionStartSequence {
             signals.forEach(signal => sessionSignals.push(signal));
         });
         return sessionSignals.sort((a, b) => a.time - b.time);
+    }
+
+    /**
+     * Clean up resources used by RaceStartSequence
+     */
+    dispose() {
+        this._raceStartSequences.forEach(rss => {
+            rss.removePrepareForRaceStartSignalHandler(this.prepareForRaceStartSignalHandler);
+            rss.removeMakeRaceStartSignalHandler(this.makeRaceStartSignalHandler);
+            rss.dispose();
+        });
     }
 }
 
