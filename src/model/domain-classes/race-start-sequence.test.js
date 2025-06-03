@@ -15,13 +15,20 @@
  */
 
 import RaceStartSequence from './race-start-sequence';
+import Clock from './clock';
 import { raceScorpionA, raceHandicapA, racePursuitA } from '../__mocks__/test-data';
 import FlagState from './flag-state';
 import StartType from './start-type';
 
+jest.useFakeTimers();
+
+afterEach(() => {
+    jest.runOnlyPendingTimers();
+});
+
 describe('when it is 5 minutes before the race start time', () => {
     it('returns the next race to start', () => {
-        const raceStartSequence = new RaceStartSequence(raceScorpionA);
+        const raceStartSequence = new RaceStartSequence(raceScorpionA, new Clock());
         const race = raceStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf() - 36000));
 
         expect(race).toEqual(raceScorpionA);
@@ -30,7 +37,7 @@ describe('when it is 5 minutes before the race start time', () => {
 
 describe('when it is 0 minutes before the race start time', () => {
     it('returns the next race to start', () => {
-        const raceStartSequence = new RaceStartSequence(raceScorpionA);
+        const raceStartSequence = new RaceStartSequence(raceScorpionA, new Clock());
         const race = raceStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf()));
 
         expect(race).toEqual(raceScorpionA);
@@ -39,7 +46,7 @@ describe('when it is 0 minutes before the race start time', () => {
 
 describe('when it is 1 second after the race start time', () => {
     it('returns null as no next race to start', () => {
-        const raceStartSequence = new RaceStartSequence(raceScorpionA);
+        const raceStartSequence = new RaceStartSequence(raceScorpionA, new Clock());
         const race = raceStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf() + 1000));
 
         expect(race).toBeNull();
@@ -49,7 +56,7 @@ describe('when it is 1 second after the race start time', () => {
 describe('when using CSC club start', () => {
     describe('when single dinghy class Fleet race', () => {
         it('returns signals', () => {
-            const raceStartSequence = new RaceStartSequence(raceScorpionA);
+            const raceStartSequence = new RaceStartSequence(raceScorpionA, new Clock());
             const signals = raceStartSequence.getSignals();
         
             const classFlag = {name: 'Scorpion Class Flag'};
@@ -71,7 +78,7 @@ describe('when using CSC club start', () => {
     });
     describe('when Fleet handicap race', () => {
         it('returns signals', () => {
-            const raceStartSequence = new RaceStartSequence(raceHandicapA);
+            const raceStartSequence = new RaceStartSequence(raceHandicapA, new Clock());
             const signals = raceStartSequence.getSignals();
         
             const classFlag = {name: 'Handicap Class Flag'};
@@ -98,7 +105,7 @@ describe('when using CSC club start', () => {
                 dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
                 url: 'http://localhost:8081/dinghyracing/api/fleets/2'
             }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
-            const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
+            const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses, new Clock());
         
             const classFlag = {name: 'Handicap Class Flag'};
             const preparatoryFlag = {name: 'Blue Peter'};
@@ -126,7 +133,7 @@ describe('when using CSC club start', () => {
 describe('when using RRS26 start', () => {
     describe('when single dinghy class Fleet race', () => {
         it('returns signals', () => {
-            const raceStartSequence = new RaceStartSequence({...raceScorpionA, startType: StartType.RRS26});
+            const raceStartSequence = new RaceStartSequence({...raceScorpionA, startType: StartType.RRS26}, new Clock());
             const signals = raceStartSequence.getSignals();
 
             const classFlag = {name: 'Scorpion Class Flag'};
@@ -149,7 +156,7 @@ describe('when using RRS26 start', () => {
     });
     describe('when Fleet handicap race', () => {
         it('returns signals', () => {
-            const raceStartSequence = new RaceStartSequence({...raceHandicapA, startType: StartType.RRS26});
+            const raceStartSequence = new RaceStartSequence({...raceHandicapA, startType: StartType.RRS26}, new Clock());
             const signals = raceStartSequence.getSignals();
         
             const classFlag = {name: 'Handicap Class Flag'};
@@ -177,7 +184,7 @@ describe('when using RRS26 start', () => {
                 dinghyClasses: [{name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1831}], 
                 url: 'http://localhost:8081/dinghyracing/api/fleets/2'
             }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
-            const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses);
+            const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses, new Clock());
         
             const classFlag = {name: 'Handicap Class Flag'};
             const preparatoryFlag = {name: 'Blue Peter'};
@@ -201,4 +208,70 @@ describe('when using RRS26 start', () => {
             expect(raceStartSequence.getSignals()).toEqual([warningSignal, preparatorySignal, oneMinuteSignal, startSignal, topperSignal, laserSignal]);
         });
     });
+});
+
+describe('when time to prepare for race start signal', () => {
+    it('notifies observers', () => {
+        jest.setSystemTime(new Date("2021-10-14T10:23:59Z"));
+        const handler1 = jest.fn();
+        const handler2 = jest.fn();
+        const clock = new Clock();
+        clock.start();
+        const raceStartSequence  = new RaceStartSequence({...raceScorpionA}, clock);
+        raceStartSequence.addPrepareForRaceStartSignalHandler(handler1);
+        raceStartSequence.addPrepareForRaceStartSignalHandler(handler2);
+
+        jest.advanceTimersByTime(1251);
+        expect(handler1).toBeCalledTimes(1);
+        expect(handler2).toBeCalledTimes(1);
+    });
+});
+
+it('removes registration of an observer from prepare for race start events', () => {
+    const handler1 = jest.fn();
+        jest.setSystemTime(new Date("2021-10-14T10:24:59Z"));
+        const handler2 = jest.fn();
+        const clock = new Clock();
+        clock.start();
+        const raceStartSequence  = new RaceStartSequence({...raceScorpionA, startType: StartType.RRS26}, clock);
+        raceStartSequence.addPrepareForRaceStartSignalHandler(handler1);
+        raceStartSequence.addPrepareForRaceStartSignalHandler(handler2);
+        raceStartSequence.removePrepareForRaceStartSignalHandler(handler1);
+        jest.advanceTimersByTime(1899);
+        expect(handler1).toBeCalledTimes(0);
+        expect(handler2).toBeCalledTimes(1);
+});
+
+describe('when time to make race start signal', () => {
+    it('notifies observers', () => {
+        jest.setSystemTime(new Date("2021-10-14T10:29:59Z"));
+        const handler1 = jest.fn();
+        const handler2 = jest.fn();
+        const clock = new Clock();
+        clock.start();
+
+        const raceStartSequence  = new RaceStartSequence({...raceScorpionA}, clock);
+        raceStartSequence.addMakeRaceStartSignalHandler(handler1);
+        raceStartSequence.addMakeRaceStartSignalHandler(handler2);
+
+        jest.advanceTimersByTime(1095);
+        expect(handler1).toBeCalledTimes(1);
+        expect(handler2).toBeCalledTimes(1);
+    });
+});
+
+it('removes registration of an observer from make race start signal events', () => {
+    jest.setSystemTime(new Date("2021-10-14T10:29:59Z"));
+    const handler1 = jest.fn();
+    const handler2 = jest.fn();
+    const clock = new Clock();
+    clock.start();
+
+    const raceStartSequence  = new RaceStartSequence({...raceScorpionA, startType: StartType.RRS26}, clock);
+    raceStartSequence.addMakeRaceStartSignalHandler(handler1);
+    raceStartSequence.addMakeRaceStartSignalHandler(handler2);
+    raceStartSequence.removeMakeRaceStartSignalHandler(handler1);
+    jest.advanceTimersByTime(1000);
+    expect(handler1).toBeCalledTimes(0);
+    expect(handler2).toBeCalledTimes(1);
 });

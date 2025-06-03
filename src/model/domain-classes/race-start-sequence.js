@@ -23,10 +23,67 @@ import Signal from './signal';
 class RaceStartSequence {
     _race;
     _signals = [];
+    _prepareForRaceStartSignalHandlers = new Map();
+    _makeRaceStartSignalHandlers = new Map();
+    _clock;
 
-    constructor(race) {
+    constructor(race, clock) {
+        this.tickHandler = this.tickHandler.bind(this);
+        this.prepareForRaceStartSignal = this.prepareForRaceStartSignal.bind(this);
+        this.makeRaceStartSignal = this.makeRaceStartSignal.bind(this);
         this._race = race;
         this._signals = this._generateSignals(race);
+        this._clock = clock;
+        clock.addTickHandler(this.tickHandler);
+    }
+
+    tickHandler() {
+        const timeToSecondPrecision = this._clock.getTimeToSecondPrecision();
+        this.prepareForRaceStartSignal(timeToSecondPrecision);
+        this.makeRaceStartSignal(timeToSecondPrecision);
+    }
+
+    prepareForRaceStartSignal(time) {
+        const signalTime = new Date(time.valueOf() + 60000);
+        if (this._prepareForRaceStartSignalHandlers.size > 0 && this._signals.some(signal => signal.time.getTime() === signalTime.getTime())) {
+            this._prepareForRaceStartSignalHandlers.forEach(callback => callback());
+        }
+    }
+
+    makeRaceStartSignal(time) {
+        if (this._makeRaceStartSignalHandlers.size > 0 && this._signals.some(signal => signal.time.getTime() === time.getTime())) {
+            this._makeRaceStartSignalHandlers.forEach(callback => callback());
+        }
+    }
+
+    /**
+     * Add a function to handle prepareForRaceStartSignal events
+     * @param {callback} callback
+     */
+    addPrepareForRaceStartSignalHandler(callback) {
+        this._prepareForRaceStartSignalHandlers.set(callback, callback);
+    }
+
+    /**
+     * Remove a function handling prepareForRaceStartSignal events
+     */
+    removePrepareForRaceStartSignalHandler(callback) {
+        this._prepareForRaceStartSignalHandlers.delete(callback);
+    }
+
+    /**
+     * Add a function to handle makeRaceStartSignal events
+     * @param {callback} callback
+     */
+    addMakeRaceStartSignalHandler(callback) {
+        this._makeRaceStartSignalHandlers.set(callback, callback);
+    }
+
+    /**
+     * Remove a function handling makeRaceStartSignal events
+     */
+    removeMakeRaceStartSignalHandler(callback) {
+        this._makeRaceStartSignalHandlers.delete(callback);
     }
 
     /**
@@ -99,6 +156,13 @@ class RaceStartSequence {
             }
         }
         return signals;
+    }
+
+    /**
+     * Clean up resources used by RaceStartSequence
+     */
+    dispose() {
+        this._clock.removeTickHandler(this.tickHandler);
     }
 }
 
