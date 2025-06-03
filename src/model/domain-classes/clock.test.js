@@ -20,7 +20,7 @@ jest.useFakeTimers();
 
 afterEach(() => {
     jest.runOnlyPendingTimers();
-})
+});
 
 it('returns the correct time', () => {
     jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
@@ -307,4 +307,11 @@ describe('when need to synch with an external clock accepts a time to synch cloc
         Clock.synchToTime(testTime);
         expect(onmessageSpy).toBeCalledWith({message: 'synchToTime', body: testTime});
     });
+});
+
+it('provides time to the nearest second precision', () => {
+    const timeToSecondPrecision = new Date(Math.floor(Date.now() / 1000) * 1000);
+    const clock = new Clock();
+
+    expect(clock.getTimeToSecondPrecision()).toEqual(timeToSecondPrecision);
 });

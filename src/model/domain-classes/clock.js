@@ -154,6 +154,15 @@ class Clock {
     }
 
     /**
+     * Return a time based on the start time of the clock and the elapsed time calculated by the performance timer with precision reduced to the current second
+     * This may differ from the time that would be returned by new Date() or Date.now()
+     * @returns {Date}
+     */
+    getTimeToSecondPrecision() {
+        return new Date(Math.floor((this._startTime + this.getElapsedTime()) / 1000) * 1000);
+    }
+
+    /**
      * Get time elapsed since start time
      * This is based on performance timer to ensure monotonically increasing values returned.
      * There are known issues with the performance timer on some combinations of OS and browser relating to the timer suspending during sleep:
@@ -167,7 +176,6 @@ class Clock {
         const dNow = Date.now();
         // adjust if performance timer falls behind system clock; intended to autocorrect any error caused by sleeping of clock used for performance timer
         if (pNow + this._dateNowPerformanceNowDiff < dNow - 2) {
-            console.error(`Performance timer and Date timer variance exceeded tolerance. Performance timer constants reset. Variance was: ${pNow + this._dateNowPerformanceNowDiff - dNow} milliseconds`);
             this._dateNowPerformanceNowDiff = dNow - pNow;
             this._performanceTimerStartTime =  this._startTime - this._dateNowPerformanceNowDiff;
         }
