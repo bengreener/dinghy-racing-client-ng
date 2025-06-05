@@ -129,15 +129,13 @@ class RaceStartSequence {
                 preparatorySignalLowerSoundSignal = {description: 'One long'};
         }
 
-        // if (race.type === RaceType.FLEET) {
-            const warningFlag = {name: race.fleet.name + ' Class Flag'};
-            const preparatoryFlag = {name: 'Blue Peter'};
+        const warningFlag = {name: race.fleet.name + ' Class Flag'};
+        const preparatoryFlag = {name: 'Blue Peter'};
 
-            signals.push({meaning: 'Warning signal', time: new Date(race.plannedStartTime.valueOf() + classSignalOffsets.raise), soundSignal: {description: 'One'}, visualSignal: {flags: [warningFlag], flagsState: FlagState.RAISED}});
-            signals.push({meaning: 'Preparatory signal', time: new Date(race.plannedStartTime.valueOf() + preparatorySignalOffsets.raise), soundSignal: {description: 'One'}, visualSignal: {flags: [preparatoryFlag], flagsState: FlagState.RAISED}});
-            signals.push({meaning: preparatorySignalLowerMeaning, time: new Date(race.plannedStartTime.valueOf() + preparatorySignalOffsets.lower), soundSignal: preparatorySignalLowerSoundSignal, visualSignal: {flags: [preparatoryFlag], flagsState: FlagState.LOWERED}});
-            signals.push({meaning: 'Starting signal', time: new Date(race.plannedStartTime.valueOf()), soundSignal: {description: 'One'}, visualSignal: {flags: [warningFlag], flagsState: FlagState.LOWERED}});
-        // }
+        signals.push({meaning: 'Warning signal', time: new Date(race.plannedStartTime.valueOf() + classSignalOffsets.raise), soundSignal: {description: 'One'}, visualSignal: {flags: [warningFlag], flagsState: FlagState.RAISED}});
+        signals.push({meaning: 'Preparatory signal', time: new Date(race.plannedStartTime.valueOf() + preparatorySignalOffsets.raise), soundSignal: {description: 'One'}, visualSignal: {flags: [preparatoryFlag], flagsState: FlagState.RAISED}});
+        signals.push({meaning: preparatorySignalLowerMeaning, time: new Date(race.plannedStartTime.valueOf() + preparatorySignalOffsets.lower), soundSignal: preparatorySignalLowerSoundSignal, visualSignal: {flags: [preparatoryFlag], flagsState: FlagState.LOWERED}});
+        signals.push({meaning: 'Starting signal', time: new Date(race.plannedStartTime.valueOf()), soundSignal: {description: 'One'}, visualSignal: {flags: [warningFlag], flagsState: FlagState.LOWERED}});
         if (race.type === RaceType.PURSUIT) {
             // get dinghy classes of boats signed up to race and sort in PN order
             const sortedDinghyClasses = sortArray(race.dinghyClasses, (dinghyClass => dinghyClass.portsmouthNumber), true);
