@@ -145,7 +145,7 @@ class SessionStartSequence {
         });
         flagsMap.forEach((signals, key) => {
             if (signals.length > 2) {
-                // sort array in ascending order by signal.time and remove conflicting visual signal raise events
+                // sort array in ascending order by signal.time and remove signals where visual signals conflict (raise and lower same visual signal at same time)
                 signals.sort((a, b) => {
                     const timeDiff = a.time - b.time;
                     if (timeDiff === 0) {
@@ -159,28 +159,25 @@ class SessionStartSequence {
                     }
                     return timeDiff;
                 });
-                for (let i = 0; i < signals.length; i++) {
-                    if (signals[i].visualSignal.flagsState === FlagState.RAISED && signals[i + 1].visualSignal.flagsState === FlagState.RAISED) {
-                        signals.splice(i + 1, 1);
-                    }
-                }
-                // sort array in descending order by signal.time and remove conflicting visual signal lower events
-                signals = signals.sort((a, b) => {
-                    const timeDiff = b.time - a.time;
-                    if (timeDiff === 0) {
-                        // split a draw
-                        if (a.visualSignal.flagsState === FlagState.LOWERED) {
-                            return -1;
+                for (let i = 0; i < signals.length - 1; i++) {
+                    // remove signals that use the same visual signal and occur at the same time but, have conflicting flag states
+                    if (signals[i].time.valueOf() === signals[i + 1].time.valueOf()) {
+                        const timestamp = signals[i].time.valueOf();
+                        const raiseSignals = signals.filter(signal => signal.visualSignal.flagsState === FlagState.RAISED && signal.time.valueOf() === timestamp);
+                        const lowerSignals = signals.filter(signal => signal.visualSignal.flagsState === FlagState.LOWERED && signal.time.valueOf() === timestamp);
+                        if (raiseSignals.length === lowerSignals.length) {
+                            // all signals cancel out, remove them all (this is the expected result)
+                            signals.splice(i, raiseSignals.length + lowerSignals.length);
+                            i--;
                         }
-                        else {
-                            return 1;
+                        else if (raiseSignals.length > lowerSignals.length) {
+                            // more raise than lower signals, raise signal (should this ever happen?)
+                            signals.splice(i, raiseSignals.length + lowerSignals.length, raiseSignals[0]);
                         }
-                    }
-                    return timeDiff;
-                });
-                for (let i = 0; i < signals.length; i++) {
-                    if (signals[i].visualSignal.flagsState === FlagState.LOWERED && signals[i + 1].visualSignal.flagsState === FlagState.LOWERED) {
-                        signals.splice(i + 1, 1);
+                        else if (raiseSignals.length < lowerSignals.length) {
+                            // more lower signals than raise signals, lower signal (should this ever happen?)
+                            signals.splice(i, raiseSignals.length + lowerSignals.length, lowerSignals[0]);
+                        }
                     }
                 }
             }
