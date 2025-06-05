@@ -18,7 +18,6 @@ import SessionStartSequence from './session-start-sequence';
 import Clock from './clock';
 
 import { races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA } from '../__mocks__/test-data';
-import FlagRole from './flag-role';
 import FlagState from './flag-state';
 import StartType from './start-type';
 
