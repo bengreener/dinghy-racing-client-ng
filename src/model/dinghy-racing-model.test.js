@@ -29,7 +29,7 @@ import { httpRootURL, wsRootURL, competitorsCollectionHAL,
     competitorsCollection, competitorChrisMarshall, competitorLouScrew, competitorSarahPascal, competitorLiuBao, 
     entriesScorpionAHAL, entriesCometAHAL, entryChrisMarshallDinghy1234HAL, entriesHandicapAHAL,
     entriesScorpionA, entriesCometA, entriesHandicapA,
-    raceHandicapA, entryChrisMarshallScorpionA1234, competitorJillMyer, 
+    raceHandicapA, racePursuitA, entryChrisMarshallScorpionA1234, competitorJillMyer, 
     entrySarahPascalScorpionA6745, entryJillMyerCometA826, entryChrisMarshallHandicapA1234,
     dinghyScorpion1234Crews,
     dinghyClassComet
@@ -377,7 +377,6 @@ describe('when searching for a dinghy class by name', () => {
 })
 
 describe('when creating a new race', () => {
-    
     it('returns a promise that resolves to a result indicating success when race is created with http status 200', async () => {
         fetch.mockImplementationOnce((resource, options) => {
             // check format of data passed to fetch to reduce risk of false positive
@@ -5790,95 +5789,79 @@ describe('when a StartSequence is requested', () => {
 
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
 
-        const scorpionAWarningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, actions: []};
-        const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
-        const graduateAWarningFlag = {name: 'Graduate Class Flag', role: FlagRole.WARNING, actions: []};
-        const cometAWarningFlag = {name: 'Comet Class Flag', role: FlagRole.WARNING, actions: []};
-        const handicapAWarningFlag = {name: 'Handicap Class Flag', role: FlagRole.WARNING, actions: []};
-    
-        const scorpionAWarningFlagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        const scorpionAWarningFlagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        
-        const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        
-        const graduateAWarningFlagRaiseAction = {flag: graduateAWarningFlag, time: new Date(raceGraduateA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        const graduateAWarningFlagLowerAction = {flag: graduateAWarningFlag, time: raceGraduateA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        const scorpionClassFlag = {name: 'Scorpion Class Flag'};
+        const preparatoryFlag = {name: 'Blue Peter'};
+        const graduateClassFlag = {name: 'Graduate Class Flag'};
+        const cometClassFlag = {name: 'Comet Class Flag'};
+        const handicapClassFlag = {name: 'Handicap Class Flag'};
 
-        const cometAWarningFlagRaiseAction = {flag: cometAWarningFlag, time: new Date(raceCometA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        const cometAWarningFlagLowerAction = {flag: cometAWarningFlag, time: raceCometA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-
-        const handicapAWarningFlagRaiseAction = {flag: handicapAWarningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        const handicapAWarningFlagLowerAction = {flag: handicapAWarningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-    
-        scorpionAWarningFlag.actions.push(scorpionAWarningFlagRaiseAction);
-        scorpionAWarningFlag.actions.push(scorpionAWarningFlagLowerAction);
+        const scorpionWarningVisualSignal = {flags: [scorpionClassFlag], flagsState: FlagState.RAISED};
+        const scorpionWarningSoundSignal = {description: 'One'};
+        const graduateWarningVisualSignal = {flags: [graduateClassFlag], flagsState: FlagState.RAISED};
+        const graduateWarningSoundSignal = {description: 'One'};
+        const cometWarningVisualSignal = {flags: [cometClassFlag], flagsState: FlagState.RAISED};
+        const cometWarningSoundSignal = {description: 'One'};
+        const handicapWarningVisualSignal = {flags: [handicapClassFlag], flagsState: FlagState.RAISED};
+        const handicapWarningSoundSignal = {description: 'One'};
+        const preparatoryVisualSignal = {flags: [preparatoryFlag], flagsState: FlagState.RAISED};
+        const preparatorySoundSignal = {description: 'One'};
+        const scorpionStartVisualSignal = {flags: [scorpionClassFlag], flagsState: FlagState.LOWERED};
+        const scorpionStartSoundSignal = {description: 'One'};
+        const graduateStartVisualSignal = {flags: [graduateClassFlag], flagsState: FlagState.LOWERED};
+        const graduateStartSoundSignal = {description: 'One'};
+        const cometStartVisualSignal = {flags: [cometClassFlag], flagsState: FlagState.LOWERED};
+        const cometStartSoundSignal = {description: 'One'};
+        const handicapStartVisualSignal = {flags: [handicapClassFlag], flagsState: FlagState.LOWERED};
+        const handicapStartSoundSignal = {description: 'One'};
+        const endSequenceVisualSignal = {flags: [preparatoryFlag], flagsState: FlagState.LOWERED};
         
-        preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
-        preparatoryFlag.actions.push(preparatoryFlagLowerAction);
+        const scorpionWarningSignal = {meaning: 'Warning signal', time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), soundSignal: scorpionWarningSoundSignal, visualSignal: scorpionWarningVisualSignal};
+        const graduateWarningSignal = {meaning: 'Warning signal', time: new Date(raceGraduateA.plannedStartTime.valueOf() - 600000), soundSignal: graduateWarningSoundSignal, visualSignal: graduateWarningVisualSignal};
+        const cometWarningSignal = {meaning: 'Warning signal', time: new Date(raceCometA.plannedStartTime.valueOf() - 600000), soundSignal: cometWarningSoundSignal, visualSignal: cometWarningVisualSignal};
+        const handicapWarningSignal = {meaning: 'Warning signal', time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), soundSignal: handicapWarningSoundSignal, visualSignal: handicapWarningVisualSignal};
         
-        graduateAWarningFlag.actions.push(graduateAWarningFlagRaiseAction);
-        graduateAWarningFlag.actions.push(graduateAWarningFlagLowerAction);
+        const preparatorySignal = {meaning: 'Preparatory signal', time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
+        const scorpionStartSignal = {meaning: 'Starting signal', time: new Date(raceScorpionA.plannedStartTime.valueOf()), soundSignal: scorpionStartSoundSignal, visualSignal: scorpionStartVisualSignal};
+        const graduateStartSignal = {meaning: 'Starting signal', time: new Date(raceGraduateA.plannedStartTime.valueOf()), soundSignal: graduateStartSoundSignal, visualSignal: graduateStartVisualSignal};
+        const cometStartSignal = {meaning: 'Starting signal', time: new Date(raceCometA.plannedStartTime.valueOf()), soundSignal: cometStartSoundSignal, visualSignal: cometStartVisualSignal};
+        const endSequenceSignal = {meaning: 'Start sequence finished', time: new Date(raceHandicapA.plannedStartTime.valueOf()), soundSignal: null, visualSignal: endSequenceVisualSignal};
+        const handicapStartSignal = {meaning: 'Starting signal', time: new Date(raceHandicapA.plannedStartTime.valueOf()), soundSignal: handicapStartSoundSignal, visualSignal: handicapStartVisualSignal};
         
-        cometAWarningFlag.actions.push(cometAWarningFlagRaiseAction);
-        cometAWarningFlag.actions.push(cometAWarningFlagLowerAction);
-        
-        handicapAWarningFlag.actions.push(handicapAWarningFlagRaiseAction);
-        handicapAWarningFlag.actions.push(handicapAWarningFlagLowerAction);
-
-
         const promise = dinghyRacingModel.getStartSequence(races, RaceType.FLEET);
         const result = await promise;
-        const actions = result.domainObject.getActions();
+        const signals = result.domainObject.getSignals();
 
         expect(promise).toBeInstanceOf(Promise);
-        expect(actions).toHaveLength(10);
-        expect(actions[0]).toStrictEqual(scorpionAWarningFlagRaiseAction);
-        expect(actions[1]).toStrictEqual(scorpionAWarningFlagLowerAction);
-        expect(actions[2]).toStrictEqual(graduateAWarningFlagRaiseAction);
-        expect(actions[3]).toStrictEqual(graduateAWarningFlagLowerAction);
-        expect(actions[4]).toStrictEqual(cometAWarningFlagRaiseAction);
-        expect(actions[5]).toStrictEqual(cometAWarningFlagLowerAction);
-        expect(actions[6]).toStrictEqual(handicapAWarningFlagRaiseAction);
-        expect(actions[7]).toStrictEqual(handicapAWarningFlagLowerAction);
-        expect(actions[8]).toStrictEqual(preparatoryFlagRaiseAction);
-        expect(actions[9]).toStrictEqual(preparatoryFlagLowerAction);
+        expect(signals.length).toBe(10);
+        expect(signals).toEqual(expect.arrayContaining([scorpionWarningSignal, preparatorySignal, graduateWarningSignal, scorpionStartSignal, cometWarningSignal, graduateStartSignal, handicapWarningSignal, endSequenceSignal, cometStartSignal, handicapStartSignal]));
 
         jest.runOnlyPendingTimers();
         jest.useRealTimers();
-    });    
+    });
     describe('when race is a pursuit race', () => {
         describe('when race is an open handicap', () => {
             it('provides the base class to be used for the fleet when calculating start offsets', async () => {
                 // open handicap is defined as a fleet with no explicit classes set and RaceStartSequence needs a base class to caclculate offsets so additional action is required by DinghyRacingModel to supply this class
                 jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
                 fetch.mockImplementation((resource) => {
-                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&type=PURSUIT&sort=plannedStartTime,ASC') {
-                        return Promise.resolve({
-                            ok: true,
-                            status: 200,
-                            json: () => Promise.resolve({...racesCollectionHAL, _embedded: {races:[{...raceHandicap_AHAL, type: RaceType.PURSUIT}]}})
-                        });
-                    }
-                    if (resource === 'http://localhost:8081/dinghyracing/api/races/8/fleet') {
-                        return Promise.resolve({
-                            ok: true,
-                            status: 200, 
-                            json: () => Promise.resolve(fleetHandicapHAL)
-                        });
-                    }
-                    if (resource === 'http://localhost:8081/dinghyracing/api/fleets/2/dinghyClasses') {
-                        return Promise.resolve({
-                            ok: true,
-                            status: 200, 
-                            json: () => Promise.resolve(fleetHandicapDinghyClassHAL)
-                        });
-                    }
                     if (resource === 'http://localhost:8081/dinghyracing/api/dinghyClasses/search/findTopByOrderByPortsmouthNumberDesc') {
                         return Promise.resolve({
                             ok: true,
                             status: 200,
-                            json: () => Promise.resolve(dinghyClassCometHAL)
+                            json: () => Promise.resolve({
+                                'name': 'Optimist (Club)',
+                                'crewSize': 1,
+                                'portsmouthNumber': 1835,
+                                'externalName': null,
+                                '_links': {
+                                    'self': {
+                                        'href': 'http://localhost:8081/dinghyracing/api/dinghyClasses/31'
+                                    },
+                                    'dinghyClass': {
+                                        'href': 'http://localhost:8081/dinghyracing/api/dinghyClasses/31'
+                                    }
+                                }
+                            })
                         });
                     }
                     else {
@@ -5891,18 +5874,34 @@ describe('when a StartSequence is requested', () => {
                 });
                 const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
 
-                const cometWarningFlag = {name: 'Comet Class Flag', role: FlagRole.WARNING, actions: []};
-                const cometWarningFlagRaiseAction = {flag: cometWarningFlag, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-                const cometWarningFlagLowerAction = {flag: cometWarningFlag, time: raceHandicapA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-                cometWarningFlag.actions.push(cometWarningFlagRaiseAction);
-                cometWarningFlag.actions.push(cometWarningFlagLowerAction);
 
-                const result = await dinghyRacingModel.getStartSequence([{...raceHandicapA, type: RaceType.PURSUIT}], RaceType.PURSUIT);
-                const actions = result.domainObject.getActions();
+                const handicapClassFlag = {name: 'Handicap Class Flag'};
+                const preparatoryFlag = {name: 'Blue Peter'};
 
-                expect(actions).toHaveLength(4);
-                expect(actions[0]).toStrictEqual(cometWarningFlagRaiseAction);
-                expect(actions[1]).toStrictEqual(cometWarningFlagLowerAction);
+                const handicapWarningVisualSignal = {flags: [handicapClassFlag], flagsState: FlagState.RAISED};
+                const handicapWarningSoundSignal = {description: 'One'};
+                const handicapWarningSignal = {meaning: 'Warning signal', time: new Date(racePursuitA.plannedStartTime.valueOf() - 300000), visualSignal: handicapWarningVisualSignal, soundSignal: handicapWarningSoundSignal};
+                const preparatoryVisualSignal = {flags: [preparatoryFlag], flagsState: FlagState.RAISED};
+                const preparatorySoundSignal = {description: 'One'};
+                const preparatorySignal = {meaning: 'Preparatory signal', time: new Date(racePursuitA.plannedStartTime.valueOf() - 240000), visualSignal: preparatoryVisualSignal, soundSignal: preparatorySoundSignal};
+                const oneMinuteVisualSignal = {flags: [preparatoryFlag], flagsState: FlagState.LOWERED};
+                const oneMinuteSoundSignal = {description: 'One long'};
+                const oneMinuteSignal = {meaning: 'One minute', time: new Date(racePursuitA.plannedStartTime.valueOf() - 60000), visualSignal: oneMinuteVisualSignal, soundSignal: oneMinuteSoundSignal};
+
+
+                const handicapStartVisualSignal = {flags: [handicapClassFlag], flagsState: FlagState.LOWERED};
+                const handicapStartSoundSignal = {description: 'One'};
+                const handicapStartSignal = {meaning: 'Starting signal', time: racePursuitA.plannedStartTime, soundSignal: handicapStartSoundSignal, visualSignal: handicapStartVisualSignal};
+                const cometStartSoundSignal = {description: 'One'};
+                const cometStartSignal = {meaning: 'Comet start', time: new Date(racePursuitA.plannedStartTime.valueOf() + 920000), soundSignal: cometStartSoundSignal};
+                const scorpionStartSoundSignal = {description: 'One'};
+                const scorpionStartSignal = {meaning: 'Scorpion start', time: new Date(racePursuitA.plannedStartTime.valueOf() + 1166000), soundSignal: scorpionStartSoundSignal};
+
+                const result = await dinghyRacingModel.getStartSequence([{...racePursuitA, dinghyClasses: [dinghyClassComet, dinghyClassScorpion]}], RaceType.PURSUIT);
+                const signals = result.domainObject.getSignals();
+
+                expect(signals).toHaveLength(6);
+                expect(signals).toEqual(expect.arrayContaining([handicapWarningSignal, preparatorySignal, oneMinuteSignal, handicapStartSignal, cometStartSignal, scorpionStartSignal]));
                         
                 jest.runOnlyPendingTimers();
                 jest.useRealTimers();

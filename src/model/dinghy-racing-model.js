@@ -15,7 +15,7 @@
  */
 
 import { Client } from '@stomp/stompjs';
-import StartSequence from './domain-classes/start-sequence';
+import SessionStartSequence from './domain-classes/session-start-sequence';
 import RaceType from './domain-classes/race-type';
 import StartType from './domain-classes/start-type';
 import Clock from './domain-classes/clock';
@@ -1539,7 +1539,7 @@ class DinghyRacingModel {
                 }
             })
         }
-        const startSequence = new StartSequence(races);
+        const startSequence = new SessionStartSequence(races, this.clock);
         return Promise.resolve({success: true, domainObject: startSequence});
     }
 
