@@ -17,8 +17,10 @@
 import SessionStartSequence from './session-start-sequence';
 import Clock from './clock';
 
-import { races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA } from '../__mocks__/test-data';
-import FlagState from './flag-state';
+import { races, raceScorpionA, raceHandicapA } from '../__mocks__/test-data';
+import { preparatoryVisualSignal, preparatorySoundSignal, preparatorySignal, scorpionWarningSignal,
+    scorpionStartSignal, scorpionPreparatorySignal, graduateWarningSignal, graduateStartSignal, cometWarningSignal, cometStartSignal,
+    handicapWarningSignal, handicapStartSignal, endSequenceVisualSignal, endSequenceSignal } from '../__mocks__/test-data';
 import StartType from './start-type';
 
 jest.useFakeTimers();
@@ -32,44 +34,6 @@ describe('when using CSC club start', () => {
         const clock = new Clock();
         clock.start();
         const sessionStartSequence = new SessionStartSequence(races, clock);
-    
-        const scorpionClassFlag = {name: 'Scorpion Class Flag'};
-        const preparatoryFlag = {name: 'Blue Peter'};
-        const graduateClassFlag = {name: 'Graduate Class Flag'};
-        const cometClassFlag = {name: 'Comet Class Flag'};
-        const handicapClassFlag = {name: 'Handicap Class Flag'};
-
-        const scorpionWarningVisualSignal = {flags: [scorpionClassFlag], flagsState: FlagState.RAISED};
-        const scorpionWarningSoundSignal = {description: 'One'};
-        const graduateWarningVisualSignal = {flags: [graduateClassFlag], flagsState: FlagState.RAISED};
-        const graduateWarningSoundSignal = {description: 'One'};
-        const cometWarningVisualSignal = {flags: [cometClassFlag], flagsState: FlagState.RAISED};
-        const cometWarningSoundSignal = {description: 'One'};
-        const handicapWarningVisualSignal = {flags: [handicapClassFlag], flagsState: FlagState.RAISED};
-        const handicapWarningSoundSignal = {description: 'One'};
-        const preparatoryVisualSignal = {flags: [preparatoryFlag], flagsState: FlagState.RAISED};
-        const preparatorySoundSignal = {description: 'One'};
-        const scorpionStartVisualSignal = {flags: [scorpionClassFlag], flagsState: FlagState.LOWERED};
-        const scorpionStartSoundSignal = {description: 'One'};
-        const graduateStartVisualSignal = {flags: [graduateClassFlag], flagsState: FlagState.LOWERED};
-        const graduateStartSoundSignal = {description: 'One'};
-        const cometStartVisualSignal = {flags: [cometClassFlag], flagsState: FlagState.LOWERED};
-        const cometStartSoundSignal = {description: 'One'};
-        const handicapStartVisualSignal = {flags: [handicapClassFlag], flagsState: FlagState.LOWERED};
-        const handicapStartSoundSignal = {description: 'One'};
-        const endSequenceVisualSignal = {flags: [preparatoryFlag], flagsState: FlagState.LOWERED};
-        
-        const scorpionWarningSignal = {meaning: 'Warning signal', time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), soundSignal: scorpionWarningSoundSignal, visualSignal: scorpionWarningVisualSignal};
-        const graduateWarningSignal = {meaning: 'Warning signal', time: new Date(raceGraduateA.plannedStartTime.valueOf() - 600000), soundSignal: graduateWarningSoundSignal, visualSignal: graduateWarningVisualSignal};
-        const cometWarningSignal = {meaning: 'Warning signal', time: new Date(raceCometA.plannedStartTime.valueOf() - 600000), soundSignal: cometWarningSoundSignal, visualSignal: cometWarningVisualSignal};
-        const handicapWarningSignal = {meaning: 'Warning signal', time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), soundSignal: handicapWarningSoundSignal, visualSignal: handicapWarningVisualSignal};
-        
-        const preparatorySignal = {meaning: 'Preparatory signal', time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
-        const scorpionStartSignal = {meaning: 'Starting signal', time: new Date(raceScorpionA.plannedStartTime.valueOf()), soundSignal: scorpionStartSoundSignal, visualSignal: scorpionStartVisualSignal};
-        const graduateStartSignal = {meaning: 'Starting signal', time: new Date(raceGraduateA.plannedStartTime.valueOf()), soundSignal: graduateStartSoundSignal, visualSignal: graduateStartVisualSignal};
-        const cometStartSignal = {meaning: 'Starting signal', time: new Date(raceCometA.plannedStartTime.valueOf()), soundSignal: cometStartSoundSignal, visualSignal: cometStartVisualSignal};
-        const endSequenceSignal = {meaning: 'Start sequence finished', time: new Date(raceHandicapA.plannedStartTime.valueOf()), soundSignal: null, visualSignal: endSequenceVisualSignal};
-        const handicapStartSignal = {meaning: 'Starting signal', time: new Date(raceHandicapA.plannedStartTime.valueOf()), soundSignal: handicapStartSoundSignal, visualSignal: handicapStartVisualSignal};
         
         const signals = sessionStartSequence.getSignals();
         expect(signals.length).toBe(10);
@@ -117,31 +81,15 @@ describe('when using RRS26 start', () => {
         const clock = new Clock();
         clock.start();
         const sessionStartSequence = new SessionStartSequence([raceScorpionA_rrs26, raceHandicapA_rrs26], clock);
-    
-        const scorpionClassFlag = {name: 'Scorpion Class Flag'};
-        const preparatoryFlag = {name: 'Blue Peter'};
-        const handicapClassFlag = {name: 'Handicap Class Flag'};
-        const scorpionWarningVisualSignal = {flags: [scorpionClassFlag], flagsState: FlagState.RAISED};
-        const scorpionWarningSoundSignal = {description: 'One'};
-        const handicapWarningVisualSignal = {flags: [handicapClassFlag], flagsState: FlagState.RAISED};
-        const handicapWarningSoundSignal = {description: 'One'};
-        const preparatoryVisualSignal = {flags: [preparatoryFlag], flagsState: FlagState.RAISED};
-        const preparatorySoundSignal = {description: 'One'};
-        const scorpionStartVisualSignal = {flags: [scorpionClassFlag], flagsState: FlagState.LOWERED};
-        const scorpionStartSoundSignal = {description: 'One'};
-        const handicapStartVisualSignal = {flags: [handicapClassFlag], flagsState: FlagState.LOWERED};
-        const handicapStartSoundSignal = {description: 'One'};
-        const endSequenceVisualSignal = {flags: [preparatoryFlag], flagsState: FlagState.LOWERED};
-        const scorpionWarningSignal = {meaning: 'Warning signal', time: new Date(raceScorpionA_rrs26.plannedStartTime.valueOf() - 300000), soundSignal: scorpionWarningSoundSignal, visualSignal: scorpionWarningVisualSignal};
-        const scorpionPreparatorySignal = {meaning: 'Preparatory signal', time: new Date(raceScorpionA_rrs26.plannedStartTime.valueOf() - 240000), soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
-        const scorpionOneMinuteSignal = {meaning: 'One minute', time: new Date(raceScorpionA_rrs26.plannedStartTime.valueOf() - 60000), soundSignal: {description: 'One long'}, visualSignal: endSequenceVisualSignal};
-        const scorpionStartSignal = {meaning: 'Starting signal', time: new Date(raceScorpionA_rrs26.plannedStartTime.valueOf()), soundSignal: scorpionStartSoundSignal, visualSignal: scorpionStartVisualSignal};
-        const handicapWarningSignal = {meaning: 'Warning signal', time: new Date(raceHandicapA_rrs26.plannedStartTime.valueOf() - 300000), soundSignal: handicapWarningSoundSignal, visualSignal: handicapWarningVisualSignal};
-        const handicapPreparatorySignal = {meaning: 'Preparatory signal', time: new Date(raceHandicapA_rrs26.plannedStartTime.valueOf() - 240000), soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
-        const handicapOneMinuteSignal = {meaning: 'One minute', time: new Date(raceHandicapA_rrs26.plannedStartTime.valueOf() - 60000), soundSignal: {description: 'One long'}, visualSignal: endSequenceVisualSignal};
-        const handicapStartSignal = {meaning: 'Starting signal', time: new Date(raceHandicapA_rrs26.plannedStartTime.valueOf()), soundSignal: handicapStartSoundSignal, visualSignal: handicapStartVisualSignal};
+
+        const scorpionWarningSignal_rrs26 = {...scorpionWarningSignal, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000)};
+        const scorpionPreparatorySignal_rrs26 = {...scorpionPreparatorySignal, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000)};
+        const scorpionOneMinuteSignal = {meaning: 'One minute', time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), soundSignal: {description: 'One long'}, visualSignal: endSequenceVisualSignal};
+        const handicapWarningSignal_rrs26 = {...handicapWarningSignal, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000)};
+        const handicapPreparatorySignal_rrs26 = {meaning: 'Preparatory signal', time: new Date(raceHandicapA.plannedStartTime.valueOf() - 240000), soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
+        const handicapOneMinuteSignal = {meaning: 'One minute', time: new Date(raceHandicapA.plannedStartTime.valueOf() - 60000), soundSignal: {description: 'One long'}, visualSignal: endSequenceVisualSignal};
         
-        expect(sessionStartSequence.getSignals()).toEqual([scorpionWarningSignal, scorpionPreparatorySignal, scorpionOneMinuteSignal, scorpionStartSignal, handicapWarningSignal, handicapPreparatorySignal, handicapOneMinuteSignal, handicapStartSignal]);
+        expect(sessionStartSequence.getSignals()).toEqual([scorpionWarningSignal_rrs26, scorpionPreparatorySignal_rrs26, scorpionOneMinuteSignal, scorpionStartSignal, handicapWarningSignal_rrs26, handicapPreparatorySignal_rrs26, handicapOneMinuteSignal, handicapStartSignal]);
     });
     describe('when 6 minutes before the start of the first race and 11 minutes before start of second race', () => {
         it('returns the next race that will start', () => {
