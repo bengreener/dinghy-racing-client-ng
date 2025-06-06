@@ -14,64 +14,119 @@
  * limitations under the License. 
  */
 
-import { screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import { customRender } from '../test-utilities/custom-renders';
 import SignalIndicator from './SignalIndicator';
 import DinghyRacingModel from '../model/dinghy-racing-model';
-import FlagState from '../model/domain-classes/flag-state';
 import { httpRootURL, wsRootURL } from '../model/__mocks__/test-data';
+import { raceScorpionA, scorpionWarningSignal, scorpionStartSignal } from '../model/__mocks__/test-data';
+
+jest.useFakeTimers();
 
 describe('when signals use flags', () => {
+    it('displays the name of the flags', () => {
+        jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.valueOf() - 600001));
+        const signals = [scorpionWarningSignal, scorpionStartSignal];
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+
+        customRender(<SignalIndicator signals={signals} />, model);
+
+        expect(screen.getByText(/scorpion class flag/i)).toBeInTheDocument();
+    });
     describe('when before time of first signal', () => {
         it('displays flags as lowered', () => {
-            expect(false).toBeTruthy();
+            jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.valueOf() - 600001));
+            const signals = [scorpionWarningSignal, scorpionStartSignal];
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+
+            customRender(<SignalIndicator signals={signals} />, model);
+
+            expect(screen.getByText(/lowered/i)).toBeInTheDocument();
         });
         it('displays time to next signal', () => {
-            expect(false).toBeTruthy();
+            jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.valueOf() - 600001));
+            const signals = [scorpionWarningSignal, scorpionStartSignal];
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+
+            customRender(<SignalIndicator signals={signals} />, model);
+
+            expect(screen.getByText(/00:01/i)).toBeInTheDocument();
         });
     });
     describe('when time of first signal', () => {
         it('shows flag state for first signal', () => {
-            expect(false).toBeTruthy();
+            jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.valueOf() - 600000));
+            const signals = [scorpionWarningSignal, scorpionStartSignal];
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+
+            customRender(<SignalIndicator signals={signals} />, model);
+
+            expect(screen.getByText(/raised/i)).toBeInTheDocument();
         });
         it('shows 0:00 for time to next signal', () => {
-            expect(false).toBeTruthy();
+            jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.valueOf() - 600000));
+            const signals = [scorpionWarningSignal, scorpionStartSignal];
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+
+            customRender(<SignalIndicator signals={signals} />, model);
+
+            expect(screen.getByText(/00:00/i)).toBeInTheDocument();
         });
     });
     describe('when after time fo first signal and before time of next signal', () => {
         it('shows flag state for first signal', () => {
-            expect(false).toBeTruthy();
+            jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.valueOf() - 300001));
+            const signals = [scorpionWarningSignal, scorpionStartSignal];
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+
+            customRender(<SignalIndicator signals={signals} />, model);
+
+            expect(screen.getByText(/raised/i)).toBeInTheDocument();
         });
         it('shows time to next signal', () => {
-            expect(false).toBeTruthy();
+            jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.valueOf() - 60000));
+            const signals = [scorpionWarningSignal, scorpionStartSignal];
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+
+            customRender(<SignalIndicator signals={signals} />, model);
+
+            expect(screen.getByText(/01:00/i)).toBeInTheDocument();
         });
     });
     describe('when after time of last signal', () => {
         it('shows flag sate for last signal', () => {
-            expect(false).toBeTruthy();
+            jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.valueOf() + 100000));
+            const signals = [scorpionWarningSignal, scorpionStartSignal];
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+
+            customRender(<SignalIndicator signals={signals} />, model);
+
+            expect(screen.getByText(/lowered/i)).toBeInTheDocument();
         });
         it('shows no time to next signal', () => {
-            expect(false).toBeTruthy();
+            jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.valueOf() + 100000));
+            const signals = [scorpionWarningSignal, scorpionStartSignal];
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+
+            customRender(<SignalIndicator signals={signals} />, model);
+
+            expect(screen.getByLabelText(/change in/i)).toHaveValue('00:00');
         });
-    });
-    it('displays ', () => {
-        const signals = [
-            {meaning: 'test signal 1', time: new Date(Date.now() - 1000), soundSignal: null, visualSignal: {flags: [{name: 'flag 1'}], flagsState: FlagState.RAISED}}, 
-            {meaning: 'test signal 2', time: new Date(Date.now() + 59000) , soundSignal: null, visualSignal: {flags: [{name: 'flag 1'}], flagsState: FlagState.LOWERED}}];
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    
-        customRender(<SignalIndicator signals={signals} />, model);
-        screen.debug();
     });
 });
 
 describe('when clock ticks', () => {
-    it('updates time', () => {
+    it('updates time', async () => {
         // check time to next signal is updated
-        expect(false).toBeTruthy();
-    });
-});
+        jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.valueOf() - 600001));
+        const signals = [scorpionWarningSignal, scorpionStartSignal];
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
-describe('when signals do not use flags', () => {
-    // placeholder for future development
+        customRender(<SignalIndicator signals={signals} />, model);
+
+        await act(() => {
+            jest.runOnlyPendingTimers();
+        });
+        expect(screen.getByText(/00:00/i)).toBeInTheDocument();
+    });
 });

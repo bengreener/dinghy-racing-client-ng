@@ -36,12 +36,23 @@ function SignalIndicator({ signals }) {
     //set tick handler
     useEffect(() => {
         model.getClock().addTickHandler(tickHandler);
-    }, []);
+    }, [model]);
 
     const flags = signals[0]?.visualSignal.flags;
-    const lastSignal = signals.findLast(signal => signal.time < time);
-    const nextSignal = signals.find(signal => signal.time >= time);
-    const timeToChange = nextSignal ? nextSignal.time.valueOf() - time.valueOf() : 0;
+    const lastSignal = signals.findLast(signal => signal.time <= time); // only works when there are no more than 2 signals
+    const nextSignal = signals.find(signal => signal.time > time);
+    // const timeToChange = nextSignal ? nextSignal.time.valueOf() - time.valueOf() : 0;
+    const timeToChange = () => {
+        if (lastSignal?.time.valueOf() === time.valueOf()) {
+            return 0;
+        }
+        else if (nextSignal) {
+            return nextSignal.time.valueOf() - time.valueOf();
+        }
+        else {
+            return 0;
+        }
+    }
 
     return (
         <div className='signal-indicator w3-row'>
@@ -55,7 +66,7 @@ function SignalIndicator({ signals }) {
             </div>
             <div className='w3-col s4 m2 w3-cell-row'>
                 <label htmlFor={'change-in-output'} className='w3-cell' >Change In</label>
-                <output id='change-in-output' className='w3-cell' >{Clock.formatDuration(timeToChange, false, true)}</output>
+                <output id='change-in-output' className='w3-cell' >{Clock.formatDuration(timeToChange(), false, true)}</output>
             </div>
         </div>
     )
