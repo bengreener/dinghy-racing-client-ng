@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
-import StartSequence from '../domain-classes/start-sequence';
+
+import Clock from '../domain-classes/clock';
+import SessionStartSequence from '../domain-classes/session-start-sequence';
 
 class DinghyRacingModel {
     httpRootURL;
@@ -28,6 +30,7 @@ class DinghyRacingModel {
     dinghyClassUpdateCallbacks = new Map();
     fleetCreationCallbacks = new Set();
     fleetUpdateCallbacks = new Map();
+    clock = new Clock();
 
     /**
      * Provide a blank competitor template
@@ -342,6 +345,10 @@ class DinghyRacingModel {
         return Promise.resolve({success: true, domainObject: []});
     }
 
+    getClock() {
+        return this.clock;
+    }
+
     async getDinghy(url) {
         return null;
     }
@@ -411,7 +418,7 @@ class DinghyRacingModel {
     }
 
     async getStartSequence(races, type) {
-        return Promise.resolve({'success': true, 'domainObject': new StartSequence(races)});
+        return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, this.clock)});
     }
 
     async startRace(race, startTime) {
