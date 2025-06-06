@@ -6569,7 +6569,7 @@ describe('when the slowest dinghy class is requested', () => {
     })
 });
 
-it('provides a clcok', () => {
+it('provides a clock', () => {
     const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
     expect(dinghyRacingModel.getClock()).toBeInstanceOf(Clock);
 });

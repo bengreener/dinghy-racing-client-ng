@@ -141,6 +141,7 @@ class DinghyRacingModel {
             this.stompClient.subscribe('/topic/updateFleet', this.handleFleetUpdate);
         };
         this.stompClient.activate();
+        this.clock.start();
     }
 
     /**
