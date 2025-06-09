@@ -59,9 +59,8 @@ describe('when using CSC club start', () => {
         it('returns signals', () => {
             const raceStartSequence = new RaceStartSequence(raceScorpionA, new Clock());
             const signals = raceStartSequence.getSignals();
-        
             const scorpionEndSequenceSignal = {...endSequenceSignal, time: new Date(raceScorpionA.plannedStartTime.valueOf())};
-        
+
             expect(signals).toEqual([scorpionWarningSignal, preparatorySignal, scorpionEndSequenceSignal, scorpionStartSignal]);
         });
     });
@@ -69,7 +68,7 @@ describe('when using CSC club start', () => {
         it('returns signals', () => {
             const raceStartSequence = new RaceStartSequence(raceHandicapA, new Clock());
             const signals = raceStartSequence.getSignals();
-        
+
             const classFlag = {name: 'Handicap Class Flag'};
             const preparatoryFlag = {name: 'Blue Peter'};
             const warningVisualSignal = {flags: [classFlag], flagsState: FlagState.RAISED};
@@ -83,7 +82,7 @@ describe('when using CSC club start', () => {
             const preparatorySignal = {meaning: 'Preparatory signal', time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
             const fiveMinuteSignal = {meaning: 'Start sequence finished', time: new Date(raceHandicapA.plannedStartTime.valueOf()), soundSignal: null, visualSignal: fiveMinuteVisualSignal};
             const startSignal = {meaning: 'Starting signal', time: new Date(raceHandicapA.plannedStartTime.valueOf()), soundSignal: startSoundSignal, visualSignal: startVisualSignal};
-        
+
             expect(signals).toEqual([warningSignal, preparatorySignal, fiveMinuteSignal, startSignal]);
         });
     });
@@ -95,7 +94,7 @@ describe('when using CSC club start', () => {
                 url: 'http://localhost:8081/dinghyracing/api/fleets/2'
             }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.CSCCLUBSTART};
             const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses, new Clock());
-        
+
             const classFlag = {name: 'Handicap Class Flag'};
             const preparatoryFlag = {name: 'Blue Peter'};
             const warningVisualSignal = {flags: [classFlag], flagsState: FlagState.RAISED};
@@ -135,7 +134,7 @@ describe('when using RRS26 start', () => {
         it('returns signals', () => {
             const raceStartSequence = new RaceStartSequence({...raceHandicapA, startType: StartType.RRS26}, new Clock());
             const signals = raceStartSequence.getSignals();
-        
+
             const classFlag = {name: 'Handicap Class Flag'};
             const preparatoryFlag = {name: 'Blue Peter'};
             const warningVisualSignal = {flags: [classFlag], flagsState: FlagState.RAISED};
@@ -150,7 +149,7 @@ describe('when using RRS26 start', () => {
             const preparatorySignal = {meaning: 'Preparatory signal', time: new Date(raceHandicapA.plannedStartTime.valueOf() - 240000), soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
             const oneMinuteSignal = {meaning: 'One minute', time: new Date(raceHandicapA.plannedStartTime.valueOf() - 60000), soundSignal: oneMinuteSoundSignal, visualSignal: oneMinuteVisualSignal};
             const startSignal = {meaning: 'Starting signal', time: new Date(raceHandicapA.plannedStartTime.valueOf()), soundSignal: startSoundSignal, visualSignal: startVisualSignal};
-        
+
             expect(signals).toEqual([warningSignal, preparatorySignal, oneMinuteSignal, startSignal]);
         });
     });
@@ -162,7 +161,7 @@ describe('when using RRS26 start', () => {
                 url: 'http://localhost:8081/dinghyracing/api/fleets/2'
             }, dinghyClasses: [{name: 'Topper', crewSize: 1, portsmouthNumber: 1369}, {name: 'Laser', crewSize: 1, portsmouthNumber: 1102}], startType: StartType.RRS26};
             const raceStartSequence = new RaceStartSequence(raceWithDinghyClasses, new Clock());
-        
+
             const classFlag = {name: 'Handicap Class Flag'};
             const preparatoryFlag = {name: 'Blue Peter'};
             const warningVisualSignal = {flags: [classFlag], flagsState: FlagState.RAISED};

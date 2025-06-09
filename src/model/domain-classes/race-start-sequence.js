@@ -18,7 +18,6 @@ import FlagState from './flag-state';
 import { sortArray } from '../../utilities/array-utilities';
 import RaceType from './race-type';
 import StartType from './start-type';
-import Signal from './signal';
 
 class RaceStartSequence {
     _race;
