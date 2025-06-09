@@ -31,17 +31,20 @@ function SignalIndicator({ signals }) {
 
     const tickHandler = useCallback(() => {
         setTime(model.getClock().getTimeToSecondPrecision());
-    });
+    }, [model]);
 
     //set tick handler
     useEffect(() => {
         model.getClock().addTickHandler(tickHandler);
-    }, [model]);
+
+        return(() => {
+            model.getClock().removeTickHandler(tickHandler);
+        })
+    }, [model, tickHandler]);
 
     const flags = signals[0]?.visualSignal.flags;
     const lastSignal = signals.findLast(signal => signal.time <= time); // only works when there are no more than 2 signals
     const nextSignal = signals.find(signal => signal.time > time);
-    // const timeToChange = nextSignal ? nextSignal.time.valueOf() - time.valueOf() : 0;
     const timeToChange = () => {
         if (lastSignal?.time.valueOf() === time.valueOf()) {
             return 0;
