@@ -14,8 +14,6 @@
  * limitations under the License. 
  */
 
-import FlagState from '../model/domain-classes/flag-state';
-import { useState } from 'react';
 import SignalIndicator from './SignalIndicator';
 
 /**
@@ -50,9 +48,8 @@ function SignalPanel({ signals = [] }) {
     // group signals by flags used
 
     return (
-        <div>
-            {/* {orderedSignals.map(signal => <SignalIndicator key={Math.random()} signals={[signal]} />)} */}
-            {Array.from(flagsMap.values()).map(signals => <SignalIndicator key={Math.random()} signals={signals} />)}
+        <div className='signals-panel'>
+            {Array.from(flagsMap.values()).map((signals, index) => <SignalIndicator key={index} signals={signals} />)}
         </div>
     );
 }
