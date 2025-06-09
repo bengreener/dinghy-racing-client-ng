@@ -51,6 +51,11 @@ function RaceHeaderView({ race, showInRaceData = true }) {
         });
     }, [model, race]);
 
+    const tickHandler = useCallback(() => {
+        const currentElapsedTime = race.clock.getElapsedTime(); // ensure state calculated on current time uses the same value
+        setElapsedTime(currentElapsedTime); // takes effect next render so can't be used to drive caluclations of other state updates based on time in this handler
+    }, [race.clock]);
+
     function handleRacePostponeClick() {
         setShowPostponeRace(true);
     };
@@ -81,14 +86,11 @@ function RaceHeaderView({ race, showInRaceData = true }) {
 
     useEffect(() => {
         if (previousRace.current && previousRace.current.clock) {
-            previousRace.current.clock.removeTickHandler();
+            previousRace.current.clock.removeTickHandler(tickHandler);
         }
-        race.clock.addTickHandler(() => {
-            const currentElapsedTime = race.clock.getElapsedTime(); // ensure state calculated on current time uses the same value
-            setElapsedTime(currentElapsedTime); // takes effect next render so can't be used to drive caluclations of other state updates based on time in this handler
-        });
+        race.clock.addTickHandler(tickHandler);
         previousRace.current = race;
-    }, [race]);
+    }, [race, tickHandler]);
 
     function closePostponeRaceFormDialog() {
         setShowPostponeRace(false);
