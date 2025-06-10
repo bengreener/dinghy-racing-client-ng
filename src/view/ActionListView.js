@@ -14,29 +14,31 @@
  * limitations under the License. 
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Clock from '../model/domain-classes/clock';
 import FlagState from '../model/domain-classes/flag-state';
-import { sortArray } from '../utilities/array-utilities';
 
 /**
  * Provide a list, withing timings, of the actions that need to be completed to start the races
  * @param {Object} props
- * @param {Array<Action>} actions to display
+ * @param {Array<Signals>} props.signals that determine the actions to be displayed
+ * @param {Clock} props.clock clock to use to time actions
  * @returns {HTMLDivElement}
  */
-function ActionListView({ actions }) {
-    const [clock] = useState(new Clock(Date.now()));
-    const [time, setTime] = useState(Clock.now()); // use Clock.now to get adjusted time when synched to an external clock
+function ActionListView({ signals, clock }) {
+    const [timestamp, setTimestamp] = useState(clock.getTimeToSecondPrecision().valueOf()); // use Clock.now to get adjusted time when synched to an external clock
 
-    function handleTick() {
-        setTime(Clock.now());
-    };
+    const handleTick = useCallback(() => {
+        setTimestamp(clock.getTimeToSecondPrecision().valueOf());
+    }, [clock]);
 
     useEffect(() => {
         clock.addTickHandler(handleTick);
-        clock.start();
-    }, [clock]);
+
+        return (() => {
+            clock.removeTickHandler(handleTick);
+        })
+    }, [clock, handleTick]);
 
     const resolvedOptions = Intl.DateTimeFormat().resolvedOptions();
     let formatOptions = {
@@ -50,31 +52,40 @@ function ActionListView({ actions }) {
 
     // create race start actions list
     const actionsDescriptionsMap = new Map();
-    sortArray(actions, (action) => action.time).forEach(action => {
-        let actionDescription = '';
-        if (action.afterState === FlagState.RAISED) {
-            actionDescription += 'Raise ' + action.flag.name;// + ' flag';
+    signals.sort((a, b) => a.time.valueOf() - b.time.valueOf());
+    signals.forEach((signal) => {
+        let description = signal.meaning;
+        if (description) {
+            description += '. ';
         }
-        else if (action.afterState === FlagState.LOWERED) {
-            actionDescription += 'Lower ' + action.flag.name;// + ' flag';
+        if (signal?.visualSignal?.flagsState === FlagState.RAISED) {
+            description += 'Raise ' + signal.visualSignal.flags.map(flag => flag.name).join(' + ') + '.';
         }
-        if (actionsDescriptionsMap.has(action.time.valueOf())) {
-            const oldAction = actionsDescriptionsMap.get(action.time.valueOf());
-            actionsDescriptionsMap.set(action.time.valueOf(), oldAction + '\n' + actionDescription);
+        else if (signal?.visualSignal?.flagsState === FlagState.LOWERED) {
+            description += 'Lower ' + signal.visualSignal.flags.map(flag => flag.name).join(' + ') + '.';
+        }
+        if (signal?.soundSignal) {
+            if (description) {
+                description += ' ';
+            }
+            description += 'Sound ' + signal.soundSignal.description + '.';
+        }
+        if (actionsDescriptionsMap.has(signal.time.valueOf())) {
+            const oldDescription = actionsDescriptionsMap.get(signal.time.valueOf());
+            actionsDescriptionsMap.set(signal.time.valueOf(), oldDescription + '\n' + description);
         }
         else {
-            actionsDescriptionsMap.set(action.time.valueOf(), actionDescription);
+            actionsDescriptionsMap.set(signal.time.valueOf(), description);
         }
     });
 
     const actionRows = []
-    const now = Date.now();
-    actionsDescriptionsMap.forEach((actionDescription, timestamp) => {
-        if (timestamp >= now - 999) { // allow for imprecision; will probably not be exactly on the second and want display to briefly show zero value 
-            const countdown = Math.min(time - timestamp, 0);
-            actionRows.push(<tr key={timestamp}>
+    actionsDescriptionsMap.forEach((actionDescription, timekey) => {
+        if (timekey >= timestamp) {
+            const countdown = Math.max(timekey - timestamp, 0);
+            actionRows.push(<tr key={timekey}>
                 <td key='time'>
-                    {timeFormat.format(new Date(timestamp))}
+                    {timeFormat.format(new Date(timekey))}
                 </td>
                 <td key='action'className='preserve-whitespace'>
                     {actionDescription}
