@@ -106,6 +106,7 @@ class DinghyRacingModel {
         }
         this.httpRootURL = httpRootURL;
         this.wsRootURL = wsRootURL;
+        this.clock.start();
     }
 
     registerCompetitorCreationCallback(callback) {
