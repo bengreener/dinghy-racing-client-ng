@@ -15,15 +15,16 @@
  */
 
 import { customRender } from '../test-utilities/custom-renders';
-import { act, screen, within, prettyDOM } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RaceStartConsole from './RaceStartConsole';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 import { httpRootURL, wsRootURL, races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet, racePursuitA, fleetHandicap } from '../model/__mocks__/test-data';
-import StartSequence from '../model/domain-classes/start-sequence';
+import SessionStartSequence from '../model/domain-classes/session-start-sequence';
 import RaceType from '../model/domain-classes/race-type';
 import { SortOrder } from '../model/dinghy-racing-model';
+import Clock from '../model/domain-classes/clock';
 
 
 jest.mock('../model/dinghy-racing-model');
@@ -130,7 +131,7 @@ it('calls DinghyRacingModel.getStartSequence with correct arguments', async () =
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-    const getStartSequenceSpy = jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races)})});
+    const getStartSequenceSpy = jest.spyOn(model, 'getStartSequence');
     
     await act(async () => {        
         customRender(<RaceStartConsole />, model, controller);
@@ -165,7 +166,7 @@ describe('when new value set for race type', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-        const getStartSequenceSpy = jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races)})});
+        const getStartSequenceSpy = jest.spyOn(model, 'getStartSequence');
 
         await act(async () => {        
             customRender(<RaceStartConsole />, model, controller);
@@ -182,7 +183,7 @@ describe('when new value set for race type', () => {
 it('defaults session start to 8:00 today', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+    jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
     
     await act(async () => {        
         customRender(<RaceStartConsole />, model, controller);
@@ -195,7 +196,7 @@ it('defaults session start to 8:00 today', async () => {
 it('defaults session end to 20:00 of today', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+    jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
     
     await act(async () => {        
         customRender(<RaceStartConsole />, model, controller);
@@ -210,7 +211,7 @@ it('provides countdown value and message to Countdown control', async () => {
     const controller = new DinghyRacingController(model);
     jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     jest.spyOn(model, 'getStartSequence').mockImplementation(() => {
-        return Promise.resolve({'success': true, 'domainObject': new StartSequence([ raceScorpionA ])})
+        return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence([ raceScorpionA ], new Clock())});
     });
 
     await act(async () => {
@@ -226,7 +227,7 @@ it('displays race names and blue peter', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-    jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races)})});
+    jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races)})});
 
     await act(async () => {
         customRender(<RaceStartConsole />, model, controller);
@@ -243,30 +244,33 @@ it('displays race names and blue peter', async () => {
 it('displays initial state for each flag', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+    jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => Promise.resolve({success:true, domainObject: races}));
+    jest.spyOn(model, 'getStartSequence');
 
+    let container;
     await act(async () => {
-        customRender(<RaceStartConsole />, model, controller);
+        ({ container } = customRender(<RaceStartConsole />, model, controller));
     });
 
-    const flagIndicators = (screen.getByRole('heading', {name: 'Flags'})).parentNode;
-    expect(within(flagIndicators).getAllByText(/raised/i)).toHaveLength(3);
-    expect(within(flagIndicators).getAllByText(/lowered/i)).toHaveLength(2);
+    const signalsPanel = container.getElementsByClassName('signals-panel')[0];
+    expect(within(signalsPanel).getAllByText(/raised/i)).toHaveLength(3);
+    expect(within(signalsPanel).getAllByText(/lowered/i)).toHaveLength(2);
 });
 
 it('displays time to next flag state change for each flag', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+    jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, model.getClock())})});
 
+    let container;
     await act(async () => {
-        customRender(<RaceStartConsole />, model, controller);
+        ({ container } = customRender(<RaceStartConsole />, model, controller));
     });
 
-    const flagIndicators = (screen.getByRole('heading', {name: 'Flags'})).parentNode;
-    expect(within(flagIndicators).getAllByText(/05:00/i)).toHaveLength(2);
-    expect(within(flagIndicators).getAllByText(/10:00/i)).toHaveLength(2);
-    expect(within(flagIndicators).getByText(/20:00/i)).toBeInTheDocument();
+    const signalsPanel = container.getElementsByClassName('signals-panel')[0];
+    expect(within(signalsPanel).getAllByText(/00:00/i)).toHaveLength(2);
+    expect(within(signalsPanel).getAllByText(/05:00/i)).toHaveLength(2);
+    expect(within(signalsPanel).getAllByText(/10:00/i)).toHaveLength(1);
 });
 
 it('displays race headers for races in session', async () => {
@@ -275,7 +279,7 @@ it('displays race headers for races in session', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races, model})});
-    jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+    jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
 
     await act(async () => {
         customRender(<RaceStartConsole />, model, controller);
@@ -322,7 +326,7 @@ it('does not display in race data in race headers', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races, model})});
-    jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+    jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
 
     await act(async () => {
         customRender(<RaceStartConsole />, model, controller);
@@ -342,7 +346,7 @@ it('displays actions to start races in session', async () => {
 
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+    jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, new Clock())})});
 
     await act(async () => {
         customRender(<RaceStartConsole />, model, controller);
@@ -367,7 +371,9 @@ describe('when clock ticks', () => {
 
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+        // const clock = new Clock();
+        // clock.start();
+        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, model.getClock())})});
 
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
@@ -387,7 +393,7 @@ describe('when clock ticks', () => {
 
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
-            jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+            jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, model.getClock())})});
 
             await act(async () => {
                 customRender(<RaceStartConsole />, model, controller);
@@ -406,7 +412,7 @@ describe('when clock ticks', () => {
 
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, model.getClock())})});
 
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
@@ -432,9 +438,7 @@ describe('when clock ticks', () => {
             jest.setSystemTime(new Date('2021-10-14T10:23:59Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
-            jest.spyOn(model, 'getStartSequence').mockImplementation(() => {
-                return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})
-            });
+            jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
             await act(async () => {
                 customRender(<RaceStartConsole />, model, controller);
             });
@@ -452,9 +456,7 @@ describe('when clock ticks', () => {
             jest.setSystemTime(new Date('2021-10-14T10:24:00Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
-            jest.spyOn(model, 'getStartSequence').mockImplementation(() => {
-                return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})
-            });
+            jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
             await act(async () => {
                 customRender(<RaceStartConsole />, model, controller);
             });
@@ -472,9 +474,7 @@ describe('when clock ticks', () => {
             jest.setSystemTime(new Date('2021-10-14T10:24:59Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
-            jest.spyOn(model, 'getStartSequence').mockImplementation(() => {
-                return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})
-            });
+            jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
             await act(async () => {
                 customRender(<RaceStartConsole />, model, controller);
             });act(() => {
@@ -491,9 +491,7 @@ describe('when clock ticks', () => {
             jest.setSystemTime(new Date('2021-10-14T10:25:00Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
-            jest.spyOn(model, 'getStartSequence').mockImplementation(() => {
-                return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})
-            });
+            jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
             await act(async () => {
                 customRender(<RaceStartConsole />, model, controller);
             });act(() => {
@@ -509,7 +507,7 @@ it('registers an interest in race updates for races in session', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races, model})});
-    jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+    jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
     const registerRaceUpdateCallbackSpy = jest.spyOn(model, 'registerRaceUpdateCallback');
 
     customRender(<RaceStartConsole />, model, controller);
@@ -527,7 +525,7 @@ describe('when races within session are changed', () => {
         races_copy[0] = {...races[0]};
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races_copy, model)})});
+        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races_copy, model.getClock())})});
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
@@ -543,7 +541,7 @@ describe('when races within session are changed', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races, model})});
-        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+        jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
@@ -562,7 +560,7 @@ it('registers an interest in fleet updates for races in session', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA]})});
-    jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence([raceScorpionA, raceGraduateA, raceCometA, raceHandicapA])})});
+    jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence([raceScorpionA, raceGraduateA, raceCometA, raceHandicapA])})});
     const registerFleetUpdateCallbackSpy = jest.spyOn(model, 'registerFleetUpdateCallback');
 
     customRender(<RaceStartConsole />, model, controller);
@@ -580,11 +578,11 @@ describe('when the fleet associated with the race is changed', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': [{...racePursuitA, fleet: fleet, dinghyClasses: [dinghyClassScorpion]}], model})});
-        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence([{...racePursuitA, fleet: fleet, dinghyClasses: [dinghyClassScorpion]}], model)})});
+        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence([{...racePursuitA, fleet: fleet, dinghyClasses: [dinghyClassScorpion]}], model.getClock())})});
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
-        expect(screen.queryAllByText(/comet/i)[0]).toBeInTheDocument();
+        expect(screen.queryAllByText(/scorpion/i)[0]).toBeInTheDocument();
 
         fleet.dinghyClasses = [dinghyClassScorpion];
         await act(async () => {
@@ -592,7 +590,7 @@ describe('when the fleet associated with the race is changed', () => {
             model.handleFleetUpdate({'body': fleet.url});
         });
         
-        expect(screen.queryAllByText(/comet/i)).toHaveLength(0);
+        expect(screen.queryAllByText(/scorpion/i)).toHaveLength(0);
     });
 });
 
@@ -603,9 +601,7 @@ describe('when 6 minutes 1 second before start of first race', () => {
         jest.setSystemTime(new Date('2021-10-14T10:23:59Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {
-            return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})
-        });
+        jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
@@ -621,9 +617,7 @@ describe('when 6 minutes before start of first race', () => {
         jest.setSystemTime(new Date('2021-10-14T10:24:00Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {
-            return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})
-        });
+        jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
@@ -639,9 +633,7 @@ describe('when 5 minutes 59 second before start of first race', () => {
         jest.setSystemTime(new Date('2021-10-14T10:24:01Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {
-            return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})
-        });
+        jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
@@ -657,9 +649,7 @@ describe('when 1 second before start of first race', () => {
         jest.setSystemTime(new Date('2021-10-14T10:29:59Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {
-            return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})
-        });
+        jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
@@ -675,9 +665,7 @@ describe('when start of first race', () => {
         jest.setSystemTime(new Date('2021-10-14T10:20:00Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {
-            return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})
-        });
+        jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
@@ -693,9 +681,7 @@ describe('when 1 second after start of first race', () => {
         jest.setSystemTime(new Date('2021-10-14T10:30:01Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {
-            return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})
-        });
+        jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
@@ -713,7 +699,7 @@ describe('when selected races changed', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races)})});
+        jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races)})});
     
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
@@ -737,7 +723,7 @@ describe('when selected races changed', () => {
         const races = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA]; // was dropping handicap race when full test suit run for some reason so redlcare as appears to resolve :-/
         const selectedRaces = [raceGraduateA, raceCometA, raceHandicapA];
         jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-        const getStartSequenceSpy = jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(selectedRaces)})});
+        const getStartSequenceSpy = jest.spyOn(model, 'getStartSequence');
 
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
@@ -755,7 +741,7 @@ describe('when selected races changed', () => {
         const controller = new DinghyRacingController(model);
         const selectedRaces = [raceGraduateA, raceCometA, raceHandicapA];
         jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(selectedRaces, model)})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(selectedRaces, new Clock())})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, new Clock())})});
     
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
@@ -781,7 +767,7 @@ describe('when selected races changed', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(selectedRaces, model)})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+        jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(selectedRaces, new Clock())})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, new Clock())})});
 
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
