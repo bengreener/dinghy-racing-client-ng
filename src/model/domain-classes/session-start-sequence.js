@@ -16,8 +16,6 @@
 
 import RaceStartSequence from './race-start-sequence';
 import FlagState from './flag-state';
-import FlagRole from './flag-role';
-import { sortArray } from '../../utilities/array-utilities';
 
 class SessionStartSequence {
     _races = [];
