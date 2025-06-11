@@ -68,7 +68,7 @@ function ActionListView({ signals, clock }) {
             if (description) {
                 description += ' ';
             }
-            description += 'Sound ' + signal.soundSignal.description + '.';
+            description += 'Sound: ' + signal.soundSignal.description + '.';
         }
         if (actionsDescriptionsMap.has(signal.time.valueOf())) {
             const oldDescription = actionsDescriptionsMap.get(signal.time.valueOf());
