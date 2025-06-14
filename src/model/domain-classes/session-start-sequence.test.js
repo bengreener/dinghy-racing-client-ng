@@ -15,465 +15,186 @@
  */
 
 import SessionStartSequence from './session-start-sequence';
+import Clock from './clock';
 
-import { raceScorpionA, raceHandicapA } from '../__mocks__/test-data';
-import FlagRole from './flag-role';
-import FlagState from './flag-state';
+import { races, raceScorpionA, raceHandicapA } from '../__mocks__/test-data';
+import { preparatoryVisualSignal, preparatorySoundSignal, preparatorySignal, scorpionWarningSignal,
+    scorpionStartSignal, scorpionPreparatorySignal, graduateWarningSignal, graduateStartSignal, cometWarningSignal, cometStartSignal,
+    handicapWarningSignal, handicapStartSignal, endSequenceVisualSignal, endSequenceSignal } from '../__mocks__/test-data';
+import StartType from './start-type';
 
-describe('when CSC Club Start for Fleet races', () => {
+jest.useFakeTimers();
+
+afterEach(() => {
+    jest.runOnlyPendingTimers();
+});
+
+describe('when using CSC club start', () => {
+    it('returns correct signals', () => {
+        const clock = new Clock();
+        clock.start();
+        const sessionStartSequence = new SessionStartSequence(races, clock);
+        
+        const signals = sessionStartSequence.getSignals();
+        expect(signals.length).toBe(10);
+        expect(signals).toEqual(expect.arrayContaining([scorpionWarningSignal, preparatorySignal, graduateWarningSignal, scorpionStartSignal, cometWarningSignal, graduateStartSignal, handicapWarningSignal, endSequenceSignal, cometStartSignal, handicapStartSignal]));
+    });
     describe('when 11 minutes before the start of the first race and 16 minutes before start of second race', () => {
-        it('returns correct flags', () => {
-            const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
-        
-            const scorpionAWarningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-            const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-            const raceHandicapAWarningFlag = {name: 'Handicap Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
-            
-            preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
-            preparatoryFlag.actions.push(preparatoryFlagLowerAction);
-            
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagRaiseAction);
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagLowerAction);
-
-            const flags = sessionStartSequence.getFlagsAtTime(new Date(raceScorpionA.plannedStartTime.valueOf() - 660000));
-        
-            expect(flags[0]).toStrictEqual(scorpionAWarningFlag);
-            expect(flags[1]).toStrictEqual(preparatoryFlag);
-            expect(flags[2]).toStrictEqual(raceHandicapAWarningFlag);
-        });
-        it('returns correct flags with correct next action', () => {
-            const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
-        
-            const scorpionAWarningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-            const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-            const raceHandicapAWarningFlag = {name: 'Handicap Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
-            
-            preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
-            preparatoryFlag.actions.push(preparatoryFlagLowerAction);
-            
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagRaiseAction);
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagLowerAction);
-
-            const flags = sessionStartSequence.getFlagsAtTimeWithNextAction(new Date(raceScorpionA.plannedStartTime.valueOf() - 660000));
-        
-            expect(flags[0]).toStrictEqual({flag: scorpionAWarningFlag, action: scorpionAWarningflagRaiseAction});
-            expect(flags[1]).toStrictEqual({flag: preparatoryFlag, action: preparatoryFlagRaiseAction});
-            expect(flags[2]).toStrictEqual({flag: raceHandicapAWarningFlag, action: raceHandicapAWarningflagRaiseAction});
-        });
         it('returns the next race that will start', () => {
             const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
+            const clock = new Clock();
+            clock.start();
+            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart], clock);
         
             const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf() - 660000));
             expect(race).toStrictEqual(raceScorpionA);
         });
     });
-    describe('when 10 minutes before the start of the first race and 15 minutes before start of second race', () => {
-        it('returns correct flags', () => {
-            const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
-        
-            const scorpionAWarningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
-            const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-            const raceHandicapAWarningFlag = {name: 'Handicap Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
-            
-            preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
-            preparatoryFlag.actions.push(preparatoryFlagLowerAction);
-            
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagRaiseAction);
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagLowerAction);
-
-            const flags = sessionStartSequence.getFlagsAtTime(new Date(raceScorpionA.plannedStartTime.valueOf() - 600000));
-        
-            expect(flags[0]).toStrictEqual(scorpionAWarningFlag);
-            expect(flags[1]).toStrictEqual(preparatoryFlag);
-            expect(flags[2]).toStrictEqual(raceHandicapAWarningFlag);
-        });
-        it('returns correct flags with correct next action', () => {
-            const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
-        
-            const scorpionAWarningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
-            const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-            const raceHandicapAWarningFlag = {name: 'Handicap Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
-            
-            preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
-            preparatoryFlag.actions.push(preparatoryFlagLowerAction);
-            
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagRaiseAction);
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagLowerAction);
-
-            const flags = sessionStartSequence.getFlagsAtTimeWithNextAction(new Date(raceScorpionA.plannedStartTime.valueOf() - 600000));
-        
-            expect(flags[0]).toStrictEqual({flag: scorpionAWarningFlag, action: scorpionAWarningflagLowerAction});
-            expect(flags[1]).toStrictEqual({flag: preparatoryFlag, action: preparatoryFlagRaiseAction});
-            expect(flags[2]).toStrictEqual({flag: raceHandicapAWarningFlag, action: raceHandicapAWarningflagRaiseAction});
-        });
-    });
-    describe('when 5 minutes before the start of the first race and 10 minutes before start of second race', () => {
-        it('returns correct flags', () => {
-            const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
-        
-            const scorpionAWarningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
-            const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.RAISED, actions: []};
-            const raceHandicapAWarningFlag = {name: 'Handicap Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
-
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
-            
-            preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
-            preparatoryFlag.actions.push(preparatoryFlagLowerAction);
-            
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagRaiseAction);
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagLowerAction);
-            
-            const flags = sessionStartSequence.getFlagsAtTime(new Date(raceScorpionA.plannedStartTime.valueOf() - 300000));
-        
-            expect(flags[0]).toStrictEqual(scorpionAWarningFlag);
-            expect(flags[1]).toStrictEqual(preparatoryFlag);
-            expect(flags[2]).toStrictEqual(raceHandicapAWarningFlag);
-        });
-        it('returns correct flags with correct next action', () => {
-            const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
-        
-            const scorpionAWarningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
-            const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.RAISED, actions: []};
-            const raceHandicapAWarningFlag = {name: 'Handicap Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
-
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
-            
-            preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
-            preparatoryFlag.actions.push(preparatoryFlagLowerAction);
-            
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagRaiseAction);
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagLowerAction);
-
-            const flags = sessionStartSequence.getFlagsAtTimeWithNextAction(new Date(raceScorpionA.plannedStartTime.valueOf() - 300000));
-            expect(flags[0]).toStrictEqual({flag: scorpionAWarningFlag, action: scorpionAWarningflagLowerAction});
-            expect(flags[1]).toStrictEqual({flag: preparatoryFlag, action: preparatoryFlagLowerAction});
-            expect(flags[2]).toStrictEqual({flag: raceHandicapAWarningFlag, action: raceHandicapAWarningflagLowerAction});
-        });
-    });
     describe('when 0 minutes before the start of the first race and 5 minutes before start of second race', () => {
-        it('returns correct flags', () => {
-            const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
-        
-            const scorpionAWarningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-            const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.RAISED, actions: []};
-            const raceHandicapAWarningFlag = {name: 'Handicap Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
-
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
-            
-            preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
-            preparatoryFlag.actions.push(preparatoryFlagLowerAction);
-            
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagRaiseAction);
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagLowerAction);
-
-            const flags = sessionStartSequence.getFlagsAtTime(raceScorpionA.plannedStartTime);
-        
-            expect(flags[0]).toStrictEqual(scorpionAWarningFlag);
-            expect(flags[1]).toStrictEqual(preparatoryFlag);
-            expect(flags[2]).toStrictEqual(raceHandicapAWarningFlag);
-        });
-        it('returns correct flags with correct next action', () => {
-            const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
-        
-            const scorpionAWarningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-            const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.RAISED, actions: []};
-            const raceHandicapAWarningFlag = {name: 'Handicap Class Flag', role: FlagRole.WARNING, state: FlagState.RAISED, actions: []};
-
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
-            
-            preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
-            preparatoryFlag.actions.push(preparatoryFlagLowerAction);
-            
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagRaiseAction);
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagLowerAction);
-
-            const flags = sessionStartSequence.getFlagsAtTimeWithNextAction(raceScorpionA.plannedStartTime);
-        
-            expect(flags[0]).toStrictEqual({flag: scorpionAWarningFlag, action: undefined});
-            expect(flags[1]).toStrictEqual({flag: preparatoryFlag, action: preparatoryFlagLowerAction});
-            expect(flags[2]).toStrictEqual({flag: raceHandicapAWarningFlag, action: raceHandicapAWarningflagLowerAction});
-        });
         it('returns the next race that will start', () => {
             const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
+            const clock = new Clock();
+            clock.start();
+            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart], clock);
         
             const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf()));
             expect(race).toStrictEqual(raceScorpionA);
         });
     });
     describe('when 5 minutes after the start of the first race and 0 minutes before start of second race', () => {
-        it('returns correct flags', () => {
-            const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
-        
-            const scorpionAWarningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-            const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-            const raceHandicapAWarningFlag = {name: 'Handicap Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
-            
-            preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
-            preparatoryFlag.actions.push(preparatoryFlagLowerAction);
-            
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagRaiseAction);
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagLowerAction);
-
-            const flags = sessionStartSequence.getFlagsAtTime(raceHandicapA_newStart.plannedStartTime);
-        
-            expect(flags[0]).toStrictEqual(scorpionAWarningFlag);
-            expect(flags[1]).toStrictEqual({...preparatoryFlag});
-            expect(flags[2]).toStrictEqual(raceHandicapAWarningFlag);
-        });
-        it('returns correct flags with correct next action', () => {
-            const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
-        
-            const scorpionAWarningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-            const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-            const raceHandicapAWarningFlag = {name: 'Handicap Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
-
-            const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            
-            const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-            const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
-            scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
-            
-            preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
-            preparatoryFlag.actions.push(preparatoryFlagLowerAction);
-            
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagRaiseAction);
-            raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagLowerAction);
-
-            const flags = sessionStartSequence.getFlagsAtTimeWithNextAction(raceHandicapA_newStart.plannedStartTime);
-        
-            expect(flags[0]).toStrictEqual({flag: scorpionAWarningFlag, action: undefined});
-            expect(flags[1]).toStrictEqual({flag: preparatoryFlag, action: undefined});
-            expect(flags[2]).toStrictEqual({flag: raceHandicapAWarningFlag, action: undefined});
-        });
         it('returns the next race that will start', () => {
             const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
+            const clock = new Clock();
+            clock.start();
+            const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart], clock);
         
             const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf() + 300000));
             expect(race).toStrictEqual(raceHandicapA_newStart);
         });
     });
-    it('returns the correct actions', () => {
-        const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-        const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart]);
-        
-        const scorpionAWarningFlag = {name: 'Scorpion Class Flag', role: FlagRole.WARNING, actions: []};
-        const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
-        const raceHandicapAWarningFlag = {name: 'Handicap Class Flag', role: FlagRole.WARNING, actions: []};
+});
 
-        const scorpionAWarningflagRaiseAction = {flag: scorpionAWarningFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        const scorpionAWarningflagLowerAction = {flag: scorpionAWarningFlag, time: raceScorpionA.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        
-        const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        
-        const raceHandicapAWarningflagRaiseAction = {flag: raceHandicapAWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        const raceHandicapAWarningflagLowerAction = {flag: raceHandicapAWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+describe('when using RRS26 start', () => {
+    it('returns correct signals', () => {
+        const raceScorpionA_rrs26 = {...raceScorpionA, startType: StartType.RRS26};
+        const raceHandicapA_rrs26 = {...raceHandicapA, startType: StartType.RRS26};
+        const clock = new Clock();
+        clock.start();
+        const sessionStartSequence = new SessionStartSequence([raceScorpionA_rrs26, raceHandicapA_rrs26], clock);
 
-        scorpionAWarningFlag.actions.push(scorpionAWarningflagRaiseAction);
-        scorpionAWarningFlag.actions.push(scorpionAWarningflagLowerAction);
+        const scorpionWarningSignal_rrs26 = {...scorpionWarningSignal, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000)};
+        const scorpionPreparatorySignal_rrs26 = {...scorpionPreparatorySignal, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000)};
+        const scorpionOneMinuteSignal = {meaning: 'One minute', time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), soundSignal: {description: 'One long'}, visualSignal: endSequenceVisualSignal};
+        const handicapWarningSignal_rrs26 = {...handicapWarningSignal, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000)};
+        const handicapPreparatorySignal_rrs26 = {meaning: 'Preparatory signal', time: new Date(raceHandicapA.plannedStartTime.valueOf() - 240000), soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
+        const handicapOneMinuteSignal = {meaning: 'One minute', time: new Date(raceHandicapA.plannedStartTime.valueOf() - 60000), soundSignal: {description: 'One long'}, visualSignal: endSequenceVisualSignal};
         
-        preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
-        preparatoryFlag.actions.push(preparatoryFlagLowerAction);
+        expect(sessionStartSequence.getSignals()).toEqual([scorpionWarningSignal_rrs26, scorpionPreparatorySignal_rrs26, scorpionOneMinuteSignal, scorpionStartSignal, handicapWarningSignal_rrs26, handicapPreparatorySignal_rrs26, handicapOneMinuteSignal, handicapStartSignal]);
+    });
+    describe('when 6 minutes before the start of the first race and 11 minutes before start of second race', () => {
+        it('returns the next race that will start', () => {
+            const raceScorpionA_rrs26 = {...raceScorpionA, startType: StartType.RRS26};
+            const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z'), startType: StartType.RRS26};
+            const clock = new Clock();
+            clock.start();
+            const sessionStartSequence = new SessionStartSequence([raceScorpionA_rrs26, raceHandicapA_newStart], clock);
         
-        raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagRaiseAction);
-        raceHandicapAWarningFlag.actions.push(raceHandicapAWarningflagLowerAction);
-
-        const actions = sessionStartSequence.getActions();
-
-        expect(actions[0]).toStrictEqual(scorpionAWarningflagRaiseAction);
-        expect(actions[1]).toStrictEqual(scorpionAWarningflagLowerAction);
-        expect(actions[2]).toStrictEqual(raceHandicapAWarningflagRaiseAction);
-        expect(actions[3]).toStrictEqual(raceHandicapAWarningflagLowerAction);
-        expect(actions[4]).toStrictEqual(preparatoryFlagRaiseAction);
-        expect(actions[5]).toStrictEqual(preparatoryFlagLowerAction);
+            const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA_rrs26.plannedStartTime.valueOf() - 360000));
+            expect(race).toStrictEqual(raceScorpionA_rrs26);
+        });
+    });
+    describe('when 0 minutes before the start of the first race and 5 minutes before start of second race', () => {
+        it('returns the next race that will start', () => {
+            const raceScorpionA_rrs26 = {...raceScorpionA, startType: StartType.RRS26};
+            const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z'), startType: StartType.RRS26};
+            const clock = new Clock();
+            clock.start();
+            const sessionStartSequence = new SessionStartSequence([raceScorpionA_rrs26, raceHandicapA_newStart], clock);
+        
+            const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA_rrs26.plannedStartTime.valueOf()));
+            expect(race).toStrictEqual(raceScorpionA_rrs26);
+        });
+    });
+    describe('when 5 minutes after the start of the first race and 0 minutes before start of second race', () => {
+        it('returns the next race that will start', () => {
+            const raceScorpionA_rrs26 = {...raceScorpionA, startType: StartType.RRS26};
+            const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
+            const clock = new Clock();
+            clock.start();
+            const sessionStartSequence = new SessionStartSequence([raceScorpionA_rrs26, raceHandicapA_newStart], clock);
+        
+            const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA_rrs26.plannedStartTime.valueOf() + 300000));
+            expect(race).toStrictEqual(raceHandicapA_newStart);
+        });
     });
 });
 
-describe('when two races in the start sequence use the same flag', () => {
-    it('returns a single instance of the flag', () => {
+describe('when time to prepare for race start signal', () => {
+    it('notifies observers', () => {
+        jest.setSystemTime(new Date("2021-10-14T10:23:59Z"));
         const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-        const raceHandicapB = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T11:35:00Z')};
-        const sessionStartSequence = new SessionStartSequence([raceHandicapA_newStart, raceHandicapB]);
-    
-        const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, state: FlagState.LOWERED, actions: []};
-        const handicapWarningFlag = {name: 'Handicap Class Flag', role: FlagRole.WARNING, state: FlagState.LOWERED, actions: []};
+        const handler1 = jest.fn();
+        const handler2 = jest.fn();
+        const clock = new Clock();
+        clock.start();
+        const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart], clock);
+        sessionStartSequence.addPrepareForRaceStartSignalHandler(handler1);
+        sessionStartSequence.addPrepareForRaceStartSignalHandler(handler2);
 
-        const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapB.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        
-        const raceHandicapAWarningflagRaiseAction = {flag: handicapWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        const raceHandicapAWarningflagLowerAction = {flag: handicapWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-
-        const raceHandicapBWarningflagRaiseAction = {flag: handicapWarningFlag, time: new Date(raceHandicapB.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        const raceHandicapBWarningflagLowerAction = {flag: handicapWarningFlag, time: raceHandicapB.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        
-        preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
-        preparatoryFlag.actions.push(preparatoryFlagLowerAction);
-        
-        handicapWarningFlag.actions.push(raceHandicapAWarningflagRaiseAction);
-        handicapWarningFlag.actions.push(raceHandicapAWarningflagLowerAction);
-
-        handicapWarningFlag.actions.push(raceHandicapBWarningflagRaiseAction);
-        handicapWarningFlag.actions.push(raceHandicapBWarningflagLowerAction);
-
-        const flags = sessionStartSequence.getFlagsAtTime(new Date(raceScorpionA.plannedStartTime.valueOf() - 660000));
-    
-        expect(flags).toHaveLength(2);
-        expect(flags[0]).toStrictEqual(handicapWarningFlag);
-        expect(flags[1]).toStrictEqual(preparatoryFlag);
+        jest.advanceTimersByTime(1251);
+        expect(handler1).toBeCalledTimes(2);
+        expect(handler2).toBeCalledTimes(2);
     });
-    it('combines the actions for both races into a single actions list', () => {
+});
+
+it('removes registration of an observer from prepare for race start events', () => {
+    const handler1 = jest.fn();
+    const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
+        jest.setSystemTime(new Date("2021-10-14T10:23:59Z"));
+        const handler2 = jest.fn();
+        const clock = new Clock();
+        clock.start();
+        const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart], clock);
+        sessionStartSequence.addPrepareForRaceStartSignalHandler(handler1);
+        sessionStartSequence.addPrepareForRaceStartSignalHandler(handler2);
+        sessionStartSequence.removePrepareForRaceStartSignalHandler(handler1);
+        jest.advanceTimersByTime(1899);
+        expect(handler1).toBeCalledTimes(0);
+        expect(handler2).toBeCalledTimes(2);
+});
+
+describe('when time to make race start signal', () => {
+    it('notifies observers', () => {
+        jest.setSystemTime(new Date("2021-10-14T10:29:59Z"));
         const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
-        const raceHandicapB = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T11:35:00Z')};
-        const sessionStartSequence = new SessionStartSequence([raceHandicapA_newStart, raceHandicapB]);
-    
-        const preparatoryFlag = {name: 'Blue Peter', role: FlagRole.PREPARATORY, actions: []};
-        const handicapWarningFlag = {name: 'Handicap Class Flag', role: FlagRole.WARNING, actions: []};
+        const handler1 = jest.fn();
+        const handler2 = jest.fn();
+        const clock = new Clock();
+        clock.start();
 
-        const preparatoryFlagRaiseAction = {flag: preparatoryFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 300000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        const preparatoryFlagLowerAction = {flag: preparatoryFlag, time: raceHandicapB.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        
-        const raceHandicapAWarningflagRaiseAction = {flag: handicapWarningFlag, time: new Date(raceHandicapA_newStart.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        const raceHandicapAWarningflagLowerAction = {flag: handicapWarningFlag, time: raceHandicapA_newStart.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
+        const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart], clock);
+        sessionStartSequence.addMakeRaceStartSignalHandler(handler1);
+        sessionStartSequence.addMakeRaceStartSignalHandler(handler2);
 
-        const raceHandicapBWarningflagRaiseAction = {flag: handicapWarningFlag, time: new Date(raceHandicapB.plannedStartTime.valueOf() - 600000), afterState: FlagState.RAISED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        const raceHandicapBWarningflagLowerAction = {flag: handicapWarningFlag, time: raceHandicapB.plannedStartTime, afterState: FlagState.LOWERED, signalPrepareRaceStartStateChange: true, signalRaceStartStateChange: true};
-        
-        preparatoryFlag.actions.push(preparatoryFlagRaiseAction);
-        preparatoryFlag.actions.push(preparatoryFlagLowerAction);
-        
-        handicapWarningFlag.actions.push(raceHandicapAWarningflagRaiseAction);
-        handicapWarningFlag.actions.push(raceHandicapAWarningflagLowerAction);
-
-        handicapWarningFlag.actions.push(raceHandicapBWarningflagRaiseAction);
-        handicapWarningFlag.actions.push(raceHandicapBWarningflagLowerAction);
-
-        const actions = sessionStartSequence.getActions();
-
-        expect(actions[0]).toStrictEqual(raceHandicapAWarningflagRaiseAction);
-        expect(actions[1]).toStrictEqual(raceHandicapAWarningflagLowerAction);
-        expect(actions[2]).toStrictEqual(raceHandicapBWarningflagRaiseAction);
-        expect(actions[3]).toStrictEqual(raceHandicapBWarningflagLowerAction);
-        expect(actions[4]).toStrictEqual(preparatoryFlagRaiseAction);
-        expect(actions[5]).toStrictEqual(preparatoryFlagLowerAction);
+        jest.advanceTimersByTime(1095);
+        expect(handler1).toBeCalledTimes(2);
+        expect(handler2).toBeCalledTimes(2);
     });
-})
+});
+
+it('removes registration of an observer from make race start signal events', () => {
+    jest.setSystemTime(new Date("2021-10-14T10:29:59Z"));
+    const raceHandicapA_newStart = {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:35:00Z')};
+    const handler1 = jest.fn();
+    const handler2 = jest.fn();
+    const clock = new Clock();
+    clock.start();
+
+    const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart], clock);
+    sessionStartSequence.addMakeRaceStartSignalHandler(handler1);
+    sessionStartSequence.addMakeRaceStartSignalHandler(handler2);
+    sessionStartSequence.removeMakeRaceStartSignalHandler(handler1);
+    jest.advanceTimersByTime(1000);
+    expect(handler1).toBeCalledTimes(0);
+    expect(handler2).toBeCalledTimes(2);
+});

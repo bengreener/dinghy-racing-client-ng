@@ -1,3 +1,5 @@
+import FlagState from '../domain-classes/flag-state';
+
 const httpRootURL = 'http://localhost:8081/dinghyracing/api';
 const wsRootURL = 'ws://localhost:8081/dinghyracing';
 
@@ -19,45 +21,13 @@ const competitorsCollectionHAL = {_embedded:{competitors:[
 const dinghyClassScorpionHAL = {name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043, externalName: 'SCORPION', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/1' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/1' } } };
 const dinghyClassGraduateHAL = {name: 'Graduate', crewSize: 2, portsmouthNumber: 1110, externalName: null, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/5' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/5' } } };
 const dinghyClassCometHAL = {name: 'Comet', crewSize: 1, portsmouthNumber: 1210, externalName: null, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/16' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses/16' } } };
-// const dinghyClassNotSetHAL = {name:'',crewSize:0,_links:{self:{href:''},dinghyClass:{href:''}}};
+
 const dinghyClassCollectionHAL = {
 	_embedded: {dinghyClasses: [ dinghyClassScorpionHAL, dinghyClassGraduateHAL, dinghyClassCometHAL ] }, _links: {
 		self: {href: 'http://localhost:8081/dinghyracing/api/dinghyClasses' }, profile: {href: 'http://localhost:8081/dinghyracing/api/profile/dinghyClasses' } }, 
 		 	page: {size: 20, totalElements: 3, totalPages: 1, number: 0 
 		} 
 };
-// const dinghyClassSchemaJSON = {
-// 	title: 'Dinghy class', 
-// 	properties: { 
-// 		name: {title: 'Name', readOnly: false, description: 'identifier', type: 'string' },
-// 		crewSize: {title: 'Crew size', readOnly: false, type: 'integer'} 
-// 	}, definitions: { }, type: 'object', $schema: 'http://json-schema.org/draft-04/schema#' 
-// };
-// const dinghyClassSchemaALPS = { 
-// 	alps: {version: '1.0', descriptor: [
-// 		{
-// 			id: 'dinghyClass-representation', 
-// 			href: 'http://localhost:8081/dinghyracing/api/profile/dinghyClasses', 
-// 			descriptor: [
-// 				{name: 'name', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'identifier' } },
-// 				{name:'crewSize', type:'SEMANTIC'}
-// 			]
-// 		}, 
-// 		{id: 'create-dinghyClasses', name: 'dinghyClasses', type: 'UNSAFE', descriptor: [ ], rt: '#dinghyClass-representation' }, 
-// 		{
-// 			id: 'get-dinghyClasses', name: 'dinghyClasses', type: 'SAFE', descriptor: [
-// 				{name: 'page', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'The page to return.'} }, 
-// 				{name: 'size', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'The size of the page to return.' } }, 
-// 				{name: 'sort', type: 'SEMANTIC', doc: {format: 'TEXT', value: 'The sorting criteria to use to calculate the content of the page.' } } 
-// 			], 
-// 			rt: '#dinghyClass-representation' 
-// 		}, 
-// 		{id: 'delete-dinghyClass', name: 'dinghyClass', type: 'IDEMPOTENT', descriptor: [ ], rt: '#dinghyClass-representation'}, 
-// 		{id: 'update-dinghyClass', name: 'dinghyClass', type: 'IDEMPOTENT', descriptor: [ ], rt: '#dinghyClass-representation'}, 
-// 		{id: 'get-dinghyClass', name: 'dinghyClass', type: 'SAFE', descriptor: [ ], rt: '#dinghyClass-representation'}, 
-// 		{id: 'patch-dinghyClass', name: 'dinghyClass', type: 'UNSAFE', descriptor: [ ], rt: '#dinghyClass-representation'}
-// 	]}
-// };
 
 const fleetScorpionHAL = { 'name' : 'Scorpion', '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/1' }, 'fleet' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/1' }, 'dinghyClasses' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/1/dinghyClasses' } } };
 const fleetHandicapHAL = { 'name' : 'Handicap', '_links' : { 'self' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/2' }, 'fleet' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/2' }, 'dinghyClasses' : { 'href' : 'http://localhost:8081/dinghyracing/api/fleets/2/dinghyClasses' } } };
@@ -438,6 +408,51 @@ const dinghyGraduate1234Crews = [ dinghyGraduate1234CrewA ];
 const dinghyComet1234CrewA = { helm: competitorBobHoskins, mate: null };
 const dinghyComet1234Crews = [ dinghyComet1234CrewA ]
 
+// Start Signals
+const preparatoryFlag = {name: 'Blue Peter'};
+const preparatoryVisualSignal = {flags: [preparatoryFlag], flagsState: FlagState.RAISED};
+const preparatorySoundSignal = {description: 'One'};
+const preparatorySignal = {meaning: 'Preparatory signal', time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
+
+const endSequenceVisualSignal = {flags: [preparatoryFlag], flagsState: FlagState.LOWERED};
+const endSequenceSignal = {meaning: 'Start sequence finished', time: new Date(raceHandicapA.plannedStartTime.valueOf()), soundSignal: null, visualSignal: endSequenceVisualSignal};
+
+const scorpionClassFlag = {name: 'Scorpion Class Flag'};
+const scorpionWarningVisualSignal = {flags: [scorpionClassFlag], flagsState: FlagState.RAISED};
+const scorpionWarningSoundSignal = {description: 'One'};
+const scorpionWarningSignal = {meaning: 'Warning signal', time: new Date(raceScorpionA.plannedStartTime.valueOf() - 600000), soundSignal: scorpionWarningSoundSignal, visualSignal: scorpionWarningVisualSignal};
+const scorpionStartVisualSignal = {flags: [scorpionClassFlag], flagsState: FlagState.LOWERED};
+const scorpionStartSoundSignal = {description: 'One'};
+const scorpionStartSignal = {meaning: 'Starting signal', time: new Date(raceScorpionA.plannedStartTime.valueOf()), soundSignal: scorpionStartSoundSignal, visualSignal: scorpionStartVisualSignal};
+const scorpionPreparatorySignal = {meaning: 'Preparatory signal', time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000), soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
+const scorpionOneMinuteSignal = {meaning: 'One minute', time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), soundSignal: {description: 'One long'}, visualSignal: endSequenceVisualSignal};
+
+const graduateClassFlag = {name: 'Graduate Class Flag'};
+const graduateWarningVisualSignal = {flags: [graduateClassFlag], flagsState: FlagState.RAISED};
+const graduateWarningSoundSignal = {description: 'One'};
+const graduateStartVisualSignal = {flags: [graduateClassFlag], flagsState: FlagState.LOWERED};
+const graduateStartSoundSignal = {description: 'One'};
+const graduateWarningSignal = {meaning: 'Warning signal', time: new Date(raceGraduateA.plannedStartTime.valueOf() - 600000), soundSignal: graduateWarningSoundSignal, visualSignal: graduateWarningVisualSignal};
+const graduateStartSignal = {meaning: 'Starting signal', time: new Date(raceGraduateA.plannedStartTime.valueOf()), soundSignal: graduateStartSoundSignal, visualSignal: graduateStartVisualSignal};
+
+const cometClassFlag = {name: 'Comet Class Flag'};
+const cometWarningVisualSignal = {flags: [cometClassFlag], flagsState: FlagState.RAISED};
+const cometWarningSoundSignal = {description: 'One'};
+const cometStartVisualSignal = {flags: [cometClassFlag], flagsState: FlagState.LOWERED};
+const cometStartSoundSignal = {description: 'One'};
+const cometWarningSignal = {meaning: 'Warning signal', time: new Date(raceCometA.plannedStartTime.valueOf() - 600000), soundSignal: cometWarningSoundSignal, visualSignal: cometWarningVisualSignal};
+const cometStartSignal = {meaning: 'Starting signal', time: new Date(raceCometA.plannedStartTime.valueOf()), soundSignal: cometStartSoundSignal, visualSignal: cometStartVisualSignal};
+
+const handicapClassFlag = {name: 'Handicap Class Flag'};
+const handicapWarningVisualSignal = {flags: [handicapClassFlag], flagsState: FlagState.RAISED};
+const handicapWarningSoundSignal = {description: 'One'};
+const handicapStartVisualSignal = {flags: [handicapClassFlag], flagsState: FlagState.LOWERED};
+const handicapStartSoundSignal = {description: 'One'};
+const handicapWarningSignal = {meaning: 'Warning signal', time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), soundSignal: handicapWarningSoundSignal, visualSignal: handicapWarningVisualSignal};
+const handicapPreparatorySignal = {meaning: 'Preparatory signal', time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
+const handicapOneMinuteSignal = {meaning: 'One minute', time: new Date(raceHandicapA.plannedStartTime.valueOf() - 60000), soundSignal: {description: 'One long'}, visualSignal: endSequenceVisualSignal};
+const handicapStartSignal = {meaning: 'Starting signal', time: new Date(raceHandicapA.plannedStartTime.valueOf()), soundSignal: handicapStartSoundSignal, visualSignal: handicapStartVisualSignal};
+
 export {
 	httpRootURL, wsRootURL,
 	
@@ -468,13 +483,12 @@ export {
 
 	dinghyScorpion1234CrewAHAL, dinghyScorpion1234CrewBHAL, dinghyScorpion1234CrewsHAL,
 
-	competitorsCollection, competitorChrisMarshall, competitorSarahPascal, competitorJillMyer, competitorLouScrew, 
-	competitorOwainDavies, competitorLiuBao, 
+	competitorsCollection, competitorChrisMarshall, competitorSarahPascal, competitorJillMyer, competitorLouScrew,
+	competitorOwainDavies, competitorLiuBao,
 
 	dinghyClasses, dinghyClassesByNameAsc, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet,
 
 	fleets, fleetScorpion, fleetHandicap,
-
 
 	dinghies, dinghiesScorpion, dinghy1234, dinghy2726, dinghy6745, dinghy2928, dinghy826, dinghy1234Graduate, dinghy1234Comet,
 
@@ -483,5 +497,23 @@ export {
 	entryChrisMarshallHandicapA1234, entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745, entryJillMyerCometA826, entryChrisMarshallPursuitA1234,
 	entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA, entriesPursuitA,
 
-	dinghyScorpion1234Crews, dinghyGraduate1234Crews, dinghyComet1234Crews
+	dinghyScorpion1234Crews, dinghyGraduate1234Crews, dinghyComet1234Crews,
+
+	preparatoryFlag, preparatoryVisualSignal, preparatorySoundSignal, preparatorySignal,
+
+	scorpionClassFlag, scorpionWarningVisualSignal, scorpionWarningSoundSignal, scorpionWarningSignal,
+	scorpionStartVisualSignal, scorpionStartSoundSignal, scorpionStartSignal, scorpionPreparatorySignal,
+	scorpionOneMinuteSignal,
+
+	graduateClassFlag, graduateWarningVisualSignal, graduateWarningSoundSignal, graduateStartVisualSignal,
+	graduateStartSoundSignal, graduateWarningSignal, graduateStartSignal,
+
+	cometClassFlag, cometWarningVisualSignal, cometWarningSoundSignal, cometStartVisualSignal,
+	cometStartSoundSignal, cometWarningSignal, cometStartSignal,
+
+	handicapClassFlag, handicapWarningVisualSignal, handicapWarningSoundSignal, handicapStartVisualSignal,
+	handicapStartSoundSignal, handicapWarningSignal, handicapPreparatorySignal, handicapOneMinuteSignal,
+	handicapStartSignal,
+
+	endSequenceVisualSignal, endSequenceSignal
 }

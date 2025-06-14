@@ -36,7 +36,7 @@ class Clock {
     _startTime
     _performanceTimerStartTime; // when the race is due to start based on the value of performance.now() when clock was initialised
     _dateNowPerformanceNowDiff; // difference between Date.now() and performance.now() on clock initialisation
-    _tickHandler;
+    _tickHandlers = new Map();
     _ticker;
 
     /**
@@ -120,8 +120,10 @@ class Clock {
             // this approach results in an average interval of ~1000 milliseconds
             const setNextTick = (recursiveCallback) => {
                 this._ticker = setTimeout(() => {
-                    if (this._tickHandler) {
-                        this._tickHandler();
+                    if (this._tickHandlers.size > 0) {
+                        this._tickHandlers.forEach(callback => {
+                           callback(); 
+                        });
                     };
                     recursiveCallback(recursiveCallback);
                 }, 1000 - Date.now() % 1000);
@@ -143,21 +145,21 @@ class Clock {
     }
     
     /**
-     * Reset clock start time to now
-     */
-    reset() {
-        if (this._startTime) {
-            this._startTime = Date.now();
-        }
-    }
-    
-    /**
      * Return a time based on the start time of the clock and the elapsed time calculated by the performance timer
      * This may differ from the time that would be returned by new Date() or Date.now()
      * @returns {Date}
      */
     getTime() {
         return new Date(this._startTime + this.getElapsedTime());
+    }
+
+    /**
+     * Return a time based on the start time of the clock and the elapsed time calculated by the performance timer with precision reduced to the current second
+     * This may differ from the time that would be returned by new Date() or Date.now()
+     * @returns {Date}
+     */
+    getTimeToSecondPrecision() {
+        return new Date(Math.floor((this._startTime + this.getElapsedTime()) / 1000) * 1000);
     }
 
     /**
@@ -174,7 +176,6 @@ class Clock {
         const dNow = Date.now();
         // adjust if performance timer falls behind system clock; intended to autocorrect any error caused by sleeping of clock used for performance timer
         if (pNow + this._dateNowPerformanceNowDiff < dNow - 2) {
-            console.error(`Performance timer and Date timer variance exceeded tolerance. Performance timer constants reset. Variance was: ${pNow + this._dateNowPerformanceNowDiff - dNow} milliseconds`);
             this._dateNowPerformanceNowDiff = dNow - pNow;
             this._performanceTimerStartTime =  this._startTime - this._dateNowPerformanceNowDiff;
         }
@@ -182,18 +183,18 @@ class Clock {
     }
     
     /**
-     * Add a function to handle tick events 
+     * Add a function to handle tick events
      * @param {callback} callback 
      */
     addTickHandler(callback) {
-        this._tickHandler = callback;
+        this._tickHandlers.set(callback, callback);
     }
 
     /**
      * Remove the function handling tick events
      */
-    removeTickHandler() {
-        this._tickHandler = null;
+    removeTickHandler(callback) {
+        this._tickHandlers.delete(callback);
     }
 }
 

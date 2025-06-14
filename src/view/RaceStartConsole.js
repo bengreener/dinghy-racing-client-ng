@@ -20,7 +20,7 @@ import SelectSession from './SelectSession';
 import RaceHeaderView from './RaceHeaderView';
 import ActionListView from './ActionListView';
 import CollapsableContainer from './CollapsableContainer';
-import FlagControl from './FlagControl';
+import SignalPanel from './SignalsPanel';
 import RaceType from '../model/domain-classes/race-type';
 import Clock from '../model/domain-classes/clock';
 import CountdownDisplayControl from './CountdownDisplayControl';
@@ -34,8 +34,6 @@ function RaceStartConsole () {
     const model = useContext(ModelContext);
     const [selectedRaces, setSelectedRaces] = useState([]); // selection of race names made by user
     const [raceMap, setRaceMap] = useState(new Map()); // map of race names to races
-    const [flagsWithNextAction, setFlagsWithNextAction] = useState([]);
-    const [actions, setActions] = useState([]);
     const [message, setMessage] = useState(''); // feedback to user
     const [sessionStart, setSessionStart] = useState(() => {
         const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
@@ -50,7 +48,9 @@ function RaceStartConsole () {
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
     const [fleetUpdateRequestAt, setFleetUpdateRequestAt] = useState(Date.now()); // time of last request to fetch fleet from server. change triggers calculation of a new start sequence
     const [raceType, setRaceType] = useState(RaceType.FLEET);
-    const startSequence = useRef(null);
+    const [signals, setSignals] = useState([]);
+    const [timestamp, setTimestamp] = useState(Date.now());
+    const sessionStartSequence = useRef(null);
     const prepareAudioRef = useRef(null);
     if (prepareAudioRef.current === null) {
         prepareAudioRef.current = new Audio('./sounds/prepare_alert.mp3');
@@ -81,21 +81,22 @@ function RaceStartConsole () {
     const handleFleetUpdate = useCallback(() => {
         setFleetUpdateRequestAt(Date.now());
     }, []);
-    
 
-    const handleStartSequenceTick = useCallback(() => {
-        setFlagsWithNextAction(startSequence.current.getFlags());
-        if (startSequence.current.getRaceStartStateChange()) {
-            actAudioRef.current.play();
-        }
-        else if (startSequence.current.getPrepareForRaceStartStateChange()) {
-            prepareAudioRef.current.play();
-        }
+    const prepareForRaceSignalHandler = useCallback(() => {
+        prepareAudioRef.current.play();
     }, []);
+
+    const makeRaceStartSignalHandler = useCallback(() => {
+        actAudioRef.current.play();
+    }, []);
+
+    const handleClockTick = useCallback(() => {
+        setTimestamp(model.getClock().getTimeToSecondPrecision().valueOf());
+    }, [model]);
 
     // get races for selected session
     useEffect(() => {
-        let ignoreFetch = false; // set to true if RaceStartConsole rerendered before fetch completes to avoid using out of date result
+        let ignoreFetch = false;
         model.getRacesBetweenTimesForType(new Date(sessionStart), new Date(sessionEnd), raceType, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING}).then(result => {
             if (!ignoreFetch && !result.success) {
                 setMessage('Unable to load races\n' + result.message);
@@ -127,38 +128,40 @@ function RaceStartConsole () {
         }
     }, [model, sessionStart, sessionEnd, raceType, racesUpdateRequestAt, selectedRaces.length]);
 
-    // get start sequence for selected session
+    // Setup session start sequence
     useEffect(() => {
-        let ignoreFetch = false; // set to true if RaceStartConsole rerendered before fetch completes to avoid using out of date result
+        let ignoreFetch = false;
         model.getStartSequence(selectedRaces.map(raceName => raceMap.get(raceName)), raceType).then(result => {
             if (!ignoreFetch && !result.success) {
                 setMessage('Unable to load start sequence\n' + result.message);
             }
             else if (!ignoreFetch) {
-                startSequence.current = result.domainObject;
-                startSequence.current.addTickHandler(handleStartSequenceTick);
-                startSequence.current.startClock();
-                setFlagsWithNextAction(startSequence.current.getFlags());
-                setActions(startSequence.current.getActions());
-                if (startSequence.current.getRaceStartStateChange()) {
-                    actAudioRef.current.play();
-                }
-                else if (startSequence.current.getPrepareForRaceStartStateChange()) {
-                    prepareAudioRef.current.play();
-                }
+                sessionStartSequence.current = result.domainObject;
+                sessionStartSequence.current.addPrepareForRaceStartSignalHandler(prepareForRaceSignalHandler);
+                sessionStartSequence.current.addMakeRaceStartSignalHandler(makeRaceStartSignalHandler);
+                setSignals(sessionStartSequence.current.getSignals());
                 setMessage('');
             }
         });
 
         return () => {
             ignoreFetch = true;
-            if (startSequence.current) {
-                startSequence.current.removeTickHandler(handleStartSequenceTick);
-                startSequence.current.dispose();
-                startSequence.current = null;
+            if (sessionStartSequence.current) {
+                sessionStartSequence.current.removePrepareForRaceStartSignalHandler(prepareForRaceSignalHandler);
+                sessionStartSequence.current.removeMakeRaceStartSignalHandler(makeRaceStartSignalHandler);
+                sessionStartSequence.current.dispose();
             }
+    }
+    }, [model, selectedRaces, raceType, raceMap, racesUpdateRequestAt, fleetUpdateRequestAt, sessionStartSequence, makeRaceStartSignalHandler, prepareForRaceSignalHandler]);
+
+    // register for DinghyRacingModel clock ticks
+    useEffect(() => {
+        model.getClock().addTickHandler(handleClockTick);
+
+        return () => {
+            model.getClock().removeTickHandler(handleClockTick);
         }
-    }, [model, selectedRaces, raceType, raceMap, racesUpdateRequestAt, fleetUpdateRequestAt, handleStartSequenceTick]);
+    }, [model, handleClockTick]);
 
     // register on update callbacks for races
     useEffect(() => {
@@ -193,11 +196,11 @@ function RaceStartConsole () {
         setSelectedRaces(options.map(option => option.value));
     }
 
-    function handlesessionStartInputChange(date) {
+    function handleSessionStartInputChange(date) {
         setSessionStart(date);
     }
 
-    function handlesessionEndInputChange(date) {
+    function handleSessionEndInputChange(date) {
         setSessionEnd(date);
     }
 
@@ -210,12 +213,12 @@ function RaceStartConsole () {
     }
 
     function buildStartCountdown() {
-        if (startSequence.current) {
-            const nextRaceToStart = startSequence.current.getNextRaceToStart();
+        if (sessionStartSequence.current) {
+            const nextRaceToStart = sessionStartSequence.current.getNextRaceToStart(new Date(timestamp));
             let countdown;
             if (nextRaceToStart) {
-                const timeLeft = nextRaceToStart.clock.getElapsedTime();
-                const playAudio = timeLeft >= -10000 && timeLeft <= 999;
+                const timeLeft = nextRaceToStart.plannedStartTime.valueOf() - model.getClock().getTimeToSecondPrecision().valueOf();
+                const playAudio = timeLeft <= 10000 && timeLeft > 0;
                 countdown = <CountdownDisplayControl title={'Start Countdown'} message={nextRaceToStart.name} time={timeLeft} beep={playAudio} />;
             }
             else {
@@ -233,7 +236,7 @@ function RaceStartConsole () {
         <div className='w3-container console'>
             <CollapsableContainer heading={'Start Races'}>
                 <form className='w3-container' >
-                    <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
+                    <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handleSessionStartInputChange} onSessionEndChange={handleSessionEndInputChange} />
                     <div className='w3-row'>
                         <fieldset className='w3-third' >
                             <legend>Race Type</legend>
@@ -257,7 +260,7 @@ function RaceStartConsole () {
             {buildStartCountdown()}
             <div className='scrollable'>
             <CollapsableContainer heading={'Flags'}>
-                {flagsWithNextAction.map(flag => { return <FlagControl key={flag.flag.name} flag={flag.flag} timeToChange={flag.action ? Clock.now() - flag.action.time.valueOf() : 0} /> })} {/* use Clock.now to get adjusted time when synched to an external clock */}
+                <SignalPanel signals={signals} />
             </CollapsableContainer>
             <CollapsableContainer heading={'Races'}>
                 {selectedRaces.map(raceName => {
@@ -265,7 +268,7 @@ function RaceStartConsole () {
                     return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} showInRaceData={false} />
                 })}
             </CollapsableContainer>
-            <ActionListView actions={actions} />
+            <ActionListView signals={signals} clock={model.getClock()} />
             </div>
         </div>
     );

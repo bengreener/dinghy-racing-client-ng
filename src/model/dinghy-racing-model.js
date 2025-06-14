@@ -15,9 +15,10 @@
  */
 
 import { Client } from '@stomp/stompjs';
-import StartSequence from './domain-classes/start-sequence';
+import SessionStartSequence from './domain-classes/session-start-sequence';
 import RaceType from './domain-classes/race-type';
 import StartType from './domain-classes/start-type';
+import Clock from './domain-classes/clock';
 
 class DinghyRacingModel {
     httpRootURL;
@@ -32,6 +33,7 @@ class DinghyRacingModel {
     dinghyClassUpdateCallbacks = new Map();
     fleetCreationCallbacks = new Set();
     fleetUpdateCallbacks = new Map();
+    clock = new Clock();
 
     /**
      * Provide a blank competitor template
@@ -139,6 +141,7 @@ class DinghyRacingModel {
             this.stompClient.subscribe('/topic/updateFleet', this.handleFleetUpdate);
         };
         this.stompClient.activate();
+        this.clock.start();
     }
 
     /**
@@ -1022,6 +1025,14 @@ class DinghyRacingModel {
     }
 
     /**
+     * Get the clock
+     * @returns {Clock}
+     */
+    getClock() {
+        return this.clock;
+    }
+
+    /**
      * Get dinghy
      * @param {String} url Address of the remote resource
      * @returns {Promise<Result>}
@@ -1529,7 +1540,7 @@ class DinghyRacingModel {
                 }
             })
         }
-        const startSequence = new StartSequence(races);
+        const startSequence = new SessionStartSequence(races, this.clock);
         return Promise.resolve({success: true, domainObject: startSequence});
     }
 
