@@ -41,7 +41,7 @@ afterEach(() => {
 });
 
 describe('when rendered', () => {
-    describe('when not a pusrsuit race', () => {
+    describe('when not a pursuit race', () => {
         it('displays race name', () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
@@ -101,21 +101,25 @@ describe('when rendered', () => {
             });
         });
         it('displays postpone race button', () => {
-            // const raceScorpionA_copy = {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))};
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
             customRender(<RaceHeaderView race={{...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))}} />, model, controller);
             expect(screen.getByRole('button', {name: /postpone start/i})).toBeInTheDocument();
         });
         it('displays start race button', () => {
-            // const raceScorpionA_copy = {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))};
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
             customRender(<RaceHeaderView race={{...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))}} />, model, controller);
             expect(screen.getByRole('button', {name: /start now/i})).toBeInTheDocument();
-        });    
+        });
+        it('displays lap sheet button', () => {
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const controller = new DinghyRacingController(model);
+            customRender(<RaceHeaderView race={{...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))}} />, model, controller);
+            expect(screen.getByRole('button', {name: /lap sheet/i})).toBeInTheDocument();
+        });
     });
-    describe('when a pusrsuit race', () => {
+    describe('when a pursuit race', () => {
         it('displays race name', () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
@@ -185,80 +189,8 @@ describe('when rendered', () => {
             const controller = new DinghyRacingController(model);
             customRender(<RaceHeaderView race={{...racePursuitA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))}} />, model, controller);
             expect(screen.getByRole('button', {name: /start now/i})).toBeInTheDocument();
-        });    
+        });
     });
-    // it('displays race name', () => {
-    //     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    //     const controller = new DinghyRacingController(model);
-    //     customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
-    //     expect(screen.getByText(/scorpion a/i)).toBeInTheDocument();
-    // });    
-    // it('displays number of laps', () => {
-    //     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    //     const controller = new DinghyRacingController(model);
-    //     customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
-    //     expect(screen.getByLabelText(/^laps$/i)).toHaveValue('5');
-    // });
-    // it('displays initial race duration', () => {
-    //     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    //     const controller = new DinghyRacingController(model);
-    //     customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
-    //     expect(screen.getByLabelText(/duration/i)).toHaveValue('45:00');
-    // });
-    // it('displays remaining race duration', () => {
-    //     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    //     const controller = new DinghyRacingController(model);
-    //     const clock = new Clock();
-    //     jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 30000);
-
-    //     customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-    //     expect(screen.getByLabelText(/remaining/i)).toHaveValue('44:30');
-    // });
-    // describe('when race is in progress', () => {
-    //     it('displays elapsed time for race', () => {
-    //         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    //         const controller = new DinghyRacingController(model);
-    //         const clock = new Clock();
-    //         jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 30000);
-
-    //         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
-    //         expect(screen.getByLabelText(/elapsed/i)).toHaveValue('00:30');
-    //     });
-    // })
-    // describe('when last lap time greater than 0', () => {
-    //     it('displays estimate for number of laps that will be completed', () => {
-    //         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    //         const controller = new DinghyRacingController(model);
-    //         customRender(<RaceHeaderView race={ {...raceScorpionA, lastLapTime: 732000, lapForecast: 3.69, 'clock': new Clock()} } />, model, controller);
-    //         expect(screen.getByLabelText(/estimate/i)).toHaveValue('3.69');
-    //     });
-    //     it('displays the last lap time for the lead entry', () => {
-    //         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    //         const controller = new DinghyRacingController(model);
-    //         customRender(<RaceHeaderView race={ {...raceScorpionA, lastLapTime: 732000, 'clock': new Clock()} } />, model, controller);
-    //         expect(screen.getByLabelText(/last/i)).toHaveValue('12:12');
-    //     });
-    //     it('displays the average lap time for the lead entry', () => {
-    //         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    //         const controller = new DinghyRacingController(model);
-    //         customRender(<RaceHeaderView race={ {...raceScorpionA, lastLapTime: 732000, averageLapTime: 732000, 'clock': new Clock()} } />, model, controller);
-    //         expect(screen.getByLabelText(/average/i)).toHaveValue('12:12');
-    //     });
-    // });
-    // it('displays postpone race button', () => {
-    //     // const raceScorpionA_copy = {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))};
-    //     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    //     const controller = new DinghyRacingController(model);
-    //     customRender(<RaceHeaderView race={{...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))}} />, model, controller);
-    //     expect(screen.getByRole('button', {name: /postpone start/i})).toBeInTheDocument();
-    // });
-    // it('displays start race button', () => {
-    //     // const raceScorpionA_copy = {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))};
-    //     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    //     const controller = new DinghyRacingController(model);
-    //     customRender(<RaceHeaderView race={{...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))}} />, model, controller);
-    //     expect(screen.getByRole('button', {name: /start now/i})).toBeInTheDocument();
-    // });
 });
 
 describe('when showInRaceData is false', () => {
@@ -355,7 +287,7 @@ it('updates values when a new race is selected', async () => {
 
 describe('when postpone race button clicked', () => {
     it('displays postpone race dialog', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});;
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))} } />, model, controller);
@@ -434,5 +366,20 @@ describe('when shorten course button clicked', () => {
         expect(dialog.getByRole('spinbutton', {'name': /laps/i, 'hidden': true})).toBeInTheDocument();
         expect(dialog.getByRole('button', {'name': /cancel/i, 'hidden': true})).toBeInTheDocument();
         expect(dialog.getByRole('button', {'name': 'Update Laps', 'hidden': true})).toBeInTheDocument();
+    });
+});
+
+describe('when lap sheet button clicked', () => {
+    it('opens a new window for the lap sheet for that race', async () => {
+        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        // const openSpy = jest.fn();
+        const openSpy = jest.spyOn(window, 'open').mockImplementation(jest.fn());
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        customRender(<RaceHeaderView race={{...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))}} />, model, controller);
+        await act(async () => {
+            user.click(screen.getByRole('button', {name: /lap sheet/i}));
+        });
+        expect(openSpy).toBeCalledWith('http://localhost/lap-sheet/4');
     });
 });
