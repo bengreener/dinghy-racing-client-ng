@@ -68,6 +68,12 @@ function RaceHeaderView({ race, showInRaceData = true }) {
         setShowShortenCourse(true);
     }
 
+    function handleLapSheetClick() {
+        // get race id
+        const id = race.url.match(/(\d$)/)[0];
+        window.open(window.location.origin + '/lap-sheet/' + id);
+    }
+
     useEffect(() => {
         race.clock.start();
     }, [race]);
@@ -147,6 +153,9 @@ function RaceHeaderView({ race, showInRaceData = true }) {
                 </div>
                 <div className='w3-col m1 s6'>
                     {elapsedTime < 0 ? <button id='race-start-button' className='w3-col' onClick={handleRaceStartClick}>Start Now</button> : null}
+                </div>
+                <div className='w3-col m1 s6'>
+                    <button id='race-start-button' className='w3-col' onClick={handleLapSheetClick}>Lap Sheet</button>
                 </div>
             </div>
             <p className={userMessageClasses()}>{message}</p>
