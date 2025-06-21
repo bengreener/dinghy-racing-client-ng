@@ -372,14 +372,13 @@ describe('when shorten course button clicked', () => {
 describe('when lap sheet button clicked', () => {
     it('opens a new window for the lap sheet for that race', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        // const openSpy = jest.fn();
         const openSpy = jest.spyOn(window, 'open').mockImplementation(jest.fn());
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        customRender(<RaceHeaderView race={{...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))}} />, model, controller);
+        customRender(<RaceHeaderView race={{...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000)), url: 'http://localhost:8081/dinghyracing/api/races/485'}} />, model, controller);
         await act(async () => {
             user.click(screen.getByRole('button', {name: /lap sheet/i}));
         });
-        expect(openSpy).toBeCalledWith('http://localhost/lap-sheet/4');
+        expect(openSpy).toBeCalledWith('http://localhost/lap-sheet/485');
     });
 });

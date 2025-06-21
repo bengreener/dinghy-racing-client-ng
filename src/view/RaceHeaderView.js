@@ -70,7 +70,7 @@ function RaceHeaderView({ race, showInRaceData = true }) {
 
     function handleLapSheetClick() {
         // get race id
-        const id = race.url.match(/(\d$)/)[0];
+        const id = race.url.match(/(\d+$)/)[0];
         window.open(window.location.origin + '/lap-sheet/' + id);
     }
 
