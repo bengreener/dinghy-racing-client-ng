@@ -6317,6 +6317,35 @@ describe('when entry is requested', () => {
             expect(result).toEqual({success: true,domainObject: entryChrisMarshallScorpionA1234, eTag: '"3"'});
         })
     });
+    describe('when entry accessed via a relation from another entity so does not have a version ETag', () => {
+        it('retrieves entry and does not update local store', async () => {
+            fetch.mockImplementationOnce(() => {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, headers: new Headers(), 
+                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                });
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            dinghyRacingModel.entriesResultMap.set(entryChrisMarshallDinghy1234HAL._links.self.href, {success: true,domainObject: entryChrisMarshallScorpionA1234, eTag: '"3"'});
+            jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceScorpionA})});
+            jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+                if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
+                }
+                else if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
+                    return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
+                }
+            });
+            jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghy1234})});
+            jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
+            const promise = dinghyRacingModel.getEntry(entryChrisMarshallScorpionA1234.url);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({success: true,domainObject: entryChrisMarshallScorpionA1234, eTag: null});
+            expect(dinghyRacingModel.entriesResultMap.get(entryChrisMarshallDinghy1234HAL._links.self.href)).toEqual({success: true,domainObject: entryChrisMarshallScorpionA1234, eTag: '"3"'});
+        })
+    });
 });
 
 describe('when retrieving dinghies by sail number', () => {

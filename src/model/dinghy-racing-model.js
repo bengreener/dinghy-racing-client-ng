@@ -1297,7 +1297,9 @@ class DinghyRacingModel {
                 }
                 const entry = this._convertEntryHALtoEntry(result.domainObject, results[0].domainObject, results[1].domainObject, results[2].domainObject, results[3].domainObject, results[4].domainObject);
                 const newResult = {success: true, domainObject: entry, eTag: result.eTag}
-                this.entriesResultMap.set(url, newResult);
+                if (newResult.eTag) {
+                    this.entriesResultMap.set(url, newResult);
+                }
                 return Promise.resolve(newResult);
             }
         }
