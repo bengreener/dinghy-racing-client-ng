@@ -6310,7 +6310,7 @@ describe('when entry is requested', () => {
                 });
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            dinghyRacingModel.entriesMap.set(entryChrisMarshallDinghy1234HAL._links.self.href, {success: true,domainObject: entryChrisMarshallScorpionA1234, eTag: '"3"'});
+            dinghyRacingModel.entriesResultMap.set(entryChrisMarshallDinghy1234HAL._links.self.href, {success: true,domainObject: entryChrisMarshallScorpionA1234, eTag: '"3"'});
             const promise = dinghyRacingModel.getEntry(entryChrisMarshallScorpionA1234.url);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
