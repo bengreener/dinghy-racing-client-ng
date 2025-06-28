@@ -6310,7 +6310,7 @@ describe('when entry is requested', () => {
                 });
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            dinghyRacingModel.entriesResultMap.set(entryChrisMarshallDinghy1234HAL._links.self.href, {success: true,domainObject: entryChrisMarshallScorpionA1234, eTag: '"3"'});
+            dinghyRacingModel.entryResultMap.set(entryChrisMarshallDinghy1234HAL._links.self.href, {success: true,domainObject: entryChrisMarshallScorpionA1234, eTag: '"3"'});
             const promise = dinghyRacingModel.getEntry(entryChrisMarshallScorpionA1234.url);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
@@ -6327,7 +6327,7 @@ describe('when entry is requested', () => {
                 });
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            dinghyRacingModel.entriesResultMap.set(entryChrisMarshallDinghy1234HAL._links.self.href, {success: true,domainObject: entryChrisMarshallScorpionA1234, eTag: '"3"'});
+            dinghyRacingModel.entryResultMap.set(entryChrisMarshallDinghy1234HAL._links.self.href, {success: true,domainObject: entryChrisMarshallScorpionA1234, eTag: '"3"'});
             jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceScorpionA})});
             jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
@@ -6343,7 +6343,7 @@ describe('when entry is requested', () => {
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
             expect(result).toEqual({success: true,domainObject: entryChrisMarshallScorpionA1234, eTag: null});
-            expect(dinghyRacingModel.entriesResultMap.get(entryChrisMarshallDinghy1234HAL._links.self.href)).toEqual({success: true,domainObject: entryChrisMarshallScorpionA1234, eTag: '"3"'});
+            expect(dinghyRacingModel.entryResultMap.get(entryChrisMarshallDinghy1234HAL._links.self.href)).toEqual({success: true,domainObject: entryChrisMarshallScorpionA1234, eTag: '"3"'});
         })
     });
 });

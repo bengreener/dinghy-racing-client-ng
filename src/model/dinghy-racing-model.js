@@ -34,7 +34,7 @@ class DinghyRacingModel {
     fleetCreationCallbacks = new Set();
     fleetUpdateCallbacks = new Map();
     clock = new Clock();
-    entriesResultMap = new Map();
+    entryResultMap = new Map();
 
     /**
      * Provide a blank competitor template
@@ -1257,8 +1257,8 @@ class DinghyRacingModel {
     async getEntry(url) {
         const result = await this.read(url);
         if (result.success) {
-            if (this.entriesResultMap.has(url) && this.entriesResultMap.get(url).eTag === result.eTag) {
-                return Promise.resolve(this.entriesResultMap.get(url));
+            if (this.entryResultMap.has(url) && this.entryResultMap.get(url).eTag === result.eTag) {
+                return Promise.resolve(this.entryResultMap.get(url));
             }
             else {
                 // get race, helm, crew, and dinghy
@@ -1298,7 +1298,7 @@ class DinghyRacingModel {
                 const entry = this._convertEntryHALtoEntry(result.domainObject, results[0].domainObject, results[1].domainObject, results[2].domainObject, results[3].domainObject, results[4].domainObject);
                 const newResult = {success: true, domainObject: entry, eTag: result.eTag}
                 if (newResult.eTag) {
-                    this.entriesResultMap.set(url, newResult);
+                    this.entryResultMap.set(url, newResult);
                 }
                 return Promise.resolve(newResult);
             }
