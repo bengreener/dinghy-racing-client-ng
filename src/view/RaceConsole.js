@@ -80,6 +80,7 @@ function RaceConsole() {
         const races = Array.from(raceMap.values());
         races.forEach(race => {
             model.registerRaceUpdateCallback(race.url, handleRaceUpdate);
+            // need to update available races so when selected they include the lap information for the lead entry
             model.registerRaceEntryLapsUpdateCallback(race.url, handleRaceUpdate); // refetch all races to avoid writing new code to fetch details for a single race and inserting it into raceMap
         });
         // cleanup before effect runs and before form close
