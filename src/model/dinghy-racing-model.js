@@ -35,6 +35,7 @@ class DinghyRacingModel {
     fleetUpdateCallbacks = new Map();
     clock = new Clock();
     entryResultMap = new Map();
+    raceResultMap = new Map();
 
     /**
      * Provide a blank competitor template
@@ -1374,13 +1375,23 @@ class DinghyRacingModel {
     async getRace(url) {
         const result = await this.read(url);
         if (result.success) {
-            // get fleet
-            let fleetResult = await this.getFleet(result.domainObject._links.fleet.href);
-            if (fleetResult.success) {
-                return Promise.resolve({'success': true, 'domainObject': this._convertRaceHALToRace(result.domainObject, fleetResult.domainObject)});
+            if (this.raceResultMap.has(url) && this.raceResultMap.get(url).eTag === result.eTag) {
+                return Promise.resolve(this.raceResultMap.get(url));
             }
             else {
-                return Promise.resolve(fleetResult);
+                // get fleet
+                let fleetResult = await this.getFleet(result.domainObject._links.fleet.href);
+                if (fleetResult.success) {
+                    const race = this._convertRaceHALToRace(result.domainObject, fleetResult.domainObject);
+                    const newResult = {'success': true, 'domainObject': race, eTag: result.eTag}
+                    if (newResult.eTag) {
+                        this.raceResultMap.set(url, newResult);
+                    }
+                    return Promise.resolve(newResult);
+                }
+                else {
+                    return Promise.resolve(fleetResult);
+                }
             }
         }
         else {

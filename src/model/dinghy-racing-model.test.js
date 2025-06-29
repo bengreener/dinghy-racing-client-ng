@@ -4431,7 +4431,7 @@ describe('when a race is requested', () => {
                 return Promise.resolve({
                     ok: true,
                     status: 200,
-                    headers: new Headers(),
+                    headers: new Headers([['ETag', '"3"']]),
                     json: () => Promise.resolve(raceScorpion_AHAL_withEntries)
                 });
             }            
@@ -4508,7 +4508,7 @@ describe('when a race is requested', () => {
         const promise = dinghyRacingModel.getRace(raceScorpionA.url);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, 'domainObject': raceScorpionA_withEntries});
+        expect(result).toEqual({'success': true, 'domainObject': raceScorpionA_withEntries, eTag: '"3"'});
     });
     describe('when an entry has already sailed a lap', () => {
         it('returns a race that includes the number of laps sailed by the lead entry', async () => {
@@ -4518,7 +4518,7 @@ describe('when a race is requested', () => {
                 if (resource === raceScorpionA.url) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers(), 
+                        status: 200, headers: new Headers([['ETag', '"3"']]), 
                         json: () => Promise.resolve(raceScorpion_lapsSailed_AHAL)
                     });
                 }
@@ -4591,7 +4591,7 @@ describe('when a race is requested', () => {
             const promise = dinghyRacingModel.getRace(raceScorpion_lapsSailed.url);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': true, 'domainObject': raceScorpion_lapsSailed});
+            expect(result).toEqual({'success': true, 'domainObject': raceScorpion_lapsSailed, eTag: '"3"'});
         })
     })
     it('returns a promise that resolves to a result indicating failure when race is not found', async () => {
@@ -4679,7 +4679,7 @@ describe('when a race is requested', () => {
             if (resource === raceGraduateA.url) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(), 
+                    status: 200, headers: new Headers([['ETag', '"3"']]), 
                     json: () => Promise.resolve(raceGraduate_AHAL)
                 });
             }
@@ -4752,7 +4752,125 @@ describe('when a race is requested', () => {
         const promise = dinghyRacingModel.getRace(raceGraduateA.url);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, 'domainObject': raceGraduateA});
+        expect(result).toEqual({success: true, domainObject: raceGraduateA, eTag: '"3"'});
+    });
+    describe('when race has not changed from last time retrieved', () => {
+        it('returns race from local store', async () => {
+            const raceScorpion_AHAL_withEntries = {...raceScorpion_AHAL, dinghyClasses: [{name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043}]};
+            const raceScorpionA_withEntries = {...raceScorpionA, dinghyClasses: [{name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043}]};
+            fetch.mockImplementation((resource, options) => {
+                if (resource === raceScorpionA.url) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200,
+                        headers: new Headers([['ETag', '"3"']]),
+                        json: () => Promise.resolve(raceScorpion_AHAL_withEntries)
+                    });
+                }
+                else {
+                    return Promise.resolve({
+                        ok: false,
+                        status: 404,
+                        statusText: 'Not Found'
+                    });
+                }
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            dinghyRacingModel.raceResultMap.set(raceScorpion_AHAL_withEntries._links.self.href, {success: true,domainObject: raceScorpionA_withEntries, eTag: '"3"'});
+            const promise = dinghyRacingModel.getRace(raceScorpionA.url);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, 'domainObject': raceScorpionA_withEntries, eTag: '"3"'});
+        });
+    });
+    describe('when race accessed via a relation from another entity so does not have a version ETag', () => {
+        it('retrieves race and does not update local store', async () => {
+            const raceScorpion_AHAL_withEntries = {...raceScorpion_AHAL, dinghyClasses: [{name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043}]};
+            const raceScorpionA_withEntries = {...raceScorpionA, dinghyClasses: [{name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043}]};
+            fetch.mockImplementation((resource, options) => {
+                if (resource === raceScorpionA.url) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200,
+                        headers: new Headers(),
+                        json: () => Promise.resolve(raceScorpion_AHAL_withEntries)
+                    });
+                }            
+                if (resource === 'http://localhost:8081/dinghyracing/api/races/4/fleet') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200,
+                        headers: new Headers(),
+                        json: () => Promise.resolve(fleetScorpionHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/races/7/fleet') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200,
+                        headers: new Headers(),
+                        json: () => Promise.resolve(fleetGraduateHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/races/17/fleet') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200,
+                        headers: new Headers(), 
+                        json: () => Promise.resolve(fleetCometHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/races/8/fleet') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200,
+                        headers: new Headers(), 
+                        json: () => Promise.resolve(fleetHandicapHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/fleets/1/dinghyClasses') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers(), 
+                        json: () => Promise.resolve(fleetScorpionDinghyClassHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/fleets/2/dinghyClasses') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers(), 
+                        json: () => Promise.resolve(fleetHandicapDinghyClassHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/fleets/3/dinghyClasses') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers(), 
+                        json: () => Promise.resolve(fleetGraduateDinghyClassHAL)
+                    });
+                }
+                if (resource === 'http://localhost:8081/dinghyracing/api/fleets/4/dinghyClasses') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers(), 
+                        json: () => Promise.resolve(fleetCometDinghyClassHAL)
+                    });
+                }
+                else {
+                    return Promise.resolve({
+                        ok: false,
+                        status: 404,
+                        statusText: 'Not Found'
+                    });
+                }
+            });
+            const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            dinghyRacingModel.raceResultMap.set(raceScorpion_AHAL_withEntries._links.self.href, {success: true,domainObject: raceScorpion_AHAL_withEntries, eTag: '"3"'});
+            const promise = dinghyRacingModel.getRace(raceScorpionA.url);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result).toEqual({'success': true, 'domainObject': raceScorpionA_withEntries, eTag: null});
+        });
     });
 });
 
@@ -6235,7 +6353,7 @@ describe('when entry is requested', () => {
             fetch.mockImplementationOnce(() => {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"3"']]), 
+                    status: 200, headers: new Headers([['ETag', '"3"']]),
                     json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
                 });
             });
@@ -6305,7 +6423,7 @@ describe('when entry is requested', () => {
             fetch.mockImplementationOnce(() => {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"3"']]), 
+                    status: 200, headers: new Headers([['ETag', '"3"']]),
                     json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
                 });
             });
