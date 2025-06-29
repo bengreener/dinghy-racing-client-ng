@@ -38,7 +38,7 @@ function DownloadRace({ race, downloadFunction }) {
     }
 
     return (
-        <form className='w3-container' action='' method='get'>
+        <form className='download-race w3-container w3-padding w3-border w3-margin' action='' method='get'>
             <div className='w3-row'>
                 <label className='w3-col m3' >{race.name}</label>
                 <label className='w3-col m2' >{race.dinghyClass ? race.dinghyClass.name : ''}</label>
