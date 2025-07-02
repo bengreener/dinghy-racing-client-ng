@@ -34,7 +34,7 @@ function RaceEntriesView({ races }) {
     const [entriesMap, setEntriesMap] = useState(new Map());
     const [message, setMessage] = useState('');
     const [sortOrder, setSortOrder] = useState('default');
-    const [entriesUpdateRequestAt, setEntriesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies an entry has been updated
+    const [entriesUpdateRequestAt, setEntriesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch entries from server. change triggers a new fetch; for instance when server notifies an entry has been updated
     const [displayOrder, setDisplayOrder] = useState([]); // holds entriesMap keys in the order they are to be displayed
     const [fastGroup, setFastGroup] = useState([]); // holds the entriesMap keys of entries that have been fast grouped
 
