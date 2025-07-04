@@ -34,6 +34,8 @@ class DinghyRacingModel {
     fleetCreationCallbacks = new Set();
     fleetUpdateCallbacks = new Map();
     clock = new Clock();
+    entryResultMap = new Map();
+    raceResultMap = new Map();
 
     /**
      * Provide a blank competitor template
@@ -1256,41 +1258,51 @@ class DinghyRacingModel {
     async getEntry(url) {
         const result = await this.read(url);
         if (result.success) {
-            // get race, helm, crew, and dinghy
-            const promises = [];
-            promises.push(this.getRace(result.domainObject._links.race.href)); // race
-            promises.push(this.getCompetitor(result.domainObject._links.helm.href)); // helm
-            promises.push(this.getDinghy(result.domainObject._links.dinghy.href)); // dinghy
-            promises.push(this.getCompetitor(result.domainObject._links.crew.href)); // crew
-            promises.push(this.getLaps(result.domainObject._links.laps.href)); // laps
-            const results = await Promise.all(promises);
-            // race
-            if (!results[0].success) {
-                return Promise.resolve(results[0]);
+            if (this.entryResultMap.has(url) && this.entryResultMap.get(url).eTag === result.eTag) {
+                return Promise.resolve(this.entryResultMap.get(url));
             }
-            // helm
-            if (!results[1].success) {
-                return Promise.resolve(results[1]);
-            }
-            // dinghy
-            if (!results[2].success) {
-                return Promise.resolve(results[3]);
-            }
-            // crew
-            if (!results[3].success) {
-                // entry may not have a crew
-                if (/404/.test(results[3].message)) {
-                    results[3] = {...results[3], 'domainObject': null};
+            else {
+                // get race, helm, crew, and dinghy
+                const promises = [];
+                promises.push(this.getRace(result.domainObject._links.race.href)); // race
+                promises.push(this.getCompetitor(result.domainObject._links.helm.href)); // helm
+                promises.push(this.getDinghy(result.domainObject._links.dinghy.href)); // dinghy
+                promises.push(this.getCompetitor(result.domainObject._links.crew.href)); // crew
+                promises.push(this.getLaps(result.domainObject._links.laps.href)); // laps
+                const results = await Promise.all(promises);
+                // race
+                if (!results[0].success) {
+                    return Promise.resolve(results[0]);
                 }
-                else {
+                // helm
+                if (!results[1].success) {
+                    return Promise.resolve(results[1]);
+                }
+                // dinghy
+                if (!results[2].success) {
                     return Promise.resolve(results[3]);
                 }
+                // crew
+                if (!results[3].success) {
+                    // entry may not have a crew
+                    if (/404/.test(results[3].message)) {
+                        results[3] = {...results[3], 'domainObject': null};
+                    }
+                    else {
+                        return Promise.resolve(results[3]);
+                    }
+                }
+                // laps
+                if (!results[4].success) {
+                    return Promise.resolve(results[4]);
+                }
+                const entry = this._convertEntryHALtoEntry(result.domainObject, results[0].domainObject, results[1].domainObject, results[2].domainObject, results[3].domainObject, results[4].domainObject);
+                const newResult = {success: true, domainObject: entry, eTag: result.eTag}
+                if (newResult.eTag) {
+                    this.entryResultMap.set(url, newResult);
+                }
+                return Promise.resolve(newResult);
             }
-            // laps
-            if (!results[4].success) {
-                return Promise.resolve(results[4]);
-            }
-            return {success: true, domainObject: this._convertEntryHALtoEntry(result.domainObject, results[0].domainObject, results[1].domainObject, results[2].domainObject, results[3].domainObject, results[4].domainObject)};
         }
         else {
             return Promise.resolve(result);
@@ -1363,13 +1375,23 @@ class DinghyRacingModel {
     async getRace(url) {
         const result = await this.read(url);
         if (result.success) {
-            // get fleet
-            let fleetResult = await this.getFleet(result.domainObject._links.fleet.href);
-            if (fleetResult.success) {
-                return Promise.resolve({'success': true, 'domainObject': this._convertRaceHALToRace(result.domainObject, fleetResult.domainObject)});
+            if (this.raceResultMap.has(url) && this.raceResultMap.get(url).eTag === result.eTag) {
+                return Promise.resolve(this.raceResultMap.get(url));
             }
             else {
-                return Promise.resolve(fleetResult);
+                // get fleet
+                let fleetResult = await this.getFleet(result.domainObject._links.fleet.href);
+                if (fleetResult.success) {
+                    const race = this._convertRaceHALToRace(result.domainObject, fleetResult.domainObject);
+                    const newResult = {'success': true, 'domainObject': race, eTag: result.eTag}
+                    if (newResult.eTag) {
+                        this.raceResultMap.set(url, newResult);
+                    }
+                    return Promise.resolve(newResult);
+                }
+                else {
+                    return Promise.resolve(fleetResult);
+                }
             }
         }
         else {
@@ -1601,7 +1623,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async read(resource) {
-        return this._processFetch(resource, {method: 'GET', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, cache: 'no-store'});
+        return this._processFetch(resource, {method: 'GET', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, cache: 'no-cache'});
     }
 
     /**
@@ -1628,7 +1650,7 @@ class DinghyRacingModel {
 	}
 
     /**
-     * Delete the reosource
+     * Delete the resource
      * @param {String} resource
      * @returns {Promise<Result>}
      */
@@ -1653,7 +1675,11 @@ class DinghyRacingModel {
                 }
             }
             if (response.ok) {
-                return Promise.resolve({success: true, domainObject: json});
+                let eTag = null;
+                if (response.headers.has('ETag')) {
+                    eTag = response.headers.get('ETag');
+                }
+                return Promise.resolve({success: true, domainObject: json, eTag: eTag});
             }
             else {
                 const message = this._buildClientErrorMessage(response, json);
