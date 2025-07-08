@@ -186,6 +186,31 @@ describe('when editing a lap time', () => {
         });
         expect(removeLapCallback).not.toHaveBeenCalled();
     });
+    describe('when lap time has not changed', () => {
+        it('does not update lap time', async () => {
+            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
+                {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000},
+                {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000},
+                {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
+            ]};
+            const updateLapCallback = jest.fn((entry, value) => {});
+            render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
+            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+            const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
+            await act(async () => {
+                await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+            });
+            const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
+            await act(async () => {
+                await user.clear(lapEntryCellInput);
+                await user.type(lapEntryCellInput, '0:06');
+                await user.keyboard('{Enter}');
+            });
+            expect(updateLapCallback).not.toHaveBeenCalled();
+            expect(raceEntryView.getAttribute('class')).not.toMatch(/disabled/i);
+        });
+    });
     it('updates lap with new time supplied', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
@@ -206,7 +231,7 @@ describe('when editing a lap time', () => {
             await user.type(lapEntryCellInput, '15:53');
             await user.keyboard('{Enter}');
         });
-        expect(updateLapCallback).toBeCalledWith(entry, '15:53');
+        expect(updateLapCallback).toBeCalledWith(entry, 953000);
     });
     it('updates the display to show the edited lap time is being sent to the server', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});

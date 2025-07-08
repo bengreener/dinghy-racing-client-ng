@@ -50,10 +50,35 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     const longTouchTimeout = 500;
     const handleLastLapCellKeyUp = useCallback((event) => {
         if (event.key === 'Enter') {
+            let timeInMilliseconds = 0;
             if (updateLap) {
-                setDisabled(true);
-                updateLap(entry, event.target.value);
-                setEditMode(false);
+                // validate entry
+                if (/^(\d+:(?=[0-5]?\d:[0-5]?\d))?([0-5]?\d:(?=[0-5]?\d))?([0-5]?\d)$/.test(event.target.value)) {
+                    setEditMode(false);
+                    const timeComponents = /^((?<=^)\d*(?=:[0-5]?\d:))*:?((?<=^|:)[0-5]?\d(?=:))?:?((?<=^|:)[0-5]?\d(?=$))$/.exec(event.target.value);
+                    // get hours
+                    timeInMilliseconds += isNaN(timeComponents[1]) ? 0 : 3600000 * timeComponents[1];
+                    // get minutes
+                    timeInMilliseconds += isNaN(timeComponents[2]) ? 0 : 60000 * timeComponents[2];
+                    // get seconds
+                    timeInMilliseconds += isNaN(timeComponents[3]) ? 0 : 1000 * timeComponents[3];
+                }
+                else {
+                    // don't disable record as error will be returned by controller method
+                    // setEditMode(false);
+                    updateLap(entry, event.target.value); // this feels like a fudge but, RaceEntryView does not have error message ability. So pass to parent component to handle error
+                    return;
+                }
+                // only update lap time if value has changed. Otherwise entry will remain disabled and not reenabled as response will not have changed value.
+                const oldTime = entry.laps.reduce((a, b) => {return {time: a.time + b.time}}).time;
+                if (oldTime !== timeInMilliseconds) {
+                    setDisabled(true);
+                    setEditMode(false);
+                    updateLap(entry, timeInMilliseconds);
+                }
+                else {
+                    setEditMode(false);
+                }
             }
         }
         if (event.key === 'Escape') {

@@ -973,7 +973,8 @@ describe('when updating a lap time', () => {
             await user.type(lapEntryCellInput, '15:23');
             await user.keyboard('{Enter}');
         });
-        expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234Pre, '15:23');
+        // expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234Pre, '15:23');
+        expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234Pre, 923000);
     });
     it('refreshes display after lap time updated', async () => {
         const entriesScorpionAPre = [
@@ -1004,7 +1005,7 @@ describe('when updating a lap time', () => {
         const lapEntryCellInput = within(raceEntryView).getByRole('textbox', {value: '00:14'});
         await act(async () => { 
             await user.clear(lapEntryCellInput);
-            await user.type(lapEntryCellInput, '15000');
+            await user.type(lapEntryCellInput, '00:15');
             await user.keyboard('{Enter}');
             model.handleEntryUpdate({'body': entriesScorpionA[0].url});
         });
