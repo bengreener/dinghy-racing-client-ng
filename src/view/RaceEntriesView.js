@@ -181,6 +181,10 @@ function RaceEntriesView({ races }) {
         }
     }
 
+    function showChildUserMessage(message) {
+        setMessage(message);
+    }
+
     function onFastGroup(entryKey) {
         const entry = entriesMap.get(entryKey);
         if (entry.scoringAbbreviation == null || entry.scoringAbbreviation === '') {
@@ -327,7 +331,7 @@ function RaceEntriesView({ races }) {
             if (!entry) return null; // allow for display keys that map to a non existent entry after a race is removed from the selection; fixed by next render
             if (entry.race.type === RaceType.FLEET) {
                 return <RaceEntryView key={key} entry={entry} addLap={addLap}
-                    removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} onFastGroup={onFastGroup} inFastGroup={fastGroup.includes(key)} />
+                    removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} onFastGroup={onFastGroup} inFastGroup={fastGroup.includes(key)} showUserMessage={showChildUserMessage} />
             }
             else {
                 return <RaceEntryView key={key} entry={entry} addLap={addLap}

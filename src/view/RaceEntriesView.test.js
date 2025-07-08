@@ -1089,6 +1089,38 @@ describe('when updating a lap time', () => {
         });
         expect(screen.queryByText(/oops/i)).not.toBeInTheDocument();
     });
+    it('displays an error message when RaceEntryView fails validation of an updated lap time', async () => {
+        const entriesScorpionAPre = [
+            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7000}], 'sumOfLapTimes': 7000, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
+            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'}
+        ];
+        const entriesScorpionAPost = [
+            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 15000}], 'sumOfLapTimes': 15000, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},
+            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11'}
+        ];
+        const user = userEvent.setup();
+        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
+        jest.spyOn(model, 'getEntriesByRace')
+            .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
+            .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+        await act(async () => {
+            customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
+        });
+        const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement.parentElement;
+        const lapEntryCellOutput = within(raceEntryView).getByText('00:07');
+        await act(async () => {
+            await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+        });
+        // after render perform update
+        const lapEntryCellInput = within(raceEntryView).getByRole('textbox', {value: '00:07'});
+        await act(async () => { 
+            await user.clear(lapEntryCellInput);
+            await user.type(lapEntryCellInput, '0150012');
+            await user.keyboard('{Enter}');
+        });
+        expect(await screen.findByText(/Time must be in the format \[hh:\]\[mm:\]ss./i)).toBeInTheDocument();
+    });
 });
 
 describe('when setting a scoring abbreviation', () => {

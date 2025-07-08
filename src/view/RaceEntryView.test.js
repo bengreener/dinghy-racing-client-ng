@@ -257,6 +257,54 @@ describe('when editing a lap time', () => {
         });
         expect(raceEntryView.getAttribute('class')).toMatch(/disabled/i);
     });
+    describe('when the new lap time is entered in an invalid format', () => {
+        it('does not accept the incorrect format and keeps edit mode open', async () => {
+            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
+                {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, 
+                {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, 
+                {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
+            ]};
+            const updateLapCallback = jest.fn((entry, value) => {});
+            const showUserMessage = jest.fn((message) => {});
+            render(<RaceEntryView entry={entry} updateLap={updateLapCallback} showUserMessage={showUserMessage} />);
+            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+            const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
+            await act(async () => {
+                await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+            });
+            const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
+            await act(async () => {
+                await user.clear(lapEntryCellInput);
+                await user.type(lapEntryCellInput, '15530');
+                await user.keyboard('{Enter}');
+            });
+            expect(lapEntryCellInput).toHaveValue('15530');
+        });
+        it('calls showUserMessage prop with message explainging error', async () => {
+            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
+                {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, 
+                {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, 
+                {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
+            ]};
+            const updateLapCallback = jest.fn((entry, value) => {});
+            const showUserMessage = jest.fn((message) => {});
+            render(<RaceEntryView entry={entry} updateLap={updateLapCallback} showUserMessage={showUserMessage} />);
+            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+            const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
+            await act(async () => {
+                await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+            });
+            const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
+            await act(async () => {
+                await user.clear(lapEntryCellInput);
+                await user.type(lapEntryCellInput, '15530');
+                await user.keyboard('{Enter}');
+            });
+            expect(showUserMessage).toHaveBeenCalledWith('Time must be in the format [hh:][mm:]ss.');
+        });
+    });
 });
 
 describe('when user taps row', () => {

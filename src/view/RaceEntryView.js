@@ -29,9 +29,10 @@ import RaceType from '../model/domain-classes/race-type';
  * @param {function} props.onRaceEntryDrop
  * @param {function} [props.onFastGroup]
  * @param {boolean} [props.inFastGroup = false]
+ * @param {function} props.showUserMessage
  * @returns {HTMLTableRowElement}
  */
-function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, onRaceEntryDrop, onFastGroup, inFastGroup = false}) {
+function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, onRaceEntryDrop, onFastGroup, inFastGroup = false, showUserMessage}) {
     const [editMode, setEditMode] = useState(false);
     const [disabled, setDisabled] = useState(false);
     const prevLapCount = useRef(entry.laps.length);
@@ -64,9 +65,10 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
                     timeInMilliseconds += isNaN(timeComponents[3]) ? 0 : 1000 * timeComponents[3];
                 }
                 else {
-                    // don't disable record as error will be returned by controller method
-                    // setEditMode(false);
-                    updateLap(entry, event.target.value); // this feels like a fudge but, RaceEntryView does not have error message ability. So pass to parent component to handle error
+                    // advise user input is in wrong format
+                    if (showUserMessage) {
+                        showUserMessage('Time must be in the format [hh:][mm:]ss.');
+                    }
                     return;
                 }
                 // only update lap time if value has changed. Otherwise entry will remain disabled and not reenabled as response will not have changed value.
@@ -84,7 +86,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         if (event.key === 'Escape') {
             setEditMode(false);
         }
-    }, [entry, updateLap]);
+    }, [entry, updateLap, showUserMessage]);
 
     const handleLastLapCellFocusOut = useCallback((event) => {
         setEditMode(false);
