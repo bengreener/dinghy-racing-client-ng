@@ -35,9 +35,7 @@ import RaceType from '../model/domain-classes/race-type';
 function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, onRaceEntryDrop, onFastGroup, inFastGroup = false, showUserMessage}) {
     const [editMode, setEditMode] = useState(false);
     const [disabled, setDisabled] = useState(false);
-    const prevLapCount = useRef(entry.laps.length);
-    const prevPosition = useRef(entry.position);
-    const prevSumOfLapTimes = useRef(entry.sumOfLapTimes);
+    const prevETag = useRef(entry.metadata.eTag);
     const lapsView = [];
     let classes = 'race-entry-view w3-row w3-border w3-hover-border-blue';
 
@@ -93,11 +91,9 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     }, []);
 
     useEffect(() => {
-        if (prevLapCount.current !== entry.laps.length || prevPosition.current !== entry.position || prevSumOfLapTimes.current !== entry.sumOfLapTimes) {
+        if (prevETag.current !== entry.metadata.eTag) {
             setDisabled(false);
-            prevLapCount.current = entry.laps.length;
-            prevPosition.current = entry.position;
-            prevSumOfLapTimes.current = entry.sumOfLapTimes;
+            prevETag.current = entry.metadata.eTag;
         }
     }, [entry]);
 
