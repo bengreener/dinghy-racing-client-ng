@@ -29,4 +29,5 @@
  * @property {String} scoringAbbreviation records the scoring abbreviation that identifies an adjustment required to an entries scoring for the race 
  * @property {Integer} position of the entry in the race
  * @property {String} url The URL to the remote resource
+ * @property {Metadata} metadata
  */
