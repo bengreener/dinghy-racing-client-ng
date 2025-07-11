@@ -75,7 +75,7 @@ class DinghyRacingModel {
      */
     static entryTemplate() {
         return {race: DinghyRacingModel.raceTemplate(), helm: DinghyRacingModel.competitorTemplate(), crew: null, 
-        dinghy: DinghyRacingModel.dinghyTemplate(), laps: [], sumOfLapTimes: 0, correctedTime:0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: ''};
+        dinghy: DinghyRacingModel.dinghyTemplate(), laps: [], sumOfLapTimes: 0, correctedTime:0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: '', metadata: null};
     }
 
     /**
@@ -885,7 +885,7 @@ class DinghyRacingModel {
                 return Promise.resolve(crewResult);
             }
         }
-        return Promise.resolve({'success': true, 'domainObject': this._convertEntryHALtoEntry(entryResult.domainObject, raceResult.domainObject, helmResult.domainObject, dinghyResult.domainObject, crewResult.domainObject, lapsResult.domainObject)});
+        return Promise.resolve({'success': true, 'domainObject': this._convertEntryHALtoEntry(entryResult.domainObject, raceResult.domainObject, helmResult.domainObject, dinghyResult.domainObject, crewResult.domainObject, lapsResult.domainObject, null)});
     }
 
     /**
@@ -1296,7 +1296,7 @@ class DinghyRacingModel {
                 if (!results[4].success) {
                     return Promise.resolve(results[4]);
                 }
-                const entry = this._convertEntryHALtoEntry(result.domainObject, results[0].domainObject, results[1].domainObject, results[2].domainObject, results[3].domainObject, results[4].domainObject);
+                const entry = this._convertEntryHALtoEntry(result.domainObject, results[0].domainObject, results[1].domainObject, results[2].domainObject, results[3].domainObject, results[4].domainObject, result.eTag ? {eTag: result.eTag} : null);
                 const newResult = {success: true, domainObject: entry, eTag: result.eTag}
                 if (newResult.eTag) {
                     this.entryResultMap.set(url, newResult);
@@ -1755,13 +1755,14 @@ class DinghyRacingModel {
             url: dinghyClassHAL._links.self.href};
     }
 
-    _convertEntryHALtoEntry(entryHAL, race, helm, dinghy, crew, laps) {
+    _convertEntryHALtoEntry(entryHAL, race, helm, dinghy, crew, laps, metadata = null) {
         // include check for corrected time equals 'infinity' indicating a lap has not been completed
         return {...DinghyRacingModel.entryTemplate(), race: race, helm: helm, dinghy: dinghy, laps: laps, crew: crew,
             sumOfLapTimes: this.convertISO8601DurationToMilliseconds(entryHAL.sumOfLapTimes),
             correctedTime: entryHAL.correctedTime === 'PT2562047788015215H30M7S' ? 0 : this.convertISO8601DurationToMilliseconds(entryHAL.correctedTime),
             onLastLap: entryHAL.onLastLap,
-            finishedRace: entryHAL.finishedRace, scoringAbbreviation: entryHAL.scoringAbbreviation, position: entryHAL.position, url: entryHAL._links.self.href
+            finishedRace: entryHAL.finishedRace, scoringAbbreviation: entryHAL.scoringAbbreviation, position: entryHAL.position, url: entryHAL._links.self.href,
+            metadata: metadata
         }
     }
 

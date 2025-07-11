@@ -29,14 +29,13 @@ import RaceType from '../model/domain-classes/race-type';
  * @param {function} props.onRaceEntryDrop
  * @param {function} [props.onFastGroup]
  * @param {boolean} [props.inFastGroup = false]
+ * @param {function} props.showUserMessage
  * @returns {HTMLTableRowElement}
  */
-function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, onRaceEntryDrop, onFastGroup, inFastGroup = false}) {
+function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, onRaceEntryDrop, onFastGroup, inFastGroup = false, showUserMessage}) {
     const [editMode, setEditMode] = useState(false);
     const [disabled, setDisabled] = useState(false);
-    const prevLapCount = useRef(entry.laps.length);
-    const prevPosition = useRef(entry.position);
-    const prevSumOfLapTimes = useRef(entry.sumOfLapTimes);
+    const prevETag = useRef(entry.metadata.eTag);
     const lapsView = [];
     let classes = 'race-entry-view w3-row w3-border w3-hover-border-blue';
 
@@ -50,27 +49,51 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     const longTouchTimeout = 500;
     const handleLastLapCellKeyUp = useCallback((event) => {
         if (event.key === 'Enter') {
+            let timeInMilliseconds = 0;
             if (updateLap) {
-                setDisabled(true);
-                updateLap(entry, event.target.value);
-                setEditMode(false);
+                // validate entry
+                if (/^(\d+:(?=[0-5]?\d:[0-5]?\d))?([0-5]?\d:(?=[0-5]?\d))?([0-5]?\d)$/.test(event.target.value)) {
+                    setEditMode(false);
+                    const timeComponents = /^((?<=^)\d*(?=:[0-5]?\d:))*:?((?<=^|:)[0-5]?\d(?=:))?:?((?<=^|:)[0-5]?\d(?=$))$/.exec(event.target.value);
+                    // get hours
+                    timeInMilliseconds += isNaN(timeComponents[1]) ? 0 : 3600000 * timeComponents[1];
+                    // get minutes
+                    timeInMilliseconds += isNaN(timeComponents[2]) ? 0 : 60000 * timeComponents[2];
+                    // get seconds
+                    timeInMilliseconds += isNaN(timeComponents[3]) ? 0 : 1000 * timeComponents[3];
+                }
+                else {
+                    // advise user input is in wrong format
+                    if (showUserMessage) {
+                        showUserMessage('Time must be in the format [hh:][mm:]ss.');
+                    }
+                    return;
+                }
+                // only update lap time if value has changed. Otherwise entry will remain disabled and not reenabled as response will not have changed value.
+                const oldTime = entry.laps.reduce((a, b) => {return {time: a.time + b.time}}).time;
+                if (oldTime !== timeInMilliseconds) {
+                    setDisabled(true);
+                    setEditMode(false);
+                    updateLap(entry, timeInMilliseconds);
+                }
+                else {
+                    setEditMode(false);
+                }
             }
         }
         if (event.key === 'Escape') {
             setEditMode(false);
         }
-    }, [entry, updateLap]);
+    }, [entry, updateLap, showUserMessage]);
 
     const handleLastLapCellFocusOut = useCallback((event) => {
         setEditMode(false);
     }, []);
 
     useEffect(() => {
-        if (prevLapCount.current !== entry.laps.length || prevPosition.current !== entry.position || prevSumOfLapTimes.current !== entry.sumOfLapTimes) {
+        if (prevETag.current !== entry.metadata.eTag) {
             setDisabled(false);
-            prevLapCount.current = entry.laps.length;
-            prevPosition.current = entry.position;
-            prevSumOfLapTimes.current = entry.sumOfLapTimes;
+            prevETag.current = entry.metadata.eTag;
         }
     }, [entry]);
 

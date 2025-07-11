@@ -1200,7 +1200,7 @@ describe('when signing up to a race', () => {
         const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({success: true, domainObject: entryChrisMarshallScorpionA1234});
+        expect(result).toEqual({success: true, domainObject: {...entryChrisMarshallScorpionA1234, metadata: null}});
     });
     it('if race exists and URL provided helm exists and URL provided and dinghy exist and URL provided and crew not provided then creates race entry', async () => {
         fetch.mockImplementationOnce((resource, options) => {
@@ -1228,8 +1228,7 @@ describe('when signing up to a race', () => {
         const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        // let temp = {...entryChrisMarshallScorpionA1234};
-        expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
+        expect(result).toEqual({'success': true, domainObject: {...entryChrisMarshallScorpionA1234, metadata: null}});
     });
     it('if race exists and name and planned start time provided and helm exists and name provided and dinghy exists and sail number and class provided and crew exists and name provided then creates race entry', async () => {
         const race = {...raceScorpionA, 'url': ''};
@@ -1275,8 +1274,7 @@ describe('when signing up to a race', () => {
         const promise = dinghyRacingModel.createEntry(race, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        // let temp = {...entryChrisMarshallScorpionA1234};
-        expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
+        expect(result).toEqual({'success': true, domainObject: {...entryChrisMarshallScorpionA1234, metadata: null}});
     });
     it('if race exists and name and planned start time provided and helm exists and name provided and dinghy exists and sail number and class provided and crew not provided then creates race entry', async () => {
         const race = {...raceScorpionA, 'url': null};
@@ -1318,8 +1316,7 @@ describe('when signing up to a race', () => {
         const promise = dinghyRacingModel.createEntry(race, helm, dinghy);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        // let temp = {...entryChrisMarshallScorpionA1234};
-        expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
+        expect(result).toEqual({'success': true, domainObject: {...entryChrisMarshallScorpionA1234, metadata: null}});
     });
     it('race does not exist helm exists and URL provided dinghy exists and sail number and class provided crew exists and URL provided then does not create entry and provides message indicating cause of failure', async () => {
         const race = {...raceScorpionA, 'name': 'Race Nope', 'url': null};
@@ -1540,8 +1537,7 @@ describe('when updating an entry for a race', () => {
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, competitorChrisMarshall, dinghy1234, competitorLouScrew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        // let temp = {...entryChrisMarshallScorpionA1234};
-        expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
+        expect(result).toEqual({'success': true, domainObject: {...entryChrisMarshallScorpionA1234, metadata: null}});
     });
     it('if entry exists and URL provided helm exists and URL provided and dinghy exists and URL provided and crew not provided then updates entry', async () => {
         fetch.mockImplementationOnce((resource, options) => {
@@ -1571,8 +1567,7 @@ describe('when updating an entry for a race', () => {
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, competitorChrisMarshall, dinghy1234);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        // let temp = {...entryChrisMarshallScorpionA1234};
-        expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
+        expect(result).toEqual({'success': true, domainObject: {...entryChrisMarshallScorpionA1234, metadata: null}});
     });
     it('if entry exists and URL provided and helm exists and name provided and dinghy exists and sail number and class provided and crew exists and name provided then updates entry', async () => {
         const helm = {...competitorChrisMarshall, 'url': null};
@@ -1616,8 +1611,7 @@ describe('when updating an entry for a race', () => {
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        // let temp = {...entryChrisMarshallScorpionA1234};
-        expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
+        expect(result).toEqual({'success': true, domainObject: {...entryChrisMarshallScorpionA1234, metadata: null}});
     });
     it('if entry exists url provided and helm exists and name provided and dinghy exists and sail number and class provided and crew not provided then updates entry', async () => {
         const helm = {...competitorChrisMarshall, 'url': ''};
@@ -1658,8 +1652,7 @@ describe('when updating an entry for a race', () => {
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, helm, dinghy);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        // let temp = {...entryChrisMarshallScorpionA1234};
-        expect(result).toEqual({'success': true, domainObject: entryChrisMarshallScorpionA1234});
+        expect(result).toEqual({'success': true, domainObject: {...entryChrisMarshallScorpionA1234, metadata: null}});
     });
     it('entry exists url provided helm does not exist dinghy exists url provided crew exists and name provided does not update entry and returns message explaining reason', async () => {
         const helm = {...competitorChrisMarshall, 'name': 'Lucy Liu', 'url': ''};
@@ -3951,7 +3944,7 @@ it('provides a blank template for a race', () => {
 it('provides a blank template for a race entry', () => {
     const entry = DinghyRacingModel.entryTemplate();
 
-    expect(entry).toEqual({race: DinghyRacingModel.raceTemplate(), helm: DinghyRacingModel.competitorTemplate(), crew: null, dinghy: DinghyRacingModel.dinghyTemplate(), laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: ''});
+    expect(entry).toEqual({race: DinghyRacingModel.raceTemplate(), helm: DinghyRacingModel.competitorTemplate(), crew: null, dinghy: DinghyRacingModel.dinghyTemplate(), laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: '', metadata: null});
 });
 
 it('provides a blank template for a lap', () => {
@@ -4031,7 +4024,7 @@ describe('when searching for entries by race', () => {
             }
             if (url === 'http://localhost:8081/dinghyracing/api/entries/21') {
                 return Promise.resolve({success: true, domainObject: {helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
-                    position: null, url: 'http://localhost:8081/dinghyracing/api/entries/21'}});
+                    position: null, url: 'http://localhost:8081/dinghyracing/api/entries/21', metadata: {eTag: '"1"'}}});
             }
         });
         const promise = dinghyRacingModel.getEntriesByRace(raceHandicapA);
@@ -4070,7 +4063,7 @@ describe('when searching for entries by race', () => {
                 return Promise.resolve({success: true, domainObject: {_embedded: {entries: [entryHAL]}}});
             }
             if (resource === 'http://localhost:8081/dinghyracing/api/entries/10') {
-                return Promise.resolve({success: true, domainObject: entryHAL});
+                return Promise.resolve({success: true, domainObject: entryHAL, eTag: '"1"'});
             }
         });
         jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
@@ -4087,7 +4080,7 @@ describe('when searching for entries by race', () => {
         const promise = dinghyRacingModel.getEntriesByRace(raceScorpionA);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234, sumOfLapTimes: 660000}]});
+        expect(result).toEqual({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234, sumOfLapTimes: 660000, metadata: {eTag: '"1"'}}]});
     });    
     it('converts the value for correctedLapTime to the correct value', async () => {
         const entryHAL = {...entryChrisMarshallDinghy1234HAL, correctedTime: 'PT10M32.790S'};
@@ -4097,7 +4090,7 @@ describe('when searching for entries by race', () => {
                 return Promise.resolve({success: true, domainObject: {_embedded: {entries: [entryHAL]}}});
             }
             if (resource === 'http://localhost:8081/dinghyracing/api/entries/10') {
-                return Promise.resolve({success: true, domainObject: entryHAL});
+                return Promise.resolve({success: true, domainObject: entryHAL, eTag: '"1"'});
             }
         });
         jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
@@ -4114,7 +4107,7 @@ describe('when searching for entries by race', () => {
         const promise = dinghyRacingModel.getEntriesByRace(raceScorpionA);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234, correctedTime: 632790}]});
+        expect(result).toEqual({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234, correctedTime: 632790, metadata: {eTag: '"1"'}}]});
     });
     it('returns a promise that resolves to a result indicating success and containing the entries when entries are found and some entries are on the last lap', async () => {
         const entriesHandicapAHAL_onLastLap = { _embedded : { entries : [
@@ -4324,94 +4317,94 @@ describe('when searching for entries by race', () => {
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
             jest.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1430') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorCarmenWhiting, crew: competitorNoelHills, race: raceGraduateA, dinghy: dinghy1, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1430'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorCarmenWhiting, crew: competitorNoelHills, race: raceGraduateA, dinghy: dinghy1, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1430', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1431') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorAjDavis, crew: competitorDanielLittle, race: raceGraduateA, dinghy: dinghy290, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1431'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorAjDavis, crew: competitorDanielLittle, race: raceGraduateA, dinghy: dinghy290, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1431', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1432') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorIvanPlatt, crew: competitorAizaAustin, race: raceGraduateA, dinghy: dinghy2009, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1432'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorIvanPlatt, crew: competitorAizaAustin, race: raceGraduateA, dinghy: dinghy2009, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1432', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1433') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorNellPowell, crew: competitorWilliamMorrison, race: raceGraduateA, dinghy: dinghy2097, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1433'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorNellPowell, crew: competitorWilliamMorrison, race: raceGraduateA, dinghy: dinghy2097, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1433', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1434') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorGraceRees, crew: competitorAugustKhan, race: raceGraduateA, dinghy: dinghy2373, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1434'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorGraceRees, crew: competitorAugustKhan, race: raceGraduateA, dinghy: dinghy2373, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1434', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1435') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorArranAshley, crew: competitorYuvrajSheppard, race: raceGraduateA, dinghy: dinghy2471, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1435'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorArranAshley, crew: competitorYuvrajSheppard, race: raceGraduateA, dinghy: dinghy2471, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1435', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1436') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorMacySmall, crew: competitorMaximFlynn, race: raceGraduateA, dinghy: dinghy2482, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1436'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorMacySmall, crew: competitorMaximFlynn, race: raceGraduateA, dinghy: dinghy2482, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1436', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1437') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorDestinyBourne, crew: competitorCezarWhelan, race: raceGraduateA, dinghy: dinghy2725, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1437'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorDestinyBourne, crew: competitorCezarWhelan, race: raceGraduateA, dinghy: dinghy2725, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1437', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1438') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorDominicBarnett, crew: competitorBaileyPreston, race: raceGraduateA, dinghy: dinghy2849, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1438'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorDominicBarnett, crew: competitorBaileyPreston, race: raceGraduateA, dinghy: dinghy2849, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1438', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1439') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorAlaraTaylor, crew: competitorNadiaBarrow, race: raceGraduateA, dinghy: dinghy2862, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1439'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorAlaraTaylor, crew: competitorNadiaBarrow, race: raceGraduateA, dinghy: dinghy2862, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1439', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1440') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorKieraDaniels, crew: competitorZimalGrainger, race: raceGraduateA, dinghy: dinghy2889, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1440'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorKieraDaniels, crew: competitorZimalGrainger, race: raceGraduateA, dinghy: dinghy2889, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1440', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1441') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorAmariBarber, crew: competitorRuqayyahWhittle, race: raceGraduateA, dinghy: dinghy2910, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1441'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorAmariBarber, crew: competitorRuqayyahWhittle, race: raceGraduateA, dinghy: dinghy2910, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1441', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1442') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorHazelWheeler, crew: competitorJaysonGraves, race: raceGraduateA, dinghy: dinghy2912, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1442'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorHazelWheeler, crew: competitorJaysonGraves, race: raceGraduateA, dinghy: dinghy2912, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1442', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1443') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorLucasMillward, crew: competitorBellaBourne, race: raceGraduateA, dinghy: dinghy2928, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1443'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorLucasMillward, crew: competitorBellaBourne, race: raceGraduateA, dinghy: dinghy2928, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1443', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1444') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorLouiseBarron, crew: competitorCobieBaldwin, race: raceGraduateA, dinghy: dinghy2931, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1444'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorLouiseBarron, crew: competitorCobieBaldwin, race: raceGraduateA, dinghy: dinghy2931, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1444', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1445') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorAlastairKhatun, crew: competitorIrisSandhu, race: raceGraduateA, dinghy: dinghy2938, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1445'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorAlastairKhatun, crew: competitorIrisSandhu, race: raceGraduateA, dinghy: dinghy2938, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1445', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1446') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorSamsonMcGowan, crew: competitorEsmeHyde, race: raceGraduateA, dinghy: dinghy2969, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1446'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorSamsonMcGowan, crew: competitorEsmeHyde, race: raceGraduateA, dinghy: dinghy2969, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1446', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1447') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorCalebParkinson, crew: competitorDakotaMoss, race: raceGraduateA, dinghy: dinghy2970, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1447'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorCalebParkinson, crew: competitorDakotaMoss, race: raceGraduateA, dinghy: dinghy2970, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1447', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1448') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorInayaRegan, crew: competitorLeoEaton, race: raceGraduateA, dinghy: dinghy2971, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1448'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorInayaRegan, crew: competitorLeoEaton, race: raceGraduateA, dinghy: dinghy2971, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1448', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1449') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorLeiaHaynes, crew: competitorDarcyEmery, race: raceGraduateA, dinghy: dinghy2973, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1449'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorLeiaHaynes, crew: competitorDarcyEmery, race: raceGraduateA, dinghy: dinghy2973, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1449', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1450') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorNatanNewman, crew: competitorDiegoHoughton, race: raceGraduateA, dinghy: dinghy2985, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1450'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorNatanNewman, crew: competitorDiegoHoughton, race: raceGraduateA, dinghy: dinghy2985, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1450', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1451') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorJamesonSharpe, crew: competitorShelbyMiller, race: raceGraduateA, dinghy: dinghy2987, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1451'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorJamesonSharpe, crew: competitorShelbyMiller, race: raceGraduateA, dinghy: dinghy2987, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1451', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1452') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorElifPugh, crew: competitorMaceyVaughan, race: raceGraduateA, dinghy: dinghy3006, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1452'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorElifPugh, crew: competitorMaceyVaughan, race: raceGraduateA, dinghy: dinghy3006, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1452', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1453') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorWilfredMead, crew: competitorLaineyAbbott, race: raceGraduateA, dinghy: dinghy3009, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1453'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorWilfredMead, crew: competitorLaineyAbbott, race: raceGraduateA, dinghy: dinghy3009, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1453', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1454') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorFrankySheppard, crew: competitorPaddyLowe, race: raceGraduateA, dinghy: dinghy3014, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1454'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorFrankySheppard, crew: competitorPaddyLowe, race: raceGraduateA, dinghy: dinghy3014, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1454', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1455') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorLeniTyler, crew: competitorBaaniManning, race: raceGraduateA, dinghy: dinghy3015, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1455'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorLeniTyler, crew: competitorBaaniManning, race: raceGraduateA, dinghy: dinghy3015, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1455', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1456') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorMahnoorHope, crew: competitorSarahPritchard, race: raceGraduateA, dinghy: dinghy3020, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1456'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorMahnoorHope, crew: competitorSarahPritchard, race: raceGraduateA, dinghy: dinghy3020, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1456', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1457') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorAnthonyDillon, crew: competitorLucienHoare, race: raceGraduateA, dinghy: dinghy3021, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1457'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorAnthonyDillon, crew: competitorLucienHoare, race: raceGraduateA, dinghy: dinghy3021, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1457', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1458') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorZackaryLindsay, crew: competitorSerenDuffy, race: raceGraduateA, dinghy: dinghy3022, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1458'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorZackaryLindsay, crew: competitorSerenDuffy, race: raceGraduateA, dinghy: dinghy3022, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1458', metadata: {eTag: '"1"'}}});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1459') {
-                    return Promise.resolve({success: true, domainObject: {helm: competitorKhalilRushton, crew: competitorBiancaSwan, race: raceGraduateA, dinghy: dinghy3088, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1459'}});
+                    return Promise.resolve({success: true, domainObject: {helm: competitorKhalilRushton, crew: competitorBiancaSwan, race: raceGraduateA, dinghy: dinghy3088, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1459', metadata: {eTag: '"1"'}}});
                 }
             });
             const promise = dinghyRacingModel.getEntriesByRace(raceGraduateA);
@@ -6372,7 +6365,7 @@ describe('when entry is requested', () => {
             const promise = dinghyRacingModel.getEntry(entryChrisMarshallScorpionA1234.url);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({success: true,domainObject: entryChrisMarshallScorpionA1234, eTag: '"3"'});
+            expect(result).toEqual({success: true, domainObject: {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"3"'}}, eTag: '"3"'});
         });
     });
     describe('when dinghy does not have a crew', () => {
@@ -6399,7 +6392,7 @@ describe('when entry is requested', () => {
             const promise = dinghyRacingModel.getEntry(entryChrisMarshallScorpionA1234.url);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({success: true, domainObject: {...entryChrisMarshallScorpionA1234, crew: null}, eTag: '"3"'});
+            expect(result).toEqual({success: true, domainObject: {...entryChrisMarshallScorpionA1234, crew: null, metadata: {eTag: '"3"'}}, eTag: '"3"'});
         });
     });
     it('returns a promise that resolves to a result indicating failure when entry is not found', async () => {
@@ -6428,11 +6421,11 @@ describe('when entry is requested', () => {
                 });
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            dinghyRacingModel.entryResultMap.set(entryChrisMarshallDinghy1234HAL._links.self.href, {success: true,domainObject: entryChrisMarshallScorpionA1234, eTag: '"3"'});
+            dinghyRacingModel.entryResultMap.set(entryChrisMarshallDinghy1234HAL._links.self.href, {success: true,domainObject: {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"3"'}}, eTag: '"3"'});
             const promise = dinghyRacingModel.getEntry(entryChrisMarshallScorpionA1234.url);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({success: true,domainObject: entryChrisMarshallScorpionA1234, eTag: '"3"'});
+            expect(result).toEqual({success: true, domainObject: {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"3"'}}, eTag: '"3"'});
         })
     });
     describe('when entry accessed via a relation from another entity so does not have a version ETag', () => {
@@ -6445,7 +6438,7 @@ describe('when entry is requested', () => {
                 });
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            dinghyRacingModel.entryResultMap.set(entryChrisMarshallDinghy1234HAL._links.self.href, {success: true,domainObject: entryChrisMarshallScorpionA1234, eTag: '"3"'});
+            dinghyRacingModel.entryResultMap.set(entryChrisMarshallDinghy1234HAL._links.self.href, {success: true, domainObject: {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"3"'}}, eTag: '"3"'});
             jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceScorpionA})});
             jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
@@ -6460,8 +6453,8 @@ describe('when entry is requested', () => {
             const promise = dinghyRacingModel.getEntry(entryChrisMarshallScorpionA1234.url);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({success: true,domainObject: entryChrisMarshallScorpionA1234, eTag: null});
-            expect(dinghyRacingModel.entryResultMap.get(entryChrisMarshallDinghy1234HAL._links.self.href)).toEqual({success: true,domainObject: entryChrisMarshallScorpionA1234, eTag: '"3"'});
+            expect(result).toEqual({success: true,domainObject: {...entryChrisMarshallScorpionA1234, metadata: null}, eTag: null});
+            expect(dinghyRacingModel.entryResultMap.get(entryChrisMarshallDinghy1234HAL._links.self.href)).toEqual({success: true, domainObject: {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"3"'}}, eTag: '"3"'});
         })
     });
 });

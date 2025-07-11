@@ -359,10 +359,11 @@ const entryChrisMarshallScorpionA1234 = {
 	finishedRace: false,
 	scoringAbbreviation: null, 
 	position: null,
-	url: 'http://localhost:8081/dinghyracing/api/entries/10'
+	url: 'http://localhost:8081/dinghyracing/api/entries/10',
+	metadata: {eTag: '"1"'}
 };
 const entrySarahPascalScorpionA6745 = {helm: competitorSarahPascal, crew: competitorOwainDavies, race: raceScorpionA, dinghy: dinghy6745, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
-	position: null, url: 'http://localhost:8081/dinghyracing/api/entries/11'};
+	position: null, url: 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}};
 
 const entriesScorpionA = [
 	entryChrisMarshallScorpionA1234,
@@ -370,10 +371,10 @@ const entriesScorpionA = [
 ];
 const entriesGraduateA = [
 	{helm: competitorJillMyer, crew: null, race: raceGraduateA, dinghy: dinghy2928, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null,
-		position: null, url: 'http://localhost:8081/dinghyracing/api/entries/12'}
+		position: null, url: 'http://localhost:8081/dinghyracing/api/entries/12', metadata: {eTag: '"1"'}}
 ];
 const entryJillMyerCometA826 = {helm: competitorJillMyer, crew: null, race: raceCometA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
-	position: null, url: 'http://localhost:8081/dinghyracing/api/entries/19'};
+	position: null, url: 'http://localhost:8081/dinghyracing/api/entries/19', metadata: {eTag: '"1"'}};
 const entriesCometA = [
 	entryJillMyerCometA826
 ];
@@ -382,7 +383,7 @@ const entryChrisMarshallHandicapA1234 = {helm: competitorChrisMarshall, crew: co
 const entriesHandicapA = [
 	entryChrisMarshallHandicapA1234, 
 	{helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
-		position: null, url: 'http://localhost:8081/dinghyracing/api/entries/21'}
+		position: null, url: 'http://localhost:8081/dinghyracing/api/entries/21', metadata: {eTag: '"1"'}}
 ];
 
 const entryChrisMarshallPursuitA1234 = {
@@ -395,7 +396,8 @@ const entryChrisMarshallPursuitA1234 = {
 	finishedRace: false,
 	scoringAbbreviation: null, 
 	position: null,
-	url: 'http://localhost:8081/dinghyracing/api/entries/22'
+	url: 'http://localhost:8081/dinghyracing/api/entries/22',
+	metadata: {eTag: '"1"'}
 };
 
 const entriesPursuitA = [ entryChrisMarshallPursuitA1234 ];

@@ -34,20 +34,20 @@ afterEach(() => {
 });
 
 it('renders', () => {
-    render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
+    render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} />);
     const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
     expect(SMScorp1234entry).toBeInTheDocument();
 });
 
 it('displays lap times', async () => {
     const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-    const entry = {...entryChrisMarshallScorpionA1234, laps: [{number: 1, time: 1234}]};
+    const entry = {...entryChrisMarshallScorpionA1234, laps: [{number: 1, time: 1234}], metadata: {eTag: '"1"'}};
     render(<RaceEntryView entry={entry} />);
     expect(screen.getByText('00:01')).toBeInTheDocument();
 });
 
 it('displays cumulative sum of lap times', async () => {
-    const entry = {...entryChrisMarshallScorpionA1234, laps: [{number: 1, time: 1234}, {number: 2, time: 1234}, {number: 3, time: 1234}]};
+    const entry = {...entryChrisMarshallScorpionA1234, laps: [{number: 1, time: 1234}, {number: 2, time: 1234}, {number: 3, time: 1234}], metadata: {eTag: '"1"'}};
     render(<RaceEntryView entry={entry} />);
     expect(screen.getByText('00:01')).toBeInTheDocument();
     expect(screen.getByText('00:02')).toBeInTheDocument();
@@ -55,7 +55,7 @@ it('displays cumulative sum of lap times', async () => {
 });
 
 it('displays position', () => {
-    const entry = {...entryChrisMarshallScorpionA1234, laps: [{number: 1, time: 1234}, {number: 2, time: 1234}, {number: 3, time: 1234}], position: 5};
+    const entry = {...entryChrisMarshallScorpionA1234, laps: [{number: 1, time: 1234}, {number: 2, time: 1234}, {number: 3, time: 1234}], position: 5, metadata: {eTag: '"1"'}};
     render(<RaceEntryView entry={entry} />);
     expect(screen.getByText('5')).toBeInTheDocument();
 });
@@ -63,7 +63,7 @@ it('displays position', () => {
 describe('before race has started', () => {
     it('calls addLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, race: {...entryChrisMarshallScorpionA1234.race, plannedStartTime: new Date(Date.now() + 60000)}};
+        const entry = {...entryChrisMarshallScorpionA1234, race: {...entryChrisMarshallScorpionA1234.race, plannedStartTime: new Date(Date.now() + 60000)}, metadata: {eTag: '"1"'}};
         const addLapCallback = jest.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         // const SMScorp1234entry = screen.getByText(/1234/i);
@@ -78,7 +78,7 @@ describe('before race has started', () => {
 describe('after race has started', () => {
     it('calls addLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234};
+        const entry = {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}};
         const addLapCallback = jest.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -92,7 +92,7 @@ describe('after race has started', () => {
 describe('when a lap is removed from an entry', () => {
     it('calls removeLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234};
+        const entry = {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}};
         const removeLapCallback = jest.fn((e) => {entry.laps.pop()});
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -104,7 +104,7 @@ describe('when a lap is removed from an entry', () => {
     });
     it('updates the display to show the delete lap instruction has been sent to the server', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234};
+        const entry = {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}};
         const removeLapCallback = jest.fn((e) => {entry.laps.pop()});
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -121,7 +121,7 @@ describe('when secondary mouse button is clicked', () => {
         it('accepts a new lap time input in the last field of the row', async () => {
             const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
             const entry = {...entryChrisMarshallScorpionA1234, laps: [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}], 
-                'sumOfLapTimes': 6000};
+                'sumOfLapTimes': 6000, metadata: {eTag: '"1"'}};
             render(<RaceEntryView entry={entry} />);
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
@@ -140,7 +140,7 @@ describe('when secondary mouse button is clicked', () => {
         it('does not enter edit mode and accepts a lap time via left click', async () => {
             const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
             const addLapCallback = jest.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
-            const entry = {...entryChrisMarshallScorpionA1234, laps: []};
+            const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
             render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             await act(async () => {
@@ -157,7 +157,8 @@ describe('when secondary mouse button is clicked', () => {
 describe('when editing a lap time', () => {
     it('does not add new lap when primary button clicked', async () => { 
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}]};
+        const entry = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000},
+            {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}], metadata: {eTag: '"1"'}};
         const addLapCallback = jest.fn();
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
@@ -172,7 +173,8 @@ describe('when editing a lap time', () => {
     });
     it('does not remove last lap when ctrl+primary button clicked', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}]};
+        const entry = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(),
+            number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}], metadata: {eTag: '"1"'}};
         const removeLapCallback = jest.fn((e) => {entry.laps.pop()});
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -186,13 +188,38 @@ describe('when editing a lap time', () => {
         });
         expect(removeLapCallback).not.toHaveBeenCalled();
     });
+    describe('when lap time has not changed', () => {
+        it('does not update lap time', async () => {
+            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
+                {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000},
+                {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000},
+                {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
+            ], metadata: {eTag: '"1"'}};
+            const updateLapCallback = jest.fn((entry, value) => {});
+            render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
+            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+            const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
+            await act(async () => {
+                await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+            });
+            const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
+            await act(async () => {
+                await user.clear(lapEntryCellInput);
+                await user.type(lapEntryCellInput, '0:06');
+                await user.keyboard('{Enter}');
+            });
+            expect(updateLapCallback).not.toHaveBeenCalled();
+            expect(raceEntryView.getAttribute('class')).not.toMatch(/disabled/i);
+        });
+    });
     it('updates lap with new time supplied', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
             {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, 
             {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, 
             {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
-        ]};
+        ], metadata: {eTag: '"1"'}};
         const updateLapCallback = jest.fn((entry, value) => {});
         render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
@@ -206,7 +233,7 @@ describe('when editing a lap time', () => {
             await user.type(lapEntryCellInput, '15:53');
             await user.keyboard('{Enter}');
         });
-        expect(updateLapCallback).toBeCalledWith(entry, '15:53');
+        expect(updateLapCallback).toBeCalledWith(entry, 953000);
     });
     it('updates the display to show the edited lap time is being sent to the server', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
@@ -214,7 +241,7 @@ describe('when editing a lap time', () => {
             {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, 
             {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, 
             {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
-        ]};
+        ], metadata: {eTag: '"1"'}};
         const updateLapCallback = jest.fn((entry, value) => {});
         await act(async () => {
             render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
@@ -232,12 +259,60 @@ describe('when editing a lap time', () => {
         });
         expect(raceEntryView.getAttribute('class')).toMatch(/disabled/i);
     });
+    describe('when the new lap time is entered in an invalid format', () => {
+        it('does not accept the incorrect format and keeps edit mode open', async () => {
+            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
+                {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, 
+                {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, 
+                {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
+            ], metadata: {eTag: '"1"'}};
+            const updateLapCallback = jest.fn((entry, value) => {});
+            const showUserMessage = jest.fn((message) => {});
+            render(<RaceEntryView entry={entry} updateLap={updateLapCallback} showUserMessage={showUserMessage} />);
+            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+            const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
+            await act(async () => {
+                await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+            });
+            const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
+            await act(async () => {
+                await user.clear(lapEntryCellInput);
+                await user.type(lapEntryCellInput, '15530');
+                await user.keyboard('{Enter}');
+            });
+            expect(lapEntryCellInput).toHaveValue('15530');
+        });
+        it('calls showUserMessage prop with message explainging error', async () => {
+            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
+                {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, 
+                {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, 
+                {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
+            ], metadata: {eTag: '"1"'}};
+            const updateLapCallback = jest.fn((entry, value) => {});
+            const showUserMessage = jest.fn((message) => {});
+            render(<RaceEntryView entry={entry} updateLap={updateLapCallback} showUserMessage={showUserMessage} />);
+            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+            const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
+            await act(async () => {
+                await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+            });
+            const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
+            await act(async () => {
+                await user.clear(lapEntryCellInput);
+                await user.type(lapEntryCellInput, '15530');
+                await user.keyboard('{Enter}');
+            });
+            expect(showUserMessage).toHaveBeenCalledWith('Time must be in the format [hh:][mm:]ss.');
+        });
+    });
 });
 
 describe('when user taps row', () => {
     it('calls addLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, laps: []};
+        const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
         const addLapCallback = jest.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -252,7 +327,11 @@ describe('when user taps and holds on row', () => {
     it('accepts a new lap time input in the last field of the row', async () => {
         const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}]};
+        const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
+            {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000},
+            {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000},
+            {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
+        ], metadata: {eTag: '"1"'}};
         render(<RaceEntryView entry={entry} />);
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         await act(async () => {
@@ -275,7 +354,11 @@ describe('when user taps and holds on row', () => {
 describe('when user swipes left on row', () => {
     xit('calls removeLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}]};
+        const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
+            {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000},
+            {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000},
+            {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
+        ], metadata: {eTag: '"1"'}};
         const removeLapCallback = jest.fn((e) => {entry.laps.pop()});
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -291,7 +374,7 @@ describe('when user swipes left on row', () => {
 
 describe('when entry is on last lap', () => {
     it('has a class of on-last-lap', () => {
-        const entryOnLastLap = {...entryChrisMarshallScorpionA1234, laps: [], 'onLastLap': true};
+        const entryOnLastLap = {...entryChrisMarshallScorpionA1234, laps: [], 'onLastLap': true, metadata: {eTag: '"1"'}};
         render(<RaceEntryView entry={entryOnLastLap} />);
         const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
         expect(raceEntryView.getAttribute('class')).toMatch(/on-last-lap/i);
@@ -300,7 +383,7 @@ describe('when entry is on last lap', () => {
 
 describe('when entry is not on last lap', () => {
     it('does not have a class of on-last-lap', () => {
-        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
+        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement;
         expect(SMScorp1234entry.getAttribute('class')).not.toMatch(/on-last-lap/i);
     });
@@ -308,7 +391,7 @@ describe('when entry is not on last lap', () => {
 
 describe('when entry has finished race', () => {
     it('has a class of finished-race', () => {
-        const entryOnLastLap = {...entryChrisMarshallScorpionA1234, 'finishedRace': true};
+        const entryOnLastLap = {...entryChrisMarshallScorpionA1234, 'finishedRace': true, metadata: {eTag: '"1"'}};
         render(<RaceEntryView entry={entryOnLastLap} />);
         const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
         expect(raceEntryView.getAttribute('class')).toMatch(/finished-race/i);
@@ -317,7 +400,7 @@ describe('when entry has finished race', () => {
 
 describe('when entry has not finished race', () => {
     it('does not have a class of finished-race', () => {
-        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
+        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement;
         expect(SMScorp1234entry.getAttribute('class')).not.toMatch(/finished-race/i);
     });
@@ -325,7 +408,7 @@ describe('when entry has not finished race', () => {
 
 describe('when a scoring abbreviation is not selected', () => {
     it('only has a classes of race-entry-view w3-row w3-border w3-hover-border-blue cursor-pointer preserve-whitespace', () => {
-        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
+        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} />);
         const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
         expect(raceEntryView.getAttribute('class')).toMatch(/^race-entry-view w3-row w3-border w3-hover-border-blue$/i);
     });
@@ -335,17 +418,17 @@ describe('when a scoring abbreviation is selected', () => {
     it('calls setScoringAbbreviation callback provided as prop', async () => {
         const setScoringAbbreviationSpy = jest.fn();
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
+        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
         const selectSA = screen.getByRole('combobox');
         await act(async() => {
             await user.selectOptions(selectSA, 'DNS');
         });
-        expect(setScoringAbbreviationSpy).toHaveBeenCalledWith(entryChrisMarshallScorpionA1234, 'DNS');
+        expect(setScoringAbbreviationSpy).toHaveBeenCalledWith({...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}, 'DNS');
     });
     it('updates the display to show a scoring abbreviation is being sent to the server', async () => {
         const setScoringAbbreviationSpy = jest.fn();
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
+        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
         const selectSA = screen.getByRole('combobox');
         await act(async () => {
             await user.selectOptions(selectSA, 'DNS');
@@ -354,7 +437,7 @@ describe('when a scoring abbreviation is selected', () => {
     });
     describe('when entry did not start the race', () => {
         it('has a class of did-not-start', () => {
-            const entryDNS = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DNS'};
+            const entryDNS = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DNS', metadata: {eTag: '"2"'}};
             render(<RaceEntryView entry={entryDNS} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/did-not-start/i);
@@ -362,7 +445,7 @@ describe('when a scoring abbreviation is selected', () => {
     });
     describe('when entry retired', () => {
         it('has a class of retired', () => {
-            const entryRET = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'RET'};
+            const entryRET = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'RET', metadata: {eTag: '"2"'}};
             render(<RaceEntryView entry={entryRET} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/retired/i);
@@ -370,7 +453,7 @@ describe('when a scoring abbreviation is selected', () => {
     });
     describe('when entry disqualified', () => {
         it('has a class of disqualified', () => {
-            const entryRET = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DSQ'};
+            const entryRET = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DSQ', metadata: {eTag: '"2"'}};
             render(<RaceEntryView entry={entryRET} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/disqualified/i);
@@ -378,7 +461,7 @@ describe('when a scoring abbreviation is selected', () => {
     });
     describe('when entry did not compete in the race', () => {
         it('has a class of did-not-start', () => {
-            const entryDNC = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DNC'};
+            const entryDNC = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DNC', metadata: {eTag: '"2"'}};
             render(<RaceEntryView entry={entryDNC} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/did-not-compete/i);
@@ -386,7 +469,7 @@ describe('when a scoring abbreviation is selected', () => {
     });
     describe('when entry on course side at start of race', () => {
         it('has a class of on-course-side', () => {
-            const entryOCS = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'OCS'};
+            const entryOCS = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'OCS', metadata: {eTag: '"2"'}};
             render(<RaceEntryView entry={entryOCS} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/on-course-side/i);
@@ -394,7 +477,7 @@ describe('when a scoring abbreviation is selected', () => {
     });
     describe('when entry did not finish the race', () => {
         it('has a class of did-not-finish', () => {
-            const entryDNF = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DNF'};
+            const entryDNF = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DNF', metadata: {eTag: '"2"'}};
             render(<RaceEntryView entry={entryDNF} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/did-not-finish/i);
@@ -405,7 +488,7 @@ describe('when a scoring abbreviation is selected', () => {
 describe('when the entry is selected to add a new lap', () => {
     it('updates the display to show it has been selected', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234};
+        const entry = {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}};
         const addLapCallback = jest.fn();
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -416,7 +499,7 @@ describe('when the entry is selected to add a new lap', () => {
     });
     it('does not accept selection to add a new lap time', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, laps: []};
+        const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
         const addLapCallback = jest.fn();
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -433,7 +516,7 @@ describe('when the entry is selected to add a new lap', () => {
     xdescribe('when confirmation is received of the recorded lap', () => {
         it('updates the display to show it can be selected for lap entry', async () => {
             const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-            const entry = {...entryChrisMarshallScorpionA1234, laps: []};
+            const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
             const addLapCallback = jest.fn();
             const { rerender } = render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
             const SMScorp1234entry = await screen.findByText(/1234/i);
@@ -451,7 +534,7 @@ describe('when the entry is selected to add a new lap', () => {
         });
         it('accepts selection to add a new lap time', async () => {
             const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-            const entry = {...entryChrisMarshallScorpionA1234, laps: []};
+            const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
             const addLapCallback = jest.fn();
             const { rerender } = render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
             const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -475,8 +558,8 @@ describe('when user drags and drops an entry to a new position', () => {
     it('calls function passed to onRaceEntryDrop with subject key and target key ', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         const onRaceEntryDropSpy = jest.fn();
-        const entry1 = {...entryChrisMarshallScorpionA1234, laps: []};
-        const entry2 = {...entrySarahPascalScorpionA6745};
+        const entry1 = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
+        const entry2 = {...entrySarahPascalScorpionA6745, metadata: {eTag: '"1"'}};
         const addLapCallback = jest.fn();
         render(
             <div>
@@ -495,8 +578,8 @@ describe('when user drags and drops an entry to a new position', () => {
     it('calls function passed to onRaceEntryDrop with value set by dragStart event', async () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         const onRaceEntryDropSpy = jest.fn();
-        const entry1 = {...entryChrisMarshallScorpionA1234, laps: []};
-        const entry2 = {...entrySarahPascalScorpionA6745};
+        const entry1 = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
+        const entry2 = {...entrySarahPascalScorpionA6745, metadata: {eTag: '"1"'}};
         const addLapCallback = jest.fn();
         render(
             <div>
@@ -525,8 +608,8 @@ describe('when user drags and drops an entry to a new position', () => {
             const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
             const onRaceEntryDropSpy = jest.fn();
             const raceScorpionAPursuit = {...raceScorpionA, type: 'PURSUIT'};
-            const entry1 = {...entryChrisMarshallScorpionA1234, race: raceScorpionAPursuit, laps: []};
-            const entry2 = {...entrySarahPascalScorpionA6745, race: raceScorpionAPursuit};
+            const entry1 = {...entryChrisMarshallScorpionA1234, race: raceScorpionAPursuit, laps: [], metadata: {eTag: '"1"'}};
+            const entry2 = {...entrySarahPascalScorpionA6745, race: raceScorpionAPursuit, metadata: {eTag: '"1"'}};
             const addLapCallback = jest.fn();
             render(
                 <div>
@@ -553,8 +636,8 @@ describe('when user drags and drops an entry to a new position', () => {
             it('does nothing', async () => {
                 const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
                 const onRaceEntryDropSpy = jest.fn();
-                const entry1 = {...entryChrisMarshallScorpionA1234, laps: []};
-                const entry2 = {...entrySarahPascalScorpionA6745};
+                const entry1 = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
+                const entry2 = {...entrySarahPascalScorpionA6745, metadata: {eTag: '"1"'}};
                 const addLapCallback = jest.fn();
                 render(
                     <div>
@@ -584,8 +667,8 @@ describe('when user drags and drops an entry to a new position', () => {
         it('does not update the display to show the position of the target entry is being updated', async () => {
             const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
             const onRaceEntryDropSpy = jest.fn();
-            const entry1 = {...entryChrisMarshallScorpionA1234, laps: []};
-            const entry2 = {...entrySarahPascalScorpionA6745};
+            const entry1 = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
+            const entry2 = {...entrySarahPascalScorpionA6745, metadata: {eTag: '"1"'}};
             const addLapCallback = jest.fn();
             render(
                 <div>
@@ -616,7 +699,7 @@ describe('when handler set for onFastGroup', () => {
     it('displays option to fast group entry', () => {
         const onFastGroupHandlerSpy = jest.fn();
 
-        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} />);
+        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} onFastGroup={onFastGroupHandlerSpy} />);
         const fastGroupButton = screen.getByRole('checkbox');
         expect(fastGroupButton).toBeInTheDocument();
     });
@@ -624,7 +707,7 @@ describe('when handler set for onFastGroup', () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         const onFastGroupHandlerSpy = jest.fn();
 
-        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} inFastGroup={true} />);
+        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} onFastGroup={onFastGroupHandlerSpy} inFastGroup={true} />);
         const fastGroupButton = screen.getByRole('checkbox');
         // await act(async () => {
         //     user.click(fastGroupButton);
@@ -636,7 +719,7 @@ describe('when handler set for onFastGroup', () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         const onFastGroupHandlerSpy = jest.fn();
 
-        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} inFastGroup={false} />);
+        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} onFastGroup={onFastGroupHandlerSpy} inFastGroup={false} />);
         const fastGroupButton = screen.getByRole('checkbox');
 
         expect(fastGroupButton).not.toBeChecked();
@@ -645,7 +728,7 @@ describe('when handler set for onFastGroup', () => {
         const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
         const onFastGroupHandlerSpy = jest.fn();
 
-        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} />);
+        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} onFastGroup={onFastGroupHandlerSpy} />);
         const fastGroupButton = screen.getByRole('checkbox');
         await act(async () => {
             user.click(fastGroupButton);
@@ -657,7 +740,7 @@ describe('when handler set for onFastGroup', () => {
 
 describe('when handler not set for onFastGroup', () => {
     it('does not display option to fast group entry', () => {
-        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
+        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} />);
         const fastGroupButton = screen.queryByRole('checkbox');
         expect(fastGroupButton).not.toBeInTheDocument();
     });

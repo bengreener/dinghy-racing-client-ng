@@ -90,7 +90,7 @@ class DinghyRacingController {
     updateLap(entry, time) {
         let timeInMilliseconds = 0;
         // if time is a string convert to number of milliseconds
-        if (typeof time !== 'number') {
+        if (!Number.isInteger(time)) {
             if (/^(\d+:(?=[0-5]?\d:[0-5]?\d))?([0-5]?\d:(?=[0-5]?\d))?([0-5]?\d)$/.test(time)) {
                 const timeComponents = /^((?<=^)\d*(?=:[0-5]?\d:))*:?((?<=^|:)[0-5]?\d(?=:))?:?((?<=^|:)[0-5]?\d(?=$))$/.exec(time);
                 // get hours
