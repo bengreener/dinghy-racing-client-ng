@@ -150,10 +150,13 @@ function RaceEntriesView({ races }) {
 
     async function addLap(entry) {
         // if race was referenced by entries wouldn't need to keep looking it up. 
-        // fix this in getEntries useEffect by replacing referenced race data from REST with that from races prop 
+        // fix this in getEntries useEffect by replacing referenced race data from REST with that from races prop
         const race = races.find((r) => {
-            return r.name === entry.race.name && r.plannedStartTime.valueOf() === entry.race.plannedStartTime.valueOf();
-        });
+                // name & planned start time are unique identifiers for race over long term but for a single session name is sufficient
+                // need to simplify comes from impact of use of browser cache and a master copy of entry held by dinghy racing model (previously data was refreshed constantly, now change to race data doesn't trigger version ETag chnage for entry so local copy used)
+                // quick fix required as this causes issue with routine activity during race starts
+                return r.name === entry.race.name;// && r.plannedStartTime.valueOf() === entry.race.plannedStartTime.valueOf();
+            });
         const result = await controller.addLap(entry, race.clock.getElapsedTime());
         if (!result.success) {
             setMessage(result.message);
