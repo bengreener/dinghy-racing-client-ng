@@ -47,7 +47,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
 	const thresholdTime = 500;
 	const thresholdDistance = 10;
     const longTouchTimeout = 500;
-    const handleLastLapCellKeyUp = useCallback((event) => {
+    const handleLastLapCellKeyUp = useCallback(async (event) => {
         if (event.key === 'Enter') {
             let timeInMilliseconds = 0;
             if (updateLap) {
@@ -74,7 +74,10 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
                 if (oldTime !== timeInMilliseconds) {
                     setDisabled(true);
                     setEditMode(false);
-                    updateLap(entry, timeInMilliseconds);
+                    const result = await updateLap(entry, timeInMilliseconds);
+                    if (!result?.success) {
+                        setDisabled(false);
+                    }
                 }
                 else {
                     setEditMode(false);
@@ -97,21 +100,25 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         }
     }, [entry]);
 
-    function handleClick(event) {
+    async function handleClick(event) {
         if (!editMode && !disabled) {
+            let result;
             if (event.button === 0 && event.ctrlKey) {
                 if (removeLap) {
                     setDisabled(true);
-                    removeLap(entry);
+                    result = await removeLap(entry);
                 }    
             }
             else if (event.button === 0) {
                 if (!entry.finishedRace && !entry.scoringAbbreviation && entry.race.plannedStartTime < new Date()  && addLap) {
                     setDisabled(true);
-                    addLap(entry);
+                    result = await addLap(entry);
                 }
             }
-        }        
+            if (!result?.success) {
+                setDisabled(false);
+            }
+        }
     }
 
     function handleAuxClick(event) {
@@ -194,10 +201,13 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         tracking = false;
     }
 
-    function handleScoringAbbreviationSelection(event) {
+    async function handleScoringAbbreviationSelection(event) {
         if (setScoringAbbreviation) {
             setDisabled(true);
-            setScoringAbbreviation(entry, event.target.value);
+            const result = await setScoringAbbreviation(entry, event.target.value);
+            if (!result?.success) {
+                setDisabled(false);
+            }
         }
     }
 
@@ -221,7 +231,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         event.dataTransfer.dropEffect = 'move';
     }
 
-    function dropHandler(event) {
+    async function dropHandler(event) {
         event.preventDefault();
         const subjectKey = event.dataTransfer.getData('text/html');
         const targetKey = entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name;
@@ -229,7 +239,10 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
             if (entry.race.type === RaceType.PURSUIT) {
                 setDisabled(true);
             }
-            onRaceEntryDrop(event.dataTransfer.getData('text/html'), entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
+            const result = await onRaceEntryDrop(event.dataTransfer.getData('text/html'), entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
+            if (!result?.success) {
+                setDisabled(false);
+            }
         }
     }
 
