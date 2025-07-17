@@ -78,6 +78,17 @@ describe('when update laps button clicked', () => {
     });
 });
 
+describe('when enter button is pressed', () => {
+    it('calls function passed to onUpdate with race and value entered for laps', async () => {
+        const onUpdateSpy = jest.fn();
+        const user = userEvent.setup();
+        render(<AdjustCourseForm race={raceScorpionA} minLaps={0} maxLaps={5} initialValue={3} onUpdate={onUpdateSpy} />);
+        const lapInput = screen.getByLabelText(/set laps/i);
+        await user.keyboard('{Enter}');
+        expect(onUpdateSpy).toHaveBeenCalledWith(raceScorpionA, 3);
+    });
+});
+
 describe('when contained in a modal dialog', () => {
     describe('when update laps button clicked', () => {
         it('closes containing dialog', async () => {

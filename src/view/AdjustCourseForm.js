@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 /**
  * Provide a form to get the new number of laps that will be sailed when a course is shortened
@@ -30,29 +30,29 @@ import { useCallback, useState } from 'react';
 function AdjustCourseForm({ race, minLaps = 1, maxLaps = 100, initialValue, onUpdate, closeParent}) {
     const [laps, setLaps] = useState(initialValue ? initialValue : minLaps);
 
-    const handleUpdateButtonClick = useCallback((event) => {
+    function handleChange({ target }) {
+        if (target.value >= minLaps && target.value <= maxLaps) {
+            setLaps(target.value);
+        }
+    }
+
+    function handleSubmit(event) {
         event.preventDefault();
         onUpdate(race, Number(laps));
         if (closeParent) {
             closeParent();
         }
-    }, [race, laps, onUpdate, closeParent]);
-
-    function handleChange({ target }) {
-        if (target.value >= minLaps && target.value <= maxLaps) {
-            setLaps(target.value);
-        }
-    };
+    }
 
     return (
-        <form action='' method='get'>
+        <form onSubmit={handleSubmit}>
             <div>
                 <label htmlFor='set-laps-input'>Set Laps</label>
-                <input id='set-laps-input' name='laps' type='number' min={minLaps.toString()} max={maxLaps.toString()} value={laps} onChange={handleChange} />
+                <input id='set-laps-input' name='laps' type='number' min={minLaps.toString()} max={maxLaps.toString()} value={laps} onChange={handleChange} autoFocus/>
             </div>
             <div>
                 {closeParent ? <button type='button' onClick={closeParent}>Cancel</button> : null}
-                <button type='button' onClick={handleUpdateButtonClick}>Update Laps</button>
+                <button type='submit' >Update Laps</button>
             </div>
         </form>
     )
