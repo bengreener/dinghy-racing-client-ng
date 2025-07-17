@@ -79,3 +79,14 @@ describe('when postpone button clicked', () => {
         expect(postponeCallbackMock).toBeCalledTimes(1);
     });
 });
+
+describe('when enter button is pressed', () => {
+    it('postpones race', async () => {
+        const postponeCallbackMock = jest.fn((race, duration) => {});
+        const user = userEvent.setup();
+        render(<PostponeRaceForm race={raceScorpionA} onPostpone={postponeCallbackMock} />);
+        const delayInput = screen.getByRole('spinbutton', {'name': /delay/i});
+        await user.keyboard('{Enter}');
+        expect(postponeCallbackMock).toBeCalledTimes(1);
+    });
+});

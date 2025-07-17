@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 /**
  * Provide a form to get the duration of a race postponement
@@ -27,34 +27,34 @@ import { useCallback, useState } from 'react';
  */
  function PostponeRaceForm({race, onPostpone, closeParent}) {
     const [duration, setDuration] = useState(30);
-    
-    const handlePostponeButtonClick = useCallback((event) => {
-        event.preventDefault();
-        onPostpone(race, duration * 60 * 1000);
-        if (closeParent) {
-            closeParent();
-        }
-    }, [race, duration, onPostpone, closeParent]);
 
     function handleChange({ target }) {
         if (target.value >= 0) {
             setDuration(target.value);
         }
-    };
+    }
+
+    function handleSubmit(event) {
+        event.preventDefault();
+        onPostpone(race, duration * 60 * 1000);
+        if (closeParent) {
+            closeParent();
+        }
+    }
 
     return(
-        <form action='' method='get'>
+        <form onSubmit={handleSubmit}>
             <div>
                 <label htmlFor='delay-input'>Delay</label>
-                <input id='delay-input' type='number' name='delay' min='0' step='5' value={duration} onChange={handleChange} />
+                <input id='delay-input' type='number' name='delay' min='0' step='5' value={duration} onChange={handleChange} autoFocus />
             </div>
             <div>
                 {closeParent ? <button type='button' onClick={closeParent}>Cancel</button> : null}
-                <button type='button' onClick={handlePostponeButtonClick}>Postpone</button>
+                <button type='submit' >Postpone</button>
             </div>
         </form>
     )
-};
+}
 
 export default PostponeRaceForm;
 
