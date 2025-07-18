@@ -42,6 +42,9 @@ button.embedded {
     cursor: pointer;
     background-color: inherit;
 }
+button.selected {
+	background-color: #85D6FF;
+}
 .action-list-view {
     display: flex;
     flex-direction: column;

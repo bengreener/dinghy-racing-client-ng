@@ -37,6 +37,9 @@ function App({model, controller}) {
     const [roles, setRoles] = React.useState([]);
     const [showSetTimeForm, setShowSetTimeForm] = React.useState(false);
     const sidebarRef = useRef(null);
+    const enrolmentButtonRef = useRef(null);
+    const raceStartButtonRef = useRef(null);
+    const runRaceButtonRef = useRef(null);
 
     useEffect(() => {
         const authorisation = new Authorisation();
@@ -48,38 +51,65 @@ function App({model, controller}) {
     });
 
     function showCreateDinghyClassForm() {
+        raceStartButtonRef.current.classList.remove('selected');
+        runRaceButtonRef.current.classList.remove('selected');
+        enrolmentButtonRef.current.classList.remove('selected');
         setDisplayPort(<DinghyClassConsole key={Date.now()} />);
     }
 
     function showFleetsForm() {
+        raceStartButtonRef.current.classList.remove('selected');
+        runRaceButtonRef.current.classList.remove('selected');
+        enrolmentButtonRef.current.classList.remove('selected');
         setDisplayPort(<FleetConsole key={Date.now()} />);
     }
 
     function showCreateRaceForm() {
+        raceStartButtonRef.current.classList.remove('selected');
+        runRaceButtonRef.current.classList.remove('selected');
+        enrolmentButtonRef.current.classList.remove('selected');
         setDisplayPort(<CreateRace key={Date.now()} onCreate={controller.createRace} />);
     }
 
     function showUpcomingRaces() {
+        raceStartButtonRef.current.classList.remove('selected');
+        runRaceButtonRef.current.classList.remove('selected');
+        enrolmentButtonRef.current.classList.add('selected');
         setDisplayPort(<ViewUpcomingRaces key={Date.now()} showSignUpForm={showSignUpForm}/>);
     }
 
     function showSignUpForm(race) {
+        raceStartButtonRef.current.classList.remove('selected');
+        runRaceButtonRef.current.classList.remove('selected');
+        enrolmentButtonRef.current.classList.remove('selected');
         setDisplayPort(<SignUp race={race} />)
     }
 
     function showRaceStartConsole() {
+        enrolmentButtonRef.current.classList.remove('selected');
+        runRaceButtonRef.current.classList.remove('selected');
+        raceStartButtonRef.current.classList.add('selected');
         setDisplayPort(<RaceStartConsole key={Date.now()}/>);
     }
 
     function showRaceConsole() {
+        raceStartButtonRef.current.classList.remove('selected');
+        enrolmentButtonRef.current.classList.remove('selected');
+        runRaceButtonRef.current.classList.add('selected');
         setDisplayPort(<RaceConsole key={Date.now()}/>);
     }
 
     function showCompetitorsConsole() {
+        raceStartButtonRef.current.classList.remove('selected');
+        runRaceButtonRef.current.classList.remove('selected');
+        enrolmentButtonRef.current.classList.remove('selected');
         setDisplayPort(<CompetitorsConsole key={Date.now()}/>);
     }
 
     function showDownloadRaces() {
+        raceStartButtonRef.current.classList.remove('selected');
+        runRaceButtonRef.current.classList.remove('selected');
+        enrolmentButtonRef.current.classList.remove('selected');
         setDisplayPort(<DownloadRacesForm key={Date.now()}/>);
     }
 
@@ -133,13 +163,13 @@ function App({model, controller}) {
                     <button key={9} type='button' className='w3-bar-item w3-btn' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
                 </div>
                 <nav className='w3-row w3-bginfosys-display-bottommiddle-m1' >
-                    <button key={3} type='button' className='w3-third bgis-min-content w3-btn w3-card' onClick={showUpcomingRaces}>Enrolment</button>
+                    <button key={3} ref={enrolmentButtonRef} type='button' className='w3-third bgis-min-content w3-btn w3-card' onClick={showUpcomingRaces}>Enrolment</button>
                     {roles.includes('ROLE_RACE_OFFICER') ? 
-                        <button key={4} type='button' className='w3-third w3-btn w3-card' onClick={showRaceStartConsole}>Race Start</button>
+                        <button key={4} ref={raceStartButtonRef} type='button' className='w3-third w3-btn w3-card' onClick={showRaceStartConsole}>Race Start</button>
                         : null
                     }
                     {roles.includes('ROLE_RACE_OFFICER') ? 
-                        <button key={5} type='button' className='w3-third w3-btn w3-card' onClick={showRaceConsole}>Run Race</button>
+                        <button key={5} ref={runRaceButtonRef} type='button' className='w3-third w3-btn w3-card' onClick={showRaceConsole}>Run Race</button>
                         : null
                     }
                 </nav>

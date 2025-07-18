@@ -131,7 +131,27 @@ describe('when dinghy classes button clicked', () => {
       await user.click(btnCreateDinghyClass);
     });
     expect(await screen.findByLabelText('Class Name')).toBeInTheDocument();
-  })
+  });
+  it('main menu buttons are not shown as selected', async () => {
+    const user = userEvent.setup();
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    jest.spyOn(DinghyRacingModel, 'dinghyClassTemplate').mockImplementation(() => {return {'name': '', 'url': ''}});
+    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+    const dinghyRacingController = new DinghyRacingController(model);
+
+    render(<App model={model} controller={dinghyRacingController} />);
+    const btnMenu = await screen.findByRole('button', {name: /☰/i})
+    await act(async () => {
+      await user.click(btnMenu);
+    });
+    const btnCreateDinghyClass = await screen.findByRole('button', {name: /dinghy classes\b/i});
+    await act(async () => {
+      await user.click(btnCreateDinghyClass);
+    });
+    expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
+    expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
+    expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
+  });
 });
 
 describe('when fleets button clicked', () => {
@@ -139,8 +159,8 @@ describe('when fleets button clicked', () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const dinghyRacingController = new DinghyRacingController(model);
-    jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+    jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})})
+    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})})
 
     render(<App model={model} controller={dinghyRacingController} />);
     const btnMenu = await screen.findByRole('button', {name: /☰/i})
@@ -152,7 +172,27 @@ describe('when fleets button clicked', () => {
       await user.click(btnFleets);
     });
     expect(await screen.findByRole('heading', {name: /fleet/i})).toBeInTheDocument();
-  })
+  });
+  it('main menu buttons are not shown as selected', async () => {
+    const user = userEvent.setup();
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const dinghyRacingController = new DinghyRacingController(model);
+    jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})})
+    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})})
+
+    render(<App model={model} controller={dinghyRacingController} />);
+    const btnMenu = await screen.findByRole('button', {name: /☰/i})
+    await act(async () => {
+      await user.click(btnMenu);
+    });
+    const btnFleets = await screen.findByRole('button', {name: /fleets\b/i});
+    await act(async () => {
+      await user.click(btnFleets);
+    });
+    expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
+    expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
+    expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
+  });
 });
 
 describe('when create race button clicked', () => {
@@ -172,7 +212,26 @@ describe('when create race button clicked', () => {
       await user.click(btnCreateRace);
     });
     expect(await screen.findByLabelText('Race Name')).toBeInTheDocument();
-  })
+  });
+  it('main menu buttons are not shown as selected', async () => {
+    const user = userEvent.setup();
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const dinghyRacingController = new DinghyRacingController(model);
+    jest.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve(fleets)});
+
+    render(<App model={model} controller={dinghyRacingController} />);
+    const btnMenu = await screen.findByRole('button', {name: /☰/i})
+    await act(async () => {
+      await user.click(btnMenu);
+    });
+    const btnCreateRace = await screen.findByRole('button', {name: /create race\b/i});
+    await act(async () => {
+      await user.click(btnCreateRace);
+    });
+    expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
+    expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
+    expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
+  });
 });
 
 describe('when upcoming races button clicked', () => {
@@ -196,7 +255,26 @@ describe('when upcoming races button clicked', () => {
     expect(await screen.findByText('Scorpion A')).toBeInTheDocument();
     expect(await screen.findByText('Graduate A')).toBeInTheDocument();
     expect(await screen.findByText(timeCheck)).toBeInTheDocument();
-  })
+  });
+  it('only enrolment button shown as selected', async () => {
+    const user = userEvent.setup();
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const dinghyRacingController = new DinghyRacingController(model);
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+
+    render(<App model={model} controller={dinghyRacingController} />);
+    const btnMenu = await screen.findByRole('button', {name: /☰/i})
+    await act(async () => {
+      await user.click(btnMenu);
+    });
+    const btnViewUpcomingRaces = await screen.findByRole('button', {name: /enrolment\b/i});
+    await act(async () => {
+      await user.click(btnViewUpcomingRaces);
+    });
+    expect(btnViewUpcomingRaces.classList).toContain('selected');
+    expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
+    expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
+  });
 });
 
 describe('when race console button is clicked', ()  => {
@@ -212,6 +290,23 @@ describe('when race console button is clicked', ()  => {
     await act(async () => {
       await user.click(btnRaceConsole);
     });
+    expect(await screen.findByRole('heading', {name: /select races/i})).toBeInTheDocument();
+  });
+  it('only run race button shown as selected', async () => {
+    const user = userEvent.setup();
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    const dinghyRacingController = new DinghyRacingController(model);
+
+    render(<App model={model} controller={dinghyRacingController} />);
+    const btnRaceConsole = await screen.findByRole('button', {name: /run race\b/i});
+    await act(async () => {
+      await user.click(btnRaceConsole);
+    });
+    expect(btnRaceConsole.classList).toContain('selected');
+    expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
+    expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
   });
 });
 
@@ -242,6 +337,37 @@ describe('when race start console button is clicked', ()  => {
     await act(async () => {
       await user.click(btnRaceStartConsole);
     });
+    expect(await screen.findByRole('heading', {name: /start races/i})).toBeInTheDocument();
+  });
+  it('displays race start console', async () => {
+    const user = userEvent.setup();
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+      if (race.name === 'Scorpion A') {
+        return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})
+      }
+      if (race.name === 'Graduate A') {
+        return Promise.resolve({'success': true, 'domainObject': entriesGraduateA})
+      }
+      if (race.name === 'Comet A') {
+        return Promise.resolve({'success': true, 'domainObject': entriesCometA})
+      }
+      if (race.name === 'Handicap A') {
+        return Promise.resolve({'success': true, 'domainObject': entriesHandicapA})
+      }
+    });
+    jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({success: false, message: 'Set to fail'})});
+    const dinghyRacingController = new DinghyRacingController(model);
+
+    render(<App model={model} controller={dinghyRacingController} />);
+    const btnRaceStartConsole = await screen.findByRole('button', {name: /race start\b/i});
+    await act(async () => {
+      await user.click(btnRaceStartConsole);
+    });
+    expect(btnRaceStartConsole.classList).toContain('selected');
+    expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
+    expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
   });
 });
 
@@ -264,6 +390,26 @@ describe('when download races console button is clicked', ()  => {
     });
     expect(await screen.findByRole('heading', {name: /download races/i})).toBeInTheDocument();
   });
+  it('main menu buttons are not shown as selected', async () => {
+    const user = userEvent.setup();
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    const dinghyRacingController = new DinghyRacingController(model);
+
+    render(<App model={model} controller={dinghyRacingController} />);
+    const btnMenu = await screen.findByRole('button', {name: /☰/i})
+    await act(async () => {
+      await user.click(btnMenu);
+    });
+    const btnDownloadRaces = await screen.findByRole('button', {name: /download races\b/i});
+    await act(async () => {
+      await user.click(btnDownloadRaces);
+    });
+    expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
+    expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
+    expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
+  });
 });
 
 describe('when competitors console button is clicked', () => {
@@ -282,6 +428,24 @@ describe('when competitors console button is clicked', () => {
       await user.click(btnCompetitors);
     });
     expect(await screen.findByRole('heading', {name: /competitors/i})).toBeInTheDocument();
+  });
+  it('main menu buttons are not shown as selected', async () => {
+    const user = userEvent.setup();
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+
+    render(<App model={model} />);
+    const btnMenu = await screen.findByRole('button', {name: /☰/i})
+    await act(async () => {
+      await user.click(btnMenu);
+    });
+    const btnCompetitors = await screen.findByRole('button', {name: /competitors\b/i});
+    await act(async () => {
+      await user.click(btnCompetitors);
+    });
+    expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
+    expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
+    expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
   });
 });
 
