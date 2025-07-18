@@ -14,12 +14,12 @@
  * limitations under the License. 
  */
 
-import { act, screen} from '@testing-library/react';
+import { act, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { customRender } from '../test-utilities/custom-renders';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import ViewUpcomingRaces from './ViewUpcomingRaces';
-import { httpRootURL, wsRootURL, races, raceScorpionA } from '../model/__mocks__/test-data';
+import { httpRootURL, wsRootURL, races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA } from '../model/__mocks__/test-data';
 
 jest.mock('../model/dinghy-racing-model');
 
@@ -71,7 +71,7 @@ it('displays the details of upcoming races', async () => {
 
     jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     await act(async () => {
-        await customRender(<ViewUpcomingRaces />, model);
+        customRender(<ViewUpcomingRaces />, model);
     });    
 
     const cells = await screen.findAllByRole('cell');
@@ -85,6 +85,27 @@ it('displays the details of upcoming races', async () => {
     expect(cellValues).toContain('10-5-Go');
 });
 
+it('displays the details of upcoming races in order of planned start time', async () => {
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+
+    const races = [
+        {...raceScorpionA, plannedStartTime: new Date('2021-10-14T10:10:00Z')},
+        {...raceGraduateA, plannedStartTime: new Date('2021-10-14T10:15:00Z')},
+        {...raceCometA, plannedStartTime: new Date('2021-10-14T10:05:00Z')},
+        {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:00:00Z')}
+    ]
+
+    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    await act(async () => {
+        customRender(<ViewUpcomingRaces />, model);
+    });
+    const raceRows = await screen.findAllByRole('row');
+    expect(within(raceRows[1]).getByText(/handicap a/i)).toBeInTheDocument();
+    expect(within(raceRows[2]).getByText(/comet a/i)).toBeInTheDocument();
+    expect(within(raceRows[3]).getByText(/scorpion a/i)).toBeInTheDocument();
+    expect(within(raceRows[4]).getByText(/graduate a/i)).toBeInTheDocument();
+});
+
 describe('when start time is changed', () => {
     it('gets the races that fall into the new time period', async () => {
         const user = userEvent.setup();
@@ -92,7 +113,7 @@ describe('when start time is changed', () => {
 
         jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': [raceScorpionA]})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         await act(async () => {
-            await customRender(<ViewUpcomingRaces />, model);
+            customRender(<ViewUpcomingRaces />, model);
         });    
     
         let cells = await screen.findAllByRole('cell');
@@ -118,7 +139,7 @@ describe('when end time is changed', () => {
 
         jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': [raceScorpionA]})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         await act(async () => {
-            await customRender(<ViewUpcomingRaces />, model);
+            customRender(<ViewUpcomingRaces />, model);
         });    
     
         let cells = await screen.findAllByRole('cell');
@@ -145,7 +166,7 @@ describe('when a race is selected', () => {
         const showSignUpFormMock = jest.fn();
 
         await act(async () => {
-            await customRender(<ViewUpcomingRaces showSignUpForm={showSignUpFormMock}/>, model);
+            customRender(<ViewUpcomingRaces showSignUpForm={showSignUpFormMock}/>, model);
         });
         
         const cellRaceScorpionA = await screen.findByRole('cell', {name: 'Scorpion A'});
@@ -160,7 +181,7 @@ describe('when races fail to load', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'That was a bust!'})});
         await act(async () => {
-            await customRender(<ViewUpcomingRaces />, model);
+            customRender(<ViewUpcomingRaces />, model);
         });
         const message = await screen.findByText(/That was a bust!/);
         expect(message).toBeInTheDocument();

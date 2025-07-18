@@ -113,7 +113,7 @@ function ViewUpcomingRaces({ showSignUpForm = false }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {Array.from(raceMap.values()).map(race => 
+                    {Array.from(raceMap.values()).sort((a, b) => {return a.plannedStartTime.getTime() - b.plannedStartTime.getTime()}).map(race => 
                             <tr className='clickable-table-row' key={race.url} id={race.url} onClick={handleRowClick} >
                                 <td>{race.name}</td>
                                 <td>{race.dinghyClass ? race.dinghyClass.name : ''}</td>
