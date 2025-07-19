@@ -51,65 +51,65 @@ function App({model, controller}) {
     });
 
     function showCreateDinghyClassForm() {
-        raceStartButtonRef.current.classList.remove('selected');
-        runRaceButtonRef.current.classList.remove('selected');
-        enrolmentButtonRef.current.classList.remove('selected');
+        raceStartButtonRef.current?.classList.remove('selected');
+        runRaceButtonRef.current?.classList.remove('selected');
+        enrolmentButtonRef.current?.classList.remove('selected');
         setDisplayPort(<DinghyClassConsole key={Date.now()} />);
     }
 
     function showFleetsForm() {
-        raceStartButtonRef.current.classList.remove('selected');
-        runRaceButtonRef.current.classList.remove('selected');
-        enrolmentButtonRef.current.classList.remove('selected');
+        raceStartButtonRef.current?.classList.remove('selected');
+        runRaceButtonRef.current?.classList.remove('selected');
+        enrolmentButtonRef.current?.classList.remove('selected');
         setDisplayPort(<FleetConsole key={Date.now()} />);
     }
 
     function showCreateRaceForm() {
-        raceStartButtonRef.current.classList.remove('selected');
-        runRaceButtonRef.current.classList.remove('selected');
-        enrolmentButtonRef.current.classList.remove('selected');
+        raceStartButtonRef.current?.classList.remove('selected');
+        runRaceButtonRef.current?.classList.remove('selected');
+        enrolmentButtonRef.current?.classList.remove('selected');
         setDisplayPort(<CreateRace key={Date.now()} onCreate={controller.createRace} />);
     }
 
     function showUpcomingRaces() {
-        raceStartButtonRef.current.classList.remove('selected');
-        runRaceButtonRef.current.classList.remove('selected');
-        enrolmentButtonRef.current.classList.add('selected');
+        raceStartButtonRef.current?.classList.remove('selected');
+        runRaceButtonRef.current?.classList.remove('selected');
+        enrolmentButtonRef.current?.classList.add('selected');
         setDisplayPort(<ViewUpcomingRaces key={Date.now()} showSignUpForm={showSignUpForm}/>);
     }
 
     function showSignUpForm(race) {
-        raceStartButtonRef.current.classList.remove('selected');
-        runRaceButtonRef.current.classList.remove('selected');
-        enrolmentButtonRef.current.classList.remove('selected');
+        raceStartButtonRef.current?.classList.remove('selected');
+        runRaceButtonRef.current?.classList.remove('selected');
+        enrolmentButtonRef.current?.classList.remove('selected');
         setDisplayPort(<SignUp race={race} />)
     }
 
     function showRaceStartConsole() {
-        enrolmentButtonRef.current.classList.remove('selected');
-        runRaceButtonRef.current.classList.remove('selected');
-        raceStartButtonRef.current.classList.add('selected');
+        enrolmentButtonRef.current?.classList.remove('selected');
+        runRaceButtonRef.current?.classList.remove('selected');
+        raceStartButtonRef.current?.classList.add('selected');
         setDisplayPort(<RaceStartConsole key={Date.now()}/>);
     }
 
     function showRaceConsole() {
-        raceStartButtonRef.current.classList.remove('selected');
-        enrolmentButtonRef.current.classList.remove('selected');
-        runRaceButtonRef.current.classList.add('selected');
+        raceStartButtonRef.current?.classList.remove('selected');
+        enrolmentButtonRef.current?.classList.remove('selected');
+        runRaceButtonRef.current?.classList.add('selected');
         setDisplayPort(<RaceConsole key={Date.now()}/>);
     }
 
     function showCompetitorsConsole() {
-        raceStartButtonRef.current.classList.remove('selected');
-        runRaceButtonRef.current.classList.remove('selected');
-        enrolmentButtonRef.current.classList.remove('selected');
+        raceStartButtonRef.current?.classList.remove('selected');
+        runRaceButtonRef.current?.classList.remove('selected');
+        enrolmentButtonRef.current?.classList.remove('selected');
         setDisplayPort(<CompetitorsConsole key={Date.now()}/>);
     }
 
     function showDownloadRaces() {
-        raceStartButtonRef.current.classList.remove('selected');
-        runRaceButtonRef.current.classList.remove('selected');
-        enrolmentButtonRef.current.classList.remove('selected');
+        raceStartButtonRef.current?.classList.remove('selected');
+        runRaceButtonRef.current?.classList.remove('selected');
+        enrolmentButtonRef.current?.classList.remove('selected');
         setDisplayPort(<DownloadRacesForm key={Date.now()}/>);
     }
 
