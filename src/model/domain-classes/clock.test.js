@@ -123,7 +123,6 @@ it('removes a tick handler', () => {
     expect(handler2).toBeCalledTimes(10);
 });
 
-
 describe('when formatting a duration as [hh:]mm:ss', () => {
     it('converts 86399999ms to 23:59:59', () => {
         expect(Clock.formatDuration(86399999)).toBe('23:59:59');

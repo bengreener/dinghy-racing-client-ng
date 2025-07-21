@@ -157,7 +157,7 @@ function RaceEntriesView({ races }) {
             // quick fix required as this causes issue with routine activity during race starts
             return r.name === entry.race.name;// && r.plannedStartTime.valueOf() === entry.race.plannedStartTime.valueOf();
         });
-        const resultPromise = controller.addLap(entry, race?.clock.getElapsedTime());
+        const resultPromise = controller.addLap(entry, race?.clock.getElapsedTime(race.plannedStartTime));
         const result = await resultPromise;
         if (!result.success) {
             setMessage(result.message);

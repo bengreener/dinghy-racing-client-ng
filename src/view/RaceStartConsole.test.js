@@ -279,7 +279,7 @@ it('displays race headers for races in session', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races, model})});
-    jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+    jest.spyOn(model, 'getStartSequence');
 
     await act(async () => {
         customRender(<RaceStartConsole />, model, controller);

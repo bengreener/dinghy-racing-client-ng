@@ -119,6 +119,7 @@ class Clock {
             // using setInterval would create timing creep; interval is always > 1000 by a 'random factor'
             // this approach results in an average interval of ~1000 milliseconds
             const setNextTick = (recursiveCallback) => {
+                // console.log(`tick nextDelay: ${1000 - Date.now() % 1000}`);
                 this._ticker = setTimeout(() => {
                     if (this._tickHandlers.size > 0) {
                         this._tickHandlers.forEach(callback => {
@@ -169,17 +170,19 @@ class Clock {
      * Chromium: https://issues.chromium.org/issues/40765101
      * Firefox: https://bugzilla.mozilla.org/show_bug.cgi?id=1709767
      * Safari/ Webkit: https://bugs.webkit.org/show_bug.cgi?id=225610
+     * @param {Date} [date] if provided calculates elapsed time from this time instead of start time of clock 
      * @returns {number} The number of milliseconds elapsed since timer started, adjusted for any periods during which timer was stopped. Can be negative if start time not yet reached.
      */
-    getElapsedTime() {
+    getElapsedTime(date) {
         const pNow = performance.now();
         const dNow = Date.now();
+        const raceStartAdjustment = date ? this._startTime - date.getTime() : 0;
         // adjust if performance timer falls behind system clock; intended to autocorrect any error caused by sleeping of clock used for performance timer
         if (pNow + this._dateNowPerformanceNowDiff < dNow - 2) {
             this._dateNowPerformanceNowDiff = dNow - pNow;
             this._performanceTimerStartTime =  this._startTime - this._dateNowPerformanceNowDiff;
         }
-        return pNow - this._performanceTimerStartTime + Clock._synchOffset;
+        return pNow - this._performanceTimerStartTime + raceStartAdjustment + Clock._synchOffset;
     }
     
     /**

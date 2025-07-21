@@ -34,7 +34,7 @@ function RaceHeaderView({ race, showInRaceData = true }) {
     const model = useContext(ModelContext);
     const controller = useContext(ControllerContext);
     const [updatedRace, setUpdatedRace] = useState(race);
-    const [elapsedTime, setElapsedTime] = useState(race.clock.getElapsedTime());
+    const [elapsedTime, setElapsedTime] = useState(race.clock.getElapsedTime(race.plannedStartTime));
     const [message, setMessage] = useState('');
     const previousRace = useRef(); // enables removal of tickHandler from previous race when rendered with new race
     const [showPostponeRace, setShowPostponeRace] = useState(false);
@@ -52,7 +52,7 @@ function RaceHeaderView({ race, showInRaceData = true }) {
     }, [model, race]);
 
     const tickHandler = useCallback(() => {
-        const currentElapsedTime = race.clock.getElapsedTime(); // ensure state calculated on current time uses the same value
+        const currentElapsedTime = race.clock.getElapsedTime(race.plannedStartTime); // ensure state calculated on current time uses the same value
         setElapsedTime(currentElapsedTime); // takes effect next render so can't be used to drive caluclations of other state updates based on time in this handler
     }, [race.clock]);
 
