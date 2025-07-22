@@ -24,7 +24,7 @@ class Clock {
         this._broadcastChannel.onmessage = ({ data }) => {
             switch (data.message) {
                 case 'synchToTime':
-                    Clock.synchEvent = true;
+                    Clock._synchEvent = true;
                     Clock.synchToTime(data.body);
                     break;
                 default:
