@@ -26,9 +26,9 @@ import RaceType from '../model/domain-classes/race-type';
 import { SortOrder } from '../model/dinghy-racing-model';
 import Clock from '../model/domain-classes/clock';
 
-
 jest.mock('../model/dinghy-racing-model');
 jest.mock('../controller/dinghy-racing-controller');
+jest.mock('../model/domain-classes/clock');
 
 HTMLDialogElement.prototype.close = jest.fn();
 HTMLMediaElement.prototype.play = jest.fn();

@@ -23,6 +23,7 @@ import * as csvWriter from '../utilities/csv-writer.js';
 import NameFormat from './name-format.js';
 
 jest.mock('../model/dinghy-racing-model');
+jest.mock('../model/domain-classes/clock');
 
 describe('when creating a new Dinghy Class', () => {
     describe('when a name is not supplied for a new dinghy class', () => {

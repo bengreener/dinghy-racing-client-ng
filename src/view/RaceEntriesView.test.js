@@ -30,6 +30,7 @@ import { entriesGraduateA_bigData } from '../model/__mocks__/test-data-more-data
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 
 jest.mock('../model/dinghy-racing-model');
+jest.mock('../model/domain-classes/clock');
 
 // some of the updates display after tests may no longer be required as update route via web sockets is driven from server (2 tests lap times following entry update notification & clears error message after successful update)?
 

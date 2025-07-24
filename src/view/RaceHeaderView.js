@@ -54,7 +54,7 @@ function RaceHeaderView({ race, showInRaceData = true }) {
     const tickHandler = useCallback(() => {
         const currentElapsedTime = race.clock.getElapsedTime(race.plannedStartTime); // ensure state calculated on current time uses the same value
         setElapsedTime(currentElapsedTime); // takes effect next render so can't be used to drive caluclations of other state updates based on time in this handler
-    }, [race.clock]);
+    }, [race.clock, race.plannedStartTime]);
 
     function handleRacePostponeClick() {
         setShowPostponeRace(true);
@@ -73,10 +73,6 @@ function RaceHeaderView({ race, showInRaceData = true }) {
         const id = race.url.match(/(\d+$)/)[0];
         window.open(window.location.origin + '/lap-sheet/' + id);
     }
-
-    useEffect(() => {
-        race.clock.start();
-    }, [race]);
 
     useEffect(() => {
         let ignoreFetch = false; // set to true if RaceEntriewView rerendered before fetch completes to avoid using out of date result

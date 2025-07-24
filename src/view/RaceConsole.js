@@ -19,7 +19,6 @@ import { useCallback, useContext, useEffect, useState } from 'react';
 import ModelContext from './ModelContext';
 import RaceEntriesView from './RaceEntriesView';
 import RaceHeaderView from './RaceHeaderView';
-import Clock from '../model/domain-classes/clock';
 import CollapsableContainer from './CollapsableContainer';
 import SelectSession from './SelectSession';
 import RaceType from '../model/domain-classes/race-type';

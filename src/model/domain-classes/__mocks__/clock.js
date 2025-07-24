@@ -103,20 +103,6 @@ class Clock {
      * @param {Date} startTime The start time for the clock. Defaults to the time of instantiation.
      */
     constructor(startTime = new Date()) {
-        if (window.Worker) {
-            const url = new URL('./tick-worker.js', import.meta.url);
-            this._ticker = new Worker(url);
-            this._ticker.onmessage = (event) => {
-                    if (this._tickHandlers.size > 0) {
-                        this._tickHandlers.forEach(callback => {
-                        callback(); 
-                    });
-                };
-            }
-        }
-        else {
-            console.log(`clock: A browser that supports web workers is required for clock timer functions to work.`)
-        }
         this._startTime = startTime.valueOf();
         this._dateNowPerformanceNowDiff = Date.now() - performance.now();
         this._performanceTimerStartTime =  this._startTime - this._dateNowPerformanceNowDiff;
@@ -128,7 +114,23 @@ class Clock {
      * Aligned to system clock rather than performance timer as variation should be minimal and adjusting to performance timer would incur a (slight) overhead
      */
     start() {
-        this._ticker.postMessage('start');
+        if (!this._ticker) {
+            // synchronise to system clock so tick is every time system clock seconds change
+            // using setInterval would create timing creep; interval is always > 1000 by a 'random factor'
+            // this approach results in an average interval of ~1000 milliseconds
+            const setNextTick = (recursiveCallback) => {
+                // console.log(`tick nextDelay: ${1000 - Date.now() % 1000}`);
+                this._ticker = setTimeout(() => {
+                    if (this._tickHandlers.size > 0) {
+                        this._tickHandlers.forEach(callback => {
+                           callback(); 
+                        });
+                    };
+                    recursiveCallback(recursiveCallback);
+                }, 1000 - Date.now() % 1000);
+            }
+            setNextTick(setNextTick);
+        }
     }
 
     /**
@@ -136,7 +138,11 @@ class Clock {
      * This does not affect elapsed time which is calculated from the start time given when clock was instantiated or reset
      */
     stop() {
-        this._ticker.postMessage('stop');
+        // if clock started then stop it else do nothing
+        if (this._ticker) {
+            clearTimeout(this._ticker);
+            this._ticker = null;
+        }
     }
     
     /**

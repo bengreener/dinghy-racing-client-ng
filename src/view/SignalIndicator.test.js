@@ -21,6 +21,7 @@ import DinghyRacingModel from '../model/dinghy-racing-model';
 import { httpRootURL, wsRootURL } from '../model/__mocks__/test-data';
 import { raceScorpionA, scorpionWarningSignal, scorpionStartSignal } from '../model/__mocks__/test-data';
 
+jest.mock('../model/domain-classes/clock');
 jest.useFakeTimers();
 
 describe('when signals use flags', () => {

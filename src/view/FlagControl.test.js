@@ -19,6 +19,8 @@ import FlagControl from './FlagControl';
 import FlagState from '../model/domain-classes/flag-state';
 import FlagRole from '../model/domain-classes/flag-role';
 
+jest.mock('../model/domain-classes/clock');
+
 beforeEach(() => {
     jest.resetAllMocks();
     jest.useFakeTimers();

@@ -24,6 +24,7 @@ import { httpRootURL, wsRootURL, raceScorpionA, raceGraduateA, racePursuitA, ent
 import Clock from '../model/domain-classes/clock';
 
 jest.mock('../model/dinghy-racing-model');
+jest.mock('../model/domain-classes/clock');
 jest.mock('@stomp/stompjs');
 
 HTMLDialogElement.prototype.showModal = jest.fn();

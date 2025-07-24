@@ -22,7 +22,6 @@ import ActionListView from './ActionListView';
 import CollapsableContainer from './CollapsableContainer';
 import SignalPanel from './SignalsPanel';
 import RaceType from '../model/domain-classes/race-type';
-import Clock from '../model/domain-classes/clock';
 import CountdownDisplayControl from './CountdownDisplayControl';
 import { SortOrder } from '../model/dinghy-racing-model';
 

@@ -15,11 +15,13 @@
  */
 
 import { customRender } from '../test-utilities/custom-renders';
-import { screen, within } from '@testing-library/react';
+import { within } from '@testing-library/react';
 import SignalPanel from './SignalsPanel';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import FlagState from '../model/domain-classes/flag-state';
 import { httpRootURL, wsRootURL } from '../model/__mocks__/test-data';
+
+jest.mock('../model/domain-classes/clock');
 
 it('displays signal indicators in order of time of first signal managed by each indicator', () => {
     const signals = [

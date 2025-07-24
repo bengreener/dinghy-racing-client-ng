@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import Clock from '../domain-classes/clock';
+import Clock from '../domain-classes/__mocks__/clock';
 import SessionStartSequence from '../domain-classes/session-start-sequence';
 
 class DinghyRacingModel {
