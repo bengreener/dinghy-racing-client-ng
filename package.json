@@ -1,6 +1,6 @@
 {
   "name": "dinghy-racing-client-ng",
-  "version": "2025.7.5.dev",
+  "version": "2025.7.5",
   "private": true,
   "homepage": ".",
   "dependencies": {
