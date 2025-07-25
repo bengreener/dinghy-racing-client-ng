@@ -138,7 +138,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     function gestureStart(event) {
         tracking = true;
         /* could use e.timeStamp but apparently it's 'whack' in Fx/Android */
-        start.t = new Date().getTime();
+        start.t = Date.now();
         start.x = event.clientX;
         start.y = event.clientY;
         touchTimeoutId = setTimeout(() => {
@@ -171,7 +171,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
                 touchTimeoutId = null;
             }
             tracking = false;
-            var now = new Date().getTime();
+            var now = Date.now();
             var deltaTime = now - start.t;
             var deltaX = end.x - start.x;
             var deltaY = end.y - start.y;
