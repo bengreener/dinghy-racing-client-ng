@@ -24,6 +24,7 @@ import DownloadRacesForm from './DownloadRacesForm';
 import NameFormat from '../controller/name-format';
 
 jest.mock('../model/dinghy-racing-model');
+jest.mock('../model/domain-classes/clock');
 
 it('renders', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);

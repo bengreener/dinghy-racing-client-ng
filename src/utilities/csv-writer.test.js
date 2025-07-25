@@ -18,6 +18,8 @@ import { downloadRaceEntriesCSV, functionsForTestingOnly } from './csv-writer';
 import  { raceScorpionA, raceCometA, raceHandicapA, entriesScorpionA, racePursuitA, entriesCometA, entriesHandicapA, entriesPursuitA } from '../model/__mocks__/test-data';
 import NameFormat from '../controller/name-format';
 
+jest.mock('../model/domain-classes/clock');
+
 // Testing requires coding of createObjectURL that would probably invalidate test
 xit('writes race entry data to a file', async () => {
     // ??

@@ -54,10 +54,10 @@ import {
 } from './__mocks__/test-data-more-data';
 import FlagState from './domain-classes/flag-state';
 import RaceType from './domain-classes/race-type';
-import FlagRole from './domain-classes/flag-role';
 import Clock from './domain-classes/clock';
 
 global.fetch = jest.fn();
+jest.mock('./domain-classes/clock');
 
 beforeEach(() => {
     fetch.mockClear();

@@ -25,6 +25,7 @@ import RaceType from '../model/domain-classes/race-type';
 
 jest.mock('../model/dinghy-racing-model');
 jest.mock('../controller/dinghy-racing-controller');
+jest.mock('../model/domain-classes/clock');
 
 HTMLDialogElement.prototype.close = jest.fn();
 

@@ -24,6 +24,7 @@ import Authorisation from './controller/authorisation';
 
 jest.mock('./controller/dinghy-racing-controller');
 jest.mock('./model/dinghy-racing-model');
+jest.mock('./model/domain-classes/clock');
 jest.mock('./controller/authorisation');
 
 HTMLDialogElement.prototype.showModal = jest.fn();

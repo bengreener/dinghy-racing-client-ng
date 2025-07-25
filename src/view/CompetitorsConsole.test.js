@@ -24,6 +24,7 @@ import { httpRootURL, wsRootURL, competitorsCollection, competitorChrisMarshall 
 
 jest.mock('../model/dinghy-racing-model');
 jest.mock('../controller/dinghy-racing-controller');
+jest.mock('../model/domain-classes/clock');
 
 it('renders', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);

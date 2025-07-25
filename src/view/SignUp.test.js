@@ -35,6 +35,7 @@ import { httpRootURL, wsRootURL,
 
 jest.mock('../model/dinghy-racing-model');
 jest.mock('../controller/dinghy-racing-controller');
+jest.mock('../model/domain-classes/clock');
 
 const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 const controller = new DinghyRacingController(model);    

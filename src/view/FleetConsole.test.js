@@ -26,6 +26,7 @@ import { dinghyClasses } from '../model/__mocks__/test-data';
 
 jest.mock('../model/dinghy-racing-model');
 jest.mock('../controller/dinghy-racing-controller');
+jest.mock('../model/domain-classes/clock');
 
 it('renders', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);

@@ -26,9 +26,9 @@ import RaceType from '../model/domain-classes/race-type';
 import { SortOrder } from '../model/dinghy-racing-model';
 import Clock from '../model/domain-classes/clock';
 
-
 jest.mock('../model/dinghy-racing-model');
 jest.mock('../controller/dinghy-racing-controller');
+jest.mock('../model/domain-classes/clock');
 
 HTMLDialogElement.prototype.close = jest.fn();
 HTMLMediaElement.prototype.play = jest.fn();
@@ -279,7 +279,7 @@ it('displays race headers for races in session', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     jest.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races, model})});
-    jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+    jest.spyOn(model, 'getStartSequence');
 
     await act(async () => {
         customRender(<RaceStartConsole />, model, controller);

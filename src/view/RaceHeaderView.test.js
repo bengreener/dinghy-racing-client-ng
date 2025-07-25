@@ -24,6 +24,7 @@ import { httpRootURL, wsRootURL, raceScorpionA, raceGraduateA, racePursuitA, ent
 import Clock from '../model/domain-classes/clock';
 
 jest.mock('../model/dinghy-racing-model');
+jest.mock('../model/domain-classes/clock');
 jest.mock('@stomp/stompjs');
 
 HTMLDialogElement.prototype.showModal = jest.fn();
@@ -226,7 +227,7 @@ describe('when race has not yet started', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
 
-        customRender(<RaceHeaderView key={raceScorpionA.name+startTime.toISOString()} race={ {...raceScorpionA, 'plannedStartTime': startTime.toISOString(),'clock': clock} } />, model, controller);
+        customRender(<RaceHeaderView key={raceScorpionA.name+startTime.toISOString()} race={ {...raceScorpionA, 'plannedStartTime': startTime,'clock': clock} } />, model, controller);
         
         const outputRemaining = screen.getByLabelText(/countdown/i);
         expect(outputRemaining).toHaveValue('01:00');

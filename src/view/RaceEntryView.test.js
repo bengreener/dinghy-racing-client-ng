@@ -19,7 +19,8 @@ import userEvent from '@testing-library/user-event';
 import RaceEntryView from './RaceEntryView';
 import { raceScorpionA, entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745 } from '../model/__mocks__/test-data';
 import DinghyRacingModel from '../model/dinghy-racing-model';
-// import { PositionConstant } from './RaceEntriesView';
+
+jest.mock('../model/domain-classes/clock');
 
 const entryRowLastCellLapTimeCellOffset = 4;
 

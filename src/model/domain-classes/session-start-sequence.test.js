@@ -24,6 +24,7 @@ import { preparatoryVisualSignal, preparatorySoundSignal, preparatorySignal, sco
 import StartType from './start-type';
 
 jest.useFakeTimers();
+jest.mock('./clock');
 
 afterEach(() => {
     jest.runOnlyPendingTimers();

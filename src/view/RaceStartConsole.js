@@ -22,7 +22,6 @@ import ActionListView from './ActionListView';
 import CollapsableContainer from './CollapsableContainer';
 import SignalPanel from './SignalsPanel';
 import RaceType from '../model/domain-classes/race-type';
-import Clock from '../model/domain-classes/clock';
 import CountdownDisplayControl from './CountdownDisplayControl';
 import { SortOrder } from '../model/dinghy-racing-model';
 
@@ -106,7 +105,7 @@ function RaceStartConsole () {
                 const options = []; // html option elements
                 const optionsRaceNames = []; // just the names of the races to match with previously selected races
                 result.domainObject.forEach(race => {
-                    race.clock = new Clock(race.plannedStartTime);
+                    race.clock = model.getClock();
                     map.set(race.name, race);
                     options.push(<option key={race.name + race.plannedStartTime.toISOString()} value={race.name} >{race.name}</option>);
                     optionsRaceNames.push(race.name);

@@ -19,6 +19,8 @@ import ActionListView from './ActionListView';
 import FlagState from '../model/domain-classes/flag-state';
 import Clock from '../model/domain-classes/clock';
 
+jest.mock('../model/domain-classes/clock');
+
 const formatOptions = {
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     hour: '2-digit',

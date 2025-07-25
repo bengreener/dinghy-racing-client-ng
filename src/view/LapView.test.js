@@ -18,6 +18,8 @@ import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import LapView from './LapView';
 
+jest.mock('../model/domain-classes/clock');
+
 describe('when editable is false', () => {
     it('displays value in time format', () => {
         render(<LapView value={1015897} />);

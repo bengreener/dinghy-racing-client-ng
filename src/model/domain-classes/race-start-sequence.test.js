@@ -21,6 +21,7 @@ import { preparatorySignal, scorpionWarningSignal, scorpionStartSignal, scorpion
 import FlagState from './flag-state';
 import StartType from './start-type';
 
+jest.mock('./clock');
 jest.useFakeTimers();
 
 afterEach(() => {

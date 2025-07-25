@@ -21,10 +21,10 @@ import DinghyClassConsole from './DinghyClassConsole';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 import { httpRootURL, wsRootURL, dinghyClasses, dinghyClassScorpion } from '../model/__mocks__/test-data';
-import { toBeInTheDocument } from '@testing-library/jest-dom/matchers';
 
 jest.mock('../model/dinghy-racing-model');
 jest.mock('../controller/dinghy-racing-controller');
+jest.mock('../model/domain-classes/clock');
 
 it('renders', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
