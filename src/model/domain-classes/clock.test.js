@@ -25,7 +25,7 @@ afterEach(() => {
 it('returns the correct time', () => {
     jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
     const clock = new Clock(new Date(Date.now() + 10000));
-    const time = clock.getTime().valueOf();
+    const time = clock.getTime();
     const pMod = Date.now() - Math.floor(performance.now());
     expect(time).toEqual(Math.floor(performance.now() + pMod));
 });
@@ -270,7 +270,7 @@ describe('when need to synch with an external clock accepts a time to synch cloc
         jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
         Clock.synchToTime(new Date(Date.now() - 3000)); // set time to synch all clocks to
         const clock = new Clock(new Date(Date.now() + 10000));
-        const time = clock.getTime().valueOf();
+        const time = clock.getTime();
         const pMod = Date.now() - Math.floor(performance.now());
         expect(time).toEqual(Math.floor(performance.now() + pMod) - 3000);
     });

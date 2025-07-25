@@ -145,7 +145,7 @@ class Clock {
      * @returns {Date}
      */
     getTime() {
-        return new Date(this._startTime + this.getElapsedTime());
+        return this._startTime + this.getElapsedTime();
     }
 
     /**
