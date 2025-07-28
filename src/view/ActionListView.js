@@ -26,10 +26,10 @@ import FlagState from '../model/domain-classes/flag-state';
  * @returns {HTMLDivElement}
  */
 function ActionListView({ signals, clock }) {
-    const [timestamp, setTimestamp] = useState(clock.getTimeToSecondPrecision().valueOf()); // use Clock.now to get adjusted time when synched to an external clock
+    const [timestamp, setTimestamp] = useState(clock.getTimeToSecondPrecision()); // use Clock.now to get adjusted time when synched to an external clock
 
     const handleTick = useCallback(() => {
-        setTimestamp(clock.getTimeToSecondPrecision().valueOf());
+        setTimestamp(clock.getTimeToSecondPrecision());
     }, [clock]);
 
     useEffect(() => {

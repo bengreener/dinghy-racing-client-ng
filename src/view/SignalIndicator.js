@@ -46,11 +46,11 @@ function SignalIndicator({ signals }) {
     const lastSignal = signals.findLast(signal => signal.time <= time); // only works when there are no more than 2 signals
     const nextSignal = signals.find(signal => signal.time > time);
     const timeToChange = () => {
-        if (lastSignal?.time.valueOf() === time.valueOf()) {
+        if (lastSignal?.time === time) {
             return 0;
         }
         else if (nextSignal) {
-            return nextSignal.time.valueOf() - time.valueOf();
+            return nextSignal.time - time;
         }
         else {
             return 0;

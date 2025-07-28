@@ -309,7 +309,7 @@ describe('when need to synch with an external clock accepts a time to synch cloc
 });
 
 it('provides time to the nearest second precision', () => {
-    const timeToSecondPrecision = new Date(Math.floor(Date.now() / 1000) * 1000);
+    const timeToSecondPrecision = Math.floor(Date.now() / 1000) * 1000;
     const clock = new Clock();
 
     expect(clock.getTimeToSecondPrecision()).toEqual(timeToSecondPrecision);

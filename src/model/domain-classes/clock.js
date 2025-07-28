@@ -142,7 +142,7 @@ class Clock {
     /**
      * Return a time based on the start time of the clock and the elapsed time calculated by the performance timer
      * This may differ from the time that would be returned by new Date() or Date.now()
-     * @returns {Date}
+     * @returns {number}
      */
     getTime() {
         return this._startTime + this.getElapsedTime();
@@ -151,10 +151,10 @@ class Clock {
     /**
      * Return a time based on the start time of the clock and the elapsed time calculated by the performance timer with precision reduced to the current second
      * This may differ from the time that would be returned by new Date() or Date.now()
-     * @returns {Date}
+     * @returns {number}
      */
     getTimeToSecondPrecision() {
-        return new Date(Math.floor((this._startTime + this.getElapsedTime()) / 1000) * 1000);
+        return Math.floor((this._startTime + this.getElapsedTime()) / 1000) * 1000;
     }
 
     /**

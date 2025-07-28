@@ -90,7 +90,7 @@ function RaceStartConsole () {
     }, []);
 
     const handleClockTick = useCallback(() => {
-        setTimestamp(model.getClock().getTimeToSecondPrecision().valueOf());
+        setTimestamp(model.getClock().getTimeToSecondPrecision());
     }, [model]);
 
     // get races for selected session
@@ -216,7 +216,7 @@ function RaceStartConsole () {
             const nextRaceToStart = sessionStartSequence.current.getNextRaceToStart(new Date(timestamp));
             let countdown;
             if (nextRaceToStart) {
-                const timeLeft = nextRaceToStart.plannedStartTime.valueOf() - model.getClock().getTimeToSecondPrecision().valueOf();
+                const timeLeft = nextRaceToStart.plannedStartTime.valueOf() - model.getClock().getTimeToSecondPrecision();
                 const playAudio = timeLeft <= 10000 && timeLeft > 0;
                 countdown = <CountdownDisplayControl title={'Start Countdown'} message={nextRaceToStart.name} time={timeLeft} beep={playAudio} />;
             }

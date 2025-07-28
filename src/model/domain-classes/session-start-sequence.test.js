@@ -47,7 +47,7 @@ describe('when using CSC club start', () => {
             clock.start();
             const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart], clock);
         
-            const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf() - 660000));
+            const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.getTime() - 660000));
             expect(race).toStrictEqual(raceScorpionA);
         });
     });
@@ -58,7 +58,7 @@ describe('when using CSC club start', () => {
             clock.start();
             const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart], clock);
         
-            const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf()));
+            const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.getTime()));
             expect(race).toStrictEqual(raceScorpionA);
         });
     });
@@ -69,7 +69,7 @@ describe('when using CSC club start', () => {
             clock.start();
             const sessionStartSequence = new SessionStartSequence([raceScorpionA, raceHandicapA_newStart], clock);
         
-            const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf() + 300000));
+            const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.getTime() + 300000));
             expect(race).toStrictEqual(raceHandicapA_newStart);
         });
     });
@@ -83,12 +83,12 @@ describe('when using RRS26 start', () => {
         clock.start();
         const sessionStartSequence = new SessionStartSequence([raceScorpionA_rrs26, raceHandicapA_rrs26], clock);
 
-        const scorpionWarningSignal_rrs26 = {...scorpionWarningSignal, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000)};
-        const scorpionPreparatorySignal_rrs26 = {...scorpionPreparatorySignal, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000)};
-        const scorpionOneMinuteSignal = {meaning: 'One minute', time: new Date(raceScorpionA.plannedStartTime.valueOf() - 60000), soundSignal: {description: 'One long'}, visualSignal: endSequenceVisualSignal};
-        const handicapWarningSignal_rrs26 = {...handicapWarningSignal, time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000)};
-        const handicapPreparatorySignal_rrs26 = {meaning: 'Preparatory signal', time: new Date(raceHandicapA.plannedStartTime.valueOf() - 240000), soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
-        const handicapOneMinuteSignal = {meaning: 'One minute', time: new Date(raceHandicapA.plannedStartTime.valueOf() - 60000), soundSignal: {description: 'One long'}, visualSignal: endSequenceVisualSignal};
+        const scorpionWarningSignal_rrs26 = {...scorpionWarningSignal, time: raceScorpionA.plannedStartTime.getTime() - 300000};
+        const scorpionPreparatorySignal_rrs26 = {...scorpionPreparatorySignal, time: raceScorpionA.plannedStartTime.getTime() - 240000};
+        const scorpionOneMinuteSignal = {meaning: 'One minute', time: raceScorpionA.plannedStartTime.getTime() - 60000, soundSignal: {description: 'One long'}, visualSignal: endSequenceVisualSignal};
+        const handicapWarningSignal_rrs26 = {...handicapWarningSignal, time: raceHandicapA.plannedStartTime.getTime() - 300000};
+        const handicapPreparatorySignal_rrs26 = {meaning: 'Preparatory signal', time: raceHandicapA.plannedStartTime.getTime() - 240000, soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
+        const handicapOneMinuteSignal = {meaning: 'One minute', time: raceHandicapA.plannedStartTime.getTime() - 60000, soundSignal: {description: 'One long'}, visualSignal: endSequenceVisualSignal};
         
         expect(sessionStartSequence.getSignals()).toEqual([scorpionWarningSignal_rrs26, scorpionPreparatorySignal_rrs26, scorpionOneMinuteSignal, scorpionStartSignal, handicapWarningSignal_rrs26, handicapPreparatorySignal_rrs26, handicapOneMinuteSignal, handicapStartSignal]);
     });
@@ -100,7 +100,7 @@ describe('when using RRS26 start', () => {
             clock.start();
             const sessionStartSequence = new SessionStartSequence([raceScorpionA_rrs26, raceHandicapA_newStart], clock);
         
-            const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA_rrs26.plannedStartTime.valueOf() - 360000));
+            const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA_rrs26.plannedStartTime.getTime() - 360000));
             expect(race).toStrictEqual(raceScorpionA_rrs26);
         });
     });
@@ -112,7 +112,7 @@ describe('when using RRS26 start', () => {
             clock.start();
             const sessionStartSequence = new SessionStartSequence([raceScorpionA_rrs26, raceHandicapA_newStart], clock);
         
-            const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA_rrs26.plannedStartTime.valueOf()));
+            const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA_rrs26.plannedStartTime.getTime()));
             expect(race).toStrictEqual(raceScorpionA_rrs26);
         });
     });
@@ -124,7 +124,7 @@ describe('when using RRS26 start', () => {
             clock.start();
             const sessionStartSequence = new SessionStartSequence([raceScorpionA_rrs26, raceHandicapA_newStart], clock);
         
-            const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA_rrs26.plannedStartTime.valueOf() + 300000));
+            const race = sessionStartSequence.getNextRaceToStart(new Date(raceScorpionA_rrs26.plannedStartTime.getTime() + 300000));
             expect(race).toStrictEqual(raceHandicapA_newStart);
         });
     });

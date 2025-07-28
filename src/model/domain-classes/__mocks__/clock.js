@@ -160,7 +160,7 @@ class Clock {
      * @returns {Date}
      */
     getTimeToSecondPrecision() {
-        return new Date(Math.floor((this._startTime + this.getElapsedTime()) / 1000) * 1000);
+        return Math.floor((this._startTime + this.getElapsedTime()) / 1000) * 1000;
     }
 
     /**
