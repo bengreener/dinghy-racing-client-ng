@@ -25,6 +25,9 @@ import { useRef } from 'react';
  * @param {Boolean} [prop.beep = false]
  */
 function CountdownDisplayControl({ time, message, beep = false }) {
+
+    //console.log(`,CountdownDisplayControl,${Date.now()},${performance.now()},,,${time},`);
+
     const beepAudio = useRef(new Audio('./sounds/beep_2000hz_100ms_mono.wav'));
 
     if (beep) {
