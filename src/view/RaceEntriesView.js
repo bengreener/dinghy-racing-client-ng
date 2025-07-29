@@ -137,7 +137,7 @@ function RaceEntriesView({ races }) {
                         weight = weight * 2;
                     }
                     const lastLapTime = entry.sumOfLapTimes ? entry.sumOfLapTimes : 0;
-                    return (entry.race.plannedStartTime.valueOf() + lastLapTime + ((entry.race.duration / entry.race.plannedLaps) * entry.dinghy.dinghyClass.portsmouthNumber / 1000)) * weight;
+                    return (entry.race.plannedStartTime.getTime() + lastLapTime + ((entry.race.duration / entry.race.plannedLaps) * entry.dinghy.dinghyClass.portsmouthNumber / 1000)) * weight;
                 });
                 break;
             default:
@@ -155,7 +155,7 @@ function RaceEntriesView({ races }) {
             // name & planned start time are unique identifiers for race over long term but for a single session name is sufficient
             // need to simplify comes from impact of use of browser cache and a master copy of entry held by dinghy racing model (previously data was refreshed constantly, now change to race data doesn't trigger version ETag chnage for entry so local copy used)
             // quick fix required as this causes issue with routine activity during race starts
-            return r.name === entry.race.name;// && r.plannedStartTime.valueOf() === entry.race.plannedStartTime.valueOf();
+            return r.name === entry.race.name;
         });
         const resultPromise = controller.addLap(entry, race?.clock.getElapsedTime(race.plannedStartTime));
         const result = await resultPromise;

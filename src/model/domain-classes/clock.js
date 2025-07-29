@@ -85,7 +85,7 @@ class Clock {
     }
 
     static synchToTime(time) {
-        Clock._synchOffset = time.valueOf() - Date.now();
+        Clock._synchOffset = time.getTime() - Date.now();
         if (!Clock.synchEvent) {
             Clock._broadcastChannel.postMessage({message: 'synchToTime', body: time});
         }
@@ -117,7 +117,7 @@ class Clock {
         else {
             console.log(`clock: A browser that supports web workers is required for clock timer functions to work.`)
         }
-        this._startTime = startTime.valueOf();
+        this._startTime = startTime.getTime();
         this._dateNowPerformanceNowDiff = Date.now() - performance.now();
         this._performanceTimerStartTime =  this._startTime - this._dateNowPerformanceNowDiff;
     }

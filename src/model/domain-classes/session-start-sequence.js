@@ -159,10 +159,10 @@ class SessionStartSequence {
                 });
                 for (let i = 0; i < signals.length - 1; i++) {
                     // remove signals that use the same visual signal and occur at the same time but, have conflicting flag states
-                    if (signals[i].time.valueOf() === signals[i + 1].time.valueOf()) {
-                        const timestamp = signals[i].time.valueOf();
-                        const raiseSignals = signals.filter(signal => signal.visualSignal.flagsState === FlagState.RAISED && signal.time.valueOf() === timestamp);
-                        const lowerSignals = signals.filter(signal => signal.visualSignal.flagsState === FlagState.LOWERED && signal.time.valueOf() === timestamp);
+                    if (signals[i].time === signals[i + 1].time) {
+                        const timestamp = signals[i].time;
+                        const raiseSignals = signals.filter(signal => signal.visualSignal.flagsState === FlagState.RAISED && signal.time === timestamp);
+                        const lowerSignals = signals.filter(signal => signal.visualSignal.flagsState === FlagState.LOWERED && signal.time === timestamp);
                         if (raiseSignals.length === lowerSignals.length) {
                             // all signals cancel out, remove them all (this is the expected result)
                             signals.splice(i, raiseSignals.length + lowerSignals.length);

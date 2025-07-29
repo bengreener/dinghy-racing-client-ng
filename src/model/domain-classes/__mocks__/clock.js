@@ -85,7 +85,7 @@ class Clock {
     }
 
     static synchToTime(time) {
-        Clock._synchOffset = time.valueOf() - Date.now();
+        Clock._synchOffset = time.getTime() - Date.now();
         if (!Clock.synchEvent) {
             Clock._broadcastChannel.postMessage({message: 'synchToTime', body: time});
         }
@@ -103,7 +103,7 @@ class Clock {
      * @param {Date} startTime The start time for the clock. Defaults to the time of instantiation.
      */
     constructor(startTime = new Date()) {
-        this._startTime = startTime.valueOf();
+        this._startTime = startTime.getTime();
         this._dateNowPerformanceNowDiff = Date.now() - performance.now();
         this._performanceTimerStartTime =  this._startTime - this._dateNowPerformanceNowDiff;
     }

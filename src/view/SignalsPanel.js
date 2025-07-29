@@ -23,11 +23,9 @@ import SignalIndicator from './SignalIndicator';
  * @returns {HTMLDivElement}
  */
 function SignalPanel({ signals = [] }) {
-    // const orderedSignals = signals.filter(signal => signal.visualSignal).sort((a, b) => a.time.valueOf() - b.time.valueOf());
-
     // build a map with keyed by flags used and with an order based on timing of first signal using the flags
     const flagsMap = new Map();
-    signals.filter(signal => signal.visualSignal).sort((a, b) => a.time.valueOf() - b.time.valueOf()).forEach(signal => {
+    signals.filter(signal => signal.visualSignal).sort((a, b) => a.time - b.time).forEach(signal => {
         // generate a key to avoid issues with matching by reference
         const generateFlagsKey = (flags) => {
             const flagNames = flags.map(flag => flag.name);

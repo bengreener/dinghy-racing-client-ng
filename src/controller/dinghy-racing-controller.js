@@ -544,7 +544,7 @@ class DinghyRacingController {
                 return Promise.resolve(result);
             }
         }
-        const newTime = new Date(race.plannedStartTime.valueOf() + duration);
+        const newTime = new Date(race.plannedStartTime.getTime() + duration);
         return this.model.update(race.url, {'plannedStartTime': newTime});
     }
 }

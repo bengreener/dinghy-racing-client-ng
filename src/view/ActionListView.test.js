@@ -64,11 +64,11 @@ it('displays actions', () => {
     const visualSignalPUp = {flags: [flagP], flagsState: FlagState.RAISED};
     const visualSignalBUp = {flags: [flagB], flagsState: FlagState.RAISED};
 
-    const signalAUp = {meaning: 'Warning signal', time: new Date(now), visualSignal: visualSignalAUp, soundSignal: {description: 'One'}};
-    const signalADown = {meaning: 'Starting signal', time: new Date(now + 600000), visualSignal: visualSignalADown, soundSignal: {description: 'One'}};
-    const signalPUp = {meaning: 'Preparatory signal', time: new Date(now + 300000), visualSignal: visualSignalPUp, soundSignal: {description: 'One long'}};
-    const signalBUp = {meaning: 'Warning signal',time: new Date(now + 300000), visualSignal: visualSignalBUp, soundSignal: {description: 'One'}};
-    const soundOnly = {meaning: 'Class start',time: new Date(now + 1050000), soundSignal: {description: 'One'}};
+    const signalAUp = {meaning: 'Warning signal', time: now, visualSignal: visualSignalAUp, soundSignal: {description: 'One'}};
+    const signalADown = {meaning: 'Starting signal', time: now + 600000, visualSignal: visualSignalADown, soundSignal: {description: 'One'}};
+    const signalPUp = {meaning: 'Preparatory signal', time: now + 300000, visualSignal: visualSignalPUp, soundSignal: {description: 'One long'}};
+    const signalBUp = {meaning: 'Warning signal',time: now + 300000, visualSignal: visualSignalBUp, soundSignal: {description: 'One'}};
+    const soundOnly = {meaning: 'Class start',time: now + 1050000, soundSignal: {description: 'One'}};
 
     const signals = [signalAUp, signalADown, signalPUp, signalBUp, soundOnly];
 
@@ -101,10 +101,10 @@ it('updates action countdowns every second', async () => {
     const visualSignalPUp = {flags: [flagP], flagsState: FlagState.RAISED};
     const visualSignalBUp = {flags: [flagB], flagsState: FlagState.RAISED};
 
-    const signalAUp = {meaning: 'Warning signal', time: new Date(now), visualSignal: visualSignalAUp};
-    const signalADown = {meaning: 'Starting signal', time: new Date(now + 600000), visualSignal: visualSignalADown};
-    const signalPUp = {meaning: 'Preparatory signal', time: new Date(now + 300000), visualSignal: visualSignalPUp};
-    const signalBUp = {meaning: 'Warning signal',time: new Date(now + 300000), visualSignal: visualSignalBUp};
+    const signalAUp = {meaning: 'Warning signal', time: now, visualSignal: visualSignalAUp};
+    const signalADown = {meaning: 'Starting signal', time: now + 600000, visualSignal: visualSignalADown};
+    const signalPUp = {meaning: 'Preparatory signal', time: now + 300000, visualSignal: visualSignalPUp};
+    const signalBUp = {meaning: 'Warning signal',time: now + 300000, visualSignal: visualSignalBUp};
 
     const signals = [signalAUp, signalADown, signalPUp, signalBUp];
 
@@ -118,12 +118,10 @@ it('updates action countdowns every second', async () => {
 
     const actionListView = container.getElementsByClassName('action-list-view')[0];
 
-    // screen.debug(actionListView);
     await act(async () => {
         jest.advanceTimersByTime(1000);
     });
 
-    // screen.debug(actionListView);
     const actionRows = screen.getAllByRole('row');
     expect(actionRows).toHaveLength(3);
     expect(await within(actionRows[1]).findByText(/04:59/i)).toBeInTheDocument();
@@ -141,10 +139,10 @@ it('does not display actions that have expired', async() => {
     const visualSignalPUp = {flags: [flagP], flagsState: FlagState.RAISED};
     const visualSignalBUp = {flags: [flagB], flagsState: FlagState.RAISED};
 
-    const signalAUp = {meaning: 'Warning signal', time: new Date(now - 600000), visualSignal: visualSignalAUp};
-    const signalADown = {meaning: 'Starting signal', time: new Date(now), visualSignal: visualSignalADown};
-    const signalPUp = {meaning: 'Preparatory signal', time: new Date(now - 300000), visualSignal: visualSignalPUp};
-    const signalBUp = {meaning: 'Warning signal',time: new Date(now  - 300000), visualSignal: visualSignalBUp};
+    const signalAUp = {meaning: 'Warning signal', time: now - 600000, visualSignal: visualSignalAUp};
+    const signalADown = {meaning: 'Starting signal', time: now, visualSignal: visualSignalADown};
+    const signalPUp = {meaning: 'Preparatory signal', time: now - 300000, visualSignal: visualSignalPUp};
+    const signalBUp = {meaning: 'Warning signal',time: now  - 300000, visualSignal: visualSignalBUp};
 
     const signals = [signalAUp, signalADown, signalPUp, signalBUp];
 

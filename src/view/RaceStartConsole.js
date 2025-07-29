@@ -44,11 +44,11 @@ function RaceStartConsole () {
         sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
         return sessionEnd;
     });
-    const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
-    const [fleetUpdateRequestAt, setFleetUpdateRequestAt] = useState(Date.now()); // time of last request to fetch fleet from server. change triggers calculation of a new start sequence
+    const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(model.getClock().getTime()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
+    const [fleetUpdateRequestAt, setFleetUpdateRequestAt] = useState(model.getClock().getTime()); // time of last request to fetch fleet from server. change triggers calculation of a new start sequence
     const [raceType, setRaceType] = useState(RaceType.FLEET);
     const [signals, setSignals] = useState([]);
-    const [timestamp, setTimestamp] = useState(Date.now());
+    const [timestamp, setTimestamp] = useState(model.getClock().getTime());
     const sessionStartSequence = useRef(null);
     const prepareAudioRef = useRef(null);
     if (prepareAudioRef.current === null) {
@@ -74,12 +74,12 @@ function RaceStartConsole () {
     }
 
     const handleRaceUpdate = useCallback(() => {
-        setRacesUpdateRequestAt(Date.now());
-    }, []);
+        setRacesUpdateRequestAt(model.getClock().getTime());
+    }, [model]);
 
     const handleFleetUpdate = useCallback(() => {
-        setFleetUpdateRequestAt(Date.now());
-    }, []);
+        setFleetUpdateRequestAt(model.getClock().getTime());
+    }, [model]);
 
     const prepareForRaceSignalHandler = useCallback(() => {
         prepareAudioRef.current.play();
@@ -216,7 +216,7 @@ function RaceStartConsole () {
             const nextRaceToStart = sessionStartSequence.current.getNextRaceToStart(new Date(timestamp));
             let countdown;
             if (nextRaceToStart) {
-                const timeLeft = nextRaceToStart.plannedStartTime.valueOf() - model.getClock().getTimeToSecondPrecision();
+                const timeLeft = nextRaceToStart.plannedStartTime.getTime() - model.getClock().getTimeToSecondPrecision();
                 const playAudio = timeLeft <= 10000 && timeLeft > 0;
                 countdown = <CountdownDisplayControl title={'Start Countdown'} message={nextRaceToStart.name} time={timeLeft} beep={playAudio} />;
             }
