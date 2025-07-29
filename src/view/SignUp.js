@@ -225,13 +225,15 @@ function SignUp({ race }) {
     // get dinghy classes
     useEffect(() => {
         const buildDinghyClassOptions = (dinghyClasses) => {
+            // sort values into ascending alphabetical order 
+            const sortedDinghyClasses = dinghyClasses.toSorted((a, b) => {return a.name.localeCompare(b.name)});
             // build dinghy class options
             let options = [];
             let map = new Map();
             // set handicap options
             options.push(<option key={''} value={''}></option> );
             // set dinghy classes
-            dinghyClasses.forEach(dinghyClass => {
+            sortedDinghyClasses.forEach(dinghyClass => {
                 options.push(<option key={dinghyClass.name} value={dinghyClass.name}>{dinghyClass.name}</option>);
                 map.set(dinghyClass.name, dinghyClass);
             });
