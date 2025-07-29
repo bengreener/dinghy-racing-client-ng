@@ -175,10 +175,12 @@ function RaceEntriesView({ races }) {
     }
 
     async function updateLap(entry, value) {
-        const result = await controller.updateLap(entry, value);
+        const resultPromise = controller.updateLap(entry, value);
+        const result = await resultPromise;
         if (!result.success) {
             setMessage(result.message);
         }
+        return resultPromise;
     }
 
     async function setScoringAbbreviation(entry, value) {
