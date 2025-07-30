@@ -33,14 +33,13 @@ HTMLDialogElement.prototype.close = jest.fn();
 beforeEach(() => {
   jest.clearAllMocks();
   jest.restoreAllMocks();
-  // jest.spyOn(console, 'error')
-  // console.error.mockImplementation(() => null);
 });
 
 it('displays menu buttons', async () => {
-  const dinghyRacingController = new DinghyRacingController(new DinghyRacingModel(httpRootURL, wsRootURL));
+  const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+  const dinghyRacingController = new DinghyRacingController(model);
   await act(async () => {
-    render(<App controller={dinghyRacingController} />);
+    render(<App model={model} controller={dinghyRacingController} />);
   });
   const btnCreateDinghyClass = screen.getByRole('button', {name: /dinghy classes\b/i, hidden: true});
   const btnCreateRace = screen.getByRole('button', {name: /create race\b/i, hidden: true});
@@ -64,29 +63,31 @@ it('displays menu buttons', async () => {
 
 describe('user roles does not include ROLE_RACE_SCHEDULER', () => {
   it('does not provide option to add dinghy class', async () => {
-    const dinghyRacingController = new DinghyRacingController(new DinghyRacingModel(httpRootURL, wsRootURL));
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const dinghyRacingController = new DinghyRacingController(model);
     jest.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
     await act(async () => {
-      render(<App controller={dinghyRacingController} />);
+      render(<App model={model} controller={dinghyRacingController} />);
     });
     const btnCreateDinghyClass = screen.queryByRole('button', {name: /create dinghy class\b/i});
     expect(btnCreateDinghyClass).not.toBeInTheDocument();
   });
   it('does not provide option to add race', async () => {
-    const dinghyRacingController = new DinghyRacingController(new DinghyRacingModel(httpRootURL, wsRootURL));
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const dinghyRacingController = new DinghyRacingController(model);
     jest.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
     await act(async () => {
-      render(<App controller={dinghyRacingController} />);
+      render(<App model={model} controller={dinghyRacingController} />);
     });
     const btnCreateRace = screen.queryByRole('button', {name: /create race\b/i});
     expect(btnCreateRace).not.toBeInTheDocument();
   });
-  
   it('does not provide option to display fleets console', async () => {
-    const dinghyRacingController = new DinghyRacingController(new DinghyRacingModel(httpRootURL, wsRootURL));
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const dinghyRacingController = new DinghyRacingController(model);
     jest.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
     await act(async () => {
-      render(<App controller={dinghyRacingController} />);
+      render(<App model={model} controller={dinghyRacingController} />);
     });
     const btnFleets = screen.queryByRole('button', {name: /fleets\b/i});
     expect(btnFleets).not.toBeInTheDocument();
@@ -95,19 +96,21 @@ describe('user roles does not include ROLE_RACE_SCHEDULER', () => {
 
 describe('user roles does not include ROLE_RACE_OFFICER', () => {
   it('does not provide option to access race console', async () => {
-    const dinghyRacingController = new DinghyRacingController(new DinghyRacingModel(httpRootURL, wsRootURL));
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const dinghyRacingController = new DinghyRacingController(model);
     jest.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
     await act(async () => {
-      render(<App controller={dinghyRacingController} />);
+      render(<App model={model} controller={dinghyRacingController} />);
     });
     const btnRaceConsole = screen.queryByRole('button', {name: /run race\b/i});
     expect(btnRaceConsole).not.toBeInTheDocument();
   });
   it('does not provide option to access race start console', async () => {
-    const dinghyRacingController = new DinghyRacingController(new DinghyRacingModel(httpRootURL, wsRootURL));
+    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const dinghyRacingController = new DinghyRacingController(model);
     jest.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
     await act(async () => {
-      render(<App controller={dinghyRacingController} />);
+      render(<App model={model} controller={dinghyRacingController} />);
     });
     const btnRaceStartConsole = screen.queryByRole('button', {name: /race start\b/i});
     expect(btnRaceStartConsole).not.toBeInTheDocument();

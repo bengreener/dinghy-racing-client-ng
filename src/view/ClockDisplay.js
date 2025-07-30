@@ -14,15 +14,28 @@
  * limitations under the License. 
  */
 
+import { useEffect, useState } from 'react';
 import Clock from '../model/domain-classes/clock';
-import { useRef } from 'react';
 
 /**
  * Display a formatted time
  * @param {Object} prop
- * @param {Integer} prop.time
+ * @param {Integer} prop.clock
  */
-function TimeDisplay({ time }) {
+function ClockDisplay({ clock }) {
+    const [time, setTime] = useState(clock.getTime());
+
+    useEffect(() => {
+        const tickHandler = () => {
+            setTime(clock.getTime());
+        }
+        clock.addTickHandler(tickHandler);
+
+        return () => {
+            clock.removeTickHandler(tickHandler);
+        }
+    }, [clock]);
+
     return (
         <div className='time-display' >
             <output>{Clock.formatTime(time)}</output>
@@ -30,4 +43,4 @@ function TimeDisplay({ time }) {
     )
 }
 
-export default TimeDisplay;
+export default ClockDisplay;
