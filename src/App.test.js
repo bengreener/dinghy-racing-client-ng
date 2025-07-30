@@ -21,6 +21,7 @@ import DinghyRacingController from './controller/dinghy-racing-controller';
 import DinghyRacingModel from './model/dinghy-racing-model';
 import { httpRootURL, wsRootURL, dinghyClasses, fleets, races, entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA, competitorsCollection } from './model/__mocks__/test-data';
 import Authorisation from './controller/authorisation';
+import Clock from './model/domain-classes/clock';
 
 jest.mock('./controller/dinghy-racing-controller');
 jest.mock('./model/dinghy-racing-model');
@@ -59,6 +60,16 @@ it('displays menu buttons', async () => {
   expect(btnDownloadRaces).toBeInTheDocument();
   expect(btnSynchExternalCloclRaces).toBeInTheDocument();
   expect(btnLogout).toBeInTheDocument();
+});
+
+it('displays time', async () => {
+  const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+  const dinghyRacingController = new DinghyRacingController(model);
+  await act(async () => {
+    render(<App model={model} controller={dinghyRacingController} />);
+  });
+
+  expect(screen.getByText(Clock.formatTime(new Date()))).toBeInTheDocument();
 });
 
 describe('user roles does not include ROLE_RACE_SCHEDULER', () => {
