@@ -18,7 +18,7 @@ import Clock from '../model/domain-classes/clock';
 import { useRef } from 'react';
 
 /**
- * Display a formatted time and a message
+ * Display a formatted time coutdown and a message
  * @param {Object} prop
  * @param {Integer} prop.time
  * @param {String} prop.message

@@ -259,6 +259,54 @@ describe('when formatting a duration in seconds', () => {
     });
 });
 
+describe('when formatting a time as hh:mm:ss', () => {
+    it('converts 86399999ms to 23:59:59', () => {
+        expect(Clock.formatTime(86399999)).toBe('23:59:59');
+    });
+    it('converts 86400000ms to 00:00:00', () => {
+        expect(Clock.formatTime(86400000)).toBe('00:00:00');
+    });
+    it('converts 86400999ms to 00:00:00', () => {
+        expect(Clock.formatTime(86400999)).toBe('00:00:00');
+    });
+    it('converts 1000ms to 00:00:01', () => {
+        expect(Clock.formatTime(1000)).toBe('00:00:01');
+    });
+    it('converts 999ms to 00:00:00', () => {
+        expect(Clock.formatTime(999)).toBe('00:00:00');
+    });
+    it('converts 1ms to 00:00:00', () => {
+        expect(Clock.formatTime(1)).toBe('00:00:00');
+    });
+    it('converts 0ms to 00:00:00', () => {
+        expect(Clock.formatTime(0)).toBe('00:00:00');
+    });
+});
+
+describe('when formatting a time as hh:mm:ss.000', () => {
+    it('converts 86399999ms to 23:59:59.999', () => {
+        expect(Clock.formatTime(86399999, true)).toBe('23:59:59.999');
+    });
+    it('converts 86400000ms to 00:00:00.000', () => {
+        expect(Clock.formatTime(86400000, true)).toBe('00:00:00.000');
+    });
+    it('converts 86400999ms to 00:00:00.999', () => {
+        expect(Clock.formatTime(86400999, true)).toBe('00:00:00.999');
+    });
+    it('converts 1000ms to 00@00:01.000', () => {
+        expect(Clock.formatTime(1000, true)).toBe('00:00:01.000');
+    });
+    it('converts 999ms to 00:00:00.999', () => {
+        expect(Clock.formatTime(999, true)).toBe('00:00:00.999');
+    });
+    it('converts 1ms to 00:00:00.001', () => {
+        expect(Clock.formatTime(1, true)).toBe('00:00:00.001');
+    });
+    it('converts 0ms to 00:00:00.000', () => {
+        expect(Clock.formatTime(0, true)).toBe('00:00:00.000');
+    });
+});
+
 describe('when not synched against an external clocl', () => {
     it('returns the same value for Clock.now() as Date.now()', () => {
         expect(Clock.now()).toEqual(Date.now());

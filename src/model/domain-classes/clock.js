@@ -40,6 +40,29 @@ class Clock {
     _ticker;
 
     /**
+     * Format a time in milliseconds into a string
+     * @param {Number} duration Duration in milliseconds
+     * @param {boolean} [fractionalSeconds = false] true to display fractional seconds to 3 decimal places
+     * @returns {String}
+     */
+    static formatTime(time, fractionalSeconds = false) {
+        const resolvedOptions = Intl.DateTimeFormat().resolvedOptions();
+        let formatOptions = {
+            timeZone: resolvedOptions.timeZone,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        };
+        if (fractionalSeconds) {
+          formatOptions = {...formatOptions, fractionalSecondDigits: 3};
+        };
+        const timeFormat = new Intl.DateTimeFormat(resolvedOptions.locale, formatOptions);
+
+        return timeFormat.format(new Date(time));
+    }
+
+    /**
      * Formats a duration in milliseconds into a string; format hh:mm:ss
      * If fractional seconds is false will truncate to the current second
      * @param {Number} duration Duration in milliseconds
