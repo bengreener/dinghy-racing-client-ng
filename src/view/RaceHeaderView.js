@@ -80,7 +80,7 @@ function RaceHeaderView({ race, showInRaceData = true }) {
         if (pursuitEndAudioRef.current != null && (Math.floor(currentElapsedTime / 1000) * 1000) === race.duration) {
             pursuitEndAudioRef.current.play();
         }
-    }, [race.clock, race.plannedStartTime]);
+    }, [race.clock, race.plannedStartTime, race.duration]);
 
     function handleRacePostponeClick() {
         setShowPostponeRace(true);
