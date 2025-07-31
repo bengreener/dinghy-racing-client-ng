@@ -112,12 +112,17 @@ function RaceHeaderView({ race, showInRaceData = true }) {
         }
     }, [model, race, handleRaceEntryLapsUpdate]);
 
+    // add tick handler
     useEffect(() => {
         if (previousRace.current && previousRace.current.clock) {
             previousRace.current.clock.removeTickHandler(tickHandler);
         }
         race.clock.addTickHandler(tickHandler);
         previousRace.current = race;
+
+        return (() => {
+            race.clock.removeTickHandler(tickHandler);
+        });
     }, [race, tickHandler]);
 
     function closePostponeRaceFormDialog() {
