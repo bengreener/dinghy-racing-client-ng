@@ -6,11 +6,10 @@ function startTicker() {
     // using setInterval would create timing creep; interval is always > 1000 by a 'random factor'
     // this approach results in an average interval of ~1000 milliseconds
     const setNextTick = (recursiveCallback) => {
-        //console.log(`,tick,${Date.now()},${performance.now()},${performance.now() + dateOffset},${1000 - (performance.now() + dateOffset) % 1000},,`);
         ticker = setTimeout(() => {
             postMessage(null);
             recursiveCallback(recursiveCallback);
-        }, 1000 - (performance.now() + dateOffset) % 1000);
+        }, 1001 - (performance.now() + dateOffset) % 1000);
     }
     setNextTick(setNextTick);
 }
