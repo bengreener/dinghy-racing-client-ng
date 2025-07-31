@@ -383,3 +383,57 @@ describe('when lap sheet button clicked', () => {
         expect(openSpy).toBeCalledWith('http://localhost/lap-sheet/485');
     });
 });
+
+describe('when race is a pursuit race', () => {
+    describe('when 61 seconds before the end of the race', () => {
+        xit('does not sound an audio warning to prepare for the end of the race', () => {
+            // don't know how to actually test this :(
+            expect(true).toBeFalsy();
+        });
+    });
+    describe('when 60 seconds before the end of the race', () => {
+        xit('sounds an audio warning to prepare for the end of the race', () => {
+            // don't know how to actually test this :(
+            expect(true).toBeFalsy();
+        });
+    });
+    describe('when 59 seconds before the end of the race', () => {
+        xit('does not sound an audio warning to prepare for the end of the race', () => {
+            // don't know how to actually test this :(
+            expect(true).toBeFalsy();
+        });
+    });
+    describe('when 1 seconds before the end of the race', () => {
+        xit('does not sound an audio warning for the end of the race', () => {
+            // don't know how to actually test this :(
+            expect(true).toBeFalsy();
+        });
+    });
+    describe('when the end of the race', () => {
+        xit('sounds an audio warning for the end of the race', () => {
+            // don't know how to actually test this :(
+            expect(true).toBeFalsy();
+        });
+    });
+    describe('when 1 seconds after the end of the race', () => {
+        xit('does not sound an audio warning for the end of the race', () => {
+            // don't know how to actually test this :(
+            expect(true).toBeFalsy();
+        });
+    });
+});
+
+describe('when race is a fleet race', () => {
+    describe('when 60 seconds before the end of the race', () => {
+        xit('does not sound an audio warning for the end of the race', () => {
+            // don't know how to actually test this :(
+            expect(true).toBeFalsy();
+        })
+    });
+    describe('when the end of the race', () => {
+        xit('does not sound an audio warning for the end of the race', () => {
+            // don't know how to actually test this :(
+            expect(true).toBeFalsy();
+        });
+    });
+});
