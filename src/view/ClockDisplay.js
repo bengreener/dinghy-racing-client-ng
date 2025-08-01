@@ -14,31 +14,33 @@
  * limitations under the License. 
  */
 
+import { useEffect, useState } from 'react';
 import Clock from '../model/domain-classes/clock';
-import { useRef } from 'react';
 
 /**
- * Display a formatted time countdown and a message
+ * Display a formatted time
  * @param {Object} prop
- * @param {Integer} prop.time
- * @param {String} prop.message
- * @param {Boolean} [prop.beep = false]
+ * @param {Integer} prop.clock
  */
-function CountdownDisplayControl({ time, message, beep = false }) {
-    const beepAudio = useRef(new Audio('./sounds/beep_2000hz_100ms_mono.wav'));
+function ClockDisplay({ clock }) {
+    const [time, setTime] = useState(clock.getTime());
 
-    if (beep) {
-        beepAudio.current.play();
-    }
+    useEffect(() => {
+        const tickHandler = () => {
+            setTime(clock.getTime());
+        }
+        clock.addTickHandler(tickHandler);
+
+        return () => {
+            clock.removeTickHandler(tickHandler);
+        }
+    }, [clock]);
 
     return (
-        <div className='countdown-display-control' >
-            <output className='clock-display'>{Clock.formatDuration(time, false, true)}</output>
-            <div>
-                <output>{message}</output>
-            </div>
+        <div className='time-display' >
+            <output>{Clock.formatTime(time)}</output>
         </div>
     )
 }
 
-export default CountdownDisplayControl;
+export default ClockDisplay;

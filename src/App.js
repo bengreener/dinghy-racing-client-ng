@@ -31,6 +31,7 @@ import ModalDialog from './view/ModalDialog';
 import SetTimeForm from './view/SetTimeForm';
 import Clock from './model/domain-classes/clock';
 import FleetConsole from './view/FleetConsole';
+import ClockDisplay from './view/ClockDisplay';
 
 function App({model, controller}) {
     const [displayPort, setDisplayPort] = React.useState();
@@ -173,6 +174,11 @@ function App({model, controller}) {
                         : null
                     }
                 </nav>
+            </div>
+            <div className='w3-row'>
+                <div className='w3-right'>
+                    <ClockDisplay clock={model.getClock()} />
+                </div>
             </div>
             <div className='display-port' >
             <ErrorBoundary key={Date.now()}>

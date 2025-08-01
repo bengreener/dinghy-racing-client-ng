@@ -40,6 +40,29 @@ class Clock {
     _ticker;
 
     /**
+     * Format a time in milliseconds into a string
+     * @param {Number} duration Duration in milliseconds
+     * @param {boolean} [fractionalSeconds = false] true to display fractional seconds to 3 decimal places
+     * @returns {String}
+     */
+    static formatTime(time, fractionalSeconds = false) {
+        const resolvedOptions = Intl.DateTimeFormat().resolvedOptions();
+        let formatOptions = {
+            timeZone: resolvedOptions.timeZone,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        };
+        if (fractionalSeconds) {
+          formatOptions = {...formatOptions, fractionalSecondDigits: 3};
+        };
+        const timeFormat = new Intl.DateTimeFormat(resolvedOptions.locale, formatOptions);
+
+        return timeFormat.format(new Date(time));
+    }
+
+    /**
      * Formats a duration in milliseconds into a string; format hh:mm:ss
      * If fractional seconds is false will truncate to the current second
      * @param {Number} duration Duration in milliseconds
@@ -85,7 +108,7 @@ class Clock {
     }
 
     static synchToTime(time) {
-        Clock._synchOffset = time.valueOf() - Date.now();
+        Clock._synchOffset = time.getTime() - Date.now();
         if (!Clock.synchEvent) {
             Clock._broadcastChannel.postMessage({message: 'synchToTime', body: time});
         }
@@ -103,7 +126,7 @@ class Clock {
      * @param {Date} startTime The start time for the clock. Defaults to the time of instantiation.
      */
     constructor(startTime = new Date()) {
-        this._startTime = startTime.valueOf();
+        this._startTime = startTime.getTime();
         this._dateNowPerformanceNowDiff = Date.now() - performance.now();
         this._performanceTimerStartTime =  this._startTime - this._dateNowPerformanceNowDiff;
     }
@@ -119,7 +142,6 @@ class Clock {
             // using setInterval would create timing creep; interval is always > 1000 by a 'random factor'
             // this approach results in an average interval of ~1000 milliseconds
             const setNextTick = (recursiveCallback) => {
-                // console.log(`tick nextDelay: ${1000 - Date.now() % 1000}`);
                 this._ticker = setTimeout(() => {
                     if (this._tickHandlers.size > 0) {
                         this._tickHandlers.forEach(callback => {
@@ -151,7 +173,7 @@ class Clock {
      * @returns {Date}
      */
     getTime() {
-        return new Date(this._startTime + this.getElapsedTime());
+        return this._startTime + this.getElapsedTime();
     }
 
     /**
@@ -160,7 +182,7 @@ class Clock {
      * @returns {Date}
      */
     getTimeToSecondPrecision() {
-        return new Date(Math.floor((this._startTime + this.getElapsedTime()) / 1000) * 1000);
+        return Math.floor((this._startTime + this.getElapsedTime()) / 1000) * 1000;
     }
 
     /**

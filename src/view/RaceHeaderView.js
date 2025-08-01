@@ -39,6 +39,26 @@ function RaceHeaderView({ race, showInRaceData = true }) {
     const previousRace = useRef(); // enables removal of tickHandler from previous race when rendered with new race
     const [showPostponeRace, setShowPostponeRace] = useState(false);
     const [showShortenCourse, setShowShortenCourse] = useState(false);
+    const audioContext = useRef(new AudioContext());
+    const pursuitEndWarningAudioRef = useRef(null);
+    const pursuitEndAudioRef = useRef(null);
+    const pursuitEndWarningTrack = useRef(null);
+    const pursuitEndTrack = useRef(null);
+
+    if (pursuitEndWarningAudioRef.current === null && race.type === RaceType.PURSUIT) {
+        pursuitEndWarningAudioRef.current = new Audio('./sounds/prepare_alert.mp3');
+    }
+    if (pursuitEndAudioRef.current === null && race.type === RaceType.PURSUIT) {
+        pursuitEndAudioRef.current = new Audio('./sounds/act_alert.mp3');
+    }
+    if (pursuitEndWarningTrack === null && audioContext != null && pursuitEndWarningAudioRef.current != null) {
+        pursuitEndWarningTrack.current = audioContext.createMediaElementSource(pursuitEndWarningAudioRef.current);
+        pursuitEndWarningTrack.current(audioContext.current.destination);
+    }
+    if (pursuitEndTrack === null && audioContext != null && pursuitEndAudioRef.current != null) {
+        pursuitEndTrack.current = audioContext.createMediaElementSource(pursuitEndAudioRef.current);
+        pursuitEndTrack.current(audioContext.current.destination);
+    }
 
     const handleRaceEntryLapsUpdate = useCallback(() => {
         model.getRace(race.url).then(result => {
@@ -54,7 +74,13 @@ function RaceHeaderView({ race, showInRaceData = true }) {
     const tickHandler = useCallback(() => {
         const currentElapsedTime = race.clock.getElapsedTime(race.plannedStartTime); // ensure state calculated on current time uses the same value
         setElapsedTime(currentElapsedTime); // takes effect next render so can't be used to drive caluclations of other state updates based on time in this handler
-    }, [race.clock, race.plannedStartTime]);
+        if (pursuitEndWarningAudioRef.current != null && (Math.floor(currentElapsedTime / 1000) * 1000) === race.duration - 60000) {
+            pursuitEndWarningAudioRef.current.play();
+        }
+        if (pursuitEndAudioRef.current != null && (Math.floor(currentElapsedTime / 1000) * 1000) === race.duration) {
+            pursuitEndAudioRef.current.play();
+        }
+    }, [race.clock, race.plannedStartTime, race.duration]);
 
     function handleRacePostponeClick() {
         setShowPostponeRace(true);
@@ -86,12 +112,17 @@ function RaceHeaderView({ race, showInRaceData = true }) {
         }
     }, [model, race, handleRaceEntryLapsUpdate]);
 
+    // add tick handler
     useEffect(() => {
         if (previousRace.current && previousRace.current.clock) {
             previousRace.current.clock.removeTickHandler(tickHandler);
         }
         race.clock.addTickHandler(tickHandler);
         previousRace.current = race;
+
+        return (() => {
+            race.clock.removeTickHandler(tickHandler);
+        });
     }, [race, tickHandler]);
 
     function closePostponeRaceFormDialog() {

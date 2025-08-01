@@ -1,4 +1,5 @@
-var ticker;
+let ticker;
+let dateOffset = Date.now() - performance.now();
 
 function startTicker() {
     // synchronise to system clock so tick is every time system clock seconds change
@@ -8,7 +9,7 @@ function startTicker() {
         ticker = setTimeout(() => {
             postMessage(null);
             recursiveCallback(recursiveCallback);
-        }, 1000 - Date.now() % 1000);
+        }, 1001 - (performance.now() + dateOffset) % 1000);
     }
     setNextTick(setNextTick);
 }

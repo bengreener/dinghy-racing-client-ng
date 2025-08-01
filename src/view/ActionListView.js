@@ -26,10 +26,10 @@ import FlagState from '../model/domain-classes/flag-state';
  * @returns {HTMLDivElement}
  */
 function ActionListView({ signals, clock }) {
-    const [timestamp, setTimestamp] = useState(clock.getTimeToSecondPrecision().valueOf()); // use Clock.now to get adjusted time when synched to an external clock
+    const [timestamp, setTimestamp] = useState(clock.getTimeToSecondPrecision()); // use Clock.now to get adjusted time when synched to an external clock
 
     const handleTick = useCallback(() => {
-        setTimestamp(clock.getTimeToSecondPrecision().valueOf());
+        setTimestamp(clock.getTimeToSecondPrecision());
     }, [clock]);
 
     useEffect(() => {
@@ -52,7 +52,7 @@ function ActionListView({ signals, clock }) {
 
     // create race start actions list
     const actionsDescriptionsMap = new Map();
-    signals.sort((a, b) => a.time.valueOf() - b.time.valueOf());
+    signals.sort((a, b) => a.time - b.time);
     signals.forEach((signal) => {
         let description = signal.meaning;
         if (description) {
@@ -70,12 +70,12 @@ function ActionListView({ signals, clock }) {
             }
             description += 'Sound: ' + signal.soundSignal.description + '.';
         }
-        if (actionsDescriptionsMap.has(signal.time.valueOf())) {
-            const oldDescription = actionsDescriptionsMap.get(signal.time.valueOf());
-            actionsDescriptionsMap.set(signal.time.valueOf(), oldDescription + '\n' + description);
+        if (actionsDescriptionsMap.has(signal.time)) {
+            const oldDescription = actionsDescriptionsMap.get(signal.time);
+            actionsDescriptionsMap.set(signal.time, oldDescription + '\n' + description);
         }
         else {
-            actionsDescriptionsMap.set(signal.time.valueOf(), description);
+            actionsDescriptionsMap.set(signal.time, description);
         }
     });
 

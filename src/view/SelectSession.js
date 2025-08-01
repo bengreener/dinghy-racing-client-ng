@@ -30,7 +30,7 @@ function SelectSession({ sessionStart, sessionEnd, onSessionStartChange, onSessi
     const [start, setStart] = useState(() => {
         let localSessionStart;
         if (sessionStart) {
-            localSessionStart  = new Date(sessionStart.valueOf()); // as value passed by reference updating sessionStart prop value directly could have side effects (values will be changed on second call under strict mode in development)
+            localSessionStart  = new Date(sessionStart.getTime()); // as value passed by reference updating sessionStart prop value directly could have side effects (values will be changed on second call under strict mode in development)
             localSessionStart.setMinutes(localSessionStart.getMinutes() - localSessionStart.getTimezoneOffset());
         }
         return localSessionStart ? localSessionStart.toISOString().substring(0, 16) : '';
@@ -38,7 +38,7 @@ function SelectSession({ sessionStart, sessionEnd, onSessionStartChange, onSessi
     const [end, setEnd] = useState(() => {
         let localSessionEnd;
         if (sessionEnd) {
-            localSessionEnd = new Date(sessionEnd.valueOf()); // as value passed by reference updating sessionEnd prop value directly could have side effects (values will be changed on second call under strict mode in development)
+            localSessionEnd = new Date(sessionEnd.getTime()); // as value passed by reference updating sessionEnd prop value directly could have side effects (values will be changed on second call under strict mode in development)
             localSessionEnd.setMinutes(localSessionEnd.getMinutes() - localSessionEnd.getTimezoneOffset());
         }
         return localSessionEnd ? localSessionEnd.toISOString().substring(0, 16) : '';

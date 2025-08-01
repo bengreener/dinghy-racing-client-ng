@@ -31,7 +31,7 @@ afterEach(() => {
 describe('when it is 5 minutes before the race start time', () => {
     it('returns the next race to start', () => {
         const raceStartSequence = new RaceStartSequence(raceScorpionA, new Clock());
-        const race = raceStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf() - 36000));
+        const race = raceStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.getTime() - 36000));
 
         expect(race).toEqual(raceScorpionA);
     });
@@ -40,7 +40,7 @@ describe('when it is 5 minutes before the race start time', () => {
 describe('when it is 0 minutes before the race start time', () => {
     it('returns the next race to start', () => {
         const raceStartSequence = new RaceStartSequence(raceScorpionA, new Clock());
-        const race = raceStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf()));
+        const race = raceStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.getTime()));
 
         expect(race).toEqual(raceScorpionA);
     });
@@ -49,7 +49,7 @@ describe('when it is 0 minutes before the race start time', () => {
 describe('when it is 1 second after the race start time', () => {
     it('returns null as no next race to start', () => {
         const raceStartSequence = new RaceStartSequence(raceScorpionA, new Clock());
-        const race = raceStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.valueOf() + 1000));
+        const race = raceStartSequence.getNextRaceToStart(new Date(raceScorpionA.plannedStartTime.getTime() + 1000));
 
         expect(race).toBeNull();
     });
@@ -60,7 +60,7 @@ describe('when using CSC club start', () => {
         it('returns signals', () => {
             const raceStartSequence = new RaceStartSequence(raceScorpionA, new Clock());
             const signals = raceStartSequence.getSignals();
-            const scorpionEndSequenceSignal = {...endSequenceSignal, time: new Date(raceScorpionA.plannedStartTime.valueOf())};
+            const scorpionEndSequenceSignal = {...endSequenceSignal, time: raceScorpionA.plannedStartTime.getTime()};
 
             expect(signals).toEqual([scorpionWarningSignal, preparatorySignal, scorpionEndSequenceSignal, scorpionStartSignal]);
         });
@@ -79,10 +79,10 @@ describe('when using CSC club start', () => {
             const fiveMinuteVisualSignal = {flags: [preparatoryFlag], flagsState: FlagState.LOWERED};
             const startVisualSignal = {flags: [classFlag], flagsState: FlagState.LOWERED};
             const startSoundSignal = {description: 'One'};
-            const warningSignal = {meaning: 'Warning signal', time: new Date(raceHandicapA.plannedStartTime.valueOf() - 600000), soundSignal: warningSoundSignal, visualSignal: warningVisualSignal};
-            const preparatorySignal = {meaning: 'Preparatory signal', time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
-            const fiveMinuteSignal = {meaning: 'Start sequence finished', time: new Date(raceHandicapA.plannedStartTime.valueOf()), soundSignal: null, visualSignal: fiveMinuteVisualSignal};
-            const startSignal = {meaning: 'Starting signal', time: new Date(raceHandicapA.plannedStartTime.valueOf()), soundSignal: startSoundSignal, visualSignal: startVisualSignal};
+            const warningSignal = {meaning: 'Warning signal', time: raceHandicapA.plannedStartTime.getTime() - 600000, soundSignal: warningSoundSignal, visualSignal: warningVisualSignal};
+            const preparatorySignal = {meaning: 'Preparatory signal', time: raceHandicapA.plannedStartTime.getTime() - 300000, soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
+            const fiveMinuteSignal = {meaning: 'Start sequence finished', time: raceHandicapA.plannedStartTime.getTime(), soundSignal: null, visualSignal: fiveMinuteVisualSignal};
+            const startSignal = {meaning: 'Starting signal', time: raceHandicapA.plannedStartTime.getTime(), soundSignal: startSoundSignal, visualSignal: startVisualSignal};
 
             expect(signals).toEqual([warningSignal, preparatorySignal, fiveMinuteSignal, startSignal]);
         });
@@ -107,12 +107,12 @@ describe('when using CSC club start', () => {
             const startSoundSignal = {description: 'One'};
             const topperStartSoundSignal = {description: 'One'};
             const laserStartSoundSignal = {description: 'One'};
-            const warningSignal = {meaning: 'Warning signal', time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 600000), soundSignal: warningSoundSignal, visualSignal: warningVisualSignal};
-            const preparatorySignal = {meaning: 'Preparatory signal', time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
-            const fiveMinuteSignal = {meaning: 'Start sequence finished', time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf()), soundSignal: null, visualSignal: fiveMinuteVisualSignal};
-            const startSignal = {meaning: 'Starting signal', time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf()), soundSignal: startSoundSignal, visualSignal: startVisualSignal};
-            const topperSignal = {meaning: 'Topper start', time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), soundSignal: topperStartSoundSignal};
-            const laserSignal = {meaning: 'Laser start', time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), soundSignal: laserStartSoundSignal};
+            const warningSignal = {meaning: 'Warning signal', time: raceWithDinghyClasses.plannedStartTime.getTime() - 600000, soundSignal: warningSoundSignal, visualSignal: warningVisualSignal};
+            const preparatorySignal = {meaning: 'Preparatory signal', time: raceWithDinghyClasses.plannedStartTime.getTime() - 300000, soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
+            const fiveMinuteSignal = {meaning: 'Start sequence finished', time: raceWithDinghyClasses.plannedStartTime.getTime(), soundSignal: null, visualSignal: fiveMinuteVisualSignal};
+            const startSignal = {meaning: 'Starting signal', time: raceWithDinghyClasses.plannedStartTime.getTime(), soundSignal: startSoundSignal, visualSignal: startVisualSignal};
+            const topperSignal = {meaning: 'Topper start', time: raceWithDinghyClasses.plannedStartTime.getTime() + 682000, soundSignal: topperStartSoundSignal};
+            const laserSignal = {meaning: 'Laser start', time: raceWithDinghyClasses.plannedStartTime.getTime() + 1075000, soundSignal: laserStartSoundSignal};
 
             expect(raceStartSequence.getSignals()).toEqual([warningSignal, preparatorySignal, fiveMinuteSignal, startSignal, topperSignal, laserSignal]);
         });
@@ -125,8 +125,8 @@ describe('when using RRS26 start', () => {
             const raceStartSequence = new RaceStartSequence({...raceScorpionA, startType: StartType.RRS26}, new Clock());
             const signals = raceStartSequence.getSignals();
 
-            const scorpionWarningSignal_rrs26 = {...scorpionWarningSignal, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 300000)};
-            const scorpionPreparatorySignal_rrs26 = {...scorpionPreparatorySignal, time: new Date(raceScorpionA.plannedStartTime.valueOf() - 240000)};
+            const scorpionWarningSignal_rrs26 = {...scorpionWarningSignal, time: raceScorpionA.plannedStartTime.getTime() - 300000};
+            const scorpionPreparatorySignal_rrs26 = {...scorpionPreparatorySignal, time: raceScorpionA.plannedStartTime.getTime() - 240000};
 
             expect(signals).toEqual([scorpionWarningSignal_rrs26, scorpionPreparatorySignal_rrs26, scorpionOneMinuteSignal, scorpionStartSignal]);
         });
@@ -146,10 +146,10 @@ describe('when using RRS26 start', () => {
             const oneMinuteSoundSignal = {description: 'One long'};
             const startVisualSignal = {flags: [classFlag], flagsState: FlagState.LOWERED};
             const startSoundSignal = {description: 'One'};
-            const warningSignal = {meaning: 'Warning signal', time: new Date(raceHandicapA.plannedStartTime.valueOf() - 300000), soundSignal: warningSoundSignal, visualSignal: warningVisualSignal};
-            const preparatorySignal = {meaning: 'Preparatory signal', time: new Date(raceHandicapA.plannedStartTime.valueOf() - 240000), soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
-            const oneMinuteSignal = {meaning: 'One minute', time: new Date(raceHandicapA.plannedStartTime.valueOf() - 60000), soundSignal: oneMinuteSoundSignal, visualSignal: oneMinuteVisualSignal};
-            const startSignal = {meaning: 'Starting signal', time: new Date(raceHandicapA.plannedStartTime.valueOf()), soundSignal: startSoundSignal, visualSignal: startVisualSignal};
+            const warningSignal = {meaning: 'Warning signal', time: raceHandicapA.plannedStartTime.getTime() - 300000, soundSignal: warningSoundSignal, visualSignal: warningVisualSignal};
+            const preparatorySignal = {meaning: 'Preparatory signal', time: raceHandicapA.plannedStartTime.getTime() - 240000, soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
+            const oneMinuteSignal = {meaning: 'One minute', time: raceHandicapA.plannedStartTime.getTime() - 60000, soundSignal: oneMinuteSoundSignal, visualSignal: oneMinuteVisualSignal};
+            const startSignal = {meaning: 'Starting signal', time: raceHandicapA.plannedStartTime.getTime(), soundSignal: startSoundSignal, visualSignal: startVisualSignal};
 
             expect(signals).toEqual([warningSignal, preparatorySignal, oneMinuteSignal, startSignal]);
         });
@@ -175,12 +175,12 @@ describe('when using RRS26 start', () => {
             const startSoundSignal = {description: 'One'};
             const topperStartSoundSignal = {description: 'One'};
             const laserStartSoundSignal = {description: 'One'};
-            const warningSignal = {meaning: 'Warning signal', time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 300000), soundSignal: warningSoundSignal, visualSignal: warningVisualSignal};
-            const preparatorySignal = {meaning: 'Preparatory signal', time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 240000), soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
-            const oneMinuteSignal = {meaning: 'One minute', time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() - 60000), soundSignal: oneMinuteSoundSignal, visualSignal: oneMinuteVisualSignal};
-            const startSignal = {meaning: 'Starting signal', time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf()), soundSignal: startSoundSignal, visualSignal: startVisualSignal};
-            const topperSignal = {meaning: 'Topper start', time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 682000), soundSignal: topperStartSoundSignal};
-            const laserSignal = {meaning: 'Laser start', time: new Date(raceWithDinghyClasses.plannedStartTime.valueOf() + 1075000), soundSignal: laserStartSoundSignal};
+            const warningSignal = {meaning: 'Warning signal', time: raceWithDinghyClasses.plannedStartTime.getTime() - 300000, soundSignal: warningSoundSignal, visualSignal: warningVisualSignal};
+            const preparatorySignal = {meaning: 'Preparatory signal', time: raceWithDinghyClasses.plannedStartTime.getTime() - 240000, soundSignal: preparatorySoundSignal, visualSignal: preparatoryVisualSignal};
+            const oneMinuteSignal = {meaning: 'One minute', time: raceWithDinghyClasses.plannedStartTime.getTime() - 60000, soundSignal: oneMinuteSoundSignal, visualSignal: oneMinuteVisualSignal};
+            const startSignal = {meaning: 'Starting signal', time: raceWithDinghyClasses.plannedStartTime.getTime(), soundSignal: startSoundSignal, visualSignal: startVisualSignal};
+            const topperSignal = {meaning: 'Topper start', time: raceWithDinghyClasses.plannedStartTime.getTime() + 682000, soundSignal: topperStartSoundSignal};
+            const laserSignal = {meaning: 'Laser start', time: raceWithDinghyClasses.plannedStartTime.getTime() + 1075000, soundSignal: laserStartSoundSignal};
 
             expect(raceStartSequence.getSignals()).toEqual([warningSignal, preparatorySignal, oneMinuteSignal, startSignal, topperSignal, laserSignal]);
         });

@@ -86,6 +86,16 @@ describe('when signing up for a race', () => {
         const options = within(inputDinghyClass).getAllByRole('option');
         expect(options.length).toBe(3);
     });
+    it('presents dinghy classes in ascending alphabetical order', async () => {
+        const fleetHandicap = {name: 'Handicap', dinghyClasses: [dinghyClassScorpion, dinghyClassGraduate], url: 'http://localhost:8081/dinghyracing/api/fleets/2'};
+        await act(async () => {
+            customRender(<SignUp race={{...raceHandicapA, fleet: fleetHandicap}}/>, model, controller);
+        });
+        const inputDinghyClass = screen.getByLabelText(/class/i);
+        const options = within(inputDinghyClass).getAllByRole('option');
+        const values = options.map(o => o.value);
+        expect(values).toEqual(['', 'Graduate', 'Scorpion']);
+    });
     describe('when race for a fleet that includes only dinghy classes with no crew', () => {
         it('renders', async () => {
             await act(async () => {
@@ -9777,8 +9787,7 @@ describe('when race is for a fleet with a single class', () => {
 });
 
 it('registers an interest in fleet updates for races in session', async () => {
-    jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})}); // ???? works when run in debug or as lone test. When run as part of larger test run order of last 2 calls keeps being revesed so never correct
-    // jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence([raceScorpionA, raceGraduateA, raceCometA, raceHandicapA], model)})});
+    jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
     const registerFleetUpdateCallbackSpy = jest.spyOn(model, 'registerFleetUpdateCallback');
     const fleet = {...fleetHandicap, dinghyClasses: [dinghyClassComet, dinghyClassGraduate]};
 
