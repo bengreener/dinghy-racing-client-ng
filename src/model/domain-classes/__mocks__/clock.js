@@ -142,7 +142,6 @@ class Clock {
             // using setInterval would create timing creep; interval is always > 1000 by a 'random factor'
             // this approach results in an average interval of ~1000 milliseconds
             const setNextTick = (recursiveCallback) => {
-                // console.log(`tick nextDelay: ${1000 - Date.now() % 1000}`);
                 this._ticker = setTimeout(() => {
                     if (this._tickHandlers.size > 0) {
                         this._tickHandlers.forEach(callback => {
