@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import ModelContext from './ModelContext';
 import SelectSession from './SelectSession';
 import RaceHeaderView from './RaceHeaderView';
@@ -32,12 +32,13 @@ import { storageAvailable } from '../utilities/storage-utilities';
  */
 function RaceStartConsole () {
     const model = useContext(ModelContext);
+    const sessionStorageAvailable = useMemo(() => storageAvailable('sessionStorage'), []);
     const [selectedRaces, setSelectedRaces] = useState([]); // selection of race names made by user
     const [raceMap, setRaceMap] = useState(new Map()); // map of race names to races
     const [message, setMessage] = useState(''); // feedback to user
     const [sessionStart, setSessionStart] = useState(() => {
         let sessionStart;
-        if (storageAvailable('sessionStorage')) {
+        if (sessionStorageAvailable) {
             const storedValue = sessionStorage.getItem('sessionStart');
             if (storedValue) {
                 sessionStart = new Date(storedValue);
@@ -51,7 +52,7 @@ function RaceStartConsole () {
     });
     const [sessionEnd, setSessionEnd] = useState(() => {
         let sessionEnd;
-        if (storageAvailable('sessionStorage')) {
+        if (sessionStorageAvailable) {
             const storedValue = sessionStorage.getItem('sessionEnd');
             if (storedValue) {
                 sessionEnd = new Date(storedValue);
@@ -215,14 +216,14 @@ function RaceStartConsole () {
     }
 
     function handleSessionStartInputChange(date) {
-        if (storageAvailable('sessionStorage')) {
+        if (sessionStorageAvailable) {
             sessionStorage.setItem('sessionStart', date.toISOString());
         }
         setSessionStart(date);
     }
 
     function handleSessionEndInputChange(date) {
-        if (storageAvailable('sessionStorage')) {
+        if (sessionStorageAvailable) {
             sessionStorage.setItem('sessionEnd', date.toISOString());
         }
         setSessionEnd(date);
