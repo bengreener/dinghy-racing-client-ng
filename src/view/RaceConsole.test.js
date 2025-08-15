@@ -33,6 +33,7 @@ HTMLDialogElement.prototype.close = jest.fn();
 afterEach(() => {
     sessionStorage.removeItem('sessionStart');
     sessionStorage.removeItem('sessionEnd');
+    sessionStorage.removeItem('raceType');
 });
 
 it('renders', async () => {
@@ -502,7 +503,6 @@ describe('when session storage is available', () => {
     describe('when start session time has been changed from default this sesssion', () => {
         it('uses value set for session start by user', async () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
             jest.spyOn(model, 'getStartSequence');
     
             sessionStorage.setItem('sessionStart', '2024-08-15T14:00:00Z');
@@ -518,7 +518,6 @@ describe('when session storage is available', () => {
     describe('when end session time has been changed from default this sesssion', () => {
         it('uses value set for session end by user', async () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
             jest.spyOn(model, 'getStartSequence');
     
             sessionStorage.setItem('sessionEnd', '2024-08-15T10:00:00Z');
@@ -531,13 +530,27 @@ describe('when session storage is available', () => {
             expect(selectSessionEnd).toHaveValue('2024-08-15T11:00');
         });
     });
+    describe('when race type has been changed from default this session', () => {
+        it('uses value set for race type by user', async () => {
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(model, 'getStartSequence');
+    
+            sessionStorage.setItem('raceType', 'PURSUIT');
+            
+            await act(async () => {        
+                customRender(<RaceConsole />, model);
+            });
+    
+            const checkboxPursuit = screen.getByLabelText(/pursuit/i);
+            expect(checkboxPursuit).toBeChecked();
+        });
+    });
 });
 
 describe('when session storage is not available', () => {
     describe('when start session time has been changed from default this sesssion', () => {
-        it('uses default value set for session start', async () => {
+        it('uses default value for session start', async () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
             jest.spyOn(model, 'getStartSequence');
             jest.spyOn(storageUtilities, 'storageAvailable').mockImplementation(() => false);
     
@@ -552,9 +565,8 @@ describe('when session storage is not available', () => {
         });
     });
     describe('when end session time has been changed from default this sesssion', () => {
-        it('uses value set for session end by user', async () => {
+        it('uses default value for session end', async () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
             jest.spyOn(model, 'getStartSequence');
             jest.spyOn(storageUtilities, 'storageAvailable').mockImplementation(() => false);
     
@@ -566,6 +578,21 @@ describe('when session storage is not available', () => {
     
             const selectSessionEnd = screen.getByLabelText(/session end/i);
             expect(selectSessionEnd).toHaveValue(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000).toISOString().substring(0, 16));
+        });
+    });
+    describe('when race type has been changed from default this session', () => {
+        it('uses default value for race type', async () => {
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            jest.spyOn(model, 'getStartSequence');
+    
+            sessionStorage.setItem('raceType', 'PURSUIT');
+            
+            await act(async () => {        
+                customRender(<RaceConsole />, model);
+            });
+    
+            const checkboxPursuit = screen.getByLabelText(/pursuit/i);
+            expect(checkboxPursuit).not.toBeChecked();
         });
     });
 });

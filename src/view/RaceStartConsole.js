@@ -66,7 +66,19 @@ function RaceStartConsole () {
     });
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(model.getClock().getTime()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
     const [fleetUpdateRequestAt, setFleetUpdateRequestAt] = useState(model.getClock().getTime()); // time of last request to fetch fleet from server. change triggers calculation of a new start sequence
-    const [raceType, setRaceType] = useState(RaceType.FLEET);
+    const [raceType, setRaceType] = useState(() => {
+        let raceType;
+        if (sessionStorageAvailable) {
+            const storedValue = sessionStorage.getItem('raceType');
+            if (storedValue) {
+                raceType = RaceType.from(storedValue);
+            }
+        }
+        if (!raceType) {
+            raceType = RaceType.FLEET;
+        }
+        return raceType;
+    });
     const [signals, setSignals] = useState([]);
     const [timestamp, setTimestamp] = useState(model.getClock().getTime());
     const sessionStartSequence = useRef(null);
@@ -230,6 +242,9 @@ function RaceStartConsole () {
     }
 
     function handleRaceTypeChange({ target }) {
+        if (sessionStorageAvailable) {
+            sessionStorage.setItem('raceType', target.value);
+        }
         setRaceType(RaceType.from(target.value));
     }
 
@@ -267,11 +282,11 @@ function RaceStartConsole () {
                             <legend>Race Type</legend>
                             <div className='w3-cell-row'>
                                 <div className='w3-cell'>
-                                    <input id='radio-race-type-fleet' name='race-type' type='radio' value='FLEET' onChange={handleRaceTypeChange} defaultChecked='true'/>
+                                    <input id='radio-race-type-fleet' name='race-type' type='radio' value='FLEET' onChange={handleRaceTypeChange} checked={raceType === RaceType.FLEET} />
                                     <label htmlFor='radio-race-type-fleet'>Fleet</label>
                                 </div>
                                 <div className='w3-cell'>
-                                    <input id='radio-race-type-pursuit' name='race-type' type='radio' value='PURSUIT' onChange={handleRaceTypeChange} />
+                                    <input id='radio-race-type-pursuit' name='race-type' type='radio' value='PURSUIT' onChange={handleRaceTypeChange} checked={raceType === RaceType.PURSUIT}/>
                                     <label htmlFor='radio-race-type-pursuit'>Pursuit</label>
                                 </div>
                             </div>
