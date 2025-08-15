@@ -24,6 +24,7 @@ import SignalPanel from './SignalsPanel';
 import RaceType from '../model/domain-classes/race-type';
 import CountdownDisplayControl from './CountdownDisplayControl';
 import { SortOrder } from '../model/dinghy-racing-model';
+import { storageAvailable } from '../utilities/storage-utilities';
 
 /**
  * Provide Race Officer with information needed to successfully start races in a session
@@ -35,13 +36,31 @@ function RaceStartConsole () {
     const [raceMap, setRaceMap] = useState(new Map()); // map of race names to races
     const [message, setMessage] = useState(''); // feedback to user
     const [sessionStart, setSessionStart] = useState(() => {
-        const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
-        sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
+        let sessionStart;
+        if (storageAvailable('sessionStorage')) {
+            const storedValue = sessionStorage.getItem('sessionStart');
+            if (storedValue) {
+                sessionStart = new Date(storedValue);
+            }
+        }
+        if (!sessionStart) {
+            sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
+            sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
+        }
         return sessionStart;
     });
     const [sessionEnd, setSessionEnd] = useState(() => {
-        const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000); // create as 20:00 UTC intially
-        sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
+        let sessionEnd;
+        if (storageAvailable('sessionStorage')) {
+            const storedValue = sessionStorage.getItem('sessionEnd');
+            if (storedValue) {
+                sessionEnd = new Date(storedValue);
+            }
+        }
+        if (!sessionEnd) {
+            sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000); // create as 20:00 UTC intially
+            sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
+        }
         return sessionEnd;
     });
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(model.getClock().getTime()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
@@ -196,10 +215,16 @@ function RaceStartConsole () {
     }
 
     function handleSessionStartInputChange(date) {
+        if (storageAvailable('sessionStorage')) {
+            sessionStorage.setItem('sessionStart', date.toISOString());
+        }
         setSessionStart(date);
     }
 
     function handleSessionEndInputChange(date) {
+        if (storageAvailable('sessionStorage')) {
+            sessionStorage.setItem('sessionEnd', date.toISOString());
+        }
         setSessionEnd(date);
     }
 

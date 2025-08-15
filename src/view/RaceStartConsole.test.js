@@ -25,6 +25,7 @@ import SessionStartSequence from '../model/domain-classes/session-start-sequence
 import RaceType from '../model/domain-classes/race-type';
 import { SortOrder } from '../model/dinghy-racing-model';
 import Clock from '../model/domain-classes/clock';
+import * as storageUtilities from '../utilities/storage-utilities';
 
 jest.mock('../model/dinghy-racing-model');
 jest.mock('../controller/dinghy-racing-controller');
@@ -183,7 +184,7 @@ describe('when new value set for race type', () => {
 it('defaults session start to 8:00 today', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    jest.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+    jest.spyOn(model, 'getStartSequence');
     
     await act(async () => {        
         customRender(<RaceStartConsole />, model, controller);
@@ -790,5 +791,77 @@ describe('when selected races changed', () => {
         expect(within(actionRows[3]).getByText(/lower graduate class flag/i)).toBeInTheDocument();
         expect(within(actionRows[3]).getByText(/lower blue peter/i)).toBeInTheDocument();
         expect(within(actionRows[3]).getByText(/10:00/i)).toBeInTheDocument();
+    });
+});
+
+describe('when session storage is available', () => {
+    describe('when start session time has been changed from deafult this sesssion', () => {
+        it('uses value set for session start by user', async () => {
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const controller = new DinghyRacingController(model);
+            jest.spyOn(model, 'getStartSequence');
+    
+            sessionStorage.setItem('sessionStart', '2024-08-15T14:00:00Z');
+            
+            await act(async () => {        
+                customRender(<RaceStartConsole />, model, controller);
+            });
+    
+            const selectSessionStart = screen.getByLabelText(/session start/i);
+            expect(selectSessionStart).toHaveValue('2024-08-15T15:00');
+        });
+    });
+    describe('when end session time has been changed from deafult this sesssion', () => {
+        it('uses value set for session end by user', async () => {
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const controller = new DinghyRacingController(model);
+            jest.spyOn(model, 'getStartSequence');
+    
+            sessionStorage.setItem('sessionEnd', '2024-08-15T10:00:00Z');
+            
+            await act(async () => {        
+                customRender(<RaceStartConsole />, model, controller);
+            });
+    
+            const selectSessionEnd = screen.getByLabelText(/session end/i);
+            expect(selectSessionEnd).toHaveValue('2024-08-15T11:00');
+        });
+    });
+});
+
+describe('when session storage is not available', () => {
+    describe('when start session time has been changed from default this sesssion', () => {
+        it('uses default value set for session start', async () => {
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const controller = new DinghyRacingController(model);
+            jest.spyOn(model, 'getStartSequence');
+            jest.spyOn(storageUtilities, 'storageAvailable').mockImplementation(() => false);
+    
+            sessionStorage.setItem('sessionStart', '2024-08-15T14:00:00Z');
+            
+            await act(async () => {        
+                customRender(<RaceStartConsole />, model, controller);
+            });
+    
+            const selectSessionStart = screen.getByLabelText(/session start/i);
+            expect(selectSessionStart).toHaveValue(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000).toISOString().substring(0, 16));
+        });
+    });
+    describe('when end session time has been changed from default this sesssion', () => {
+        it('uses value set for session end by user', async () => {
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const controller = new DinghyRacingController(model);
+            jest.spyOn(model, 'getStartSequence');
+            jest.spyOn(storageUtilities, 'storageAvailable').mockImplementation(() => false);
+    
+            sessionStorage.setItem('sessionEnd', '2024-08-15T10:00:00Z');
+            
+            await act(async () => {        
+                customRender(<RaceStartConsole />, model, controller);
+            });
+    
+            const selectSessionEnd = screen.getByLabelText(/session end/i);
+            expect(selectSessionEnd).toHaveValue(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000).toISOString().substring(0, 16));
+        });
     });
 });
