@@ -795,7 +795,7 @@ describe('when selected races changed', () => {
 });
 
 describe('when session storage is available', () => {
-    describe('when start session time has been changed from deafult this sesssion', () => {
+    describe('when start session time has been changed from default this sesssion', () => {
         it('uses value set for session start by user', async () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
@@ -811,7 +811,7 @@ describe('when session storage is available', () => {
             expect(selectSessionStart).toHaveValue('2024-08-15T15:00');
         });
     });
-    describe('when end session time has been changed from deafult this sesssion', () => {
+    describe('when end session time has been changed from default this sesssion', () => {
         it('uses value set for session end by user', async () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);

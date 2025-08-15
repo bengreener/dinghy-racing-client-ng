@@ -14,31 +14,50 @@
  * limitations under the License. 
  */
 
-import React from 'react';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import ModelContext from './ModelContext';
 import RaceEntriesView from './RaceEntriesView';
 import RaceHeaderView from './RaceHeaderView';
 import CollapsableContainer from './CollapsableContainer';
 import SelectSession from './SelectSession';
 import RaceType from '../model/domain-classes/race-type';
+import { storageAvailable } from '../utilities/storage-utilities';
 
 function RaceConsole() {
     const model = useContext(ModelContext);
+    const sessionStorageAvailable = useMemo(() => storageAvailable('sessionStorage'), []);
     const [selectedRaces, setSelectedRaces] = useState([]); // selection of race names made by user
     const [raceOptions, setRaceOptions] = useState([]); // list of names of races names for selection
     const [raceMap, setRaceMap] = useState(new Map()); // map of race names to races
     const [message, setMessage] = useState(''); // feedback to user
     const [sessionStart, setSessionStart] = useState(() => {
-        const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
-        sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
-        return sessionStart;
-    });
-    const [sessionEnd, setSessionEnd] = useState(() => {
-        const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000); // create as 18:00 UTC intially
-        sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
-        return sessionEnd;
-    });
+            let sessionStart;
+            if (sessionStorageAvailable) {
+                const storedValue = sessionStorage.getItem('sessionStart');
+                if (storedValue) {
+                    sessionStart = new Date(storedValue);
+                }
+            }
+            if (!sessionStart) {
+                sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
+                sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
+            }
+            return sessionStart;
+        });
+        const [sessionEnd, setSessionEnd] = useState(() => {
+            let sessionEnd;
+            if (sessionStorageAvailable) {
+                const storedValue = sessionStorage.getItem('sessionEnd');
+                if (storedValue) {
+                    sessionEnd = new Date(storedValue);
+                }
+            }
+            if (!sessionEnd) {
+                sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000); // create as 20:00 UTC intially
+                sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
+            }
+            return sessionEnd;
+        });
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
     const [raceType, setRaceType] = useState(RaceType.FLEET);
 
@@ -97,10 +116,16 @@ function RaceConsole() {
     }
 
     function handlesessionStartInputChange(date) {
+        if (sessionStorageAvailable) {
+            sessionStorage.setItem('sessionStart', date.toISOString());
+        }
         setSessionStart(date);
     }
 
     function handlesessionEndInputChange(date) {
+        if (sessionStorageAvailable) {
+            sessionStorage.setItem('sessionEnd', date.toISOString());
+        }
         setSessionEnd(date);
     }
 
