@@ -74,7 +74,7 @@ function DownloadRace({ race, downloadFunction }) {
 export default DownloadRace;
 
 /**
- * Action to take when AdjustCourseForm update laps button clicked
+ * Action to take when Download Results button clicked
  * @callback DownloadRace~downloadFunction
  * @param {Race} race to download
  * @param {DownloadOptions} options to configure download file

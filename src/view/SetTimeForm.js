@@ -73,7 +73,7 @@ function SetTimeForm({ setTime, closeParent }) {
 export default SetTimeForm;
 
 /**
- * Action to take when AdjustCourseForm update laps button clicked
+ * Action to take when Set Time button clicked
  * @callback SetTimeForm~setTime
  * @param {Date} time to set
  */
