@@ -171,7 +171,7 @@ function RaceHeaderView({ race, showInRaceData = true }) {
                     {showInRaceData && race.type !== RaceType.PURSUIT && updatedRace.lastLapTime > 0 ? <output id={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{Clock.formatDuration(updatedRace.averageLapTime)}</output> : null}
                 </div>
                 <div className='w3-col m1 s6'>
-                    {showInRaceData && race.type !== RaceType.PURSUIT && updatedRace.lapsSailed < updatedRace.plannedLaps - 1 ? <button id='shorten-course-button' className='w3-col' onClick={handleShortenCourseClick}>Shorten Course</button> : null}
+                    {showInRaceData && race.type !== RaceType.PURSUIT && updatedRace.lapsSailed < updatedRace.plannedLaps ? <button id='shorten-course-button' className='w3-col' onClick={handleShortenCourseClick}>Shorten Course</button> : null}
                     {!showInRaceData && race.type !== RaceType.PURSUIT ? <button id='adjust-course-button' className='w3-col' onClick={handleShortenCourseClick}>Adjust Laps</button> : null}
                 </div>
                 <div className='w3-col m1 s6'>
@@ -190,8 +190,8 @@ function RaceHeaderView({ race, showInRaceData = true }) {
                 <PostponeRaceForm race={race} onPostpone={controller.postponeRace} closeParent={closePostponeRaceFormDialog} />
             </ModalDialog>
             <ModalDialog show={showShortenCourse} onClose={closeShortenCourseDialog} testid={'shorten-course-dialog'}>
-                {showInRaceData ? <AdjustCourseForm race={race} minLaps={updatedRace.lapsSailed + 1} maxLaps={updatedRace.plannedLaps - 1} initialValue={updatedRace.plannedLaps - 1} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} /> : 
-                    <AdjustCourseForm race={race} minLaps={updatedRace.lapsSailed + 1} initialValue={updatedRace.plannedLaps - 1} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} />}
+                {showInRaceData ? <AdjustCourseForm race={race} minLaps={Math.max(1, updatedRace.lapsSailed)} maxLaps={updatedRace.plannedLaps - 1} initialValue={Math.max(1, updatedRace.plannedLaps - 1)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} /> :
+                    <AdjustCourseForm race={race} minLaps={Math.max(1, updatedRace.lapsSailed)} initialValue={Math.max(1, updatedRace.plannedLaps)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} />}
             </ModalDialog>
         </div>
     );
