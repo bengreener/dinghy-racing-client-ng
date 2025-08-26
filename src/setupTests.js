@@ -2,6 +2,10 @@
 // allows you to do things like:
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
+
+//Set ESLint no-undef rule to ignore undefined variable 'global'
+/*global global */
+
 import '@testing-library/jest-dom';
 
 class BroadcastChannel {
