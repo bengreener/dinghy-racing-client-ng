@@ -23,17 +23,17 @@ import { httpRootURL, wsRootURL, dinghyClasses, fleets, races, entriesScorpionA,
 import Authorisation from './controller/authorisation';
 import Clock from './model/domain-classes/clock';
 
-jest.mock('./controller/dinghy-racing-controller');
-jest.mock('./model/dinghy-racing-model');
-jest.mock('./model/domain-classes/clock');
-jest.mock('./controller/authorisation');
+vi.mock('./controller/dinghy-racing-controller');
+vi.mock('./model/dinghy-racing-model');
+vi.mock('./model/domain-classes/clock');
+vi.mock('./controller/authorisation');
 
-HTMLDialogElement.prototype.showModal = jest.fn();
-HTMLDialogElement.prototype.close = jest.fn();
+HTMLDialogElement.prototype.showModal = vi.fn();
+HTMLDialogElement.prototype.close = vi.fn();
 
 beforeEach(() => {
-  jest.clearAllMocks();
-  jest.restoreAllMocks();
+  vi.clearAllMocks();
+  vi.restoreAllMocks();
 });
 
 it('displays menu buttons', async () => {
@@ -76,7 +76,7 @@ describe('user roles does not include ROLE_RACE_SCHEDULER', () => {
   it('does not provide option to add dinghy class', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const dinghyRacingController = new DinghyRacingController(model);
-    jest.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
+    vi.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
     await act(async () => {
       render(<App model={model} controller={dinghyRacingController} />);
     });
@@ -86,7 +86,7 @@ describe('user roles does not include ROLE_RACE_SCHEDULER', () => {
   it('does not provide option to add race', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const dinghyRacingController = new DinghyRacingController(model);
-    jest.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
+    vi.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
     await act(async () => {
       render(<App model={model} controller={dinghyRacingController} />);
     });
@@ -96,7 +96,7 @@ describe('user roles does not include ROLE_RACE_SCHEDULER', () => {
   it('does not provide option to display fleets console', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const dinghyRacingController = new DinghyRacingController(model);
-    jest.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
+    vi.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
     await act(async () => {
       render(<App model={model} controller={dinghyRacingController} />);
     });
@@ -109,7 +109,7 @@ describe('user roles does not include ROLE_RACE_OFFICER', () => {
   it('does not provide option to access race console', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const dinghyRacingController = new DinghyRacingController(model);
-    jest.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
+    vi.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
     await act(async () => {
       render(<App model={model} controller={dinghyRacingController} />);
     });
@@ -119,7 +119,7 @@ describe('user roles does not include ROLE_RACE_OFFICER', () => {
   it('does not provide option to access race start console', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const dinghyRacingController = new DinghyRacingController(model);
-    jest.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
+    vi.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
     await act(async () => {
       render(<App model={model} controller={dinghyRacingController} />);
     });
@@ -132,8 +132,8 @@ describe('when dinghy classes button clicked', () => {
   it('displays dinghy class console', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(DinghyRacingModel, 'dinghyClassTemplate').mockImplementation(() => {return {'name': '', 'url': ''}});
-    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+    vi.spyOn(DinghyRacingModel, 'dinghyClassTemplate').mockImplementation(() => {return {'name': '', 'url': ''}});
+    vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
     const dinghyRacingController = new DinghyRacingController(model);
 
     render(<App model={model} controller={dinghyRacingController} />);
@@ -150,8 +150,8 @@ describe('when dinghy classes button clicked', () => {
   it('main menu buttons are not shown as selected', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(DinghyRacingModel, 'dinghyClassTemplate').mockImplementation(() => {return {'name': '', 'url': ''}});
-    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+    vi.spyOn(DinghyRacingModel, 'dinghyClassTemplate').mockImplementation(() => {return {'name': '', 'url': ''}});
+    vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
     const dinghyRacingController = new DinghyRacingController(model);
 
     render(<App model={model} controller={dinghyRacingController} />);
@@ -174,8 +174,8 @@ describe('when fleets button clicked', () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const dinghyRacingController = new DinghyRacingController(model);
-    jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})})
-    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})})
+    vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})})
+    vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})})
 
     render(<App model={model} controller={dinghyRacingController} />);
     const btnMenu = await screen.findByRole('button', {name: /☰/i})
@@ -192,8 +192,8 @@ describe('when fleets button clicked', () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const dinghyRacingController = new DinghyRacingController(model);
-    jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})})
-    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})})
+    vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})})
+    vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})})
 
     render(<App model={model} controller={dinghyRacingController} />);
     const btnMenu = await screen.findByRole('button', {name: /☰/i})
@@ -215,7 +215,7 @@ describe('when create race button clicked', () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const dinghyRacingController = new DinghyRacingController(model);
-    jest.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve(fleets)});
+    vi.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve(fleets)});
 
     render(<App model={model} controller={dinghyRacingController} />);
     const btnMenu = await screen.findByRole('button', {name: /☰/i})
@@ -232,7 +232,7 @@ describe('when create race button clicked', () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const dinghyRacingController = new DinghyRacingController(model);
-    jest.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve(fleets)});
+    vi.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve(fleets)});
 
     render(<App model={model} controller={dinghyRacingController} />);
     const btnMenu = await screen.findByRole('button', {name: /☰/i})
@@ -255,7 +255,7 @@ describe('when upcoming races button clicked', () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const dinghyRacingController = new DinghyRacingController(model);
-    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
 
     render(<App model={model} controller={dinghyRacingController} />);
     const btnMenu = await screen.findByRole('button', {name: /☰/i})
@@ -275,7 +275,7 @@ describe('when upcoming races button clicked', () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const dinghyRacingController = new DinghyRacingController(model);
-    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
 
     render(<App model={model} controller={dinghyRacingController} />);
     const btnMenu = await screen.findByRole('button', {name: /☰/i})
@@ -296,8 +296,8 @@ describe('when race console button is clicked', ()  => {
   it('displays race console', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-    jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
     const dinghyRacingController = new DinghyRacingController(model);
 
     render(<App model={model} controller={dinghyRacingController} />);
@@ -310,8 +310,8 @@ describe('when race console button is clicked', ()  => {
   it('only run race button shown as selected', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-    jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
     const dinghyRacingController = new DinghyRacingController(model);
 
     render(<App model={model} controller={dinghyRacingController} />);
@@ -329,8 +329,8 @@ describe('when race start console button is clicked', ()  => {
   it('displays race start console', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-    jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
       if (race.name === 'Scorpion A') {
         return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})
       }
@@ -344,7 +344,7 @@ describe('when race start console button is clicked', ()  => {
         return Promise.resolve({'success': true, 'domainObject': entriesHandicapA})
       }
     });
-    jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({success: false, message: 'Set to fail'})});
+    vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({success: false, message: 'Set to fail'})});
     const dinghyRacingController = new DinghyRacingController(model);
 
     render(<App model={model} controller={dinghyRacingController} />);
@@ -357,8 +357,8 @@ describe('when race start console button is clicked', ()  => {
   it('displays race start console', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-    jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
       if (race.name === 'Scorpion A') {
         return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})
       }
@@ -372,7 +372,7 @@ describe('when race start console button is clicked', ()  => {
         return Promise.resolve({'success': true, 'domainObject': entriesHandicapA})
       }
     });
-    jest.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({success: false, message: 'Set to fail'})});
+    vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({success: false, message: 'Set to fail'})});
     const dinghyRacingController = new DinghyRacingController(model);
 
     render(<App model={model} controller={dinghyRacingController} />);
@@ -390,8 +390,8 @@ describe('when download races console button is clicked', ()  => {
   it('displays download races form', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-    jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
     const dinghyRacingController = new DinghyRacingController(model);
 
     render(<App model={model} controller={dinghyRacingController} />);
@@ -408,8 +408,8 @@ describe('when download races console button is clicked', ()  => {
   it('main menu buttons are not shown as selected', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-    jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
     const dinghyRacingController = new DinghyRacingController(model);
 
     render(<App model={model} controller={dinghyRacingController} />);
@@ -431,7 +431,7 @@ describe('when competitors console button is clicked', () => {
   it('displays competitors console', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+    vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
 
     render(<App model={model} />);
     const btnMenu = await screen.findByRole('button', {name: /☰/i})
@@ -447,7 +447,7 @@ describe('when competitors console button is clicked', () => {
   it('main menu buttons are not shown as selected', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+    vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
 
     render(<App model={model} />);
     const btnMenu = await screen.findByRole('button', {name: /☰/i})

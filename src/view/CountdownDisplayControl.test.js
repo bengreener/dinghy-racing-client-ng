@@ -17,7 +17,7 @@
 import CountdownDisplayControl from './CountdownDisplayControl';
 import { render, screen } from '@testing-library/react';
 
-jest.mock('../model/domain-classes/clock');
+vi.mock('../model/domain-classes/clock');
 
 it('renders', () => {
     render(<CountdownDisplayControl title={'Countdown'} time={-600000} message={'Some Event'} />);

@@ -36,7 +36,7 @@ it('displays options for scoring abbreviations', () => {
 
 describe('selection is changed', () => {
     it('calls onChange callback provided as prop', async () => {
-        const onChangeSpy = jest.fn();
+        const onChangeSpy = vi.fn();
         const user = userEvent.setup();
         render(<ScoringAbbreviation onChange={onChangeSpy} />);
         const selectSA = screen.getByRole('combobox');

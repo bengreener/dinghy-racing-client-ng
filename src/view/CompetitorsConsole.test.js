@@ -22,9 +22,9 @@ import DinghyRacingController from '../controller/dinghy-racing-controller';
 import CompetitorsConsole from './CompetitorsConsole';
 import { httpRootURL, wsRootURL, competitorsCollection, competitorChrisMarshall } from '../model/__mocks__/test-data';
 
-jest.mock('../model/dinghy-racing-model');
-jest.mock('../controller/dinghy-racing-controller');
-jest.mock('../model/domain-classes/clock');
+vi.mock('../model/dinghy-racing-model');
+vi.mock('../controller/dinghy-racing-controller');
+vi.mock('../model/domain-classes/clock');
 
 it('renders', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -38,7 +38,7 @@ it('renders', async () => {
 describe('when there are competitors', () => {
     it('displays list of competitors', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+        vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
         await act( async () => {
             customRender(<CompetitorsConsole />, model);
         });
@@ -48,7 +48,7 @@ describe('when there are competitors', () => {
     describe('when successfully retrieves competitors', () => {
         it('clears any error message', async () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})}).mockImplementationOnce(() => {return Promise.resolve({success: false, message: 'Oops!'})});
+            vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})}).mockImplementationOnce(() => {return Promise.resolve({success: false, message: 'Oops!'})});
             let render;
             await act( async () => {
                 render = customRender(<CompetitorsConsole />, model);
@@ -65,7 +65,7 @@ describe('when there are competitors', () => {
 describe('when there is a problem retrieving competitors', () => {
     it('displays error message', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
+        vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
         await act( async () => {
             customRender(<CompetitorsConsole />, model);
         });
@@ -77,7 +77,7 @@ describe('when a competitor is selected', () => {
     it('displays competitor details for editing', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+        vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
         await act( async () => {
             customRender(<CompetitorsConsole />, model);
         });
@@ -93,8 +93,8 @@ describe('when a competitor is selected', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
-        jest.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
+        vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+        vi.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
         await act( async () => {
             customRender(<CompetitorsConsole />, model, controller);
         });
@@ -119,7 +119,7 @@ describe('when a competitor is selected', () => {
         it('displays new name', async () => {
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+            vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
             await act( async () => {
                 customRender(<CompetitorsConsole />, model);
             });
@@ -140,8 +140,8 @@ describe('when a competitor is selected', () => {
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
-            jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
-            const updateCompetitorSpy = jest.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: true})});
+            vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+            const updateCompetitorSpy = vi.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: true})});
             await act( async () => {
                 customRender(<CompetitorsConsole />, model, controller);
             });
@@ -164,8 +164,8 @@ describe('when a competitor is selected', () => {
                 const user = userEvent.setup();
                 const model = new DinghyRacingModel(httpRootURL, wsRootURL);
                 const controller = new DinghyRacingController(model);
-                jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
-                jest.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: true})});
+                vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+                vi.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: true})});
                 await act( async () => {
                     customRender(<CompetitorsConsole />, model, controller);
                 });
@@ -188,8 +188,8 @@ describe('when a competitor is selected', () => {
                 const user = userEvent.setup();
                 const model = new DinghyRacingModel(httpRootURL, wsRootURL);
                 const controller = new DinghyRacingController(model);
-                jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [{...competitorChrisMarshall, name: 'John Smith'}]})}).mockImplementationOnce(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
-                jest.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: true})});
+                vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [{...competitorChrisMarshall, name: 'John Smith'}]})}).mockImplementationOnce(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+                vi.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: true})});
                 await act( async () => {
                     customRender(<CompetitorsConsole />, model, controller);
                 });
@@ -214,8 +214,8 @@ describe('when a competitor is selected', () => {
                 const user = userEvent.setup();
                 const model = new DinghyRacingModel(httpRootURL, wsRootURL);
                 const controller = new DinghyRacingController(model);
-                jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
-                jest.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops something went wrong.'})});
+                vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+                vi.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops something went wrong.'})});
                 await act( async () => {
                     customRender(<CompetitorsConsole />, model, controller);
                 });
@@ -240,7 +240,7 @@ describe('when a competitor is selected', () => {
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
-            jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+            vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
             await act( async () => {
                 customRender(<CompetitorsConsole />, model, controller);
             });

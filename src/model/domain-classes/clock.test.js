@@ -16,14 +16,14 @@
 
 import Clock from './clock';
 
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 afterEach(() => {
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
 });
 
 it('returns the correct time', () => {
-    jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
+    vi.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
     const clock = new Clock(new Date(Date.now() + 10000));
     const time = clock.getTime();
     const pMod = Date.now() - Math.floor(performance.now());
@@ -45,7 +45,7 @@ describe('when started without providing a start time', () => {
     it('returns elapsed time from when clock was started', () => {
         const clock = new Clock();
         clock.start();
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
         const elapsed = clock.getElapsedTime();
         expect(Math.round(elapsed)).toBe(1000);
     });    
@@ -57,7 +57,7 @@ describe('when clock already started and start instruction given', () => {
         clock.start();
         const startTime = clock._startTime;
         // sleep thread and then check time is as expected
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
         clock.start();
         const elapsed = clock.getElapsedTime();
         expect(clock._startTime).toBe(startTime);
@@ -66,39 +66,39 @@ describe('when clock already started and start instruction given', () => {
 });
 
 it('stops', () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
     const clock = new Clock();
     clock.addTickHandler(handler);
     clock.start();
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
     expect(handler).toBeCalledTimes(1);
     clock.stop();
-    jest.advanceTimersByTime(10000);
+    vi.advanceTimersByTime(10000);
     expect(handler).toBeCalledTimes(1);
 });
 
 describe('when clock ticks', () => {
     it('calls tick handler', () => {
-        const handler = jest.fn();
+        const handler = vi.fn();
     
         const clock = new Clock();
         clock.addTickHandler(handler);
         clock.start();
         for(let i = 0; i < 10; i++) {
-            jest.runOnlyPendingTimers();
+            vi.runOnlyPendingTimers();
         };
         expect(handler).toBeCalledTimes(10);
     });
     it('calls tick handlers', () => {
-        const handler1 = jest.fn();
-        const handler2 = jest.fn();
+        const handler1 = vi.fn();
+        const handler2 = vi.fn();
     
         const clock = new Clock();
         clock.addTickHandler(handler1);
         clock.addTickHandler(handler2);
         clock.start();
         for(let i = 0; i < 10; i++) {
-            jest.runOnlyPendingTimers();
+            vi.runOnlyPendingTimers();
         }
         
         expect(handler1).toBeCalledTimes(10);
@@ -107,8 +107,8 @@ describe('when clock ticks', () => {
 });
 
 it('removes a tick handler', () => {
-    const handler1 = jest.fn();
-    const handler2 = jest.fn();
+    const handler1 = vi.fn();
+    const handler2 = vi.fn();
 
     const clock = new Clock();
     clock.addTickHandler(handler1);
@@ -116,7 +116,7 @@ it('removes a tick handler', () => {
     clock.removeTickHandler(handler1);
     clock.start();
     for(let i = 0; i < 10; i++) {
-        jest.runOnlyPendingTimers();
+        vi.runOnlyPendingTimers();
     }
     
     expect(handler1).not.toBeCalled();
@@ -315,7 +315,7 @@ describe('when not synched against an external clocl', () => {
 
 describe('when need to synch with an external clock accepts a time to synch clocks to and any associated clocks synch to that time when calculating elapsed time', () => {
     it('returns the correct time', () => {
-        jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
+        vi.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
         Clock.synchToTime(new Date(Date.now() - 3000)); // set time to synch all clocks to
         const clock = new Clock(new Date(Date.now() + 10000));
         const time = clock.getTime();
@@ -342,14 +342,14 @@ describe('when need to synch with an external clock accepts a time to synch cloc
         });
     });
     it('sends message to a broadcast channel to advise either Clocks to synch to external time', () => {
-        const postMessageSpy = jest.spyOn(BroadcastChannel.prototype, 'postMessage');
+        const postMessageSpy = vi.spyOn(BroadcastChannel.prototype, 'postMessage');
         const testTime = new Date();
         Clock.synchToTime(testTime);
         expect(postMessageSpy).toBeCalledWith({message: 'synchToTime', body: testTime});
     });
-    // not sure how to make this work. May need to bring in broadcast-channel package from NPM and use to pollyfill jest. Would then need to create a seperate context to send messages between? :-/
-    xit('picks up a message from a broadcast channel to receive notification to synch against an external time', () => {
-        // const onmessageSpy = jest.spyOn(BroadcastChannel.prototype, 'onmessage');
+    // not sure how to make this work. May need to bring in broadcast-channel package from NPM and use to pollyfill vi. Would then need to create a seperate context to send messages between? :-/
+    it.skip('picks up a message from a broadcast channel to receive notification to synch against an external time', () => {
+        // const onmessageSpy = vi.spyOn(BroadcastChannel.prototype, 'onmessage');
         const testTime = new Date(Date.now() + 1000);
         Clock.synchToTime(testTime);
         expect(onmessageSpy).toBeCalledWith({message: 'synchToTime', body: testTime});

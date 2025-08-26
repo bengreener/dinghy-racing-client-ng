@@ -33,20 +33,20 @@ import { httpRootURL, wsRootURL,
     dinghyClassGraduate,
     fleetHandicap} from '../model/__mocks__/test-data';
 
-jest.mock('../model/dinghy-racing-model');
-jest.mock('../controller/dinghy-racing-controller');
-jest.mock('../model/domain-classes/clock');
+vi.mock('../model/dinghy-racing-model');
+vi.mock('../controller/dinghy-racing-controller');
+vi.mock('../model/domain-classes/clock');
 
 const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 const controller = new DinghyRacingController(model);    
 
 beforeEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
-    jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': competitorsCollection})});
-    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClasses})});
-    jest.spyOn(model, 'getDinghies').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghies})});
-    jest.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
+    vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': competitorsCollection})});
+    vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClasses})});
+    vi.spyOn(model, 'getDinghies').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghies})});
+    vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
         if (race === raceScorpionA){
             return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
         }
@@ -60,10 +60,10 @@ beforeEach(() => {
             return Promise.resolve({success: false, message: 'Race not found.'});
         }
     });
-    jest.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => {
+    vi.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => {
         return Promise.resolve({success: true, domainObject: dinghy1234 })
     });
-    jest.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
+    vi.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
         if (dinghy.url === dinghy1234.url) {
             return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
         }
@@ -170,7 +170,7 @@ describe('when signing up for a race', () => {
 
             describe('when sign-up button clicked', () => {
                 it('creates entry with values entered into form and dinghy class set per race', async () => {
-                    const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                    const onSignupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -191,7 +191,7 @@ describe('when signing up for a race', () => {
                 });
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
@@ -215,7 +215,7 @@ describe('when signing up for a race', () => {
                 });
                 describe('when entry is a duplicate of an exisiting entry', () =>{
                     it('provides the dinghy class, sail number, and helm name', async () => {
-                        jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({
                                 success: false, 
                                 message: "HTTP Error: 409 Conflict Message: The entry '15-7-17' already exists; this may be caused by an uppercase/ lowercase difference between existing record and the value entered."});
@@ -259,10 +259,10 @@ describe('when signing up for a race', () => {
         
             describe('when create button clicked', () => {
                 it('creates helm and then creates entry with values entered into form', async () => {
-                    const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                    const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -285,7 +285,7 @@ describe('when signing up for a race', () => {
                 
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
                         const user = userEvent.setup();
@@ -311,10 +311,10 @@ describe('when signing up for a race', () => {
                 
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
@@ -356,10 +356,10 @@ describe('when signing up for a race', () => {
             
             describe('when create button clicked', () => {
                 it('creates dinghy and then creates entry with values entered into form', async () => {
-                    const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                    const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                    const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -383,7 +383,7 @@ describe('when signing up for a race', () => {
                 
                 describe('when dinghy not created', () => {
                     it('it displays failure message and entered values remain on form', async () => {
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -409,10 +409,10 @@ describe('when signing up for a race', () => {
                 
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
@@ -454,13 +454,13 @@ describe('when signing up for a race', () => {
             
             describe('when create button clicked', () => {
                 it('creates helm and dinghy and then creates entry with values entered into form', async () => {
-                    const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                    const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                    const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -485,10 +485,10 @@ describe('when signing up for a race', () => {
                 
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -515,10 +515,10 @@ describe('when signing up for a race', () => {
                     
                 describe('when dinghy not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -545,10 +545,10 @@ describe('when signing up for a race', () => {
                     
                 describe('when neither helm nor dinghy created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -576,13 +576,13 @@ describe('when signing up for a race', () => {
     
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
@@ -608,11 +608,11 @@ describe('when signing up for a race', () => {
         });
         
         it('clears form on success', async () => {
-            jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+            vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                 return Promise.resolve({'success': true});
             });
-            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
-            jest.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
+            vi.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
+            vi.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
                 return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
             });
             const user = userEvent.setup();
@@ -642,7 +642,7 @@ describe('when signing up for a race', () => {
         });
         
         it('displays entries for race', async () => {
-            jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesCometA})});
+            vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesCometA})});
             customRender(<SignUp race={raceCometA}/>, model, controller);
             expect(await screen.findByRole('cell', {'name': /Jill Myer/i})).toBeInTheDocument();
             expect((await screen.findAllByRole('cell', {'name': /Comet/i}))[0]).toBeInTheDocument();
@@ -651,7 +651,7 @@ describe('when signing up for a race', () => {
         });
 
         it('shows a count of the number of entries to the race', async () => {
-            jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesHandicapA})});
+            vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesHandicapA})});
             await act(async () => {
                 customRender(<SignUp race={raceCometA}/>, model, controller);
             });
@@ -746,7 +746,7 @@ describe('when signing up for a race', () => {
                 
             describe('when create button clicked', () => {
                 it('creates entry with values entered into form and dinghy class set per race', async () => {
-                    const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                    const onSignupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -772,7 +772,7 @@ describe('when signing up for a race', () => {
             
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
@@ -823,10 +823,10 @@ describe('when signing up for a race', () => {
         
             describe('when create button clicked', () => {
                 it('creates helm and then creates entry with values entered into form', async () => {
-                    const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                    const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -853,7 +853,7 @@ describe('when signing up for a race', () => {
                 
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
                         const user = userEvent.setup();
@@ -884,10 +884,10 @@ describe('when signing up for a race', () => {
                 
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
@@ -938,10 +938,10 @@ describe('when signing up for a race', () => {
             
             describe('when create button clicked', () => {
                 it('creates dinghy and then creates entry with values entered into form', async () => {
-                    const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                    const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                    const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -969,7 +969,7 @@ describe('when signing up for a race', () => {
                 
                 describe('when dinghy not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -1000,10 +1000,10 @@ describe('when signing up for a race', () => {
     
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
@@ -1054,10 +1054,10 @@ describe('when signing up for a race', () => {
             
             describe('when create button clicked', () => {
                 it('creates crew and then creates entry with values entered into form', async () => {
-                    const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                    const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -1085,7 +1085,7 @@ describe('when signing up for a race', () => {
                 
                 describe('when crew not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
                         const user = userEvent.setup();
@@ -1116,10 +1116,10 @@ describe('when signing up for a race', () => {
                 
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
@@ -1170,13 +1170,13 @@ describe('when signing up for a race', () => {
             
             describe('when create button clicked', () => {
                 it('creates helm and dinghy and then creates entry with values entered into form', async () => {
-                    const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                    const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                    const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -1205,10 +1205,10 @@ describe('when signing up for a race', () => {
                 
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -1240,10 +1240,10 @@ describe('when signing up for a race', () => {
                 
                 describe('when dinghy not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -1275,10 +1275,10 @@ describe('when signing up for a race', () => {
                     
                 describe('when neither helm nor dinghy created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
-                        const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -1311,13 +1311,13 @@ describe('when signing up for a race', () => {
     
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
@@ -1368,10 +1368,10 @@ describe('when signing up for a race', () => {
             
             describe('when create button clicked', () => {
                 it('creates helm and crew and then creates entry with values entered into form', async () => {
-                    const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                    const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -1402,7 +1402,7 @@ describe('when signing up for a race', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         // SignUp does not refresh competitor list so button label will not change
                         // const updatedCompetitorsCollection = [...competitorsCollection, {'name':'Pop Off', 'url': 'http://localhost:8081/dinghyracing/api/competitors/999'}];
-                        // jest.spyOn(model, 'getCompetitors').mockImplementation(() => {
+                        // vi.spyOn(model, 'getCompetitors').mockImplementation(() => {
                         //     console.log(`getCompetitors.mockImplementation`);
                         //     return Promise.resolve({'success': true, 'domainObject': updatedCompetitorsCollection
                         // })})
@@ -1410,7 +1410,7 @@ describe('when signing up for a race', () => {
                         //         console.log(`getCompetitors.mockImplementationOnce`);
                         //         return Promise.resolve({'success': true, 'domainObject': competitorsCollection})
                         //     });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                             if (competitor.name === 'Not There') {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             }
@@ -1451,7 +1451,7 @@ describe('when signing up for a race', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         // SignUp does not refresh competitor list so button label will not change
                         // const updatedCompetitorsCollection = [...competitorsCollection, {'name':'Pop Off', 'url': 'http://localhost:8081/dinghyracing/api/competitors/999'}];
-                        // jest.spyOn(model, 'getCompetitors').mockImplementation(() => {
+                        // vi.spyOn(model, 'getCompetitors').mockImplementation(() => {
                         //     console.log(`getCompetitors.mockImplementation`);
                         //     return Promise.resolve({'success': true, 'domainObject': updatedCompetitorsCollection
                         // })})
@@ -1459,7 +1459,7 @@ describe('when signing up for a race', () => {
                         //         console.log(`getCompetitors.mockImplementationOnce`);
                         //         return Promise.resolve({'success': true, 'domainObject': competitorsCollection})
                         //     });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                             if (competitor.name === 'Pop Off') {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             }
@@ -1498,7 +1498,7 @@ describe('when signing up for a race', () => {
                     
                 describe('when neither helm nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
                         const user = userEvent.setup();
@@ -1530,10 +1530,10 @@ describe('when signing up for a race', () => {
                 
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
@@ -1584,13 +1584,13 @@ describe('when signing up for a race', () => {
             
             describe('when create button clicked', () => {
                 it('creates dinghy and crew and then creates entry with values entered into form', async () => {
-                    const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                    const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                    const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -1619,10 +1619,10 @@ describe('when signing up for a race', () => {
                 
                 describe('when dinghy not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -1654,10 +1654,10 @@ describe('when signing up for a race', () => {
                 
                 describe('when crew not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -1689,10 +1689,10 @@ describe('when signing up for a race', () => {
     
                 describe('when neither dinghy nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
-                        const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -1725,13 +1725,13 @@ describe('when signing up for a race', () => {
     
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
@@ -1782,13 +1782,13 @@ describe('when signing up for a race', () => {
             
             describe('when create button clicked', () => {
                 it('creates helm and dinghy and crew and then creates entry with values entered into form', async () => {
-                    const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                    const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                    const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -1818,7 +1818,7 @@ describe('when signing up for a race', () => {
                 
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                             if (competitor.name === 'Not There') {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             }
@@ -1826,7 +1826,7 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': true});
                             }
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -1859,10 +1859,10 @@ describe('when signing up for a race', () => {
     
                 describe('when dinghy not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -1895,7 +1895,7 @@ describe('when signing up for a race', () => {
     
                 describe('when crew not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                             if (competitor.name === 'Pop Off') {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             }
@@ -1903,7 +1903,7 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': true});
                             }
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -1936,7 +1936,7 @@ describe('when signing up for a race', () => {
                     
                 describe('when neither helm nor dinghy created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                             if (competitor.name === 'Not There') {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             }
@@ -1944,7 +1944,7 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': true});
                             }
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -1978,10 +1978,10 @@ describe('when signing up for a race', () => {
     
                 describe('when neither helm nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -2014,7 +2014,7 @@ describe('when signing up for a race', () => {
                 
                 describe('when neither dinghy nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                             if (competitor.name === 'Pop Off') {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             }
@@ -2022,7 +2022,7 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': true});
                             }
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -2056,10 +2056,10 @@ describe('when signing up for a race', () => {
                 
                 describe('when neither helm nor dinghy nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -2093,13 +2093,13 @@ describe('when signing up for a race', () => {
     
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
@@ -2130,11 +2130,11 @@ describe('when signing up for a race', () => {
         });
     
         it('clears form on success', async () => {
-            jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+            vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                 return Promise.resolve({'success': true});
             });
-            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
-            jest.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
+            vi.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
+            vi.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
                 return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
             });
             const user = userEvent.setup();
@@ -2168,7 +2168,7 @@ describe('when signing up for a race', () => {
         });
         
         it('displays entries for race', async () => {
-            jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+            vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
             customRender(<SignUp race={raceScorpionA}/>, model, controller);
             expect(await screen.findByRole('cell', {'name': /Chris Marshall/i})).toBeInTheDocument();
             expect((await screen.findAllByRole('cell', {'name': /Scorpion/i}))[0]).toBeInTheDocument();
@@ -2272,7 +2272,7 @@ describe('when signing up for a race', () => {
                 
                 describe('when create button clicked', () => {
                     it('creates entry with values entered into form and dinghy class set per race', async () => {
-                        const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        const onSignupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -2299,7 +2299,7 @@ describe('when signing up for a race', () => {
                 
                     describe('when entry not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                            const onSignupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
@@ -2352,10 +2352,10 @@ describe('when signing up for a race', () => {
             
                 describe('when create button clicked', () => {
                     it('creates helm and then creates entry with values entered into form', async () => {
-                        const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -2383,7 +2383,7 @@ describe('when signing up for a race', () => {
                     
                     describe('when helm not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
                             const user = userEvent.setup();
@@ -2413,10 +2413,10 @@ describe('when signing up for a race', () => {
                     });
                     describe('when entry not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                            vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
@@ -2468,10 +2468,10 @@ describe('when signing up for a race', () => {
                 
                 describe('when create button clicked', () => {
                     it('creates dinghy and then creates entry with values entered into form', async () => {
-                        const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -2500,7 +2500,7 @@ describe('when signing up for a race', () => {
     
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -2532,10 +2532,10 @@ describe('when signing up for a race', () => {
     
                     describe('when entry not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                            vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
@@ -2588,13 +2588,13 @@ describe('when signing up for a race', () => {
                 
                 describe('when create button clicked', () => {
                     it('creates helm and dinghy and then creates entry with values entered into form', async () => {
-                        const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -2624,10 +2624,10 @@ describe('when signing up for a race', () => {
                     
                     describe('when helm not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
@@ -2660,10 +2660,10 @@ describe('when signing up for a race', () => {
     
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -2696,10 +2696,10 @@ describe('when signing up for a race', () => {
     
                     describe('when neither helm nor dinghy created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -2778,7 +2778,7 @@ describe('when signing up for a race', () => {
     
                 describe('when create button clicked', () => {
                     it('creates entry with values entered into form and dinghy class set per race', async () => {
-                        const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        const onSignupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -2809,7 +2809,7 @@ describe('when signing up for a race', () => {
                 
                     describe('when entry not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const onSignupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                            const onSignupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
@@ -2871,10 +2871,10 @@ describe('when signing up for a race', () => {
             
                 describe('when create button clicked', () => {
                     it('creates helm and then creates entry with values entered into form', async () => {
-                        const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -2906,7 +2906,7 @@ describe('when signing up for a race', () => {
                     
                     describe('when helm not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
                             const user = userEvent.setup();
@@ -2942,10 +2942,10 @@ describe('when signing up for a race', () => {
                     });
                     describe('when entry not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                            vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
@@ -3007,10 +3007,10 @@ describe('when signing up for a race', () => {
                 
                 describe('when create button clicked', () => {
                     it('creates dinghy and then creates entry with values entered into form', async () => {
-                        const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -3042,7 +3042,7 @@ describe('when signing up for a race', () => {
                     });
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -3078,10 +3078,10 @@ describe('when signing up for a race', () => {
                     });
                     describe('when entry not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                            vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
@@ -3143,10 +3143,10 @@ describe('when signing up for a race', () => {
                 
                 describe('when create button clicked', () => {
                     it('creates crew and then creates entry with values entered into form', async () => {
-                        const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -3179,7 +3179,7 @@ describe('when signing up for a race', () => {
     
                     describe('when crew not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
                             const user = userEvent.setup();
@@ -3215,10 +3215,10 @@ describe('when signing up for a race', () => {
     
                     describe('when entry not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                            vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
@@ -3279,13 +3279,13 @@ describe('when signing up for a race', () => {
                 
                 describe('when create button clicked', () => {
                     it('creates helm and dinghy and then creates entry with values entered into form', async () => {
-                        const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -3319,10 +3319,10 @@ describe('when signing up for a race', () => {
                     
                     describe('when helm not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
@@ -3359,10 +3359,10 @@ describe('when signing up for a race', () => {
     
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -3399,10 +3399,10 @@ describe('when signing up for a race', () => {
     
                     describe('when neither helm nor dinghy created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
-                            const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -3440,13 +3440,13 @@ describe('when signing up for a race', () => {
     
                     describe('when entry not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                            vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
@@ -3507,10 +3507,10 @@ describe('when signing up for a race', () => {
                 
                 describe('when create button clicked', () => {
                     it('creates helm and crew and then creates entry with values entered into form', async () => {
-                        const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -3546,7 +3546,7 @@ describe('when signing up for a race', () => {
                         it('displays failure message and entered values remain on form', async () => {
                         // SignUp does not refresh competitor list so button label will not change
                         // const updatedCompetitorsCollection = [...competitorsCollection, {'name':'Pop Off', 'url': 'http://localhost:8081/dinghyracing/api/competitors/999'}];
-                        // jest.spyOn(model, 'getCompetitors').mockImplementation(() => {
+                        // vi.spyOn(model, 'getCompetitors').mockImplementation(() => {
                         //     console.log(`getCompetitors.mockImplementation`);
                         //     return Promise.resolve({'success': true, 'domainObject': updatedCompetitorsCollection
                         // })})
@@ -3554,7 +3554,7 @@ describe('when signing up for a race', () => {
                         //         console.log(`getCompetitors.mockImplementationOnce`);
                         //         return Promise.resolve({'success': true, 'domainObject': competitorsCollection})
                         //     });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                             if (competitor.name === 'Not There') {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             }
@@ -3600,7 +3600,7 @@ describe('when signing up for a race', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             // SignUp does not refresh competitor list so button label will not change
                             // const updatedCompetitorsCollection = [...competitorsCollection, {'name':'Pop Off', 'url': 'http://localhost:8081/dinghyracing/api/competitors/999'}];
-                            // jest.spyOn(model, 'getCompetitors').mockImplementation(() => {
+                            // vi.spyOn(model, 'getCompetitors').mockImplementation(() => {
                             //     console.log(`getCompetitors.mockImplementation`);
                             //     return Promise.resolve({'success': true, 'domainObject': updatedCompetitorsCollection
                             // })})
@@ -3608,7 +3608,7 @@ describe('when signing up for a race', () => {
                             //         console.log(`getCompetitors.mockImplementationOnce`);
                             //         return Promise.resolve({'success': true, 'domainObject': competitorsCollection})
                             //     });
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                                 if (competitor.name === 'Pop Off') {
                                     return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                                 }
@@ -3652,7 +3652,7 @@ describe('when signing up for a race', () => {
     
                     describe('when neither helm nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
                             const user = userEvent.setup();
@@ -3689,10 +3689,10 @@ describe('when signing up for a race', () => {
     
                     describe('when entry not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                            vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
@@ -3753,13 +3753,13 @@ describe('when signing up for a race', () => {
                 
                 describe('when create button clicked', () => {
                     it('creates dinghy and crew and then creates entry with values entered into form', async () => {
-                        const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -3793,10 +3793,10 @@ describe('when signing up for a race', () => {
                     
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -3833,10 +3833,10 @@ describe('when signing up for a race', () => {
     
                     describe('when crew not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
@@ -3873,10 +3873,10 @@ describe('when signing up for a race', () => {
     
                     describe('when neither dinghy nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
-                            const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -3914,13 +3914,13 @@ describe('when signing up for a race', () => {
     
                     describe('when entry not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                            vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
@@ -3981,13 +3981,13 @@ describe('when signing up for a race', () => {
                 
                 describe('when create button clicked', () => {
                     it('creates helm and dinghy and crew and then creates entry with values entered into form', async () => {
-                        const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                        const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -4022,7 +4022,7 @@ describe('when signing up for a race', () => {
                     
                     describe('when helm not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                                 if (competitor.name === 'Not There') {
                                     return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                                 }
@@ -4030,7 +4030,7 @@ describe('when signing up for a race', () => {
                                     return Promise.resolve({'success': true});
                                 }
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
@@ -4068,10 +4068,10 @@ describe('when signing up for a race', () => {
         
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -4109,7 +4109,7 @@ describe('when signing up for a race', () => {
         
                     describe('when crew not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                                 if (competitor.name === 'Pop Off') {
                                     return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                                 }
@@ -4117,7 +4117,7 @@ describe('when signing up for a race', () => {
                                     return Promise.resolve({'success': true});
                                 }
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
@@ -4155,7 +4155,7 @@ describe('when signing up for a race', () => {
                         
                     describe('when neither helm nor dinghy created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                                 if (competitor.name === 'Not There') {
                                     return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                                 }
@@ -4163,7 +4163,7 @@ describe('when signing up for a race', () => {
                                     return Promise.resolve({'success': true});
                                 }
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -4202,10 +4202,10 @@ describe('when signing up for a race', () => {
         
                     describe('when neither helm nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
@@ -4243,7 +4243,7 @@ describe('when signing up for a race', () => {
                     
                     describe('when neither dinghy nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                                 if (competitor.name === 'Pop Off') {
                                     return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                                 }
@@ -4251,7 +4251,7 @@ describe('when signing up for a race', () => {
                                     return Promise.resolve({'success': true});
                                 }
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -4290,10 +4290,10 @@ describe('when signing up for a race', () => {
                     
                     describe('when neither helm nor dinghy nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -4332,13 +4332,13 @@ describe('when signing up for a race', () => {
         
                     describe('when entry not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+                            vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
@@ -4375,10 +4375,10 @@ describe('when signing up for a race', () => {
         });
     
         it('clears form on success', async () => {
-            jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+            vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                 return Promise.resolve({'success': true});
             });
-            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
+            vi.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
             const user = userEvent.setup();
             customRender(<SignUp race={raceHandicapA}/>, model, controller);
             const inputDinghyClass = screen.getByLabelText(/class/i);
@@ -4415,7 +4415,7 @@ describe('when signing up for a race', () => {
         });
         
         it('displays entries for race', async () => {
-            jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesHandicapA})});
+            vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesHandicapA})});
             customRender(<SignUp race={raceHandicapA}/>, model, controller);
             expect(await screen.findByRole('cell', {'name': /Chris Marshall/i})).toBeInTheDocument();
             expect((await screen.findAllByRole('cell', {'name': /Scorpion/i}))[0]).toBeInTheDocument();
@@ -4565,7 +4565,7 @@ describe('when updating an existing entry', () => {
             
             describe('when update button clicked', () => {
                 it('updates entry with values entered into form and dinghy class set per race', async () => {
-                    const onUpdateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                    const onUpdateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -4595,7 +4595,7 @@ describe('when updating an existing entry', () => {
             
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
@@ -4649,10 +4649,10 @@ describe('when updating an existing entry', () => {
         
             describe('when update button clicked', () => {
                 it('creates helm and then updates entry with values entered into form', async () => {
-                    const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                    const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -4676,7 +4676,7 @@ describe('when updating an existing entry', () => {
                 
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
                         const user = userEvent.setup();
@@ -4704,10 +4704,10 @@ describe('when updating an existing entry', () => {
                 
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
@@ -4751,10 +4751,10 @@ describe('when updating an existing entry', () => {
             
             describe('when create button clicked', () => {
                 it('creates dinghy and then creates entry with values entered into form', async () => {
-                    const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                    const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                    const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -4778,7 +4778,7 @@ describe('when updating an existing entry', () => {
                 
                 describe('when dinghy not created', () => {
                     it('it displays failure message and entered values remain on form', async () => {
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -4806,10 +4806,10 @@ describe('when updating an existing entry', () => {
                 
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
@@ -4859,13 +4859,13 @@ describe('when updating an existing entry', () => {
             
             describe('when update button clicked', () => {
                 it('creates helm and dinghy and then updates entry with values entered into form', async () => {
-                    const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                    const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                    const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -4896,10 +4896,10 @@ describe('when updating an existing entry', () => {
                 
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -4932,10 +4932,10 @@ describe('when updating an existing entry', () => {
                     
                 describe('when dinghy not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -4968,10 +4968,10 @@ describe('when updating an existing entry', () => {
                     
                 describe('when neither helm nor dinghy created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -5005,13 +5005,13 @@ describe('when updating an existing entry', () => {
     
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
@@ -5043,11 +5043,11 @@ describe('when updating an existing entry', () => {
         });
         
         it('clears form on success', async () => {
-            jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+            vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                 return Promise.resolve({'success': true});
             });
-            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
-            jest.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
+            vi.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
+            vi.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
                 return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
             });
             const user = userEvent.setup();
@@ -5194,7 +5194,7 @@ describe('when updating an existing entry', () => {
                 
             describe('when update button clicked', () => {
                 it('updates entry with values entered into form and dinghy class set per race', async () => {
-                    const onUpdateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                    const onUpdateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -5227,7 +5227,7 @@ describe('when updating an existing entry', () => {
             
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
@@ -5292,10 +5292,10 @@ describe('when updating an existing entry', () => {
         
             describe('when update button clicked', () => {
                 it('updates helm and then updates entry with values entered into form', async () => {
-                    const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                    const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -5329,7 +5329,7 @@ describe('when updating an existing entry', () => {
                 
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
                         const user = userEvent.setup();
@@ -5367,10 +5367,10 @@ describe('when updating an existing entry', () => {
                 
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
@@ -5435,10 +5435,10 @@ describe('when updating an existing entry', () => {
             
             describe('when update button clicked', () => {
                 it('creates dinghy and then updates entry with values entered into form', async () => {
-                    const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                    const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                    const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -5473,7 +5473,7 @@ describe('when updating an existing entry', () => {
                 
                 describe('when dinghy not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -5511,10 +5511,10 @@ describe('when updating an existing entry', () => {
     
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
@@ -5579,10 +5579,10 @@ describe('when updating an existing entry', () => {
             
             describe('when update button clicked', () => {
                 it('creates crew and then updates entry with values entered into form', async () => {
-                    const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                    const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -5617,7 +5617,7 @@ describe('when updating an existing entry', () => {
                 
                 describe('when crew not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
                         const user = userEvent.setup();
@@ -5655,10 +5655,10 @@ describe('when updating an existing entry', () => {
                 
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
@@ -5723,13 +5723,13 @@ describe('when updating an existing entry', () => {
             
             describe('when update button clicked', () => {
                 it('creates helm and dinghy and then updates entry with values entered into form', async () => {
-                    const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                    const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                    const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -5765,10 +5765,10 @@ describe('when updating an existing entry', () => {
                 
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -5807,10 +5807,10 @@ describe('when updating an existing entry', () => {
                 
                 describe('when dinghy not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -5849,10 +5849,10 @@ describe('when updating an existing entry', () => {
                     
                 describe('when neither helm nor dinghy created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
-                        const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -5892,13 +5892,13 @@ describe('when updating an existing entry', () => {
     
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
@@ -5963,10 +5963,10 @@ describe('when updating an existing entry', () => {
             
             describe('when update button clicked', () => {
                 it('creates helm and crew and then updates entry with values entered into form', async () => {
-                    const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                    const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -6004,7 +6004,7 @@ describe('when updating an existing entry', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         // SignUp does not refresh competitor list so button label will not change
                         // const updatedCompetitorsCollection = [...competitorsCollection, {'name':'Pop Off', 'url': 'http://localhost:8081/dinghyracing/api/competitors/999'}];
-                        // jest.spyOn(model, 'getCompetitors').mockImplementation(() => {
+                        // vi.spyOn(model, 'getCompetitors').mockImplementation(() => {
                         //     console.log(`getCompetitors.mockImplementation`);
                         //     return Promise.resolve({'success': true, 'domainObject': updatedCompetitorsCollection
                         // })})
@@ -6012,7 +6012,7 @@ describe('when updating an existing entry', () => {
                         //         console.log(`getCompetitors.mockImplementationOnce`);
                         //         return Promise.resolve({'success': true, 'domainObject': competitorsCollection})
                         //     });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                             if (competitor.name === 'Not There') {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             }
@@ -6060,7 +6060,7 @@ describe('when updating an existing entry', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         // SignUp does not refresh competitor list so button label will not change
                         // const updatedCompetitorsCollection = [...competitorsCollection, {'name':'Pop Off', 'url': 'http://localhost:8081/dinghyracing/api/competitors/999'}];
-                        // jest.spyOn(model, 'getCompetitors').mockImplementation(() => {
+                        // vi.spyOn(model, 'getCompetitors').mockImplementation(() => {
                         //     console.log(`getCompetitors.mockImplementation`);
                         //     return Promise.resolve({'success': true, 'domainObject': updatedCompetitorsCollection
                         // })})
@@ -6068,7 +6068,7 @@ describe('when updating an existing entry', () => {
                         //         console.log(`getCompetitors.mockImplementationOnce`);
                         //         return Promise.resolve({'success': true, 'domainObject': competitorsCollection})
                         //     });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                             if (competitor.name === 'Pop Off') {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             }
@@ -6110,7 +6110,7 @@ describe('when updating an existing entry', () => {
                     
                 describe('when neither helm nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
                         const user = userEvent.setup();
@@ -6145,10 +6145,10 @@ describe('when updating an existing entry', () => {
                 
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
@@ -6205,13 +6205,13 @@ describe('when updating an existing entry', () => {
             
             describe('when update button clicked', () => {
                 it('creates dinghy and crew and then updates entry with values entered into form', async () => {
-                    const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                    const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                    const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -6243,10 +6243,10 @@ describe('when updating an existing entry', () => {
                 
                 describe('when dinghy not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -6281,10 +6281,10 @@ describe('when updating an existing entry', () => {
                 
                 describe('when crew not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -6319,10 +6319,10 @@ describe('when updating an existing entry', () => {
     
                 describe('when neither dinghy nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
-                        const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -6358,13 +6358,13 @@ describe('when updating an existing entry', () => {
     
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
@@ -6425,13 +6425,13 @@ describe('when updating an existing entry', () => {
             
             describe('when update button clicked', () => {
                 it('creates helm and dinghy and crew and then updates entry with values entered into form', async () => {
-                    const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                    const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                    const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
-                    const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                    const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
@@ -6468,7 +6468,7 @@ describe('when updating an existing entry', () => {
                 
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                             if (competitor.name === 'Not There') {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             }
@@ -6476,7 +6476,7 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': true});
                             }
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -6516,10 +6516,10 @@ describe('when updating an existing entry', () => {
     
                 describe('when dinghy not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -6559,7 +6559,7 @@ describe('when updating an existing entry', () => {
     
                 describe('when crew not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                             if (competitor.name === 'Pop Off') {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             }
@@ -6567,7 +6567,7 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': true});
                             }
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -6607,7 +6607,7 @@ describe('when updating an existing entry', () => {
                     
                 describe('when neither helm nor dinghy created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                             if (competitor.name === 'Not There') {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             }
@@ -6615,7 +6615,7 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': true});
                             }
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -6656,10 +6656,10 @@ describe('when updating an existing entry', () => {
     
                 describe('when neither helm nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -6699,7 +6699,7 @@ describe('when updating an existing entry', () => {
                 
                 describe('when neither dinghy nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                             if (competitor.name === 'Pop Off') {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             }
@@ -6707,7 +6707,7 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': true});
                             }
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -6748,10 +6748,10 @@ describe('when updating an existing entry', () => {
                 
                 describe('when neither helm nor dinghy nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
@@ -6792,13 +6792,13 @@ describe('when updating an existing entry', () => {
     
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
-                        jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
@@ -6836,11 +6836,11 @@ describe('when updating an existing entry', () => {
         });
     
         it('clears form on success', async () => {
-            jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+            vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                 return Promise.resolve({'success': true});
             });
-            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
-            jest.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
+            vi.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
+            vi.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
                 return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
             });
             const user = userEvent.setup();
@@ -6997,7 +6997,7 @@ describe('when updating an existing entry', () => {
                 
                 describe('when update button clicked', () => {
                     it('updates entry with values entered into form and dinghy class set per race', async () => {
-                        const onUpdateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        const onUpdateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -7030,7 +7030,7 @@ describe('when updating an existing entry', () => {
                 
                     describe('when entry not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                            vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
@@ -7095,10 +7095,10 @@ describe('when updating an existing entry', () => {
             
                 describe('when update button clicked', () => {
                     it('creates helm and then updates entry with values entered into form', async () => {
-                        const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -7132,7 +7132,7 @@ describe('when updating an existing entry', () => {
                     
                     describe('when helm not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
                             const user = userEvent.setup();
@@ -7168,10 +7168,10 @@ describe('when updating an existing entry', () => {
                     });
                     describe('when entry not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                            vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
@@ -7235,10 +7235,10 @@ describe('when updating an existing entry', () => {
                 
                 describe('when update button clicked', () => {
                     it('creates dinghy and then updates entry with values entered into form', async () => {
-                        const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -7273,7 +7273,7 @@ describe('when updating an existing entry', () => {
     
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -7311,10 +7311,10 @@ describe('when updating an existing entry', () => {
     
                     describe('when entry not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                            vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
@@ -7379,13 +7379,13 @@ describe('when updating an existing entry', () => {
                 
                 describe('when update button clicked', () => {
                     it('creates helm and dinghy and then updates entry with values entered into form', async () => {
-                        const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -7421,10 +7421,10 @@ describe('when updating an existing entry', () => {
                     
                     describe('when helm not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
@@ -7463,10 +7463,10 @@ describe('when updating an existing entry', () => {
     
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -7505,10 +7505,10 @@ describe('when updating an existing entry', () => {
     
                     describe('when neither helm nor dinghy created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -7605,7 +7605,7 @@ describe('when updating an existing entry', () => {
     
                 describe('when update button clicked', () => {
                     it('updates entry with values entered into form and dinghy class set per race', async () => {
-                        const onUpdateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        const onUpdateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -7643,7 +7643,7 @@ describe('when updating an existing entry', () => {
                 
                     describe('when entry not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                            vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
@@ -7709,10 +7709,10 @@ describe('when updating an existing entry', () => {
             
                 describe('when update button clicked', () => {
                     it('creates helm and then updates entry with values entered into form', async () => {
-                        const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -7743,7 +7743,7 @@ describe('when updating an existing entry', () => {
                     
                     describe('when helm not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
                             const user = userEvent.setup();
@@ -7778,10 +7778,10 @@ describe('when updating an existing entry', () => {
                     });
                     describe('when entry not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                            vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
@@ -7849,10 +7849,10 @@ describe('when updating an existing entry', () => {
                 
                 describe('when update button clicked', () => {
                     it('creates dinghy and then updates entry with values entered into form', async () => {
-                        const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -7883,7 +7883,7 @@ describe('when updating an existing entry', () => {
                     });
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -7918,10 +7918,10 @@ describe('when updating an existing entry', () => {
                     });
                     describe('when entry not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                            vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
@@ -7981,10 +7981,10 @@ describe('when updating an existing entry', () => {
                 
                 describe('when update button clicked', () => {
                     it('creates crew and then updates entry with values entered into form', async () => {
-                        const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -8016,7 +8016,7 @@ describe('when updating an existing entry', () => {
     
                     describe('when crew not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
                             const user = userEvent.setup();
@@ -8051,10 +8051,10 @@ describe('when updating an existing entry', () => {
     
                     describe('when entry not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                            vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
@@ -8117,13 +8117,13 @@ describe('when updating an existing entry', () => {
                 
                 describe('when update button clicked', () => {
                     it('creates helm and dinghy and then updates entry with values entered into form', async () => {
-                        const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -8160,10 +8160,10 @@ describe('when updating an existing entry', () => {
                     
                     describe('when helm not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
@@ -8203,10 +8203,10 @@ describe('when updating an existing entry', () => {
     
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -8246,10 +8246,10 @@ describe('when updating an existing entry', () => {
     
                     describe('when neither helm nor dinghy created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
-                            const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -8290,13 +8290,13 @@ describe('when updating an existing entry', () => {
     
                     describe('when entry not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                            vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
@@ -8363,10 +8363,10 @@ describe('when updating an existing entry', () => {
                 
                 describe('when update button clicked', () => {
                     it('creates helm and crew and then updates entry with values entered into form', async () => {
-                        const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -8405,7 +8405,7 @@ describe('when updating an existing entry', () => {
                         it('displays failure message and entered values remain on form', async () => {
                         // SignUp does not refresh competitor list so button label will not change
                         // const updatedCompetitorsCollection = [...competitorsCollection, {'name':'Pop Off', 'url': 'http://localhost:8081/dinghyracing/api/competitors/999'}];
-                        // jest.spyOn(model, 'getCompetitors').mockImplementation(() => {
+                        // vi.spyOn(model, 'getCompetitors').mockImplementation(() => {
                         //     console.log(`getCompetitors.mockImplementation`);
                         //     return Promise.resolve({'success': true, 'domainObject': updatedCompetitorsCollection
                         // })})
@@ -8413,7 +8413,7 @@ describe('when updating an existing entry', () => {
                         //         console.log(`getCompetitors.mockImplementationOnce`);
                         //         return Promise.resolve({'success': true, 'domainObject': competitorsCollection})
                         //     });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                             if (competitor.name === 'Not There') {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             }
@@ -8462,7 +8462,7 @@ describe('when updating an existing entry', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             // SignUp does not refresh competitor list so button label will not change
                             // const updatedCompetitorsCollection = [...competitorsCollection, {'name':'Pop Off', 'url': 'http://localhost:8081/dinghyracing/api/competitors/999'}];
-                            // jest.spyOn(model, 'getCompetitors').mockImplementation(() => {
+                            // vi.spyOn(model, 'getCompetitors').mockImplementation(() => {
                             //     console.log(`getCompetitors.mockImplementation`);
                             //     return Promise.resolve({'success': true, 'domainObject': updatedCompetitorsCollection
                             // })})
@@ -8470,7 +8470,7 @@ describe('when updating an existing entry', () => {
                             //         console.log(`getCompetitors.mockImplementationOnce`);
                             //         return Promise.resolve({'success': true, 'domainObject': competitorsCollection})
                             //     });
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                                 if (competitor.name === 'Pop Off') {
                                     return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                                 }
@@ -8517,7 +8517,7 @@ describe('when updating an existing entry', () => {
 
                     describe('when neither helm nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
                             const user = userEvent.setup();
@@ -8557,10 +8557,10 @@ describe('when updating an existing entry', () => {
 
                     describe('when entry not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                            vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
@@ -8627,13 +8627,13 @@ describe('when updating an existing entry', () => {
                 
                 describe('when update button clicked', () => {
                     it('creates dinghy and crew and then updates entry with values entered into form', async () => {
-                        const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -8670,10 +8670,10 @@ describe('when updating an existing entry', () => {
                     
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -8713,10 +8713,10 @@ describe('when updating an existing entry', () => {
     
                     describe('when crew not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
@@ -8756,10 +8756,10 @@ describe('when updating an existing entry', () => {
     
                     describe('when neither dinghy nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
-                            const createHelmSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -8800,13 +8800,13 @@ describe('when updating an existing entry', () => {
     
                     describe('when entry not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                            vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
@@ -8877,13 +8877,13 @@ describe('when updating an existing entry', () => {
                 
                 describe('when update button clicked', () => {
                     it('creates helm and dinghy and crew and then updates entry with values entered into form', async () => {
-                        const updateEntrySpy = jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                        const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                        const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
-                        const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                        const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
@@ -8925,7 +8925,7 @@ describe('when updating an existing entry', () => {
                     
                     describe('when helm not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                                 if (competitor.name === 'Not There') {
                                     return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                                 }
@@ -8933,7 +8933,7 @@ describe('when updating an existing entry', () => {
                                     return Promise.resolve({'success': true});
                                 }
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
@@ -8978,10 +8978,10 @@ describe('when updating an existing entry', () => {
         
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -9026,7 +9026,7 @@ describe('when updating an existing entry', () => {
         
                     describe('when crew not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                                 if (competitor.name === 'Pop Off') {
                                     return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                                 }
@@ -9034,7 +9034,7 @@ describe('when updating an existing entry', () => {
                                     return Promise.resolve({'success': true});
                                 }
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
@@ -9079,7 +9079,7 @@ describe('when updating an existing entry', () => {
                         
                     describe('when neither helm nor dinghy created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                                 if (competitor.name === 'Not There') {
                                     return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                                 }
@@ -9087,7 +9087,7 @@ describe('when updating an existing entry', () => {
                                     return Promise.resolve({'success': true});
                                 }
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -9133,10 +9133,10 @@ describe('when updating an existing entry', () => {
         
                     describe('when neither helm nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
@@ -9181,7 +9181,7 @@ describe('when updating an existing entry', () => {
                     
                     describe('when neither dinghy nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                                 if (competitor.name === 'Pop Off') {
                                     return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                                 }
@@ -9189,7 +9189,7 @@ describe('when updating an existing entry', () => {
                                     return Promise.resolve({'success': true});
                                 }
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -9235,10 +9235,10 @@ describe('when updating an existing entry', () => {
                     
                     describe('when neither helm nor dinghy nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
-                            const createCompetitorSpy = jest.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
+                            const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
-                            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
@@ -9284,13 +9284,13 @@ describe('when updating an existing entry', () => {
         
                     describe('when entry not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
-                            jest.spyOn(controller, 'createCompetitor').mockImplementation(() => {
+                            vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'createDinghy').mockImplementation(() => {
+                            vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': true});
                             });
-                            jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+                            vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
@@ -9334,11 +9334,11 @@ describe('when updating an existing entry', () => {
         });
     
         it('clears form on success', async () => {
-            jest.spyOn(controller, 'updateEntry').mockImplementation(() => {
+            vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                 return Promise.resolve({'success': true});
             });
-            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
-            jest.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
+            vi.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
+            vi.spyOn(model, 'getCrewsByDinghy').mockImplementation(() => {
                 return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
             });
             const user = userEvent.setup();
@@ -9411,8 +9411,8 @@ describe('when updating an existing entry', () => {
 
 it('registers an interest in race updates for the race being signed up to', async () => {
     const user = userEvent.setup();
-    jest.spyOn(model, 'getEntriesByRace').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-    const registerRaceUpdateCallbackSpy = jest.spyOn(model, 'registerRaceUpdateCallback');
+    vi.spyOn(model, 'getEntriesByRace').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    const registerRaceUpdateCallbackSpy = vi.spyOn(model, 'registerRaceUpdateCallback');
 
     customRender(<SignUp race={raceScorpionA}/>, model, controller);
     expect((await screen.findAllByRole('cell', {'name': /Scorpion/i}))[0]).toBeInTheDocument();
@@ -9422,8 +9422,8 @@ it('registers an interest in race updates for the race being signed up to', asyn
 
 it('registers an interest in entry updates for the entries in the race being signed up to', async () => {
     const user = userEvent.setup();
-    jest.spyOn(model, 'getEntriesByRace').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-    const registerEntryUpdateCallbackSpy = jest.spyOn(model, 'registerEntryUpdateCallback');
+    vi.spyOn(model, 'getEntriesByRace').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    const registerEntryUpdateCallbackSpy = vi.spyOn(model, 'registerEntryUpdateCallback');
 
     customRender(<SignUp race={raceScorpionA}/>, model, controller);
     expect((await screen.findAllByRole('cell', {'name': /Scorpion/i}))[0]).toBeInTheDocument();
@@ -9434,7 +9434,7 @@ it('registers an interest in entry updates for the entries in the race being sig
 
 it('removes an entry that has been withdrawn from list of displayed entries', async () => {
     const entriesScorpionADeleted = [entriesScorpionA[0]];
-    jest.spyOn(model, 'getEntriesByRace').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionADeleted})});
+    vi.spyOn(model, 'getEntriesByRace').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionADeleted})});
     await act(async () => {
         customRender(<SignUp race={raceScorpionA}/>, model, controller);
     });
@@ -9449,9 +9449,9 @@ it('removes an entry that has been withdrawn from list of displayed entries', as
 describe('when the withdraw button for an entry is clicked', () => {
     it('calls the controller withDraw entry method with the entry to be withdrawn', async () => {
         const user = userEvent.setup();
-        jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesCometA})});
+        vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesCometA})});
         customRender(<SignUp race={raceCometA}/>, model, controller);
-        const withdrawEntrySpy = jest.spyOn(controller, 'withdrawEntry').mockImplementation(() => {return Promise.resolve({success: true})});
+        const withdrawEntrySpy = vi.spyOn(controller, 'withdrawEntry').mockImplementation(() => {return Promise.resolve({success: true})});
         const jillMyerCell = await screen.findByRole('cell', {'name': /Jill Myer/i});
         const entryJillMyerRow = jillMyerCell.parentElement;
         const withdrawButton = within(entryJillMyerRow).getByRole('button', {name: /x/i});
@@ -9463,7 +9463,7 @@ describe('when the withdraw button for an entry is clicked', () => {
 });
 
 it('registers an interest in new competitors', async () => {
-    const registerCompetitorCreationCallbackSpy = jest.spyOn(model, 'registerCompetitorCreationCallback');
+    const registerCompetitorCreationCallbackSpy = vi.spyOn(model, 'registerCompetitorCreationCallback');
 
     customRender(<SignUp race={raceScorpionA}/>, model, controller);
     expect((await screen.findAllByRole('cell', {'name': /Scorpion/i}))[0]).toBeInTheDocument();
@@ -9474,7 +9474,7 @@ it('registers an interest in new competitors', async () => {
 describe('when a new competitor is created', () => {
     it('updates the list of known competitors', async () => {
         const competitorsCollection_updated = [...competitorsCollection, {name: 'new', url: 'http://localhost:8081/dinghyracing/api/competitors/99'}]
-        jest.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': competitorsCollection_updated})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': competitorsCollection})});
+        vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': competitorsCollection_updated})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': competitorsCollection})});
         customRender(<SignUp race={raceCometA}/>, model, controller);
         
         await act(async () => {
@@ -9485,7 +9485,7 @@ describe('when a new competitor is created', () => {
 });
 
 it('registers an interest in new dinghies', async () => {
-    const registerDinghyCreationCallbackSpy = jest.spyOn(model, 'registerDinghyCreationCallback');
+    const registerDinghyCreationCallbackSpy = vi.spyOn(model, 'registerDinghyCreationCallback');
 
     customRender(<SignUp race={raceScorpionA}/>, model, controller);
     expect((await screen.findAllByRole('cell', {'name': /Scorpion/i}))[0]).toBeInTheDocument();
@@ -9496,7 +9496,7 @@ it('registers an interest in new dinghies', async () => {
 describe('when a new dinghy is created', () => {
     it('updates the list of known dinghies', async () => {
         const dinghies_updated = [...dinghies, {sailNumber: '999', dinghyClass: dinghyClassScorpion, url: 'http://localhost:8081/dinghyracing/api/dinghies/99'}]
-        jest.spyOn(model, 'getDinghies').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghies_updated})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghies})});
+        vi.spyOn(model, 'getDinghies').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghies_updated})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghies})});
         customRender(<SignUp race={raceCometA}/>, model, controller);
         
         await act(async () => {
@@ -9509,7 +9509,7 @@ describe('when a new dinghy is created', () => {
 describe('when a new dinghy class is created', () => {
     it('updates the list of known dinghy classes', async () => {
         const dinghyClasses_updated = [...dinghyClasses, {name: 'Avalon', crewSize: 5, portsMouthNumber: 856, url: 'http://localhost:8081/dinghyracing/api/dinghyClasses/99'}]
-        jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClasses_updated})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClasses})});
+        vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClasses_updated})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClasses})});
         customRender(<SignUp race={raceHandicapA}/>, model, controller);
 
         await act(async () => {
@@ -9522,7 +9522,7 @@ describe('when a new dinghy class is created', () => {
 describe('when a sailnumber is entered', () => {
     it('displays dinghy class and previous crews for boats with that sail number', async () => {
         const user = userEvent.setup();
-        jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234, dinghy1234Graduate ]})});
+        vi.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234, dinghy1234Graduate ]})});
         await act(async () => {
             customRender(<SignUp race={raceHandicapA}/>, model, controller);
         });
@@ -9548,9 +9548,9 @@ describe('when a sailnumber is entered', () => {
     it('only displays entries that are eligible to sail based on the fleet for the race', async () => {
         const user = userEvent.setup();
 
-        jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234, dinghy1234Graduate ]})});
-        jest.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234 })});
-        jest.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
+        vi.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234, dinghy1234Graduate ]})});
+        vi.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234 })});
+        vi.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
             if (dinghy.url === dinghy1234.url) {
                 return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
             }
@@ -9586,9 +9586,9 @@ describe('when a sailnumber is entered', () => {
             it('displays an error message when there is a problem retrieving previous entries', async () => {
                 const user = userEvent.setup();
         
-                jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
-                jest.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!' })});
-                jest.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
+                vi.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
+                vi.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!' })});
+                vi.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
                     if (dinghy.url === dinghy1234.url) {
                         return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
                     }
@@ -9613,8 +9613,8 @@ describe('when a sailnumber is entered', () => {
             it('displays an error message when there is a problem retrieving previous entries', async () => {
                 const user = userEvent.setup();
         
-                jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
-                jest.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => {
+                vi.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
+                vi.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => {
                     return Promise.resolve(
                         {
                             success: false, 
@@ -9643,9 +9643,9 @@ describe('when a sailnumber is entered', () => {
         it('clears error message on success', async () => {
             const user = userEvent.setup();
         
-            jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementationOnce(() => {return Promise.resolve({success: false, message: 'Oops!'})});
-            jest.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementationOnce(() => {return Promise.resolve({success: false, message: 'Oops!' })});
-            // jest.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
+            vi.spyOn(model, 'getDinghiesBySailNumber').mockImplementationOnce(() => {return Promise.resolve({success: false, message: 'Oops!'})});
+            vi.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementationOnce(() => {return Promise.resolve({success: false, message: 'Oops!' })});
+            // vi.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
             //     if (dinghy.url === dinghy1234.url) {
             //         return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
             //     }
@@ -9681,7 +9681,7 @@ describe('when a sailnumber is entered', () => {
 describe('when a previous entry is selected', () => {
     it('populates the signup form with details from the previous entry', async () => {
         const user = userEvent.setup();
-        jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234, dinghy1234Graduate ]})});
+        vi.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234, dinghy1234Graduate ]})});
         await act(async () => {
             customRender(<SignUp race={raceHandicapA}/>, model, controller);
         });
@@ -9705,8 +9705,8 @@ describe('when a previous entry is selected', () => {
     it('overwrites any previously entered values removing any value entered for mate if mate in selected record is null', async () => {
         const user = userEvent.setup();
 
-        jest.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234, dinghy1234Graduate, dinghy1234Comet ]})});
-        jest.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
+        vi.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234, dinghy1234Graduate, dinghy1234Comet ]})});
+        vi.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
             if (dinghy.url === dinghy1234.url) {
                 return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
             }
@@ -9752,10 +9752,10 @@ describe('when a previous entry is selected', () => {
 describe('when race is for a fleet with a single class', () => {
     describe('when display has been cleared', () => {
         it('allows a new dinghy to be created', async () => {
-            const signupToRaceSpy = jest.spyOn(controller, 'signupToRace').mockImplementation(() => {
+            const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                 return Promise.resolve({'success': true});
             });
-            const createDinghySpy = jest.spyOn(controller, 'createDinghy').mockImplementation((dinghy) => {
+            const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation((dinghy) => {
                 if (!dinghy || !dinghy.sailNumber) {
                     return Promise.resolve({'success': false, 'message': 'A sail number is required for a new dinghy.'});
                 }
@@ -9787,8 +9787,8 @@ describe('when race is for a fleet with a single class', () => {
 });
 
 it('registers an interest in fleet updates for races in session', async () => {
-    jest.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
-    const registerFleetUpdateCallbackSpy = jest.spyOn(model, 'registerFleetUpdateCallback');
+    vi.spyOn(model, 'getStartSequence').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+    const registerFleetUpdateCallbackSpy = vi.spyOn(model, 'registerFleetUpdateCallback');
     const fleet = {...fleetHandicap, dinghyClasses: [dinghyClassComet, dinghyClassGraduate]};
 
     await act(async () => {
@@ -9801,7 +9801,7 @@ it('registers an interest in fleet updates for races in session', async () => {
 describe('when the fleet associated with the race is changed', () => {
     it('updates the list of dinghy classes', async () => {
         const fleet = {...fleetHandicap, dinghyClasses: [dinghyClassComet, dinghyClassGraduate, dinghyClassScorpion]};
-        jest.spyOn(model, 'getFleet').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': {...fleetHandicap, dinghyClasses: [dinghyClassGraduate, dinghyClassScorpion]}})});
+        vi.spyOn(model, 'getFleet').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': {...fleetHandicap, dinghyClasses: [dinghyClassGraduate, dinghyClassScorpion]}})});
 
         await act(async () => {
             customRender(<SignUp race={{...raceHandicapA, fleet: fleet}}/>, model, controller);

@@ -56,13 +56,13 @@ import FlagState from './domain-classes/flag-state';
 import RaceType from './domain-classes/race-type';
 import Clock from './domain-classes/clock';
 
-global.fetch = jest.fn();
-jest.mock('./domain-classes/clock');
+global.fetch = vi.fn();
+vi.mock('./domain-classes/clock');
 
 beforeEach(() => {
     fetch.mockClear();
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
 });
 
 describe('when creating a new object via REST', () => {
@@ -399,7 +399,7 @@ describe('when creating a new race', () => {
             }
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getFleet').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleetScorpion})});
+        vi.spyOn(dinghyRacingModel, 'getFleet').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleetScorpion})});
         const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00.000Z'), 'fleet': fleetScorpion, 'duration': 2700000, type:'FLEET', startType: 'CSCCLUBSTART'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -425,7 +425,7 @@ describe('when creating a new race', () => {
             }
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getFleet').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleetScorpion})});
+        vi.spyOn(dinghyRacingModel, 'getFleet').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleetScorpion})});
         const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00.000Z'), 'fleet': fleetScorpion, 'duration': 2700000, type:'FLEET', startType: 'CSCCLUBSTART'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -1186,8 +1186,8 @@ describe('when signing up to a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
-        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+        vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
                 return Promise.resolve({success: true, domainObject: competitorLouScrew});
             }
@@ -1195,8 +1195,8 @@ describe('when signing up to a race', () => {
                 return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
-        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -1214,8 +1214,8 @@ describe('when signing up to a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
-        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+        vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
                 return Promise.resolve({success: true, domainObject: competitorLouScrew});
             }
@@ -1223,8 +1223,8 @@ describe('when signing up to a race', () => {
                 return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
-        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -1246,8 +1246,8 @@ describe('when signing up to a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
-        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+        vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
                 return Promise.resolve({success: true, domainObject: competitorLouScrew});
             }
@@ -1255,10 +1255,10 @@ describe('when signing up to a race', () => {
                 return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
-        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
-        jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': raceScorpionA}));
-        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        vi.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': raceScorpionA}));
+        vi.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
             if (name === 'Chris Marshall') {
                 return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
             }
@@ -1269,8 +1269,8 @@ describe('when signing up to a race', () => {
                 return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
+        vi.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
+        vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
         const promise = dinghyRacingModel.createEntry(race, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -1291,8 +1291,8 @@ describe('when signing up to a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
-        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+        vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
                 return Promise.resolve({success: true, domainObject: competitorLouScrew});
             }
@@ -1300,10 +1300,10 @@ describe('when signing up to a race', () => {
                 return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
-        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
-        jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': raceScorpionA}));
-        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        vi.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': raceScorpionA}));
+        vi.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
             if (name === 'Chris Marshall') {
                 return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall})
             }
@@ -1311,8 +1311,8 @@ describe('when signing up to a race', () => {
                 return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
+        vi.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
+        vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
         const promise = dinghyRacingModel.createEntry(race, helm, dinghy);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -1334,8 +1334,8 @@ describe('when signing up to a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': false, 'message': 'Race not found'}));
-        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+        vi.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': false, 'message': 'Race not found'}));
+        vi.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
             if (name === 'Chris Marshall') {
                 return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
             }
@@ -1346,8 +1346,8 @@ describe('when signing up to a race', () => {
                 return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
+        vi.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
+        vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
         const promise = dinghyRacingModel.createEntry(race, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -1369,7 +1369,7 @@ describe('when signing up to a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+        vi.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
             if (name === 'Lucy Liu') {
                 return Promise.resolve({'success': false, 'message': 'Competitor not found'});
             }
@@ -1380,7 +1380,7 @@ describe('when signing up to a race', () => {
                 return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
+        vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
         const promise = dinghyRacingModel.createEntry(race, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -1402,8 +1402,8 @@ describe('when signing up to a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': raceScorpionA}));
-        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+        vi.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': raceScorpionA}));
+        vi.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
             if (name === 'Chris Marshall') {
                 return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
             }
@@ -1414,8 +1414,8 @@ describe('when signing up to a race', () => {
                 return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': false, 'message': 'Dinghy does not exist'}));
+        vi.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
+        vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': false, 'message': 'Dinghy does not exist'}));
         const promise = dinghyRacingModel.createEntry(race, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -1437,7 +1437,7 @@ describe('when signing up to a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+        vi.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
             if (name === 'Lou Screw') {
                 return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
             }
@@ -1445,7 +1445,7 @@ describe('when signing up to a race', () => {
                 return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
+        vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
         const promise = dinghyRacingModel.createEntry(race, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -1523,8 +1523,8 @@ describe('when updating an entry for a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
-        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+        vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
                 return Promise.resolve({success: true, domainObject: competitorLouScrew});
             }
@@ -1532,8 +1532,8 @@ describe('when updating an entry for a race', () => {
                 return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
-        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, competitorChrisMarshall, dinghy1234, competitorLouScrew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -1551,10 +1551,10 @@ describe('when updating an entry for a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
-        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
-        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
-        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
                 return Promise.resolve({success: true, domainObject: competitorLouScrew});
             }
@@ -1562,8 +1562,8 @@ describe('when updating an entry for a race', () => {
                 return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
-        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, competitorChrisMarshall, dinghy1234);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -1584,7 +1584,7 @@ describe('when updating an entry for a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+        vi.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
             if (name === 'Chris Marshall') {
                 return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
             }
@@ -1595,10 +1595,10 @@ describe('when updating an entry for a race', () => {
                 return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
-        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
-        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+        vi.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
+        vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
+        vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
                 return Promise.resolve({success: true, domainObject: competitorLouScrew});
             }
@@ -1606,8 +1606,8 @@ describe('when updating an entry for a race', () => {
                 return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
-        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -1627,8 +1627,8 @@ describe('when updating an entry for a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': raceScorpionA}));
-        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+        vi.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': raceScorpionA}));
+        vi.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
             if (name === 'Chris Marshall') {
                 return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall})
             }
@@ -1636,10 +1636,10 @@ describe('when updating an entry for a race', () => {
                 return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
-        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
-        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+        vi.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
+        vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
+        vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
                 return Promise.resolve({success: true, domainObject: competitorLouScrew});
             }
@@ -1647,8 +1647,8 @@ describe('when updating an entry for a race', () => {
                 return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
-        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, helm, dinghy);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -1669,7 +1669,7 @@ describe('when updating an entry for a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+        vi.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
             if (name === 'Lucy Liu') {
                 return Promise.resolve({'success': false, 'message': 'Competitor not found'});
             }
@@ -1680,7 +1680,7 @@ describe('when updating an entry for a race', () => {
                 return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
+        vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -1702,8 +1702,8 @@ describe('when updating an entry for a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': raceScorpionA}));
-        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+        vi.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': raceScorpionA}));
+        vi.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
             if (name === 'Chris Marshall') {
                 return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
             }
@@ -1714,8 +1714,8 @@ describe('when updating an entry for a race', () => {
                 return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': false, 'message': 'Dinghy does not exist'}));
+        vi.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
+        vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': false, 'message': 'Dinghy does not exist'}));
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -1738,7 +1738,7 @@ describe('when updating an entry for a race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+        vi.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
             if (name === 'Lou Screw') {
                 return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
             }
@@ -1746,7 +1746,7 @@ describe('when updating an entry for a race', () => {
                 return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
+        vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -2310,7 +2310,7 @@ describe('when updating a competitor', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+        vi.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
             if (name === 'Chris Marshall') {
                 return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
             }
@@ -2325,7 +2325,7 @@ describe('when updating a competitor', () => {
     });
     it('if competitor does not exist returns message explaining issue', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
+        vi.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
             return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
         });
         const promise = dinghyRacingModel.updateCompetitor({name: 'Chris Martian'}, 'Chris Marshal');
@@ -2395,7 +2395,7 @@ describe('when creating a new dinghy', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => Promise.resolve({success: true, domainObject: dinghyClassScorpion}));
+        vi.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => Promise.resolve({success: true, domainObject: dinghyClassScorpion}));
 
         const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', 'dinghyClass': dinghyClassScorpion});
         const result = await promise;
@@ -2412,8 +2412,8 @@ describe('when creating a new dinghy', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => Promise.resolve({success: true, domainObject: dinghyClassScorpion}));
+        const getDinghyClassByNameSpy = vi.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
+        vi.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => Promise.resolve({success: true, domainObject: dinghyClassScorpion}));
 
         const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', 'dinghyClass': {'name': 'Scorpion'}});
         const result = await promise;
@@ -2424,7 +2424,7 @@ describe('when creating a new dinghy', () => {
     });
     it('when supplied dinghy class does not contain URL and dinghy class does not exist returns a promise that resolves to a result indicating failure', async () => {        
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const getDinghyClassByNameSpy = jest.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': false, 'message': 'Dinghy class does not exist.'}));
+        const getDinghyClassByNameSpy = vi.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': false, 'message': 'Dinghy class does not exist.'}));
 
         const promise = dinghyRacingModel.createDinghy({'sailNumber': '1234', 'dinghyClass': {...DinghyRacingModel.dinghyClassTemplate(), 'name': 'Not a Dinghy Class'}});
         const result = await promise;
@@ -3975,7 +3975,7 @@ describe('when searching for entries by race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
+        vi.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/10') {
                 return Promise.resolve({success: true, domainObject: entryChrisMarshallScorpionA1234});
             }
@@ -3998,7 +3998,7 @@ describe('when searching for entries by race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
+        vi.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/19') {
                 return Promise.resolve({success: true, domainObject: entryJillMyerCometA826});
             }
@@ -4018,7 +4018,7 @@ describe('when searching for entries by race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
+        vi.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/20') {
                 return Promise.resolve({success: true, domainObject: entryChrisMarshallHandicapA1234});
             }
@@ -4042,7 +4042,7 @@ describe('when searching for entries by race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
+        vi.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/10') {
                 return Promise.resolve({success: true, domainObject: entryChrisMarshallScorpionA1234});
             }
@@ -4058,7 +4058,7 @@ describe('when searching for entries by race', () => {
     it('converts the value for sumOfLapTimes to the correct value', async () => {
         const entryHAL = {...entryChrisMarshallDinghy1234HAL, sumOfLapTimes: 'PT11M00S'};
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'read').mockImplementation((resource) => {
+        vi.spyOn(dinghyRacingModel, 'read').mockImplementation((resource) => {
             if (resource === raceScorpionA.url + '/signedUp') {
                 return Promise.resolve({success: true, domainObject: {_embedded: {entries: [entryHAL]}}});
             }
@@ -4066,8 +4066,8 @@ describe('when searching for entries by race', () => {
                 return Promise.resolve({success: true, domainObject: entryHAL, eTag: '"1"'});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
-        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+        vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
                 return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
             }
@@ -4075,8 +4075,8 @@ describe('when searching for entries by race', () => {
                 return Promise.resolve({success: true, domainObject: competitorLouScrew});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
-        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         const promise = dinghyRacingModel.getEntriesByRace(raceScorpionA);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -4085,7 +4085,7 @@ describe('when searching for entries by race', () => {
     it('converts the value for correctedLapTime to the correct value', async () => {
         const entryHAL = {...entryChrisMarshallDinghy1234HAL, correctedTime: 'PT10M32.790S'};
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'read').mockImplementation((resource) => {
+        vi.spyOn(dinghyRacingModel, 'read').mockImplementation((resource) => {
             if (resource === raceScorpionA.url + '/signedUp') {
                 return Promise.resolve({success: true, domainObject: {_embedded: {entries: [entryHAL]}}});
             }
@@ -4093,8 +4093,8 @@ describe('when searching for entries by race', () => {
                 return Promise.resolve({success: true, domainObject: entryHAL, eTag: '"1"'});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
-        jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+        vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
                 return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
             }
@@ -4102,8 +4102,8 @@ describe('when searching for entries by race', () => {
                 return Promise.resolve({success: true, domainObject: competitorLouScrew});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
-        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         const promise = dinghyRacingModel.getEntriesByRace(raceScorpionA);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -4145,7 +4145,7 @@ describe('when searching for entries by race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getEntry').mockImplementationOnce((url) => {
+        vi.spyOn(dinghyRacingModel, 'getEntry').mockImplementationOnce((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/20') {
                 return Promise.resolve({success: true, domainObject: {helm: competitorChrisMarshall, crew: competitorLouScrew, race: raceHandicapA, dinghy: dinghy1234, laps: [], sumOfLapTimes: 0, onLastLap: true, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/20'}});
             }
@@ -4202,7 +4202,7 @@ describe('when searching for entries by race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
+        vi.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/20') {
                 return Promise.resolve({success: true, domainObject: {helm: competitorChrisMarshall, crew: competitorLouScrew, race: raceHandicapA, dinghy: dinghy1234, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: true, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/20'}});
             }
@@ -4210,7 +4210,7 @@ describe('when searching for entries by race', () => {
                 return Promise.resolve({success: true, domainObject: {helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, onLastLap: true, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/21'}});
             }
         });
-        jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
+        vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
         const promise = dinghyRacingModel.getEntriesByRace(raceHandicapA);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -4251,7 +4251,7 @@ describe('when searching for entries by race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
+        vi.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/20') {
                 return Promise.resolve({success: true, domainObject: entryChrisMarshall_DNS});
             }
@@ -4315,7 +4315,7 @@ describe('when searching for entries by race', () => {
                 }
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            jest.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
+            vi.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1430') {
                     return Promise.resolve({success: true, domainObject: {helm: competitorCarmenWhiting, crew: competitorNoelHills, race: raceGraduateA, dinghy: dinghy1, laps: [], sumOfLapTimes: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, position: null, url: 'http://localhost:8081/dinghyracing/api/entries/1430', metadata: {eTag: '"1"'}}});
                 }
@@ -4497,7 +4497,7 @@ describe('when a race is requested', () => {
             }
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        // jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
+        // vi.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
         const promise = dinghyRacingModel.getRace(raceScorpionA.url);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -4580,7 +4580,7 @@ describe('when a race is requested', () => {
                 }
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
+            vi.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
             const promise = dinghyRacingModel.getRace(raceScorpion_lapsSailed.url);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
@@ -4741,7 +4741,7 @@ describe('when a race is requested', () => {
             }
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassGraduate})});
+        vi.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassGraduate})});
         const promise = dinghyRacingModel.getRace(raceGraduateA.url);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -4909,7 +4909,7 @@ describe('when a dinghy is requested', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
+        vi.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
         const promise = dinghyRacingModel.getDinghy(dinghy1234.url);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -5006,7 +5006,7 @@ describe('when starting a race', () => {
                 });
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': {raceScorpionA}})});
+            vi.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': {raceScorpionA}})});
             const promise = dinghyRacingModel.startRace({ 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00Z'), 'dinghyClass': dinghyClassScorpion}, new Date());
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
@@ -5021,7 +5021,7 @@ describe('when starting a race', () => {
                 });
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
+            vi.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
             const promise = dinghyRacingModel.startRace({ 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00Z'), 'dinghyClass': dinghyClassScorpion}, new Date());
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
@@ -5225,7 +5225,7 @@ describe('when updating a lap from a race', () => {
 describe('when a websocket message callback has been set for entry update', () => {
     it('calls the callback', done => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerEntryUpdateCallback('http://localhost:8081/dinghyracing/api/entries/10', callback);
         // create delay to give time for stomp mock to trigger callback
         setTimeout(() => {
@@ -5235,30 +5235,30 @@ describe('when a websocket message callback has been set for entry update', () =
     });
     it('does not set another reference to the same callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerEntryUpdateCallback('http://localhost:8081/dinghyracing/api/entries/10', callback);
         dinghyRacingModel.registerEntryUpdateCallback('http://localhost:8081/dinghyracing/api/entries/10', callback);
         expect(dinghyRacingModel.entryUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/entries/10').size).toBe(1);
     });
     it('sets a functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback1 = jest.fn();
-        const callback2 = jest.fn();
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
         dinghyRacingModel.registerEntryUpdateCallback('http://localhost:8081/dinghyracing/api/entries/10', callback1);
         dinghyRacingModel.registerEntryUpdateCallback('http://localhost:8081/dinghyracing/api/entries/10', callback2);
         expect(dinghyRacingModel.entryUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/entries/10').size).toBe(2);
     });
     it('removes websocket message when requested', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerEntryUpdateCallback('http://localhost:8081/dinghyracing/api/entries/10', callback);
         dinghyRacingModel.unregisterEntryUpdateCallback('http://localhost:8081/dinghyracing/api/entries/10', callback);
         expect(dinghyRacingModel.entryUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/entries/10').size).toBe(0);
     });
     it('does not remove functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback1 = jest.fn();
-        const callback2 = jest.fn();
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
         dinghyRacingModel.registerEntryUpdateCallback('http://localhost:8081/dinghyracing/api/entries/10', callback1);
         dinghyRacingModel.registerEntryUpdateCallback('http://localhost:8081/dinghyracing/api/entries/10', callback2);
         dinghyRacingModel.unregisterEntryUpdateCallback('http://localhost:8081/dinghyracing/api/entries/10', callback1);
@@ -5269,7 +5269,7 @@ describe('when a websocket message callback has been set for entry update', () =
 describe('when a websocket message callback has been set for race update', () => {
     it('calls the callback', done => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback);
         // create delay to give time for stomp mock to trigger callback
         setTimeout(() => {
@@ -5279,30 +5279,30 @@ describe('when a websocket message callback has been set for race update', () =>
     });
     it('does not set another reference to the same callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback);
         dinghyRacingModel.registerRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback);
         expect(dinghyRacingModel.raceUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/races/4').size).toBe(1);
     });
     it('sets a functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback1 = jest.fn();
-        const callback2 = jest.fn();
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
         dinghyRacingModel.registerRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback1);
         dinghyRacingModel.registerRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback2);
         expect(dinghyRacingModel.raceUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/races/4').size).toBe(2);
     });
     it('removes websocket message when requested', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback);
         dinghyRacingModel.unregisterRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback);
         expect(dinghyRacingModel.raceUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/races/4').size).toBe(0);
     });
     it('does not remove functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback1 = jest.fn();
-        const callback2 = jest.fn();
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
         dinghyRacingModel.registerRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback1);
         dinghyRacingModel.registerRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback2);
         dinghyRacingModel.unregisterRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback1);
@@ -5313,7 +5313,7 @@ describe('when a websocket message callback has been set for race update', () =>
 describe('when a websocket message callback has been set for race entry laps update', () => {
     it('calls the callback', done => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerRaceEntryLapsUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback);
         // create delay to give time for stomp mock to trigger callback
         setTimeout(() => {
@@ -5323,30 +5323,30 @@ describe('when a websocket message callback has been set for race entry laps upd
     });
     it('does not set another reference to the same callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerRaceEntryLapsUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback);
         dinghyRacingModel.registerRaceEntryLapsUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback);
         expect(dinghyRacingModel.raceEntryLapsUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/races/4').size).toBe(1);
     });
     it('sets a functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback1 = jest.fn();
-        const callback2 = jest.fn();
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
         dinghyRacingModel.registerRaceEntryLapsUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback1);
         dinghyRacingModel.registerRaceEntryLapsUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback2);
         expect(dinghyRacingModel.raceEntryLapsUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/races/4').size).toBe(2);
     });
     it('removes websocket message when requested', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerRaceEntryLapsUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback);
         dinghyRacingModel.unregisterRaceEntryLapsUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback);
         expect(dinghyRacingModel.raceEntryLapsUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/races/4').size).toBe(0);
     });
     it('does not remove functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback1 = jest.fn();
-        const callback2 = jest.fn();
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
         dinghyRacingModel.registerRaceEntryLapsUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback1);
         dinghyRacingModel.registerRaceEntryLapsUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback2);
         dinghyRacingModel.unregisterRaceEntryLapsUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback1);
@@ -5920,7 +5920,7 @@ describe('when retrieving a list of races that start between the specified times
 
 describe('when a StartSequence is requested', () => {
     it('returns a promise that resolves to a success containing a StartSequence for the races between the start and end times', async () => {
-        jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
+        vi.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
 
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
 
@@ -5970,14 +5970,14 @@ describe('when a StartSequence is requested', () => {
         expect(signals.length).toBe(10);
         expect(signals).toEqual(expect.arrayContaining([scorpionWarningSignal, preparatorySignal, graduateWarningSignal, scorpionStartSignal, cometWarningSignal, graduateStartSignal, handicapWarningSignal, endSequenceSignal, cometStartSignal, handicapStartSignal]));
 
-        jest.runOnlyPendingTimers();
-        jest.useRealTimers();
+        vi.runOnlyPendingTimers();
+        vi.useRealTimers();
     });
     describe('when race is a pursuit race', () => {
         describe('when race is an open handicap', () => {
             it('provides the base class to be used for the fleet when calculating start offsets', async () => {
                 // open handicap is defined as a fleet with no explicit classes set and RaceStartSequence needs a base class to caclculate offsets so additional action is required by DinghyRacingModel to supply this class
-                jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
+                vi.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
                 fetch.mockImplementation((resource) => {
                     if (resource === 'http://localhost:8081/dinghyracing/api/dinghyClasses/search/findTopByOrderByPortsmouthNumberDesc') {
                         return Promise.resolve({
@@ -6038,8 +6038,8 @@ describe('when a StartSequence is requested', () => {
                 expect(signals).toHaveLength(6);
                 expect(signals).toEqual(expect.arrayContaining([handicapWarningSignal, preparatorySignal, oneMinuteSignal, handicapStartSignal, cometStartSignal, scorpionStartSignal]));
                         
-                jest.runOnlyPendingTimers();
-                jest.useRealTimers();
+                vi.runOnlyPendingTimers();
+                vi.useRealTimers();
             });
         });
     });
@@ -6087,7 +6087,7 @@ describe('when updating the plannedLaps for a race', () => {
                 });
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': {raceScorpionA}})});
+            vi.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': {raceScorpionA}})});
             const promise = dinghyRacingModel.updateRacePlannedLaps({ 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00Z'), plannedLaps: 5, 'dinghyClass': dinghyClassScorpion}, 4);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
@@ -6102,7 +6102,7 @@ describe('when updating the plannedLaps for a race', () => {
                 });
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            jest.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
+            vi.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
             const promise = dinghyRacingModel.updateRacePlannedLaps({ 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00Z'), plannedLaps: 5, 'dinghyClass': dinghyClassScorpion}, 4);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
@@ -6114,7 +6114,7 @@ describe('when updating the plannedLaps for a race', () => {
 describe('when a websocket message callback has been set for competitor creation', () => {
     it('calls the callback', done => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerCompetitorCreationCallback(callback);
         // create delay to give time for stomp mock to trigger callback
         setTimeout(() => {
@@ -6124,30 +6124,30 @@ describe('when a websocket message callback has been set for competitor creation
     });
     it('does not set another reference to the same callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerCompetitorCreationCallback(callback);
         dinghyRacingModel.registerCompetitorCreationCallback(callback);
         expect(dinghyRacingModel.competitorCreationCallbacks.size).toBe(1);
     });
     it('sets a functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback1 = jest.fn();
-        const callback2 = jest.fn();
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
         dinghyRacingModel.registerCompetitorCreationCallback(callback1);
         dinghyRacingModel.registerCompetitorCreationCallback(callback2);
         expect(dinghyRacingModel.competitorCreationCallbacks.size).toBe(2);
     });
     it('removes websocket message when requested', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerCompetitorCreationCallback(callback);
         dinghyRacingModel.unregisterCompetitorCreationCallback(callback);
         expect(dinghyRacingModel.competitorCreationCallbacks.size).toBe(0);
     });
     it('does not remove functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback1 = jest.fn();
-        const callback2 = jest.fn();
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
         dinghyRacingModel.registerCompetitorCreationCallback(callback1);
         dinghyRacingModel.registerCompetitorCreationCallback(callback2);
         dinghyRacingModel.unregisterCompetitorCreationCallback(callback1);
@@ -6158,7 +6158,7 @@ describe('when a websocket message callback has been set for competitor creation
 describe('when a websocket message callback has been set for dinghy creation', () => {
     it('calls the callback', done => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerDinghyCreationCallback(callback);
         // create delay to give time for stomp mock to trigger callback
         setTimeout(() => {
@@ -6168,30 +6168,30 @@ describe('when a websocket message callback has been set for dinghy creation', (
     });
     it('does not set another reference to the same callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerDinghyCreationCallback(callback);
         dinghyRacingModel.registerDinghyCreationCallback(callback);
         expect(dinghyRacingModel.dinghyCreationCallbacks.size).toBe(1);
     });
     it('sets a functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback1 = jest.fn();
-        const callback2 = jest.fn();
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
         dinghyRacingModel.registerDinghyCreationCallback(callback1);
         dinghyRacingModel.registerDinghyCreationCallback(callback2);
         expect(dinghyRacingModel.dinghyCreationCallbacks.size).toBe(2);
     });
     it('removes websocket message when requested', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerDinghyCreationCallback(callback);
         dinghyRacingModel.unregisterDinghyCreationCallback(callback);
         expect(dinghyRacingModel.dinghyCreationCallbacks.size).toBe(0);
     });
     it('does not remove functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback1 = jest.fn();
-        const callback2 = jest.fn();
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
         dinghyRacingModel.registerDinghyCreationCallback(callback1);
         dinghyRacingModel.registerDinghyCreationCallback(callback2);
         dinghyRacingModel.unregisterDinghyCreationCallback(callback1);
@@ -6202,7 +6202,7 @@ describe('when a websocket message callback has been set for dinghy creation', (
 describe('when a websocket message callback has been set for dinghy class creation', () => {
     it('calls the callback', done => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerDinghyClassCreationCallback(callback);
         // create delay to give time for stomp mock to trigger callback
         setTimeout(() => {
@@ -6212,30 +6212,30 @@ describe('when a websocket message callback has been set for dinghy class creati
     });
     it('does not set another reference to the same callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerDinghyClassCreationCallback(callback);
         dinghyRacingModel.registerDinghyClassCreationCallback(callback);
         expect(dinghyRacingModel.dinghyClassCreationCallbacks.size).toBe(1);
     });
     it('sets a functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback1 = jest.fn();
-        const callback2 = jest.fn();
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
         dinghyRacingModel.registerDinghyClassCreationCallback(callback1);
         dinghyRacingModel.registerDinghyClassCreationCallback(callback2);
         expect(dinghyRacingModel.dinghyClassCreationCallbacks.size).toBe(2);
     });
     it('removes websocket message when requested', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerDinghyClassCreationCallback(callback);
         dinghyRacingModel.unregisterDinghyClassCreationCallback(callback);
         expect(dinghyRacingModel.dinghyClassCreationCallbacks.size).toBe(0);
     });
     it('does not remove functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback1 = jest.fn();
-        const callback2 = jest.fn();
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
         dinghyRacingModel.registerDinghyClassCreationCallback(callback1);
         dinghyRacingModel.registerDinghyClassCreationCallback(callback2);
         dinghyRacingModel.unregisterDinghyClassCreationCallback(callback1);
@@ -6246,7 +6246,7 @@ describe('when a websocket message callback has been set for dinghy class creati
 describe('when a websocket message callback has been set for dinghy class update', () => {
     it('calls the callback', done => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClasses/1', callback);
         // create delay to give time for stomp mock to trigger callback
         setTimeout(() => {
@@ -6256,30 +6256,30 @@ describe('when a websocket message callback has been set for dinghy class update
     });
     it('does not set another reference to the same callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClasses/1', callback);
         dinghyRacingModel.registerDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClasses/1', callback);
         expect(dinghyRacingModel.dinghyClassUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/dinghyClasses/1').size).toBe(1);
     });
     it('sets a functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback1 = jest.fn();
-        const callback2 = jest.fn();
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
         dinghyRacingModel.registerDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClass/1', callback1);
         dinghyRacingModel.registerDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClass/1', callback2);
         expect(dinghyRacingModel.dinghyClassUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/dinghyClass/1').size).toBe(2);
     });
     it('removes websocket message when requested', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClasses/1', callback);
         dinghyRacingModel.unregisterDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClasses/1', callback);
         expect(dinghyRacingModel.dinghyClassUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/dinghyClasses/1').size).toBe(0);
     });
     it('does not remove functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback1 = jest.fn();
-        const callback2 = jest.fn();
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
         dinghyRacingModel.registerDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClasses/1', callback1);
         dinghyRacingModel.registerDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClasses/1', callback2);
         dinghyRacingModel.unregisterDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClasses/1', callback1);
@@ -6351,8 +6351,8 @@ describe('when entry is requested', () => {
                 });
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceScorpionA})});
-            jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+            vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceScorpionA})});
+            vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
                     return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
                 }
@@ -6360,8 +6360,8 @@ describe('when entry is requested', () => {
                     return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
                 }
             });
-            jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghy1234})});
-            jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
+            vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghy1234})});
+            vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
             const promise = dinghyRacingModel.getEntry(entryChrisMarshallScorpionA1234.url);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
@@ -6378,8 +6378,8 @@ describe('when entry is requested', () => {
                 });
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceScorpionA})});
-            jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+            vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceScorpionA})});
+            vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
                     return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
                 }
@@ -6387,8 +6387,8 @@ describe('when entry is requested', () => {
                     return Promise.resolve({'success': false, message: 'Unable to load race entries HTTP Error: 404 Message: JSON.parse: unexpected end of data at line 1 column 1 of the JSON data'});
                 }
             });
-            jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghy1234})});
-            jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
+            vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghy1234})});
+            vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
             const promise = dinghyRacingModel.getEntry(entryChrisMarshallScorpionA1234.url);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
@@ -6439,8 +6439,8 @@ describe('when entry is requested', () => {
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
             dinghyRacingModel.entryResultMap.set(entryChrisMarshallDinghy1234HAL._links.self.href, {success: true, domainObject: {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"3"'}}, eTag: '"3"'});
-            jest.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceScorpionA})});
-            jest.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+            vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceScorpionA})});
+            vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
                     return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
                 }
@@ -6448,8 +6448,8 @@ describe('when entry is requested', () => {
                     return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
                 }
             });
-            jest.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghy1234})});
-            jest.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
+            vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghy1234})});
+            vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
             const promise = dinghyRacingModel.getEntry(entryChrisMarshallScorpionA1234.url);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
@@ -6648,7 +6648,7 @@ describe('when the crews that have sailed a dinghy are requested', () => {
 describe('when a websocket message callback has been set for fleet creation', () => {
     it('calls the callback', done => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerFleetCreationCallback(callback);
         // create delay to give time for stomp mock to trigger callback
         setTimeout(() => {
@@ -6658,30 +6658,30 @@ describe('when a websocket message callback has been set for fleet creation', ()
     });
     it('does not set another reference to the same callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerFleetCreationCallback(callback);
         dinghyRacingModel.registerFleetCreationCallback(callback);
         expect(dinghyRacingModel.fleetCreationCallbacks.size).toBe(1);
     });
     it('sets a functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback1 = jest.fn();
-        const callback2 = jest.fn();
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
         dinghyRacingModel.registerFleetCreationCallback(callback1);
         dinghyRacingModel.registerFleetCreationCallback(callback2);
         expect(dinghyRacingModel.fleetCreationCallbacks.size).toBe(2);
     });
     it('removes websocket message when requested', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerFleetCreationCallback(callback);
         dinghyRacingModel.unregisterFleetCreationCallback(callback);
         expect(dinghyRacingModel.fleetCreationCallbacks.size).toBe(0);
     });
     it('does not remove functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback1 = jest.fn();
-        const callback2 = jest.fn();
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
         dinghyRacingModel.registerFleetCreationCallback(callback1);
         dinghyRacingModel.registerFleetCreationCallback(callback2);
         dinghyRacingModel.unregisterFleetCreationCallback(callback1);
@@ -6692,7 +6692,7 @@ describe('when a websocket message callback has been set for fleet creation', ()
 describe('when a websocket message callback has been set for dinghy class update', () => {
     it('calls the callback', done => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback);
         // create delay to give time for stomp mock to trigger callback
         setTimeout(() => {
@@ -6702,30 +6702,30 @@ describe('when a websocket message callback has been set for dinghy class update
     });
     it('does not set another reference to the same callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback);
         dinghyRacingModel.registerFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback);
         expect(dinghyRacingModel.fleetUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/fleet/1').size).toBe(1);
     });
     it('sets a functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback1 = jest.fn();
-        const callback2 = jest.fn();
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
         dinghyRacingModel.registerFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback1);
         dinghyRacingModel.registerFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback2);
         expect(dinghyRacingModel.fleetUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/fleet/1').size).toBe(2);
     });
     it('removes websocket message when requested', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback = jest.fn();
+        const callback = vi.fn();
         dinghyRacingModel.registerFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback);
         dinghyRacingModel.unregisterFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback);
         expect(dinghyRacingModel.fleetUpdateCallbacks.get('http://localhost:8081/dinghyracing/api/fleet/1').size).toBe(0);
     });
     it('does not remove functionally equivalent but different callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const callback1 = jest.fn();
-        const callback2 = jest.fn();
+        const callback1 = vi.fn();
+        const callback2 = vi.fn();
         dinghyRacingModel.registerFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback1);
         dinghyRacingModel.registerFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback2);
         dinghyRacingModel.unregisterFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback1);

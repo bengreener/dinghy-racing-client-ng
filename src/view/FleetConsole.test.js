@@ -24,15 +24,15 @@ import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
 import { dinghyClasses } from '../model/__mocks__/test-data';
 
-jest.mock('../model/dinghy-racing-model');
-jest.mock('../controller/dinghy-racing-controller');
-jest.mock('../model/domain-classes/clock');
+vi.mock('../model/dinghy-racing-model');
+vi.mock('../controller/dinghy-racing-controller');
+vi.mock('../model/domain-classes/clock');
 
 it('renders', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+    vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+    vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
 
     await act(async () => {
         customRender(<FleetConsole />, model, controller);
@@ -47,8 +47,8 @@ it('renders', async () => {
 it('displays list of dinghy classes', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+    vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+    vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
 
     await act( async () => {
         customRender(<FleetConsole />, model, controller);
@@ -64,8 +64,8 @@ describe('when a dinghy class is selected', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-        jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+        vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+        vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
 
         await act( async () => {
             customRender(<FleetConsole />, model, controller);
@@ -85,8 +85,8 @@ describe('when more than one dinghy class is selected', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-        jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+        vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+        vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
 
         await act( async () => {
             customRender(<FleetConsole />, model, controller);
@@ -110,8 +110,8 @@ it('accepts the name of a fleet', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+    vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+    vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
     
     await act( async () => {
         customRender(<FleetConsole />, model, controller);
@@ -129,9 +129,9 @@ describe('when update button clicked', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-        jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-        const createFleetSpy = jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({success: true})});
+        vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+        vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+        const createFleetSpy = vi.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({success: true})});
         
         await act( async () => {
             customRender(<FleetConsole />, model, controller);
@@ -148,9 +148,9 @@ describe('when update button clicked', () => {
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
-            jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-            jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-            const createFleetSpy = jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({success: true})});
+            vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+            vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+            const createFleetSpy = vi.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({success: true})});
     
             await act( async () => {
                 customRender(<FleetConsole />, model, controller);
@@ -170,9 +170,9 @@ describe('when update button clicked', () => {
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
-            jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-            jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-            jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true, domainObject: fleetScorpion})});
+            vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+            vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+            vi.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true, domainObject: fleetScorpion})});
             
             await act( async () => {
                 customRender(<FleetConsole />, model, controller);
@@ -195,9 +195,9 @@ describe('when update button clicked', () => {
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
-            jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-            jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-            const createFleetSpy = jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({success: true})});
+            vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+            vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+            const createFleetSpy = vi.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({success: true})});
     
             await act( async () => {
                 customRender(<FleetConsole />, model, controller);
@@ -219,9 +219,9 @@ describe('when update button clicked', () => {
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
-            jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-            jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-            jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true, domainObject: fleetScorpion})});
+            vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+            vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+            vi.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true, domainObject: fleetScorpion})});
             
             await act( async () => {
                 customRender(<FleetConsole />, model, controller);
@@ -243,9 +243,9 @@ describe('when update button clicked', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-        jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-        const createFleetSpy = jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true})});
+        vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+        vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+        const createFleetSpy = vi.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true})});
         
         await act( async () => {
             customRender(<FleetConsole />, model, controller);
@@ -263,9 +263,9 @@ describe('when update button clicked', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-        jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-        jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': false, message: 'That was a bust!'})});
+        vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+        vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+        vi.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': false, message: 'That was a bust!'})});
         
         await act( async () => {
             customRender(<FleetConsole />, model, controller);
@@ -287,9 +287,9 @@ describe('when cancel button is clicked', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-        jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-        jest.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true, domainObject: fleetScorpion})});
+        vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+        vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+        vi.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true, domainObject: fleetScorpion})});
         
         await act( async () => {
             customRender(<FleetConsole />, model, controller);
@@ -311,8 +311,8 @@ describe('when cancel button is clicked', () => {
 it('displays existing fleets', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-    jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+    vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+    vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
 
     await act( async () => {
         customRender(<FleetConsole />, model, controller);
@@ -327,8 +327,8 @@ describe('when a fleet is selected', () => {
     it('displays fleet details for editing', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-        jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+        vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+        vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
         await act( async () => {
             customRender(<FleetConsole />, model);
         });
@@ -347,9 +347,9 @@ describe('when a fleet is selected', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-        jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-        jest.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
+        vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+        vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+        vi.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
         await act( async () => {
             customRender(<FleetConsole />, model, controller);
         });
@@ -374,8 +374,8 @@ describe('when a fleet is selected', () => {
         it('displays new values', async () => {
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-            jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+            vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+            vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
             await act( async () => {
                 customRender(<FleetConsole />, model);
             });
@@ -400,9 +400,9 @@ describe('when a fleet is selected', () => {
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
-            jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-            jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-            const updateFleetSpy = jest.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: true, domainObject: {...fleetScorpion, name: 'Scorp Pro', dinghyClasses: [dinghyClassComet]}})});
+            vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+            vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+            const updateFleetSpy = vi.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: true, domainObject: {...fleetScorpion, name: 'Scorp Pro', dinghyClasses: [dinghyClassComet]}})});
             await act( async () => {
                 customRender(<FleetConsole />, model, controller);
             });
@@ -428,9 +428,9 @@ describe('when a fleet is selected', () => {
                 const user = userEvent.setup();
                 const model = new DinghyRacingModel(httpRootURL, wsRootURL);
                 const controller = new DinghyRacingController(model);
-                jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-                jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-                jest.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: true, domainObject: {...fleetScorpion, name: 'Scorp Pro', dinghyClasses: [dinghyClassComet]}})});
+                vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+                vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+                vi.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: true, domainObject: {...fleetScorpion, name: 'Scorp Pro', dinghyClasses: [dinghyClassComet]}})});
                 await act( async () => {
                     customRender(<FleetConsole />, model, controller);
                 });
@@ -455,10 +455,10 @@ describe('when a fleet is selected', () => {
                 const user = userEvent.setup();
                 const model = new DinghyRacingModel(httpRootURL, wsRootURL);
                 const controller = new DinghyRacingController(model);
-                jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success:true, domainObject: [{...fleets[0], name: 'Scorp Pro', dingyClasses: [dinghyClassComet]}, fleets[1]]})})
+                vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success:true, domainObject: [{...fleets[0], name: 'Scorp Pro', dingyClasses: [dinghyClassComet]}, fleets[1]]})})
                     .mockImplementationOnce(() => {return Promise.resolve({success: true, domainObject: fleets})});
-                jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-                jest.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: true, domainObject: {...fleetScorpion, name: 'Scorp Pro', dinghyClasses: [dinghyClassComet]}})});
+                vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+                vi.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: true, domainObject: {...fleetScorpion, name: 'Scorp Pro', dinghyClasses: [dinghyClassComet]}})});
                 await act( async () => {
                     customRender(<FleetConsole />, model, controller);
                 });
@@ -490,9 +490,9 @@ describe('when a fleet is selected', () => {
                 const user = userEvent.setup();
                 const model = new DinghyRacingModel(httpRootURL, wsRootURL);
                 const controller = new DinghyRacingController(model);
-                jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-                jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-                jest.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops something went wrong.'})});
+                vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+                vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+                vi.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops something went wrong.'})});
                 await act( async () => {
                     customRender(<FleetConsole />, model, controller);
                 });
@@ -517,8 +517,8 @@ describe('when a fleet is selected', () => {
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
-            jest.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-            jest.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+            vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
+            vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
             await act( async () => {
                 customRender(<FleetConsole />, model, controller);
             });

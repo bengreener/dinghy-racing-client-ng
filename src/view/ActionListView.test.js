@@ -19,7 +19,7 @@ import ActionListView from './ActionListView';
 import FlagState from '../model/domain-classes/flag-state';
 import Clock from '../model/domain-classes/clock';
 
-jest.mock('../model/domain-classes/clock');
+vi.mock('../model/domain-classes/clock');
 
 const formatOptions = {
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -31,13 +31,13 @@ const formatOptions = {
 const timeFormat = new Intl.DateTimeFormat('utc', formatOptions);
 
 beforeEach(() => {
-    jest.useFakeTimers();
-    jest.spyOn(global, 'setTimeout')
+    vi.useFakeTimers();
+    vi.spyOn(global, 'setTimeout')
 });
 
 afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
 });
 
 it('renders', () => {
@@ -119,7 +119,7 @@ it('updates action countdowns every second', async () => {
     const actionListView = container.getElementsByClassName('action-list-view')[0];
 
     await act(async () => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
     });
 
     const actionRows = screen.getAllByRole('row');

@@ -16,7 +16,7 @@
 
 import Authorisation from './authorisation';
 
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 it('returns array of roles', async () => {
     fetch.mockImplementation((resource, options) => {
@@ -41,7 +41,7 @@ it('returns array of roles', async () => {
 
 describe('when error occurs', () => {
     it('returns an empty array', async () => {// an error is expected to be thrown so mock out console logging of errors so as not to clutter up console
-        jest.spyOn(console, 'error');
+        vi.spyOn(console, 'error');
         console.error.mockImplementation(() => {});
 
         fetch.mockImplementation(() => {

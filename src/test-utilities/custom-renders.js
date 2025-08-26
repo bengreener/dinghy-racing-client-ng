@@ -19,7 +19,7 @@ import ModelContext from '../view/ModelContext';
 import ControllerContext from '../view/ControllerContext';
 
 // beforeEach(() => {
-//     jest.spyOn(console, 'error');
+//     vi.spyOn(console, 'error');
 //     console.error.mockImplementation(() => {});
 // })
 

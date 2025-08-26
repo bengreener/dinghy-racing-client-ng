@@ -23,8 +23,8 @@ import DinghyRacingController from '../controller/dinghy-racing-controller';
 import DownloadRacesForm from './DownloadRacesForm';
 import NameFormat from '../controller/name-format';
 
-jest.mock('../model/dinghy-racing-model');
-jest.mock('../model/domain-classes/clock');
+vi.mock('../model/dinghy-racing-model');
+vi.mock('../model/domain-classes/clock');
 
 it('renders', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -92,7 +92,7 @@ it('accepts a change to the get races in window start time', async () => {
 
 it('calls model get races between times with values set for start and end of window', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const getRacesBetweenTimesSpy = jest.spyOn(model, 'getRacesBetweenTimes');
+    const getRacesBetweenTimesSpy = vi.spyOn(model, 'getRacesBetweenTimes');
     const startTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000);
     startTime.setMinutes(startTime.getMinutes() + startTime.getTimezoneOffset());
     const endTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 75600000);
@@ -108,7 +108,7 @@ describe('when start time for races window chnages', () => {
     it('calls model get races between times with new time set for start and end of window', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const getRacesBetweenTimesSpy = jest.spyOn(model, 'getRacesBetweenTimes');
+        const getRacesBetweenTimesSpy = vi.spyOn(model, 'getRacesBetweenTimes');
         const startTime = new Date('2020-02-12T12:10');
         startTime.setMinutes(startTime.getMinutes() + startTime.getTimezoneOffset());
         const endTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 75600000);
@@ -131,7 +131,7 @@ describe('when end time for races window chnages', () => {
     it('calls model get races between times with start time and new time set for end of window', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const getRacesBetweenTimesSpy = jest.spyOn(model, 'getRacesBetweenTimes');
+        const getRacesBetweenTimesSpy = vi.spyOn(model, 'getRacesBetweenTimes');
         const startTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000);
         startTime.setMinutes(startTime.getMinutes() + startTime.getTimezoneOffset());
 
@@ -152,7 +152,7 @@ describe('when end time for races window chnages', () => {
 describe('when an error is received', () => {
     it('displays error message', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
+        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
         await act(async () => {
             await customRender(<DownloadRacesForm />, model);
         })
@@ -161,7 +161,7 @@ describe('when an error is received', () => {
     });
     it('clears error message when a successful response is received', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
+        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
         let render;
 
         await act(async () => {
@@ -179,7 +179,7 @@ describe('when an error is received', () => {
 
 it('displays races that start within the time window specified', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const getRacesBetweenTimesSpy = jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    const getRacesBetweenTimesSpy = vi.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     await act(async () => {
         await customRender(<DownloadRacesForm />, model);
     });
@@ -200,8 +200,8 @@ describe('when download results button clicked', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': [raceScorpionA]})});
-        const downloadFunctionSpy = jest.spyOn(controller, 'downloadRaceResults').mockImplementation(() => {return Promise.resolve({'success': true})});
+        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': [raceScorpionA]})});
+        const downloadFunctionSpy = vi.spyOn(controller, 'downloadRaceResults').mockImplementation(() => {return Promise.resolve({'success': true})});
         await act(async () => {
             await customRender(<DownloadRacesForm />, model, controller);
         });
@@ -215,8 +215,8 @@ describe('when download results button clicked', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': [raceScorpionA]})});
-        jest.spyOn(controller, 'downloadRaceResults').mockImplementation(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
+        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': [raceScorpionA]})});
+        vi.spyOn(controller, 'downloadRaceResults').mockImplementation(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
         await act(async () => {
             await customRender(<DownloadRacesForm />, model, controller);
         });

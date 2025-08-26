@@ -59,7 +59,7 @@ it('displays download race button', () => {
 
 it('calls method passed to download function with race', async () => {
     const user = userEvent.setup();
-    const downloadFunctionSpy = jest.fn();
+    const downloadFunctionSpy = vi.fn();
     render(<DownloadRace race={raceScorpionA} downloadFunction={downloadFunctionSpy} />);
 
     await user.click(screen.getByRole('button', {name: /download results/i}));

@@ -22,13 +22,13 @@ import { raceScorpionA } from '../model/__mocks__/test-data';
 
 describe('when contained in a modal dialog', () => {
     it('renders', () => {
-        render(<PostponeRaceForm closeParent={jest.fn()} />);
+        render(<PostponeRaceForm closeParent={vi.fn()} />);
         expect(screen.getByRole('spinbutton', {'name': /delay/i})).toBeInTheDocument();
         expect(screen.getByRole('button', {'name': /cancel/i})).toBeInTheDocument();
         expect(screen.getByRole('button', {'name': /postpone/i})).toBeInTheDocument();
     });
     it('when cancelled it closes containing dialog', async () => {
-        const closeDialogeCallbackMock = jest.fn(() => {});
+        const closeDialogeCallbackMock = vi.fn(() => {});
         const user = userEvent.setup();
         render(<PostponeRaceForm closeParent={closeDialogeCallbackMock} />);
         const cancelButtton = screen.getByRole('button', {'name': /cancel/i});
@@ -71,7 +71,7 @@ describe('when delay is input', () => {
 
 describe('when postpone button clicked', () => {
     it('postpones race', async () => {
-        const postponeCallbackMock = jest.fn((race, duration) => {});
+        const postponeCallbackMock = vi.fn((race, duration) => {});
         const user = userEvent.setup();
         render(<PostponeRaceForm race={raceScorpionA} onPostpone={postponeCallbackMock} />);
         const postponeButtton = screen.getByRole('button', {'name': /postpone/i});
@@ -82,7 +82,7 @@ describe('when postpone button clicked', () => {
 
 describe('when enter button is pressed', () => {
     it('postpones race', async () => {
-        const postponeCallbackMock = jest.fn((race, duration) => {});
+        const postponeCallbackMock = vi.fn((race, duration) => {});
         const user = userEvent.setup();
         render(<PostponeRaceForm race={raceScorpionA} onPostpone={postponeCallbackMock} />);
         const delayInput = screen.getByRole('spinbutton', {'name': /delay/i});

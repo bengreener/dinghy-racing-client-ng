@@ -21,12 +21,12 @@ import DinghyRacingModel from '../model/dinghy-racing-model';
 import { httpRootURL, wsRootURL } from '../model/__mocks__/test-data';
 import { raceScorpionA, scorpionWarningSignal, scorpionStartSignal } from '../model/__mocks__/test-data';
 
-jest.mock('../model/domain-classes/clock');
-jest.useFakeTimers();
+vi.mock('../model/domain-classes/clock');
+vi.useFakeTimers();
 
 describe('when signals use flags', () => {
     it('displays the name of the flags', () => {
-        jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 600001));
+        vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 600001));
         const signals = [scorpionWarningSignal, scorpionStartSignal];
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
@@ -36,7 +36,7 @@ describe('when signals use flags', () => {
     });
     describe('when before time of first signal', () => {
         it('displays flags as lowered', () => {
-            jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 600001));
+            vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 600001));
             const signals = [scorpionWarningSignal, scorpionStartSignal];
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
@@ -45,7 +45,7 @@ describe('when signals use flags', () => {
             expect(screen.getByText(/lowered/i)).toBeInTheDocument();
         });
         it('displays time to next signal', () => {
-            jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 600001));
+            vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 600001));
             const signals = [scorpionWarningSignal, scorpionStartSignal];
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
@@ -56,7 +56,7 @@ describe('when signals use flags', () => {
     });
     describe('when time of first signal', () => {
         it('shows flag state for first signal', () => {
-            jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 600000));
+            vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 600000));
             const signals = [scorpionWarningSignal, scorpionStartSignal];
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
@@ -65,7 +65,7 @@ describe('when signals use flags', () => {
             expect(screen.getByText(/raised/i)).toBeInTheDocument();
         });
         it('shows 0:00 for time to next signal', () => {
-            jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 600000));
+            vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 600000));
             const signals = [scorpionWarningSignal, scorpionStartSignal];
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
@@ -76,7 +76,7 @@ describe('when signals use flags', () => {
     });
     describe('when after time fo first signal and before time of next signal', () => {
         it('shows flag state for first signal', () => {
-            jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 300001));
+            vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 300001));
             const signals = [scorpionWarningSignal, scorpionStartSignal];
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
@@ -85,7 +85,7 @@ describe('when signals use flags', () => {
             expect(screen.getByText(/raised/i)).toBeInTheDocument();
         });
         it('shows time to next signal', () => {
-            jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 60000));
+            vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 60000));
             const signals = [scorpionWarningSignal, scorpionStartSignal];
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
@@ -96,7 +96,7 @@ describe('when signals use flags', () => {
     });
     describe('when after time of last signal', () => {
         it('shows flag sate for last signal', () => {
-            jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() + 100000));
+            vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() + 100000));
             const signals = [scorpionWarningSignal, scorpionStartSignal];
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
@@ -105,7 +105,7 @@ describe('when signals use flags', () => {
             expect(screen.getByText(/lowered/i)).toBeInTheDocument();
         });
         it('shows no time to next signal', () => {
-            jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() + 100000));
+            vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() + 100000));
             const signals = [scorpionWarningSignal, scorpionStartSignal];
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
@@ -119,14 +119,14 @@ describe('when signals use flags', () => {
 describe('when clock ticks', () => {
     it('updates time', async () => {
         // check time to next signal is updated
-        jest.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 600001));
+        vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 600001));
         const signals = [scorpionWarningSignal, scorpionStartSignal];
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
         customRender(<SignalIndicator signals={signals} />, model);
 
         await act(() => {
-            jest.runOnlyPendingTimers();
+            vi.runOnlyPendingTimers();
         });
         expect(screen.getByText(/00:00/i)).toBeInTheDocument();
     });

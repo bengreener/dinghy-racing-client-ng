@@ -16,7 +16,7 @@
 
 'use strict'
 
-jest.createMockFromModule('@stomp/stompjs');
+vi.createMockFromModule('@stomp/stompjs');
 
 export const ActivationState = {
     ACTIVE: "active",

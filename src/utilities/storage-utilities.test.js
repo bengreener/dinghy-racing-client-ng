@@ -17,7 +17,7 @@
 import { storageAvailable } from './storage-utilities';
 
 afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 });
 
 describe('when local storage is available', () =>
@@ -37,7 +37,7 @@ describe('when session storage is available', () =>
 describe('when local storage is not available', () =>
 {
     it('returns false', () => {
-        jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+        vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
             throw new Error();
         });
         expect(storageAvailable('localStorage')).toBeFalsy();
@@ -47,7 +47,7 @@ describe('when local storage is not available', () =>
 describe('when session storage is not available', () =>
 {
     it('returns false', () => {
-        jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+        vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
             throw new Error();
         });
         expect(storageAvailable('sessionStorage')).toBeFalsy();

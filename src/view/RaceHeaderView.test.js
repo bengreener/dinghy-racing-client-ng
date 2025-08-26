@@ -23,22 +23,22 @@ import DinghyRacingController from '../controller/dinghy-racing-controller';
 import { httpRootURL, wsRootURL, raceScorpionA, raceGraduateA, racePursuitA, entriesScorpionA, entriesGraduateA } from '../model/__mocks__/test-data';
 import Clock from '../model/domain-classes/clock';
 
-jest.mock('../model/dinghy-racing-model');
-jest.mock('../model/domain-classes/clock');
-jest.mock('@stomp/stompjs');
+vi.mock('../model/dinghy-racing-model');
+vi.mock('../model/domain-classes/clock');
+vi.mock('@stomp/stompjs');
 
-HTMLDialogElement.prototype.showModal = jest.fn();
-HTMLDialogElement.prototype.close = jest.fn();
+HTMLDialogElement.prototype.showModal = vi.fn();
+HTMLDialogElement.prototype.close = vi.fn();
 
 beforeEach(() => {
-    jest.resetAllMocks();
-    jest.useFakeTimers();
-    jest.spyOn(global, 'setTimeout');
+    vi.resetAllMocks();
+    vi.useFakeTimers();
+    vi.spyOn(global, 'setTimeout');
 });
 
 afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
 });
 
 describe('when rendered', () => {
@@ -65,7 +65,7 @@ describe('when rendered', () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
             const clock = new Clock();
-            jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 30000);
+            vi.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 30000);
     
             customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
             expect(screen.getByLabelText(/remaining/i)).toHaveValue('44:30');
@@ -75,7 +75,7 @@ describe('when rendered', () => {
                 const model = new DinghyRacingModel(httpRootURL, wsRootURL);
                 const controller = new DinghyRacingController(model);
                 const clock = new Clock();
-                jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 30000);
+                vi.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 30000);
     
                 customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
                 expect(screen.getByLabelText(/elapsed/i)).toHaveValue('00:30');
@@ -143,7 +143,7 @@ describe('when rendered', () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
             const clock = new Clock();
-            jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 30000);
+            vi.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 30000);
     
             customRender(<RaceHeaderView race={ {...racePursuitA, 'clock': clock} } />, model, controller);
             expect(screen.getByLabelText(/remaining/i)).toHaveValue('44:30');
@@ -153,7 +153,7 @@ describe('when rendered', () => {
                 const model = new DinghyRacingModel(httpRootURL, wsRootURL);
                 const controller = new DinghyRacingController(model);
                 const clock = new Clock();
-                jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 30000);
+                vi.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 30000);
     
                 customRender(<RaceHeaderView race={ {...racePursuitA, 'clock': clock} } />, model, controller);
                 expect(screen.getByLabelText(/elapsed/i)).toHaveValue('00:30');
@@ -222,7 +222,7 @@ describe('when race has not yet started', () => {
     it('displays countdown to start of race as a positive value', () => {
         const startTime = new Date(Date.now() + 60000);
         const clock = new Clock(startTime);
-        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => -60000);
+        vi.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => -60000);
 
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -238,10 +238,10 @@ describe('when a race has started', () => {
     it('updates the remaining time field to show the time remaining', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        jest.spyOn(controller, 'startRace');
+        vi.spyOn(controller, 'startRace');
         const startTime = new Date(Date.now() - 6000);
         const clock = new Clock(startTime);
-        jest.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 6000);
+        vi.spyOn(clock, 'getElapsedTime').mockImplementationOnce(() => 6000);
 
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': clock} } />, model, controller);
 
@@ -263,17 +263,17 @@ describe('when a race has started', () => {
 });
 
 it('updates values when a new race is selected', async () => {
-    const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});;
+    const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});;
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     const clock = new Clock();
-    jest.spyOn(controller, 'startRace');
-    jest.spyOn(model, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceGraduateA})})
+    vi.spyOn(controller, 'startRace');
+    vi.spyOn(model, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceGraduateA})})
         .mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': raceScorpionA})});
-    jest.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesGraduateA})})
+    vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesGraduateA})})
         .mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-    jest.spyOn(model, 'registerEntryUpdateCallback');
-    jest.spyOn(clock, 'getElapsedTime').mockImplementation(() => 5000);
+    vi.spyOn(model, 'registerEntryUpdateCallback');
+    vi.spyOn(clock, 'getElapsedTime').mockImplementation(() => 5000);
 
     const {rerender} = customRender(<RaceHeaderView key={raceScorpionA.name+raceScorpionA.plannedStartTime.toISOString()} race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
     expect(screen.getByText(/scorpion a/i)).toBeInTheDocument();
@@ -288,7 +288,7 @@ it('updates values when a new race is selected', async () => {
 
 describe('when postpone race button clicked', () => {
     it('displays postpone race dialog', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))} } />, model, controller);
@@ -304,7 +304,7 @@ describe('when postpone race button clicked', () => {
 
 describe('when race has started and no entries have sailed a lap', () => {
     it('displays Restart Race button', () => {
-        jest.setSystemTime(new Date('2021-10-14T10:35:00Z'));
+        vi.setSystemTime(new Date('2021-10-14T10:35:00Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
@@ -314,7 +314,7 @@ describe('when race has started and no entries have sailed a lap', () => {
 
 describe('when race has started and an entry has sailed a lap', () => {
     it('does not display Restart Race button', async () => {
-        jest.setSystemTime(new Date('2021-10-14T10:35:00Z'));
+        vi.setSystemTime(new Date('2021-10-14T10:35:00Z'));
         const raceScorpionAWithLaps = {...raceScorpionA, lapsSailed: 1};
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -325,8 +325,8 @@ describe('when race has started and an entry has sailed a lap', () => {
 
 describe('when restart race button clicked', () => {
     it('displays postpone race dialog', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        jest.setSystemTime(new Date('2021-10-14T10:35:00Z'));
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:35:00Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
@@ -342,10 +342,10 @@ describe('when restart race button clicked', () => {
 
 describe('when start now button clicked', () => {
     it('starts race', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});;
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});;
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        const startRaceSpy = jest.spyOn(controller, 'startRace');
+        const startRaceSpy = vi.spyOn(controller, 'startRace');
 
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))}} />, model, controller);
         const startRaceButton = screen.getByRole('button', {'name': /start now/i});
@@ -356,7 +356,7 @@ describe('when start now button clicked', () => {
 
 describe('when shorten course button clicked', () => {
     it('displays shorten course dialog', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))} } />, model, controller);
@@ -372,8 +372,8 @@ describe('when shorten course button clicked', () => {
 
 describe('when lap sheet button clicked', () => {
     it('opens a new window for the lap sheet for that race', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const openSpy = jest.spyOn(window, 'open').mockImplementation(jest.fn());
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        const openSpy = vi.spyOn(window, 'open').mockImplementation(vi.fn());
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={{...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000)), url: 'http://localhost:8081/dinghyracing/api/races/485'}} />, model, controller);
@@ -386,37 +386,37 @@ describe('when lap sheet button clicked', () => {
 
 describe('when race is a pursuit race', () => {
     describe('when 61 seconds before the end of the race', () => {
-        xit('does not sound an audio warning to prepare for the end of the race', () => {
+        it.skip('does not sound an audio warning to prepare for the end of the race', () => {
             // don't know how to actually test this :(
             expect(true).toBeFalsy();
         });
     });
     describe('when 60 seconds before the end of the race', () => {
-        xit('sounds an audio warning to prepare for the end of the race', () => {
+        it.skip('sounds an audio warning to prepare for the end of the race', () => {
             // don't know how to actually test this :(
             expect(true).toBeFalsy();
         });
     });
     describe('when 59 seconds before the end of the race', () => {
-        xit('does not sound an audio warning to prepare for the end of the race', () => {
+        it.skip('does not sound an audio warning to prepare for the end of the race', () => {
             // don't know how to actually test this :(
             expect(true).toBeFalsy();
         });
     });
     describe('when 1 seconds before the end of the race', () => {
-        xit('does not sound an audio warning for the end of the race', () => {
+        it.skip('does not sound an audio warning for the end of the race', () => {
             // don't know how to actually test this :(
             expect(true).toBeFalsy();
         });
     });
     describe('when the end of the race', () => {
-        xit('sounds an audio warning for the end of the race', () => {
+        it.skip('sounds an audio warning for the end of the race', () => {
             // don't know how to actually test this :(
             expect(true).toBeFalsy();
         });
     });
     describe('when 1 seconds after the end of the race', () => {
-        xit('does not sound an audio warning for the end of the race', () => {
+        it.skip('does not sound an audio warning for the end of the race', () => {
             // don't know how to actually test this :(
             expect(true).toBeFalsy();
         });
@@ -425,13 +425,13 @@ describe('when race is a pursuit race', () => {
 
 describe('when race is a fleet race', () => {
     describe('when 60 seconds before the end of the race', () => {
-        xit('does not sound an audio warning for the end of the race', () => {
+        it.skip('does not sound an audio warning for the end of the race', () => {
             // don't know how to actually test this :(
             expect(true).toBeFalsy();
         })
     });
     describe('when the end of the race', () => {
-        xit('does not sound an audio warning for the end of the race', () => {
+        it.skip('does not sound an audio warning for the end of the race', () => {
             // don't know how to actually test this :(
             expect(true).toBeFalsy();
         });

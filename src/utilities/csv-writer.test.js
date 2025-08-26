@@ -18,24 +18,24 @@ import { downloadRaceEntriesCSV, functionsForTestingOnly } from './csv-writer';
 import  { raceScorpionA, raceCometA, raceHandicapA, entriesScorpionA, racePursuitA, entriesCometA, entriesHandicapA, entriesPursuitA } from '../model/__mocks__/test-data';
 import NameFormat from '../controller/name-format';
 
-jest.mock('../model/domain-classes/clock');
+vi.mock('../model/domain-classes/clock');
 
 // Testing requires coding of createObjectURL that would probably invalidate test
-xit('writes race entry data to a file', async () => {
+it.skip('writes race entry data to a file', async () => {
     // ??
 });
 
 it('returns a promise indicating success', async () => {
-    global.URL.createObjectURL = jest.fn(); // function does not exist in jsdom
-    global.URL.revokeObjectURL = jest.fn(); // function does not exist in jsdom
+    global.URL.createObjectURL = vi.fn(); // function does not exist in jsdom
+    global.URL.revokeObjectURL = vi.fn(); // function does not exist in jsdom
     const promise = downloadRaceEntriesCSV(raceScorpionA, entriesScorpionA);
     expect(promise).toBeInstanceOf(Promise);
     expect(await promise).toEqual({'success': true});
 });
 
 it('returns a promise indicating failure and providing a message with the cause', async () => {
-    global.URL.createObjectURL = jest.fn(() => {throw new Error('Oops!')}); // function does not exist in jsdom
-    global.URL.revokeObjectURL = jest.fn(); // function does not exist in jsdom
+    global.URL.createObjectURL = vi.fn(() => {throw new Error('Oops!')}); // function does not exist in jsdom
+    global.URL.revokeObjectURL = vi.fn(); // function does not exist in jsdom
     const promise = downloadRaceEntriesCSV(raceScorpionA, entriesScorpionA);
     expect(promise).toBeInstanceOf(Promise);
     expect(await promise).toEqual({'success': false, 'message': 'Oops!'});
@@ -197,14 +197,14 @@ describe('when race is a pursuit race', () => {
     });
 });
 
-xit('it displays a save file dialog', async () => {
+it.skip('it displays a save file dialog', async () => {
     // do not know how to test this
 });
 
-xit('it saves the file with the name provided by the save file dialog', async () => {
+it.skip('it saves the file with the name provided by the save file dialog', async () => {
     // do not know how to test this
 });
 
-xit('it saves the file in the location selected by the save file dialog', async () => {
+it.skip('it saves the file in the location selected by the save file dialog', async () => {
     // do not know how to test this
 });

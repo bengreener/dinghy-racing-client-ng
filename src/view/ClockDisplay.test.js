@@ -18,7 +18,7 @@ import ClockDisplay from './ClockDisplay';
 import { act, render, screen } from '@testing-library/react';
 import Clock from '../model/domain-classes/clock';
 
-jest.mock('../model/domain-classes/clock');
+vi.mock('../model/domain-classes/clock');
 
 const resolvedOptions = Intl.DateTimeFormat().resolvedOptions();
 const formatOptions = {
@@ -31,12 +31,12 @@ const formatOptions = {
 const timeFormat = new Intl.DateTimeFormat(resolvedOptions.locale, formatOptions);
 
 beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers().setSystemTime(new Date('2021-10-14T10:41:42Z'));
+    vi.clearAllMocks();
+    vi.useFakeTimers().setSystemTime(new Date('2021-10-14T10:41:42Z'));
 });
 
 afterEach(() => {
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
 });
 
 it('renders', () => {
@@ -54,7 +54,7 @@ describe('when clock ticks', () => {
         render(<ClockDisplay clock={clock} />);
 
         await act(async () => {
-            jest.advanceTimersByTime(1000);
+            vi.advanceTimersByTime(1000);
         });
         const formattedTime = timeFormat.format(new Date(time + 1000));
         expect(screen.getByText(formattedTime)).toBeInTheDocument();

@@ -18,7 +18,7 @@ import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import LapView from './LapView';
 
-jest.mock('../model/domain-classes/clock');
+vi.mock('../model/domain-classes/clock');
 
 describe('when editable is false', () => {
     it('displays value in time format', () => {
@@ -26,7 +26,7 @@ describe('when editable is false', () => {
         screen.getByText('16:55');
     });
     it('does not call value passed to keyup', async () => {
-        const keyupMock = jest.fn();
+        const keyupMock = vi.fn();
         const user = userEvent.setup();
         render(<LapView value={895689} editable={false} keyup={keyupMock} />);
         screen.getByText('14:55').focus();
@@ -34,8 +34,8 @@ describe('when editable is false', () => {
         expect(keyupMock).not.toBeCalled();
     });
     it('does not call value passed to focusout', () => {
-        const keyupMock = jest.fn();
-        const focusoutMock = jest.fn();
+        const keyupMock = vi.fn();
+        const focusoutMock = vi.fn();
         const user = userEvent.setup(); 
         render(<LapView value={312568} editable={false} keyup={keyupMock} focusout={focusoutMock} />);
         const cell = screen.getByText('05:12');
@@ -67,7 +67,7 @@ describe('when editable is true', () => {
         expect(input).toHaveValue('00:09');
     }); 
     it('calls value passed to keyup', async () => {
-        const keyupMock = jest.fn();
+        const keyupMock = vi.fn();
         const user = userEvent.setup();
         render(<LapView value={1234} editable={true} keyup={keyupMock} />);
         screen.getByRole('textbox').focus();
@@ -75,8 +75,8 @@ describe('when editable is true', () => {
         expect(keyupMock).toBeCalled();
     });
     it('calls value passed to focusout', () => {
-        const keyupMock = jest.fn();
-        const focusoutMock = jest.fn();
+        const keyupMock = vi.fn();
+        const focusoutMock = vi.fn();
         const user = userEvent.setup();
         render(<LapView value={1234} editable={true} keyup={keyupMock} focusout={focusoutMock} />);
         const cell = screen.getByRole('textbox');

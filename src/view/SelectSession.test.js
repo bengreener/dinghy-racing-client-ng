@@ -37,7 +37,7 @@ it('provides option to select end time for session', async () => {
 });
 
 it('displays session start provided as prop adjusted to local time zone', () => {
-    const onSessionStartChangeSpy = jest.fn();
+    const onSessionStartChangeSpy = vi.fn();
     const sessionStart = new Date('2024', '11', '25', 8, 30);
     const sessionStartLocal = sessionStart;
     sessionStartLocal.setMinutes(sessionStartLocal.getMinutes() - sessionStartLocal.getTimezoneOffset());
@@ -48,7 +48,7 @@ it('displays session start provided as prop adjusted to local time zone', () => 
 });
 
 it('displays session end provided as prop adjusted to local time zone', () => {
-    const onSessionEndChangeSpy = jest.fn();
+    const onSessionEndChangeSpy = vi.fn();
     const sessionEnd = new Date('2024', '12', '25', 18, 0);
     const sessionEndLocal = sessionEnd;
     sessionEndLocal.setMinutes(sessionEndLocal.getMinutes() - sessionEndLocal.getTimezoneOffset());
@@ -61,7 +61,7 @@ it('displays session end provided as prop adjusted to local time zone', () => {
 describe('when session start is set to a valid date', () => {
     it('calls session start change handler with date set', async () => {
         const user = userEvent.setup();
-        const onSessionStartChangeSpy = jest.fn();
+        const onSessionStartChangeSpy = vi.fn();
 
         const sessionStart = new Date('2024', '11', '25', 8, 30);
         render(<SelectSession sessionStart={sessionStart} onSessionStartChange={onSessionStartChangeSpy}/>);
@@ -78,7 +78,7 @@ describe('when session start is set to a valid date', () => {
 describe('when session start is set to an invalid date', () => {
     it('does not call session start change handler', async () => {
         const user = userEvent.setup();
-        const onSessionStartChangeSpy = jest.fn();
+        const onSessionStartChangeSpy = vi.fn();
 
         const sessionStart = new Date('2024', '11', '25', 8, 30);
         render(<SelectSession sessionStart={sessionStart} onSessionStartChange={onSessionStartChangeSpy}/>);
@@ -95,7 +95,7 @@ describe('when session start is set to an invalid date', () => {
 describe('when session end is set to a valid date', () => {
     it('calls session end change handler with date set', async () => {
         const user = userEvent.setup();
-        const onSessionEndChangeSpy = jest.fn();
+        const onSessionEndChangeSpy = vi.fn();
 
         const sessionEnd = new Date('2024', '11', '25', 8, 30);
         render(<SelectSession sessionEnd={sessionEnd} onSessionEndChange={onSessionEndChangeSpy}/>);
@@ -112,7 +112,7 @@ describe('when session end is set to a valid date', () => {
 describe('when session end is set to an invalid date', () => {
     it('does not call session end change handler', async () => {
         const user = userEvent.setup();
-        const onSessionEndChangeSpy = jest.fn();
+        const onSessionEndChangeSpy = vi.fn();
 
         const sessionEnd = new Date('2024', '11', '25', 8, 30);
         render(<SelectSession sessionEnd={sessionEnd} onSessionEndChange={onSessionEndChangeSpy}/>);
@@ -129,8 +129,8 @@ describe('when session end is set to an invalid date', () => {
 describe('when session start is set to value greater than session end', () => {
     it('updates session end to the same as session start', async () => {
         const user = userEvent.setup();
-        const onSessionStartChangeSpy = jest.fn();
-        const onSessionEndChangeSpy = jest.fn();
+        const onSessionStartChangeSpy = vi.fn();
+        const onSessionEndChangeSpy = vi.fn();
 
         const sessionStart = new Date('2024', '11', '25', 8, 0);
         const sessionEnd = new Date('2024', '11', '25', 18, 0);
@@ -146,8 +146,8 @@ describe('when session start is set to value greater than session end', () => {
     });
     it('calls session end change handler with date set', async () => {
         const user = userEvent.setup();
-        const onSessionStartChangeSpy = jest.fn();
-        const onSessionEndChangeSpy = jest.fn();
+        const onSessionStartChangeSpy = vi.fn();
+        const onSessionEndChangeSpy = vi.fn();
 
         const sessionStart = new Date('2024', '11', '25', 8, 0);
         const sessionEnd = new Date('2024', '11', '25', 18, 0);
@@ -165,8 +165,8 @@ describe('when session start is set to value greater than session end', () => {
 describe('when session start is set to value greater than session end', () => {
     it('updates session end to the same as session start', async () => {
         const user = userEvent.setup();
-        const onSessionStartChangeSpy = jest.fn();
-        const onSessionEndChangeSpy = jest.fn();
+        const onSessionStartChangeSpy = vi.fn();
+        const onSessionEndChangeSpy = vi.fn();
 
         const sessionStart = new Date('2024', '11', '25', 8, 0);
         const sessionEnd = new Date('2024', '11', '25', 18, 0);
@@ -182,8 +182,8 @@ describe('when session start is set to value greater than session end', () => {
     });
     it('updates session start change handler with date set', async() => {
         const user = userEvent.setup();
-        const onSessionStartChangeSpy = jest.fn();
-        const onSessionEndChangeSpy = jest.fn();
+        const onSessionStartChangeSpy = vi.fn();
+        const onSessionEndChangeSpy = vi.fn();
 
         const sessionStart = new Date('2024', '11', '25', 8, 0);
         const sessionEnd = new Date('2024', '11', '25', 18, 0);

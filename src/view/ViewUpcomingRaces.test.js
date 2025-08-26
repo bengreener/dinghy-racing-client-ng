@@ -21,12 +21,12 @@ import DinghyRacingModel from '../model/dinghy-racing-model';
 import ViewUpcomingRaces from './ViewUpcomingRaces';
 import { httpRootURL, wsRootURL, races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA } from '../model/__mocks__/test-data';
 
-jest.mock('../model/dinghy-racing-model');
+vi.mock('../model/dinghy-racing-model');
 
 it('renders', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
-    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': []})});
+    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': []})});
     await act(async () => {
         await customRender(<ViewUpcomingRaces />, model);
     });
@@ -44,7 +44,7 @@ it('renders', async () => {
 it('defaults start time for race selection to now', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
-    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': []})});
+    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': []})});
     await act(async () => {
         await customRender(<ViewUpcomingRaces />, model);
     });
@@ -57,7 +57,7 @@ it('defaults start time for race selection to now', async () => {
 it('defaults end time for race selection to 20:00 today', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
-    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': []})});
+    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': []})});
     await act(async () => {
         await customRender(<ViewUpcomingRaces />, model);
     });
@@ -69,7 +69,7 @@ it('defaults end time for race selection to 20:00 today', async () => {
 it('displays the details of upcoming races', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
-    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     await act(async () => {
         customRender(<ViewUpcomingRaces />, model);
     });    
@@ -95,7 +95,7 @@ it('displays the details of upcoming races in order of planned start time', asyn
         {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:00:00Z')}
     ]
 
-    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     await act(async () => {
         customRender(<ViewUpcomingRaces />, model);
     });
@@ -111,7 +111,7 @@ describe('when start time is changed', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
-        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': [raceScorpionA]})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': [raceScorpionA]})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         await act(async () => {
             customRender(<ViewUpcomingRaces />, model);
         });    
@@ -137,7 +137,7 @@ describe('when end time is changed', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
-        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': [raceScorpionA]})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': [raceScorpionA]})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         await act(async () => {
             customRender(<ViewUpcomingRaces />, model);
         });    
@@ -162,8 +162,8 @@ describe('when a race is selected', () => {
     it('the method passed to showSignUpForm is called with the selected race', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-        const showSignUpFormMock = jest.fn();
+        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        const showSignUpFormMock = vi.fn();
 
         await act(async () => {
             customRender(<ViewUpcomingRaces showSignUpForm={showSignUpFormMock}/>, model);
@@ -179,7 +179,7 @@ describe('when a race is selected', () => {
 describe('when races fail to load', () => {
     it('displays the error message', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'That was a bust!'})});
+        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'That was a bust!'})});
         await act(async () => {
             customRender(<ViewUpcomingRaces />, model);
         });
@@ -190,8 +190,8 @@ describe('when races fail to load', () => {
 
 it('registers an interest in race updates for races in selected period', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    jest.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-    const registerRaceUpdateCallbackSpy = jest.spyOn(model, 'registerRaceUpdateCallback');
+    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    const registerRaceUpdateCallbackSpy = vi.spyOn(model, 'registerRaceUpdateCallback');
 
     customRender(<ViewUpcomingRaces />, model);
     await screen.findAllByRole('cell');
@@ -207,7 +207,7 @@ describe('when races within session are changed', () => {
         const races_copy = [...races];
         races_copy[0] = {...races[0]};
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races_copy})});
+        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races_copy})});
         await act(async () => {        
             customRender(<ViewUpcomingRaces />, model);
         });
@@ -220,7 +220,7 @@ describe('when races within session are changed', () => {
     });
     it('removes a race that has had start time changed so it falls outside session time window', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        jest.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         await act(async () => {        
             customRender(<ViewUpcomingRaces />, model);
         });

@@ -19,17 +19,17 @@ import FlagControl from './FlagControl';
 import FlagState from '../model/domain-classes/flag-state';
 import FlagRole from '../model/domain-classes/flag-role';
 
-jest.mock('../model/domain-classes/clock');
+vi.mock('../model/domain-classes/clock');
 
 beforeEach(() => {
-    jest.resetAllMocks();
-    jest.useFakeTimers();
-    jest.spyOn(global, 'setTimeout');
+    vi.resetAllMocks();
+    vi.useFakeTimers();
+    vi.spyOn(global, 'setTimeout');
 });
 
 afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
 });
 
 it('diaplays the name of the flag', () => {

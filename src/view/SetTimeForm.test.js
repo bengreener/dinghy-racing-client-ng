@@ -29,7 +29,7 @@ const timeFormat = new Intl.DateTimeFormat('en-GB', formatOptions);
 
 it('renders', () => {
     const testTimeString = timeFormat.format(Date.now());
-    const closeParentSpy = jest.fn();
+    const closeParentSpy = vi.fn();
     render(<SetTimeForm closeParent = {closeParentSpy} />);
     expect(screen.getByLabelText(/enter time/i)).toHaveValue(testTimeString);
     expect(screen.getByRole('button', {name: /set time/i})).toBeInTheDocument();
@@ -50,7 +50,7 @@ it('displays new value entered for time', async () => {
 
 describe('when set time button clicked', () => {
     it('calls function passed to setTime with time entered', async () => {
-        const setTimeSpy = jest.fn();
+        const setTimeSpy = vi.fn();
         const user = userEvent.setup();
         
         render(<SetTimeForm setTime={setTimeSpy} />);
@@ -69,8 +69,8 @@ describe('when set time button clicked', () => {
 describe('when contained in a modal dialog', () => {
     describe('when update laps button clicked', () => {
         it('closes containing dialog', async () => {
-            const setTimeSpy = jest.fn();
-            const closeParentSpy = jest.fn();
+            const setTimeSpy = vi.fn();
+            const closeParentSpy = vi.fn();
             const user = userEvent.setup();
             
             render(<SetTimeForm setTime={setTimeSpy} closeParent={closeParentSpy} />);
@@ -85,7 +85,7 @@ describe('when contained in a modal dialog', () => {
         });
     });
     it('when cancelled it closes containing dialog', async () => {
-        const closeParentSpy = jest.fn();
+        const closeParentSpy = vi.fn();
         const user = userEvent.setup();
         
         render(<SetTimeForm closeParent={closeParentSpy} />);

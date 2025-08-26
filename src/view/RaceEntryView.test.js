@@ -20,18 +20,18 @@ import RaceEntryView from './RaceEntryView';
 import { raceScorpionA, entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745 } from '../model/__mocks__/test-data';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 
-jest.mock('../model/domain-classes/clock');
+vi.mock('../model/domain-classes/clock');
 
 const entryRowLastCellLapTimeCellOffset = 4;
 
 beforeEach(() => {
-    jest.useFakeTimers();
-    jest.spyOn(global, 'setTimeout');
+    vi.useFakeTimers();
+    vi.spyOn(global, 'setTimeout');
 });
 
 afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
 });
 
 it('renders', () => {
@@ -41,7 +41,7 @@ it('renders', () => {
 });
 
 it('displays lap times', async () => {
-    const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+    const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
     const entry = {...entryChrisMarshallScorpionA1234, laps: [{number: 1, time: 1234}], metadata: {eTag: '"1"'}};
     render(<RaceEntryView entry={entry} />);
     expect(screen.getByText('00:01')).toBeInTheDocument();
@@ -63,9 +63,9 @@ it('displays position', () => {
 
 describe('before race has started', () => {
     it('calls addLap callback with entry', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234, race: {...entryChrisMarshallScorpionA1234.race, plannedStartTime: new Date(Date.now() + 60000)}, metadata: {eTag: '"1"'}};
-        const addLapCallback = jest.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
+        const addLapCallback = vi.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         // const SMScorp1234entry = screen.getByText(/1234/i);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -78,9 +78,9 @@ describe('before race has started', () => {
 
 describe('after race has started', () => {
     it('calls addLap callback with entry', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}};
-        const addLapCallback = jest.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
+        const addLapCallback = vi.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
@@ -92,9 +92,9 @@ describe('after race has started', () => {
 
 describe('when a lap is removed from an entry', () => {
     it('calls removeLap callback with entry', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}};
-        const removeLapCallback = jest.fn((e) => {entry.laps.pop()});
+        const removeLapCallback = vi.fn((e) => {entry.laps.pop()});
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
@@ -104,9 +104,9 @@ describe('when a lap is removed from an entry', () => {
         expect(removeLapCallback).toBeCalledWith(entry);
     });
     it('updates the display to show the delete lap instruction has been sent to the server', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}};
-        const removeLapCallback = jest.fn((e) => {
+        const removeLapCallback = vi.fn((e) => {
             entry.laps.pop();
             return Promise.resolve({success: true});
         });
@@ -120,9 +120,9 @@ describe('when a lap is removed from an entry', () => {
     });
     describe('when lap removal fails', () => {
         it('entry view is enabled to accept input', async () => {
-            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
             const entry = {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}};
-            const removeLapCallback = jest.fn((e) => {
+            const removeLapCallback = vi.fn((e) => {
                 entry.laps.pop();
                 return Promise.resolve({success: false});
             });
@@ -140,7 +140,7 @@ describe('when a lap is removed from an entry', () => {
 describe('when secondary mouse button is clicked', () => {
     describe('when a lap has been recorded for the entry', () => {
         it('accepts a new lap time input in the last field of the row', async () => {
-            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
             const entry = {...entryChrisMarshallScorpionA1234, laps: [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}], 
                 'sumOfLapTimes': 6000, metadata: {eTag: '"1"'}};
             render(<RaceEntryView entry={entry} />);
@@ -159,8 +159,8 @@ describe('when secondary mouse button is clicked', () => {
     });
     describe('when a lap has not been recorded for the entry', () => {
         it('does not enter edit mode and accepts a lap time via left click', async () => {
-            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-            const addLapCallback = jest.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
+            const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+            const addLapCallback = vi.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
             const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
             render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
@@ -177,10 +177,10 @@ describe('when secondary mouse button is clicked', () => {
 
 describe('when editing a lap time', () => {
     it('does not add new lap when primary button clicked', async () => { 
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000},
             {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}], metadata: {eTag: '"1"'}};
-        const addLapCallback = jest.fn();
+        const addLapCallback = vi.fn();
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
@@ -193,10 +193,10 @@ describe('when editing a lap time', () => {
         expect(addLapCallback).not.toHaveBeenCalled();
     });
     it('does not remove last lap when ctrl+primary button clicked', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(),
             number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}], metadata: {eTag: '"1"'}};
-        const removeLapCallback = jest.fn((e) => {entry.laps.pop()});
+        const removeLapCallback = vi.fn((e) => {entry.laps.pop()});
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         const lastCell = SMScorp1234entry.parentElement.lastChild;
@@ -211,13 +211,13 @@ describe('when editing a lap time', () => {
     });
     describe('when lap time has not changed', () => {
         it('does not update lap time', async () => {
-            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
             const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
                 {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000},
                 {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000},
                 {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
             ], metadata: {eTag: '"1"'}};
-            const updateLapCallback = jest.fn((entry, value) => {});
+            const updateLapCallback = vi.fn((entry, value) => {});
             render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
@@ -235,13 +235,13 @@ describe('when editing a lap time', () => {
         });
     });
     it('updates lap with new time supplied', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
             {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, 
             {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, 
             {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
         ], metadata: {eTag: '"1"'}};
-        const updateLapCallback = jest.fn((entry, value) => {});
+        const updateLapCallback = vi.fn((entry, value) => {});
         render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
@@ -257,13 +257,13 @@ describe('when editing a lap time', () => {
         expect(updateLapCallback).toBeCalledWith(entry, 953000);
     });
     it('updates the display to show the edited lap time is being sent to the server', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
             {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, 
             {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, 
             {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
         ], metadata: {eTag: '"1"'}};
-        const updateLapCallback = jest.fn((entry, value) => {
+        const updateLapCallback = vi.fn((entry, value) => {
             return Promise.resolve({success: true});
         });
         await act(async () => {
@@ -284,13 +284,13 @@ describe('when editing a lap time', () => {
     });
     describe('when lap update fails', () => {
         it('entry view is enabled to accept input', async () => {
-            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
             const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
                 {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, 
                 {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, 
                 {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
             ], metadata: {eTag: '"1"'}};
-            const updateLapCallback = jest.fn((entry, value) => {
+            const updateLapCallback = vi.fn((entry, value) => {
                 return Promise.resolve({success: false});
             });
             await act(async () => {
@@ -312,14 +312,14 @@ describe('when editing a lap time', () => {
     });
     describe('when the new lap time is entered in an invalid format', () => {
         it('does not accept the incorrect format and keeps edit mode open', async () => {
-            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
             const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
                 {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, 
                 {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, 
                 {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
             ], metadata: {eTag: '"1"'}};
-            const updateLapCallback = jest.fn((entry, value) => {});
-            const showUserMessage = jest.fn((message) => {});
+            const updateLapCallback = vi.fn((entry, value) => {});
+            const showUserMessage = vi.fn((message) => {});
             render(<RaceEntryView entry={entry} updateLap={updateLapCallback} showUserMessage={showUserMessage} />);
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
@@ -335,14 +335,14 @@ describe('when editing a lap time', () => {
             expect(lapEntryCellInput).toHaveValue('15530');
         });
         it('calls showUserMessage prop with message explainging error', async () => {
-            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
             const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
                 {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, 
                 {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, 
                 {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
             ], metadata: {eTag: '"1"'}};
-            const updateLapCallback = jest.fn((entry, value) => {});
-            const showUserMessage = jest.fn((message) => {});
+            const updateLapCallback = vi.fn((entry, value) => {});
+            const showUserMessage = vi.fn((message) => {});
             render(<RaceEntryView entry={entry} updateLap={updateLapCallback} showUserMessage={showUserMessage} />);
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
@@ -362,9 +362,9 @@ describe('when editing a lap time', () => {
 
 describe('when user taps row', () => {
     it('calls addLap callback with entry', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
-        const addLapCallback = jest.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
+        const addLapCallback = vi.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
@@ -374,9 +374,9 @@ describe('when user taps row', () => {
     });
     describe('when add lap fails', () => {
         it('entry view is enabled to accept input', async () => {
-            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
             const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
-            const addLapCallback = jest.fn((e) => {
+            const addLapCallback = vi.fn((e) => {
                 return Promise.resolve({success: false});
             });
             let container;
@@ -393,8 +393,8 @@ describe('when user taps row', () => {
 
 describe('when user taps and holds on row', () => {
     it('accepts a new lap time input in the last field of the row', async () => {
-        const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const setTimeoutSpy = vi.spyOn(global, 'setTimeout');
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
             {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000},
             {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000},
@@ -406,7 +406,7 @@ describe('when user taps and holds on row', () => {
             await user.pointer({target: raceEntryView, keys: '[TouchA>]'});
         });
         act(() => {
-            jest.advanceTimersByTime(500);
+            vi.advanceTimersByTime(500);
         });
         const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
         await act(async () => {
@@ -420,14 +420,14 @@ describe('when user taps and holds on row', () => {
 // may not be possible to test this due to a current issue in @testing-library/user-event with generating pointer move event 
 // https://github.com/testing-library/user-event/issues/1047
 describe('when user swipes left on row', () => {
-    xit('calls removeLap callback with entry', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+    it.skip('calls removeLap callback with entry', async () => {
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
             {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000},
             {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000},
             {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
         ], metadata: {eTag: '"1"'}};
-        const removeLapCallback = jest.fn((e) => {entry.laps.pop()});
+        const removeLapCallback = vi.fn((e) => {entry.laps.pop()});
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         const position1 = SMScorp1234entry.parentElement.children[3];
@@ -484,10 +484,10 @@ describe('when a scoring abbreviation is not selected', () => {
 
 describe('when a scoring abbreviation is selected', () => {
     it('calls setScoringAbbreviation callback provided as prop', async () => {
-        const setScoringAbbreviationSpy = jest.fn(() => {
+        const setScoringAbbreviationSpy = vi.fn(() => {
             return Promise.resolve({success: true});
         });
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
         const selectSA = screen.getByRole('combobox');
         await act(async() => {
@@ -496,10 +496,10 @@ describe('when a scoring abbreviation is selected', () => {
         expect(setScoringAbbreviationSpy).toHaveBeenCalledWith({...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}, 'DNS');
     });
     it('updates the display to show a scoring abbreviation is being sent to the server', async () => {
-        const setScoringAbbreviationSpy = jest.fn(() => {
+        const setScoringAbbreviationSpy = vi.fn(() => {
             return Promise.resolve({success: true});
         });
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
         const selectSA = screen.getByRole('combobox');
         await act(async () => {
@@ -509,10 +509,10 @@ describe('when a scoring abbreviation is selected', () => {
     });
     describe('when adding scoring abbreviation fails', () => {
         it('entry view is enabled to accept input', async () => {
-            const setScoringAbbreviationSpy = jest.fn(() => {
+            const setScoringAbbreviationSpy = vi.fn(() => {
                 return Promise.resolve({success: false});
             });
-            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
             render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
             const selectSA = screen.getByRole('combobox');
             await act(async () => {
@@ -573,9 +573,9 @@ describe('when a scoring abbreviation is selected', () => {
 
 describe('when the entry is selected to add a new lap', () => {
     it('updates the display to show it has been selected', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}};
-        const addLapCallback = jest.fn(() => {
+        const addLapCallback = vi.fn(() => {
             return Promise.resolve({success: true});
         });
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
@@ -586,9 +586,9 @@ describe('when the entry is selected to add a new lap', () => {
         expect(screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).toMatch(/disabled/i);
     });
     it('does not allow user to immediately add another lap time', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
-        const addLapCallback = jest.fn(() => {
+        const addLapCallback = vi.fn(() => {
             return Promise.resolve({success: true});
         });
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
@@ -604,9 +604,9 @@ describe('when the entry is selected to add a new lap', () => {
     });
     describe('when add lap fails', () => {
         it('entry view is enabled to accept input', async () => {
-            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
             const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
-            const addLapCallback = jest.fn((e) => {
+            const addLapCallback = vi.fn((e) => {
                 return Promise.resolve({success: false});
             });
             let container;
@@ -620,11 +620,11 @@ describe('when the entry is selected to add a new lap', () => {
         });
     });
     // how to make this work useEffect results in a class on a visible field being changed so can't wait for an element to appear so waitFor doesn't seem to wait :-/
-    xdescribe('when confirmation is received of the recorded lap', () => {
+    describe.skip('when confirmation is received of the recorded lap', () => {
         it('updates the display to show it can be selected for lap entry', async () => {
-            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
             const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
-            const addLapCallback = jest.fn();
+            const addLapCallback = vi.fn();
             const { rerender } = render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
             const SMScorp1234entry = await screen.findByText(/1234/i);
             await act(async () => {
@@ -640,9 +640,9 @@ describe('when the entry is selected to add a new lap', () => {
             });            
         });
         it('accepts selection to add a new lap time', async () => {
-            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
+            const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
             const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
-            const addLapCallback = jest.fn();
+            const addLapCallback = vi.fn();
             const { rerender } = render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
             const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
             await act(async () => {
@@ -663,11 +663,11 @@ describe('when the entry is selected to add a new lap', () => {
 describe('when user drags and drops an entry to a new position', () => {
     // seems like a forced test but, couldn't get pointer events to trigger drag and drop API events :-(
     it('calls function passed to onRaceEntryDrop with subject key and target key ', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const onRaceEntryDropSpy = jest.fn();
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        const onRaceEntryDropSpy = vi.fn();
         const entry1 = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
         const entry2 = {...entrySarahPascalScorpionA6745, metadata: {eTag: '"1"'}};
-        const addLapCallback = jest.fn();
+        const addLapCallback = vi.fn();
         render(
             <div>
                 <RaceEntryView entry={entry1} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
@@ -683,11 +683,11 @@ describe('when user drags and drops an entry to a new position', () => {
         expect(onRaceEntryDropSpy).toHaveBeenCalled();
     });
     it('calls function passed to onRaceEntryDrop with value set by dragStart event', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const onRaceEntryDropSpy = jest.fn();
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        const onRaceEntryDropSpy = vi.fn();
         const entry1 = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
         const entry2 = {...entrySarahPascalScorpionA6745, metadata: {eTag: '"1"'}};
-        const addLapCallback = jest.fn();
+        const addLapCallback = vi.fn();
         render(
             <div>
                 <RaceEntryView entry={entry1} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
@@ -712,8 +712,8 @@ describe('when user drags and drops an entry to a new position', () => {
     });
     describe('when race is a pursuit race', () => {
         it('updates the display to show the position of the target entry is being updated', async () => {
-            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-            const onRaceEntryDropSpy = jest.fn(() => {
+            const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+            const onRaceEntryDropSpy = vi.fn(() => {
                 return Promise.resolve({success: true});
             });
             const raceScorpionAPursuit = {...raceScorpionA, type: 'PURSUIT'};
@@ -742,8 +742,8 @@ describe('when user drags and drops an entry to a new position', () => {
         });
         describe('when entry drop fails', () => {
             it('entry view is enabled to accept input', async () => {
-                const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-                const onRaceEntryDropSpy = jest.fn(() => {
+                const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+                const onRaceEntryDropSpy = vi.fn(() => {
                     return Promise.resolve({success: false});
                 });
                 const raceScorpionAPursuit = {...raceScorpionA, type: 'PURSUIT'};
@@ -773,11 +773,11 @@ describe('when user drags and drops an entry to a new position', () => {
         });
         describe('when entry is dropped on itself', () => {
             it('does nothing', async () => {
-                const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-                const onRaceEntryDropSpy = jest.fn();
+                const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+                const onRaceEntryDropSpy = vi.fn();
                 const entry1 = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
                 const entry2 = {...entrySarahPascalScorpionA6745, metadata: {eTag: '"1"'}};
-                const addLapCallback = jest.fn();
+                const addLapCallback = vi.fn();
                 render(
                     <div>
                         <RaceEntryView entry={entry1} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
@@ -804,11 +804,11 @@ describe('when user drags and drops an entry to a new position', () => {
     });
     describe('when race is not a pursuit race', () => {
         it('does not update the display to show the position of the target entry is being updated', async () => {
-            const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-            const onRaceEntryDropSpy = jest.fn();
+            const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+            const onRaceEntryDropSpy = vi.fn();
             const entry1 = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
             const entry2 = {...entrySarahPascalScorpionA6745, metadata: {eTag: '"1"'}};
-            const addLapCallback = jest.fn();
+            const addLapCallback = vi.fn();
             render(
                 <div>
                     <RaceEntryView entry={entry1} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
@@ -836,15 +836,15 @@ describe('when user drags and drops an entry to a new position', () => {
 
 describe('when handler set for onFastGroup', () => {
     it('displays option to fast group entry', () => {
-        const onFastGroupHandlerSpy = jest.fn();
+        const onFastGroupHandlerSpy = vi.fn();
 
         render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} onFastGroup={onFastGroupHandlerSpy} />);
         const fastGroupButton = screen.getByRole('checkbox');
         expect(fastGroupButton).toBeInTheDocument();
     });
     it('fast group option shows selected when inFastGroup prop is true', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const onFastGroupHandlerSpy = jest.fn();
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        const onFastGroupHandlerSpy = vi.fn();
 
         render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} onFastGroup={onFastGroupHandlerSpy} inFastGroup={true} />);
         const fastGroupButton = screen.getByRole('checkbox');
@@ -855,8 +855,8 @@ describe('when handler set for onFastGroup', () => {
         expect(fastGroupButton).toBeChecked();
     });
     it('fast group option shows unselected when inFastGroup prop is false', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const onFastGroupHandlerSpy = jest.fn();
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        const onFastGroupHandlerSpy = vi.fn();
 
         render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} onFastGroup={onFastGroupHandlerSpy} inFastGroup={false} />);
         const fastGroupButton = screen.getByRole('checkbox');
@@ -864,8 +864,8 @@ describe('when handler set for onFastGroup', () => {
         expect(fastGroupButton).not.toBeChecked();
     });
     it('calls handler with key for entry when fast group option is checked', async () => {
-        const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime});
-        const onFastGroupHandlerSpy = jest.fn();
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        const onFastGroupHandlerSpy = vi.fn();
 
         render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} onFastGroup={onFastGroupHandlerSpy} />);
         const fastGroupButton = screen.getByRole('checkbox');

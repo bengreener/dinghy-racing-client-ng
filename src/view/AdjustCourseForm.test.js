@@ -65,7 +65,7 @@ it('shows initial value set for number of laps', () => {
 
 describe('when update laps button clicked', () => {
     it('calls function passed to onUpdate with race and value entered for laps', async () => {
-        const onUpdateSpy = jest.fn();
+        const onUpdateSpy = vi.fn();
         const user = userEvent.setup();
         render(<AdjustCourseForm race={raceScorpionA} minLaps={0} maxLaps={5} initialValue={3} onUpdate={onUpdateSpy} />);
         const lapInput = screen.getByLabelText(/set laps/i);
@@ -80,7 +80,7 @@ describe('when update laps button clicked', () => {
 
 describe('when enter button is pressed', () => {
     it('calls function passed to onUpdate with race and value entered for laps', async () => {
-        const onUpdateSpy = jest.fn();
+        const onUpdateSpy = vi.fn();
         const user = userEvent.setup();
         render(<AdjustCourseForm race={raceScorpionA} minLaps={0} maxLaps={5} initialValue={3} onUpdate={onUpdateSpy} />);
         const lapInput = screen.getByLabelText(/set laps/i);
@@ -92,8 +92,8 @@ describe('when enter button is pressed', () => {
 describe('when contained in a modal dialog', () => {
     describe('when update laps button clicked', () => {
         it('closes containing dialog', async () => {
-            const onUpdateSpy = jest.fn();
-            const closeParentSpy = jest.fn();
+            const onUpdateSpy = vi.fn();
+            const closeParentSpy = vi.fn();
             const user = userEvent.setup();
             render(<AdjustCourseForm race={raceScorpionA} minLaps={0} maxLaps={5} initialValue={3} onUpdate={onUpdateSpy} closeParent={closeParentSpy} />);
             const lapInput = screen.getByLabelText(/set laps/i);
@@ -106,7 +106,7 @@ describe('when contained in a modal dialog', () => {
         });
     });
     it('when cancelled it closes containing dialog', async () => {
-        const closeParentSpy = jest.fn();
+        const closeParentSpy = vi.fn();
         const user = userEvent.setup();
         render(<AdjustCourseForm closeParent={closeParentSpy} />);
         const cancelButtton = screen.getByRole('button', {'name': /cancel/i});

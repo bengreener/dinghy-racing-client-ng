@@ -21,11 +21,11 @@ import { preparatorySignal, scorpionWarningSignal, scorpionStartSignal, scorpion
 import FlagState from './flag-state';
 import StartType from './start-type';
 
-jest.mock('./clock');
-jest.useFakeTimers();
+vi.mock('./clock');
+vi.useFakeTimers();
 
 afterEach(() => {
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
 });
 
 describe('when it is 5 minutes before the race start time', () => {
@@ -189,41 +189,41 @@ describe('when using RRS26 start', () => {
 
 describe('when time to prepare for race start signal', () => {
     it('notifies observers', () => {
-        jest.setSystemTime(new Date("2021-10-14T10:23:59Z"));
-        const handler1 = jest.fn();
-        const handler2 = jest.fn();
+        vi.setSystemTime(new Date("2021-10-14T10:23:59Z"));
+        const handler1 = vi.fn();
+        const handler2 = vi.fn();
         const clock = new Clock();
         clock.start();
         const raceStartSequence  = new RaceStartSequence({...raceScorpionA}, clock);
         raceStartSequence.addPrepareForRaceStartSignalHandler(handler1);
         raceStartSequence.addPrepareForRaceStartSignalHandler(handler2);
 
-        jest.advanceTimersByTime(1251);
+        vi.advanceTimersByTime(1251);
         expect(handler1).toBeCalledTimes(1);
         expect(handler2).toBeCalledTimes(1);
     });
 });
 
 it('removes registration of an observer from prepare for race start events', () => {
-    const handler1 = jest.fn();
-        jest.setSystemTime(new Date("2021-10-14T10:24:59Z"));
-        const handler2 = jest.fn();
+    const handler1 = vi.fn();
+        vi.setSystemTime(new Date("2021-10-14T10:24:59Z"));
+        const handler2 = vi.fn();
         const clock = new Clock();
         clock.start();
         const raceStartSequence  = new RaceStartSequence({...raceScorpionA, startType: StartType.RRS26}, clock);
         raceStartSequence.addPrepareForRaceStartSignalHandler(handler1);
         raceStartSequence.addPrepareForRaceStartSignalHandler(handler2);
         raceStartSequence.removePrepareForRaceStartSignalHandler(handler1);
-        jest.advanceTimersByTime(1899);
+        vi.advanceTimersByTime(1899);
         expect(handler1).toBeCalledTimes(0);
         expect(handler2).toBeCalledTimes(1);
 });
 
 describe('when time to make race start signal', () => {
     it('notifies observers', () => {
-        jest.setSystemTime(new Date("2021-10-14T10:29:59Z"));
-        const handler1 = jest.fn();
-        const handler2 = jest.fn();
+        vi.setSystemTime(new Date("2021-10-14T10:29:59Z"));
+        const handler1 = vi.fn();
+        const handler2 = vi.fn();
         const clock = new Clock();
         clock.start();
 
@@ -231,16 +231,16 @@ describe('when time to make race start signal', () => {
         raceStartSequence.addMakeRaceStartSignalHandler(handler1);
         raceStartSequence.addMakeRaceStartSignalHandler(handler2);
 
-        jest.advanceTimersByTime(1095);
+        vi.advanceTimersByTime(1095);
         expect(handler1).toBeCalledTimes(1);
         expect(handler2).toBeCalledTimes(1);
     });
 });
 
 it('removes registration of an observer from make race start signal events', () => {
-    jest.setSystemTime(new Date("2021-10-14T10:29:59Z"));
-    const handler1 = jest.fn();
-    const handler2 = jest.fn();
+    vi.setSystemTime(new Date("2021-10-14T10:29:59Z"));
+    const handler1 = vi.fn();
+    const handler2 = vi.fn();
     const clock = new Clock();
     clock.start();
 
@@ -248,7 +248,7 @@ it('removes registration of an observer from make race start signal events', () 
     raceStartSequence.addMakeRaceStartSignalHandler(handler1);
     raceStartSequence.addMakeRaceStartSignalHandler(handler2);
     raceStartSequence.removeMakeRaceStartSignalHandler(handler1);
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
     expect(handler1).toBeCalledTimes(0);
     expect(handler2).toBeCalledTimes(1);
 });

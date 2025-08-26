@@ -18,7 +18,7 @@ import { render, screen, prettyDOM } from '@testing-library/react';
 import ErrorBoundary from './ErrorBoundary';
 
 // beforeEach(() => {
-//     jest.spyOn(console, 'error');
+//     vi.spyOn(console, 'error');
 //     console.error.mockImplementation(() => {});
 // })
 
@@ -36,7 +36,7 @@ describe('when there is no error', () => {
 describe('when there is an error', () => {
     it('displays the error message', () => {
         // an error is expected to be thrown so mock out console logging of errors so as not to clutter up console
-        jest.spyOn(console, 'error');
+        vi.spyOn(console, 'error');
         console.error.mockImplementation(() => {});
 
         const ThrowError = () => {
