@@ -16,8 +16,6 @@
 
 'use strict'
 
-// vi.createMockFromModule('@stomp/stompjs');
-
 export const ActivationState = {
     ACTIVE: "active",
     DEACTIVATING: "deactivating",
