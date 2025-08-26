@@ -16,7 +16,7 @@
 
 import getDinghyRacingProperties from './dinghy-racing-properties';
 
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 beforeEach(() => {
     fetch.mockClear();
