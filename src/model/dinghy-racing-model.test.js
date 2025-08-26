@@ -55,15 +55,22 @@ import {
 import FlagState from './domain-classes/flag-state';
 import RaceType from './domain-classes/race-type';
 import Clock from './domain-classes/clock';
+import { Stomp } from '@stomp/stompjs';
 
 global.fetch = vi.fn();
 vi.mock('./domain-classes/clock');
+vi.mock('@stomp/stompjs');
 
 beforeEach(() => {
     fetch.mockClear();
+    vi.useFakeTimers();
     vi.clearAllMocks();
     vi.restoreAllMocks();
 });
+
+afterEach(() => {
+    vi.useRealTimers();
+})
 
 describe('when creating a new object via REST', () => {
     it('Handles a situation where no body is returned', async () => {
@@ -5223,15 +5230,13 @@ describe('when updating a lap from a race', () => {
 });
 
 describe('when a websocket message callback has been set for entry update', () => {
-    it('calls the callback', done => {
+    it('calls the callback', () => { 
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const callback = vi.fn();
         dinghyRacingModel.registerEntryUpdateCallback('http://localhost:8081/dinghyracing/api/entries/10', callback);
-        // create delay to give time for stomp mock to trigger callback
-        setTimeout(() => {
-            expect(callback).toBeCalled();
-            done();
-        }, 1);
+        
+        vi.runOnlyPendingTimers();
+        expect(callback).toBeCalled();
     });
     it('does not set another reference to the same callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -5267,15 +5272,13 @@ describe('when a websocket message callback has been set for entry update', () =
 });
 
 describe('when a websocket message callback has been set for race update', () => {
-    it('calls the callback', done => {
+    it('calls the callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const callback = vi.fn();
         dinghyRacingModel.registerRaceUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback);
-        // create delay to give time for stomp mock to trigger callback
-        setTimeout(() => {
-            expect(callback).toBeCalled();
-            done();
-        }, 1);
+        
+        vi.runOnlyPendingTimers();
+        expect(callback).toBeCalled();
     });
     it('does not set another reference to the same callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -5311,15 +5314,13 @@ describe('when a websocket message callback has been set for race update', () =>
 });
 
 describe('when a websocket message callback has been set for race entry laps update', () => {
-    it('calls the callback', done => {
+    it('calls the callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const callback = vi.fn();
         dinghyRacingModel.registerRaceEntryLapsUpdateCallback('http://localhost:8081/dinghyracing/api/races/4', callback);
-        // create delay to give time for stomp mock to trigger callback
-        setTimeout(() => {
-            expect(callback).toBeCalled();
-            done();
-        }, 1);
+
+        vi.runOnlyPendingTimers();
+        expect(callback).toBeCalled();
     });
     it('does not set another reference to the same callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -6112,15 +6113,13 @@ describe('when updating the plannedLaps for a race', () => {
 });
 
 describe('when a websocket message callback has been set for competitor creation', () => {
-    it('calls the callback', done => {
+    it('calls the callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const callback = vi.fn();
         dinghyRacingModel.registerCompetitorCreationCallback(callback);
-        // create delay to give time for stomp mock to trigger callback
-        setTimeout(() => {
-            expect(callback).toBeCalled();
-            done();
-        }, 1);
+        
+        vi.runOnlyPendingTimers();
+        expect(callback).toBeCalled();
     });
     it('does not set another reference to the same callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -6156,15 +6155,13 @@ describe('when a websocket message callback has been set for competitor creation
 });
 
 describe('when a websocket message callback has been set for dinghy creation', () => {
-    it('calls the callback', done => {
+    it('calls the callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const callback = vi.fn();
         dinghyRacingModel.registerDinghyCreationCallback(callback);
-        // create delay to give time for stomp mock to trigger callback
-        setTimeout(() => {
-            expect(callback).toBeCalled();
-            done();
-        }, 1);
+        
+        vi.runOnlyPendingTimers();
+        expect(callback).toBeCalled();
     });
     it('does not set another reference to the same callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -6200,15 +6197,13 @@ describe('when a websocket message callback has been set for dinghy creation', (
 });
 
 describe('when a websocket message callback has been set for dinghy class creation', () => {
-    it('calls the callback', done => {
+    it('calls the callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const callback = vi.fn();
         dinghyRacingModel.registerDinghyClassCreationCallback(callback);
-        // create delay to give time for stomp mock to trigger callback
-        setTimeout(() => {
-            expect(callback).toBeCalled();
-            done();
-        }, 1);
+        
+        vi.runOnlyPendingTimers();
+        expect(callback).toBeCalled();
     });
     it('does not set another reference to the same callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -6244,15 +6239,13 @@ describe('when a websocket message callback has been set for dinghy class creati
 });
 
 describe('when a websocket message callback has been set for dinghy class update', () => {
-    it('calls the callback', done => {
+    it('calls the callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const callback = vi.fn();
         dinghyRacingModel.registerDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClasses/1', callback);
-        // create delay to give time for stomp mock to trigger callback
-        setTimeout(() => {
-            expect(callback).toBeCalled();
-            done();
-        }, 1);
+        
+        vi.runOnlyPendingTimers();
+        expect(callback).toBeCalled();
     });
     it('does not set another reference to the same callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -6646,15 +6639,13 @@ describe('when the crews that have sailed a dinghy are requested', () => {
 });
 
 describe('when a websocket message callback has been set for fleet creation', () => {
-    it('calls the callback', done => {
+    it('calls the callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const callback = vi.fn();
         dinghyRacingModel.registerFleetCreationCallback(callback);
-        // create delay to give time for stomp mock to trigger callback
-        setTimeout(() => {
-            expect(callback).toBeCalled();
-            done();
-        }, 1);
+        
+        vi.runOnlyPendingTimers();
+        expect(callback).toBeCalled();
     });
     it('does not set another reference to the same callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -6690,15 +6681,13 @@ describe('when a websocket message callback has been set for fleet creation', ()
 });
 
 describe('when a websocket message callback has been set for dinghy class update', () => {
-    it('calls the callback', done => {
+    it('calls the callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const callback = vi.fn();
         dinghyRacingModel.registerFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback);
-        // create delay to give time for stomp mock to trigger callback
-        setTimeout(() => {
-            expect(callback).toBeCalled();
-            done();
-        }, 1);
+        
+        vi.runOnlyPendingTimers();
+        expect(callback).toBeCalled();
     });
     it('does not set another reference to the same callback', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
