@@ -46,11 +46,9 @@ const timeFormat = new Intl.DateTimeFormat('utc', formatOptions);
 beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers().setSystemTime(new Date('2021-10-14T10:25:00Z'));
-    vi.spyOn(global, 'setTimeout');
 });
 
 afterEach(() => {
-    vi.runOnlyPendingTimers();
     vi.useRealTimers();
     sessionStorage.removeItem('sessionStart');
     sessionStorage.removeItem('sessionEnd');
@@ -107,9 +105,8 @@ it('displays races included in selected session', async () => {
     await act(async () => {
         customRender(<RaceStartConsole />, model, controller);
     });
-
-    const optionScorpion = await screen.findByRole('option', {'name': /Scorpion A/i});
-    const optionsGraduate = await screen.findByRole('option', {'name': /Graduate A/i});
+    const optionScorpion = screen.getByRole('option', {'name': /Scorpion A/i});
+    const optionsGraduate = screen.getByRole('option', {'name': /Graduate A/i});
     
     expect(optionScorpion).toBeInTheDocument();
     expect(optionsGraduate).toBeInTheDocument();
@@ -160,7 +157,7 @@ describe('when new value set for race type', () => {
         });
         
         await act(async () => {
-            await user.click(screen.getByLabelText(/pursuit/i));
+            user.click(screen.getByLabelText(/pursuit/i));
         });
     
         expect(getRacesBetweenTimesForTypeSpy).toHaveBeenCalledWith(sessionStart, sessionEnd, RaceType.PURSUIT, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
@@ -177,7 +174,7 @@ describe('when new value set for race type', () => {
         });
 
         await act(async () => {
-            await user.click(screen.getByLabelText(/pursuit/i));
+            user.click(screen.getByLabelText(/pursuit/i));
         });
 
         expect(getStartSequenceSpy).toHaveBeenCalledWith(races, RaceType.PURSUIT);
@@ -200,7 +197,7 @@ it('defaults session start to 8:00 today', async () => {
 it('defaults session end to 20:00 of today', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    vi.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+    vi.spyOn(model, 'getStartSequence');
     
     await act(async () => {        
         customRender(<RaceStartConsole />, model, controller);
@@ -231,7 +228,7 @@ it('displays race names and blue peter', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-    vi.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races)})});
+    vi.spyOn(model, 'getStartSequence');
 
     await act(async () => {
         customRender(<RaceStartConsole />, model, controller);
@@ -330,7 +327,7 @@ it('does not display in race data in race headers', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races, model})});
-    vi.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+    vi.spyOn(model, 'getStartSequence');
 
     await act(async () => {
         customRender(<RaceStartConsole />, model, controller);
@@ -372,11 +369,8 @@ it('displays actions to start races in session', async () => {
 describe('when clock ticks', () => {
     it('updates time to next flag state change', async () => {
         const races = [raceScorpionA, raceGraduateA];
-
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        // const clock = new Clock();
-        // clock.start();
         vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, model.getClock())})});
 
         await act(async () => {
@@ -388,8 +382,8 @@ describe('when clock ticks', () => {
         });
 
         const flagIndicators = (screen.getByRole('heading', {name: 'Flags'})).parentNode;
-        expect(await within(flagIndicators).findAllByText(/04:59/i)).toHaveLength(1);
-        expect(await within(flagIndicators).findAllByText(/09:59/i)).toHaveLength(2);
+        expect(within(flagIndicators).getAllByText(/04:59/i)).toHaveLength(1);
+        expect(within(flagIndicators).getAllByText(/09:59/i)).toHaveLength(2);
 	});
     describe('when a flag state change is triggered', () => {
         it('updates the displayed flag state to the new flag state', async () => {
@@ -403,12 +397,12 @@ describe('when clock ticks', () => {
                 customRender(<RaceStartConsole />, model, controller);
             });
 
-            act(() => {
+            await act(async () => {
                 vi.advanceTimersByTime(300000);
             });
 
-            expect(await screen.findAllByText(/raised/i)).toHaveLength(2);
-            expect(await screen.findAllByText(/lowered/i)).toHaveLength(1);
+            expect(screen.getAllByText(/raised/i)).toHaveLength(2);
+            expect(screen.getAllByText(/lowered/i)).toHaveLength(1);
         });
     });
     it('updates countdown for actions', async () => {
@@ -422,7 +416,7 @@ describe('when clock ticks', () => {
             customRender(<RaceStartConsole />, model, controller);
         });
 
-        act(() => {
+        await act(async () => {
             vi.advanceTimersByTime(1000);
         });
 
@@ -442,11 +436,11 @@ describe('when clock ticks', () => {
             vi.setSystemTime(new Date('2021-10-14T10:23:59Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
-            vi.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+            vi.spyOn(model, 'getStartSequence');
             await act(async () => {
                 customRender(<RaceStartConsole />, model, controller);
             });
-            act(() => {
+            await act(async () => {
                 vi.advanceTimersByTime(1000);
             });
             const audio = screen.queryByTestId('prepare-sound-warning-audio');
@@ -460,11 +454,11 @@ describe('when clock ticks', () => {
             vi.setSystemTime(new Date('2021-10-14T10:24:00Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
-            vi.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+            vi.spyOn(model, 'getStartSequence');
             await act(async () => {
                 customRender(<RaceStartConsole />, model, controller);
             });
-            act(() => {
+            await act(async () => {
                 vi.advanceTimersByTime(1000);
             });
             const audio = screen.queryByTestId('prepare-sound-warning-audio');
@@ -478,10 +472,11 @@ describe('when clock ticks', () => {
             vi.setSystemTime(new Date('2021-10-14T10:24:59Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
-            vi.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+            vi.spyOn(model, 'getStartSequence');
             await act(async () => {
                 customRender(<RaceStartConsole />, model, controller);
-            });act(() => {
+            });
+            await act(async () => {
                 vi.advanceTimersByTime(1000);
             });
             const audio = screen.queryByTestId('act-sound-warning-audio');
@@ -495,10 +490,11 @@ describe('when clock ticks', () => {
             vi.setSystemTime(new Date('2021-10-14T10:25:00Z'));
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
-            vi.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+            vi.spyOn(model, 'getStartSequence');
             await act(async () => {
                 customRender(<RaceStartConsole />, model, controller);
-            });act(() => {
+            });
+            await act(async () => {
                 vi.advanceTimersByTime(1000);
             });
             const audio = screen.queryByTestId('act-sound-warning-audio');
@@ -511,11 +507,13 @@ it('registers an interest in race updates for races in session', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races, model})});
-    vi.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+    vi.spyOn(model, 'getStartSequence');
     const registerRaceUpdateCallbackSpy = vi.spyOn(model, 'registerRaceUpdateCallback');
 
-    customRender(<RaceStartConsole />, model, controller);
-    await screen.findAllByText(/scorpion a/i);
+    await act(async () => {
+        customRender(<RaceStartConsole />, model, controller);
+    });
+    screen.getAllByText(/scorpion a/i);
 
     expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/races/4', expect.any(Function));
     expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(2, 'http://localhost:8081/dinghyracing/api/races/7', expect.any(Function));
@@ -545,7 +543,7 @@ describe('when races within session are changed', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races, model})});
-        vi.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+        vi.spyOn(model, 'getStartSequence');
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
@@ -564,11 +562,14 @@ it('registers an interest in fleet updates for races in session', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA]})});
-    vi.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence([raceScorpionA, raceGraduateA, raceCometA, raceHandicapA])})});
+    vi.spyOn(model, 'getStartSequence');
     const registerFleetUpdateCallbackSpy = vi.spyOn(model, 'registerFleetUpdateCallback');
 
-    customRender(<RaceStartConsole />, model, controller);
-    await screen.findAllByText(/scorpion a/i);
+    await act(async () => {
+        customRender(<RaceStartConsole />, model, controller);
+    });
+    
+    screen.getAllByText(/scorpion a/i);
 
     expect(registerFleetUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/fleets/1', expect.any(Function));
     expect(registerFleetUpdateCallbackSpy).toHaveBeenNthCalledWith(2, 'http://localhost:8081/dinghyracing/api/fleets/3', expect.any(Function));
@@ -605,7 +606,7 @@ describe('when 6 minutes 1 second before start of first race', () => {
         vi.setSystemTime(new Date('2021-10-14T10:23:59Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+        vi.spyOn(model, 'getStartSequence');
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
@@ -621,7 +622,7 @@ describe('when 6 minutes before start of first race', () => {
         vi.setSystemTime(new Date('2021-10-14T10:24:00Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+        vi.spyOn(model, 'getStartSequence');
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
@@ -703,7 +704,7 @@ describe('when selected races changed', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-        vi.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races)})});
+        vi.spyOn(model, 'getStartSequence');
     
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
@@ -713,10 +714,10 @@ describe('when selected races changed', () => {
         let raceA = within(raceHeaders).getByText(/scorpion a/i);
         expect(raceA).toBeInTheDocument();
 
-        const selectRace = await screen.findByLabelText(/Race/i);
-        await act(async () => {
-            user.deselectOptions(selectRace, ['Scorpion A']);
-        });
+        const selectRace = screen.getByLabelText(/Race/i);
+
+        user.deselectOptions(selectRace, ['Scorpion A']);
+        
         raceA = within(raceHeaders).queryByText(/scorpion a/i);
         expect(raceA).not.toBeInTheDocument();
     });
@@ -733,10 +734,10 @@ describe('when selected races changed', () => {
             customRender(<RaceStartConsole />, model, controller);
         });
 
-        const selectRace = await screen.findByLabelText(/Race/i);
-        await act(async () => {
-            user.deselectOptions(selectRace, ['Scorpion A']);
-        });
+        const selectRace = await screen.getByLabelText(/Race/i);
+        
+        user.deselectOptions(selectRace, ['Scorpion A']);
+
         expect(getStartSequenceSpy).toHaveBeenLastCalledWith(selectedRaces, RaceType.FLEET);
     });
     it('displays race names and blue peter', async () => {
@@ -751,10 +752,9 @@ describe('when selected races changed', () => {
             customRender(<RaceStartConsole />, model, controller);
         });
     
-        const selectRace = await screen.findByLabelText(/Race/i);
-        await act(async () => {
-            user.deselectOptions(selectRace, ['Scorpion A']);
-        });
+        const selectRace = screen.getByLabelText(/Race/i);
+        
+        user.deselectOptions(selectRace, ['Scorpion A']);
 
         const flagIndicators = (screen.getByRole('heading', {name: 'Flags'})).parentNode;
         expect(within(flagIndicators).queryByText(/scorpion class/i)).not.toBeInTheDocument();
@@ -777,10 +777,9 @@ describe('when selected races changed', () => {
             customRender(<RaceStartConsole />, model, controller);
         });
 
-        const selectRace = await screen.findByLabelText(/Race/i);
-        await act(async () => {
-            user.deselectOptions(selectRace, ['Scorpion A']);
-        });
+        const selectRace = screen.getByLabelText(/Race/i);
+        
+        user.deselectOptions(selectRace, ['Scorpion A']);
 
         const actionRows = screen.getAllByRole('row');
         expect(actionRows).toHaveLength(4);
