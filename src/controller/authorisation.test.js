@@ -16,10 +16,16 @@
 
 import Authorisation from './authorisation';
 
-global.fetch = vi.fn();
+afterEach(() => {
+    vi.restoreAllMocks();
+});
 
 it('returns array of roles', async () => {
-    fetch.mockImplementation((resource, options) => {
+    vi.spyOn(window, 'location', 'get').mockReturnValue({
+        origin: 'http://localhost/',
+        pathname: ''
+    });
+    vi.spyOn(window, 'fetch').mockImplementation((resource, options) => {
         if (resource === 'http://localhost/authentication/roles') {
             return Promise.resolve({
                 ok: true,
@@ -37,6 +43,7 @@ it('returns array of roles', async () => {
     });
     const authorisation = new Authorisation();
     expect(await authorisation.getRoles()).toEqual(['ROLE_SAILOR']);
+    vi.unstubAllGlobals();
 });
 
 describe('when error occurs', () => {
@@ -44,7 +51,7 @@ describe('when error occurs', () => {
         vi.spyOn(console, 'error');
         console.error.mockImplementation(() => {});
 
-        fetch.mockImplementation(() => {
+        vi.spyOn(window, 'fetch').mockImplementation(() => {
             throw new TypeError('Failed to fetch roles');
         });
         const authorisation = new Authorisation();
@@ -57,7 +64,7 @@ describe('when error occurs', () => {
 
 describe('when fetch operation is not successful', () => {
     it('returns an empty array', async () => {
-        fetch.mockImplementation((resource, options) => {
+        vi.spyOn(window, 'fetch').mockImplementation((resource, options) => {
             if (resource === 'http://localhost/authentication/roles') {
                 return Promise.resolve({
                     ok: false,
@@ -73,7 +80,7 @@ describe('when fetch operation is not successful', () => {
 
 describe('when response does not include roles', () => {
     it('returns an empty array', async () => {
-        fetch.mockImplementation((resource, options) => {
+        vi.spyOn(window, 'fetch').mockImplementation((resource, options) => {
             if (resource === 'http://localhost/authentication/roles') {
                 return Promise.resolve({
                     ok: true,
