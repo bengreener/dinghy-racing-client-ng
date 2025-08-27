@@ -18,8 +18,44 @@ import Clock from './clock';
 
 vi.useFakeTimers();
 
+beforeEach(() => {
+    // mock tick-worker web worker
+    const Worker = vi.fn(function(url) {
+        this.postMessage = function(event) {
+            switch (event) {
+                case 'start':
+                    this.startTicker();
+                    break;
+                case 'stop':
+                    this.stopTicker();
+                    break;
+                default:
+                    console.log(`tick-worker: Unknown command: ${event}`);
+            }
+        };
+        this.dateOffset = Date.now() - performance.now();
+        this.ticker;
+        this.startTicker = () => {
+            const setNextTick = (recursiveCallback) => {
+                this.ticker = setTimeout(() => {
+                    if (this.onmessage) {
+                        this.onmessage();
+                    }
+                    recursiveCallback(recursiveCallback);
+                }, 1001 - (performance.now() + this.dateOffset) % 1000);
+            }
+            setNextTick(setNextTick);
+        };
+        this.stopTicker = () => {
+            clearInterval(this.ticker);
+        }
+    });
+    vi.stubGlobal('Worker', Worker);
+});
+
 afterEach(() => {
     vi.runOnlyPendingTimers();
+    vi.unstubAllGlobals();
 });
 
 it('returns the correct time', () => {
@@ -260,50 +296,85 @@ describe('when formatting a duration in seconds', () => {
 });
 
 describe('when formatting a time as hh:mm:ss', () => {
+    const resolvedOptions = Intl.DateTimeFormat().resolvedOptions();
+    let formatOptions = {
+        timeZone: resolvedOptions.timeZone,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    };
+    const timeFormat = new Intl.DateTimeFormat(resolvedOptions.locale, formatOptions);
+
     it('converts 86399999ms to 23:59:59', () => {
-        expect(Clock.formatTime(86399999)).toBe('23:59:59');
+        const testTime = timeFormat.format(new Date(86399999));
+        expect(Clock.formatTime(86399999)).toBe(testTime);
     });
     it('converts 86400000ms to 00:00:00', () => {
-        expect(Clock.formatTime(86400000)).toBe('00:00:00');
+        const testTime = timeFormat.format(new Date(86400000));
+        expect(Clock.formatTime(86400000)).toBe(testTime);
     });
     it('converts 86400999ms to 00:00:00', () => {
-        expect(Clock.formatTime(86400999)).toBe('00:00:00');
+        const testTime = timeFormat.format(new Date(86400999));
+        expect(Clock.formatTime(86400999)).toBe(testTime);
     });
     it('converts 1000ms to 00:00:01', () => {
-        expect(Clock.formatTime(1000)).toBe('00:00:01');
+        const testTime = timeFormat.format(new Date(1000));
+        expect(Clock.formatTime(1000)).toBe(testTime);
     });
     it('converts 999ms to 00:00:00', () => {
-        expect(Clock.formatTime(999)).toBe('00:00:00');
+        const testTime = timeFormat.format(new Date(999));
+        expect(Clock.formatTime(999)).toBe(testTime);
     });
     it('converts 1ms to 00:00:00', () => {
-        expect(Clock.formatTime(1)).toBe('00:00:00');
+        const testTime = timeFormat.format(new Date(1));
+        expect(Clock.formatTime(1)).toBe(testTime);
     });
     it('converts 0ms to 00:00:00', () => {
-        expect(Clock.formatTime(0)).toBe('00:00:00');
+        const testTime = timeFormat.format(new Date(0));
+        expect(Clock.formatTime(0)).toBe(testTime);
     });
 });
 
 describe('when formatting a time as hh:mm:ss.000', () => {
+    const resolvedOptions = Intl.DateTimeFormat().resolvedOptions();
+    let formatOptions = {
+        timeZone: resolvedOptions.timeZone,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+        fractionalSecondDigits: 3
+    };
+    const timeFormat = new Intl.DateTimeFormat(resolvedOptions.locale, formatOptions);
+
     it('converts 86399999ms to 23:59:59.999', () => {
-        expect(Clock.formatTime(86399999, true)).toBe('23:59:59.999');
+        const testTime = timeFormat.format(new Date(86399999));
+        expect(Clock.formatTime(86399999, true)).toBe(testTime);
     });
-    it('converts 86400000ms to 00:00:00.000', () => {
-        expect(Clock.formatTime(86400000, true)).toBe('00:00:00.000');
+    it('converts 86400000ms to 00:00:00.000Z', () => {
+        const testTime = timeFormat.format(new Date(86400000));
+        expect(Clock.formatTime(86400000, true)).toBe(testTime);
     });
     it('converts 86400999ms to 00:00:00.999', () => {
-        expect(Clock.formatTime(86400999, true)).toBe('00:00:00.999');
+        const testTime = timeFormat.format(new Date(86400999));
+        expect(Clock.formatTime(86400999, true)).toBe(testTime);
     });
     it('converts 1000ms to 00@00:01.000', () => {
-        expect(Clock.formatTime(1000, true)).toBe('00:00:01.000');
+        const testTime = timeFormat.format(new Date(1000));
+        expect(Clock.formatTime(1000, true)).toBe(testTime);
     });
     it('converts 999ms to 00:00:00.999', () => {
-        expect(Clock.formatTime(999, true)).toBe('00:00:00.999');
+        const testTime = timeFormat.format(new Date(999));
+        expect(Clock.formatTime(999, true)).toBe(testTime);
     });
     it('converts 1ms to 00:00:00.001', () => {
-        expect(Clock.formatTime(1, true)).toBe('00:00:00.001');
+        const testTime = timeFormat.format(new Date(1));
+        expect(Clock.formatTime(1, true)).toBe(testTime);
     });
     it('converts 0ms to 00:00:00.000', () => {
-        expect(Clock.formatTime(0, true)).toBe('00:00:00.000');
+        const testTime = timeFormat.format(new Date(0));
+        expect(Clock.formatTime(0, true)).toBe(testTime);
     });
 });
 

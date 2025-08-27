@@ -73,9 +73,11 @@ class Clock {
     static formatDuration(duration, fractionalSeconds = false, countdown = false) {
         let durationSeconds = 0;
         if (fractionalSeconds) {
+            // fractional seconds so negative times should be nearest integer to -0
             durationSeconds = Math.abs(Math.trunc(duration / 1000));
         }
         else {
+            // no fractional seconds so negative times should move to next negative integer value away from -0
             durationSeconds = Math.abs(Math.floor(duration / 1000));
         }
         const durationMinutes = Math.abs(Math.trunc(durationSeconds / 60));
@@ -85,7 +87,7 @@ class Clock {
         if (durationHours > 0) {
             formattedValue = String(durationHours).padStart(2, '0') + ':';
         }
-            formattedValue = formattedValue + String(durationMinutes - durationHours * 60).padStart(2, '0') + ':' + String(durationSeconds - durationMinutes * 60).padStart(2, '0');
+        formattedValue = formattedValue + String(durationMinutes - durationHours * 60).padStart(2, '0') + ':' + String(durationSeconds - durationMinutes * 60).padStart(2, '0');
         if (fractionalSeconds) {
             formattedValue += '.' + String(Math.abs(duration) - durationSeconds * 1000).padStart(3, '0');
         }
