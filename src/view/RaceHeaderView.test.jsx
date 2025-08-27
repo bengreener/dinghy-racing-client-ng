@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { customRender } from '../test-utilities/custom-renders';
+import { customRender } from '../test-utilities/custom-renders.jsx';
 import userEvent from '@testing-library/user-event';
 import { act, screen, within } from '@testing-library/react';
 import RaceHeaderView from './RaceHeaderView';
@@ -33,7 +33,7 @@ HTMLDialogElement.prototype.close = vi.fn();
 beforeEach(() => {
     vi.resetAllMocks();
     vi.useFakeTimers();
-    vi.spyOn(global, 'setTimeout');
+    // vi.spyOn(global, 'setTimeout');
 });
 
 afterEach(() => {
@@ -287,13 +287,13 @@ it('updates values when a new race is selected', async () => {
 });
 
 describe('when postpone race button clicked', () => {
-    it('displays postpone race dialog', async () => {
-        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+    it('displays postpone race dialog', () => {
+        const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))} } />, model, controller);
-        await act(async () => {
-            await user.click(screen.getByRole('button', {'name': /postpone start/i}));
+        act(() => {
+            user.click(screen.getByRole('button', {'name': /postpone start/i}));
         });
         const dialog = within(screen.getByTestId('postpone-race-dialog'));
         expect(dialog.getByRole('spinbutton', {'name': /delay/i, 'hidden': true})).toBeInTheDocument();
@@ -324,14 +324,14 @@ describe('when race has started and an entry has sailed a lap', () => {
 });
 
 describe('when restart race button clicked', () => {
-    it('displays postpone race dialog', async () => {
-        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+    it('displays postpone race dialog', () => {
+        const user = userEvent.setup();
         vi.setSystemTime(new Date('2021-10-14T10:35:00Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         customRender(<RaceHeaderView race={ {...raceScorpionA, 'clock': new Clock()} } />, model, controller);
-        await act(async () => {
-            await user.click(screen.getByRole('button', {'name': /restart/i}));
+        act(() => {
+            user.click(screen.getByRole('button', {'name': /restart/i}));
         });
         const dialog = within(screen.getByTestId('postpone-race-dialog'));
         expect(dialog.getByRole('spinbutton', {'name': /delay/i, 'hidden': true})).toBeInTheDocument();
@@ -342,14 +342,20 @@ describe('when restart race button clicked', () => {
 
 describe('when start now button clicked', () => {
     it('starts race', async () => {
-        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});;
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         const startRaceSpy = vi.spyOn(controller, 'startRace');
 
-        customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))}} />, model, controller);
+        act(() => {
+            customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))}} />, model, controller);
+        });
+        
         const startRaceButton = screen.getByRole('button', {'name': /start now/i});
-        await user.click(startRaceButton);
+        await act(async () => {
+            user.click(startRaceButton);
+        });
+        
         expect(startRaceSpy).toHaveBeenCalled();
     });
 });
@@ -359,9 +365,12 @@ describe('when shorten course button clicked', () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))} } />, model, controller);
+        act(() => {
+            customRender(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))} } />, model, controller);
+        });
+        
         await act(async () => {
-            await user.click(screen.getByRole('button', {'name': /shorten course/i}));
+            user.click(screen.getByRole('button', {'name': /shorten course/i}));
         });
         const dialog = within(screen.getByTestId('shorten-course-dialog'));
         expect(dialog.getByRole('spinbutton', {'name': /laps/i, 'hidden': true})).toBeInTheDocument();
@@ -372,11 +381,17 @@ describe('when shorten course button clicked', () => {
 
 describe('when lap sheet button clicked', () => {
     it('opens a new window for the lap sheet for that race', async () => {
+        vi.spyOn(window, 'location', 'get').mockReturnValue({
+            origin: 'http://localhost',
+            pathname: ''
+        });
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const openSpy = vi.spyOn(window, 'open').mockImplementation(vi.fn());
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        customRender(<RaceHeaderView race={{...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000)), url: 'http://localhost:8081/dinghyracing/api/races/485'}} />, model, controller);
+        act(() => {
+            customRender(<RaceHeaderView race={{...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000)), url: 'http://localhost:8081/dinghyracing/api/races/485'}} />, model, controller);
+        });
         await act(async () => {
             user.click(screen.getByRole('button', {name: /lap sheet/i}));
         });
