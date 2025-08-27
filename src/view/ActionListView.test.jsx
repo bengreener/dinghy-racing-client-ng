@@ -32,21 +32,24 @@ const timeFormat = new Intl.DateTimeFormat('utc', formatOptions);
 
 beforeEach(() => {
     vi.useFakeTimers();
-    vi.spyOn(global, 'setTimeout')
 });
 
 afterEach(() => {
-    vi.runOnlyPendingTimers();
     vi.useRealTimers();
 });
 
 it('renders', () => {
-    render(<ActionListView signals={[]} clock={new Clock()}/>);
+    act(() => {
+        render(<ActionListView signals={[]} clock={new Clock()}/>);
+    });
+
     expect(screen.getByRole('heading', {name: /action list/i})).toBeInTheDocument();
 });
 
 it('displays a header for the action list', () => {
-    render(<ActionListView signals={[]} clock={new Clock()}/>);
+    act(() => {
+        render(<ActionListView signals={[]} clock={new Clock()}/>);
+    });
     expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByRole('columnheader', {name: /time/i})).toBeInTheDocument();
     expect(screen.getByRole('columnheader', {name: /action/i})).toBeInTheDocument();
@@ -72,7 +75,9 @@ it('displays actions', () => {
 
     const signals = [signalAUp, signalADown, signalPUp, signalBUp, soundOnly];
 
-    render(<ActionListView signals={signals} clock={new Clock()}/>);
+    act(() => {
+        render(<ActionListView signals={signals} clock={new Clock()}/>);
+    });
 
     const actionRows = screen.getAllByRole('row');
     expect(actionRows).toHaveLength(5);
@@ -90,7 +95,7 @@ it('displays actions', () => {
     expect(within(actionRows[4]).getByText(/17:30/i)).toBeInTheDocument();
 });
 
-it('updates action countdowns every second', async () => {
+it('updates action countdowns every second', () => {
     const now = Math.floor(Date.now() / 1000) * 1000;
     const flagA = {name: 'A Class Flag'};
     const flagP = {name: 'P Flag'};
@@ -111,24 +116,17 @@ it('updates action countdowns every second', async () => {
     const clock = new Clock();
     clock.start();
 
-    let container;
-    await act(async () => {
-        ({ container } = render(<ActionListView signals={signals} clock={clock}/>));
-    });
-
-    const actionListView = container.getElementsByClassName('action-list-view')[0];
-
-    await act(async () => {
+    act(() => {
+        render(<ActionListView signals={signals} clock={clock}/>);
         vi.advanceTimersByTime(1000);
     });
-
     const actionRows = screen.getAllByRole('row');
     expect(actionRows).toHaveLength(3);
-    expect(await within(actionRows[1]).findByText(/04:59/i)).toBeInTheDocument();
-    expect(await within(actionRows[2]).findByText(/09:59/i)).toBeInTheDocument();
+    expect(within(actionRows[1]).getByText(/04:59/i)).toBeInTheDocument();
+    expect(within(actionRows[2]).getByText(/09:59/i)).toBeInTheDocument();
 });
 
-it('does not display actions that have expired', async() => {
+it('does not display actions that have expired', () => {
     const now = Math.floor(Date.now() / 1000) * 1000;
     const flagA = {name: 'A Class Flag'};
     const flagP = {name: 'P Flag'};
@@ -146,7 +144,10 @@ it('does not display actions that have expired', async() => {
 
     const signals = [signalAUp, signalADown, signalPUp, signalBUp];
 
-    render(<ActionListView signals={signals} clock={new Clock()}/>);
+    act(() => {
+        render(<ActionListView signals={signals} clock={new Clock()}/>);
+    });
+    
     const actionRows = screen.getAllByRole('row');
     expect(actionRows).toHaveLength(2);
     expect(within(actionRows[1]).queryByText(timeFormat.format(new Date(now - 600000)))).not.toBeInTheDocument();
