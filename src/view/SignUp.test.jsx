@@ -110,31 +110,28 @@ describe('when signing up for a race', () => {
             expect(inputSailNumber).toBeInTheDocument();
             expect(btnCreate).toBeInTheDocument();
         });
-        
         describe('when helm name is entered', () => {
             it('displays helm name', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceCometA}/>, model, controller);
-                const inputHelm = screen.getByLabelText(/helm/i);
                 await act(async () => {
-                    await user.type(inputHelm, 'Chris Marshall');
+                    customRender(<SignUp race={raceCometA}/>, model, controller);
                 });
+                const inputHelm = screen.getByLabelText(/helm/i);
+                await user.type(inputHelm, 'Chris Marshall');
                 expect(inputHelm).toHaveValue('Chris Marshall');
             });
         });
-    
         describe('when sail number is entered', () => {
             it('displays sail number', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceCometA}/>, model, controller);
-                const inputSailNumber = screen.getByLabelText(/sail/i);
                 await act(async () => {
-                    await user.type(inputSailNumber, 'g6754i');
+                    customRender(<SignUp race={raceCometA}/>, model, controller);
                 });
+                const inputSailNumber = screen.getByLabelText(/sail/i);
+                await user.type(inputSailNumber, 'g6754i');
                 expect(inputSailNumber).toHaveValue('g6754i');
             });
         });
-    
         it('does not request entry of dinghy class', async () => {
             await act(async () => {
                 customRender(<SignUp race={raceCometA}/>, model, controller);
@@ -142,51 +139,40 @@ describe('when signing up for a race', () => {
             const inputDinghyClass = screen.queryByLabelText(/class/i);
             expect(inputDinghyClass).not.toBeInTheDocument();
         });
-    
         it('does not request entry of crew', async () => {
             await act(async () => {
                 customRender(<SignUp race={raceCometA}/>, model, controller);
             });
-            // const inputCrew = screen.queryByLabelText(/crew/i);
-            // expect(inputCrew).not.toBeInTheDocument();
             const inputCrew = screen.getByLabelText(/crew/i);
             expect(inputCrew).toBeDisabled();
         });
-
         describe('when helm and dinghy exist', () => {
             it('displays sign-up button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceCometA}/>, model, controller);
+                await act(async () => {
+                    customRender(<SignUp race={raceCometA}/>, model, controller);
+                });
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
-                await act(async () => {
-                    await user.type(inputHelm, 'Jill Myer');
-                });
-                await act(async () => {
-                    await user.type(inputSailNumber, '826');
-                });
+                await user.type(inputHelm, 'Jill Myer');
+                await user.type(inputSailNumber, '826');
                 expect(screen.getByRole('button', {'name': /^sign-up(?!.)/i}));
             });
-
             describe('when sign-up button clicked', () => {
                 it('creates entry with values entered into form and dinghy class set per race', async () => {
                     const onSignupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceCometA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceCometA}/>, model, controller);
+                    });
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Jill Myer');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, '826');
-                    });
+                    await user.type(inputHelm, 'Jill Myer');
+                    await user.type(inputSailNumber, '826');
                     const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                    await act(async () => {
-                        await user.click(buttonCreate);
-                    });
+                    await user.click(buttonCreate);
                     expect(onSignupToRaceSpy).toHaveBeenCalledWith(raceCometA, competitorJillMyer, dinghy826);
                 });
                 describe('when entry not created', () => {
@@ -195,19 +181,15 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceCometA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceCometA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Jill Myer');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '826');
-                        });
+                        await user.type(inputHelm, 'Jill Myer');
+                        await user.type(inputSailNumber, '826');
                         const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Jill Myer');
                         expect(inputSailNumber).toHaveValue('826');
@@ -221,19 +203,15 @@ describe('when signing up for a race', () => {
                                 message: "HTTP Error: 409 Conflict Message: The entry '15-7-17' already exists; this may be caused by an uppercase/ lowercase difference between existing record and the value entered."});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceCometA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceCometA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Jill Myer');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '826');
-                        });
+                        await user.type(inputHelm, 'Jill Myer');
+                        await user.type(inputSailNumber, '826');
                         const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('HTTP Error: 409 Conflict Message: The entry already exists; this may be caused by an uppercase/ lowercase difference between existing record and the value entered.')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Jill Myer');
                         expect(inputSailNumber).toHaveValue('826');
@@ -241,22 +219,18 @@ describe('when signing up for a race', () => {
                 });
             });
         });
-    
         describe('when helm does not exist', () => {
             it('displays create helm & sign-up button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceCometA}/>, model, controller);
+                await act(async () => {
+                    customRender(<SignUp race={raceCometA}/>, model, controller);
+                });
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
-                await act(async () => {
-                    await user.type(inputHelm, 'Not There');
-                });
-                await act(async () => {
-                    await user.type(inputSailNumber, '826');
-                });
+                await user.type(inputHelm, 'Not There');
+                await user.type(inputSailNumber, '826');
                 expect(screen.getByRole('button', {'name': /add helm & sign-up/i}));
             });
-        
             describe('when create button clicked', () => {
                 it('creates helm and then creates entry with values entered into form', async () => {
                     const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -266,49 +240,39 @@ describe('when signing up for a race', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceCometA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceCometA}/>, model, controller);
+                    });
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, '826');
-                    });
+                    await user.type(inputHelm, 'Not There');
+                    await user.type(inputSailNumber, '826');
                     const createButton = screen.getByRole('button', {'name': /add helm & sign-up/i});
-                    await act(async () => {
-                        await user.click(createButton);
-                    });
+                    await user.click(createButton);
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                     expect(signupToRaceSpy).toHaveBeenCalledWith(raceCometA, {'name': 'Not There', 'url': ''}, dinghy826);
-                })
-                
+                });
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceCometA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceCometA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '826');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, '826');
                         const createButton = screen.getByRole('button', {'name': /add helm & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(screen.getByText('Competitor not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Not There');
                         expect(inputSailNumber).toHaveValue('826');
                     });
                 });
-                
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -318,19 +282,15 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceCometA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceCometA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '826');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, '826');
                         const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Not There');
                         expect(inputSailNumber).toHaveValue('826');
@@ -338,22 +298,16 @@ describe('when signing up for a race', () => {
                 });
             });
         });
-    
         describe('when dinghy does not exist', () => {
             it('displays create dinghy and sign-up button', async () => {
                 const user = userEvent.setup();
                 customRender(<SignUp race={raceCometA}/>, model, controller);
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
-                await act(async () => {
-                    await user.type(inputHelm, 'Jill Myer');
-                });
-                await act(async () => {
-                    await user.type(inputSailNumber, 'g6754i');
-                });
+                await user.type(inputHelm, 'Jill Myer');
+                await user.type(inputSailNumber, 'g6754i');
                 expect(screen.getByRole('button', {'name': /add dinghy & sign-up/i}));
             });
-            
             describe('when create button clicked', () => {
                 it('creates dinghy and then creates entry with values entered into form', async () => {
                     const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -366,47 +320,35 @@ describe('when signing up for a race', () => {
                     customRender(<SignUp race={raceCometA}/>, model, controller);
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Jill Myer');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, 'g6754i');
-                    });
+                    await user.type(inputHelm, 'Jill Myer');
+                    await user.type(inputSailNumber, 'g6754i');
                     const createButton = screen.getByRole('button', {'name': /add dinghy & sign-up/i});
-                    await act(async () => {
-                        await user.click(createButton);
-                    });
+                    await user.click(createButton);
                     expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url':''});
                     expect(signupToRaceSpy).toHaveBeenCalledWith(raceCometA, competitorJillMyer,
                         {'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                 });
-                
                 describe('when dinghy not created', () => {
                     it('it displays failure message and entered values remain on form', async () => {
                         const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceCometA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceCometA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Jill Myer');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
+                        await user.type(inputHelm, 'Jill Myer');
+                        await user.type(inputSailNumber, 'g6754i');
                         const createButton = screen.getByRole('button', {'name': /add dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                         expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Jill Myer');
                         expect(inputSailNumber).toHaveValue('g6754i');
                     });
                 });
-                
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
@@ -416,19 +358,15 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceCometA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceCometA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Jill Myer');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
+                        await user.type(inputHelm, 'Jill Myer');
+                        await user.type(inputSailNumber, 'g6754i');
                         const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Jill Myer');
                         expect(inputSailNumber).toHaveValue('g6754i');
@@ -436,22 +374,18 @@ describe('when signing up for a race', () => {
                 });
             });			
         });
-    
         describe('when neither helm nor dinghy exist', () => {
             it('displays create helm & dinghy & sign-up button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceCometA}/>, model, controller);
+                await act(async () => {
+                    customRender(<SignUp race={raceCometA}/>, model, controller);
+                });
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
-                await act(async () => {
-                    await user.type(inputHelm, 'Not There');
-                });
-                await act(async () => {
-                    await user.type(inputSailNumber, 'xyz');
-                });
+                await user.type(inputHelm, 'Not There');
+                await user.type(inputSailNumber, 'xyz');
                 expect(screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i}));
             });
-            
             describe('when create button clicked', () => {
                 it('creates helm and dinghy and then creates entry with values entered into form', async () => {
                     const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -464,25 +398,20 @@ describe('when signing up for a race', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceCometA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceCometA}/>, model, controller);
+                    });
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, 'g6754i');
-                    });
+                    await user.type(inputHelm, 'Not There');
+                    await user.type(inputSailNumber, 'g6754i');
                     const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
-                    await act(async () => {
-                        await user.click(createButton);
-                    });
+                    await user.click(createButton);
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                     expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url':''});
                     expect(signupToRaceSpy).toHaveBeenCalledWith(raceCometA, {'name': 'Not There', 'url': ''},
                         {'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                 });
-                
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -492,27 +421,22 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceCometA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceCometA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, 'g6754i');
                         const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                         expect(screen.getByText('Competitor not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Not There');
                         expect(inputSailNumber).toHaveValue('g6754i');
                     });
-                });
-                    
+                }); 
                 describe('when dinghy not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -522,27 +446,22 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceCometA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceCometA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, 'g6754i');
                         const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                         expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Not There');
                         expect(inputSailNumber).toHaveValue('g6754i');
                     });
-                });
-                    
+                }); 
                 describe('when neither helm nor dinghy created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -552,19 +471,15 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceCometA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceCometA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, 'g6754i');
                         const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                         expect(screen.getByText(/Competitor not created/i)).toBeInTheDocument();
@@ -573,7 +488,6 @@ describe('when signing up for a race', () => {
                         expect(inputSailNumber).toHaveValue('g6754i');
                     });
                 });
-    
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -586,19 +500,15 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceCometA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceCometA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, 'g6754i');
                         const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Not There');
                         expect(inputSailNumber).toHaveValue('g6754i');
@@ -606,7 +516,6 @@ describe('when signing up for a race', () => {
                 });
             });
         });
-        
         it('clears form on success', async () => {
             vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                 return Promise.resolve({'success': true});
@@ -616,20 +525,16 @@ describe('when signing up for a race', () => {
                 return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
             });
             const user = userEvent.setup();
-            customRender(<SignUp race={raceCometA}/>, model, controller);
+            await act(async () => {
+                customRender(<SignUp race={raceCometA}/>, model, controller);
+            });
             const inputHelm = screen.getByLabelText(/helm/i);
             const inputSailNumber = screen.getByLabelText(/sail/i);
-            await act(async () => {
-                await user.type(inputHelm, 'Jill Myer');
-            });
-            await act(async () => {
-                await user.type(inputSailNumber, '826');
-                await user.keyboard('{Tab}');
-            });
+            await user.type(inputHelm, 'Jill Myer');
+            await user.type(inputSailNumber, '826');
+            await user.keyboard('{Tab}');
             const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-            await act(async () => {
-                await user.click(buttonCreate);
-            });
+            await user.click(buttonCreate);
             const raceTitle = screen.getByRole('heading', {'name': /comet a/i});
             const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
             const previousEntries = within(screen.getByTestId('previous-entries'));
@@ -640,16 +545,16 @@ describe('when signing up for a race', () => {
             expect(previousEntries.getAllByRole('row')).toHaveLength(1);
             expect(btnCreate).toBeInTheDocument();
         });
-        
         it('displays entries for race', async () => {
             vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesCometA})});
-            customRender(<SignUp race={raceCometA}/>, model, controller);
+            await act(async () => {
+                customRender(<SignUp race={raceCometA}/>, model, controller);
+            });
             expect(await screen.findByRole('cell', {'name': /Jill Myer/i})).toBeInTheDocument();
             expect((await screen.findAllByRole('cell', {'name': /Comet/i}))[0]).toBeInTheDocument();
             expect(await screen.findByRole('cell', {'name': /826/i})).toBeInTheDocument();
             expect((await screen.findAllByRole('button', {name: /x/i}))[0]).toBeInTheDocument();
         });
-
         it('shows a count of the number of entries to the race', async () => {
             vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesHandicapA})});
             await act(async () => {
@@ -678,33 +583,29 @@ describe('when signing up for a race', () => {
             expect(inputCrew).toBeInTheDocument();
             expect(btnCreate).toBeInTheDocument();
             expect(btnCancel).toBeInTheDocument();
-
         });
-    
         describe('when helm name is entered', () => {
             it('displays helm name', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const inputHelm = screen.getByLabelText(/helm/i);
                 await act(async () => {
-                    await user.type(inputHelm, 'Chris Marshall');
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
                 });
+                const inputHelm = screen.getByLabelText(/helm/i);
+                await user.type(inputHelm, 'Chris Marshall');
                 expect(inputHelm).toHaveValue('Chris Marshall');
             });
         });
-    
         describe('when sail number is entered', () => {
             it('displays sail number', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const inputSailNumber = screen.getByLabelText(/sail/i);
                 await act(async () => {
-                    await user.type(inputSailNumber, 'g6754i');
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
                 });
+                const inputSailNumber = screen.getByLabelText(/sail/i);
+                await user.type(inputSailNumber, 'g6754i');
                 expect(inputSailNumber).toHaveValue('g6754i');
             });
         });
-        
         it('does not request entry of dinghy class', async () => {
             await act(async () => {
                 customRender(<SignUp race={raceScorpionA}/>, model, controller);
@@ -712,87 +613,67 @@ describe('when signing up for a race', () => {
             const inputDinghyClass = screen.queryByLabelText(/class/i);
             expect(inputDinghyClass).not.toBeInTheDocument();
         });
-    
         describe('when crew name is entered', () => {
             it('displays crew name', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const inputCrew = screen.getByLabelText(/crew/i);
                 await act(async () => {
-                    await user.type(inputCrew, 'Lou Screw');
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
                 });
+                const inputCrew = screen.getByLabelText(/crew/i);
+                await user.type(inputCrew, 'Lou Screw');
                 expect(inputCrew).toHaveValue('Lou Screw');
             });
         });
-        
         describe('when helm and dinghy and crew exist', () => {
             it('displays sign-up button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                await act(async () => {
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                });
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
                 const inputCrew = screen.getByLabelText(/crew/i);
-                await act(async () => {
-                    await user.type(inputHelm, 'Chris Marshall');
-                });
-                await act(async () => {
-                    await user.type(inputSailNumber, '1234');
-                });
-                await act(async () => {
-                    await user.type(inputCrew, 'Lou Screw');
-                });
+                await user.type(inputHelm, 'Chris Marshall');
+                await user.type(inputSailNumber, '1234');
+                await user.type(inputCrew, 'Lou Screw');
                 expect(screen.getByRole('button', {'name': /^sign-up(?!.)/i}));
             });
-                
             describe('when create button clicked', () => {
                 it('creates entry with values entered into form and dinghy class set per race', async () => {
                     const onSignupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    });
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Chris Marshall');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, '1234');
-                    });
-                    await act(async () => {
-                        await user.type(inputCrew, 'Lou Screw');
-                    });
+                    await user.type(inputHelm, 'Chris Marshall');
+                    await user.type(inputSailNumber, '1234');
+                    await user.type(inputCrew, 'Lou Screw');
                     const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                    await act(async () => {
-                        await user.click(buttonCreate);
-                    });
+                    await user.click(buttonCreate);
                     expect(onSignupToRaceSpy).toHaveBeenCalledWith(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
                 });
-            
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Chris Marshall');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.type(inputHelm, 'Chris Marshall');
+                        await user.type(inputSailNumber, '1234');
+                        await user.type(inputCrew, 'Lou Screw');
                         const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Chris Marshall');
                         expect(inputSailNumber).toHaveValue('1234');
@@ -801,26 +682,20 @@ describe('when signing up for a race', () => {
                 });
             });
         });
-    
         describe('when helm does not exist', () => {
             it('displays create helm & sign-up button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                await act(async () => {
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                });
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
                 const inputCrew = screen.getByLabelText(/crew/i);
-                await act(async () => {
-                    await user.type(inputHelm, 'Not There');
-                });
-                await act(async () => {
-                    await user.type(inputSailNumber, '1234');
-                });
-                await act(async () => {
-                    await user.type(inputCrew, 'Lou Screw');
-                });
+                await user.type(inputHelm, 'Not There');
+                await user.type(inputSailNumber, '1234');
+                await user.type(inputCrew, 'Lou Screw');
                 expect(screen.getByRole('button', {'name': /add helm & sign-up/i}));
             });
-        
             describe('when create button clicked', () => {
                 it('creates helm and then creates entry with values entered into form', async () => {
                     const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -830,58 +705,44 @@ describe('when signing up for a race', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    });
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, '1234');
-                    });
-                    await act(async () => {
-                        await user.type(inputCrew, 'Lou Screw');
-                    });
+                    await user.type(inputHelm, 'Not There');
+                    await user.type(inputSailNumber, '1234');
+                    await user.type(inputCrew, 'Lou Screw');
                     const createButton = screen.getByRole('button', {'name': /add helm & sign-up/i});
-                    await act(async () => {
-                        await user.click(createButton);
-                    });
+                    await user.click(createButton);
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                     expect(signupToRaceSpy).toHaveBeenCalledWith(raceScorpionA, {'name': 'Not There', 'url': ''}, dinghy1234, competitorLouScrew);
                 });
-                
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, '1234');
+                        await user.type(inputCrew, 'Lou Screw');
                         const createButton = screen.getByRole('button', {'name': /add helm & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(screen.getByText('Competitor not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Not There');
                         expect(inputSailNumber).toHaveValue('1234');
                         expect(inputCrew).toHaveValue('Lou Screw');
                     });
-                });				
-                
+                });
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -891,23 +752,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, '1234');
+                        await user.type(inputCrew, 'Lou Screw');
                         const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Not There');
                         expect(inputSailNumber).toHaveValue('1234');
@@ -916,26 +771,20 @@ describe('when signing up for a race', () => {
                 });
             });
         });
-            
         describe('when dinghy does not exist', () => {
             it('displays create dinghy and sign-up button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                await act(async () => {
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                });
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
                 const inputCrew = screen.getByLabelText(/crew/i);
-                await act(async () => {
-                    await user.type(inputHelm, 'Chris Marshall');
-                });
-                await act(async () => {
-                    await user.type(inputSailNumber, 'g6754i');
-                });
-                await act(async () => {
-                    await user.type(inputCrew, 'Lou Screw');
-                })
+                await user.type(inputHelm, 'Chris Marshall');
+                await user.type(inputSailNumber, 'g6754i');
+                await user.type(inputCrew, 'Lou Screw');
                 expect(screen.getByRole('button', {'name': /add dinghy & sign-up/i}));
             });
-            
             describe('when create button clicked', () => {
                 it('creates dinghy and then creates entry with values entered into form', async () => {
                     const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -945,51 +794,38 @@ describe('when signing up for a race', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    });
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Chris Marshall');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, 'xyz');
-                    });
-                    await act(async () => {
-                        await user.type(inputCrew, 'Lou Screw');
-                    });
+                    await user.type(inputHelm, 'Chris Marshall');
+                    await user.type(inputSailNumber, 'xyz');
+                    await user.type(inputCrew, 'Lou Screw');
                     const createButton = screen.getByRole('button', {'name': /add dinghy & sign-up/i});
-                    await act(async () => {
-                        await user.click(createButton);
-                    });
+                    await user.click(createButton);
                     expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                     expect(signupToRaceSpy).toHaveBeenCalledWith(raceScorpionA, competitorChrisMarshall,
                         {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, competitorLouScrew);
                 });
-                
                 describe('when dinghy not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Chris Marshall');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.type(inputHelm, 'Chris Marshall');
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.type(inputCrew, 'Lou Screw');
                         const createButton = screen.getByRole('button', {'name': /add dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                         expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Chris Marshall');
@@ -997,7 +833,6 @@ describe('when signing up for a race', () => {
                         expect(inputCrew).toHaveValue('Lou Screw');
                     });
                 });
-    
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
@@ -1007,23 +842,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Chris Marshall');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.type(inputHelm, 'Chris Marshall');
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.type(inputCrew, 'Lou Screw');
                         const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Chris Marshall');
                         expect(inputSailNumber).toHaveValue('xyz');
@@ -1032,26 +861,20 @@ describe('when signing up for a race', () => {
                 });
             });
         });
-    
         describe('when crew does not exist', () => {
             it('displays create crew and sign-up button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                await act(async () => {
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                });
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
                 const inputCrew = screen.getByLabelText(/crew/i);
-                await act(async () => {
-                    await user.type(inputHelm, 'Chris Marshall');
-                });
-                await act(async () => {
-                    await user.type(inputSailNumber, '1234');
-                });
-                await act(async () => {
-                    await user.type(inputCrew, 'Not There');
-                })
+                await user.type(inputHelm, 'Chris Marshall');
+                await user.type(inputSailNumber, '1234');
+                await user.type(inputCrew, 'Not There');
                 expect(screen.getByRole('button', {'name': /add crew & sign-up/i}));
             });
-            
             describe('when create button clicked', () => {
                 it('creates crew and then creates entry with values entered into form', async () => {
                     const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -1061,51 +884,38 @@ describe('when signing up for a race', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    });
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Chris Marshall');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, '1234');
-                    });
-                    await act(async () => {
-                        await user.type(inputCrew, 'Pop Off');
-                    });
+                    await user.type(inputHelm, 'Chris Marshall');
+                    await user.type(inputSailNumber, '1234');
+                    await user.type(inputCrew, 'Pop Off');
                     const createButton = screen.getByRole('button', {'name': /add crew & sign-up/i});
-                    await act(async () => {
-                        await user.click(createButton);
-                    });
+                    await user.click(createButton);
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url':''});
                     expect(signupToRaceSpy).toHaveBeenCalledWith(raceScorpionA, competitorChrisMarshall,
                         dinghy1234, {'name': 'Pop Off', 'url': ''});
                 });
-                
                 describe('when crew not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Chris Marshall');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Not There');
-                        });
+                        await user.type(inputHelm, 'Chris Marshall');
+                        await user.type(inputSailNumber, '1234');
+                        await user.type(inputCrew, 'Not There');
                         const createButton = screen.getByRole('button', {'name': /add crew & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(screen.getByText('Competitor not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Chris Marshall');
@@ -1113,7 +923,6 @@ describe('when signing up for a race', () => {
                         expect(inputCrew).toHaveValue('Not There');
                     });
                 });
-                
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -1123,23 +932,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Chris Marshall');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Not There');
-                        });
+                        await user.type(inputHelm, 'Chris Marshall');
+                        await user.type(inputSailNumber, '1234');
+                        await user.type(inputCrew, 'Not There');
                         const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Chris Marshall');
                         expect(inputSailNumber).toHaveValue('1234');
@@ -1148,26 +951,20 @@ describe('when signing up for a race', () => {
                 });
             });
         });
-    
         describe('when neither helm nor dinghy exist', () => {
             it('displays create helm and dinghy and sign-up button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                await act(async () => {
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                });
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
                 const inputCrew = screen.getByLabelText(/crew/i);
-                await act(async () => {
-                    await user.type(inputHelm, 'Not There');
-                });
-                await act(async () => {
-                    await user.type(inputSailNumber, 'xyz');
-                });
-                await act(async () => {
-                    await user.type(inputCrew, 'Lou Screw');
-                });
+                await user.type(inputHelm, 'Not There');
+                await user.type(inputSailNumber, 'xyz');
+                await user.type(inputCrew, 'Lou Screw');
                 expect(screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i}));
             });
-            
             describe('when create button clicked', () => {
                 it('creates helm and dinghy and then creates entry with values entered into form', async () => {
                     const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -1180,29 +977,22 @@ describe('when signing up for a race', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    });
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, 'xyz');
-                    });
-                    await act(async () => {
-                        await user.type(inputCrew, 'Lou Screw');
-                    });
+                    await user.type(inputHelm, 'Not There');
+                    await user.type(inputSailNumber, 'xyz');
+                    await user.type(inputCrew, 'Lou Screw');
                     const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
-                    await act(async () => {
-                        await user.click(createButton);
-                    });
+                    await user.click(createButton);
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                     expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                     expect(signupToRaceSpy).toHaveBeenCalledWith(raceScorpionA, {'name': 'Not There', 'url': ''},
                         {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, competitorLouScrew);
                 });
-                
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -1212,23 +1002,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.type(inputCrew, 'Lou Screw');
                         const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                         expect(screen.getByText('Competitor not created')).toBeInTheDocument();
@@ -1237,7 +1021,6 @@ describe('when signing up for a race', () => {
                         expect(inputCrew).toHaveValue('Lou Screw');
                     });
                 });
-                
                 describe('when dinghy not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -1247,23 +1030,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.type(inputCrew, 'Lou Screw');
                         const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                         expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
@@ -1271,8 +1048,7 @@ describe('when signing up for a race', () => {
                         expect(inputSailNumber).toHaveValue('g6754i');
                         expect(inputCrew).toHaveValue('Lou Screw');
                     });
-                });
-                    
+                }); 
                 describe('when neither helm nor dinghy created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
                         const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -1282,23 +1058,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.type(inputCrew, 'Lou Screw');
                         const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                         expect(screen.getByText(/Competitor not created/i)).toBeInTheDocument();
@@ -1308,7 +1078,6 @@ describe('when signing up for a race', () => {
                         expect(inputCrew).toHaveValue('Lou Screw');
                     });
                 });
-    
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -1321,23 +1090,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.type(inputCrew, 'Lou Screw');
                         const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Not There');
                         expect(inputSailNumber).toHaveValue('xyz');
@@ -1346,26 +1109,20 @@ describe('when signing up for a race', () => {
                 });
             });
         });
-    
         describe('when neither helm nor crew exist', () => {
             it('displays create helm & crew & sign-up button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                await act(async () => {
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                });
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
                 const inputCrew = screen.getByLabelText(/crew/i);
-                await act(async () => {
-                    await user.type(inputHelm, 'Not There');
-                });
-                await act(async () => {
-                    await user.type(inputSailNumber, '1234');
-                });
-                await act(async () => {
-                    await user.type(inputCrew, 'Pop Off');
-                });
+                await user.type(inputHelm, 'Not There');
+                await user.type(inputSailNumber, '1234');
+                await user.type(inputCrew, 'Pop Off');
                 expect(screen.getByRole('button', {'name': /add helm & crew & sign-up/i}));
             });
-            
             describe('when create button clicked', () => {
                 it('creates helm and crew and then creates entry with values entered into form', async () => {
                     const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -1375,29 +1132,22 @@ describe('when signing up for a race', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    });
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, '1234');
-                    });
-                    await act(async () => {
-                        await user.type(inputCrew, 'Pop Off');
-                    });
+                    await user.type(inputHelm, 'Not There');
+                    await user.type(inputSailNumber, '1234');
+                    await user.type(inputCrew, 'Pop Off');
                     const createButton = screen.getByRole('button', {'name': /add helm & crew & sign-up/i});
-                    await act(async () => {
-                        await user.click(createButton);
-                    });
+                    await user.click(createButton);
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url':''});
                     expect(signupToRaceSpy).toHaveBeenCalledWith(raceScorpionA, {'name': 'Not There', 'url': ''},
                         dinghy1234, {'name': 'Pop Off', 'url': ''});
                 });
-                
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         // SignUp does not refresh competitor list so button label will not change
@@ -1419,23 +1169,17 @@ describe('when signing up for a race', () => {
                             }
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, '1234');
+                        await user.type(inputCrew, 'Pop Off');
                         const createButton = screen.getByRole('button', {'name': /add helm & crew & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(screen.getAllByText('Competitor not created')).toHaveLength(1);
@@ -1446,7 +1190,6 @@ describe('when signing up for a race', () => {
                         // expect(await screen.findByRole('button', {'name': /add helm & sign-up/i})).toBeInTheDocument();
                     });
                 });
-    
                 describe('when crew not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         // SignUp does not refresh competitor list so button label will not change
@@ -1468,23 +1211,17 @@ describe('when signing up for a race', () => {
                             }
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, '1234');
+                        await user.type(inputCrew, 'Pop Off');
                         const createButton = screen.getByRole('button', {'name': /add helm & crew & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(screen.getAllByText('Competitor not created')).toHaveLength(1);
@@ -1494,31 +1231,24 @@ describe('when signing up for a race', () => {
                         // SignUp does not refresh competitor list so button label will not change
                         // expect(await screen.findByRole('button', {'name': /add helm & sign-up/i})).toBeInTheDocument();
                     });
-                });
-                    
+                }); 
                 describe('when neither helm nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, '1234');
+                        await user.type(inputCrew, 'Pop Off');
                         const createButton = screen.getByRole('button', {'name': /add helm & crew & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(screen.getByText('Competitor not created/nCompetitor not created')).toBeInTheDocument();
@@ -1527,7 +1257,6 @@ describe('when signing up for a race', () => {
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
                 });
-                
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -1537,23 +1266,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, '1234');
+                        await user.type(inputCrew, 'Pop Off');
                         const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Not There');
                         expect(inputSailNumber).toHaveValue('1234');
@@ -1562,26 +1285,20 @@ describe('when signing up for a race', () => {
                 });
             });
         });
-    
         describe('when neither dinghy nor crew exist', () => {
             it('displays create dinghy and crew and sign-up button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                await act(async () => {
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                });
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
                 const inputCrew = screen.getByLabelText(/crew/i);
-                await act(async () => {
-                    await user.type(inputHelm, 'Chris Marshall');
-                });
-                await act(async () => {
-                    await user.type(inputSailNumber, 'xyz');
-                });
-                await act(async () => {
-                    await user.type(inputCrew, 'Pop Off');
-                });
+                await user.type(inputHelm, 'Chris Marshall');
+                await user.type(inputSailNumber, 'xyz');
+                await user.type(inputCrew, 'Pop Off');
                 expect(screen.getByRole('button', {'name': /add crew & dinghy & sign-up/i}));
             });
-            
             describe('when create button clicked', () => {
                 it('creates dinghy and crew and then creates entry with values entered into form', async () => {
                     const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -1594,29 +1311,22 @@ describe('when signing up for a race', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    });
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Chris Marshall');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, 'xyz');
-                    });
-                    await act(async () => {
-                        await user.type(inputCrew, 'Pop Off');
-                    });
+                    await user.type(inputHelm, 'Chris Marshall');
+                    await user.type(inputSailNumber, 'xyz');
+                    await user.type(inputCrew, 'Pop Off');
                     const createButton = screen.getByRole('button', {'name': /add crew & dinghy & sign-up/i});
-                    await act(async () => {
-                        await user.click(createButton);
-                    });
+                    await user.click(createButton);
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url':''});
                     expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                     expect(signupToRaceSpy).toHaveBeenCalledWith(raceScorpionA, competitorChrisMarshall,
                         {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, {'name': 'Pop Off', 'url': ''});
                 });
-                
                 describe('when dinghy not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -1626,23 +1336,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Chris Marshall');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.type(inputHelm, 'Chris Marshall');
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.type(inputCrew, 'Pop Off');
                         const createButton = screen.getByRole('button', {'name': /add crew & dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                         expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
@@ -1651,7 +1355,6 @@ describe('when signing up for a race', () => {
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
                 });
-                
                 describe('when crew not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -1661,23 +1364,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Chris Marshall');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.type(inputHelm, 'Chris Marshall');
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.type(inputCrew, 'Pop Off');
                         const createButton = screen.getByRole('button', {'name': /add crew & dinghy & sign-up/i});
-                        await act(async () => {
                             await user.click(createButton);
-                        });
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                         expect(screen.getByText('Competitor not created')).toBeInTheDocument();
@@ -1686,7 +1383,6 @@ describe('when signing up for a race', () => {
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
                 });
-    
                 describe('when neither dinghy nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
                         const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -1696,23 +1392,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Chris Marshall');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Not There');
-                        });
+                        await user.type(inputHelm, 'Chris Marshall');
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.type(inputCrew, 'Not There');
                         const createButton = screen.getByRole('button', {'name': /add crew & dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                         expect(screen.getByText(/Competitor not created/i)).toBeInTheDocument();
@@ -1722,7 +1412,6 @@ describe('when signing up for a race', () => {
                         expect(inputCrew).toHaveValue('Not There');
                     });
                 });
-    
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -1735,23 +1424,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Chris Marshall');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Not There');
-                        });
+                        await user.type(inputHelm, 'Chris Marshall');
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.type(inputCrew, 'Not There');
                         const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Chris Marshall');
                         expect(inputSailNumber).toHaveValue('xyz');
@@ -1760,26 +1443,20 @@ describe('when signing up for a race', () => {
                 });
             });
         });
-    
         describe('when neither helm nor dinghy nor crew exist', () => {
             it('displays create helm and dinghy and crew and sign-up button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                await act(async () => {
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                });
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
                 const inputCrew = screen.getByLabelText(/crew/i);
-                await act(async () => {
-                    await user.type(inputHelm, 'Not There');
-                });
-                await act(async () => {
-                    await user.type(inputSailNumber, 'xyz');
-                });
-                await act(async () => {
-                    await user.type(inputCrew, 'Pop Off');
-                });
+                await user.type(inputHelm, 'Not There');
+                await user.type(inputSailNumber, 'xyz');
+                await user.type(inputCrew, 'Pop Off');
                 expect(screen.getByRole('button', {'name': /add helm & crew & dinghy & sign-up/i}));
-            });
-            
+            });            
             describe('when create button clicked', () => {
                 it('creates helm and dinghy and crew and then creates entry with values entered into form', async () => {
                     const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -1792,30 +1469,23 @@ describe('when signing up for a race', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    });
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, 'xyz');
-                    });
-                    await act(async () => {
-                        await user.type(inputCrew, 'Pop Off');
-                    });
+                    await user.type(inputHelm, 'Not There');
+                    await user.type(inputSailNumber, 'xyz');
+                    await user.type(inputCrew, 'Pop Off');
                     const createButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & sign-up/i});
-                    await act(async () => {
-                        await user.click(createButton);
-                    });
+                    await user.click(createButton);
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url':''});
                     expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                     expect(signupToRaceSpy).toHaveBeenCalledWith(raceScorpionA, {'name': 'Not There', 'url': ''},
                         {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, {'name': 'Pop Off', 'url': ''});
                 });
-                
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -1830,23 +1500,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.type(inputCrew, 'Pop Off');
                         const createButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -1856,7 +1520,6 @@ describe('when signing up for a race', () => {
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
                 });
-    
                 describe('when dinghy not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -1866,23 +1529,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.type(inputCrew, 'Pop Off');
                         const createButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & sign-up/i});
-                        await act(async () => {
                             await user.click(createButton);
-                        });
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -1892,7 +1549,6 @@ describe('when signing up for a race', () => {
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
                 });
-    
                 describe('when crew not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -1907,23 +1563,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.type(inputCrew, 'Pop Off');
                         const createButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -1932,8 +1582,7 @@ describe('when signing up for a race', () => {
                         expect(inputSailNumber).toHaveValue('xyz');
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
-                });				
-                    
+                }); 
                 describe('when neither helm nor dinghy created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -1948,23 +1597,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.type(inputCrew, 'Pop Off');
                         const createButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -1975,7 +1618,6 @@ describe('when signing up for a race', () => {
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
                 });
-    
                 describe('when neither helm nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -1985,23 +1627,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.type(inputCrew, 'Pop Off');
                         const createButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -2011,7 +1647,6 @@ describe('when signing up for a race', () => {
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
                 });
-                
                 describe('when neither dinghy nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -2026,23 +1661,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.type(inputCrew, 'Pop Off');
                         const createButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -2053,7 +1682,6 @@ describe('when signing up for a race', () => {
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
                 });
-                
                 describe('when neither helm nor dinghy nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -2063,23 +1691,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.type(inputCrew, 'Pop Off');
                         const createButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -2090,7 +1712,6 @@ describe('when signing up for a race', () => {
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
                 });
-    
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -2103,23 +1724,17 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.type(inputCrew, 'Pop Off');
                         const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Not There');
                         expect(inputSailNumber).toHaveValue('xyz');
@@ -2128,7 +1743,6 @@ describe('when signing up for a race', () => {
                 });
             });      
         });
-    
         it('clears form on success', async () => {
             vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                 return Promise.resolve({'success': true});
@@ -2138,24 +1752,18 @@ describe('when signing up for a race', () => {
                 return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
             });
             const user = userEvent.setup();
-            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+            await act(async () => {
+                customRender(<SignUp race={raceScorpionA}/>, model, controller);
+            });
             const inputHelm = screen.getByLabelText(/helm/i);
             const inputSailNumber = screen.getByLabelText(/sail/i);
             const inputCrew = screen.getByLabelText(/crew/i);
-            await act(async () => {
-                await user.type(inputHelm, 'Chris Marshall');
-            });
-            await act(async () => {
-                await user.type(inputSailNumber, '1234');
-                await user.keyboard('{Tab}');
-            });
-            await act(async () => {
-                await user.type(inputCrew, 'Lou Screw');
-            });
+            await user.type(inputHelm, 'Chris Marshall');
+            await user.type(inputSailNumber, '1234');
+            await user.keyboard('{Tab}');
+            await user.type(inputCrew, 'Lou Screw');
             const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-            await act(async () => {
-                await user.click(buttonCreate);
-            });
+            await user.click(buttonCreate);
             const raceTitle = screen.getByRole('heading', {'name': /scorpion a/i});
             const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
             const previousEntries = within(screen.getByTestId('previous-entries'));
@@ -2166,10 +1774,11 @@ describe('when signing up for a race', () => {
             expect(previousEntries.getAllByRole('row')).toHaveLength(1);
             expect(btnCreate).toBeInTheDocument();
         });
-        
         it('displays entries for race', async () => {
             vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+            await act(async () => {
+                customRender(<SignUp race={raceScorpionA}/>, model, controller);
+            });
             expect(await screen.findByRole('cell', {'name': /Chris Marshall/i})).toBeInTheDocument();
             expect((await screen.findAllByRole('cell', {'name': /Scorpion/i}))[0]).toBeInTheDocument();
             expect(await screen.findByRole('cell', {'name': /1234/i})).toBeInTheDocument();
@@ -2202,125 +1811,101 @@ describe('when signing up for a race', () => {
         describe('when helm name is entered then ', () => {
             it('displays helm name', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                const inputHelm = screen.getByLabelText(/helm/i);
                 await act(async () => {
-                    await user.type(inputHelm, 'Chris Marshall');
+                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
                 });
+                const inputHelm = screen.getByLabelText(/helm/i);
+                await user.type(inputHelm, 'Chris Marshall');
                 expect(inputHelm).toHaveValue('Chris Marshall');
             });
         });
-    
         describe('when sail number is entered', () => {
             it('displays sail number', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                const inputSailNumber = screen.getByLabelText(/sail/i);
                 await act(async () => {
-                    await user.type(inputSailNumber, '1234');
+                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
                 });
+                const inputSailNumber = screen.getByLabelText(/sail/i);
+                await user.type(inputSailNumber, '1234');
                 expect(inputSailNumber).toHaveValue('1234');
             });
         });
-    
         describe('when dinghy class is entered', () => {
             it('displays dinghy class', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                const inputDinghyClass = screen.getByLabelText(/class/i);
-                await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                 await act(async () => {
-                    await user.selectOptions(inputDinghyClass, 'Scorpion');
+                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
                 });
+                const inputDinghyClass = screen.getByLabelText(/class/i);
+                screen.getAllByRole('option');
+                await user.selectOptions(inputDinghyClass, 'Scorpion');
                 expect(inputDinghyClass).toHaveValue('Scorpion');
             });
         });
-        
         describe('when dinghy class with no crew selected', () => {
             it('does not request entry of crew', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                const inputDinghyClass = screen.getByLabelText(/class/i);
-                await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                 await act(async () => {
-                    await user.selectOptions(inputDinghyClass, 'Comet');
+                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
                 });
+                const inputDinghyClass = screen.getByLabelText(/class/i);
+                await user.selectOptions(inputDinghyClass, 'Comet');
                 const inputCrew = screen.queryByLabelText(/crew/i);
-                // expect(inputCrew).not.toBeInTheDocument();
                 expect(inputCrew).toBeDisabled();
             });
-            
             describe('when helm and dinghy exist', () => {
                 it('displays sign-up button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                    const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                     await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Comet');
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
                     });
+                    const inputDinghyClass = screen.getByLabelText(/class/i);
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Comet');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Jill Myer');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, '826');
-                    });
+                    await user.type(inputHelm, 'Jill Myer');
+                    await user.type(inputSailNumber, '826');
                     expect(screen.getByRole('button', {'name': /^sign-up(?!.)/i}));
                 });
-                
                 describe('when create button clicked', () => {
                     it('creates entry with values entered into form and dinghy class set per race', async () => {
                         const onSignupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                        const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                         await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Comet');
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
                         });
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Comet');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Jill Myer');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '826');
-                        });
+                        await user.type(inputHelm, 'Jill Myer');
+                        await user.type(inputSailNumber, '826');
                         const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(onSignupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, competitorJillMyer, dinghy826);
                     });
-                
                     describe('when entry not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const onSignupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Comet');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Comet');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Jill Myer');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, '826');
-                            });
+                            await user.type(inputHelm, 'Jill Myer');
+                            await user.type(inputSailNumber, '826');
                             const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Jill Myer');
                             expect(inputDinghyClass).toHaveValue('Comet');
@@ -2329,27 +1914,21 @@ describe('when signing up for a race', () => {
                     });
                 });
             });
-    
             describe('when helm does not exist', () => {
                 it('displays create helm & sign-up button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                    const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                     await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Comet');
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
                     });
+                    const inputDinghyClass = screen.getByLabelText(/class/i);
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Comet');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, '826');
-                    });
+                    await user.type(inputHelm, 'Not There');
+                    await user.type(inputSailNumber, '826');
                     expect(screen.getByRole('button', {'name': /add helm & sign-up/i}));
                 });
-            
                 describe('when create button clicked', () => {
                     it('creates helm and then creates entry with values entered into form', async () => {
                         const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -2359,52 +1938,39 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                        const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                         await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Comet');
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
                         });
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Comet');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '826');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, '826');
                         const createButton = screen.getByRole('button', {'name': /add helm & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                         expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, {'name': 'Not There', 'url': ''}, dinghy826);
                     });
-                    
                     describe('when helm not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Comet');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Comet');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, '826');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, '826');
                             const createButton = screen.getByRole('button', {'name': /add helm & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(screen.getByText('Competitor not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Not There');
@@ -2420,24 +1986,18 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Comet');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Comet');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, '826');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, '826');
                             const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Not There');
                             expect(inputSailNumber).toHaveValue('826');
@@ -2445,27 +2005,21 @@ describe('when signing up for a race', () => {
                     });
                 });
             });
-    
             describe('when dinghy does not exist', () => {
                 it('displays create dinghy and sign-up button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                    const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                     await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Comet');
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
                     });
+                    const inputDinghyClass = screen.getByLabelText(/class/i);
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Comet');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Jill Myer');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, 'g6754i');
-                    });
+                    await user.type(inputHelm, 'Jill Myer');
+                    await user.type(inputSailNumber, 'g6754i');
                     expect(screen.getByRole('button', {'name': /add dinghy & sign-up/i}));
                 });
-                
                 describe('when create button clicked', () => {
                     it('creates dinghy and then creates entry with values entered into form', async () => {
                         const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -2475,53 +2029,40 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                        const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                         await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Comet');
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
                         });
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Comet');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Jill Myer');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
+                        await user.type(inputHelm, 'Jill Myer');
+                        await user.type(inputSailNumber, 'g6754i');
                         const createButton = screen.getByRole('button', {'name': /add dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url':''});
                         expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, competitorJillMyer,
                             {'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                     });
-    
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Comet');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Comet');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Jill Myer');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
+                            await user.type(inputHelm, 'Jill Myer');
+                            await user.type(inputSailNumber, 'g6754i');
                             const createButton = screen.getByRole('button', {'name': /add dinghy & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                             expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Jill Myer');
@@ -2529,7 +2070,6 @@ describe('when signing up for a race', () => {
                             expect(inputSailNumber).toHaveValue('g6754i');
                         });
                     });
-    
                     describe('when entry not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
@@ -2539,24 +2079,18 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Comet');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Comet');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Jill Myer');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
+                            await user.type(inputHelm, 'Jill Myer');
+                            await user.type(inputSailNumber, 'g6754i');
                             const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Jill Myer');
                             expect(inputDinghyClass).toHaveValue('Comet');
@@ -2565,27 +2099,21 @@ describe('when signing up for a race', () => {
                     });
                 });	
             });
-    
             describe('when neither helm nor dinghy exist', () => {
                 it('displays create helm & dinghy & sign-up button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                    const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                     await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Comet');
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
                     });
+                    const inputDinghyClass = screen.getByLabelText(/class/i);
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Comet');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, 'xyz');
-                    });
+                    await user.type(inputHelm, 'Not There');
+                    await user.type(inputSailNumber, 'xyz');
                     expect(screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i}));
                 });
-                
                 describe('when create button clicked', () => {
                     it('creates helm and dinghy and then creates entry with values entered into form', async () => {
                         const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -2598,30 +2126,23 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                        const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                         await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Comet');
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
                         });
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Comet');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, 'g6754i');
                         const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url':''});
                         expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, {'name': 'Not There', 'url': ''},
                             {'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                     });
-                    
                     describe('when helm not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -2631,24 +2152,18 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Comet');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Comet');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, 'g6754i');
                             const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                             expect(screen.getByText('Competitor not created')).toBeInTheDocument();
@@ -2657,7 +2172,6 @@ describe('when signing up for a race', () => {
                             expect(inputSailNumber).toHaveValue('g6754i');
                         });
                     });
-    
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -2667,24 +2181,18 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Comet');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Comet');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, 'g6754i');
                             const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                             expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
@@ -2693,7 +2201,6 @@ describe('when signing up for a race', () => {
                             expect(inputSailNumber).toHaveValue('g6754i');
                         });
                     });
-    
                     describe('when neither helm nor dinghy created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -2703,24 +2210,18 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Comet');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Comet');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, 'g6754i');
                             const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                             expect(screen.getByText(/Competitor not created/i)).toBeInTheDocument();
@@ -2733,108 +2234,80 @@ describe('when signing up for a race', () => {
                 });
             });
         });
-    
         describe('when dinghy class with crew selected', () => {	
             describe('when crew name is entered', () => {
                 it('displays crew name', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    });
                     const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                    await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Scorpion');
-                    });
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.type(inputCrew, 'Lou Screw');
-                        expect(inputCrew).toHaveValue('Lou Screw');
-                    });
+                    await user.type(inputCrew, 'Lou Screw');
+                    expect(inputCrew).toHaveValue('Lou Screw');
                 });
             });
-    
             describe('when helm and dinghy and crew exist', () => {
                 it('displays sign-up button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                    const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                     await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Scorpion');
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
                     });
+                    const inputDinghyClass = screen.getByLabelText(/class/i);
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Chris Marshall');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, '1234');
-                    });
-                    await act(async () => {
-                        await user.type(inputCrew, 'Lou Screw');
-                    });
+                    await user.type(inputHelm, 'Chris Marshall');
+                    await user.type(inputSailNumber, '1234');
+                    await user.type(inputCrew, 'Lou Screw');
                     expect(screen.getByRole('button', {'name': /^sign-up(?!.)/i}));
                 });
-    
                 describe('when create button clicked', () => {
                     it('creates entry with values entered into form and dinghy class set per race', async () => {
                         const onSignupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                        const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                         await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Scorpion');
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
                         });
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Scorpion');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Chris Marshall');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.type(inputHelm, 'Chris Marshall');
+                        await user.type(inputSailNumber, '1234');
+                        await user.type(inputCrew, 'Lou Screw');
                         const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(onSignupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
                     });
-                
                     describe('when entry not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const onSignupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Chris Marshall');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, '1234');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Lou Screw');
-                            });
+                            await user.type(inputHelm, 'Chris Marshall');
+                            await user.type(inputSailNumber, '1234');
+                            await user.type(inputCrew, 'Lou Screw');
                             const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Chris Marshall');
                             expect(inputDinghyClass).toHaveValue('Scorpion');
@@ -2844,31 +2317,23 @@ describe('when signing up for a race', () => {
                     });
                 });
             });
-    
             describe('when helm does not exist', () => {
                 it('displays create helm & sign-up button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                    const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                     await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Scorpion');
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
                     });
+                    const inputDinghyClass = screen.getByLabelText(/class/i);
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, '1234');
-                    });
-                    await act(async () => {
-                        await user.type(inputCrew, 'Lou Screw');
-                    });
+                    await user.type(inputHelm, 'Not There');
+                    await user.type(inputSailNumber, '1234');
+                    await user.type(inputCrew, 'Lou Screw');
                     expect(screen.getByRole('button', {'name': /add helm & sign-up/i}));
                 });
-            
                 describe('when create button clicked', () => {
                     it('creates helm and then creates entry with values entered into form', async () => {
                         const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -2878,60 +2343,43 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                        const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                         await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Scorpion');
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
                         });
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Scorpion');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, '1234');
+                        await user.type(inputCrew, 'Lou Screw');
                         const createButton = screen.getByRole('button', {'name': /add helm & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                         expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, {'name': 'Not There', 'url': ''}, dinghy1234, competitorLouScrew);
                     });
-                    
                     describe('when helm not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, '1234');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Lou Screw');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, '1234');
+                            await user.type(inputCrew, 'Lou Screw');
                             const createButton = screen.getByRole('button', {'name': /add helm & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(screen.getByText('Competitor not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Not There');
@@ -2949,28 +2397,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, '1234');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Lou Screw');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, '1234');
+                            await user.type(inputCrew, 'Lou Screw');
                             const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Not There');
                             expect(inputDinghyClass).toHaveValue('Scorpion');
@@ -2980,31 +2420,23 @@ describe('when signing up for a race', () => {
                     });
                 });
             });
-    
             describe('when dinghy does not exist', () => {
                 it('displays create dinghy and sign-up button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                    const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                     await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Scorpion');
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
                     });
+                    const inputDinghyClass = screen.getByLabelText(/class/i);
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Chris Marshall');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, 'g6754i');
-                    });
-                    await act(async () => {
-                        await user.type(inputCrew, 'Lou Screw');
-                    })
+                    await user.type(inputHelm, 'Chris Marshall');
+                    await user.type(inputSailNumber, 'g6754i');
+                    await user.type(inputCrew, 'Lou Screw');
                     expect(screen.getByRole('button', {'name': /add dinghy & sign-up/i}));
                 });
-                
                 describe('when create button clicked', () => {
                     it('creates dinghy and then creates entry with values entered into form', async () => {
                         const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -3014,28 +2446,20 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                        const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                         await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Scorpion');
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
                         });
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Scorpion');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Chris Marshall');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.type(inputHelm, 'Chris Marshall');
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.type(inputCrew, 'Lou Screw');
                         const createButton = screen.getByRole('button', {'name': /add dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                         expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, competitorChrisMarshall,
                             {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, competitorLouScrew);
@@ -3046,28 +2470,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Chris Marshall');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'xyz');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Lou Screw');
-                            });
+                            await user.type(inputHelm, 'Chris Marshall');
+                            await user.type(inputSailNumber, 'xyz');
+                            await user.type(inputCrew, 'Lou Screw');
                             const createButton = screen.getByRole('button', {'name': /add dinghy & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                             expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Chris Marshall');
@@ -3085,28 +2501,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Chris Marshall');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'xyz');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Lou Screw');
-                            });
+                            await user.type(inputHelm, 'Chris Marshall');
+                            await user.type(inputSailNumber, 'xyz');
+                            await user.type(inputCrew, 'Lou Screw');
                             const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Chris Marshall');
                             expect(inputDinghyClass).toHaveValue('Scorpion');
@@ -3116,31 +2524,23 @@ describe('when signing up for a race', () => {
                     });
                 });
             });
-    
             describe('when crew does not exist', () => {
                 it('displays create crew and sign-up button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                    const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                     await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Scorpion');
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
                     });
+                    const inputDinghyClass = screen.getByLabelText(/class/i);
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Chris Marshall');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, '1234');
-                    });
-                    await act(async () => {
-                        await user.type(inputCrew, 'Pop Off');
-                    })
+                    await user.type(inputHelm, 'Chris Marshall');
+                    await user.type(inputSailNumber, '1234');
+                    await user.type(inputCrew, 'Pop Off');
                     expect(screen.getByRole('button', {'name': /add crew & sign-up/i}));
                 });
-                
                 describe('when create button clicked', () => {
                     it('creates crew and then creates entry with values entered into form', async () => {
                         const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -3150,61 +2550,44 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                        const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                         await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Scorpion');
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
                         });
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Scorpion');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Chris Marshall');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.type(inputHelm, 'Chris Marshall');
+                        await user.type(inputSailNumber, '1234');
+                        await user.type(inputCrew, 'Pop Off');
                         const createButton = screen.getByRole('button', {'name': /add crew & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, competitorChrisMarshall,
                             dinghy1234, {'name': 'Pop Off', 'url': ''});
                     });
-    
                     describe('when crew not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Chris Marshall');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, '1234');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.type(inputHelm, 'Chris Marshall');
+                            await user.type(inputSailNumber, '1234');
+                            await user.type(inputCrew, 'Pop Off');
                             const createButton = screen.getByRole('button', {'name': /add crew & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(screen.getByText('Competitor not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Chris Marshall');
@@ -3212,7 +2595,6 @@ describe('when signing up for a race', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-    
                     describe('when entry not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -3222,28 +2604,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Chris Marshall');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, '1234');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.type(inputHelm, 'Chris Marshall');
+                            await user.type(inputSailNumber, '1234');
+                            await user.type(inputCrew, 'Pop Off');
                             const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Chris Marshall');
                             expect(inputSailNumber).toHaveValue('1234');
@@ -3252,31 +2626,23 @@ describe('when signing up for a race', () => {
                     });
                 });
             });
-    
             describe('when neither helm nor dinghy exist', () => {
                 it('displays create helm & dinghy & sign-up button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                    const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                     await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Scorpion');
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
                     });
+                    const inputDinghyClass = screen.getByLabelText(/class/i);
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, 'xyz');
-                    });
-                    await act(async () => {
-                        await user.type(inputCrew, 'Lou Screw');
-                    });
+                    await user.type(inputHelm, 'Not There');
+                    await user.type(inputSailNumber, 'xyz');
+                    await user.type(inputCrew, 'Lou Screw');
                     expect(screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i}));
                 });
-                
                 describe('when create button clicked', () => {
                     it('creates helm and dinghy and then creates entry with values entered into form', async () => {
                         const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -3289,34 +2655,25 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                        const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                         await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Scorpion');
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
                         });
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Scorpion');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.type(inputCrew, 'Lou Screw');
                         const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                         expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, {'name': 'Not There', 'url': ''},
                             {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, competitorLouScrew);
                     });
-                    
                     describe('when helm not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -3326,28 +2683,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'xyz');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Lou Screw');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, 'xyz');
+                            await user.type(inputCrew, 'Lou Screw');
                             const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                             expect(screen.getByText('Competitor not created')).toBeInTheDocument();
@@ -3356,7 +2705,6 @@ describe('when signing up for a race', () => {
                             expect(inputCrew).toHaveValue('Lou Screw');
                         });
                     });
-    
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -3366,28 +2714,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Lou Screw');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, 'g6754i');
+                            await user.type(inputCrew, 'Lou Screw');
                             const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                             expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
@@ -3396,7 +2736,6 @@ describe('when signing up for a race', () => {
                             expect(inputCrew).toHaveValue('Lou Screw');
                         });
                     });
-    
                     describe('when neither helm nor dinghy created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
                             const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -3406,28 +2745,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Lou Screw');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, 'g6754i');
+                            await user.type(inputCrew, 'Lou Screw');
                             const createButton = screen.getByRole('button', {'name': /add helm & dinghy & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                             expect(screen.getByText(/Competitor not created/i)).toBeInTheDocument();
@@ -3437,7 +2768,6 @@ describe('when signing up for a race', () => {
                             expect(inputCrew).toHaveValue('Lou Screw');
                         });
                     });
-    
                     describe('when entry not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -3450,28 +2780,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'xyz');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Lou Screw');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, 'xyz');
+                            await user.type(inputCrew, 'Lou Screw');
                             const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Not There');
                             expect(inputSailNumber).toHaveValue('xyz');
@@ -3480,28 +2802,21 @@ describe('when signing up for a race', () => {
                     });
                 });
             });
-    
             describe('when neither helm nor crew exist', () => {
                 it('displays create helm & crew & sign-up button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                    const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                     await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Scorpion');
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
                     });
+                    const inputDinghyClass = screen.getByLabelText(/class/i);
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, '1234');
-                    });
-                    await act(async () => {
-                        await user.type(inputCrew, 'Pop Off');
-                    });
+                    await user.type(inputHelm, 'Not There');
+                    await user.type(inputSailNumber, '1234');
+                    await user.type(inputCrew, 'Pop Off');
                     expect(screen.getByRole('button', {'name': /add helm & crew & sign-up/i}));
                 });
                 
@@ -3514,34 +2829,25 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                        const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                         await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Scorpion');
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
                         });
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Scorpion');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, '1234');
+                        await user.type(inputCrew, 'Pop Off');
                         const createButton = screen.getByRole('button', {'name': /add helm & crew & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url':''});
                         expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, {'name': 'Not There', 'url': ''},
                             dinghy1234, {'name': 'Pop Off', 'url': ''});
                     });
-                    
                     describe('when helm not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                         // SignUp does not refresh competitor list so button label will not change
@@ -3563,28 +2869,20 @@ describe('when signing up for a race', () => {
                             }
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                        const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                         await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Scorpion');
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
                         });
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Scorpion');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, '1234');
+                        await user.type(inputCrew, 'Pop Off');
                         const createButton = screen.getByRole('button', {'name': /add helm & crew & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(screen.getAllByText('Competitor not created')).toHaveLength(1);
@@ -3595,7 +2893,6 @@ describe('when signing up for a race', () => {
                         // expect(await screen.findByRole('button', {'name': /add helm & sign-up/i})).toBeInTheDocument();
                         });
                     });
-    
                     describe('when crew not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             // SignUp does not refresh competitor list so button label will not change
@@ -3617,28 +2914,20 @@ describe('when signing up for a race', () => {
                                 }
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, '1234');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, '1234');
+                            await user.type(inputCrew, 'Pop Off');
                             const createButton = screen.getByRole('button', {'name': /add helm & crew & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(screen.getAllByText('Competitor not created')).toHaveLength(1);
@@ -3649,35 +2938,26 @@ describe('when signing up for a race', () => {
                             // expect(await screen.findByRole('button', {'name': /add helm & sign-up/i})).toBeInTheDocument();
                         });
                     });
-    
                     describe('when neither helm nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, '1234');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, '1234');
+                            await user.type(inputCrew, 'Pop Off');
                             const createButton = screen.getByRole('button', {'name': /add helm & crew & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(screen.getByText('Competitor not created/nCompetitor not created')).toBeInTheDocument();
@@ -3686,7 +2966,6 @@ describe('when signing up for a race', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-    
                     describe('when entry not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -3696,28 +2975,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, '1234');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, '1234');
+                            await user.type(inputCrew, 'Pop Off');
                             const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Not There');
                             expect(inputSailNumber).toHaveValue('1234');
@@ -3726,31 +2997,23 @@ describe('when signing up for a race', () => {
                     });
                 });
             });
-            
             describe('when neither dinghy nor crew exist', () => {
                 it('displays create dinghy & crew & sign-up button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                    const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                     await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Scorpion');
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
                     });
+                    const inputDinghyClass = screen.getByLabelText(/class/i);
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Chris Marshall');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, 'xyz');
-                    });
-                    await act(async () => {
-                        await user.type(inputCrew, 'Pop Off');
-                    });
+                    await user.type(inputHelm, 'Chris Marshall');
+                    await user.type(inputSailNumber, 'xyz');
+                    await user.type(inputCrew, 'Pop Off');
                     expect(screen.getByRole('button', {'name': /add crew & dinghy & sign-up/i}));
                 });
-                
                 describe('when create button clicked', () => {
                     it('creates dinghy and crew and then creates entry with values entered into form', async () => {
                         const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -3763,34 +3026,25 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                        const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                         await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Scorpion');
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
                         });
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Scorpion');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Chris Marshall');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.type(inputHelm, 'Chris Marshall');
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.type(inputCrew, 'Pop Off');
                         const createButton = screen.getByRole('button', {'name': /add crew & dinghy & sign-up/i});
-                        await act(async () => {
-                            await user.click(createButton);
-                        });
+                        await user.click(createButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url':''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                         expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, competitorChrisMarshall,
                             {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, {'name': 'Pop Off', 'url': ''});
                     });
-                    
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -3800,28 +3054,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Chris Marshall');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.type(inputHelm, 'Chris Marshall');
+                            await user.type(inputSailNumber, 'g6754i');
+                            await user.type(inputCrew, 'Pop Off');
                             const createButton = screen.getByRole('button', {'name': /add crew & dinghy & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                             expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
@@ -3830,7 +3076,6 @@ describe('when signing up for a race', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-    
                     describe('when crew not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -3840,28 +3085,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Chris Marshall');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.type(inputHelm, 'Chris Marshall');
+                            await user.type(inputSailNumber, 'g6754i');
+                            await user.type(inputCrew, 'Pop Off');
                             const createButton = screen.getByRole('button', {'name': /add crew & dinghy & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                             expect(screen.getByText('Competitor not created')).toBeInTheDocument();
@@ -3870,7 +3107,6 @@ describe('when signing up for a race', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-    
                     describe('when neither dinghy nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
                             const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -3880,28 +3116,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Chris Marshall');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Not There');
-                            });
+                            await user.type(inputHelm, 'Chris Marshall');
+                            await user.type(inputSailNumber, 'g6754i');
+                            await user.type(inputCrew, 'Not There');
                             const createButton = screen.getByRole('button', {'name': /add crew & dinghy & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                             expect(screen.getByText(/Competitor not created/i)).toBeInTheDocument();
@@ -3911,7 +3139,6 @@ describe('when signing up for a race', () => {
                             expect(inputCrew).toHaveValue('Not There');
                         });
                     });
-    
                     describe('when entry not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -3924,28 +3151,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Chris Marshall');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'xyz');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Not There');
-                            });
+                            await user.type(inputHelm, 'Chris Marshall');
+                            await user.type(inputSailNumber, 'xyz');
+                            await user.type(inputCrew, 'Not There');
                             const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Chris Marshall');
                             expect(inputSailNumber).toHaveValue('xyz');
@@ -3954,31 +3173,23 @@ describe('when signing up for a race', () => {
                     });
                 });
             });
-            
             describe('when neither helm nor dinghy nor crew exist', () => {
                 it('displays create helm & dinghy & crew & sign-up button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                    const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                     await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Scorpion');
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
                     });
+                    const inputDinghyClass = screen.getByLabelText(/class/i);
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.type(inputSailNumber, 'xyz');
-                    });
-                    await act(async () => {
-                        await user.type(inputCrew, 'Pop Off');
-                    });
+                    await user.type(inputHelm, 'Not There');
+                    await user.type(inputSailNumber, 'xyz');
+                    await user.type(inputCrew, 'Pop Off');
                     expect(screen.getByRole('button', {'name': /add helm & crew & dinghy & sign-up/i}));
                 });
-                
                 describe('when create button clicked', () => {
                     it('creates helm and dinghy and crew and then creates entry with values entered into form', async () => {
                         const signupToRaceSpy = vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
@@ -3991,35 +3202,26 @@ describe('when signing up for a race', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                        const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                         await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Scorpion');
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
                         });
+                        const inputDinghyClass = screen.getByLabelText(/class/i);
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Scorpion');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.type(inputHelm, 'Not There');
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.type(inputCrew, 'Pop Off');
                         const createButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & sign-up/i});
-                        await act(async () => {
                             await user.click(createButton);
-                        });
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url':''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                         expect(signupToRaceSpy).toHaveBeenCalledWith(raceHandicapA, {'name': 'Not There', 'url': ''},
                             {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, {'name': 'Pop Off', 'url': ''});
                     });
-                    
                     describe('when helm not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -4034,28 +3236,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'xyz');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, 'xyz');
+                            await user.type(inputCrew, 'Pop Off');
                             const createButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -4065,7 +3259,6 @@ describe('when signing up for a race', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-        
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -4075,28 +3268,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, 'g6754i');
+                            await user.type(inputCrew, 'Pop Off');
                             const createButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -4106,7 +3291,6 @@ describe('when signing up for a race', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-        
                     describe('when crew not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -4121,28 +3305,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'xyz');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, 'xyz');
+                            await user.type(inputCrew, 'Pop Off');
                             const createButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -4151,8 +3327,7 @@ describe('when signing up for a race', () => {
                             expect(inputSailNumber).toHaveValue('xyz');
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
-                    });				
-                        
+                    }); 
                     describe('when neither helm nor dinghy created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -4167,28 +3342,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, 'g6754i');
+                            await user.type(inputCrew, 'Pop Off');
                             const createButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -4199,7 +3366,6 @@ describe('when signing up for a race', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-        
                     describe('when neither helm nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -4209,28 +3375,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, 'g6754i');
+                            await user.type(inputCrew, 'Pop Off');
                             const createButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -4240,7 +3398,6 @@ describe('when signing up for a race', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-                    
                     describe('when neither dinghy nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -4255,28 +3412,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, 'g6754i');
+                            await user.type(inputCrew, 'Pop Off');
                             const createButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -4287,7 +3436,6 @@ describe('when signing up for a race', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-                    
                     describe('when neither helm nor dinghy nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -4297,28 +3445,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, 'g6754i');
+                            await user.type(inputCrew, 'Pop Off');
                             const createButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & sign-up/i});
-                            await act(async () => {
-                                await user.click(createButton);
-                            });
+                            await user.click(createButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -4329,7 +3469,6 @@ describe('when signing up for a race', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-        
                     describe('when entry not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -4342,28 +3481,20 @@ describe('when signing up for a race', () => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-                            const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
                             await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
                             });
+                            const inputDinghyClass = screen.getByLabelText(/class/i);
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.type(inputSailNumber, 'xyz');
-                            });
-                            await act(async () => {
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.type(inputHelm, 'Not There');
+                            await user.type(inputSailNumber, 'xyz');
+                            await user.type(inputCrew, 'Pop Off');
                             const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Not There');
                             expect(inputSailNumber).toHaveValue('xyz');
@@ -4373,36 +3504,27 @@ describe('when signing up for a race', () => {
                 });
             });
         });
-    
         it('clears form on success', async () => {
             vi.spyOn(controller, 'signupToRace').mockImplementation(() => {
                 return Promise.resolve({'success': true});
             });
             vi.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234 ]})});
             const user = userEvent.setup();
-            customRender(<SignUp race={raceHandicapA}/>, model, controller);
-            const inputDinghyClass = screen.getByLabelText(/class/i);
-            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
             await act(async () => {
-                await user.selectOptions(inputDinghyClass, 'Scorpion');
+                customRender(<SignUp race={raceHandicapA}/>, model, controller);
             });
+            const inputDinghyClass = screen.getByLabelText(/class/i);
+            screen.getAllByRole('option');
+            await user.selectOptions(inputDinghyClass, 'Scorpion');
             const inputHelm = screen.getByLabelText(/helm/i);
             const inputSailNumber = screen.getByLabelText(/sail/i);
             const inputCrew = screen.getByLabelText(/crew/i);
-            await act(async () => {
-                await user.type(inputHelm, 'Chris Marshall');
-            });
-            await act(async () => {
-                await user.type(inputSailNumber, '1234');
-                await user.keyboard('{Tab}');
-            });
-            await act(async () => {
-                await user.type(inputCrew, 'Lou Screw');
-            });
+            await user.type(inputHelm, 'Chris Marshall');
+            await user.type(inputSailNumber, '1234');
+            await user.keyboard('{Tab}');
+            await user.type(inputCrew, 'Lou Screw');
             const buttonCreate = screen.getByRole('button', {'name': /sign-up/i});
-            await act(async () => {
-                await user.click(buttonCreate);
-            });
+            await user.click(buttonCreate);
             const raceTitle = screen.getByRole('heading', {'name': /handicap a/i});
             const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
             const previousEntries = within(screen.getByTestId('previous-entries'));
@@ -4413,10 +3535,11 @@ describe('when signing up for a race', () => {
             expect(previousEntries.getAllByRole('row')).toHaveLength(1);
             expect(btnCreate).toBeInTheDocument();
         });
-        
         it('displays entries for race', async () => {
             vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesHandicapA})});
-            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+            await act(async () => {
+                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+            });
             expect(await screen.findByRole('cell', {'name': /Chris Marshall/i})).toBeInTheDocument();
             expect((await screen.findAllByRole('cell', {'name': /Scorpion/i}))[0]).toBeInTheDocument();
             expect(await screen.findByRole('cell', {'name': /1234/i})).toBeInTheDocument();
@@ -4432,20 +3555,15 @@ describe('when signing up for a race', () => {
         await act(async () => {
             customRender(<SignUp race={raceHandicapA}/>, model, controller);
         });
-
         const inputDinghyClass = screen.getByLabelText(/class/i);
         const inputHelm = screen.getByLabelText(/helm/i);
         const inputSailNumber = screen.getByLabelText(/sail/i);
         const inputCrew = screen.getByLabelText(/crew/i);
-        await act(async () => {
-            await user.type(inputHelm, 'Chris Marshall');
-            await user.type(inputSailNumber, '1234');
-            await user.keyboard('{Tab}');
-            await user.type(inputCrew, 'Lou Screw');
-        });
-        await act(async () => {
-            await user.click(screen.getByRole('button', {name: /cancel/i}));
-        });
+        await user.type(inputHelm, 'Chris Marshall');
+        await user.type(inputSailNumber, '1234');
+        await user.keyboard('{Tab}');
+        await user.type(inputCrew, 'Lou Screw');
+        await user.click(screen.getByRole('button', {name: /cancel/i}));
         expect(inputHelm).toHaveValue('');
         expect(inputCrew).toHaveValue('');
         expect(inputSailNumber).toHaveValue('');
@@ -4549,75 +3667,54 @@ describe('when updating an existing entry', () => {
                 });
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
-
                 const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
-                await act(async () => {
-                    await user.click(cellJillMyer);
-                });
-                await act(async () => {
-                    await user.clear(inputHelm);
-                    await user.clear(inputSailNumber);
-                    await user.type(inputHelm, 'Chris Marshall');
-                    await user.type(inputSailNumber, '1234');
-                });
+                await user.click(cellJillMyer);
+                await user.clear(inputHelm);
+                await user.clear(inputSailNumber);
+                await user.type(inputHelm, 'Chris Marshall');
+                await user.type(inputSailNumber, '1234');
                 expect(screen.getByRole('button', {'name': /^update$/i}));
             });
-            
             describe('when update button clicked', () => {
                 it('updates entry with values entered into form and dinghy class set per race', async () => {
                     const onUpdateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceCometA}/>, model, controller);
-                    
-                    const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
                     await act(async () => {
-                        await user.click(cellJillMyer);
+                    customRender(<SignUp race={raceCometA}/>, model, controller);
                     });
-
+                    const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
+                    await user.click(cellJillMyer);
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
-                    await act(async () => {
-                        await user.clear(inputHelm);
-                        await user.type(inputHelm, 'Chris Marshall');
-                    });
-                    await act(async () => {
-                        await user.clear(inputSailNumber);
-                        await user.type(inputSailNumber, '1234');
-                    });
+                    await user.clear(inputHelm);
+                    await user.type(inputHelm, 'Chris Marshall');
+                    await user.clear(inputSailNumber);
+                    await user.type(inputSailNumber, '1234');
                     const buttonUpdate = screen.getByRole('button', {'name': /update/i});
-                    await act(async () => {
-                        await user.click(buttonUpdate);
-                    });
+                    await user.click(buttonUpdate);
                     expect(onUpdateEntrySpy).toHaveBeenCalledWith(entryJillMyerCometA826, competitorChrisMarshall, {...dinghy1234});
                 });
-            
                 describe('when entry not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceCometA}/>, model, controller);
-                        const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
                         await act(async () => {
-                            await user.click(cellJillMyer);
+                            customRender(<SignUp race={raceCometA}/>, model, controller);
                         });
+                        const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
+                        await user.click(cellJillMyer);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Chris Marshall');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, '1234');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Chris Marshall');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, '1234');
                         const buttonUpdate = screen.getByRole('button', {'name': /update/i});
-                        await act(async () => {
-                            await user.click(buttonUpdate);
-                        });
+                        await user.click(buttonUpdate);
                         expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Chris Marshall');
                         expect(inputSailNumber).toHaveValue('1234');
@@ -4625,28 +3722,22 @@ describe('when updating an existing entry', () => {
                 });	
             });
         });
-    
         describe('when helm does not exist', () => {
             it('displays create helm & update button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceCometA}/>, model, controller);
-                const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
                 await act(async () => {
-                    await user.click(cellJillMyer);
+                    customRender(<SignUp race={raceCometA}/>, model, controller);
                 });
+                const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
+                await user.click(cellJillMyer);
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
-                await act(async () => {
-                    await user.clear(inputHelm);
-                    await user.type(inputHelm, 'Not There');
-                });
-                await act(async () => {
-                    await user.clear(inputSailNumber);
-                    await user.type(inputSailNumber, '1234');
-                });
+                await user.clear(inputHelm);
+                await user.type(inputHelm, 'Not There');
+                await user.clear(inputSailNumber);
+                await user.type(inputSailNumber, '1234');
                 expect(screen.getByRole('button', {'name': /add helm & update/i}));
             });
-        
             describe('when update button clicked', () => {
                 it('creates helm and then updates entry with values entered into form', async () => {
                     const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
@@ -4656,52 +3747,42 @@ describe('when updating an existing entry', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceCometA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceCometA}/>, model, controller);
+                    });
                     const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
-                    await act(async () => {
-                        await user.click(cellJillMyer);
-                    });
+                    await user.click(cellJillMyer);
                     const inputHelm = screen.getByLabelText(/helm/i);
-                    await act(async () => {
-                        await user.clear(inputHelm);
-                        await user.type(inputHelm, 'Not There');
-                    });
+                    await user.clear(inputHelm);
+                    await user.type(inputHelm, 'Not There');
                     const updateButton = screen.getByRole('button', {'name': /add helm & update/i});
-                    await act(async () => {
-                        await user.click(updateButton);
-                    });
+                    await user.click(updateButton);
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                     expect(updateEntrySpy).toHaveBeenCalledWith(entryJillMyerCometA826, {'name': 'Not There', 'url': ''}, dinghy826);
-                })
-                
+                });
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceCometA}/>, model, controller);
-                        const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
                         await act(async () => {
-                            await user.click(cellJillMyer);
+                            customRender(<SignUp race={raceCometA}/>, model, controller);
                         });
+                        const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
+                        await user.click(cellJillMyer);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
                         const updateButton = screen.getByRole('button', {'name': /add helm & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(screen.getByText('Competitor not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Not There');
                         expect(inputSailNumber).toHaveValue('826');
                     });
                 });
-                
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -4711,20 +3792,16 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceCometA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceCometA}/>, model, controller);
+                        });
                         const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
-                        await act(async () => {
-                            await user.click(cellJillMyer);
-                        });
+                        await user.click(cellJillMyer);
                         const inputHelm = screen.getByLabelText(/helm/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
                         const buttonUpdate = screen.getByRole('button', {'name': /update/i});
-                        await act(async () => {
-                            await user.click(buttonUpdate);
-                        });
+                        await user.click(buttonUpdate);
                         expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Not There');
                         expect(screen.getByLabelText(/sail/i)).toHaveValue('826');
@@ -4732,23 +3809,19 @@ describe('when updating an existing entry', () => {
                 });
             });
         });
-    
         describe('when dinghy does not exist', () => {
             it('displays create dinghy and sign-up button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceCometA}/>, model, controller);
+                await act(async () => {
+                    customRender(<SignUp race={raceCometA}/>, model, controller);
+                });
                 const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
-                await act(async () => {
-                    await user.click(cellJillMyer);
-                });
+                await user.click(cellJillMyer);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
-                await act(async () => {
-                    await user.clear(inputSailNumber);
-                    await user.type(inputSailNumber, 'g6754i');
-                });
+                await user.clear(inputSailNumber);
+                await user.type(inputSailNumber, 'g6754i');
                 expect(screen.getByRole('button', {'name': /add dinghy & update/i}));
             });
-            
             describe('when create button clicked', () => {
                 it('creates dinghy and then creates entry with values entered into form', async () => {
                     const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
@@ -4758,52 +3831,42 @@ describe('when updating an existing entry', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceCometA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceCometA}/>, model, controller);
+                    });
                     const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
-                    await act(async () => {
-                        await user.click(cellJillMyer);
-                    });
+                    await user.click(cellJillMyer);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
-                    await act(async () => {
-                        await user.clear(inputSailNumber);
-                        await user.type(inputSailNumber, 'g6754i');
-                    });
+                    await user.clear(inputSailNumber);
+                    await user.type(inputSailNumber, 'g6754i');
                     const updateButton = screen.getByRole('button', {'name': /add dinghy & update/i});
-                    await act(async () => {
-                        await user.click(updateButton);
-                    });
+                    await user.click(updateButton);
                     expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url':''});
                     expect(updateEntrySpy).toHaveBeenCalledWith(entryJillMyerCometA826, competitorJillMyer, {'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                 });
-                
                 describe('when dinghy not created', () => {
                     it('it displays failure message and entered values remain on form', async () => {
                         const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceCometA}/>, model, controller);
-                        const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
                         await act(async () => {
-                            await user.click(cellJillMyer);
+                            customRender(<SignUp race={raceCometA}/>, model, controller);
                         });
+                        const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
+                        await user.click(cellJillMyer);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'g6754i');
                         const updateButton = screen.getByRole('button', {'name': /add dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                         expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Jill Myer');
                         expect(inputSailNumber).toHaveValue('g6754i');
                     });
                 });
-                
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
@@ -4813,21 +3876,17 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceCometA}/>, model, controller);
-                        const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
                         await act(async () => {
-                            await user.click(cellJillMyer);
+                            customRender(<SignUp race={raceCometA}/>, model, controller);
                         });
+                        const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
+                        await user.click(cellJillMyer);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'g6754i');
                         const buttonUpdate = screen.getByRole('button', {'name': /update/i});
-                        await act(async () => {
-                            await user.click(buttonUpdate);
-                        });
+                        await user.click(buttonUpdate);
                         expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Jill Myer');
                         expect(inputSailNumber).toHaveValue('g6754i');
@@ -4841,19 +3900,13 @@ describe('when updating an existing entry', () => {
                 const user = userEvent.setup();
                 customRender(<SignUp race={raceCometA}/>, model, controller);
                 const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
-                await act(async () => {
-                    await user.click(cellJillMyer);
-                });
+                await user.click(cellJillMyer);
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
-                await act(async () => {
-                    await user.clear(inputHelm);
-                    await user.type(inputHelm, 'Not There');
-                });
-                await act(async () => {
-                    await user.clear(inputSailNumber);
-                    await user.type(inputSailNumber, 'xyz');
-                });
+                await user.clear(inputHelm);
+                await user.type(inputHelm, 'Not There');
+                await user.clear(inputSailNumber);
+                await user.type(inputSailNumber, 'xyz');
                 expect(screen.getByRole('button', {'name': /add helm & dinghy & update/i}));
             });
             
@@ -4869,31 +3922,24 @@ describe('when updating an existing entry', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceCometA}/>, model, controller);
-                    const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
                     await act(async () => {
-                        await user.click(cellJillMyer);
+                        customRender(<SignUp race={raceCometA}/>, model, controller);
                     });
+                    const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
+                    await user.click(cellJillMyer);
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
-                    await act(async () => {
-                        await user.clear(inputHelm);
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.clear(inputSailNumber);
-                        await user.type(inputSailNumber, 'g6754i');
-                    });
+                    await user.clear(inputHelm);
+                    await user.type(inputHelm, 'Not There');
+                    await user.clear(inputSailNumber);
+                    await user.type(inputSailNumber, 'g6754i');
                     const updateButton = screen.getByRole('button', {'name': /add helm & dinghy & update/i});
-                    await act(async () => {
-                        await user.click(updateButton);
-                    });
+                    await user.click(updateButton);
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                     expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url':''});
                     expect(updateEntrySpy).toHaveBeenCalledWith(entryJillMyerCometA826, {'name': 'Not There', 'url': ''},
                         {'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                 });
-                
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -4903,33 +3949,26 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceCometA}/>, model, controller);
-                        const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
                         await act(async () => {
-                            await user.click(cellJillMyer);
+                            customRender(<SignUp race={raceCometA}/>, model, controller);
                         });
+                        const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
+                        await user.click(cellJillMyer);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'g6754i');
                         const updateButton = screen.getByRole('button', {'name': /add helm & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                         expect(screen.getByText('Competitor not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Not There');
                         expect(inputSailNumber).toHaveValue('g6754i');
                     });
-                });
-                    
+                }); 
                 describe('when dinghy not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -4939,25 +3978,19 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceCometA}/>, model, controller);
-                        const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
                         await act(async () => {
-                            await user.click(cellJillMyer);
+                            customRender(<SignUp race={raceCometA}/>, model, controller);
                         });
+                        const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
+                        await user.click(cellJillMyer);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'g6754i');
                         const updateButton = screen.getByRole('button', {'name': /add helm & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                         expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
@@ -4965,7 +3998,6 @@ describe('when updating an existing entry', () => {
                         expect(inputSailNumber).toHaveValue('g6754i');
                     });
                 });
-                    
                 describe('when neither helm nor dinghy created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -4975,25 +4007,19 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceCometA}/>, model, controller);
-                        const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
                         await act(async () => {
-                            await user.click(cellJillMyer);
+                            customRender(<SignUp race={raceCometA}/>, model, controller);
                         });
+                        const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
+                        await user.click(cellJillMyer);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'g6754i');
                         const updateButton = screen.getByRole('button', {'name': /add helm & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                         expect(screen.getByText(/Competitor not created/i)).toBeInTheDocument();
@@ -5002,7 +4028,6 @@ describe('when updating an existing entry', () => {
                         expect(inputSailNumber).toHaveValue('g6754i');
                     });
                 });
-    
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -5015,25 +4040,19 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceCometA}/>, model, controller);
-                        const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
                         await act(async () => {
-                            await user.click(cellJillMyer);
+                            customRender(<SignUp race={raceCometA}/>, model, controller);
                         });
+                        const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
+                        await user.click(cellJillMyer);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'g6754i');
                         const updateButton = screen.getByRole('button', {'name': /update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Not There');
                         expect(inputSailNumber).toHaveValue('g6754i');
@@ -5041,7 +4060,6 @@ describe('when updating an existing entry', () => {
                 });
             });
         });
-        
         it('clears form on success', async () => {
             vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                 return Promise.resolve({'success': true});
@@ -5051,26 +4069,20 @@ describe('when updating an existing entry', () => {
                 return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
             });
             const user = userEvent.setup();
-            customRender(<SignUp race={raceCometA}/>, model, controller);
-            const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
             await act(async () => {
-                await user.click(cellJillMyer);
+                customRender(<SignUp race={raceCometA}/>, model, controller);
             });
+            const cellJillMyer = await screen.findByRole('cell', {name: /jill myer/i});
+            await user.click(cellJillMyer);
             const inputHelm = screen.getByLabelText(/helm/i);
             const inputSailNumber = screen.getByLabelText(/sail/i);
-            await act(async () => {
-                await user.clear(inputHelm);
-                await user.type(inputHelm, 'Chris Marshall');
-            });
-            await act(async () => {
-                await user.clear(inputSailNumber);
-                await user.type(inputSailNumber, '1234');
-                await user.keyboard('{Tab}');
-            });
+            await user.clear(inputHelm);
+            await user.type(inputHelm, 'Chris Marshall');
+            await user.clear(inputSailNumber);
+            await user.type(inputSailNumber, '1234');
+            await user.keyboard('{Tab}');
             const updateButton = screen.getByRole('button', {'name': /update/i});
-            await act(async () => {
-                await user.click(updateButton);
-            });
+            await user.click(updateButton);
             const previousEntries = within(screen.getByTestId('previous-entries'));
             expect(inputHelm).toHaveValue('');
             expect(inputSailNumber).toHaveValue('');
@@ -5085,176 +4097,138 @@ describe('when updating an existing entry', () => {
             await act(async () => {
                 customRender(<SignUp race={raceScorpionA}/>, model, controller);
             });
-
             const raceTitle = screen.getByRole('heading', {'name': /scorpion a/i});
             const inputHelm = screen.getByLabelText(/helm/i);
             const inputCrew = screen.getByLabelText(/crew/i);
             const inputSailNumber = screen.getByLabelText(/sail/i);
-
-            const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-            await act(async () => {
-                await user.click(cellChrisMarshall);
-            });
-
+            const cellChrisMarshall = screen.getByRole('cell', {name: /chris marshall/i});
+            await user.click(cellChrisMarshall);
             expect(raceTitle).toBeInTheDocument();
             expect(inputHelm).toHaveValue('Chris Marshall');
             expect(inputCrew).toHaveValue('Lou Screw');
             expect(inputSailNumber).toHaveValue('1234');
         });
-
         describe('when helm name is entered', () => {
             it('displays helm name', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                 await act(async () => {
-                    await user.click(cellChrisMarshall);
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
                 });
+                const cellChrisMarshall = screen.getByRole('cell', {name: /chris marshall/i});
+                await user.click(cellChrisMarshall);
                 const inputHelm = screen.getByLabelText(/helm/i);
-                await act(async () => {
-                    await user.clear(inputHelm);
-                    await user.type(inputHelm, 'New Person');
-                });
+                await user.clear(inputHelm);
+                await user.type(inputHelm, 'New Person');
                 expect(inputHelm).toHaveValue('New Person');
             });
         });
-    
         describe('when sail number is entered', () => {
             it('displays sail number', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                 await act(async () => {
-                    await user.click(cellChrisMarshall);
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
                 });
+                const cellChrisMarshall = screen.getByRole('cell', {name: /chris marshall/i});
+                await user.click(cellChrisMarshall);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
-                await act(async () => {
-                    await user.clear(inputSailNumber);
-                    await user.type(inputSailNumber, 'g6754i');
-                });
+                await user.clear(inputSailNumber);
+                await user.type(inputSailNumber, 'g6754i');
                 expect(inputSailNumber).toHaveValue('g6754i');
             });
         });
-        
         it('does not request entry of dinghy class', async () => {
             const user = userEvent.setup();
             await act(async () => {
                 customRender(<SignUp race={raceScorpionA}/>, model, controller);
             });
-            const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-            await act(async () => {
-                await user.click(cellChrisMarshall);
-            });
+            const cellChrisMarshall = screen.getByRole('cell', {name: /chris marshall/i});
+            await user.click(cellChrisMarshall);
             const inputDinghyClass = screen.queryByLabelText(/class/i);
             expect(inputDinghyClass).not.toBeInTheDocument();
         });
-    
         describe('when crew name is entered', () => {
             it('displays crew name', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                 await act(async () => {
-                    await user.click(cellChrisMarshall);
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
                 });
+                const cellChrisMarshall = screen.getByRole('cell', {name: /chris marshall/i});
+                await user.click(cellChrisMarshall);
                 const inputCrew = screen.getByLabelText(/crew/i);
-                await act(async () => {
-                    await user.clear(inputCrew);
-                    await user.type(inputCrew, 'A Person');
-                });
+                await user.clear(inputCrew);
+                await user.type(inputCrew, 'A Person');
                 expect(inputCrew).toHaveValue('A Person');
             });
         });
-        
         describe('when helm and dinghy and crew exist', () => {
             it('displays update button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                 await act(async () => {
-                    await user.click(cellChrisMarshall);
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
                 });
+                const cellChrisMarshall = screen.getByRole('cell', {name: /chris marshall/i});
+                await user.click(cellChrisMarshall);
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
                 const inputCrew = screen.getByLabelText(/crew/i);
-                await act(async () => {
-                    await user.clear(inputHelm);
-                    await user.type(inputHelm, 'Jill Myer');
-                });
-                await act(async () => {
-                    await user.clear(inputSailNumber);
-                    await user.type(inputSailNumber, '826');
-                });
-                await act(async () => {
-                    await user.clear(inputCrew);
-                    await user.type(inputCrew, 'Chris Marshall');
-                });
+                await user.clear(inputHelm);
+                await user.type(inputHelm, 'Jill Myer');
+                await user.clear(inputSailNumber);
+                await user.type(inputSailNumber, '826');
+                await user.clear(inputCrew);
+                await user.type(inputCrew, 'Chris Marshall');
                 expect(screen.getByRole('button', {'name': /^update$/i}));
             });
-                
             describe('when update button clicked', () => {
                 it('updates entry with values entered into form and dinghy class set per race', async () => {
                     const onUpdateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                     await act(async () => {
-                        await user.click(cellChrisMarshall);
+                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
                     });
+                    const cellChrisMarshall = screen.getByRole('cell', {name: /chris marshall/i});
+                    user.click(cellChrisMarshall);
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
                     await act(async () => {
                         await user.clear(inputHelm);
                         await user.type(inputHelm, 'Chris Marshall');
-                    });
-                    await act(async () => {
                         await user.clear(inputSailNumber);
                         await user.type(inputSailNumber, '1234');
                     });
-                    await act(async () => {
-                        await user.clear(inputCrew);
-                        await user.type(inputCrew, 'Lou Screw');
-                    });
+                    await user.clear(inputCrew);
+                    await user.type(inputCrew, 'Lou Screw');
                     const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                    await act(async () => {
-                        await user.click(buttonCreate);
-                    });
-                    expect(onUpdateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallScorpionA1234, competitorChrisMarshall, dinghy1234, competitorLouScrew);
+                    user.click(buttonCreate);
+                    await vi.waitFor(async () => {
+                        expect(onUpdateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallScorpionA1234, competitorChrisMarshall, dinghy1234, competitorLouScrew);
+                    });                    
                 });
-            
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });                        
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Chris Marshall');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Chris Marshall');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, '1234');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Lou Screw');
                         const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Chris Marshall');
                         expect(inputSailNumber).toHaveValue('1234');
@@ -5263,30 +4237,23 @@ describe('when updating an existing entry', () => {
                 });
             });
         });
-    
         describe('when helm does not exist', () => {
             it('displays update helm & update button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                 await act(async () => {
-                    await user.click(cellChrisMarshall);
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
                 });
+                const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                await user.click(cellChrisMarshall);
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
                 const inputCrew = screen.getByLabelText(/crew/i);
-                await act(async () => {
-                    await user.clear(inputHelm);
-                    await user.type(inputHelm, 'Not There');
-                });
-                await act(async () => {
-                    await user.clear(inputSailNumber);
-                    await user.type(inputSailNumber, '1234');
-                });
-                await act(async () => {
-                    await user.clear(inputCrew);
-                    await user.type(inputCrew, 'Lou Screw');
-                });
+                await user.clear(inputHelm);
+                await user.type(inputHelm, 'Not There');
+                await user.clear(inputSailNumber);
+                await user.type(inputSailNumber, '1234');
+                await user.clear(inputCrew);
+                await user.type(inputCrew, 'Lou Screw');
                 expect(screen.getByRole('button', {'name': /add helm & update/i}));
             });
         
@@ -5299,30 +4266,22 @@ describe('when updating an existing entry', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                     await act(async () => {
-                        await user.click(cellChrisMarshall);
-                    });
+                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    });                    
+                    const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                    await user.click(cellChrisMarshall);
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.clear(inputHelm);
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.clear(inputSailNumber);
-                        await user.type(inputSailNumber, '1234');
-                    });
-                    await act(async () => {
-                        await user.clear(inputCrew);
-                        await user.type(inputCrew, 'Lou Screw');
-                    });
+                    await user.clear(inputHelm);
+                    await user.type(inputHelm, 'Not There');
+                    await user.clear(inputSailNumber);
+                    await user.type(inputSailNumber, '1234');
+                    await user.clear(inputCrew);
+                    await user.type(inputCrew, 'Lou Screw');
                     const updateButton = screen.getByRole('button', {'name': /add helm & update/i});
-                    await act(async () => {
-                        await user.click(updateButton);
-                    });
+                    await user.click(updateButton);
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                     expect(updateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallScorpionA1234, {'name': 'Not There', 'url': ''}, dinghy1234, competitorLouScrew);
                 });
@@ -5333,30 +4292,22 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
                         });
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, '1234');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Lou Screw');
                         const updateButton = screen.getByRole('button', {'name': /add helm & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(screen.getByText('Competitor not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Not There');
@@ -5374,30 +4325,22 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
                         });
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, '1234');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Lou Screw');
                         const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Not There');
                         expect(inputSailNumber).toHaveValue('1234');
@@ -5405,34 +4348,26 @@ describe('when updating an existing entry', () => {
                     });
                 });
             });
-        });
-            
+        }); 
         describe('when dinghy does not exist', () => {
             it('displays create dinghy and update button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                 await act(async () => {
-                    await user.click(cellChrisMarshall);
-                });
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                });                
+                const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                await user.click(cellChrisMarshall);
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
                 const inputCrew = screen.getByLabelText(/crew/i);
-                await act(async () => {
-                    await user.clear(inputHelm);
-                    await user.type(inputHelm, 'Chris Marshall');
-                });
-                await act(async () => {
-                    await user.clear(inputSailNumber);
-                    await user.type(inputSailNumber, 'g6754i');
-                });
-                await act(async () => {
-                    await user.clear(inputCrew);
-                    await user.type(inputCrew, 'Lou Screw');
-                })
+                await user.clear(inputHelm);
+                await user.type(inputHelm, 'Chris Marshall');
+                await user.clear(inputSailNumber);
+                await user.type(inputSailNumber, 'g6754i');
+                await user.clear(inputCrew);
+                await user.type(inputCrew, 'Lou Screw');
                 expect(screen.getByRole('button', {'name': /add dinghy & update/i}));
             });
-            
             describe('when update button clicked', () => {
                 it('creates dinghy and then updates entry with values entered into form', async () => {
                     const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
@@ -5442,30 +4377,22 @@ describe('when updating an existing entry', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                     await act(async () => {
-                        await user.click(cellChrisMarshall);
+                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
                     });
+                    const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                    await user.click(cellChrisMarshall);
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.clear(inputHelm);
-                        await user.type(inputHelm, 'Chris Marshall');
-                    });
-                    await act(async () => {
-                        await user.clear(inputSailNumber);
-                        await user.type(inputSailNumber, 'xyz');
-                    });
-                    await act(async () => {
-                        await user.clear(inputCrew);
-                        await user.type(inputCrew, 'Lou Screw');
-                    });
+                    await user.clear(inputHelm);
+                    await user.type(inputHelm, 'Chris Marshall');
+                    await user.clear(inputSailNumber);
+                    await user.type(inputSailNumber, 'xyz');
+                    await user.clear(inputCrew);
+                    await user.type(inputCrew, 'Lou Screw');
                     const updateButton = screen.getByRole('button', {'name': /add dinghy & update/i});
-                    await act(async () => {
-                        await user.click(updateButton);
-                    });
+                    await user.click(updateButton);
                     expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                     expect(updateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallScorpionA1234, competitorChrisMarshall,
                         {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, competitorLouScrew);
@@ -5477,30 +4404,22 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                        await act(async () => {
-                            await user.click(cellChrisMarshall);
+                        await act (async () => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
                         });
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Chris Marshall');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Chris Marshall');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Lou Screw');
                         const updateButton = screen.getByRole('button', {'name': /add dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                         expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Chris Marshall');
@@ -5518,30 +4437,22 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
                         });
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Chris Marshall');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Chris Marshall');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Lou Screw');
                         const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Chris Marshall');
                         expect(inputSailNumber).toHaveValue('xyz');
@@ -5550,30 +4461,23 @@ describe('when updating an existing entry', () => {
                 });
             });
         });
-    
         describe('when crew does not exist', () => {
             it('displays create crew and update button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                 await act(async () => {
-                    await user.click(cellChrisMarshall);
-                });
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                });                
+                const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                await user.click(cellChrisMarshall);
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
                 const inputCrew = screen.getByLabelText(/crew/i);
-                await act(async () => {
-                    await user.clear(inputHelm);
-                    await user.type(inputHelm, 'Chris Marshall');
-                });
-                await act(async () => {
-                    await user.clear(inputSailNumber);
-                    await user.type(inputSailNumber, '1234');
-                });
-                await act(async () => {
-                    await user.clear(inputCrew);
-                    await user.type(inputCrew, 'Not There');
-                })
+                await user.clear(inputHelm);
+                await user.type(inputHelm, 'Chris Marshall');
+                await user.clear(inputSailNumber);
+                await user.type(inputSailNumber, '1234');
+                await user.clear(inputCrew);
+                await user.type(inputCrew, 'Not There');
                 expect(screen.getByRole('button', {'name': /add crew & update/i}));
             });
             
@@ -5586,30 +4490,22 @@ describe('when updating an existing entry', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                     await act(async () => {
-                        await user.click(cellChrisMarshall);
-                    });
+                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                    });                    
+                    const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                    await user.click(cellChrisMarshall);
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.clear(inputHelm);
-                        await user.type(inputHelm, 'Chris Marshall');
-                    });
-                    await act(async () => {
-                        await user.clear(inputSailNumber);
-                        await user.type(inputSailNumber, '1234');
-                    });
-                    await act(async () => {
-                        await user.clear(inputCrew);
-                        await user.type(inputCrew, 'Pop Off');
-                    });
+                    await user.clear(inputHelm);
+                    await user.type(inputHelm, 'Chris Marshall');
+                    await user.clear(inputSailNumber);
+                    await user.type(inputSailNumber, '1234');
+                    await user.clear(inputCrew);
+                    await user.type(inputCrew, 'Pop Off');
                     const updateButton = screen.getByRole('button', {'name': /add crew & update/i});
-                    await act(async () => {
-                        await user.click(updateButton);
-                    });
+                    await user.click(updateButton);
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url':''});
                     expect(updateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallScorpionA1234, competitorChrisMarshall,
                         dinghy1234, {'name': 'Pop Off', 'url': ''});
@@ -5621,30 +4517,22 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
                         });
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Chris Marshall');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Not There');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Chris Marshall');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, '1234');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Not There');
                         const updateButton = screen.getByRole('button', {'name': /add crew & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(screen.getByText('Competitor not created')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Chris Marshall');
@@ -5652,7 +4540,6 @@ describe('when updating an existing entry', () => {
                         expect(inputCrew).toHaveValue('Not There');
                     });
                 });
-                
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -5662,30 +4549,22 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });                        
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Chris Marshall');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Not There');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Chris Marshall');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, '1234');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Not There');
                         const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Chris Marshall');
                         expect(inputSailNumber).toHaveValue('1234');
@@ -5694,30 +4573,23 @@ describe('when updating an existing entry', () => {
                 });
             });
         });
-    
         describe('when neither helm nor dinghy exist', () => {
             it('displays create helm and dinghy and update button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                 await act(async () => {
-                    await user.click(cellChrisMarshall);
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
                 });
+                const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                await user.click(cellChrisMarshall);
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
                 const inputCrew = screen.getByLabelText(/crew/i);
-                await act(async () => {
-                    await user.clear(inputHelm);
-                    await user.type(inputHelm, 'Not There');
-                });
-                await act(async () => {
-                    await user.clear(inputSailNumber);
-                    await user.type(inputSailNumber, 'xyz');
-                });
-                await act(async () => {
-                    await user.clear(inputCrew);
-                    await user.type(inputCrew, 'Lou Screw');
-                });
+                await user.clear(inputHelm);
+                await user.type(inputHelm, 'Not There');
+                await user.clear(inputSailNumber);
+                await user.type(inputSailNumber, 'xyz');
+                await user.clear(inputCrew);
+                await user.type(inputCrew, 'Lou Screw');
                 expect(screen.getByRole('button', {'name': /add helm & dinghy & update/i}));
             });
             
@@ -5733,36 +4605,27 @@ describe('when updating an existing entry', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                     await act(async () => {
-                        await user.click(cellChrisMarshall);
+                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
                     });
+                    const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                    await user.click(cellChrisMarshall);
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.clear(inputHelm);
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.clear(inputSailNumber);
-                        await user.type(inputSailNumber, 'xyz');
-                    });
-                    await act(async () => {
-                        await user.clear(inputCrew);
-                        await user.type(inputCrew, 'Lou Screw');
-                    });
+                    await user.clear(inputHelm);
+                    await user.type(inputHelm, 'Not There');
+                    await user.clear(inputSailNumber);
+                    await user.type(inputSailNumber, 'xyz');
+                    await user.clear(inputCrew);
+                    await user.type(inputCrew, 'Lou Screw');
                     const updateButton = screen.getByRole('button', {'name': /add helm & dinghy & update/i});
-                    await act(async () => {
-                        await user.click(updateButton);
-                    });
+                    await user.click(updateButton);
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                     expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                     expect(updateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallScorpionA1234, {'name': 'Not There', 'url': ''},
                         {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, competitorLouScrew);
                 });
-                
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -5772,30 +4635,22 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                        await act(async () => {
-                            await user.click(cellChrisMarshall);
+                        await act(async() => {
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
                         });
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Lou Screw');
                         const updateButton = screen.getByRole('button', {'name': /add helm & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                         expect(screen.getByText('Competitor not created')).toBeInTheDocument();
@@ -5804,7 +4659,6 @@ describe('when updating an existing entry', () => {
                         expect(inputCrew).toHaveValue('Lou Screw');
                     });
                 });
-                
                 describe('when dinghy not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -5814,30 +4668,22 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
                         });
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Lou Screw');
                         const updateButton = screen.getByRole('button', {'name': /add helm & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                         expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
@@ -5845,8 +4691,7 @@ describe('when updating an existing entry', () => {
                         expect(inputSailNumber).toHaveValue('g6754i');
                         expect(inputCrew).toHaveValue('Lou Screw');
                     });
-                });
-                    
+                }); 
                 describe('when neither helm nor dinghy created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
                         const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -5856,30 +4701,22 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });                        
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Lou Screw');
                         const updateButton = screen.getByRole('button', {'name': /add helm & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                         expect(screen.getByText(/Competitor not created/i)).toBeInTheDocument();
@@ -5889,7 +4726,6 @@ describe('when updating an existing entry', () => {
                         expect(inputCrew).toHaveValue('Lou Screw');
                     });
                 });
-    
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -5902,30 +4738,22 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
                         });
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Lou Screw');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Lou Screw');
                         const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Not There');
                         expect(inputSailNumber).toHaveValue('xyz');
@@ -5934,30 +4762,23 @@ describe('when updating an existing entry', () => {
                 });
             });
         });
-    
         describe('when neither helm nor crew exist', () => {
             it('displays create helm & crew & update button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                 await act(async () => {
-                    await user.click(cellChrisMarshall);
-                });
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                });                
+                const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                await user.click(cellChrisMarshall);
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
                 const inputCrew = screen.getByLabelText(/crew/i);
-                await act(async () => {
-                    await user.clear(inputHelm);
-                    await user.type(inputHelm, 'Not There');
-                });
-                await act(async () => {
-                    await user.clear(inputSailNumber);
-                    await user.type(inputSailNumber, '1234');
-                });
-                await act(async () => {
-                    await user.clear(inputCrew);
-                    await user.type(inputCrew, 'Pop Off');
-                });
+                await user.clear(inputHelm);
+                await user.type(inputHelm, 'Not There');
+                await user.clear(inputSailNumber);
+                await user.type(inputSailNumber, '1234');
+                await user.clear(inputCrew);
+                await user.type(inputCrew, 'Pop Off');
                 expect(screen.getByRole('button', {'name': /add helm & crew & update/i}));
             });
             
@@ -5970,30 +4791,22 @@ describe('when updating an existing entry', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                     await act(async () => {
-                        await user.click(cellChrisMarshall);
+                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
                     });
+                    const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                    await user.click(cellChrisMarshall);
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.clear(inputHelm);
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.clear(inputSailNumber);
-                        await user.type(inputSailNumber, '1234');
-                    });
-                    await act(async () => {
-                        await user.clear(inputCrew);
-                        await user.type(inputCrew, 'Pop Off');
-                    });
+                    await user.clear(inputHelm);
+                    await user.type(inputHelm, 'Not There');
+                    await user.clear(inputSailNumber);
+                    await user.type(inputSailNumber, '1234');
+                    await user.clear(inputCrew);
+                    await user.type(inputCrew, 'Pop Off');
                     const updateButton = screen.getByRole('button', {'name': /add helm & crew & update/i});
-                    await act(async () => {
-                        await user.click(updateButton);
-                    });
+                    await user.click(updateButton);
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url':''});
                     expect(updateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallScorpionA1234, {'name': 'Not There', 'url': ''},
@@ -6021,30 +4834,22 @@ describe('when updating an existing entry', () => {
                             }
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });                        
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, '1234');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, '1234');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Pop Off');
                         const updateButton = screen.getByRole('button', {'name': /add helm & crew & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(screen.getAllByText('Competitor not created')).toHaveLength(1);
@@ -6077,26 +4882,20 @@ describe('when updating an existing entry', () => {
                             }
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
                         });
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Pop Off');
                         const updateButton = screen.getByRole('button', {'name': /add helm & crew & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(screen.getAllByText('Competitor not created')).toHaveLength(1);
@@ -6106,34 +4905,27 @@ describe('when updating an existing entry', () => {
                         // SignUp does not refresh competitor list so button label will not change
                         // expect(await screen.findByRole('button', {'name': /add helm & update/i})).toBeInTheDocument();
                     });
-                });
-                    
+                }); 
                 describe('when neither helm nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                             return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
                         });
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Pop Off');
                         const updateButton = screen.getByRole('button', {'name': /add helm & crew & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(screen.getByText('Competitor not created/nCompetitor not created')).toBeInTheDocument();
@@ -6142,7 +4934,6 @@ describe('when updating an existing entry', () => {
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
                 });
-                
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -6152,26 +4943,20 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
                         });
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Pop Off');
                         const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Not There');
                         expect(inputSailNumber).toHaveValue('1234');
@@ -6180,29 +4965,23 @@ describe('when updating an existing entry', () => {
                 });
             });
         });
-    
         describe('when neither dinghy nor crew exist', () => {
             it('displays create dinghy and crew and update button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                 await act(async () => {
-                    await user.click(cellChrisMarshall);
-                });
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                });                
+                const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                await user.click(cellChrisMarshall);
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
                 const inputCrew = screen.getByLabelText(/crew/i);
-                await act(async () => {
-                    await user.clear(inputSailNumber);
-                    await user.type(inputSailNumber, 'xyz');
-                });
-                await act(async () => {
-                    await user.clear(inputCrew);
-                    await user.type(inputCrew, 'Pop Off');
-                });
+                await user.clear(inputSailNumber);
+                await user.type(inputSailNumber, 'xyz');
+                await user.clear(inputCrew);
+                await user.type(inputCrew, 'Pop Off');
                 expect(screen.getByRole('button', {'name': /add crew & dinghy & update/i}));
             });
-            
             describe('when update button clicked', () => {
                 it('creates dinghy and crew and then updates entry with values entered into form', async () => {
                     const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
@@ -6215,32 +4994,25 @@ describe('when updating an existing entry', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                     await act(async () => {
-                        await user.click(cellChrisMarshall);
+                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
                     });
+                    const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                    await user.click(cellChrisMarshall);
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.clear(inputSailNumber);
-                        await user.type(inputSailNumber, 'xyz');
-                    });
-                    await act(async () => {
-                        await user.clear(inputCrew);
-                        await user.type(inputCrew, 'Pop Off');
-                    });
+                    await user.clear(inputSailNumber);
+                    await user.type(inputSailNumber, 'xyz');
+                    await user.clear(inputCrew);
+                    await user.type(inputCrew, 'Pop Off');
                     const updateButton = screen.getByRole('button', {'name': /add crew & dinghy & update/i});
-                    await act(async () => {
-                        await user.click(updateButton);
-                    });
+                    await user.click(updateButton);
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url':''});
                     expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                     expect(updateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallScorpionA1234, competitorChrisMarshall,
                         {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, {'name': 'Pop Off', 'url': ''});
                 });
-                
                 describe('when dinghy not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -6250,26 +5022,20 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });                        
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Pop Off');
                         const updateButton = screen.getByRole('button', {'name': /add crew & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                         expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
@@ -6278,7 +5044,6 @@ describe('when updating an existing entry', () => {
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
                 });
-                
                 describe('when crew not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -6288,26 +5053,20 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });                        
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Pop Off');
                         const updateButton = screen.getByRole('button', {'name': /add crew & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                         expect(screen.getByText('Competitor not created')).toBeInTheDocument();
@@ -6316,7 +5075,6 @@ describe('when updating an existing entry', () => {
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
                 });
-    
                 describe('when neither dinghy nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
                         const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -6326,26 +5084,20 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });                        
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Not There');
-                        });
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Not There');
                         const updateButton = screen.getByRole('button', {'name': /add crew & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                         expect(screen.getByText(/Competitor not created/i)).toBeInTheDocument();
@@ -6355,7 +5107,6 @@ describe('when updating an existing entry', () => {
                         expect(inputCrew).toHaveValue('Not There');
                     });
                 });
-    
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -6368,26 +5119,20 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
                         });
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Not There');
-                        });
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Not There');
                         const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Chris Marshall');
                         expect(inputSailNumber).toHaveValue('xyz');
@@ -6396,33 +5141,25 @@ describe('when updating an existing entry', () => {
                 });
             });
         });
-    
         describe('when neither helm nor dinghy nor crew exist', () => {
             it('displays create helm and dinghy and crew and update button', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                 await act(async () => {
-                    await user.click(cellChrisMarshall);
+                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
                 });
+                const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                await user.click(cellChrisMarshall);
                 const inputHelm = screen.getByLabelText(/helm/i);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
                 const inputCrew = screen.getByLabelText(/crew/i);
-                await act(async () => {
-                    await user.clear(inputHelm);
-                    await user.type(inputHelm, 'Not There');
-                });
-                await act(async () => {
-                    await user.clear(inputSailNumber);
-                    await user.type(inputSailNumber, 'xyz');
-                });
-                await act(async () => {
-                    await user.clear(inputCrew);
-                    await user.type(inputCrew, 'Pop Off');
-                });
+                await user.clear(inputHelm);
+                await user.type(inputHelm, 'Not There');
+                await user.clear(inputSailNumber);
+                await user.type(inputSailNumber, 'xyz');
+                await user.clear(inputCrew);
+                await user.type(inputCrew, 'Pop Off');
                 expect(screen.getByRole('button', {'name': /add helm & crew & dinghy & update/i}));
             });
-            
             describe('when update button clicked', () => {
                 it('creates helm and dinghy and crew and then updates entry with values entered into form', async () => {
                     const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
@@ -6435,37 +5172,28 @@ describe('when updating an existing entry', () => {
                         return Promise.resolve({'success': true});
                     });
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                    const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                     await act(async () => {
-                        await user.click(cellChrisMarshall);
+                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
                     });
+                    const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                    await user.click(cellChrisMarshall);
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.clear(inputHelm);
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.clear(inputSailNumber);
-                        await user.type(inputSailNumber, 'xyz');
-                    });
-                    await act(async () => {
-                        await user.clear(inputCrew);
-                        await user.type(inputCrew, 'Pop Off');
-                    });
+                    await user.clear(inputHelm);
+                    await user.type(inputHelm, 'Not There');
+                    await user.clear(inputSailNumber);
+                    await user.type(inputSailNumber, 'xyz');
+                    await user.clear(inputCrew);
+                    await user.type(inputCrew, 'Pop Off');
                     const updateButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & update/i});
-                    await act(async () => {
-                        await user.click(updateButton);
-                    });
+                    await user.click(updateButton);
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                     expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url':''});
                     expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                     expect(updateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallScorpionA1234, {'name': 'Not There', 'url': ''},
                         {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, {'name': 'Pop Off', 'url': ''});
                 });
-                
                 describe('when helm not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -6480,30 +5208,22 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
                         });
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Pop Off');
                         const updateButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -6513,7 +5233,6 @@ describe('when updating an existing entry', () => {
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
                 });
-    
                 describe('when dinghy not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -6523,30 +5242,22 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
                         });
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Pop Off');
                         const updateButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -6556,7 +5267,6 @@ describe('when updating an existing entry', () => {
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
                 });
-    
                 describe('when crew not created', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -6571,30 +5281,22 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
                         });
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Pop Off');
                         const updateButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -6603,8 +5305,7 @@ describe('when updating an existing entry', () => {
                         expect(inputSailNumber).toHaveValue('xyz');
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
-                });				
-                    
+                }); 
                 describe('when neither helm nor dinghy created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -6619,30 +5320,22 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });                        
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Pop Off');
                         const updateButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -6653,7 +5346,6 @@ describe('when updating an existing entry', () => {
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
                 });
-    
                 describe('when neither helm nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -6663,30 +5355,22 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
                         });
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Pop Off');
                         const updateButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -6696,7 +5380,6 @@ describe('when updating an existing entry', () => {
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
                 });
-                
                 describe('when neither dinghy nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -6711,30 +5394,22 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });                        
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Pop Off');
                         const updateButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -6745,7 +5420,6 @@ describe('when updating an existing entry', () => {
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
                 });
-                
                 describe('when neither helm nor dinghy nor crew created', () => {
                     it('displays failure messages and entered values remain on form', async () => {
                         const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -6755,30 +5429,22 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
+                        });                        
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'g6754i');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Pop Off');
                         const updateButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -6789,7 +5455,6 @@ describe('when updating an existing entry', () => {
                         expect(inputCrew).toHaveValue('Pop Off');
                     });
                 });
-    
                 describe('when entry not updated', () => {
                     it('displays failure message and entered values remain on form', async () => {
                         vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -6802,30 +5467,22 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceScorpionA}/>, model, controller);
-                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
                         await act(async () => {
-                            await user.click(cellChrisMarshall);
+                            customRender(<SignUp race={raceScorpionA}/>, model, controller);
                         });
+                        const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+                        await user.click(cellChrisMarshall);
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Pop Off');
                         const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                         expect(inputHelm).toHaveValue('Not There');
                         expect(inputSailNumber).toHaveValue('xyz');
@@ -6834,7 +5491,6 @@ describe('when updating an existing entry', () => {
                 });
             });      
         });
-    
         it('clears form on success', async () => {
             vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                 return Promise.resolve({'success': true});
@@ -6844,31 +5500,23 @@ describe('when updating an existing entry', () => {
                 return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
             });
             const user = userEvent.setup();
-            customRender(<SignUp race={raceScorpionA}/>, model, controller);
-            const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
             await act(async () => {
-                await user.click(cellChrisMarshall);
+                customRender(<SignUp race={raceScorpionA}/>, model, controller);
             });
+            const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
+            await user.click(cellChrisMarshall);
             const inputHelm = screen.getByLabelText(/helm/i);
             const inputSailNumber = screen.getByLabelText(/sail/i);
             const inputCrew = screen.getByLabelText(/crew/i);
-            await act(async () => {
-                await user.clear(inputHelm);
-                await user.type(inputHelm, 'Jill Myer');
-            });
-            await act(async () => {
-                await user.clear(inputSailNumber);
-                await user.type(inputSailNumber, '826');
-                await user.keyboard('{Tab}');
-            });
-            await act(async () => {
-                await user.clear(inputCrew);
-                await user.type(inputCrew, 'Chris Marshall');
-            });
+            await user.clear(inputHelm);
+            await user.type(inputHelm, 'Jill Myer');
+            await user.clear(inputSailNumber);
+            await user.type(inputSailNumber, '826');
+            await user.keyboard('{Tab}');
+            await user.clear(inputCrew);
+            await user.type(inputCrew, 'Chris Marshall');
             const updateButton = screen.getByRole('button', {'name': /update/i});
-            await act(async () => {
-                await user.click(updateButton);
-            });
+            await user.click(updateButton);
             const previousEntries = within(screen.getByTestId('previous-entries'));
             expect(screen.getByRole('heading', {'name': /scorpion a/i})).toBeInTheDocument();
             expect(inputHelm).toHaveValue('');
@@ -6884,180 +5532,138 @@ describe('when updating an existing entry', () => {
             await act(async () => {
                 customRender(<SignUp race={raceHandicapA}/>, model, controller);
             });
-
             const raceTitle = screen.getByRole('heading', {'name': /handicap a/i});
             const inputHelm = screen.getByLabelText(/helm/i);
             const inputCrew = screen.getByLabelText(/crew/i);
             const inputSailNumber = screen.getByLabelText(/sail/i);
-
             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-            await act(async () => {
-                await user.click(cellChrisMarshall);
-            });
-
+            await user.click(cellChrisMarshall);
             expect(raceTitle).toBeInTheDocument();
             expect(inputHelm).toHaveValue('Chris Marshall');
             expect(inputCrew).toHaveValue('Lou Screw');
             expect(inputSailNumber).toHaveValue('1234');
         });
-    
         describe('when helm name is entered then ', () => {
             it('displays helm name', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                await act(async () => {
+                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                });
                 const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                await act(async () => {
-                    await user.click(cellChrisMarshall);
-                });
+                await user.click(cellChrisMarshall);
                 const inputHelm = screen.getByLabelText(/helm/i);
-                await act(async () => {
-                    await user.clear(inputHelm);
-                    await user.type(inputHelm, 'Jill Myer');
-                });
+                await user.clear(inputHelm);
+                await user.type(inputHelm, 'Jill Myer');
                 expect(inputHelm).toHaveValue('Jill Myer');
             });
         });
-    
         describe('when sail number is entered', () => {
             it('displays sail number', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                await act(async () => {
+                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                });
                 const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                await act(async () => {
-                    await user.click(cellChrisMarshall);
-                });
+                await user.click(cellChrisMarshall);
                 const inputSailNumber = screen.getByLabelText(/sail/i);
-                await act(async () => {
-                    await user.clear(inputSailNumber);
-                    await user.type(inputSailNumber, 'xyz');
-                });
+                await user.clear(inputSailNumber);
+                await user.type(inputSailNumber, 'xyz');
                 expect(inputSailNumber).toHaveValue('xyz');
             });
         });
-    
         describe('when dinghy class is entered', () => {
             it('displays dinghy class', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                await act(async () => {
+                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                });
                 const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                await act(async () => {
-                    await user.click(cellChrisMarshall);
-                });
+                await user.click(cellChrisMarshall);
                 const inputDinghyClass = screen.getByLabelText(/class/i);
-                await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                await act(async () => {
-                    await user.selectOptions(inputDinghyClass, 'Comet');
-                });
+                screen.getAllByRole('option');
+                await user.selectOptions(inputDinghyClass, 'Comet');
                 expect(inputDinghyClass).toHaveValue('Comet');
             });
         });
-        
         describe('when dinghy class with no crew selected', () => {
             it('does not request entry of crew', async () => {
                 const user = userEvent.setup();
-                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                await act(async () => {
+                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                });
                 const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                await act(async () => {
-                    await user.click(cellChrisMarshall);
-                });
+                await user.click(cellChrisMarshall);
                 const inputDinghyClass = screen.getByLabelText(/class/i);
-                await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                await act(async () => {
-                    await user.selectOptions(inputDinghyClass, 'Comet');
-                });
+                screen.getAllByRole('option');
+                await user.selectOptions(inputDinghyClass, 'Comet');
                 const inputCrew = screen.queryByLabelText(/crew/i);
                 expect(inputCrew).toBeDisabled();
             });
-            
             describe('when helm and dinghy exist', () => {
                 it('displays update button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    });
                     const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                    await act(async () => {
-                        await user.click(cellChrisMarshall);
-                    });
+                    await user.click(cellChrisMarshall);
                     const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                    await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Comet');
-                    });
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Comet');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
-                    await act(async () => {
-                        await user.clear(inputHelm);
-                        await user.type(inputHelm, 'Jill Myer');
-                    });
-                    await act(async () => {
-                        await user.clear(inputSailNumber);
-                        await user.type(inputSailNumber, '826');
-                    });
+                    await user.clear(inputHelm);
+                    await user.type(inputHelm, 'Jill Myer');
+                    await user.clear(inputSailNumber);
+                    await user.type(inputSailNumber, '826');
                     expect(screen.getByRole('button', {'name': /^update$/i}));
                 });
-                
                 describe('when update button clicked', () => {
                     it('updates entry with values entered into form and dinghy class set per race', async () => {
                         const onUpdateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        });
                         const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                        await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                        await user.click(cellChrisMarshall);
                         const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                        await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Comet');
-                        });
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Comet');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Jill Myer');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, '826');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Jill Myer');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, '826');
                         const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(onUpdateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallHandicapA1234, competitorJillMyer, dinghy826);
                     });
-                
                     describe('when entry not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Comet');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Comet');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Jill Myer');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, '826');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Jill Myer');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, '826');
                             const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Jill Myer');
                             expect(inputDinghyClass).toHaveValue('Comet');
@@ -7066,33 +5672,25 @@ describe('when updating an existing entry', () => {
                     });
                 });
             });
-    
             describe('when helm does not exist', () => {
                 it('displays create helm & update button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    });
                     const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                    await act(async () => {
-                        await user.click(cellChrisMarshall);
-                    });
+                    await user.click(cellChrisMarshall);
                     const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                    await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Comet');
-                    });
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Comet');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
-                    await act(async () => {
-                        await user.clear(inputHelm);
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.clear(inputSailNumber);
-                        await user.type(inputSailNumber, '826');
-                    });
+                    await user.clear(inputHelm);
+                    await user.type(inputHelm, 'Not There');
+                    await user.clear(inputSailNumber);
+                    await user.type(inputSailNumber, '826');
                     expect(screen.getByRole('button', {'name': /add helm & update/i}));
                 });
-            
                 describe('when update button clicked', () => {
                     it('creates helm and then updates entry with values entered into form', async () => {
                         const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
@@ -7102,64 +5700,47 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        });
                         const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                        await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                        await user.click(cellChrisMarshall);
                         const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                        await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Comet');
-                        });
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Comet');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, '826');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, '826');
                         const updateButton = screen.getByRole('button', {'name': /add helm & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                         expect(updateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallHandicapA1234, {'name': 'Not There', 'url': ''}, dinghy826);
                     });
-                    
                     describe('when helm not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Comet');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Comet');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, '826');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, '826');
                             const updateButton = screen.getByRole('button', {'name': /add helm & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(screen.getByText('Competitor not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Not There');
@@ -7175,30 +5756,22 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Comet');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Comet');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, '826');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, '826');
                             const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Not There');
                             expect(inputSailNumber).toHaveValue('826');
@@ -7206,33 +5779,25 @@ describe('when updating an existing entry', () => {
                     });
                 });
             });
-    
             describe('when dinghy does not exist', () => {
                 it('displays create dinghy and update button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    });
                     const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                    await act(async () => {
-                        await user.click(cellChrisMarshall);
-                    });
+                    await user.click(cellChrisMarshall);
                     const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                    await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Comet');
-                    });
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Comet');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
-                    await act(async () => {
-                        await user.clear(inputHelm);
-                        await user.type(inputHelm, 'Jill Myer');
-                    });
-                    await act(async () => {
-                        await user.clear(inputSailNumber);
-                        await user.type(inputSailNumber, 'g6754i');
-                    });
+                    await user.clear(inputHelm);
+                    await user.type(inputHelm, 'Jill Myer');
+                    await user.clear(inputSailNumber);
+                    await user.type(inputSailNumber, 'g6754i');
                     expect(screen.getByRole('button', {'name': /add dinghy & update/i}));
                 });
-                
                 describe('when update button clicked', () => {
                     it('creates dinghy and then updates entry with values entered into form', async () => {
                         const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
@@ -7242,65 +5807,48 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        });
                         const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                        await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                        await user.click(cellChrisMarshall);
                         const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                        await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Comet');
-                        });
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Comet');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Jill Myer');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Jill Myer');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'g6754i');
                         const updateButton = screen.getByRole('button', {'name': /add dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url':''});
                         expect(updateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallHandicapA1234, competitorJillMyer,
                             {'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                     });
-    
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createDinghySpy = vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Comet');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Comet');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Jill Myer');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Jill Myer');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'g6754i');
                             const updateButton = screen.getByRole('button', {'name': /add dinghy & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                             expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Jill Myer');
@@ -7308,7 +5856,6 @@ describe('when updating an existing entry', () => {
                             expect(inputSailNumber).toHaveValue('g6754i');
                         });
                     });
-    
                     describe('when entry not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
@@ -7318,30 +5865,22 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Comet');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Comet');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Jill Myer');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Jill Myer');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'g6754i');
                             const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Jill Myer');
                             expect(inputDinghyClass).toHaveValue('Comet');
@@ -7350,33 +5889,25 @@ describe('when updating an existing entry', () => {
                     });
                 });	
             });
-    
             describe('when neither helm nor dinghy exist', () => {
                 it('displays create helm & dinghy & update button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    });
                     const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                    await act(async () => {
-                        await user.click(cellChrisMarshall);
-                    });
+                    await user.click(cellChrisMarshall);
                     const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                    await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Comet');
-                    });
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Comet');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
-                    await act(async () => {
-                        await user.clear(inputHelm);
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.clear(inputSailNumber);
-                        await user.type(inputSailNumber, 'xyz');
-                    });
+                    await user.clear(inputHelm);
+                    await user.type(inputHelm, 'Not There');
+                    await user.clear(inputSailNumber);
+                    await user.type(inputSailNumber, 'xyz');
                     expect(screen.getByRole('button', {'name': /add helm & dinghy & update/i}));
                 });
-                
                 describe('when update button clicked', () => {
                     it('creates helm and dinghy and then updates entry with values entered into form', async () => {
                         const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
@@ -7389,36 +5920,27 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        });
                         const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                        await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                        await user.click(cellChrisMarshall);
                         const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                        await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Comet');
-                        });
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Comet');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'g6754i');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'g6754i');
                         const updateButton = screen.getByRole('button', {'name': /add helm & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url':''});
                         expect(updateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallHandicapA1234, {'name': 'Not There', 'url': ''},
                             {'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                     });
-                    
                     describe('when helm not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -7428,30 +5950,22 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Comet');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Comet');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'g6754i');
                             const updateButton = screen.getByRole('button', {'name': /add helm & dinghy & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                             expect(screen.getByText('Competitor not created')).toBeInTheDocument();
@@ -7460,7 +5974,6 @@ describe('when updating an existing entry', () => {
                             expect(inputSailNumber).toHaveValue('g6754i');
                         });
                     });
-    
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -7470,30 +5983,22 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Comet');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Comet');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'g6754i');
                             const updateButton = screen.getByRole('button', {'name': /add helm & dinghy & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                             expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
@@ -7502,7 +6007,6 @@ describe('when updating an existing entry', () => {
                             expect(inputSailNumber).toHaveValue('g6754i');
                         });
                     });
-    
                     describe('when neither helm nor dinghy created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -7512,30 +6016,22 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Comet');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Comet');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'g6754i');
                             const updateButton = screen.getByRole('button', {'name': /add helm & dinghy & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
                             expect(screen.getByText(/Competitor not created/i)).toBeInTheDocument();
@@ -7548,134 +6044,98 @@ describe('when updating an existing entry', () => {
                 });
             });
         });
-    
         describe('when dinghy class with crew selected', () => {	
             describe('when crew name is entered', () => {
                 it('displays crew name', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    });
                     const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                    await act(async () => {
-                        await user.click(cellChrisMarshall);
-                    });
+                    await user.click(cellChrisMarshall);
                     const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                    await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Graduate');
-                    });
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Graduate');
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.clear(inputCrew);
-                        await user.type(inputCrew, 'Jill Myer');
-                    });
+                    await user.clear(inputCrew);
+                    await user.type(inputCrew, 'Jill Myer');
                     expect(inputCrew).toHaveValue('Jill Myer');
                 });
             });
-    
             describe('when helm and dinghy and crew exist', () => {
                 it('displays update button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    });
                     const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                    await act(async () => {
-                        await user.click(cellChrisMarshall);
-                    });
+                    await user.click(cellChrisMarshall);
                     const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                    await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Scorpion');
-                    });
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.clear(inputHelm);
-                        await user.type(inputHelm, 'Jill Myer');
-                    });
-                    await act(async () => {
-                        await user.clear(inputSailNumber);
-                        await user.type(inputSailNumber, '2726');
-                    });
-                    await act(async () => {
-                        await user.clear(inputCrew);
-                        await user.type(inputCrew, 'Sarah Pascal');
-                    });
+                    await user.clear(inputHelm);
+                    await user.type(inputHelm, 'Jill Myer');
+                    await user.clear(inputSailNumber);
+                    await user.type(inputSailNumber, '2726');
+                    await user.clear(inputCrew);
+                    await user.type(inputCrew, 'Sarah Pascal');
                     expect(screen.getByRole('button', {'name': /^update$/i}));
                 });
-    
                 describe('when update button clicked', () => {
                     it('updates entry with values entered into form and dinghy class set per race', async () => {
                         const onUpdateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        });
                         const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                        await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                        await user.click(cellChrisMarshall);
                         const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                        await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Scorpion');
-                        });
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Scorpion');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Jill Myer');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, '2726');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Sarah Pascal');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Jill Myer');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, '2726');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Sarah Pascal');
                         const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                        await act(async () => {
-                            await user.click(buttonCreate);
-                        });
+                        await user.click(buttonCreate);
                         expect(onUpdateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallHandicapA1234, competitorJillMyer, dinghy2726, competitorSarahPascal);
                     });
-                
                     describe('when entry not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.findAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Jill Myer');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, '2726');
-                            });
-                            await act(async () => {
-                                await user.clear(inputCrew);
-                                await user.type(inputCrew, 'Sarah Pascal');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Jill Myer');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, '2726');
+                            await user.clear(inputCrew);
+                            await user.type(inputCrew, 'Sarah Pascal');
                             const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Jill Myer');
                             expect(inputDinghyClass).toHaveValue('Scorpion');
@@ -7685,28 +6145,22 @@ describe('when updating an existing entry', () => {
                     });
                 });
             });
-    
             describe('when helm does not exist', () => {
                 it('displays create helm & update button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    });
                     const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                    await act(async () => {
-                        await user.click(cellChrisMarshall);
-                    });
+                    await user.click(cellChrisMarshall);
                     const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                    await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Scorpion');
-                    });
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
                     const inputHelm = screen.getByLabelText(/helm/i);
-                    await act(async () => {
-                        await user.clear(inputHelm);
-                        await user.type(inputHelm, 'Not There');
-                    });
+                    await user.clear(inputHelm);
+                    await user.type(inputHelm, 'Not There');
                     expect(screen.getByRole('button', {'name': /add helm & update/i}));
                 });
-            
                 describe('when update button clicked', () => {
                     it('creates helm and then updates entry with values entered into form', async () => {
                         const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
@@ -7716,58 +6170,45 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        });
                         const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                        await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                        await user.click(cellChrisMarshall);
                         const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                        await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Scorpion');
-                        });
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Scorpion');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
                         const updateButton = screen.getByRole('button', {'name': /add helm & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                         expect(updateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallHandicapA1234, {'name': 'Not There', 'url': ''}, dinghy1234, competitorLouScrew);
                     });
-                    
                     describe('when helm not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
                             const updateButton = screen.getByRole('button', {'name': /add helm & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(screen.getByText('Competitor not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Not There');
@@ -7785,27 +6226,21 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.findAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
                             const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Not There');
                             expect(inputDinghyClass).toHaveValue('Scorpion');
@@ -7815,38 +6250,28 @@ describe('when updating an existing entry', () => {
                     });
                 });
             });
-    
             describe('when dinghy does not exist', () => {
                 it('displays create dinghy and update button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    });
                     const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                    await act(async () => {
-                        await user.click(cellChrisMarshall);
-                    });
+                    await user.click(cellChrisMarshall);
                     const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                    await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Scorpion');
-                    });
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.clear(inputHelm);
-                        await user.type(inputHelm, 'Chris Marshall');
-                    });
-                    await act(async () => {
-                        await user.clear(inputSailNumber);
-                        await user.type(inputSailNumber, 'g6754i');
-                    });
-                    await act(async () => {
-                        await user.clear(inputCrew);
-                        await user.type(inputCrew, 'Lou Screw');
-                    })
+                    await user.clear(inputHelm);
+                    await user.type(inputHelm, 'Chris Marshall');
+                    await user.clear(inputSailNumber);
+                    await user.type(inputSailNumber, 'g6754i');
+                    await user.clear(inputCrew);
+                    await user.type(inputCrew, 'Lou Screw');
                     expect(screen.getByRole('button', {'name': /add dinghy & update/i}));
                 });
-                
                 describe('when update button clicked', () => {
                     it('creates dinghy and then updates entry with values entered into form', async () => {
                         const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
@@ -7856,27 +6281,21 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        });
                         const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                        await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                        await user.click(cellChrisMarshall);
                         const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                        await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Scorpion');
-                        });
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Scorpion');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'xyz');
-                        });
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'xyz');
                         const updateButton = screen.getByRole('button', {'name': /add dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                         expect(updateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallHandicapA1234, competitorChrisMarshall,
                             {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, competitorLouScrew);
@@ -7887,27 +6306,21 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'xyz');
-                            });
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'xyz');
                             const updateButton = screen.getByRole('button', {'name': /add dinghy & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                             expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Chris Marshall');
@@ -7925,27 +6338,21 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.findAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'xyz');
-                            });
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'xyz');
                             const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Chris Marshall');
                             expect(inputDinghyClass).toHaveValue('Scorpion');
@@ -7955,30 +6362,21 @@ describe('when updating an existing entry', () => {
                     });
                 });
             });
-    
             describe('when crew does not exist', () => {
                 it('displays create crew and update button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    });
                     const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                    await act(async () => {
-                        await user.click(cellChrisMarshall);
-                    });
+                    await user.click(cellChrisMarshall);
                     const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                    await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Scorpion');
-                    });
-                    const inputHelm = screen.getByLabelText(/helm/i);
-                    const inputSailNumber = screen.getByLabelText(/sail/i);
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.clear(inputCrew);
-                        await user.type(inputCrew, 'Pop Off');
-                    })
+                    await user.clear(inputCrew);
+                    await user.type(inputCrew, 'Pop Off');
                     expect(screen.getByRole('button', {'name': /add crew & update/i}));
                 });
-                
                 describe('when update button clicked', () => {
                     it('creates crew and then updates entry with values entered into form', async () => {
                         const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
@@ -7988,59 +6386,44 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        });
                         const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                        await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                        await user.click(cellChrisMarshall);
                         const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                        await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Scorpion');
-                        });
-                        const inputHelm = screen.getByLabelText(/helm/i);
-                        const inputSailNumber = screen.getByLabelText(/sail/i);
+                        await screen.findAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Scorpion');
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Pop Off');
                         const updateButton = screen.getByRole('button', {'name': /add crew & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(updateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallHandicapA1234, competitorChrisMarshall,
                             dinghy1234, {'name': 'Pop Off', 'url': ''});
                     });
-    
                     describe('when crew not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputCrew);
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.clear(inputCrew);
+                            await user.type(inputCrew, 'Pop Off');
                             const updateButton = screen.getByRole('button', {'name': /add crew & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(screen.getByText('Competitor not created')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Chris Marshall');
@@ -8048,7 +6431,6 @@ describe('when updating an existing entry', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-    
                     describe('when entry not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -8058,27 +6440,21 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputCrew);
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.clear(inputCrew);
+                            await user.type(inputCrew, 'Pop Off');
                             const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Chris Marshall');
                             expect(inputSailNumber).toHaveValue('1234');
@@ -8087,34 +6463,25 @@ describe('when updating an existing entry', () => {
                     });
                 });
             });
-    
             describe('when neither helm nor dinghy exist', () => {
                 it('displays create helm & dinghy & update button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    });
                     const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                    await act(async () => {
-                        await user.click(cellChrisMarshall);
-                    });
+                    await user.click(cellChrisMarshall);
                     const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                    await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Scorpion');
-                    });
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
-                    const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.clear(inputHelm);
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.clear(inputSailNumber);
-                        await user.type(inputSailNumber, 'xyz');
-                    });
+                    await user.clear(inputHelm);
+                    await user.type(inputHelm, 'Not There');
+                    await user.clear(inputSailNumber);
+                    await user.type(inputSailNumber, 'xyz');
                     expect(screen.getByRole('button', {'name': /add helm & dinghy & update/i}));
                 });
-                
                 describe('when update button clicked', () => {
                     it('creates helm and dinghy and then updates entry with values entered into form', async () => {
                         const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
@@ -8127,37 +6494,27 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        });
                         const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                        await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                        await user.click(cellChrisMarshall);
                         const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                        await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Scorpion');
-                        });
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Scorpion');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
-                        const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'xyz');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'xyz');
                         const updateButton = screen.getByRole('button', {'name': /add helm & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                         expect(updateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallHandicapA1234, {'name': 'Not There', 'url': ''},
                             {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, competitorLouScrew);
                     });
-                    
                     describe('when helm not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -8167,31 +6524,23 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'xyz');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'xyz');
                             const updateButton = screen.getByRole('button', {'name': /add helm & dinghy & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                             expect(screen.getByText('Competitor not created')).toBeInTheDocument();
@@ -8200,7 +6549,6 @@ describe('when updating an existing entry', () => {
                             expect(inputCrew).toHaveValue('Lou Screw');
                         });
                     });
-    
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -8210,31 +6558,23 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });                            
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'g6754i');
                             const updateButton = screen.getByRole('button', {'name': /add helm & dinghy & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                             expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
@@ -8243,7 +6583,6 @@ describe('when updating an existing entry', () => {
                             expect(inputCrew).toHaveValue('Lou Screw');
                         });
                     });
-    
                     describe('when neither helm nor dinghy created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
                             const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -8253,31 +6592,23 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'g6754i');
                             const updateButton = screen.getByRole('button', {'name': /add helm & dinghy & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                             expect(screen.getByText(/Competitor not created/i)).toBeInTheDocument();
@@ -8287,7 +6618,6 @@ describe('when updating an existing entry', () => {
                             expect(inputCrew).toHaveValue('Lou Screw');
                         });
                     });
-    
                     describe('when entry not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -8300,31 +6630,23 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'xyz');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'xyz');
                             const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Not There');
                             expect(inputSailNumber).toHaveValue('xyz');
@@ -8333,34 +6655,26 @@ describe('when updating an existing entry', () => {
                     });
                 });
             });
-    
             describe('when neither helm nor crew exist', () => {
                 it('displays create helm & crew & update button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    });
                     const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                    await act(async () => {
-                        await user.click(cellChrisMarshall);
-                    });
+                    await user.click(cellChrisMarshall);
                     const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                    await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Scorpion');
-                    });
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.clear(inputHelm);
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.clear(inputCrew);
-                        await user.type(inputCrew, 'Pop Off');
-                    });
+                    await user.clear(inputHelm);
+                    await user.type(inputHelm, 'Not There');
+                    await user.clear(inputCrew);
+                    await user.type(inputCrew, 'Pop Off');
                     expect(screen.getByRole('button', {'name': /add helm & crew & update/i}));
                 });
-                
                 describe('when update button clicked', () => {
                     it('creates helm and crew and then updates entry with values entered into form', async () => {
                         const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
@@ -8370,37 +6684,28 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        });
                         const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                        await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                        await user.click(cellChrisMarshall);
                         const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                        await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Scorpion');
-                        });
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Scorpion');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Pop Off');
                         const updateButton = screen.getByRole('button', {'name': /add helm & crew & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url':''});
                         expect(updateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallHandicapA1234, {'name': 'Not There', 'url': ''},
                             dinghy1234, {'name': 'Pop Off', 'url': ''});
                     });
-                    
                     describe('when helm not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
                         // SignUp does not refresh competitor list so button label will not change
@@ -8422,31 +6727,23 @@ describe('when updating an existing entry', () => {
                             }
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        });
                         const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                        await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                        await user.click(cellChrisMarshall);
                         const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                        await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Scorpion');
-                        });
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Scorpion');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Pop Off');
                         const updateButton = screen.getByRole('button', {'name': /add helm & crew & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                         expect(screen.getAllByText('Competitor not created')).toHaveLength(1);
@@ -8457,7 +6754,6 @@ describe('when updating an existing entry', () => {
                         // expect(await screen.findByRole('button', {'name': /add helm & update/i})).toBeInTheDocument();
                         });
                     });
-
                     describe('when crew not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             // SignUp does not refresh competitor list so button label will not change
@@ -8479,31 +6775,23 @@ describe('when updating an existing entry', () => {
                                 }
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputCrew);
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputCrew);
+                            await user.type(inputCrew, 'Pop Off');
                             const updateButton = screen.getByRole('button', {'name': /add helm & crew & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(screen.getAllByText('Competitor not created')).toHaveLength(1);
@@ -8514,38 +6802,29 @@ describe('when updating an existing entry', () => {
                             // expect(await screen.findByRole('button', {'name': /add helm & update/i})).toBeInTheDocument();
                         });
                     });
-
                     describe('when neither helm nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
                                 return Promise.resolve({'success': false, 'message': 'Competitor not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputCrew);
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputCrew);
+                            await user.type(inputCrew, 'Pop Off');
                             const updateButton = screen.getByRole('button', {'name': /add helm & crew & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(screen.getByText('Competitor not created/nCompetitor not created')).toBeInTheDocument();
@@ -8554,7 +6833,6 @@ describe('when updating an existing entry', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-
                     describe('when entry not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -8564,31 +6842,23 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputCrew);
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputCrew);
+                            await user.type(inputCrew, 'Pop Off');
                             const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Not There');
                             expect(inputSailNumber).toHaveValue('1234');
@@ -8597,34 +6867,25 @@ describe('when updating an existing entry', () => {
                     });
                 });
             });
-            
             describe('when neither dinghy nor crew exist', () => {
                 it('displays create dinghy & crew & update button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    });
                     const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                    await act(async () => {
-                        await user.click(cellChrisMarshall);
-                    });
+                    await user.click(cellChrisMarshall);
                     const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                    await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Scorpion');
-                    });
-                    const inputHelm = screen.getByLabelText(/helm/i);
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.clear(inputSailNumber);
-                        await user.type(inputSailNumber, 'xyz');
-                    });
-                    await act(async () => {
-                        await user.clear(inputCrew);
-                        await user.type(inputCrew, 'Pop Off');
-                    });
+                    await user.clear(inputSailNumber);
+                    await user.type(inputSailNumber, 'xyz');
+                    await user.clear(inputCrew);
+                    await user.type(inputCrew, 'Pop Off');
                     expect(screen.getByRole('button', {'name': /add crew & dinghy & update/i}));
                 });
-                
                 describe('when update button clicked', () => {
                     it('creates dinghy and crew and then updates entry with values entered into form', async () => {
                         const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
@@ -8639,35 +6900,23 @@ describe('when updating an existing entry', () => {
                         const user = userEvent.setup();
                         customRender(<SignUp race={raceHandicapA}/>, model, controller);
                         const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                        await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                        await user.click(cellChrisMarshall);
                         const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                        await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Scorpion');
-                        });
-                        const inputHelm = screen.getByLabelText(/helm/i);
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Scorpion');
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Pop Off');
                         const updateButton = screen.getByRole('button', {'name': /add crew & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url':''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                         expect(updateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallHandicapA1234, competitorChrisMarshall,
                             {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, {'name': 'Pop Off', 'url': ''});
                     });
-                    
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -8677,31 +6926,23 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
-                            await act(async () => {
-                                await user.clear(inputCrew);
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'g6754i');
+                            await user.clear(inputCrew);
+                            await user.type(inputCrew, 'Pop Off');
                             const updateButton = screen.getByRole('button', {'name': /add crew & dinghy & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                             expect(screen.getByText('Dinghy not created')).toBeInTheDocument();
@@ -8710,7 +6951,6 @@ describe('when updating an existing entry', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-    
                     describe('when crew not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -8720,31 +6960,23 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.findAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
-                            await act(async () => {
-                                await user.clear(inputCrew);
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'g6754i');
+                            await user.clear(inputCrew);
+                            await user.type(inputCrew, 'Pop Off');
                             const updateButton = screen.getByRole('button', {'name': /add crew & dinghy & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                             expect(screen.getByText('Competitor not created')).toBeInTheDocument();
@@ -8753,7 +6985,6 @@ describe('when updating an existing entry', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-    
                     describe('when neither dinghy nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
                             const createHelmSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -8763,31 +6994,23 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
-                            await act(async () => {
-                                await user.clear(inputCrew);
-                                await user.type(inputCrew, 'Not There');
-                            });
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'g6754i');
+                            await user.clear(inputCrew);
+                            await user.type(inputCrew, 'Not There');
                             const updateButton = screen.getByRole('button', {'name': /add crew & dinghy & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createHelmSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
                             expect(screen.getByText(/Competitor not created/i)).toBeInTheDocument();
@@ -8797,7 +7020,6 @@ describe('when updating an existing entry', () => {
                             expect(inputCrew).toHaveValue('Not There');
                         });
                     });
-    
                     describe('when entry not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -8810,31 +7032,23 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'xyz');
-                            });
-                            await act(async () => {
-                                await user.clear(inputCrew);
-                                await user.type(inputCrew, 'Not There');
-                            });
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'xyz');
+                            await user.clear(inputCrew);
+                            await user.type(inputCrew, 'Not There');
                             const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Chris Marshall');
                             expect(inputSailNumber).toHaveValue('xyz');
@@ -8843,38 +7057,28 @@ describe('when updating an existing entry', () => {
                     });
                 });
             });
-            
             describe('when neither helm nor dinghy nor crew exist', () => {
                 it('displays create helm & dinghy & crew & update button', async () => {
                     const user = userEvent.setup();
-                    customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    await act(async () => {
+                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                    });
                     const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                    await act(async () => {
-                        await user.click(cellChrisMarshall);
-                    });
+                    await user.click(cellChrisMarshall);
                     const inputDinghyClass = screen.getByLabelText(/class/i);
-                    await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                    await act(async () => {
-                        await user.selectOptions(inputDinghyClass, 'Scorpion');
-                    });
+                    screen.getAllByRole('option');
+                    await user.selectOptions(inputDinghyClass, 'Scorpion');
                     const inputHelm = screen.getByLabelText(/helm/i);
                     const inputSailNumber = screen.getByLabelText(/sail/i);
                     const inputCrew = screen.getByLabelText(/crew/i);
-                    await act(async () => {
-                        await user.clear(inputHelm);
-                        await user.type(inputHelm, 'Not There');
-                    });
-                    await act(async () => {
-                        await user.clear(inputSailNumber);
-                        await user.type(inputSailNumber, 'xyz');
-                    });
-                    await act(async () => {
-                        await user.clear(inputCrew);
-                        await user.type(inputCrew, 'Pop Off');
-                    });
+                    await user.clear(inputHelm);
+                    await user.type(inputHelm, 'Not There');
+                    await user.clear(inputSailNumber);
+                    await user.type(inputSailNumber, 'xyz');
+                    await user.clear(inputCrew);
+                    await user.type(inputCrew, 'Pop Off');
                     expect(screen.getByRole('button', {'name': /add helm & crew & dinghy & update/i}));
                 });
-                
                 describe('when update button clicked', () => {
                     it('creates helm and dinghy and crew and then updates entry with values entered into form', async () => {
                         const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
@@ -8887,42 +7091,31 @@ describe('when updating an existing entry', () => {
                             return Promise.resolve({'success': true});
                         });
                         const user = userEvent.setup();
-                        customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        await act(async () => {
+                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                        });
                         const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                        await act(async () => {
-                            await user.click(cellChrisMarshall);
-                        });
+                        await user.click(cellChrisMarshall);
                         const inputDinghyClass = screen.getByLabelText(/class/i);
-                        await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                        await act(async () => {
-                            await user.selectOptions(inputDinghyClass, 'Scorpion');
-                        });
+                        screen.getAllByRole('option');
+                        await user.selectOptions(inputDinghyClass, 'Scorpion');
                         const inputHelm = screen.getByLabelText(/helm/i);
                         const inputSailNumber = screen.getByLabelText(/sail/i);
                         const inputCrew = screen.getByLabelText(/crew/i);
-                        await act(async () => {
-                            await user.clear(inputHelm);
-                            await user.type(inputHelm, 'Not There');
-                        });
-                        await act(async () => {
-                            await user.clear(inputSailNumber);
-                            await user.type(inputSailNumber, 'xyz');
-                        });
-                        await act(async () => {
-                            await user.clear(inputCrew);
-                            await user.type(inputCrew, 'Pop Off');
-                        });
+                        await user.clear(inputHelm);
+                        await user.type(inputHelm, 'Not There');
+                        await user.clear(inputSailNumber);
+                        await user.type(inputSailNumber, 'xyz');
+                        await user.clear(inputCrew);
+                        await user.type(inputCrew, 'Pop Off');
                         const updateButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & update/i});
-                        await act(async () => {
-                            await user.click(updateButton);
-                        });
+                        await user.click(updateButton);
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url':''});
                         expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url':''});
                         expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url':''});
                         expect(updateEntrySpy).toHaveBeenCalledWith(entryChrisMarshallHandicapA1234, {'name': 'Not There', 'url': ''},
                             {'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''}, {'name': 'Pop Off', 'url': ''});
                     });
-                    
                     describe('when helm not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -8937,35 +7130,25 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.findAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'xyz');
-                            });
-                            await act(async () => {
-                                await user.clear(inputCrew);
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'xyz');
+                            await user.clear(inputCrew);
+                            await user.type(inputCrew, 'Pop Off');
                             const updateButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -8975,7 +7158,6 @@ describe('when updating an existing entry', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-        
                     describe('when dinghy not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -8985,35 +7167,25 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
-                            await act(async () => {
-                                await user.clear(inputCrew);
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'g6754i');
+                            await user.clear(inputCrew);
+                            await user.type(inputCrew, 'Pop Off');
                             const updateButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -9023,7 +7195,6 @@ describe('when updating an existing entry', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-        
                     describe('when crew not created', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -9038,35 +7209,25 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'xyz');
-                            });
-                            await act(async () => {
-                                await user.clear(inputCrew);
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'xyz');
+                            await user.clear(inputCrew);
+                            await user.type(inputCrew, 'Pop Off');
                             const updateButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'xyz', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -9075,8 +7236,7 @@ describe('when updating an existing entry', () => {
                             expect(inputSailNumber).toHaveValue('xyz');
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
-                    });				
-                        
+                    }); 
                     describe('when neither helm nor dinghy created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -9091,35 +7251,25 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
-                            await act(async () => {
-                                await user.clear(inputCrew);
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'g6754i');
+                            await user.clear(inputCrew);
+                            await user.type(inputCrew, 'Pop Off');
                             const updateButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -9130,7 +7280,6 @@ describe('when updating an existing entry', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-        
                     describe('when neither helm nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -9140,35 +7289,25 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': true});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
-                            await act(async () => {
-                                await user.clear(inputCrew);
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'g6754i');
+                            await user.clear(inputCrew);
+                            await user.type(inputCrew, 'Pop Off');
                             const updateButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -9178,7 +7317,6 @@ describe('when updating an existing entry', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-                    
                     describe('when neither dinghy nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -9193,35 +7331,25 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
-                            await act(async () => {
-                                await user.clear(inputCrew);
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'g6754i');
+                            await user.clear(inputCrew);
+                            await user.type(inputCrew, 'Pop Off');
                             const updateButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -9232,7 +7360,6 @@ describe('when updating an existing entry', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-                    
                     describe('when neither helm nor dinghy nor crew created', () => {
                         it('displays failure messages and entered values remain on form', async () => {
                             const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation((competitor) => {
@@ -9242,35 +7369,25 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Dinghy not created'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'g6754i');
-                            });
-                            await act(async () => {
-                                await user.clear(inputCrew);
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'g6754i');
+                            await user.clear(inputCrew);
+                            await user.type(inputCrew, 'Pop Off');
                             const updateButton = screen.getByRole('button', {'name': /add helm & crew & dinghy & update/i});
-                            await act(async () => {
-                                await user.click(updateButton);
-                            });
+                            await user.click(updateButton);
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Not There', 'url': ''});
                             expect(createCompetitorSpy).toHaveBeenCalledWith({'name': 'Pop Off', 'url': ''});
                             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassScorpion, 'url': ''});
@@ -9281,7 +7398,6 @@ describe('when updating an existing entry', () => {
                             expect(inputCrew).toHaveValue('Pop Off');
                         });
                     });
-        
                     describe('when entry not updated', () => {
                         it('displays failure message and entered values remain on form', async () => {
                             vi.spyOn(controller, 'createCompetitor').mockImplementation(() => {
@@ -9294,35 +7410,25 @@ describe('when updating an existing entry', () => {
                                 return Promise.resolve({'success': false, 'message': 'Entry not updated'});
                             });
                             const user = userEvent.setup();
-                            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            await act(async () => {
+                                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+                            });
                             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-                            await act(async () => {
-                                await user.click(cellChrisMarshall);
-                            });
+                            await user.click(cellChrisMarshall);
                             const inputDinghyClass = screen.getByLabelText(/class/i);
-                            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-                            await act(async () => {
-                                await user.selectOptions(inputDinghyClass, 'Scorpion');
-                            });
+                            screen.getAllByRole('option');
+                            await user.selectOptions(inputDinghyClass, 'Scorpion');
                             const inputHelm = screen.getByLabelText(/helm/i);
                             const inputSailNumber = screen.getByLabelText(/sail/i);
                             const inputCrew = screen.getByLabelText(/crew/i);
-                            await act(async () => {
-                                await user.clear(inputHelm);
-                                await user.type(inputHelm, 'Not There');
-                            });
-                            await act(async () => {
-                                await user.clear(inputSailNumber);
-                                await user.type(inputSailNumber, 'xyz');
-                            });
-                            await act(async () => {
-                                await user.clear(inputCrew);
-                                await user.type(inputCrew, 'Pop Off');
-                            });
+                            await user.clear(inputHelm);
+                            await user.type(inputHelm, 'Not There');
+                            await user.clear(inputSailNumber);
+                            await user.type(inputSailNumber, 'xyz');
+                            await user.clear(inputCrew);
+                            await user.type(inputCrew, 'Pop Off');
                             const buttonCreate = screen.getByRole('button', {'name': /update/i});
-                            await act(async () => {
-                                await user.click(buttonCreate);
-                            });
+                            await user.click(buttonCreate);
                             expect(screen.getByText('Entry not updated')).toBeInTheDocument();
                             expect(inputHelm).toHaveValue('Not There');
                             expect(inputSailNumber).toHaveValue('xyz');
@@ -9332,7 +7438,6 @@ describe('when updating an existing entry', () => {
                 });
             });
         });
-    
         it('clears form on success', async () => {
             vi.spyOn(controller, 'updateEntry').mockImplementation(() => {
                 return Promise.resolve({'success': true});
@@ -9342,36 +7447,26 @@ describe('when updating an existing entry', () => {
                 return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
             });
             const user = userEvent.setup();
-            customRender(<SignUp race={raceHandicapA}/>, model, controller);
+            await act(async () => {
+                customRender(<SignUp race={raceHandicapA}/>, model, controller);
+            });
             const cellChrisMarshall = await screen.findByRole('cell', {name: /chris marshall/i});
-            await act(async () => {
-                await user.click(cellChrisMarshall);
-            });
+            await user.click(cellChrisMarshall);
             const inputDinghyClass = screen.getByLabelText(/class/i);
-            await screen.findAllByRole('option'); // wait for options list to be built via asynchronous calls
-            await act(async () => {
-                await user.selectOptions(inputDinghyClass, 'Scorpion');
-            });
+            screen.getAllByRole('option');
+            await user.selectOptions(inputDinghyClass, 'Scorpion');
             const inputHelm = screen.getByLabelText(/helm/i);
             const inputSailNumber = screen.getByLabelText(/sail/i);
             const inputCrew = screen.getByLabelText(/crew/i);
-            await act(async () => {
-                await user.clear(inputHelm);
-                await user.type(inputHelm, 'Chris Marshall');
-            });
-            await act(async () => {
-                await user.clear(inputSailNumber);
-                await user.type(inputSailNumber, '1234');
-                await user.keyboard('{Tab}');
-            });
-            await act(async () => {
-                await user.clear(inputCrew);
-                await user.type(inputCrew, 'Lou Screw');
-            });
+            await user.clear(inputHelm);
+            await user.type(inputHelm, 'Chris Marshall');
+            await user.clear(inputSailNumber);
+            await user.type(inputSailNumber, '1234');
+            await user.keyboard('{Tab}');
+            await user.clear(inputCrew);
+            await user.type(inputCrew, 'Lou Screw');
             const buttonCreate = screen.getByRole('button', {'name': /update/i});
-            await act(async () => {
-                await user.click(buttonCreate);
-            });
+            await user.click(buttonCreate);
             const raceTitle = screen.getByRole('heading', {'name': /handicap a/i});
             const btnCreate = screen.getByRole('button', {'name': /sign-up/i});
             const previousEntries = within(screen.getByTestId('previous-entries'));
@@ -9455,9 +7550,7 @@ describe('when the withdraw button for an entry is clicked', () => {
         const jillMyerCell = await screen.findByRole('cell', {'name': /Jill Myer/i});
         const entryJillMyerRow = jillMyerCell.parentElement;
         const withdrawButton = within(entryJillMyerRow).getByRole('button', {name: /x/i});
-        await act(async () => {
-           await user.click(withdrawButton);
-        });
+        await user.click(withdrawButton);
         expect(withdrawEntrySpy).toBeCalledWith(entryJillMyerCometA826);
     });
 });
@@ -9528,10 +7621,8 @@ describe('when a sailnumber is entered', () => {
         });
         // enter sail number
         const inputSailNumber = screen.getByLabelText(/sail/i);
-        await act(async () => {
-            await user.type(inputSailNumber, '1234');
-            await user.keyboard('{Tab}');
-        });
+        await user.type(inputSailNumber, '1234');
+        await user.keyboard('{Tab}');
         // get table that is suppossed to contain details of dinghy class and previous crews
         const previousEntries = within(screen.getByTestId('previous-entries'));
         // check it contains dinghy classes and previous crews for boats with sail number
@@ -9564,10 +7655,8 @@ describe('when a sailnumber is entered', () => {
         });
         // enter sail number
         const inputSailNumber = screen.getByLabelText(/sail/i);
-        await act(async () => {
-            await user.type(inputSailNumber, '1234');
-            await user.keyboard('{Tab}');
-        });
+        await user.type(inputSailNumber, '1234');
+        await user.keyboard('{Tab}');
         // get table that is suppossed to contain details of dinghy class and previous crews
         const previousEntries = within(screen.getByTestId('previous-entries'));
         // check it contains dinghy classes and previous crews for boats with sail number
@@ -9585,7 +7674,6 @@ describe('when a sailnumber is entered', () => {
         describe('when race is an open handicap (any dinghy class allowed)', () => {
             it('displays an error message when there is a problem retrieving previous entries', async () => {
                 const user = userEvent.setup();
-        
                 vi.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
                 vi.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!' })});
                 vi.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
@@ -9596,23 +7684,19 @@ describe('when a sailnumber is entered', () => {
                         return Promise.resolve({success: true, domainObject: dinghyGraduate1234Crews});
                     }
                 });
-                
                 await act(async () => {
                     customRender(<SignUp race={raceHandicapA}/>, model, controller);
                 });
                 // enter sail number
                 const inputSailNumber = screen.getByLabelText(/sail/i);
-                await act(async () => {
-                    await user.type(inputSailNumber, '1234');
-                    await user.keyboard('{Tab}');
-                })
+                await user.type(inputSailNumber, '1234');
+                await user.keyboard('{Tab}');
                 expect(await screen.findByText(/oops!/i)).toBeInTheDocument();
             });
         });
         describe('when race is for a restricted set of dinghy classes', () => {
             it('displays an error message when there is a problem retrieving previous entries', async () => {
                 const user = userEvent.setup();
-        
                 vi.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
                 vi.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => {
                     return Promise.resolve(
@@ -9622,22 +7706,19 @@ describe('when a sailnumber is entered', () => {
                         }
                     )
                 });
-                
                 await act(async () => {
                     customRender(<SignUp race={raceScorpionA}/>, model, controller);
                 });
                 // enter sail number
                 const inputSailNumber = screen.getByLabelText(/sail/i);
-                await act(async () => {
-                    await user.type(inputSailNumber, '1234');
-                    await user.keyboard('{Tab}');
-                })
+                await user.type(inputSailNumber, '1234');
+                await user.keyboard('{Tab}');
                 expect(screen.queryByText(/HTTP Error: 404 Message/i)).not.toBeInTheDocument();
             });
-            describe('when an entry with that sail number cannot be found for a partucular dinghy class', () => {
-                it('silently ignores the response as it is highly likely a specific combination of dinghy class and sail number will not exist expecially if the fleet has a large number of classes', async () => {
+            describe.todo('when an entry with that sail number cannot be found for a particular dinghy class', () => {
+                it.todo('silently ignores the response as it is highly likely a specific combination of dinghy class and sail number will not exist especially if the fleet has a large number of classes', async () => {
                     
-                })
+                });
             });
         });
         it('clears error message on success', async () => {
@@ -9645,30 +7726,17 @@ describe('when a sailnumber is entered', () => {
         
             vi.spyOn(model, 'getDinghiesBySailNumber').mockImplementationOnce(() => {return Promise.resolve({success: false, message: 'Oops!'})});
             vi.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementationOnce(() => {return Promise.resolve({success: false, message: 'Oops!' })});
-            // vi.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
-            //     if (dinghy.url === dinghy1234.url) {
-            //         return Promise.resolve({success: true, domainObject: dinghyScorpion1234Crews});
-            //     }
-            //     else if (dinghy.url === dinghy1234Graduate.url) {
-            //         return Promise.resolve({success: true, domainObject: dinghyGraduate1234Crews});
-            //     }
-            // });
             
             await act(async () => {
                 customRender(<SignUp race={raceScorpionA}/>, model, controller);
             });
             // enter sail number
             const inputSailNumber = screen.getByLabelText(/sail/i);
-            await act(async () => {
-                await user.type(inputSailNumber, '1234');
-                await user.keyboard('{Tab}');
-            });
+            await user.type(inputSailNumber, '1234');
+            await user.keyboard('{Tab}');
             expect(await screen.findByText(/oops!/i)).toBeInTheDocument();
-            
-            await act(async () => {
-                await user.type(inputSailNumber, '1234');
-                await user.keyboard('{Tab}');
-            });            
+            await user.type(inputSailNumber, '1234');
+            await user.keyboard('{Tab}');
             // get table that is suppossed to contain details of dinghy class and previous crews
             const previousEntries = within(screen.getByTestId('previous-entries'));
             // check it contains dinghy classes and previous crews for boats with sail number
@@ -9687,16 +7755,12 @@ describe('when a previous entry is selected', () => {
         });
         // enter sal number
         const inputSailNumber = screen.getByLabelText(/sail/i);
-        await act(async () => {
-            await user.type(inputSailNumber, '1234');
-            await user.keyboard('{Tab}');
-        });
+        await user.type(inputSailNumber, '1234');
+        await user.keyboard('{Tab}');
         // get table that is suppossed to contain details of dinghy class and previous crews
         const previousEntries = within(screen.getByTestId('previous-entries'));
         const competitorCell = await previousEntries.findByRole('cell', {name: /chris marshall/i});
-        await act(async () => {
-            await user.click(competitorCell);
-        });
+        await user.click(competitorCell);
         expect(await screen.findByLabelText(/helm/i)).toHaveValue('Chris Marshall');
         expect(await screen.findByLabelText(/crew/i)).toHaveValue('Jill Myer');
         expect(await screen.findByLabelText(/dinghy class/i)).toHaveValue('Scorpion');
@@ -9704,7 +7768,6 @@ describe('when a previous entry is selected', () => {
     });
     it('overwrites any previously entered values removing any value entered for mate if mate in selected record is null', async () => {
         const user = userEvent.setup();
-
         vi.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234, dinghy1234Graduate, dinghy1234Comet ]})});
         vi.spyOn(model, 'getCrewsByDinghy').mockImplementation((dinghy) => {
             if (dinghy.url === dinghy1234.url) {
@@ -9717,7 +7780,6 @@ describe('when a previous entry is selected', () => {
                 return Promise.resolve({success: true, domainObject: dinghyComet1234Crews});
             }
         });
-
         await act(async () => {
             customRender(<SignUp race={raceHandicapA}/>, model, controller);
         });
@@ -9726,22 +7788,16 @@ describe('when a previous entry is selected', () => {
         const inputCrew = screen.getByLabelText(/crew/i);
         const inputDinghyClass = screen.getByLabelText(/dinghy class/i);
         const inputSailNumber = screen.getByLabelText(/sail/i);
-        await act(async () => {
-            await user.selectOptions(inputDinghyClass, 'Scorpion');
-            await user.type(inputSailNumber, '7654');
-            await user.type(inputHelm, 'J R Hartley');
-        });
-        // seperate entry of crew name to allow check on dinghy class crew size to complete and setup form
-        await act(async () => {
-            await user.type(inputCrew, 'Bilbo Baggins');
-        });
+        await user.selectOptions(inputDinghyClass, 'Scorpion');
+        await user.type(inputSailNumber, '7654');
+        await user.type(inputHelm, 'J R Hartley');
+        await user.type(inputCrew, 'Bilbo Baggins');
         // confirm there is a crew value to be replaced
         expect(inputCrew).toHaveValue('Bilbo Baggins');
         const previousEntries = within(screen.getByTestId('previous-entries'));
-        const competitorCell = await previousEntries.findByRole('cell', {name: /bob hoskins/i});
-        await act(async () => {
-            await user.click(competitorCell);
-        });
+        // const competitorCell = await previousEntries.findByRole('cell', {name: /bob hoskins/i});
+        const competitorCell = previousEntries.getByRole('cell', {name: /bob hoskins/i});
+        await user.click(competitorCell);
         expect(inputHelm).toHaveValue('Bob Hoskins');
         expect(inputCrew).toHaveValue('');
         expect(inputDinghyClass).toHaveValue('Comet');
@@ -9766,22 +7822,15 @@ describe('when race is for a fleet with a single class', () => {
             });
             const user = userEvent.setup();
             customRender(<SignUp race={raceCometA}/>, model, controller);
-            await act(async () => {
-                await user.click(screen.getByRole('button', {name: /cancel/i})); // clear form
-            });
+            await user.click(screen.getByRole('button', {name: /cancel/i})); // clear form
             const inputHelm = screen.getByLabelText(/helm/i);
             const inputSailNumber = screen.getByLabelText(/sail/i);
-            await act(async () => {
-                await user.type(inputHelm, 'Jill Myer');
-                await user.type(inputSailNumber, 'g6754i');
-            });
+            await user.type(inputHelm, 'Jill Myer');
+            await user.type(inputSailNumber, 'g6754i');
             const createButton = screen.getByRole('button', {'name': /add dinghy & sign-up/i});
-            await act(async () => {
-                await user.click(createButton);
-            });
+            await user.click(createButton);
             expect(createDinghySpy).toHaveBeenCalledWith({'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url':''});
-            expect(signupToRaceSpy).toHaveBeenCalledWith(raceCometA, competitorJillMyer,
-                {'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
+            expect(signupToRaceSpy).toHaveBeenCalledWith(raceCometA, competitorJillMyer, {'sailNumber': 'g6754i', 'dinghyClass': dinghyClassComet, 'url': ''});
         });
     });
 });
