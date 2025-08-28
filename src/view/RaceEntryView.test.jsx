@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { act, fireEvent, getNodeText, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RaceEntryView from './RaceEntryView';
 import { raceScorpionA, entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745 } from '../model/__mocks__/test-data';
@@ -26,12 +26,12 @@ const entryRowLastCellLapTimeCellOffset = 4;
 
 beforeEach(() => {
     vi.useFakeTimers();
-    vi.spyOn(global, 'setTimeout');
+    // vi.spyOn(global, 'setTimeout');
 });
 
 afterEach(() => {
     vi.runOnlyPendingTimers();
-    vi.useRealTimers();
+    // vi.useRealTimers();
 });
 
 it('renders', () => {
@@ -67,11 +67,8 @@ describe('before race has started', () => {
         const entry = {...entryChrisMarshallScorpionA1234, race: {...entryChrisMarshallScorpionA1234.race, plannedStartTime: new Date(Date.now() + 60000)}, metadata: {eTag: '"1"'}};
         const addLapCallback = vi.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
-        // const SMScorp1234entry = screen.getByText(/1234/i);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
-        await act(async () => {
-            await user.click(SMScorp1234entry);
-        });
+        user.click(SMScorp1234entry);
         expect(addLapCallback).not.toBeCalledWith(entry);
     });
 });
@@ -80,13 +77,18 @@ describe('after race has started', () => {
     it('calls addLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}};
-        const addLapCallback = vi.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
-        render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
-        const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
-        await act(async () => {
-            await user.click(SMScorp1234entry);
+        const addLapCallback = vi.fn(async (e) => {
+            e.laps.push({'number': 1, 'time': 1234});
+            return Promise.resolve({success: true});
         });
-        expect(addLapCallback).toBeCalledWith(entry);
+        render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
+        
+        const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
+        user.click(SMScorp1234entry);
+        // wait for async function in RaceEntryView
+        await vi.waitFor(async () => {
+            expect(addLapCallback).toBeCalledWith(entry);
+        });
     });
 });
 
@@ -97,11 +99,12 @@ describe('when a lap is removed from an entry', () => {
         const removeLapCallback = vi.fn((e) => {entry.laps.pop()});
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
-        await act(async () => {
-            await user.keyboard('{Control>}');
-            await user.click(SMScorp1234entry);
+        user.keyboard('{Control>}');
+        user.click(SMScorp1234entry);
+        // wait for async function in RaceEntryView
+        await vi.waitFor(async () => {
+            expect(removeLapCallback).toBeCalledWith(entry);
         });
-        expect(removeLapCallback).toBeCalledWith(entry);
     });
     it('updates the display to show the delete lap instruction has been sent to the server', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
@@ -112,11 +115,12 @@ describe('when a lap is removed from an entry', () => {
         });
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
-        await act(async () => {
-            await user.keyboard('{Control>}');
-            await user.click(SMScorp1234entry);
+        user.keyboard('{Control>}');
+        user.click(SMScorp1234entry);
+        // wait for async function in RaceEntryView
+        await vi.waitFor(async () => {
+            expect(screen.getByText((content, node) => /^Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).toMatch(/disabled/i);
         });
-        expect(screen.getByText((content, node) => /^Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).toMatch(/disabled/i);
     });
     describe('when lap removal fails', () => {
         it('entry view is enabled to accept input', async () => {
@@ -128,10 +132,8 @@ describe('when a lap is removed from an entry', () => {
             });
             render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
             const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
-            await act(async () => {
-                await user.keyboard('{Control>}');
-                await user.click(SMScorp1234entry);
-            });
+            user.keyboard('{Control>}');
+            user.click(SMScorp1234entry);
             expect(screen.getByText((content, node) => /^Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).not.toMatch(/disabled/i);
         });
     });
@@ -147,14 +149,15 @@ describe('when secondary mouse button is clicked', () => {
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
             await act(async () => {
-                await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+                user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
             });
             const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
-            await act(async () => {
-                await user.clear(lapEntryCellInput);
-                await user.type(lapEntryCellInput, '00:15');
+            user.clear(lapEntryCellInput);
+            user.type(lapEntryCellInput, '00:15');
+            // wait for async function in RaceEntryView
+            await vi.waitFor(async () => {
+                expect(lapEntryCellInput).toHaveValue('00:15');
             });
-            expect(lapEntryCellInput).toHaveValue('00:15');
         });
     });
     describe('when a lap has not been recorded for the entry', () => {
@@ -164,13 +167,12 @@ describe('when secondary mouse button is clicked', () => {
             const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
             render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
-            await act(async () => {
-                await user.pointer({target: raceEntryView, keys: '[MouseRight]'});
+            user.pointer({target: raceEntryView, keys: '[MouseRight]'});
+            user.click(raceEntryView);
+            // wait for async function in RaceEntryView
+            await vi.waitFor(async () => {
+                expect(addLapCallback).toBeCalledWith(entry);
             });
-            await act(async () => {
-                await user.click(raceEntryView);
-            });
-            expect(addLapCallback).toBeCalledWith(entry);
         });
     });
 });
@@ -184,12 +186,8 @@ describe('when editing a lap time', () => {
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
-        await act(async () => {
-            await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
-        });
-        await act(async () => {
-            await user.click(raceEntryView);
-        });
+        user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+        user.click(raceEntryView);
         expect(addLapCallback).not.toHaveBeenCalled();
     });
     it('does not remove last lap when ctrl+primary button clicked', async () => {
@@ -200,13 +198,9 @@ describe('when editing a lap time', () => {
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         const lastCell = SMScorp1234entry.parentElement.lastChild;
-        await act(async () => {
-            await user.pointer({target: lastCell, keys: '[MouseRight]'});
-        });
-        await act(async () => {
-            await user.keyboard('{Control>}');
-            await user.click(SMScorp1234entry);
-        });
+        user.pointer({target: lastCell, keys: '[MouseRight]'});
+        user.keyboard('{Control>}');
+        user.click(SMScorp1234entry);
         expect(removeLapCallback).not.toHaveBeenCalled();
     });
     describe('when lap time has not changed', () => {
@@ -222,13 +216,13 @@ describe('when editing a lap time', () => {
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
             await act(async () => {
-                await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+                user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
             });
             const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
             await act(async () => {
-                await user.clear(lapEntryCellInput);
-                await user.type(lapEntryCellInput, '0:06');
-                await user.keyboard('{Enter}');
+                user.clear(lapEntryCellInput);
+                user.type(lapEntryCellInput, '0:06');
+                user.keyboard('{Enter}');
             });
             expect(updateLapCallback).not.toHaveBeenCalled();
             expect(raceEntryView.getAttribute('class')).not.toMatch(/disabled/i);
@@ -241,20 +235,25 @@ describe('when editing a lap time', () => {
             {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, 
             {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
         ], metadata: {eTag: '"1"'}};
-        const updateLapCallback = vi.fn((entry, value) => {});
+        const updateLapCallback = vi.fn((entry, value) => {
+            return Promise.resolve({success: true});
+        });
         render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
         await act(async () => {
-            await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+            user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
         });
+        
         const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
         await act(async () => {
-            await user.clear(lapEntryCellInput);
-            await user.type(lapEntryCellInput, '15:53');
-            await user.keyboard('{Enter}');
+            user.clear(lapEntryCellInput);
+            user.type(lapEntryCellInput, '15:53');
         });
-        expect(updateLapCallback).toBeCalledWith(entry, 953000);
+        user.keyboard('{Enter}');
+        await vi.waitFor(async () => {
+            expect(updateLapCallback).toBeCalledWith(entry, 953000);
+        });
     });
     it('updates the display to show the edited lap time is being sent to the server', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
@@ -266,19 +265,19 @@ describe('when editing a lap time', () => {
         const updateLapCallback = vi.fn((entry, value) => {
             return Promise.resolve({success: true});
         });
-        await act(async () => {
-            render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
-        });
+        render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
         const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall 00:0100:0300:06OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
         const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
         await act(async () => {
-            await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+            user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
         });
         const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
         await act(async () => {
-            await user.clear(lapEntryCellInput);
-            await user.type(lapEntryCellInput, '15:53');
-            await user.keyboard('{Enter}');
+            user.clear(lapEntryCellInput);
+            user.type(lapEntryCellInput, '15:53');
+        });
+        await act(async () => {
+            user.keyboard('{Enter}');
         });
         expect(raceEntryView.getAttribute('class')).toMatch(/disabled/i);
     });
@@ -299,13 +298,13 @@ describe('when editing a lap time', () => {
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall 00:0100:0300:06OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
             await act(async () => {
-                await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+                user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
             });
             const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
             await act(async () => {
-                await user.clear(lapEntryCellInput);
-                await user.type(lapEntryCellInput, '15:53');
-                await user.keyboard('{Enter}');
+                user.clear(lapEntryCellInput);
+                user.type(lapEntryCellInput, '15:53');
+                user.keyboard('{Enter}');
             });
             expect(raceEntryView.getAttribute('class')).not.toMatch(/disabled/i);
         });
@@ -324,13 +323,13 @@ describe('when editing a lap time', () => {
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
             await act(async () => {
-                await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+                user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
             });
             const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
             await act(async () => {
-                await user.clear(lapEntryCellInput);
-                await user.type(lapEntryCellInput, '15530');
-                await user.keyboard('{Enter}');
+                user.clear(lapEntryCellInput);
+                user.type(lapEntryCellInput, '15530');
+                user.keyboard('{Enter}');
             });
             expect(lapEntryCellInput).toHaveValue('15530');
         });
@@ -347,13 +346,13 @@ describe('when editing a lap time', () => {
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
             await act(async () => {
-                await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+                user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
             });
             const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
             await act(async () => {
-                await user.clear(lapEntryCellInput);
-                await user.type(lapEntryCellInput, '15530');
-                await user.keyboard('{Enter}');
+                user.clear(lapEntryCellInput);
+                user.type(lapEntryCellInput, '15530');
+                user.keyboard('{Enter}');
             });
             expect(showUserMessage).toHaveBeenCalledWith('Time must be in the format [hh:][mm:]ss.');
         });
@@ -368,7 +367,7 @@ describe('when user taps row', () => {
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
-            await user.pointer([{keys: '[TouchA]', target: SMScorp1234entry}]);
+            user.pointer([{keys: '[TouchA]', target: SMScorp1234entry}]);
         });
         expect(addLapCallback).toBeCalledWith(entry);
     });
@@ -383,7 +382,7 @@ describe('when user taps row', () => {
             ({ container } = render(<RaceEntryView entry={entry} addLap={addLapCallback} />));
             const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
             await act(async () => {
-                await user.pointer([{keys: '[TouchA]', target: SMScorp1234entry}]);
+                user.pointer([{keys: '[TouchA]', target: SMScorp1234entry}]);
             });
             const raceEntryView = container.getElementsByClassName('race-entry-view')[0];
             expect(raceEntryView.getAttribute('class')).not.toMatch(/disabled/i);
@@ -403,15 +402,15 @@ describe('when user taps and holds on row', () => {
         render(<RaceEntryView entry={entry} />);
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         await act(async () => {
-            await user.pointer({target: raceEntryView, keys: '[TouchA>]'});
+            user.pointer({target: raceEntryView, keys: '[TouchA>]'});
         });
         act(() => {
             vi.advanceTimersByTime(500);
         });
         const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
         await act(async () => {
-            await user.clear(lapEntryCellInput);
-            await user.type(lapEntryCellInput, '00:15');
+            user.clear(lapEntryCellInput);
+            user.type(lapEntryCellInput, '00:15');
         });
         expect(lapEntryCellInput).toHaveValue('00:15');
     });
@@ -433,7 +432,7 @@ describe('when user swipes left on row', () => {
         const position1 = SMScorp1234entry.parentElement.children[3];
         const position2 = SMScorp1234entry.parentElement.children[2];
         await act(async () => {
-            await user.pointer([{target: position1, coords: {x: 100, y: 100}, keys: '[TouchA>]'}, 
+            user.pointer([{target: position1, coords: {x: 100, y: 100}, keys: '[TouchA>]'}, 
                 {target:position2, coords: {x: 80, y: 100}, keys: '[TouchA]'}, {keys: '[/TouchA]'}]);
         });
         expect(removeLapCallback).toBeCalledWith(entry);
@@ -491,7 +490,7 @@ describe('when a scoring abbreviation is selected', () => {
         render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
         const selectSA = screen.getByRole('combobox');
         await act(async() => {
-            await user.selectOptions(selectSA, 'DNS');
+            user.selectOptions(selectSA, 'DNS');
         });
         expect(setScoringAbbreviationSpy).toHaveBeenCalledWith({...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}, 'DNS');
     });
@@ -503,7 +502,7 @@ describe('when a scoring abbreviation is selected', () => {
         render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
         const selectSA = screen.getByRole('combobox');
         await act(async () => {
-            await user.selectOptions(selectSA, 'DNS');
+            user.selectOptions(selectSA, 'DNS');
         });
         expect(screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).toMatch(/disabled/i);
     });
@@ -515,9 +514,7 @@ describe('when a scoring abbreviation is selected', () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
             render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
             const selectSA = screen.getByRole('combobox');
-            await act(async () => {
-                await user.selectOptions(selectSA, 'DNS');
-            });
+            user.selectOptions(selectSA, 'DNS');
             expect(screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).not.toMatch(/disabled/i);
         });
     });
@@ -581,7 +578,7 @@ describe('when the entry is selected to add a new lap', () => {
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
-            await user.click(raceEntryView);
+            user.click(raceEntryView);
         });
         expect(screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).toMatch(/disabled/i);
     });
@@ -594,11 +591,11 @@ describe('when the entry is selected to add a new lap', () => {
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
-            await user.click(SMScorp1234entry);
+            user.click(SMScorp1234entry);
         });
         expect(addLapCallback).toHaveBeenCalledTimes(1);
         await act(async () => {
-            await user.click(SMScorp1234entry);
+            user.click(SMScorp1234entry);
         });
         expect(addLapCallback).toHaveBeenCalledTimes(1);
     });
@@ -612,9 +609,7 @@ describe('when the entry is selected to add a new lap', () => {
             let container;
             ({ container } = render(<RaceEntryView entry={entry} addLap={addLapCallback} />));
             const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
-            await act(async () => {
-                await user.click(SMScorp1234entry);
-            });
+            user.click(SMScorp1234entry);
             const raceEntryView = container.getElementsByClassName('race-entry-view')[0];
             expect(raceEntryView.getAttribute('class')).not.toMatch(/disabled/i);
         });
@@ -628,7 +623,7 @@ describe('when the entry is selected to add a new lap', () => {
             const { rerender } = render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
             const SMScorp1234entry = await screen.findByText(/1234/i);
             await act(async () => {
-                await user.click(SMScorp1234entry);
+                user.click(SMScorp1234entry);
             });
             entry.laps.push({number:1, time: 1000 });
             await act(async () => {
@@ -646,14 +641,14 @@ describe('when the entry is selected to add a new lap', () => {
             const { rerender } = render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
             const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
             await act(async () => {
-                await user.click(SMScorp1234entry);
+                user.click(SMScorp1234entry);
             });
             entry.laps.push({number: 1, time: 1000 });
             await act(async () => {
                 rerender(<RaceEntryView entry={entry} addLap={addLapCallback} />);
             });
             await act(async () => {
-                await user.click(SMScorp1234entry);
+                user.click(SMScorp1234entry);
             });
             expect(addLapCallback).toHaveBeenCalledTimes(2);
         });
