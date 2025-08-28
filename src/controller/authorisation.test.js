@@ -16,15 +16,19 @@
 
 import Authorisation from './authorisation';
 
-afterEach(() => {
-    vi.restoreAllMocks();
-});
-
-it('returns array of roles', async () => {
+beforeEach(() => {
     vi.spyOn(window, 'location', 'get').mockReturnValue({
         origin: 'http://localhost/',
         pathname: ''
     });
+});
+
+afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+});
+
+it('returns array of roles', async () => {
     vi.spyOn(window, 'fetch').mockImplementation((resource, options) => {
         if (resource === 'http://localhost/authentication/roles') {
             return Promise.resolve({
@@ -43,22 +47,17 @@ it('returns array of roles', async () => {
     });
     const authorisation = new Authorisation();
     expect(await authorisation.getRoles()).toEqual(['ROLE_SAILOR']);
-    vi.unstubAllGlobals();
 });
 
 describe('when error occurs', () => {
-    it('returns an empty array', async () => {// an error is expected to be thrown so mock out console logging of errors so as not to clutter up console
-        vi.spyOn(console, 'error');
-        console.error.mockImplementation(() => {});
-
+    it('returns an empty array', async () => {
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
         vi.spyOn(window, 'fetch').mockImplementation(() => {
             throw new TypeError('Failed to fetch roles');
         });
         const authorisation = new Authorisation();
         expect(await authorisation.getRoles()).toEqual([]);
-
-        // restore console logging for errors
-        console.error.mockRestore();
+        expect(consoleSpy).toBeCalledWith(`Failed to fetch roles: Failed to fetch roles`);
     });
 });
 
