@@ -22,46 +22,34 @@ import NameFormat from '../controller/name-format';
 
 it('displays race name', () => {
     render(<DownloadRace race={raceScorpionA} />);
-
     expect(screen.getByText(/scorpion a/i));
 });
-
 it('displays race class', () => {
     render(<DownloadRace race={{...raceScorpionA, dinghyClass: {name: 'DinghyClass'}}} />);
-
     expect(screen.getByText(/dinghyclass/i));
 });
-
 it('displays race start time', () => {
     render(<DownloadRace race={raceScorpionA} />);
-
     const expectedPlannedTime = new Intl.DateTimeFormat(navigator.language, {
         dateStyle: 'medium',
         timeStyle: 'medium',
         hour12: false
     }).format(raceScorpionA.plannedStartTime);
-
     expect(screen.getByText(expectedPlannedTime));
 });
-
 it('displays options to output name as firstname surname or surname, firstname', () => {
     render(<DownloadRace race={raceScorpionA} />);
-
     expect(screen.getByRole('radio', {name: /firstname surname/i}));
     expect(screen.getByRole('radio', {name: /surname, firstname/i}));
 });
-
 it('displays download race button', () => {
     render(<DownloadRace race={raceScorpionA} />);
-
     expect(screen.getByRole('button', {name: /download results/i}));
 });
-
 it('calls method passed to download function with race', async () => {
     const user = userEvent.setup();
     const downloadFunctionSpy = vi.fn();
     render(<DownloadRace race={raceScorpionA} downloadFunction={downloadFunctionSpy} />);
-
     await user.click(screen.getByRole('button', {name: /download results/i}));
     expect(downloadFunctionSpy).toBeCalledWith(raceScorpionA, {nameFormat: NameFormat.FIRSTNAMESURNAME});
 });
