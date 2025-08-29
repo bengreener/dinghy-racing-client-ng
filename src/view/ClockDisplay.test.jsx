@@ -36,13 +36,14 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
 });
 
-it('renders', () => {
+it('renders',async () => {
     const formattedTime = timeFormat.format(new Date(Date.now()));
-
-    render(<ClockDisplay clock={new Clock()} />);
+    await act(async () => {
+        render(<ClockDisplay clock={new Clock()} />);
+    });
     expect(screen.getByText(formattedTime)).toBeInTheDocument();
 });
 
@@ -51,8 +52,9 @@ describe('when clock ticks', () => {
         const time = Date.now();
         const clock = new Clock();
         clock.start();
-        render(<ClockDisplay clock={clock} />);
-
+        await act(async () => {
+            render(<ClockDisplay clock={clock} />);
+        });
         await act(async () => {
             vi.advanceTimersByTime(1000);
         });
