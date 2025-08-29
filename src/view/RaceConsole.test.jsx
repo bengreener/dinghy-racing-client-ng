@@ -42,12 +42,9 @@ it('renders', async () => {
     vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
     const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000); // create as 18:00 UTC intially
-    
     await act(async () => {        
         customRender(<RaceConsole />, model);
     });
-
-
     const selectRace = screen.getByLabelText(/Select Race/i);
     expect(selectRace).toBeInTheDocument();
     expect(screen.getByLabelText(/fleet/i)).toBeInTheDocument();
@@ -56,69 +53,60 @@ it('renders', async () => {
     expect(screen.getByLabelText(/session start/i)).toHaveValue(sessionStart.toISOString().substring(16, 0));
     expect(screen.getByLabelText(/session end/i)).toHaveValue(sessionEnd.toISOString().substring(16, 0));
 });
-
 it('displays races available for selection', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-
-    customRender(<RaceConsole />, model);
-
+    await act(async() => {
+        customRender(<RaceConsole />, model);
+    });
     const optionScorpion = await screen.findByRole('option', {'name': /Scorpion A/i});
     const optionsGraduate = await screen.findByRole('option', {'name': /Graduate A/i});
-    
     expect(optionScorpion).toBeInTheDocument();
     expect(optionsGraduate).toBeInTheDocument();
 });
-
 it('notifies user if races cannot be retrieved', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
     vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Http 404 Error'})});
-
-    customRender(<RaceConsole />, model);
+    await act(async () => {
+        customRender(<RaceConsole />, model);
+    });
     const message = await screen.findByText(/Unable to load races/i);
     expect(message).toBeInTheDocument();
 });
-
 it('enables a race to be selected', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
     vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-
-    customRender(<RaceConsole />, model, controller);
+    await act(async () => {
+        customRender(<RaceConsole />, model, controller);
+    });
     const selectRace = await screen.findByLabelText(/Race/i);
     await screen.findAllByRole('option');
-    await act(async () => {
-        await user.selectOptions(selectRace, 'Scorpion A');
-    }); 
-    
+    await user.selectOptions(selectRace, 'Scorpion A');
     expect(selectRace.value).toBe('Scorpion A');
 });
-
 it('enables more than one race to be selected', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
     vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-
-    customRender(<RaceConsole />, model, controller);
+    await act(async () => {
+        customRender(<RaceConsole />, model, controller);
+    });
     const selectRace = await screen.findByLabelText(/Race/i);
     await screen.findAllByRole('option');
-    await act(async () => {
-        await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
-    });
-    
+    await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
     const selected = [];
     for (let i = 0; i < selectRace.selectedOptions.length; i++) {
         selected.push(selectRace.selectedOptions[i].value);
-    }
+    };
     expect(selected).toContain('Scorpion A');
     expect(selected).toContain('Graduate A');
 });
-
 describe('when a race is selected', () => {
     it('shows the duration of the selected race', async () => {
         const user = userEvent.setup();
@@ -126,13 +114,12 @@ describe('when a race is selected', () => {
         const controller = new DinghyRacingController(model);
         vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
         vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-
-        customRender(<RaceConsole />, model, controller);
+        await act(async () => {
+            customRender(<RaceConsole />, model, controller);
+        });
         const selectRace = await screen.findByLabelText(/Race/i);
         await screen.findAllByRole('option');
-        await act(async () => {
-            await user.selectOptions(selectRace, 'Scorpion A');
-        });
+        await user.selectOptions(selectRace, 'Scorpion A');
         const outputDuration = screen.getByLabelText(/duration/i)
         expect(outputDuration).toHaveValue('45:00');
     });
@@ -144,21 +131,18 @@ describe('when a race is selected', () => {
         vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         vi.spyOn(model, 'startRace').mockImplementation(() => {return Promise.resolve({'success': true})});
         const controllerStartRaceSpy = vi.spyOn(controller, 'startRace');
-    
-        customRender(<RaceConsole />, model, controller);
+        await act(async () => {
+            customRender(<RaceConsole />, model, controller);
+        });
         const selectRace = await screen.findByLabelText(/Race/i);
         await screen.findAllByRole('option');
-        await act(async () => {
-            await user.selectOptions(selectRace, 'Scorpion A');
-        });
-        
+        await user.selectOptions(selectRace, 'Scorpion A');
         const entry1 = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
         const entry2 = await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'});
         expect(entry1).toBeInTheDocument();
         expect(entry2).toBeInTheDocument();
     });
 });
-
 describe('when more than one race is selected', () => {
     it('shows the duration of the selected races', async () => {
         const user = userEvent.setup();
@@ -171,17 +155,14 @@ describe('when more than one race is selected', () => {
             else if (race.name === 'Graduate A') {
                 return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
             }
-            
         });
         vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-
-        customRender(<RaceConsole />, model, controller);
+        await act(async () => {
+            customRender(<RaceConsole />, model, controller);
+        });
         const selectRace = await screen.findByLabelText(/Race/i);
         await screen.findAllByRole('option');
-        await act(async () => {
-            await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
-        });
-        
+        await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
         const outputDuration = await screen.findAllByLabelText(/duration/i);
         expect(outputDuration).toHaveLength(2);
         expect(outputDuration[0]).toHaveValue('45:00');
@@ -198,19 +179,16 @@ describe('when more than one race is selected', () => {
             else if (race.name === 'Graduate A') {
                 return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
             }
-            
         });
         vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         vi.spyOn(model, 'startRace').mockImplementation(() => {return Promise.resolve({'success': true})});
         const controllerStartRaceSpy = vi.spyOn(controller, 'startRace');
-    
-        customRender(<RaceConsole />, model, controller);
+        await act(async () => {
+            customRender(<RaceConsole />, model, controller);
+        });
         const selectRace = await screen.findByLabelText(/Race/i);
         await screen.findAllByRole('option');
-        await act(async () => {
-            await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
-        });
-        
+        await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
         const entry1 = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
         const entry2 = await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'});
         const entry3 = await screen.findByRole('status', {name: (content, node) => node.textContent === '2928'})
@@ -219,7 +197,6 @@ describe('when more than one race is selected', () => {
         expect(entry3).toBeInTheDocument();
     });
 });
-
 describe('when a race is unselected', () => {
     it('removes race header from display', async () => {
         const user = userEvent.setup();
@@ -234,22 +211,17 @@ describe('when a race is unselected', () => {
             }
         });
         vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-
-        customRender(<RaceConsole />, model, controller);
+        await act(async () => {
+            customRender(<RaceConsole />, model, controller);
+        });        
         const selectRace = await screen.findByLabelText(/Race/i);
         await screen.findAllByRole('option');
-        await act(async () => {
-            await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
-        });
-
+        await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
         const tempRaceHeaderViews = document.getElementsByClassName('race-header-view');
         const raceHeaderViews = tempRaceHeaderViews[0].parentElement;
-        
         const graduateHeader = await within(raceHeaderViews).findByText(/graduate a/i);
         expect(graduateHeader).toBeInTheDocument();
-        await act(async () => {
-            await user.deselectOptions(selectRace, ['Graduate A']);
-        });
+        await user.deselectOptions(selectRace, ['Graduate A']);
         expect(graduateHeader).not.toBeInTheDocument();
     });
     it('removes entries from display', async () => {
@@ -265,33 +237,26 @@ describe('when a race is unselected', () => {
             }    
         });
         vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-        customRender(<RaceConsole />, model, controller);
+        await act(async () => {
+            customRender(<RaceConsole />, model, controller);
+        });        
         const selectRace = await screen.findByLabelText(/Race/i);
         await screen.findAllByRole('option');
-        await act(async() => {
-            await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
-        });
-        
-
+        await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
         const graduateEntries = await within(document.getElementsByClassName('race-entries-view')[0]).findAllByText(/Graduate/i);
         graduateEntries.forEach(entry => expect(entry).toBeInTheDocument());
-        await act(async () => {
-            await user.deselectOptions(selectRace, ['Graduate A']);
-        });
+        await user.deselectOptions(selectRace, ['Graduate A']);
         graduateEntries.forEach(entry => expect(entry).not.toBeInTheDocument());
     });
 });
-
 describe('when an error is received', () => {
     it('displays error message', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
         vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
-        
         await act(async () => {        
             customRender(<RaceConsole />, model);
         });
-    
         const errorMessage = screen.getByText(/Unable to load races/i);
         expect(errorMessage).toBeInTheDocument();
     });
@@ -301,64 +266,51 @@ describe('when an error is received', () => {
         vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})})
             .mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
         let render;
-
         await act(async () => {        
             render = customRender(<RaceConsole key={Date.now()}/>, model);
         });
-    
         const errorMessage = screen.getByText(/Unable to load races/i);
         expect(errorMessage).toBeInTheDocument();
-
         await act(async () => {
             render.rerender(<RaceConsole key={Date.now()}/>, model);
         });
         expect(screen.queryByText(/Unable to load races/i)).not.toBeInTheDocument();
     });
 });
-
 it('provides option to select start time for first race', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
     vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-    
     await act(async () => {        
         customRender(<RaceConsole />, model);
     });
-
     const selectSessionStart = screen.getByLabelText(/session start/i);
     expect(selectSessionStart).toBeInTheDocument();
 });
-
 it('provides option to select end time for first race', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
     vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-    
     await act(async () => {        
         customRender(<RaceConsole />, model);
     });
-
     const selectSessionEnd = screen.getByLabelText(/session end/i);
     expect(selectSessionEnd).toBeInTheDocument();
 });
-
 it('registers an interest in race updates for races in session', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     const registerRaceUpdateCallbackSpy = vi.spyOn(model, 'registerRaceUpdateCallback');
-
     await act(async () => {
         customRender(<RaceConsole />, model, controller);
     });
     await screen.findAllByRole('option');
-    
     expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/races/4', expect.any(Function));
     expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(2, 'http://localhost:8081/dinghyracing/api/races/7', expect.any(Function));
     expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(3, 'http://localhost:8081/dinghyracing/api/races/17', expect.any(Function));
     expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(4, 'http://localhost:8081/dinghyracing/api/races/8', expect.any(Function));
 });
-
 describe('when races within session are changed', () => {
     it('updates recorded details', async () => {
         const races_copy = [...races];
@@ -373,7 +325,7 @@ describe('when races within session are changed', () => {
         races_copy[0].name = 'Popeye Special';
         await act(async () => {
             model.handleRaceUpdate({'body': races_copy[0].url});
-        });
+        });        
         expect(screen.getByText('Popeye Special')).toBeInTheDocument();
     });
     it('removes a race that has had start time changed so it falls outside session time window', async () => {
@@ -387,13 +339,12 @@ describe('when races within session are changed', () => {
         expect(screen.getByText('Handicap A')).toBeInTheDocument();
         const url = races_local[races_local.length -1].url;
         races_local.pop();
-        await act(async () => {
+        await act(async () => {        
             model.handleRaceUpdate({'body': url});
         });
         expect(screen.queryByText('Handicap A')).not.toBeInTheDocument();
     });
 });
-
 describe('when start time for the session is changed', () => {
     it('updates list of races', async () => {
         const user = userEvent.setup();
@@ -407,15 +358,12 @@ describe('when start time for the session is changed', () => {
         expect(screen.getByText('Scorpion A')).toBeInTheDocument();
         expect(screen.queryByText('Graduate A')).not.toBeInTheDocument();
         const sessionStartInput = screen.getByLabelText(/session start/i);
-        await act(async () => {
-            await user.clear(sessionStartInput); // clear input to avoid errors when typing in new value
-            await user.type(sessionStartInput, '2020-05-12T12:30');
-        });
+        await user.clear(sessionStartInput); // clear input to avoid errors when typing in new value
+        await user.type(sessionStartInput, '2020-05-12T12:30');
         expect(screen.getByText('Scorpion A')).toBeInTheDocument();
         expect(screen.getByText('Graduate A')).toBeInTheDocument();
     });
 });
-
 describe('when end time for the session is changed', () => {
     it('updates list of races', async () => {
         const user = userEvent.setup();
@@ -430,15 +378,12 @@ describe('when end time for the session is changed', () => {
         expect(screen.getByText('Scorpion A')).toBeInTheDocument();
         expect(screen.queryByText('Graduate A')).not.toBeInTheDocument();
         const sessionEndInput = screen.getByLabelText(/session end/i);
-        await act(async () => {
-            await user.clear(sessionEndInput); // clear input to avoid errors when typing in new value
-            await user.type(sessionEndInput, sessionEnd.toISOString().substring(16, 0));
-        });
+        await user.clear(sessionEndInput); // clear input to avoid errors when typing in new value
+        await user.type(sessionEndInput, sessionEnd.toISOString().substring(16, 0));
         expect(screen.getByText('Scorpion A')).toBeInTheDocument();
         expect(screen.getByText('Graduate A')).toBeInTheDocument();
     });
 });
-
 describe('when new value set for race type', () => {
     it('calls getRacesBetweenTimesForType with correct arguments', async () => {
         const user = userEvent.setup();
@@ -448,37 +393,28 @@ describe('when new value set for race type', () => {
         sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
         const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000); // create as 18:00 UTC intially
         sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
-        
         await act(async () => {
             customRender(<RaceConsole />, model);
         });
-        
-        await act(async () => {
-            await user.click(screen.getByLabelText(/pursuit/i));
-        });
-    
+        await user.click(screen.getByLabelText(/pursuit/i));
         expect(getRacesBetweenTimesForTypeSpy).toHaveBeenCalledWith(sessionStart, sessionEnd, RaceType.PURSUIT);
     });
 });
-
 it('registers an interest in race entry laps updates for races in session', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     const registerRaceEntryLapsUpdateCallbackSpy = vi.spyOn(model, 'registerRaceEntryLapsUpdateCallback');
-
     await act(async () => {
         customRender(<RaceConsole />, model, controller);
     });
     await screen.findAllByRole('option');
-
     expect(registerRaceEntryLapsUpdateCallbackSpy).toHaveBeenCalledTimes(4);
     expect(registerRaceEntryLapsUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/races/4', expect.any(Function));
     expect(registerRaceEntryLapsUpdateCallbackSpy).toHaveBeenNthCalledWith(2, 'http://localhost:8081/dinghyracing/api/races/7', expect.any(Function));
     expect(registerRaceEntryLapsUpdateCallbackSpy).toHaveBeenNthCalledWith(3, 'http://localhost:8081/dinghyracing/api/races/17', expect.any(Function));
     expect(registerRaceEntryLapsUpdateCallbackSpy).toHaveBeenNthCalledWith(4, 'http://localhost:8081/dinghyracing/api/races/8', expect.any(Function));
 });
-
 // ensure up to date information is displayed if someone switchees the selected races in the session
 describe('when a lap is added to an entry in a race in session', () => {
     it('updates recorded details', async () => {
@@ -498,19 +434,15 @@ describe('when a lap is added to an entry in a race in session', () => {
         expect(screen.getByText('Popeye Special')).toBeInTheDocument();
     });
 });
-
 describe('when session storage is available', () => {
     describe('when start session time has been changed from default this sesssion', () => {
         it('uses value set for session start by user', async () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             vi.spyOn(model, 'getStartSequence');
-    
             sessionStorage.setItem('sessionStart', '2024-08-15T14:00:00Z');
-            
             await act(async () => {        
                 customRender(<RaceConsole />, model);
             });
-    
             const selectSessionStart = screen.getByLabelText(/session start/i);
             expect(selectSessionStart).toHaveValue('2024-08-15T15:00');
         });
@@ -519,13 +451,10 @@ describe('when session storage is available', () => {
         it('uses value set for session end by user', async () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             vi.spyOn(model, 'getStartSequence');
-    
             sessionStorage.setItem('sessionEnd', '2024-08-15T10:00:00Z');
-            
             await act(async () => {        
                 customRender(<RaceConsole />, model);
             });
-    
             const selectSessionEnd = screen.getByLabelText(/session end/i);
             expect(selectSessionEnd).toHaveValue('2024-08-15T11:00');
         });
@@ -534,32 +463,25 @@ describe('when session storage is available', () => {
         it('uses value set for race type by user', async () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             vi.spyOn(model, 'getStartSequence');
-    
             sessionStorage.setItem('raceType', 'PURSUIT');
-            
             await act(async () => {        
                 customRender(<RaceConsole />, model);
             });
-    
             const checkboxPursuit = screen.getByLabelText(/pursuit/i);
             expect(checkboxPursuit).toBeChecked();
         });
     });
 });
-
 describe('when session storage is not available', () => {
     describe('when start session time has been changed from default this sesssion', () => {
         it('uses default value for session start', async () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             vi.spyOn(model, 'getStartSequence');
             vi.spyOn(storageUtilities, 'storageAvailable').mockImplementation(() => false);
-    
             sessionStorage.setItem('sessionStart', '2024-08-15T14:00:00Z');
-            
             await act(async () => {        
                 customRender(<RaceConsole />, model);
             });
-    
             const selectSessionStart = screen.getByLabelText(/session start/i);
             expect(selectSessionStart).toHaveValue(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000).toISOString().substring(0, 16));
         });
@@ -569,13 +491,10 @@ describe('when session storage is not available', () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             vi.spyOn(model, 'getStartSequence');
             vi.spyOn(storageUtilities, 'storageAvailable').mockImplementation(() => false);
-    
             sessionStorage.setItem('sessionEnd', '2024-08-15T10:00:00Z');
-            
             await act(async () => {        
                 customRender(<RaceConsole />, model);
             });
-    
             const selectSessionEnd = screen.getByLabelText(/session end/i);
             expect(selectSessionEnd).toHaveValue(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000).toISOString().substring(0, 16));
         });
@@ -584,13 +503,10 @@ describe('when session storage is not available', () => {
         it('uses default value for race type', async () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             vi.spyOn(model, 'getStartSequence');
-    
             sessionStorage.setItem('raceType', 'PURSUIT');
-            
             await act(async () => {        
                 customRender(<RaceConsole />, model);
             });
-    
             const checkboxPursuit = screen.getByLabelText(/pursuit/i);
             expect(checkboxPursuit).not.toBeChecked();
         });
