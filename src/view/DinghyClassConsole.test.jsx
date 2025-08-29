@@ -38,98 +38,71 @@ it('renders', async () => {
     expect(screen.getByLabelText(/External Name/)).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /cancel/i})).toBeInTheDocument();
 });
-
 it('accepts the name of a dinghy class', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
-    
     await act( async () => {
         customRender(<DinghyClassConsole />, model);
     });
     const txtClassName = await screen.findByLabelText('Class Name');
-    await act(async () => {
-        await user.type(txtClassName, 'Scorpion');
-    })
-    
+    await user.type(txtClassName, 'Scorpion');
     expect(txtClassName).toHaveValue('Scorpion');
 });
-
 it('accepts the crew size', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
-    
     await act( async () => {
         customRender(<DinghyClassConsole />, model);
     });
     const crewSizeInput = await screen.findByLabelText('Crew Size');
-    await act(async () => {
-        await user.clear(crewSizeInput);
-        await user.type(crewSizeInput, '2');
-    });
-    
+    await user.clear(crewSizeInput);
+    await user.type(crewSizeInput, '2');
     expect(crewSizeInput).toHaveValue(2);
 });
-
 it('accepts the portsmouth number', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
-
     await act( async () => {
         customRender(<DinghyClassConsole />, model);
     });
     const portsmouthNumberInput = await screen.findByLabelText('Portsmouth Number');
-    await act(async () => {
-        await user.clear(portsmouthNumberInput);
-        await user.type(portsmouthNumberInput, '999');
-    });
-
+    await user.clear(portsmouthNumberInput);
+    await user.type(portsmouthNumberInput, '999');
     expect(portsmouthNumberInput).toHaveValue(999);
 });
-
 it('accepts the external name', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
-
     await act( async () => {
         customRender(<DinghyClassConsole />, model);
     });
     const externalNameInput = await screen.findByLabelText('External Name');
-    await act(async () => {
-        await user.type(externalNameInput, 'SCORPION');
-    });
-
+    await user.type(externalNameInput, 'SCORPION');
     expect(externalNameInput).toHaveValue('SCORPION');
 });
-
 it('calls the controller createDinghyClass method', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
     const createDinghyClassSpy = vi.spyOn(controller, 'createDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true})});
-    
     await act( async () => {
         customRender(<DinghyClassConsole />, model, controller);
     });
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
-    await act(async () => {
-        await user.click(btnCreate);
-    });
-
+    await user.click(btnCreate);
     expect(createDinghyClassSpy).toBeCalledTimes(1);
 });
-
 it('calls the controller createDinghyClass with new dinghy class as parameter', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
     vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
     const createDinghyClassSpy = vi.spyOn(controller, 'createDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true})});
-    
     await act( async () => {
         customRender(<DinghyClassConsole />, model, controller);
     });
@@ -138,19 +111,15 @@ it('calls the controller createDinghyClass with new dinghy class as parameter', 
     const crewSizeInput = await screen.findByLabelText('Crew Size');
     const portsmouthNumberInput = await screen.findByLabelText('Portsmouth Number');
     const externalNameInput = await screen.findByLabelText('External Name');
-    await act(async () => {
-        await user.type(txtClassName, 'Scorpion');
-        await user.clear(crewSizeInput);
-        await user.type(crewSizeInput, '2');
-        await user.clear(portsmouthNumberInput);
-        await user.type(portsmouthNumberInput, '999');
-        await user.type(externalNameInput, 'SCORPION');
-        await user.click(btnCreate);
-    });
-
+    await user.type(txtClassName, 'Scorpion');
+    await user.clear(crewSizeInput);
+    await user.type(crewSizeInput, '2');
+    await user.clear(portsmouthNumberInput);
+    await user.type(portsmouthNumberInput, '999');
+    await user.type(externalNameInput, 'SCORPION');
+    await user.click(btnCreate);
     expect(createDinghyClassSpy).toBeCalledWith({...DinghyRacingModel.dinghyClassTemplate(), name: 'Scorpion', crewSize: 2, portsmouthNumber: 999, externalName: 'SCORPION'});
 });
-
 describe('when creating a new dinghy class', () => {
     it('clears the input on success', async () => {
         const user = userEvent.setup();
@@ -158,7 +127,6 @@ describe('when creating a new dinghy class', () => {
         const controller = new DinghyRacingController(model);
         vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         vi.spyOn(controller, 'createDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, domainObject: dinghyClassScorpion})});
-        
         await act( async () => {
             customRender(<DinghyClassConsole />, model, controller);
         });
@@ -167,16 +135,13 @@ describe('when creating a new dinghy class', () => {
         const crewSizeInput = await screen.findByLabelText('Crew Size');
         const portsmouthNumberInput = await screen.findByLabelText('Portsmouth Number');
         const externalNameInput = await screen.findByLabelText('External Name');
-        await act(async () => {
-            await user.type(txtClassName, 'Scorpion');
-            await user.clear(crewSizeInput);
-            await user.type(crewSizeInput, '2');
-            await user.clear(portsmouthNumberInput);
-            await user.type(portsmouthNumberInput, '999');
-            await user.type(externalNameInput, 'SCORPION');
-            await user.click(btnCreate);
-        });
-    
+        await user.type(txtClassName, 'Scorpion');
+        await user.clear(crewSizeInput);
+        await user.type(crewSizeInput, '2');
+        await user.clear(portsmouthNumberInput);
+        await user.type(portsmouthNumberInput, '999');
+        await user.type(externalNameInput, 'SCORPION');
+        await user.click(btnCreate);
         expect(txtClassName.value).toBe('');
         expect(crewSizeInput.value).toBe('1');
         expect(portsmouthNumberInput.value).toBe('1000');
@@ -188,20 +153,15 @@ describe('when creating a new dinghy class', () => {
         const controller = new DinghyRacingController(model);
         vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         vi.spyOn(controller, 'createDinghyClass').mockImplementation(() => {return Promise.resolve({'success': false, 'message': 'That was a bust!'})});
-        
         await act( async () => {
             customRender(<DinghyClassConsole />, model, controller);
         });
         const btnCreate = screen.getByRole('button', {'name': 'Create'});
-        await act(async () => {
-            await user.click(btnCreate);
-        });
+        await user.click(btnCreate);
         const message = await screen.findByText('That was a bust!');
-    
         expect(message).toBeInTheDocument();
     });
 });
-
 describe('when there are dinghy classes', () => {
     it('displays list of dinghy classes', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -225,14 +185,13 @@ describe('when there are dinghy classes', () => {
                 render = customRender(<DinghyClassConsole />, model);
             });
             expect(await screen.findByText(/oops/i)).toBeInTheDocument();
-            await act(async () => {
+            await act( async () => {
                 render.rerender(<DinghyClassConsole />, model);
             });
             expect(screen.queryByText('Oops!')).not.toBeInTheDocument();
         });
-    })
+    });
 });
-
 describe('when a dinghy class is selected', () => {
     it('displays dinghy class details for editing', async () => {
         const user = userEvent.setup();
@@ -242,9 +201,7 @@ describe('when a dinghy class is selected', () => {
             customRender(<DinghyClassConsole />, model);
         });
         const dinghyClassCell = await screen.findByRole('cell', {name: /Scorpion/});
-        await act(async () => {
-            await user.click(dinghyClassCell);
-        });
+        await user.click(dinghyClassCell);
         expect(await screen.findByLabelText(/class name/i)).toHaveValue('Scorpion');
         expect(await screen.findByLabelText(/crew size/i)).toHaveValue(2);
         expect(await screen.findByLabelText(/portsmouth number/i)).toHaveValue(1043);
@@ -262,20 +219,14 @@ describe('when a dinghy class is selected', () => {
             customRender(<DinghyClassConsole />, model, controller);
         });
         const dinghyClassCell = await screen.findByRole('cell', {name: /Scorpion/});
-        await act(async () => {
-            await user.click(dinghyClassCell);
-        });
+        await user.click(dinghyClassCell);
         const nameInput = await screen.findByLabelText(/class name/i);
         const updateButton = screen.getByRole('button', {name: 'Update'});
-        await act(async () => {
-            await user.clear(nameInput);
-            await user.type(nameInput, 'Scorp Pro');
-            await user.click(updateButton);
-        });
+        await user.clear(nameInput);
+        await user.type(nameInput, 'Scorp Pro');
+        await user.click(updateButton);
         expect(await screen.findByText(/oops/i)).toBeInTheDocument();
-        await act(async () => {
-            await user.click(dinghyClassCell);
-        });
+        await user.click(dinghyClassCell);
         expect(screen.queryByText(/oops/i)).not.toBeInTheDocument();
     });
     describe('when values are changed', () => {
@@ -287,23 +238,19 @@ describe('when a dinghy class is selected', () => {
                 customRender(<DinghyClassConsole />, model);
             });
             const dinghyClassCell = await screen.findByRole('cell', {name: /Scorpion/});
-            await act(async () => {
-                await user.click(dinghyClassCell);
-            });
+            await user.click(dinghyClassCell);
             const nameInput = await screen.findByLabelText(/class name/i);
             const crewSizeInput = await screen.findByLabelText(/crew size/i);
             const portsmouthNumberInput = await screen.findByLabelText(/portsmouth number/i);
             const externalNameInput = await screen.findByLabelText(/external name/i);
-            await act(async () => {
-                await user.clear(nameInput);
-                await user.type(nameInput, 'Scorp Pro');
-                await user.clear(crewSizeInput);
-                await user.type(crewSizeInput, '3');
-                await user.clear(portsmouthNumberInput);
-                await user.type(portsmouthNumberInput, '999');
-                await user.clear(externalNameInput);
-                await user.type(externalNameInput, 'SCORPION PRO');
-            });
+            await user.clear(nameInput);
+            await user.type(nameInput, 'Scorp Pro');
+            await user.clear(crewSizeInput);
+            await user.type(crewSizeInput, '3');
+            await user.clear(portsmouthNumberInput);
+            await user.type(portsmouthNumberInput, '999');
+            await user.clear(externalNameInput);
+            await user.type(externalNameInput, 'SCORPION PRO');
             expect(nameInput).toHaveValue('Scorp Pro');
             expect(crewSizeInput).toHaveValue(3);
             expect(portsmouthNumberInput).toHaveValue(999);
@@ -321,26 +268,21 @@ describe('when a dinghy class is selected', () => {
                 customRender(<DinghyClassConsole />, model, controller);
             });
             const dinghyClassCell = await screen.findByRole('cell', {name: /Scorpion/});
-            await act(async () => {
-                await user.click(dinghyClassCell);
-            });
+            await user.click(dinghyClassCell);
             const nameInput = await screen.findByLabelText(/class name/i);
             const crewSizeInput = await screen.findByLabelText(/crew size/i);
             const portsmouthNumberInput = await screen.findByLabelText(/portsmouth number/i);
             const externalNameInput = await screen.findByLabelText(/external name/i);
             const updateButton = screen.getByRole('button', {name: 'Update'});
-            await act(async () => {
-                await user.clear(nameInput);
-                await user.type(nameInput, 'Scorp Pro');
-                await user.clear(crewSizeInput);
-                await user.type(crewSizeInput, '3');
-                await user.clear(portsmouthNumberInput);
-                await user.type(portsmouthNumberInput, '999');
-                await user.clear(externalNameInput);
-                await user.type(externalNameInput, 'SCORPION PRO');
-                await user.click(updateButton);
-            });
-
+            await user.clear(nameInput);
+            await user.type(nameInput, 'Scorp Pro');
+            await user.clear(crewSizeInput);
+            await user.type(crewSizeInput, '3');
+            await user.clear(portsmouthNumberInput);
+            await user.type(portsmouthNumberInput, '999');
+            await user.clear(externalNameInput);
+            await user.type(externalNameInput, 'SCORPION PRO');
+            await user.click(updateButton);
             expect(updateDinghyClassSpy).toBeCalledWith({...dinghyClassScorpion, name: 'Scorp Pro', crewSize: 3, portsmouthNumber: 999, externalName: 'SCORPION PRO'});
         });
         describe('when update is successful', () => {
@@ -354,25 +296,21 @@ describe('when a dinghy class is selected', () => {
                     customRender(<DinghyClassConsole />, model, controller);
                 });
                 const dinghyClassCell = await screen.findByRole('cell', {name: /Scorpion/});
-                await act(async () => {
-                    await user.click(dinghyClassCell);
-                });
+                await user.click(dinghyClassCell);
                 const nameInput = await screen.findByLabelText(/class name/i);
                 const crewSizeInput = await screen.findByLabelText(/crew size/i);
                 const portsmouthNumberInput = await screen.findByLabelText(/portsmouth number/i);
                 const externalNameInput = await screen.findByLabelText(/external name/i);
                 const updateButton = screen.getByRole('button', {name: 'Update'});
-                await act(async () => {
-                    await user.clear(nameInput);
-                    await user.type(nameInput, 'Scorp Pro');
-                    await user.clear(crewSizeInput);
-                    await user.type(crewSizeInput, '3');
-                    await user.clear(portsmouthNumberInput);
-                    await user.type(portsmouthNumberInput, '999');
-                    await user.clear(externalNameInput);
-                    await user.type(externalNameInput, 'SCORPION PRO');
-                    await user.click(updateButton);
-                });
+                await user.clear(nameInput);
+                await user.type(nameInput, 'Scorp Pro');
+                await user.clear(crewSizeInput);
+                await user.type(crewSizeInput, '3');
+                await user.clear(portsmouthNumberInput);
+                await user.type(portsmouthNumberInput, '999');
+                await user.clear(externalNameInput);
+                await user.type(externalNameInput, 'SCORPION PRO');
+                await user.click(updateButton);
                 expect(nameInput).toHaveValue('');
                 expect(crewSizeInput).toHaveValue(1);
                 expect(portsmouthNumberInput).toHaveValue(1000);
@@ -385,33 +323,28 @@ describe('when a dinghy class is selected', () => {
                 const controller = new DinghyRacingController(model);
                 vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [{...dinghyClassScorpion, name: 'Scorp Pro', crewSize: 3, portsmouthNumber: 999, externalName: 'SCORPION PRO'}]})}).mockImplementationOnce(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
                 vi.spyOn(controller, 'updateDinghyClass').mockImplementation(() => {return Promise.resolve({success: true, domainObject: {...dinghyClassScorpion, name: 'Scorp Pro', crewSize: 3, portsmouthNumber: 999, externalName: 'SCORPION PRO'}})});
-                await act( async () => {
+                await act(async () => {
                     customRender(<DinghyClassConsole />, model, controller);
                 });
                 const dinghyClassCell = await screen.findByRole('cell', {name: /Scorpion/});
-                await act(async () => {
-                    await user.click(dinghyClassCell);
-                });
+                await user.click(dinghyClassCell);
                 const nameInput = await screen.findByLabelText(/class name/i);
                 const crewSizeInput = await screen.findByLabelText(/crew size/i);
                 const portsmouthNumberInput = await screen.findByLabelText(/portsmouth number/i);
                 const externalNameInput = await screen.findByLabelText(/external name/i);
                 const updateButton = screen.getByRole('button', {name: 'Update'});
+                await user.clear(nameInput);
+                await user.type(nameInput, 'Scorp Pro');
+                await user.clear(crewSizeInput);
+                await user.type(crewSizeInput, '3');
+                await user.clear(portsmouthNumberInput);
+                await user.type(portsmouthNumberInput, '999');
+                await user.clear(externalNameInput);
+                await user.type(externalNameInput, 'SCORPION PRO');
+                await user.click(updateButton);
                 await act(async () => {
-                    await user.clear(nameInput);
-                    await user.type(nameInput, 'Scorp Pro');
-                    await user.clear(crewSizeInput);
-                    await user.type(crewSizeInput, '3');
-                    await user.clear(portsmouthNumberInput);
-                    await user.type(portsmouthNumberInput, '999');
-                    await user.clear(externalNameInput);
-                    await user.type(externalNameInput, 'SCORPION PRO');
-                    await user.click(updateButton);
-                });
-                await act(async () => {
-                    model.handleDinghyClassUpdate({'body': dinghyClasses[0].url});
-                });
-    
+                    model.handleDinghyClassUpdate({'body': dinghyClasses[0].url});    
+                });                
                 expect(await screen.findByRole('cell', {name: /scorp pro/i})).toBeInTheDocument();
                 expect(await screen.findByRole('cell', {name: /3/i})).toBeInTheDocument();
                 expect(await screen.findByRole('cell', {name: /999/i})).toBeInTheDocument();
@@ -429,20 +362,15 @@ describe('when a dinghy class is selected', () => {
                     customRender(<DinghyClassConsole />, model, controller);
                 });
                 const dinghyClassCell = await screen.findByRole('cell', {name: /Scorpion/});
-                await act(async () => {
-                    await user.click(dinghyClassCell);
-                });
+                await user.click(dinghyClassCell);
                 const nameInput = await screen.findByLabelText(/class name/i);
                 const updateButton = screen.getByRole('button', {name: 'Update'});
-                await act(async () => {
-                    await user.clear(nameInput);
-                    await user.type(nameInput, 'Scorp Pro');
-                    await user.click(updateButton);
-                });
-
+                await user.clear(nameInput);
+                await user.type(nameInput, 'Scorp Pro');
+                await user.click(updateButton);
                 expect(await screen.findByText('Oops something went wrong.')).toBeInTheDocument();
             });
-        })
+        });
     });
     describe('when cancelled', () => {
         it('clears input fields', async () => {
@@ -454,25 +382,21 @@ describe('when a dinghy class is selected', () => {
                 customRender(<DinghyClassConsole />, model, controller);
             });
             const dinghyClassCell = await screen.findByRole('cell', {name: /Scorpion/});
-            await act(async () => {
-                await user.click(dinghyClassCell);
-            });
+            await user.click(dinghyClassCell);
             const nameInput = await screen.findByLabelText(/class name/i);
             const crewSizeInput = await screen.findByLabelText(/crew size/i);
             const portsmouthNumberInput = await screen.findByLabelText(/portsmouth number/i);
             const externalNameInput = await screen.findByLabelText(/external name/i);
             const cancelButton = screen.getByRole('button', {name: 'Cancel'});
-            await act(async () => {
-                await user.clear(nameInput);
-                await user.type(nameInput, 'Scorp Pro');
-                await user.clear(crewSizeInput);
-                await user.type(crewSizeInput, '3');
-                await user.clear(portsmouthNumberInput);
-                await user.type(portsmouthNumberInput, '999');
-                await user.clear(externalNameInput);
-                await user.type(externalNameInput, 'SCORPION PRO');
-                await user.click(cancelButton);
-            });
+            await user.clear(nameInput);
+            await user.type(nameInput, 'Scorp Pro');
+            await user.clear(crewSizeInput);
+            await user.type(crewSizeInput, '3');
+            await user.clear(portsmouthNumberInput);
+            await user.type(portsmouthNumberInput, '999');
+            await user.clear(externalNameInput);
+            await user.type(externalNameInput, 'SCORPION PRO');
+            await user.click(cancelButton);
             expect(nameInput).toHaveValue('');
             expect(crewSizeInput).toHaveValue(1);
             expect(portsmouthNumberInput).toHaveValue(1000);
@@ -481,7 +405,6 @@ describe('when a dinghy class is selected', () => {
         });
     });
 });
-
 describe('when a new dinghy class is created', () => {
     it('updates the list of dinghy classes', async () => {
         const dinghyClasses_updated = [...dinghyClasses, {name: 'Avalon', crewSize: 5, portsMouthNumber: 856, url: 'http://localhost:8081/dinghyracing/api/dinghyClasses/99'}]
@@ -490,10 +413,9 @@ describe('when a new dinghy class is created', () => {
         await act( async () => {
             customRender(<DinghyClassConsole />, model);
         });
-
         await act(async () => {
             model.handleDinghyClassCreation('http://localhost:8081/dinghyracing/api/dinghyClasses/99');
-        });
+        });        
         expect(await screen.findByRole('cell', {name: /avalon/i})).toBeInTheDocument();
     });
 });
