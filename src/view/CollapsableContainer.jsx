@@ -23,7 +23,7 @@ import React, { useState } from 'react';
 function CollapsableContainer({ heading, children }) {
     const [showChildren, setShowChildren] = useState(false);
 
-    function handleToggleChildrenButtonClick(event) {
+    function handleToggleChildrenButtonClick() {
         setShowChildren(s => !s);
     }
 
