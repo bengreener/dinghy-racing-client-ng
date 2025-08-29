@@ -89,7 +89,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         }
     }, [entry, updateLap, showUserMessage]);
 
-    const handleLastLapCellFocusOut = useCallback((event) => {
+    const handleLastLapCellFocusOut = useCallback(() => {
         setEditMode(false);
     }, []);
 
@@ -121,7 +121,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         }
     }
 
-    function handleAuxClick(event) {
+    function handleAuxClick() {
         if (!editMode && !disabled) {
             // do not enter edit mode if there is no lap time to edit
             if (entry.laps.length > 0) {
@@ -164,7 +164,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
 		}
 	}
 
-	function gestureEnd(event) {
+	function gestureEnd() {
         if (tracking) {
             if (touchTimeoutId) {
                 clearTimeout(touchTimeoutId);
@@ -193,7 +193,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         }
 	}
 
-    function gestureCancel(event) {
+    function gestureCancel() {
         if (touchTimeoutId) {
             clearTimeout(touchTimeoutId);
             touchTimeoutId = null;
@@ -215,7 +215,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         event.stopPropagation(); // do not want to call add lap
     }
 
-    function handleFastGroupChange(event) {
+    function handleFastGroupChange() {
         if (onFastGroup) {
             onFastGroup(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
         }
