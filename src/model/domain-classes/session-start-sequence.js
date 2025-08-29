@@ -141,7 +141,7 @@ class SessionStartSequence {
                 }
             })
         });
-        flagsMap.forEach((signals, key) => {
+        flagsMap.forEach((signals) => {
             if (signals.length > 2) {
                 // sort array in ascending order by signal.time and remove signals where visual signals conflict (raise and lower same visual signal at same time)
                 signals.sort((a, b) => {
