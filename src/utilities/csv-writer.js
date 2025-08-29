@@ -21,40 +21,40 @@ import Clock from '../model/domain-classes/clock';
 /**
  * Write race, entries, and any recorded laps to a CSV file
  * File will be saved via browsers URL file download feature
- * @param {Race} race 
+ * @param {Race} race
  * @param {Array<Entry>} entries
  * @param {import('../controller/download-options').DownloadOptions} [options]
  */
-function downloadRaceEntriesCSV(race, entries, options) {
+async function downloadRaceEntriesCSV(race, entries, options) {
     const link = document.createElement('a');
-    return new Promise(async (resolve, reject) => {
-        try {
-            const data = new Blob(convertRaceEntriesToCSVArray(race, entries, options), {'type': 'text/csv'});
-            if (supportsFileSystemAccess()) {
-                // Show the file save dialog.
-                const handle = await window.showSaveFilePicker({ suggestedName: race.name + '.csv', types: [{description: 'CSV file', accept: {'text/csv': ['.csv']}}] });
-                // Write the blob to the file.
-                const writable = await handle.createWritable();
-                await writable.write(data);
-                await writable.close();
-                resolve({'success': true});
-            }
-            else {
-                link.href = window.URL.createObjectURL(data);
-                link.download = race.name + '.csv';
-                link.click();
-                resolve({'success': true});
-            }
+    let result;
+    try {
+        const data = new Blob(convertRaceEntriesToCSVArray(race, entries, options), {'type': 'text/csv'});
+        if (supportsFileSystemAccess()) {
+            // Show the file save dialog.
+            const handle = await window.showSaveFilePicker({ suggestedName: race.name + '.csv', types: [{description: 'CSV file', accept: {'text/csv': ['.csv']}}] });
+            // Write the blob to the file.
+            const writable = await handle.createWritable();
+            await writable.write(data);
+            await writable.close();
+            result = {'success': true};
         }
-        catch (error) {
-            if (error.name !== 'AbortError') {
-                resolve({'success': false, 'message': error.message});
-            }
+        else {
+            link.href = window.URL.createObjectURL(data);
+            link.download = race.name + '.csv';
+            link.click();
+            result = {'success': true};
         }
-        finally {
-            window.URL.revokeObjectURL(link.href);
+    }
+    catch (error) {
+        if (error.name !== 'AbortError') {
+            result = {'success': false, 'message': error.message};
         }
-    });
+    }
+    finally {
+        window.URL.revokeObjectURL(link.href);
+    }
+    return Promise.resolve(result);
 };
 
 function createHeader(race) {
