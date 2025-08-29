@@ -32,493 +32,430 @@ HTMLDialogElement.prototype.showModal = vi.fn();
 HTMLDialogElement.prototype.close = vi.fn();
 
 beforeEach(() => {
-  vi.clearAllMocks();
   vi.restoreAllMocks();
 });
 
 it('displays menu buttons', async () => {
-  const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-  const dinghyRacingController = new DinghyRacingController(model);
-  await act(async () => {
-    render(<App model={model} controller={dinghyRacingController} />);
-  });
-  const btnCreateDinghyClass = screen.getByRole('button', {name: /dinghy classes\b/i, hidden: true});
-  const btnCreateRace = screen.getByRole('button', {name: /create race\b/i, hidden: true});
-  const btnFleets = screen.getByRole('button', {name: /fleets/i, hidden: true});
-  const btnUpcomingRaces = screen.getByRole('button', {name: /enrolment\b/i, hidden: true});
-  const btnRaceStartConsole = screen.getByRole('button', {name: /race start\b/i, hidden: true});
-  const btnRaceConsole = screen.getByRole('button', {name: /run race\b/i, hidden: true});
-  const btnDownloadRaces = screen.getByRole('button', {name: /download races\b/i, hidden: true});
-  const btnSynchExternalCloclRaces = screen.getByRole('button', {name: /synch external clock\b/i, hidden: true});
-  const btnLogout = screen.getByRole('button', {name: /logout\b/i, hidden: true});
-  expect(btnCreateDinghyClass).toBeInTheDocument();
-  expect(btnCreateRace).toBeInTheDocument();
-  expect(btnFleets).toBeInTheDocument();
-  expect(btnUpcomingRaces).toBeInTheDocument();
-  expect(btnRaceStartConsole).toBeInTheDocument();
-  expect(btnRaceConsole).toBeInTheDocument();
-  expect(btnDownloadRaces).toBeInTheDocument();
-  expect(btnSynchExternalCloclRaces).toBeInTheDocument();
-  expect(btnLogout).toBeInTheDocument();
+	const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+	const dinghyRacingController = new DinghyRacingController(model);
+	await act(async () => {
+		render(<App model={model} controller={dinghyRacingController} />);
+	});
+	const btnCreateDinghyClass = screen.getByRole('button', {name: /dinghy classes\b/i, hidden: true});
+	const btnCreateRace = screen.getByRole('button', {name: /create race\b/i, hidden: true});
+	const btnFleets = screen.getByRole('button', {name: /fleets/i, hidden: true});
+	const btnUpcomingRaces = screen.getByRole('button', {name: /enrolment\b/i, hidden: true});
+	const btnRaceStartConsole = screen.getByRole('button', {name: /race start\b/i, hidden: true});
+	const btnRaceConsole = screen.getByRole('button', {name: /run race\b/i, hidden: true});
+	const btnDownloadRaces = screen.getByRole('button', {name: /download races\b/i, hidden: true});
+	const btnSynchExternalCloclRaces = screen.getByRole('button', {name: /synch external clock\b/i, hidden: true});
+	const btnLogout = screen.getByRole('button', {name: /logout\b/i, hidden: true});
+	expect(btnCreateDinghyClass).toBeInTheDocument();
+	expect(btnCreateRace).toBeInTheDocument();
+	expect(btnFleets).toBeInTheDocument();
+	expect(btnUpcomingRaces).toBeInTheDocument();
+	expect(btnRaceStartConsole).toBeInTheDocument();
+	expect(btnRaceConsole).toBeInTheDocument();
+	expect(btnDownloadRaces).toBeInTheDocument();
+	expect(btnSynchExternalCloclRaces).toBeInTheDocument();
+	expect(btnLogout).toBeInTheDocument();
 });
-
 it('displays time', async () => {
-  const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-  const dinghyRacingController = new DinghyRacingController(model);
-  await act(async () => {
-    render(<App model={model} controller={dinghyRacingController} />);
-  });
-
-  expect(screen.getByText(Clock.formatTime(new Date()))).toBeInTheDocument();
+	const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+	const dinghyRacingController = new DinghyRacingController(model);
+	await act(async () => {
+		render(<App model={model} controller={dinghyRacingController} />);
+	});
+	expect(screen.getByText(Clock.formatTime(new Date()))).toBeInTheDocument();
 });
-
 describe('user roles does not include ROLE_RACE_SCHEDULER', () => {
-  it('does not provide option to add dinghy class', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const dinghyRacingController = new DinghyRacingController(model);
-    vi.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
-    await act(async () => {
-      render(<App model={model} controller={dinghyRacingController} />);
-    });
-    const btnCreateDinghyClass = screen.queryByRole('button', {name: /create dinghy class\b/i});
-    expect(btnCreateDinghyClass).not.toBeInTheDocument();
-  });
-  it('does not provide option to add race', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const dinghyRacingController = new DinghyRacingController(model);
-    vi.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
-    await act(async () => {
-      render(<App model={model} controller={dinghyRacingController} />);
-    });
-    const btnCreateRace = screen.queryByRole('button', {name: /create race\b/i});
-    expect(btnCreateRace).not.toBeInTheDocument();
-  });
-  it('does not provide option to display fleets console', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const dinghyRacingController = new DinghyRacingController(model);
-    vi.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
-    await act(async () => {
-      render(<App model={model} controller={dinghyRacingController} />);
-    });
-    const btnFleets = screen.queryByRole('button', {name: /fleets\b/i});
-    expect(btnFleets).not.toBeInTheDocument();
-  });
+	it('does not provide option to add dinghy class', async () => {
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		const dinghyRacingController = new DinghyRacingController(model);
+		vi.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnCreateDinghyClass = screen.queryByRole('button', {name: /create dinghy class\b/i});
+		expect(btnCreateDinghyClass).not.toBeInTheDocument();
+	});
+	it('does not provide option to add race', async () => {
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		const dinghyRacingController = new DinghyRacingController(model);
+		vi.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnCreateRace = screen.queryByRole('button', {name: /create race\b/i});
+		expect(btnCreateRace).not.toBeInTheDocument();
+	});
+	it('does not provide option to display fleets console', async () => {
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		const dinghyRacingController = new DinghyRacingController(model);
+		vi.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnFleets = screen.queryByRole('button', {name: /fleets\b/i});
+		expect(btnFleets).not.toBeInTheDocument();
+	});
 });
-
 describe('user roles does not include ROLE_RACE_OFFICER', () => {
-  it('does not provide option to access race console', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const dinghyRacingController = new DinghyRacingController(model);
-    vi.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
-    await act(async () => {
-      render(<App model={model} controller={dinghyRacingController} />);
-    });
-    const btnRaceConsole = screen.queryByRole('button', {name: /run race\b/i});
-    expect(btnRaceConsole).not.toBeInTheDocument();
-  });
-  it('does not provide option to access race start console', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const dinghyRacingController = new DinghyRacingController(model);
-    vi.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
-    await act(async () => {
-      render(<App model={model} controller={dinghyRacingController} />);
-    });
-    const btnRaceStartConsole = screen.queryByRole('button', {name: /race start\b/i});
-    expect(btnRaceStartConsole).not.toBeInTheDocument();
-  });
+	it('does not provide option to access race console', async () => {
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		const dinghyRacingController = new DinghyRacingController(model);
+		vi.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnRaceConsole = screen.queryByRole('button', {name: /run race\b/i});
+		expect(btnRaceConsole).not.toBeInTheDocument();
+	});
+	it('does not provide option to access race start console', async () => {
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		const dinghyRacingController = new DinghyRacingController(model);
+		vi.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnRaceStartConsole = screen.queryByRole('button', {name: /race start\b/i});
+		expect(btnRaceStartConsole).not.toBeInTheDocument();
+	});
 });
-
 describe('when dinghy classes button clicked', () => {
-  it('displays dinghy class console', async () => {
-    const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(DinghyRacingModel, 'dinghyClassTemplate').mockImplementation(() => {return {'name': '', 'url': ''}});
-    vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
-    const dinghyRacingController = new DinghyRacingController(model);
-
-    render(<App model={model} controller={dinghyRacingController} />);
-    const btnMenu = await screen.findByRole('button', {name: /☰/i})
-    await act(async () => {
-      await user.click(btnMenu);
-    });
-    const btnCreateDinghyClass = await screen.findByRole('button', {name: /dinghy classes\b/i});
-    await act(async () => {
-      await user.click(btnCreateDinghyClass);
-    });
-    expect(await screen.findByLabelText('Class Name')).toBeInTheDocument();
-  });
-  it('main menu buttons are not shown as selected', async () => {
-    const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(DinghyRacingModel, 'dinghyClassTemplate').mockImplementation(() => {return {'name': '', 'url': ''}});
-    vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
-    const dinghyRacingController = new DinghyRacingController(model);
-
-    render(<App model={model} controller={dinghyRacingController} />);
-    const btnMenu = await screen.findByRole('button', {name: /☰/i})
-    await act(async () => {
-      await user.click(btnMenu);
-    });
-    const btnCreateDinghyClass = await screen.findByRole('button', {name: /dinghy classes\b/i});
-    await act(async () => {
-      await user.click(btnCreateDinghyClass);
-    });
-    expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
-    expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
-    expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
-  });
+	it('displays dinghy class console', async () => {
+		const user = userEvent.setup();
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		vi.spyOn(DinghyRacingModel, 'dinghyClassTemplate').mockImplementation(() => {return {'name': '', 'url': ''}});
+		vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+		const dinghyRacingController = new DinghyRacingController(model);
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnMenu = await screen.findByRole('button', {name: /☰/i})
+			await user.click(btnMenu);
+		const btnCreateDinghyClass = await screen.findByRole('button', {name: /dinghy classes\b/i});
+			await user.click(btnCreateDinghyClass);
+		expect(await screen.findByLabelText('Class Name')).toBeInTheDocument();
+	});
+	it('main menu buttons are not shown as selected', async () => {
+		const user = userEvent.setup();
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		vi.spyOn(DinghyRacingModel, 'dinghyClassTemplate').mockImplementation(() => {return {'name': '', 'url': ''}});
+		vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+		const dinghyRacingController = new DinghyRacingController(model);
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnMenu = await screen.findByRole('button', {name: /☰/i})
+			await user.click(btnMenu);
+		const btnCreateDinghyClass = await screen.findByRole('button', {name: /dinghy classes\b/i});
+			await user.click(btnCreateDinghyClass);
+		expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
+		expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
+		expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
+	});
 });
-
 describe('when fleets button clicked', () => {
-  it('displays fleet console', async () => {
-    const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const dinghyRacingController = new DinghyRacingController(model);
-    vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})})
-    vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})})
-
-    render(<App model={model} controller={dinghyRacingController} />);
-    const btnMenu = await screen.findByRole('button', {name: /☰/i})
-    await act(async () => {
-      await user.click(btnMenu);
-    });
-    const btnFleets = await screen.findByRole('button', {name: /fleets\b/i});
-    await act(async () => {
-      await user.click(btnFleets);
-    });
-    expect(await screen.findByRole('heading', {name: /fleet/i})).toBeInTheDocument();
-  });
-  it('main menu buttons are not shown as selected', async () => {
-    const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const dinghyRacingController = new DinghyRacingController(model);
-    vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})})
-    vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})})
-
-    render(<App model={model} controller={dinghyRacingController} />);
-    const btnMenu = await screen.findByRole('button', {name: /☰/i})
-    await act(async () => {
-      await user.click(btnMenu);
-    });
-    const btnFleets = await screen.findByRole('button', {name: /fleets\b/i});
-    await act(async () => {
-      await user.click(btnFleets);
-    });
-    expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
-    expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
-    expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
-  });
+	it('displays fleet console', async () => {
+		const user = userEvent.setup();
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		const dinghyRacingController = new DinghyRacingController(model);
+		vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})})
+		vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})})
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnMenu = await screen.findByRole('button', {name: /☰/i});
+		await user.click(btnMenu);
+		const btnFleets = await screen.findByRole('button', {name: /fleets\b/i});
+		await user.click(btnFleets);
+		expect(await screen.findByRole('heading', {name: /fleet/i})).toBeInTheDocument();
+	});
+	it('main menu buttons are not shown as selected', async () => {
+		const user = userEvent.setup();
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		const dinghyRacingController = new DinghyRacingController(model);
+		vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})})
+		vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})})
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnMenu = await screen.findByRole('button', {name: /☰/i})
+		await user.click(btnMenu);
+		const btnFleets = await screen.findByRole('button', {name: /fleets\b/i});
+		await user.click(btnFleets);
+		expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
+		expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
+		expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
+	});
 });
-
 describe('when create race button clicked', () => {
-  it('displays create race form', async () => {
-    const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const dinghyRacingController = new DinghyRacingController(model);
-    vi.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve(fleets)});
-
-    render(<App model={model} controller={dinghyRacingController} />);
-    const btnMenu = await screen.findByRole('button', {name: /☰/i})
-    await act(async () => {
-      await user.click(btnMenu);
-    });
-    const btnCreateRace = await screen.findByRole('button', {name: /create race\b/i});
-    await act(async () => {
-      await user.click(btnCreateRace);
-    });
-    expect(await screen.findByLabelText('Race Name')).toBeInTheDocument();
-  });
-  it('main menu buttons are not shown as selected', async () => {
-    const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const dinghyRacingController = new DinghyRacingController(model);
-    vi.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve(fleets)});
-
-    render(<App model={model} controller={dinghyRacingController} />);
-    const btnMenu = await screen.findByRole('button', {name: /☰/i})
-    await act(async () => {
-      await user.click(btnMenu);
-    });
-    const btnCreateRace = await screen.findByRole('button', {name: /create race\b/i});
-    await act(async () => {
-      await user.click(btnCreateRace);
-    });
-    expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
-    expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
-    expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
-  });
+	it('displays create race form', async () => {
+		const user = userEvent.setup();
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		const dinghyRacingController = new DinghyRacingController(model);
+		vi.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve(fleets)});
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnMenu = await screen.findByRole('button', {name: /☰/i});
+		await user.click(btnMenu);
+		const btnCreateRace = await screen.findByRole('button', {name: /create race\b/i});
+		await user.click(btnCreateRace);
+		expect(await screen.findByLabelText('Race Name')).toBeInTheDocument();
+	});
+	it('main menu buttons are not shown as selected', async () => {
+		const user = userEvent.setup();
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		const dinghyRacingController = new DinghyRacingController(model);
+		vi.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve(fleets)});
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnMenu = await screen.findByRole('button', {name: /☰/i})
+		await user.click(btnMenu);
+		const btnCreateRace = await screen.findByRole('button', {name: /create race\b/i});
+		await user.click(btnCreateRace);
+		expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
+		expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
+		expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
+	});
 });
-
 describe('when upcoming races button clicked', () => {
-  // test could be affected by timezone changes; for example move from British Summer Time to GMT
-  it('displays upcoming races', async () => {
-    const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const dinghyRacingController = new DinghyRacingController(model);
-    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-
-    render(<App model={model} controller={dinghyRacingController} />);
-    const btnMenu = await screen.findByRole('button', {name: /☰/i})
-    await act(async () => {
-      await user.click(btnMenu);
-    });
-    const btnViewUpcomingRaces = await screen.findByRole('button', {name: /enrolment\b/i});
-    await act(async () => {
-      await user.click(btnViewUpcomingRaces);
-    });
-    const timeCheck = new Date('2021-10-14T10:30:00Z').toLocaleString();
-    expect(await screen.findByText('Scorpion A')).toBeInTheDocument();
-    expect(await screen.findByText('Graduate A')).toBeInTheDocument();
-    expect(await screen.findByText(timeCheck)).toBeInTheDocument();
-  });
-  it('only enrolment button shown as selected', async () => {
-    const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const dinghyRacingController = new DinghyRacingController(model);
-    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-
-    render(<App model={model} controller={dinghyRacingController} />);
-    const btnMenu = await screen.findByRole('button', {name: /☰/i})
-    await act(async () => {
-      await user.click(btnMenu);
-    });
-    const btnViewUpcomingRaces = await screen.findByRole('button', {name: /enrolment\b/i});
-    await act(async () => {
-      await user.click(btnViewUpcomingRaces);
-    });
-    expect(btnViewUpcomingRaces.classList).toContain('selected');
-    expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
-    expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
-  });
+	// test could be affected by timezone changes; for example move from British Summer Time to GMT
+	it('displays upcoming races', async () => {
+		const user = userEvent.setup();
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		const dinghyRacingController = new DinghyRacingController(model);
+		vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnMenu = await screen.findByRole('button', {name: /☰/i})
+		await user.click(btnMenu);
+		const btnViewUpcomingRaces = await screen.findByRole('button', {name: /enrolment\b/i});
+		await user.click(btnViewUpcomingRaces);
+		const timeCheck = new Date('2021-10-14T10:30:00Z').toLocaleString();
+		expect(await screen.findByText('Scorpion A')).toBeInTheDocument();
+		expect(await screen.findByText('Graduate A')).toBeInTheDocument();
+		expect(await screen.findByText(timeCheck)).toBeInTheDocument();
+	});
+	it('only enrolment button shown as selected', async () => {
+		const user = userEvent.setup();
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		const dinghyRacingController = new DinghyRacingController(model);
+		vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnMenu = await screen.findByRole('button', {name: /☰/i});
+		await user.click(btnMenu);
+		const btnViewUpcomingRaces = await screen.findByRole('button', {name: /enrolment\b/i});
+		await user.click(btnViewUpcomingRaces);
+		expect(btnViewUpcomingRaces.classList).toContain('selected');
+		expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
+		expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
+	});
 });
-
 describe('when race console button is clicked', ()  => {
-  it('displays race console', async () => {
-    const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-    vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-    const dinghyRacingController = new DinghyRacingController(model);
-
-    render(<App model={model} controller={dinghyRacingController} />);
-    const btnRaceConsole = await screen.findByRole('button', {name: /run race\b/i});
-    await act(async () => {
-      await user.click(btnRaceConsole);
-    });
-    expect(await screen.findByRole('heading', {name: /select races/i})).toBeInTheDocument();
-  });
-  it('only run race button shown as selected', async () => {
-    const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-    vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-    const dinghyRacingController = new DinghyRacingController(model);
-
-    render(<App model={model} controller={dinghyRacingController} />);
-    const btnRaceConsole = await screen.findByRole('button', {name: /run race\b/i});
-    await act(async () => {
-      await user.click(btnRaceConsole);
-    });
-    expect(btnRaceConsole.classList).toContain('selected');
-    expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
-    expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
-  });
+	it('displays race console', async () => {
+		const user = userEvent.setup();
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+		vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+		const dinghyRacingController = new DinghyRacingController(model);
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnRaceConsole = await screen.findByRole('button', {name: /run race\b/i});
+		await user.click(btnRaceConsole);
+		expect(await screen.findByRole('heading', {name: /select races/i})).toBeInTheDocument();
+	});
+	it('only run race button shown as selected', async () => {
+		const user = userEvent.setup();
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+		vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+		const dinghyRacingController = new DinghyRacingController(model);
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnRaceConsole = await screen.findByRole('button', {name: /run race\b/i});
+		await user.click(btnRaceConsole);
+		expect(btnRaceConsole.classList).toContain('selected');
+		expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
+		expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
+	});
 });
-
 describe('when race start console button is clicked', ()  => {
-  it('displays race start console', async () => {
-    const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-    vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
-      if (race.name === 'Scorpion A') {
-        return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})
-      }
-      if (race.name === 'Graduate A') {
-        return Promise.resolve({'success': true, 'domainObject': entriesGraduateA})
-      }
-      if (race.name === 'Comet A') {
-        return Promise.resolve({'success': true, 'domainObject': entriesCometA})
-      }
-      if (race.name === 'Handicap A') {
-        return Promise.resolve({'success': true, 'domainObject': entriesHandicapA})
-      }
-    });
-    vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({success: false, message: 'Set to fail'})});
-    const dinghyRacingController = new DinghyRacingController(model);
-
-    render(<App model={model} controller={dinghyRacingController} />);
-    const btnRaceStartConsole = await screen.findByRole('button', {name: /race start\b/i});
-    await act(async () => {
-      await user.click(btnRaceStartConsole);
-    });
-    expect(await screen.findByRole('heading', {name: /start races/i})).toBeInTheDocument();
-  });
-  it('displays race start console', async () => {
-    const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-    vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
-      if (race.name === 'Scorpion A') {
-        return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})
-      }
-      if (race.name === 'Graduate A') {
-        return Promise.resolve({'success': true, 'domainObject': entriesGraduateA})
-      }
-      if (race.name === 'Comet A') {
-        return Promise.resolve({'success': true, 'domainObject': entriesCometA})
-      }
-      if (race.name === 'Handicap A') {
-        return Promise.resolve({'success': true, 'domainObject': entriesHandicapA})
-      }
-    });
-    vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({success: false, message: 'Set to fail'})});
-    const dinghyRacingController = new DinghyRacingController(model);
-
-    render(<App model={model} controller={dinghyRacingController} />);
-    const btnRaceStartConsole = await screen.findByRole('button', {name: /race start\b/i});
-    await act(async () => {
-      await user.click(btnRaceStartConsole);
-    });
-    expect(btnRaceStartConsole.classList).toContain('selected');
-    expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
-    expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
-  });
+	it('displays race start console', async () => {
+		const user = userEvent.setup();
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+		vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+		if (race.name === 'Scorpion A') {
+			return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})
+		}
+		if (race.name === 'Graduate A') {
+			return Promise.resolve({'success': true, 'domainObject': entriesGraduateA})
+		}
+		if (race.name === 'Comet A') {
+			return Promise.resolve({'success': true, 'domainObject': entriesCometA})
+		}
+		if (race.name === 'Handicap A') {
+			return Promise.resolve({'success': true, 'domainObject': entriesHandicapA})
+		}
+		});
+		vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({success: false, message: 'Set to fail'})});
+		const dinghyRacingController = new DinghyRacingController(model);
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnRaceStartConsole = await screen.findByRole('button', {name: /race start\b/i});
+		await user.click(btnRaceStartConsole);
+		expect(await screen.findByRole('heading', {name: /start races/i})).toBeInTheDocument();
+	});
+	it('displays race start console', async () => {
+		const user = userEvent.setup();
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+		vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+		if (race.name === 'Scorpion A') {
+			return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})
+		}
+		if (race.name === 'Graduate A') {
+			return Promise.resolve({'success': true, 'domainObject': entriesGraduateA})
+		}
+		if (race.name === 'Comet A') {
+			return Promise.resolve({'success': true, 'domainObject': entriesCometA})
+		}
+		if (race.name === 'Handicap A') {
+			return Promise.resolve({'success': true, 'domainObject': entriesHandicapA})
+		}
+		});
+		vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({success: false, message: 'Set to fail'})});
+		const dinghyRacingController = new DinghyRacingController(model);
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnRaceStartConsole = await screen.findByRole('button', {name: /race start\b/i});
+		await user.click(btnRaceStartConsole);
+		expect(btnRaceStartConsole.classList).toContain('selected');
+		expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
+		expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
+	});
 });
-
 describe('when download races console button is clicked', ()  => {
-  it('displays download races form', async () => {
-    const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-    vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-    const dinghyRacingController = new DinghyRacingController(model);
-
-    render(<App model={model} controller={dinghyRacingController} />);
-    const btnMenu = await screen.findByRole('button', {name: /☰/i})
-    await act(async () => {
-      await user.click(btnMenu);
-    });
-    const btnDownloadRaces = await screen.findByRole('button', {name: /download races\b/i});
-    await act(async () => {
-      await user.click(btnDownloadRaces);
-    });
-    expect(await screen.findByRole('heading', {name: /download races/i})).toBeInTheDocument();
-  });
-  it('main menu buttons are not shown as selected', async () => {
-    const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-    vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-    const dinghyRacingController = new DinghyRacingController(model);
-
-    render(<App model={model} controller={dinghyRacingController} />);
-    const btnMenu = await screen.findByRole('button', {name: /☰/i})
-    await act(async () => {
-      await user.click(btnMenu);
-    });
-    const btnDownloadRaces = await screen.findByRole('button', {name: /download races\b/i});
-    await act(async () => {
-      await user.click(btnDownloadRaces);
-    });
-    expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
-    expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
-    expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
-  });
+	it('displays download races form', async () => {
+		const user = userEvent.setup();
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+		vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+		const dinghyRacingController = new DinghyRacingController(model);
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnMenu = await screen.findByRole('button', {name: /☰/i})
+		await user.click(btnMenu);
+		const btnDownloadRaces = await screen.findByRole('button', {name: /download races\b/i});
+		await user.click(btnDownloadRaces);
+		expect(await screen.findByRole('heading', {name: /download races/i})).toBeInTheDocument();
+	});
+	it('main menu buttons are not shown as selected', async () => {
+		const user = userEvent.setup();
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+		vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+		const dinghyRacingController = new DinghyRacingController(model);
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnMenu = await screen.findByRole('button', {name: /☰/i})
+		await user.click(btnMenu);
+		const btnDownloadRaces = await screen.findByRole('button', {name: /download races\b/i});
+		await user.click(btnDownloadRaces);
+		expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
+		expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
+		expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
+	});
 });
-
 describe('when competitors console button is clicked', () => {
-  it('displays competitors console', async () => {
-    const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
-
-    render(<App model={model} />);
-    const btnMenu = await screen.findByRole('button', {name: /☰/i})
-    await act(async () => {
-      await user.click(btnMenu);
-    });
-    const btnCompetitors = await screen.findByRole('button', {name: /competitors\b/i});
-    await act(async () => {
-      await user.click(btnCompetitors);
-    });
-    expect(await screen.findByRole('heading', {name: /competitors/i})).toBeInTheDocument();
-  });
-  it('main menu buttons are not shown as selected', async () => {
-    const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
-
-    render(<App model={model} />);
-    const btnMenu = await screen.findByRole('button', {name: /☰/i})
-    await act(async () => {
-      await user.click(btnMenu);
-    });
-    const btnCompetitors = await screen.findByRole('button', {name: /competitors\b/i});
-    await act(async () => {
-      await user.click(btnCompetitors);
-    });
-    expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
-    expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
-    expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
-  });
+	it('displays competitors console', async () => {
+		const user = userEvent.setup();
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+		await act(async () => {
+			render(<App model={model} />);
+		});
+		const btnMenu = await screen.findByRole('button', {name: /☰/i})
+		await user.click(btnMenu);
+		const btnCompetitors = await screen.findByRole('button', {name: /competitors\b/i});
+		await user.click(btnCompetitors);
+		expect(await screen.findByRole('heading', {name: /competitors/i})).toBeInTheDocument();
+	});
+	it('main menu buttons are not shown as selected', async () => {
+		const user = userEvent.setup();
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+		await act(async () => {
+			render(<App model={model} />);
+		});
+		const btnMenu = await screen.findByRole('button', {name: /☰/i})
+		await user.click(btnMenu);
+		const btnCompetitors = await screen.findByRole('button', {name: /competitors\b/i});
+		await user.click(btnCompetitors);
+		expect(screen.getByRole('button', {name: /run race\b/i}).classList).not.toContain('selected');
+		expect(screen.getByRole('button', {name: /enrolment\b/i}).classList).not.toContain('selected');
+		expect(screen.getByRole('button', {name: /race start\b/i}).classList).not.toContain('selected');
+	});
+	it('enables user to logout', async () => {
+		// jsdom does not implement navigation so replace Window.location with a trackable mock for this test
+		const holdOldWindowLocation = {...window.location};
+		Object.defineProperty(window, 'location', {
+			value: new URL(window.location.href),
+			configurable: true,
+		});
+		const user = userEvent.setup();
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		const dinghyRacingController = new DinghyRacingController(model);
+		await act(async () => {
+			render(<App model={model} controller={dinghyRacingController} />);
+		});
+		const btnMenu = await screen.findByRole('button', {name: /☰/i})
+		await user.click(btnMenu);
+		const btnLogout = screen.getByRole('button', { 'name': /logout/i});
+		await user.click(btnLogout);
+		expect(global.window.location.href).toMatch(/logout/i);
+		// revert to old Window.location implmentation
+		Object.defineProperty(window, 'location', {
+			value: {...holdOldWindowLocation},
+			configurable: true,
+		});
+	});
 });
-
-it('enables user to logout', async () => {
-  // jsdom does not implement navigation so replace Window.location with a trackable mock for this test
-  const holdOldWindowLocation = {...window.location};
-  Object.defineProperty(window, 'location', {
-    value: new URL(window.location.href),
-    configurable: true,
-  });
-  const user = userEvent.setup();
-  const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-  const dinghyRacingController = new DinghyRacingController(model);
-
-  render(<App model={model} controller={dinghyRacingController} />);
-  const btnMenu = await screen.findByRole('button', {name: /☰/i})
-  await act(async () => {
-    await user.click(btnMenu);
-  });
-  const btnLogout = screen.getByRole('button', { 'name': /logout/i});
-  await act(async () => {
-    await user.click(btnLogout);
-  });
-  expect(global.window.location.href).toMatch(/logout/i);
-
-  // revert to old Window.location implmentation
-  Object.defineProperty(window, 'location', {
-    value: {...holdOldWindowLocation},
-    configurable: true,
-  });
-});
-
 describe('when synch external clock button clicked button clicked', () => {
-      it('displays synch external clock dialog', async () => {
-        let formatOptions = {
-          timeZone: 'UTC',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-        };
-        const timeFormat = new Intl.DateTimeFormat('en-GB', formatOptions);
-        const testTimeString = timeFormat.format(Date.now());
-        const user = userEvent.setup();
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        await act(async () => {
-          render(<App model={model} controller={controller} />);
-        });
-        const btnMenu = await screen.findByRole('button', {name: /☰/i})
-        await act(async () => {
-          await user.click(btnMenu);
-        });
-        await act(async () => {
-            await user.click(screen.getByRole('button', {'name': /synch external clock/i}));
-        });
-        const dialog = within(screen.getByTestId('synch-external-time-dialog'));
-        expect(dialog.getByLabelText(/enter time/i)).toHaveValue(testTimeString);
-        expect(dialog.getByRole('button', {name: /set time/i, 'hidden': true})).toBeInTheDocument();
-        expect(dialog.getByRole('button', {name: /cancel/i, 'hidden': true})).toBeInTheDocument();
+	it('displays synch external clock dialog', async () => {
+		let formatOptions = {
+			timeZone: 'UTC',
+			hour: '2-digit',
+			minute: '2-digit',
+			second: '2-digit',
+		};
+		const timeFormat = new Intl.DateTimeFormat('en-GB', formatOptions);
+		const testTimeString = timeFormat.format(Date.now());
+		const user = userEvent.setup();
+		const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+		const controller = new DinghyRacingController(model);
+		await act(async () => {
+			render(<App model={model} controller={controller} />);
+		});
+		const btnMenu = await screen.findByRole('button', {name: /☰/i});
+		await user.click(btnMenu);
+		await user.click(screen.getByRole('button', {'name': /synch external clock/i}));
+		const dialog = within(screen.getByTestId('synch-external-time-dialog'));
+		expect(dialog.getByLabelText(/enter time/i)).toHaveValue(testTimeString);
+		expect(dialog.getByRole('button', {name: /set time/i, 'hidden': true})).toBeInTheDocument();
+		expect(dialog.getByRole('button', {name: /cancel/i, 'hidden': true})).toBeInTheDocument();
     });
 });
