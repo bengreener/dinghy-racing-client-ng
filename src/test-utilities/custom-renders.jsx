@@ -18,15 +18,6 @@ import { render } from '@testing-library/react';
 import ModelContext from '../view/ModelContext';
 import ControllerContext from '../view/ControllerContext';
 
-// beforeEach(() => {
-//     vi.spyOn(console, 'error');
-//     console.error.mockImplementation(() => {});
-// })
-
-// afterEach(() => {
-//     console.error.mockRestore();
-// })
-
 export const customRender = (ui, model, controller, {...renderOptions} = {}) => {
     const rendered = render(
         <ModelContext.Provider value={model}>
