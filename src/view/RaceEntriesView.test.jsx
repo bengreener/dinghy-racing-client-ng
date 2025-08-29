@@ -55,7 +55,6 @@ it('renders', async () => {
     expect(screen.getAllByText(/Scorpion/i)[0]).toBeInTheDocument();
     expect(screen.getByText(/Chris marshaLL/i)).toBeInTheDocument();
 });
-
 it('displays entries for selected races', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     vi.spyOn(model, 'getEntriesByRace').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
@@ -70,7 +69,6 @@ it('displays entries for selected races', async () => {
     expect(entry2).toBeInTheDocument();
     expect(entry3).toBeInTheDocument();
 });
-
 describe('when entries cannot be loaded for a selected race', () => {
     it('displays an error message', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -84,9 +82,7 @@ describe('when entries cannot be loaded for a selected race', () => {
     it('clears the error message when entries are successfully loaded', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesGraduateA})}).mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
-
         let render;
-
         await act(async () => {
             render = customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
         });
@@ -99,7 +95,6 @@ describe('when entries cannot be loaded for a selected race', () => {
         expect(errorMessage).not.toBeInTheDocument();
     });
 });
-
 describe('when sorting entries', () => {
     it('sorts by the sailnumber', async () => {
         const entriesScorpionA = [
@@ -120,9 +115,7 @@ describe('when sorting entries', () => {
             customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
         });
         const sortBySailNumber = screen.getByRole('button', {'name': /by sail number/i});
-        await act(async () => {
-            await user.click(sortBySailNumber);
-        });
+        await user.click(sortBySailNumber);
         const raceEntryViews = document.getElementsByClassName('race-entry-view');
         expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
         expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '2928'})).toBeInTheDocument();
@@ -146,11 +139,8 @@ describe('when sorting entries', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
         });
-        
         const sortByClassAndSailNumber = screen.getByRole('button', {'name': /by class & sail number/i});
-        await act(async () => {
-            await user.click(sortByClassAndSailNumber);
-        });
+        await user.click(sortByClassAndSailNumber);
         const raceEntryViews = document.getElementsByClassName('race-entry-view');
         expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '2928'})).toBeInTheDocument();
         expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
@@ -176,9 +166,7 @@ describe('when sorting entries', () => {
             customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
         });
         const sortByLapTimeButton = screen.getByRole('button', {'name': /by lap time/i});
-        await act(async () => {
-            await user.click(sortByLapTimeButton);
-        });
+        await user.click(sortByLapTimeButton);
         const raceEntryViews = document.getElementsByClassName('race-entry-view');
         expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
         expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '2928'})).toBeInTheDocument();
@@ -204,9 +192,7 @@ describe('when sorting entries', () => {
             customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
         });
         const sortByForecast = screen.getByRole('button', {'name': /by forecast/i});
-        await act(async () => {
-            await user.click(sortByForecast);
-        });
+        await user.click(sortByForecast);
         const raceEntryViews = document.getElementsByClassName('race-entry-view');
         expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
         expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '2928'})).toBeInTheDocument();
@@ -230,18 +216,14 @@ describe('when sorting entries', () => {
             customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
         });
         const sortByLapTimeButton = screen.getByRole('button', {'name': /by lap time/i});
-        await act(async () => {
-            await user.click(sortByLapTimeButton);
-        });
+        await user.click(sortByLapTimeButton);
         const raceEntryViews = document.getElementsByClassName('race-entry-view');
         await act(async () => {
             model.handleEntryUpdate({'body': entriesScorpionA[1].url});
-        });
+        });        
         expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
         expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
-        await act(async () => {
-            await user.click(sortByLapTimeButton);
-        });
+        await user.click(sortByLapTimeButton);
         expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
         expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
     });
@@ -267,11 +249,8 @@ describe('when sorting entries', () => {
             await act(async () => {
                 customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
             });
-            
             const sortByPositionButton = screen.getByRole('button', {'name': /by position/i});
-            await act(async () => {
-                await user.click(sortByPositionButton);
-            });
+            await user.click(sortByPositionButton);
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
             expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
             expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '2928'})).toBeInTheDocument();
@@ -307,11 +286,8 @@ describe('when sorting entries', () => {
             await act(async () => {
                 customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
             });
-            
             const sortByPositionButton = screen.getByRole('button', {'name': /by position/i});
-            await act(async () => {
-                await user.click(sortByPositionButton);
-            });
+            await user.click(sortByPositionButton);
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
             expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
             expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
@@ -332,9 +308,7 @@ describe('when sorting entries', () => {
                 customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
             });
             const sortByLapTimeButton = screen.getByRole('button', {'name': /by lap time/i});
-            await act(async () => {
-                await user.click(sortByLapTimeButton);
-            });
+            await user.click(sortByLapTimeButton);
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
             expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
             expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
@@ -354,9 +328,7 @@ describe('when sorting entries', () => {
                 customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
             });
             const sortByLapTimeButton = screen.getByRole('button', {'name': /by lap time/i});
-            await act(async () => {
-                await user.click(sortByLapTimeButton);
-            });
+            await user.click(sortByLapTimeButton);
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
             expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
             expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
@@ -376,9 +348,7 @@ describe('when sorting entries', () => {
                 customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
             });
             const sortByLapTimeButton = screen.getByRole('button', {'name': /by lap time/i});
-            await act(async () => {
-                await user.click(sortByLapTimeButton);
-            });
+            await user.click(sortByLapTimeButton);
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
             expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
             expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
@@ -398,9 +368,7 @@ describe('when sorting entries', () => {
                 customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
             });
             const sortByLapTimeButton = screen.getByRole('button', {'name': /by lap time/i});
-            await act(async () => {
-                await user.click(sortByLapTimeButton);
-            });
+            await user.click(sortByLapTimeButton);
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
             expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
             expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
@@ -420,9 +388,7 @@ describe('when sorting entries', () => {
                 customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
             });
             const sortByLapTimeButton = screen.getByRole('button', {'name': /by lap time/i});
-            await act(async () => {
-                await user.click(sortByLapTimeButton);
-            });
+            await user.click(sortByLapTimeButton);
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
             expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
             expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
@@ -449,26 +415,19 @@ describe('when sorting entries', () => {
         // fast group entries
         let entry = (await screen.findByText((content, node) => /^Scorpion6745Sarah Pascal  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')));
         let onFastGroupButton = within(entry).getByRole('checkbox');
-        await act(async () => {
-            await user.click(onFastGroupButton);
-        });
+        await user.click(onFastGroupButton);
         entry = (await screen.findByText((content, node) => /^Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')));
         onFastGroupButton = within(entry).getByRole('checkbox');
-        await act(async () => {
-            await user.click(onFastGroupButton);
-        });
+        await user.click(onFastGroupButton);
         // sort by sail number
         const sortBySailNumber = screen.getByRole('button', {'name': /by sail number/i});
-        await act(async () => {
-            await user.click(sortBySailNumber);
-        });
+        await user.click(sortBySailNumber);
         const raceEntryViews = document.getElementsByClassName('race-entry-view');
         expect(within(raceEntryViews[0]).getByRole('checkbox')).not.toBeChecked();
         expect(within(raceEntryViews[1]).getByRole('checkbox')).not.toBeChecked();
         expect(within(raceEntryViews[2]).getByRole('checkbox')).not.toBeChecked();
     });
 });
-
 describe('when fast grouping entries', () => {
     it('moves first entry selected for fast group to top of entries list', async () => {
         const user = userEvent.setup();
@@ -486,9 +445,7 @@ describe('when fast grouping entries', () => {
         });
         let entry = (await screen.findByText((content, node) => /^Scorpion6745Sarah Pascal  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')));
         const onFastGroupButton = within(entry).getByRole('checkbox');
-        await act(async () => {
-            await user.click(onFastGroupButton);
-        });
+        await user.click(onFastGroupButton);
         const raceEntryViews = document.getElementsByClassName('race-entry-view');
         expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
         expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
@@ -515,15 +472,11 @@ describe('when fast grouping entries', () => {
         });
         // sort entries
         const sortByLapTimeButton = screen.getByRole('button', {'name': /by lap time/i});
-        await act(async () => {
-            await user.click(sortByLapTimeButton);
-        });
+        await user.click(sortByLapTimeButton);
         // fast group entry
         const entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'})).parentElement.parentElement.parentElement;
         const onFastGroupButton = within(entry).getByRole('checkbox');
-        await act(async () => {
-            await user.click(onFastGroupButton);
-        });
+        await user.click(onFastGroupButton);
         const raceEntryViews = document.getElementsByClassName('race-entry-view');
         expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
         expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
@@ -543,19 +496,13 @@ describe('when fast grouping entries', () => {
         });
         let entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '2928'})).parentElement.parentElement.parentElement;
         let onFastGroupButton = within(entry).getByRole('checkbox');
-        await act(async () => {
-            await user.click(onFastGroupButton);
-        });
+        await user.click(onFastGroupButton);
         entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '2009'})).parentElement.parentElement.parentElement;
         onFastGroupButton = within(entry).getByRole('checkbox');
-        await act(async () => {
-            await user.click(onFastGroupButton);
-        });
+        await user.click(onFastGroupButton);
         entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '2373'})).parentElement.parentElement.parentElement;
         onFastGroupButton = within(entry).getByRole('checkbox');
-        await act(async () => {
-            await user.click(onFastGroupButton);
-        });
+        await user.click(onFastGroupButton);
         const raceEntryViews = document.getElementsByClassName('race-entry-view');
         expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '2928'})).toBeInTheDocument();
         expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '2009'})).toBeInTheDocument();
@@ -578,14 +525,10 @@ describe('when fast grouping entries', () => {
         // fast group entries
         let entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'})).parentElement.parentElement.parentElement;
         let onFastGroupButton = within(entry).getByRole('checkbox');
-        await act(async () => {
-            await user.click(onFastGroupButton);
-        });
+        await user.click(onFastGroupButton);
         entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'})).parentElement.parentElement.parentElement;
         onFastGroupButton = within(entry).getByRole('checkbox');
-        await act(async () => {
-            await user.click(onFastGroupButton);
-        });
+        await user.click(onFastGroupButton);
         const raceEntryViews = document.getElementsByClassName('race-entry-view');
         expect(within(raceEntryViews[0]).getByRole('checkbox')).toBeChecked();
         expect(within(raceEntryViews[1]).getByRole('checkbox')).toBeChecked();
@@ -605,9 +548,7 @@ describe('when fast grouping entries', () => {
         });
         const entry = (await screen.findByText((content, node) => /^Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view'))); // with only one entry RaceEntriesView and RaceEntryView both match test unless additional criteria specified
         const onFastGroupButton = within(entry).getByRole('checkbox');
-        await act(async () => {
-            await user.click(onFastGroupButton);
-        });
+        await user.click(onFastGroupButton);
         const raceEntryViews = document.getElementsByClassName('race-entry-view');
         expect(within(raceEntryViews[0]).getByRole('checkbox')).not.toBeChecked();
         expect(screen.getByText('Cannot fast group an entry with a scoring abbreviation')).toBeInTheDocument();
@@ -631,9 +572,7 @@ describe('when fast grouping entries', () => {
             // fast group entries
             const entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'})).parentElement.parentElement.parentElement;
             const onFastGroupButton = within(entry).getByRole('checkbox');
-            await act(async () => {
-                await user.click(onFastGroupButton);
-            });
+            await user.click(onFastGroupButton);
             // select additional race
             await act(async () => {
                 render.rerender(<RaceEntriesView races={[raceScorpionA, raceCometA]} />, model);
@@ -663,14 +602,10 @@ describe('when fast grouping entries', () => {
             // fast group entries
             let entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '826'})).parentElement.parentElement.parentElement;
             let onFastGroupButton = within(entry).getByRole('checkbox');
-            await act(async () => {
-                await user.click(onFastGroupButton);
-            });
+            await user.click(onFastGroupButton);
             entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'})).parentElement.parentElement.parentElement;
             onFastGroupButton = within(entry).getByRole('checkbox');
-            await act(async () => {
-                await user.click(onFastGroupButton);
-            });
+            await user.click(onFastGroupButton);
             // deselect race
             await act(async () => {
                 render.rerender(<RaceEntriesView races={[raceScorpionA]} />, model);
@@ -681,7 +616,6 @@ describe('when fast grouping entries', () => {
         });
     });
 });
-
 describe('when removing an entry from fast group', () => {
     it('moves entry to below fast group', async () => {
         const entriesScorpionA = [
@@ -704,26 +638,20 @@ describe('when removing an entry from fast group', () => {
         const entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'})).parentElement.parentElement.parentElement;
         const onFastGroupButton = within(entry).getByRole('checkbox');
         // check fast group
-        await act(async () => {
-            await user.click(onFastGroupButton);
-        });
+        await user.click(onFastGroupButton);
         // uncheck fast group
-        await act(async () => {
-            await user.click(onFastGroupButton);
-        });
+        await user.click(onFastGroupButton);
         const raceEntryViews = document.getElementsByClassName('race-entry-view');
         expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
         expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
     });
 });
-
 describe('when adding a lap time', () => {
     it('calls controller add lap function with value of time sailed', async () => {
         const entrySarahPascalScorpionA6745 = {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
             {'number': 1, 'time': 1}, {'number': 2, 'time': 2}
         ], 'sumOfLapTimes': 0,'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}};
         const entriesScorpionA = [entrySarahPascalScorpionA6745];
-
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -734,10 +662,7 @@ describe('when adding a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
         const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'});
-        await act(async () => {
-            await user.click(entry);
-        });
-        
+        await user.click(entry);
         expect(addLapSpy).toBeCalledWith(entrySarahPascalScorpionA6745, 7);
     });
     it('updates model', async () => {
@@ -750,11 +675,8 @@ describe('when adding a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
-               
         const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
-        await act(async () => {
-            await user.click(entry);
-        });        
+        await user.click(entry);
         expect(addLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234, 7);
     });
     it('refreshes display after addLap completed', async () => {
@@ -774,10 +696,8 @@ describe('when adding a lap time', () => {
             .mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
-        });
-               
+        });    
         const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
-        
         expect(await screen.queryByText('10:25')).not.toBeInTheDocument();
         await act(async () => {
             model.handleEntryUpdate({'body': entriesScorpionA[0].url});
@@ -797,11 +717,8 @@ describe('when adding a lap time', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
-               
         const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
-        await act(async () => {
-            await user.click(entry);
-        });
+        await user.click(entry);
         expect(await screen.findByText(/oops/i)).toBeInTheDocument();
     });    
     it('releases entry if there is a problem adding the lap time', async () => {
@@ -816,12 +733,9 @@ describe('when adding a lap time', () => {
         vi.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
-        });
-               
+        });    
         const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
-        await act(async () => {
-            await user.click(entry);
-        });
+        await user.click(entry);
         expect(entry.getAttribute('class')).not.toMatch(/disabled/i);
     });
     it('clears error message on success', async () => {
@@ -841,24 +755,19 @@ describe('when adding a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
         const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
-        await act(async () => {
-            await user.click(entry);
-        });
+        await user.click(entry);
         expect(await screen.findByText(/oops/i)).toBeInTheDocument();
-
+        await user.click(entry);
         await act(async () => {
-            await user.click(entry);
             model.handleEntryUpdate({'body': entriesScorpionA[0].url});
         });
         expect(screen.queryByText(/oops/i)).not.toBeInTheDocument();
     });
 });
-
 describe('when removing a lap time', () => {
     it('updates model', async () => {
         const entryChrisMarshallScorpionA1234Pre = {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7}], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}};
         const entriesScorpionAPre = [entryChrisMarshallScorpionA1234Pre, {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0,'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}];
-
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -868,10 +777,8 @@ describe('when removing a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });        
         const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
-        await act(async () => {
-            await user.keyboard('{Control>}');
-            await user.click(entry);
-        });        
+        await user.keyboard('{Control>}');
+        await user.click(entry);
         expect(removeLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234Pre, {'number': 1, 'time': 7});
     });
     it('refreshes display after lap time removed', async () => {
@@ -892,9 +799,9 @@ describe('when removing a lap time', () => {
         const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
         const lapTime = await screen.findByText('05:12');
         expect(lapTime).toBeInTheDocument();
-        await act(async ()=> {
-            await user.keyboard('{Control>}');
-            await user.click(entry);
+        await user.keyboard('{Control>}');
+        await user.click(entry);
+        await act(async () => {
             model.handleEntryUpdate({'body': entriesScorpionA[0].url});
         });
         expect(lapTime).not.toBeInTheDocument();
@@ -918,13 +825,10 @@ describe('when removing a lap time', () => {
         vi.spyOn(controller, 'removeLap').mockImplementation((entry, time) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
-        });
-               
+        });    
         const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
-        await act(async () => {
-            await user.keyboard('{Control>}');
-            await user.click(entry);
-        });
+        await user.keyboard('{Control>}');
+        await user.click(entry);
         expect(await screen.findByText(/oops/i)).toBeInTheDocument();
     });
     it('releases entry if there is a problem problem removing the lap time', async () => {
@@ -946,13 +850,10 @@ describe('when removing a lap time', () => {
         vi.spyOn(controller, 'removeLap').mockImplementation((entry, time) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
-        });
-               
+        });    
         const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
-        await act(async () => {
-            await user.keyboard('{Control>}');
-            await user.click(entry);
-        });
+        await user.keyboard('{Control>}');
+        await user.click(entry);
         expect(entry.getAttribute('class')).not.toMatch(/disabled/i);
     });
     it('clears error message on success', async () => {
@@ -974,24 +875,19 @@ describe('when removing a lap time', () => {
         vi.spyOn(controller, 'removeLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true})}).mockImplementationOnce((entry, time) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
-        });
-               
+        });    
         const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
-        await act(async () => {
-            await user.keyboard('{Control>}');
-            await user.click(entry);
-        });
+        await user.keyboard('{Control>}');
+        await user.click(entry);
         expect(await screen.findByText(/oops/i)).toBeInTheDocument();
-        
+        await user.keyboard('{Control>}');
+        await user.click(entry);
         await act(async () => {
-            await user.keyboard('{Control>}');
-            await user.click(entry);
             model.handleEntryUpdate({'body': entriesScorpionA[0].url});
         });
         expect(screen.queryByText(/oops/i)).not.toBeInTheDocument();
     });
 });
-
 describe('when updating a lap time', () => {
     it('updates model', async () => {
         const entryChrisMarshallScorpionA1234Pre = {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7000}], 'sumOfLapTimes': 7000, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}};
@@ -999,7 +895,6 @@ describe('when updating a lap time', () => {
             entryChrisMarshallScorpionA1234Pre, 
             {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0,'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
         ];
-
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
@@ -1011,17 +906,12 @@ describe('when updating a lap time', () => {
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:07');
         // render updated components
-        await act(async () => {
-            await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
-        });
+        await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
         // after render perform update
         const lapEntryCellInput = within(raceEntryView).getByRole('textbox', {value: '00:07'});
-        await act(async () => {
-            await user.clear(lapEntryCellInput);
-            await user.type(lapEntryCellInput, '15:23');
-            await user.keyboard('{Enter}');
-        });
-        // expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234Pre, '15:23');
+        await user.clear(lapEntryCellInput);
+        await user.type(lapEntryCellInput, '15:23');
+        await user.keyboard('{Enter}');
         expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234Pre, 923000);
     });
     it('refreshes display after lap time updated', async () => {
@@ -1046,15 +936,13 @@ describe('when updating a lap time', () => {
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:14');
         // render updated components
-        await act(async () => {
-            await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
-        });
+        await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
         // after render perform update
         const lapEntryCellInput = within(raceEntryView).getByRole('textbox', {value: '00:14'});
-        await act(async () => { 
-            await user.clear(lapEntryCellInput);
-            await user.type(lapEntryCellInput, '00:15');
-            await user.keyboard('{Enter}');
+        await user.clear(lapEntryCellInput);
+        await user.type(lapEntryCellInput, '00:15');
+        await user.keyboard('{Enter}');
+        await act(async () => {
             model.handleEntryUpdate({'body': entriesScorpionA[0].url});
         });
         expect(await within(raceEntryView).findByText('00:15')).toBeInTheDocument();
@@ -1080,16 +968,12 @@ describe('when updating a lap time', () => {
         });
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:07');
-        await act(async () => {
-            await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
-        });
+        await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
         // after render perform update
         const lapEntryCellInput = within(raceEntryView).getByRole('textbox', {value: '00:07'});
-        await act(async () => { 
-            await user.clear(lapEntryCellInput);
-            await user.type(lapEntryCellInput, '00:15');
-            await user.keyboard('{Enter}');
-        });
+        await user.clear(lapEntryCellInput);
+        await user.type(lapEntryCellInput, '00:15');
+        await user.keyboard('{Enter}');
         expect(await screen.findByText(/oops/i)).toBeInTheDocument();
     });
     it('releases entry if there is a problem updating the lap time', async () => {
@@ -1113,16 +997,12 @@ describe('when updating a lap time', () => {
         });
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:07');
-        await act(async () => {
-            await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
-        });
+        await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
         // after render perform update
         const lapEntryCellInput = within(raceEntryView).getByRole('textbox', {value: '00:07'});
-        await act(async () => { 
-            await user.clear(lapEntryCellInput);
-            await user.type(lapEntryCellInput, '00:15');
-            await user.keyboard('{Enter}');
-        });
+        await user.clear(lapEntryCellInput);
+        await user.type(lapEntryCellInput, '00:15');
+        await user.keyboard('{Enter}');
         expect(raceEntryView.getAttribute('class')).not.toMatch(/disabled/i);
     });
     it('clears error message on success', async () => {
@@ -1148,24 +1028,18 @@ describe('when updating a lap time', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
         const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'});
-        // after render perform update        
-        await act(async () => {
-            await user.click(entry);
-        });
+        // after render perform update
+        await user.click(entry);
         expect(await screen.findByText(/oops/i)).toBeInTheDocument();
-        
         let raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement.parentElement;
         let lapEntryCellOutput = within(raceEntryView).getByText('00:07');
-        await act(async () => {
-            await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
-        });
-
+        await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
         // after render perform update
         let lapEntryCellInput = within(raceEntryView).getByRole('textbox', {value: '00:07'});
-        await act(async () => { 
-            await user.clear(lapEntryCellInput);
-            await user.type(lapEntryCellInput, '00:15');
-            await user.keyboard('{Enter}');
+        await user.clear(lapEntryCellInput);
+        await user.type(lapEntryCellInput, '00:15');
+        await user.keyboard('{Enter}');
+        await act(async () => {
             model.handleEntryUpdate({'body': entriesScorpionA[0].url});
         });
         expect(screen.queryByText(/oops/i)).not.toBeInTheDocument();
@@ -1190,20 +1064,15 @@ describe('when updating a lap time', () => {
         });
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:07');
-        await act(async () => {
-            await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
-        });
+        await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
         // after render perform update
         const lapEntryCellInput = within(raceEntryView).getByRole('textbox', {value: '00:07'});
-        await act(async () => { 
-            await user.clear(lapEntryCellInput);
-            await user.type(lapEntryCellInput, '0150012');
-            await user.keyboard('{Enter}');
-        });
+        await user.clear(lapEntryCellInput);
+        await user.type(lapEntryCellInput, '0150012');
+        await user.keyboard('{Enter}');
         expect(await screen.findByText(/Time must be in the format \[hh:\]\[mm:\]ss./i)).toBeInTheDocument();
     });
 });
-
 describe('when setting a scoring abbreviation', () => {
     it('call controller setScoringAbbreviation', async () => {
         const user = userEvent.setup();
@@ -1215,9 +1084,7 @@ describe('when setting a scoring abbreviation', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
         const selectSA = screen.getAllByRole('combobox')[0];
-        await act(async () => {
-            await user.selectOptions(selectSA, 'DNS');
-        });
+        await user.selectOptions(selectSA, 'DNS');
         expect(setScoringAbbreviationSpy).toBeCalledWith(entryChrisMarshallScorpionA1234, 'DNS');
     });
     it('displays a message if there is a problem updating the lap time', async () => {
@@ -1230,9 +1097,7 @@ describe('when setting a scoring abbreviation', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
         const selectSA = screen.getAllByRole('combobox')[0];
-        await act(async () => {
-            await user.selectOptions(selectSA, 'DNS');
-        });
+        await user.selectOptions(selectSA, 'DNS');
         expect(await screen.findByText(/oops/i)).toBeInTheDocument();
     });
     it('releases entry if there is a problem updating the lap time', async () => {
@@ -1245,9 +1110,7 @@ describe('when setting a scoring abbreviation', () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
         const selectSA = screen.getAllByRole('combobox')[0];
-        await act(async () => {
-            await user.selectOptions(selectSA, 'DNS');
-        });
+        await user.selectOptions(selectSA, 'DNS');
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement.parentElement;
         expect(raceEntryView.getAttribute('class')).not.toMatch(/disabled/i);
     });
@@ -1262,19 +1125,16 @@ describe('when setting a scoring abbreviation', () => {
         });
         // after render perform update
         const selectSA = screen.getAllByRole('combobox')[0];
-        await act(async () => {
-            await user.selectOptions(selectSA, 'DNS');
-        });
+        await user.selectOptions(selectSA, 'DNS');
         expect(await screen.findByText(/oops/i)).toBeInTheDocument();
         // after render perform update
+        await user.selectOptions(selectSA, 'DNS');
         await act(async () => {
-            await user.selectOptions(selectSA, 'DNS');
             model.handleEntryUpdate({'body': entriesScorpionA[0].url});
         });
         expect(screen.queryByText(/oops/i)).not.toBeInTheDocument();
     });
 });
-
 describe('when user drags and drops an entry to a new position', () => {
     it('updates the display order to show the subject entry in the position above the target entry', async () => {
         const user = userEvent.setup();
@@ -1290,18 +1150,13 @@ describe('when user drags and drops an entry to a new position', () => {
         expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
         const targetREV = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement.parentElement;
         const subjectREV = screen.getByRole('status', {name: (content, node) => node.textContent === '6745'}).parentElement.parentElement.parentElement;
-
         const dataTransferObject = {
             data: new Map(), 
             setData(key, value) {this.data.set(key, value)},
             getData(key) {return this.data.get(key)}
         };
-        await act(async () => {
-            fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
-        });
-        await act(async () => {
-            fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
-        });
+        fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
+        fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
         expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
         expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
     });
@@ -1324,20 +1179,15 @@ describe('when user drags and drops an entry to a new position', () => {
                 });
                 // sort by position to avoid position check error when dragging
                 const sortByPositionButton = screen.getByRole('button', {'name': /by position/i});
-                await act(async () => {
-                    await user.click(sortByPositionButton);
-                });
+                await user.click(sortByPositionButton);
                 const rev1 = screen.getByText(/chris marshall/i).parentElement.parentElement.parentElement;
                 const rev2 = screen.getByText(/sarah pascal/i).parentElement.parentElement.parentElement;
-        
                 const dataTransferObject = {
                     data: new Map(), 
                     setData(key, value) {this.data.set(key, value)},
                     getData(key) {return this.data.get(key)}
                 };
-                await act(async () => {
-                    fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
-                });
+                fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
                 await act(async () => {
                     fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
                 });
@@ -1352,7 +1202,6 @@ describe('when user drags and drops an entry to a new position', () => {
                 const raceGraduateAPursuit = {...raceGraduateA, type: 'PURSUIT'};
                 const entryJillMyerGraduateA2928 = {helm: competitorJillMyer, crew: null, race: raceGraduateA, dinghy: dinghy2928, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
                     position: 3, url: 'http://localhost:8081/dinghyracing/api/entries/12', metadata: {eTag: '"3'}};
-
                 vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
                     if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
                         return Promise.resolve({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234, position: 4}]});
@@ -1360,7 +1209,6 @@ describe('when user drags and drops an entry to a new position', () => {
                     if (race.url === 'http://localhost:8081/dinghyracing/api/races/7') {
                         return Promise.resolve({'success': true, 'domainObject': [entryJillMyerGraduateA2928]});
                     }
-                    
                 });
                 const controller = new DinghyRacingController(model);
                 const setUpdateEntryPositionSpy = vi.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': true})});
@@ -1369,18 +1217,13 @@ describe('when user drags and drops an entry to a new position', () => {
                 });
                 const subjectREV = screen.getByText(/chris marshall/i).parentElement.parentElement.parentElement;
                 const targetREV = screen.getByText(/jill myer/i).parentElement.parentElement.parentElement;
-        
                 const dataTransferObject = {
                     data: new Map(), 
                     setData(key, value) {this.data.set(key, value)},
                     getData(key) {return this.data.get(key)}
                 };
-                await act(async () => {
-                    fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
-                });
-                await act(async () => {
-                    fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
-                });
+                fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
+                fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
                 expect(setUpdateEntryPositionSpy).not.toBeCalledWith({...entryChrisMarshallScorpionA1234, position: 4}, 3);
             });
         });
@@ -1398,19 +1241,13 @@ describe('when user drags and drops an entry to a new position', () => {
                     // screen.debug();
                     const targetREV = screen.getByText(/chris marshall/i).parentElement.parentElement.parentElement;
                     const subjectREV = screen.getByText(/sarah pascal/i).parentElement.parentElement.parentElement;
-            
                     const dataTransferObject = {
                         data: new Map(), 
                         setData(key, value) {this.data.set(key, value)},
                         getData(key) {return this.data.get(key)}
                     };
-    
-                    await act(async () => {
-                        fireEvent.dragStart(targetREV, {dataTransfer: dataTransferObject});
-                    });
-                    await act(async () => {
-                        fireEvent.drop(subjectREV, {dataTransfer: dataTransferObject});
-                    });
+                    fireEvent.dragStart(targetREV, {dataTransfer: dataTransferObject});
+                    fireEvent.drop(subjectREV, {dataTransfer: dataTransferObject});
                     expect(setUpdateEntryPositionSpy).not.toHaveBeenCalled();
                 });
             });
@@ -1425,18 +1262,13 @@ describe('when user drags and drops an entry to a new position', () => {
                     });
                     const rev1 = screen.getByText(/chris marshall/i).parentElement.parentElement.parentElement;
                     const rev2 = screen.getByText(/sarah pascal/i).parentElement.parentElement.parentElement;
-            
                     const dataTransferObject = {
                         data: new Map(), 
                         setData(key, value) {this.data.set(key, value)},
                         getData(key) {return this.data.get(key)}
                     };
-                    await act(async () => {
-                        fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
-                    });
-                    await act(async () => {
-                        fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
-                    });
+                    fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
+                    fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
                     expect(setUpdateEntryPositionSpy).not.toHaveBeenCalled();
                     expect(document.getElementById('Scorpion-1234-Chris Marshall-position')).toHaveValue(' ');
                 });
@@ -1461,18 +1293,13 @@ describe('when user drags and drops an entry to a new position', () => {
                 });
                 const rev1 = screen.getByText(/chris marshall/i).parentElement.parentElement.parentElement;
                 const rev2 = screen.getByText(/sarah pascal/i).parentElement.parentElement.parentElement;
-        
                 const dataTransferObject = {
                     data: new Map(), 
                     setData(key, value) {this.data.set(key, value)},
                     getData(key) {return this.data.get(key)}
                 };
-                await act(async () => {
-                    fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
-                });
-                await act(async () => {
-                    fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
-                });
+                fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
+                fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
                 expect(await screen.findByText(/any old nonsense/i)).toBeInTheDocument();
             });
             it('releases entry if there is a problem updating the position', async () => {
@@ -1488,20 +1315,15 @@ describe('when user drags and drops an entry to a new position', () => {
                 });
                 // sort by position to avoid position check error when dragging
                 const sortByPositionButton = screen.getByRole('button', {'name': /by position/i});
-                await act(async () => {
-                    await user.click(sortByPositionButton);
-                });
+                await user.click(sortByPositionButton);
                 const rev1 = screen.getByText(/chris marshall/i).parentElement.parentElement.parentElement;
                 const rev2 = screen.getByText(/sarah pascal/i).parentElement.parentElement.parentElement;
-        
                 const dataTransferObject = {
                     data: new Map(), 
                     setData(key, value) {this.data.set(key, value)},
                     getData(key) {return this.data.get(key)}
                 };
-                await act(async () => {
-                    fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
-                });
+                fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
                 await act(async () => {
                     fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
                 });
@@ -1526,25 +1348,18 @@ describe('when user drags and drops an entry to a new position', () => {
                 // after render perform update
                 const rev1 = screen.getByText(/chris marshall/i).parentElement.parentElement.parentElement;
                 const rev2 = screen.getByText(/sarah pascal/i).parentElement.parentElement.parentElement;
-        
                 const dataTransferObject = {
                     data: new Map(), 
                     setData(key, value) {this.data.set(key, value)},
                     getData(key) {return this.data.get(key)}
                 };
-                await act(async () => {
-                    fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
-                });
-                await act(async () => {
-                    fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
-                });
+                fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
+                fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
                 expect(await screen.findByText(/Any old nonsense/i)).toBeInTheDocument();
                 // after render perform update
-                await act(async () => {
                     fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
-                });
-                await act(async () => {
                     fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
+                await act(async () => {
                     model.handleEntryUpdate({'body': entriesScorpionA[0].url});
                 });
                 expect(screen.queryByText(/Any old nonsense/i)).not.toBeInTheDocument();
@@ -1564,23 +1379,16 @@ describe('when user drags and drops an entry to a new position', () => {
                 });
                 // sort by position to avoid position check error when dragging
                 const sortByPositionButton = screen.getByRole('button', {'name': /by position/i});
-                await act(async () => {
-                    await user.click(sortByPositionButton);
-                });
+                await user.click(sortByPositionButton);
                 const rev1 = screen.getByText(/chris marshall/i).parentElement.parentElement.parentElement;
                 const rev2 = screen.getByText(/sarah pascal/i).parentElement.parentElement.parentElement;
-        
                 const dataTransferObject = {
                     data: new Map(), 
                     setData(key, value) {this.data.set(key, value)},
                     getData(key) {return this.data.get(key)}
                 };
-                await act(async () => {
-                    fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
-                });
-                await act(async () => {
-                    fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
-                });
+                fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
+                fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
                 expect(setUpdateEntryPositionSpy).not.toBeCalledWith({...entryChrisMarshallScorpionA1234, position: 4}, 3);
             });
         });
@@ -1602,18 +1410,13 @@ describe('when user drags and drops an entry to a new position', () => {
             });
             const rev1 = screen.getByText(/chris marshall/i).parentElement.parentElement.parentElement;
             const rev2 = screen.getByText(/sarah pascal/i).parentElement.parentElement.parentElement;
-
             const dataTransferObject = {
                 data: new Map(),
                 setData(key, value) {this.data.set(key, value)},
                 getData(key) {return this.data.get(key)}
             };
-            await act(async () => {
-                fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
-            });
-            await act(async () => {
-                fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
-            });
+            fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
+            fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
             expect(setUpdateEntryPositionSpy).not.toBeCalled();
             expect(await screen.findByText(/cannot change position of an entry with a scoring abbreviation/i)).toBeInTheDocument();
         });
@@ -1635,18 +1438,13 @@ describe('when user drags and drops an entry to a new position', () => {
             });
             const rev1 = screen.getByText(/chris marshall/i).parentElement.parentElement.parentElement;
             const rev2 = screen.getByText(/sarah pascal/i).parentElement.parentElement.parentElement;
-
             const dataTransferObject = {
                 data: new Map(),
                 setData(key, value) {this.data.set(key, value)},
                 getData(key) {return this.data.get(key)}
             };
-            await act(async () => {
-                fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
-            });
-            await act(async () => {
-                fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
-            });
+            fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
+            fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
             expect(setUpdateEntryPositionSpy).not.toBeCalled();
             expect(await screen.findByText(/cannot change position of an entry with a scoring abbreviation/i)).toBeInTheDocument();
         });
@@ -1673,26 +1471,18 @@ describe('when user drags and drops an entry to a new position', () => {
             // select entry into fast group
             const entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'})).parentElement.parentElement.parentElement;
             const onFastGroupButton = within(entry).getByRole('checkbox');
-            await act(async () => {
-                await user.click(onFastGroupButton);
-            });
+            await user.click(onFastGroupButton);
             // drag and drop entry into fast group
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
             const targetREV = screen.getByRole('status', {name: (content, node) => node.textContent === '6745'}).parentElement.parentElement.parentElement;
             const subjectREV = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement.parentElement;
-
             const dataTransferObject = {
                 data: new Map(), 
                 setData(key, value) {this.data.set(key, value)},
                 getData(key) {return this.data.get(key)}
             };
-            await act(async () => {
-                fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
-            });
-            await act(async () => {
-                fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
-            });
-
+            fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
+            fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
             expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
             expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
             expect(within(raceEntryViews[0]).getByRole('checkbox')).toBeChecked();
@@ -1721,26 +1511,18 @@ describe('when user drags and drops an entry to a new position', () => {
             // select entry into fast group
             const entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'})).parentElement.parentElement.parentElement;
             const onFastGroupButton = within(entry).getByRole('checkbox');
-            await act(async () => {
-                await user.click(onFastGroupButton);
-            });
+            await user.click(onFastGroupButton);
             // drag and drop entry into fast group
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
             const targetREV = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement.parentElement;
             const subjectREV = screen.getByRole('status', {name: (content, node) => node.textContent === '6745'}).parentElement.parentElement.parentElement;
-
             const dataTransferObject = {
                 data: new Map(), 
                 setData(key, value) {this.data.set(key, value)},
                 getData(key) {return this.data.get(key)}
             };
-            await act(async () => {
-                fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
-            });
-            await act(async () => {
-                fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
-            });
-
+            fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
+            fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
             expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
             expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
             expect(within(raceEntryViews[0]).getByRole('checkbox')).not.toBeChecked();
@@ -1769,30 +1551,20 @@ describe('when user drags and drops an entry to a new position', () => {
             // select entry into fast group
             let entry = (await screen.findByText((content, node) => /^Scorpion6745Sarah Pascal  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')));
             let onFastGroupButton = within(entry).getByRole('checkbox');
-            await act(async () => {
-                await user.click(onFastGroupButton);
-            });
+            await user.click(onFastGroupButton);
             entry = (await screen.findByText((content, node) => /^Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')));
             onFastGroupButton = within(entry).getByRole('checkbox');
-            await act(async () => {
-                await user.click(onFastGroupButton);
-            });
+            await user.click(onFastGroupButton);
             // drag and drop entry into fast group
             const targetREV = screen.getByText((content, node) => /^Scorpion6745Sarah Pascal  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view'));
             const subjectREV = screen.getByText((content, node) => /^Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view'));
-
             const dataTransferObject = {
                 data: new Map(), 
                 setData(key, value) {this.data.set(key, value)},
                 getData(key) {return this.data.get(key)}
             };
-            await act(async () => {
-                fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
-            });
-            await act(async () => {
-                fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
-            });
-
+            fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
+            fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
             expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
             expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
@@ -1801,7 +1573,6 @@ describe('when user drags and drops an entry to a new position', () => {
         });
     });
 });
-
 describe('when refresh button clicked', () => {
     it('refreshes entries', async () => {
         const user = userEvent.setup();
@@ -1827,17 +1598,12 @@ describe('when refresh button clicked', () => {
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
-               
         const refreshButton = await screen.findByRole('button', {name: /refresh/i});
-        
         expect(await screen.queryByText('10:25')).not.toBeInTheDocument();
-        await act(async () => {
-            user.click(refreshButton);
-        });
+        user.click(refreshButton);
         expect(await screen.findByText('10:25')).toBeInTheDocument();
     });
 });
-
 describe('when race is a pursuit race', () => {
     it('does not show option to fast group entries', async () => {
         const user = userEvent.setup();
@@ -1852,6 +1618,5 @@ describe('when race is a pursuit race', () => {
         });
         const entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'})).parentElement.parentElement.parentElement;        
         expect(within(entry).queryByRole('checkbox')).not.toBeInTheDocument();
-        
     });
 });
