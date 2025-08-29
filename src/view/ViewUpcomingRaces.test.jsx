@@ -25,12 +25,10 @@ vi.mock('../model/dinghy-racing-model');
 
 it('renders', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-
     vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': []})});
     await act(async () => {
         await customRender(<ViewUpcomingRaces />, model);
     });
-    
     expect(screen.getByRole('heading', {name: /upcoming races/i})).toBeInTheDocument();
     expect(screen.getByLabelText(/session start/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/session end/i)).toBeInTheDocument();
@@ -40,43 +38,34 @@ it('renders', async () => {
     expect(screen.getByText(/^type/i)).toBeInTheDocument();
     expect(screen.getByText(/start type/i)).toBeInTheDocument();
 });
-
 it('defaults start time for race selection to now', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-
     vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': []})});
     await act(async () => {
-        await customRender(<ViewUpcomingRaces />, model);
+        customRender(<ViewUpcomingRaces />, model);
     });
-    
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     expect(screen.getByLabelText(/session start/i)).toHaveValue(now.toISOString().substring(0, 16));
 });
-
 it('defaults end time for race selection to 20:00 today', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-
     vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': []})});
     await act(async () => {
-        await customRender(<ViewUpcomingRaces />, model);
+        customRender(<ViewUpcomingRaces />, model);
     });
-    
     expect(screen.getByLabelText(/session end/i)).toHaveValue(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000).toISOString().substring(0, 16));
 });
 
 // test could be affected by date time local settings
 it('displays the details of upcoming races', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-
     vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     await act(async () => {
         customRender(<ViewUpcomingRaces />, model);
-    });    
-
+    });
     const cells = await screen.findAllByRole('cell');
     const cellValues = cells.map(cell => cell.textContent);
-
     const timeCheck = new Date('2021-10-14T10:30:00Z').toLocaleString();
     expect(cellValues).toContain('Scorpion A');
     expect(cellValues).toContain('Graduate A');
@@ -84,17 +73,14 @@ it('displays the details of upcoming races', async () => {
     expect(cellValues).toContain('Fleet');
     expect(cellValues).toContain('10-5-Go');
 });
-
 it('displays the details of upcoming races in order of planned start time', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-
     const races = [
         {...raceScorpionA, plannedStartTime: new Date('2021-10-14T10:10:00Z')},
         {...raceGraduateA, plannedStartTime: new Date('2021-10-14T10:15:00Z')},
         {...raceCometA, plannedStartTime: new Date('2021-10-14T10:05:00Z')},
         {...raceHandicapA, plannedStartTime: new Date('2021-10-14T10:00:00Z')}
     ]
-
     vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     await act(async () => {
         customRender(<ViewUpcomingRaces />, model);
@@ -105,77 +91,58 @@ it('displays the details of upcoming races in order of planned start time', asyn
     expect(within(raceRows[3]).getByText(/scorpion a/i)).toBeInTheDocument();
     expect(within(raceRows[4]).getByText(/graduate a/i)).toBeInTheDocument();
 });
-
 describe('when start time is changed', () => {
     it('gets the races that fall into the new time period', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-
         vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': [raceScorpionA]})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         await act(async () => {
             customRender(<ViewUpcomingRaces />, model);
-        });    
-    
+        });
         let cells = await screen.findAllByRole('cell');
         let cellValues = cells.map(cell => cell.textContent);
         expect(cellValues).not.toContain('Graduate A');
-
         const sessionStartInput = screen.getByLabelText(/session start/i);
-        await act(async () => {
-            await user.clear(sessionStartInput); // clear input to avoid errors when typing in new value
-            await user.type(sessionStartInput, '2020-05-12T12:30');
-        });
-        
+        await user.clear(sessionStartInput); // clear input to avoid errors when typing in new value
+        await user.type(sessionStartInput, '2020-05-12T12:30');
         cells = await screen.findAllByRole('cell');
         cellValues = cells.map(cell => cell.textContent);
         expect(cellValues).toContain('Graduate A');
     });
 });
-
 describe('when end time is changed', () => {
     it('gets the races that fall into the new time period', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-
         vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': [raceScorpionA]})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         await act(async () => {
             customRender(<ViewUpcomingRaces />, model);
-        });    
-    
+        });
         let cells = await screen.findAllByRole('cell');
         let cellValues = cells.map(cell => cell.textContent);
         expect(cellValues).not.toContain('Graduate A');
-
         const sessionEndInput = screen.getByLabelText(/session start/i);
-        await act(async () => {
-            await user.clear(sessionEndInput); // clear input to avoid errors when typing in new value
-            await user.type(sessionEndInput, '2020-05-12T12:30');
-        });
-        
+        await user.clear(sessionEndInput); // clear input to avoid errors when typing in new value
+        await user.type(sessionEndInput, '2020-05-12T12:30');
         cells = await screen.findAllByRole('cell');
         cellValues = cells.map(cell => cell.textContent);
         expect(cellValues).toContain('Graduate A');
     });
 });
-
 describe('when a race is selected', () => {
     it('the method passed to showSignUpForm is called with the selected race', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         const showSignUpFormMock = vi.fn();
-
         await act(async () => {
             customRender(<ViewUpcomingRaces showSignUpForm={showSignUpFormMock}/>, model);
         });
-        
         const cellRaceScorpionA = await screen.findByRole('cell', {name: 'Scorpion A'});
         await user.click(cellRaceScorpionA);
-
         expect(showSignUpFormMock).toBeCalled();
     });
 });
-
 describe('when races fail to load', () => {
     it('displays the error message', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -187,21 +154,17 @@ describe('when races fail to load', () => {
         expect(message).toBeInTheDocument();
     })
 });
-
 it('registers an interest in race updates for races in selected period', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
     const registerRaceUpdateCallbackSpy = vi.spyOn(model, 'registerRaceUpdateCallback');
-
     customRender(<ViewUpcomingRaces />, model);
     await screen.findAllByRole('cell');
-    
     expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/races/4', expect.any(Function));
     expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(2, 'http://localhost:8081/dinghyracing/api/races/7', expect.any(Function));
     expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(3, 'http://localhost:8081/dinghyracing/api/races/17', expect.any(Function));
     expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(4, 'http://localhost:8081/dinghyracing/api/races/8', expect.any(Function));
 });
-
 describe('when races within session are changed', () => {
     it('updates recorded details', async () => {
         const races_copy = [...races];
