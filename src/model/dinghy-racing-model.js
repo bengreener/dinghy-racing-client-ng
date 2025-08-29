@@ -130,7 +130,7 @@ class DinghyRacingModel {
         this.stompClient.onStompError = (frame) => {
             console.error(frame);
         };
-        this.stompClient.onConnect = (frame) => {
+        this.stompClient.onConnect = () => {
             this.stompClient.subscribe('/topic/createCompetitor', this.handleCompetitorCreation);
             this.stompClient.subscribe('/topic/createDinghy', this.handleDinghyCreation);
             this.stompClient.subscribe('/topic/createDinghyClass', this.handleDinghyClassCreation);
@@ -166,7 +166,7 @@ class DinghyRacingModel {
      * Handle a websocket competitor creation message via the Stomp client
      * @param {String} message URI of competitor that was created
      */
-    handleCompetitorCreation(message) {
+    handleCompetitorCreation() {
         this.competitorCreationCallbacks.forEach(cb => cb());
     }
 
@@ -190,7 +190,7 @@ class DinghyRacingModel {
      * Handle a websocket dinghy creation message via the Stomp client
      * @param {String} message URI of competitor that was created
      */
-    handleDinghyCreation(message) {
+    handleDinghyCreation() {
         this.dinghyCreationCallbacks.forEach(cb => cb());
     }
 
@@ -319,7 +319,7 @@ class DinghyRacingModel {
      * Handle a websocket dinghy class creation message via the Stomp client
      * @param {String} message URI of competitor that was created
      */
-    handleDinghyClassCreation(message) {
+    handleDinghyClassCreation() {
         this.dinghyClassCreationCallbacks.forEach(cb => cb());
     }
 
@@ -378,7 +378,7 @@ class DinghyRacingModel {
      * Handle a websocket fleet creation message via the Stomp client
      * @param {String} message URI of competitor that was created
      */
-    handleFleetCreation(message) {
+    handleFleetCreation() {
         this.fleetCreationCallbacks.forEach(cb => cb());
     }
 
