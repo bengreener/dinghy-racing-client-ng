@@ -35,9 +35,7 @@ class Authorisation {
             console.error(`Failed to fetch roles: ${error.message}`);
             roles = [];
         }
-        finally {
-            return Promise.resolve(roles);
-        }
+        return Promise.resolve(roles);
     }
 }
 
