@@ -20,7 +20,7 @@ import userEvent from '@testing-library/user-event';
 import RaceStartConsole from './RaceStartConsole';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
-import { httpRootURL, wsRootURL, races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA, dinghyClassScorpion, dinghyClassGraduate, dinghyClassComet, racePursuitA, fleetHandicap } from '../model/__mocks__/test-data';
+import { httpRootURL, wsRootURL, races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA, dinghyClassScorpion, dinghyClassComet, racePursuitA, fleetHandicap } from '../model/__mocks__/test-data';
 import SessionStartSequence from '../model/domain-classes/session-start-sequence';
 import RaceType from '../model/domain-classes/race-type';
 import { SortOrder } from '../model/dinghy-racing-model';
@@ -44,11 +44,12 @@ const formatOptions = {
 const timeFormat = new Intl.DateTimeFormat('utc', formatOptions);
 
 beforeEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
     vi.useFakeTimers().setSystemTime(new Date('2021-10-14T10:25:00Z'));
 });
 
-afterEach(() => {
+afterEach(async () => {
+    await act(async() => {vi.runOnlyPendingTimers();});
     vi.useRealTimers();
     sessionStorage.removeItem('sessionStart');
     sessionStorage.removeItem('sessionEnd');
@@ -74,7 +75,6 @@ it('renders', async () => {
     expect(screen.getByRole('heading', {name: /flags/i})).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: /^races$/i})).toBeInTheDocument();
 });
-
 describe('when no races selected', () => {
     it('renders', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -96,7 +96,6 @@ describe('when no races selected', () => {
         expect(screen.getByRole('heading', {name: /^races$/i})).toBeInTheDocument();
     });
 });
-
 it('displays races included in selected session', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
@@ -111,7 +110,6 @@ it('displays races included in selected session', async () => {
     expect(optionScorpion).toBeInTheDocument();
     expect(optionsGraduate).toBeInTheDocument();
 });
-
 it('calls DinghyRacingModel.getRacesBetweenTimesForType with correct arguments', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
@@ -127,7 +125,6 @@ it('calls DinghyRacingModel.getRacesBetweenTimesForType with correct arguments',
 
     expect(getRacesBetweenTimesForTypeSpy).toHaveBeenCalledWith(sessionStart, sessionEnd, RaceType.FLEET, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
 });
-
 it('calls DinghyRacingModel.getStartSequence with correct arguments', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
@@ -140,7 +137,6 @@ it('calls DinghyRacingModel.getStartSequence with correct arguments', async () =
 
     expect(getStartSequenceSpy).toHaveBeenCalledWith(races, RaceType.FLEET);
 });
-
 describe('when new value set for race type', () => {
     it('calls DinghyRacingModel.getRacesBetweenTimesForType with correct arguments', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
@@ -180,7 +176,6 @@ describe('when new value set for race type', () => {
         expect(getStartSequenceSpy).toHaveBeenCalledWith(races, RaceType.PURSUIT);
     });
 });
-
 it('defaults session start to 8:00 today', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
@@ -193,7 +188,6 @@ it('defaults session start to 8:00 today', async () => {
     const selectSessionStart = screen.getByLabelText(/session start/i);
     expect(selectSessionStart).toHaveValue(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000).toISOString().substring(0, 16));
 });
-
 it('defaults session end to 20:00 of today', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
@@ -206,7 +200,6 @@ it('defaults session end to 20:00 of today', async () => {
     const selectSessionEnd = screen.getByLabelText(/session end/i);
     expect(selectSessionEnd).toHaveValue(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000).toISOString().substring(0, 16));
 });
-
 it('provides countdown value and message to Countdown control', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
@@ -223,7 +216,6 @@ it('provides countdown value and message to Countdown control', async () => {
     expect(within(countdownControl).getByText(/scorpion a/i)).toBeInTheDocument();
     expect(within(countdownControl).getByText(/5:00/i)).toBeInTheDocument();
 });
-
 it('displays race names and blue peter', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
@@ -241,7 +233,6 @@ it('displays race names and blue peter', async () => {
     expect(within(flagIndicators).getByText(/handicap class/i)).toBeInTheDocument();
     expect(within(flagIndicators).getByText(/comet class/i)).toBeInTheDocument();
 });
-
 it('displays initial state for each flag', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
@@ -257,7 +248,6 @@ it('displays initial state for each flag', async () => {
     expect(within(signalsPanel).getAllByText(/raised/i)).toHaveLength(3);
     expect(within(signalsPanel).getAllByText(/lowered/i)).toHaveLength(2);
 });
-
 it('displays time to next flag state change for each flag', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
@@ -273,7 +263,6 @@ it('displays time to next flag state change for each flag', async () => {
     expect(within(signalsPanel).getAllByText(/05:00/i)).toHaveLength(2);
     expect(within(signalsPanel).getAllByText(/10:00/i)).toHaveLength(1);
 });
-
 it('displays race headers for races in session', async () => {
     const races = [raceScorpionA, raceGraduateA, raceCometA, {...raceHandicapA, duration: 2100000, plannedLaps: 3}];
 
@@ -320,7 +309,6 @@ it('displays race headers for races in session', async () => {
     expect(within(raceD).getByRole('button', {name: /postpone/i})).toBeInTheDocument();
     expect(within(raceD).getByRole('button', {name: /start now/i})).toBeInTheDocument();
 });
-
 it('does not display in race data in race headers', async () => {
     const races = [raceScorpionA];
 
@@ -341,7 +329,6 @@ it('does not display in race data in race headers', async () => {
     expect(within(raceA).queryByLabelText(/last/i)).not.toBeInTheDocument();
     expect(within(raceA).queryByLabelText(/average/i)).not.toBeInTheDocument();
 });
-
 it('displays actions to start races in session', async () => {
     const races = [raceScorpionA, raceGraduateA];
 
@@ -365,7 +352,6 @@ it('displays actions to start races in session', async () => {
     expect(within(actionRows[3]).getByText(/lower graduate class flag/i)).toBeInTheDocument();
     expect(within(actionRows[3]).getByText(/10:00/i)).toBeInTheDocument();
 });
-
 describe('when clock ticks', () => {
     it('updates time to next flag state change', async () => {
         const races = [raceScorpionA, raceGraduateA];
@@ -502,7 +488,6 @@ describe('when clock ticks', () => {
         });
     })
 });
-
 it('registers an interest in race updates for races in session', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
@@ -520,7 +505,6 @@ it('registers an interest in race updates for races in session', async () => {
     expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(3, 'http://localhost:8081/dinghyracing/api/races/17', expect.any(Function));
     expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(4, 'http://localhost:8081/dinghyracing/api/races/8', expect.any(Function));
 });
-
 describe('when races within session are changed', () => {
     it('updates recorded details', async () => {
         const races_copy = [...races];
@@ -557,7 +541,6 @@ describe('when races within session are changed', () => {
         expect(screen.queryAllByText('Handicap A')).toHaveLength(0);
     });
 });
-
 it('registers an interest in fleet updates for races in session', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
@@ -576,7 +559,6 @@ it('registers an interest in fleet updates for races in session', async () => {
     expect(registerFleetUpdateCallbackSpy).toHaveBeenNthCalledWith(3, 'http://localhost:8081/dinghyracing/api/fleets/4', expect.any(Function));
     expect(registerFleetUpdateCallbackSpy).toHaveBeenNthCalledWith(4, 'http://localhost:8081/dinghyracing/api/fleets/2', expect.any(Function));
 });
-
 describe('when the fleet associated with the race is changed', () => {
     it('displays updated start sequence', async () => {
         const fleet = {...fleetHandicap, dinghyClasses: [dinghyClassComet, dinghyClassScorpion]};
@@ -598,7 +580,6 @@ describe('when the fleet associated with the race is changed', () => {
         expect(screen.queryAllByText(/scorpion/i)).toHaveLength(0);
     });
 });
-
 describe('when 6 minutes 1 second before start of first race', () => {
     // unsure how to test audio using a variable to control audio rather than <audio> element
     it.skip('prepare for race start state change audio is not present in document', async () => {
@@ -614,7 +595,6 @@ describe('when 6 minutes 1 second before start of first race', () => {
         expect(audio).not.toBeInTheDocument();
     });
 });
-
 describe('when 6 minutes before start of first race', () => {
     // unsure how to test audio using a variable to control audio rather than <audio> element
     it.skip('prepare for race start state change audio is present in document', async () => {
@@ -630,7 +610,6 @@ describe('when 6 minutes before start of first race', () => {
         expect(audio).toBeInTheDocument();
     });
 });
-
 describe('when 5 minutes 59 second before start of first race', () => {
     // unsure how to test audio using a variable to control audio rather than <audio> element
     it.skip('prepare for race start state change audio is not present in document', async () => {
@@ -646,7 +625,6 @@ describe('when 5 minutes 59 second before start of first race', () => {
         expect(audio).not.toBeInTheDocument();
     });
 });
-
 describe('when 1 second before start of first race', () => {
     // unsure how to test audio using a variable to control audio rather than <audio> element
     it.skip('race start state change audio is not present in document', async () => {
@@ -662,7 +640,6 @@ describe('when 1 second before start of first race', () => {
         expect(audio).not.toBeInTheDocument();
     });
 });
-
 describe('when start of first race', () => {
     // unsure how to test audio using a variable to control audio rather than <audio> element
     it.skip('race start state change audio is present in document', async () => {
@@ -678,7 +655,6 @@ describe('when start of first race', () => {
         expect(audio).toBeInTheDocument();
     });
 });
-
 describe('when 1 second after start of first race', () => {
     // unsure how to test audio using a variable to control audio rather than <audio> element
     it.skip('prepare for race start state change audio is not present in document', async () => {
@@ -694,30 +670,22 @@ describe('when 1 second after start of first race', () => {
         expect(audio).not.toBeInTheDocument();
     });
 });
-
 describe('when selected races changed', () => {
     it('displays race headers for selected races', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-
         const races = [raceScorpionA, raceGraduateA, raceCometA, {...raceHandicapA, duration: 2100000, plannedLaps: 3}];
-
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         vi.spyOn(model, 'getStartSequence');
-    
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
-
         const raceHeaders = (screen.getByRole('heading', {name: /^races$/i})).parentNode;
         let raceA = within(raceHeaders).getByText(/scorpion a/i);
         expect(raceA).toBeInTheDocument();
-
         const selectRace = screen.getByLabelText(/Race/i);
-
         user.deselectOptions(selectRace, ['Scorpion A']);
-        
         raceA = within(raceHeaders).queryByText(/scorpion a/i);
         expect(raceA).not.toBeInTheDocument();
     });
@@ -729,15 +697,11 @@ describe('when selected races changed', () => {
         const selectedRaces = [raceGraduateA, raceCometA, raceHandicapA];
         vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         const getStartSequenceSpy = vi.spyOn(model, 'getStartSequence');
-
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
-
         const selectRace = await screen.getByLabelText(/Race/i);
-        
         user.deselectOptions(selectRace, ['Scorpion A']);
-
         expect(getStartSequenceSpy).toHaveBeenLastCalledWith(selectedRaces, RaceType.FLEET);
     });
     it('displays race names and blue peter', async () => {
@@ -746,16 +710,14 @@ describe('when selected races changed', () => {
         const controller = new DinghyRacingController(model);
         const selectedRaces = [raceGraduateA, raceCometA, raceHandicapA];
         vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-        vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(selectedRaces, new Clock())})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, new Clock())})});
-    
+        vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve(
+            {'success': true, 'domainObject': new SessionStartSequence(selectedRaces, new Clock())})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, new Clock())}
+        )});
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
-    
         const selectRace = screen.getByLabelText(/Race/i);
-        
         user.deselectOptions(selectRace, ['Scorpion A']);
-
         const flagIndicators = (screen.getByRole('heading', {name: 'Flags'})).parentNode;
         expect(within(flagIndicators).queryByText(/scorpion class/i)).not.toBeInTheDocument();
         expect(within(flagIndicators).getByText(/blue peter/i)).toBeInTheDocument();
@@ -767,20 +729,17 @@ describe('when selected races changed', () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const races = [raceScorpionA, raceGraduateA];
         const selectedRaces = [raceGraduateA];
-
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(selectedRaces, new Clock())})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, new Clock())})});
-
+        vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve(
+            {'success': true, 'domainObject': new SessionStartSequence(selectedRaces, new Clock())})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, new Clock())}
+        )});
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
-
         const selectRace = screen.getByLabelText(/Race/i);
-        
         user.deselectOptions(selectRace, ['Scorpion A']);
-
         const actionRows = screen.getAllByRole('row');
         expect(actionRows).toHaveLength(4);
         expect(within(actionRows[1]).getByText(timeFormat.format(new Date('2021-10-14T10:25:00Z')))).toBeInTheDocument();
@@ -795,20 +754,16 @@ describe('when selected races changed', () => {
         expect(within(actionRows[3]).getByText(/10:00/i)).toBeInTheDocument();
     });
 });
-
 describe('when session storage is available', () => {
     describe('when start session time has been changed from default this sesssion', () => {
         it('uses value set for session start by user', async () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
             vi.spyOn(model, 'getStartSequence');
-    
             sessionStorage.setItem('sessionStart', '2024-08-15T14:00:00Z');
-            
             await act(async () => {        
                 customRender(<RaceStartConsole />, model, controller);
             });
-    
             const selectSessionStart = screen.getByLabelText(/session start/i);
             expect(selectSessionStart).toHaveValue('2024-08-15T15:00');
         });
@@ -818,13 +773,10 @@ describe('when session storage is available', () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
             vi.spyOn(model, 'getStartSequence');
-    
             sessionStorage.setItem('sessionEnd', '2024-08-15T10:00:00Z');
-            
             await act(async () => {        
                 customRender(<RaceStartConsole />, model, controller);
             });
-    
             const selectSessionEnd = screen.getByLabelText(/session end/i);
             expect(selectSessionEnd).toHaveValue('2024-08-15T11:00');
         });
@@ -834,27 +786,22 @@ describe('when session storage is available', () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
             vi.spyOn(model, 'getStartSequence');
-    
             sessionStorage.setItem('raceType', 'PURSUIT');
-            
             await act(async () => {        
                 customRender(<RaceStartConsole />, model, controller);
             });
-    
             const checkboxPursuit = screen.getByLabelText(/pursuit/i);
             expect(checkboxPursuit).toBeChecked();
         });
     });
 });
-
 describe('when session storage is not available', () => {
     describe('when start session time has been changed from default this sesssion', () => {
         it('uses default value for session start', async () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
             vi.spyOn(model, 'getStartSequence');
-            vi.spyOn(storageUtilities, 'storageAvailable').mockImplementation(() => false);
-    
+            vi.spyOn(storageUtilities, 'storageAvailable').mockImplementation(() => false);    
             sessionStorage.setItem('sessionStart', '2024-08-15T14:00:00Z');
             
             await act(async () => {        
@@ -870,14 +817,11 @@ describe('when session storage is not available', () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
             vi.spyOn(model, 'getStartSequence');
-            vi.spyOn(storageUtilities, 'storageAvailable').mockImplementation(() => false);
-    
+            vi.spyOn(storageUtilities, 'storageAvailable').mockImplementation(() => false);    
             sessionStorage.setItem('sessionEnd', '2024-08-15T10:00:00Z');
-            
             await act(async () => {        
                 customRender(<RaceStartConsole />, model, controller);
             });
-    
             const selectSessionEnd = screen.getByLabelText(/session end/i);
             expect(selectSessionEnd).toHaveValue(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000).toISOString().substring(0, 16));
         });
@@ -887,13 +831,11 @@ describe('when session storage is not available', () => {
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             const controller = new DinghyRacingController(model);
             vi.spyOn(model, 'getStartSequence');
-    
+            vi.spyOn(storageUtilities, 'storageAvailable').mockImplementation(() => false);
             sessionStorage.setItem('raceType', 'PURSUIT');
-            
-            await act(async () => {        
+            await act(async () => {
                 customRender(<RaceStartConsole />, model, controller);
             });
-    
             const checkboxPursuit = screen.getByLabelText(/pursuit/i);
             expect(checkboxPursuit).not.toBeChecked();
         });
