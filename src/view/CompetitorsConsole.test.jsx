@@ -61,7 +61,6 @@ describe('when there are competitors', () => {
         })
     })
 });
-
 describe('when there is a problem retrieving competitors', () => {
     it('displays error message', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
@@ -82,9 +81,7 @@ describe('when a competitor is selected', () => {
             customRender(<CompetitorsConsole />, model);
         });
         const competitorCell = await screen.findByRole('cell', {name: /chris marshall/i});
-        await act(async () => {
-            await user.click(competitorCell);
-        });
+        await user.click(competitorCell);
         expect(await screen.findByLabelText(/name/i)).toHaveValue('Chris Marshall');
         expect(screen.getByRole('button', {name: /update/i})).toBeInTheDocument();
         expect(screen.getByRole('button', {name: /cancel/i})).toBeInTheDocument();
@@ -99,22 +96,16 @@ describe('when a competitor is selected', () => {
             customRender(<CompetitorsConsole />, model, controller);
         });
         const competitorCell = await screen.findByRole('cell', {name: /chris marshall/i});
-        await act(async () => {
-            await user.click(competitorCell);
-        });
+        await user.click(competitorCell);
         const nameInput = await screen.findByLabelText(/name/i);
         const updateButton = screen.getByRole('button', {name: 'Update'});
-        await act(async () => {
-            await user.clear(nameInput);
-            await user.type(nameInput, 'John Smith');
-            await user.click(updateButton);
-        });
+        await user.clear(nameInput);
+        await user.type(nameInput, 'John Smith');
+        await user.click(updateButton);
         expect(await screen.findByText(/oops/i)).toBeInTheDocument();
-        await act(async () => {
-            await user.click(competitorCell);
-        });
+        await user.click(competitorCell);
         expect(screen.queryByText(/oops/i)).not.toBeInTheDocument();
-    })
+    });
     describe('when name is changed', () => {
         it('displays new name', async () => {
             const user = userEvent.setup();
@@ -124,14 +115,10 @@ describe('when a competitor is selected', () => {
                 customRender(<CompetitorsConsole />, model);
             });
             const competitorCell = await screen.findByRole('cell', {name: /chris marshall/i});
-            await act(async () => {
-                await user.click(competitorCell);
-            });
+            await user.click(competitorCell);
             const nameInput = await screen.findByLabelText(/name/i);
-            await act(async () => {
-                await user.clear(nameInput);
-                await user.type(nameInput, 'John Smith');
-            });
+            await user.clear(nameInput);
+            await user.type(nameInput, 'John Smith');
             expect(nameInput).toHaveValue('John Smith');
         });
     });
@@ -146,17 +133,12 @@ describe('when a competitor is selected', () => {
                 customRender(<CompetitorsConsole />, model, controller);
             });
             const competitorCell = await screen.findByRole('cell', {name: /chris marshall/i});
-            await act(async () => {
-                await user.click(competitorCell);
-            });
+            await user.click(competitorCell);
             const nameInput = await screen.findByLabelText(/name/i);
             const updateButton = screen.getByRole('button', {name: 'Update'});
-            await act(async () => {
-                await user.clear(nameInput);
-                await user.type(nameInput, 'John Smith');
-                await user.click(updateButton);
-            });
-
+            await user.clear(nameInput);
+            await user.type(nameInput, 'John Smith');
+            await user.click(updateButton);
             expect(updateCompetitorSpy).toBeCalledWith(competitorChrisMarshall, 'John Smith');
         });
         describe('when update is successful', () => {
@@ -170,17 +152,12 @@ describe('when a competitor is selected', () => {
                     customRender(<CompetitorsConsole />, model, controller);
                 });
                 const competitorCell = await screen.findByRole('cell', {name: /chris marshall/i});
-                await act(async () => {
-                    await user.click(competitorCell);
-                });
+                await user.click(competitorCell);
                 const nameInput = await screen.findByLabelText(/name/i);
                 const updateButton = screen.getByRole('button', {name: 'Update'});
-                await act(async () => {
-                    await user.clear(nameInput);
-                    await user.type(nameInput, 'John Smith');
-                    await user.click(updateButton);
-                });
-    
+                await user.clear(nameInput);
+                await user.type(nameInput, 'John Smith');
+                await user.click(updateButton);
                 expect(screen.queryByLabelText(/name/i)).not.toBeInTheDocument();
                 expect(screen.queryByRole('button', {name: /update/i})).not.toBeInTheDocument();
             });
@@ -194,17 +171,12 @@ describe('when a competitor is selected', () => {
                     customRender(<CompetitorsConsole />, model, controller);
                 });
                 const competitorCell = await screen.findByRole('cell', {name: /chris marshall/i});
-                await act(async () => {
-                    await user.click(competitorCell);
-                });
+                await user.click(competitorCell);
                 const nameInput = await screen.findByLabelText(/name/i);
                 const updateButton = screen.getByRole('button', {name: 'Update'});
-                await act(async () => {
-                    await user.clear(nameInput);
-                    await user.type(nameInput, 'John Smith');
-                    await user.click(updateButton);
-                });
-    
+                await user.clear(nameInput);
+                await user.type(nameInput, 'John Smith');
+                await user.click(updateButton);
                 expect(await screen.findByRole('cell', {name: /john smith/i})).toBeInTheDocument();
                 expect(screen.queryByRole('cell', {name: /chris marshall/i})).not.toBeInTheDocument();
             });
@@ -220,20 +192,15 @@ describe('when a competitor is selected', () => {
                     customRender(<CompetitorsConsole />, model, controller);
                 });
                 const competitorCell = await screen.findByRole('cell', {name: /chris marshall/i});
-                await act(async () => {
-                    await user.click(competitorCell);
-                });
+                await user.click(competitorCell);
                 const nameInput = await screen.findByLabelText(/name/i);
                 const updateButton = screen.getByRole('button', {name: 'Update'});
-                await act(async () => {
-                    await user.clear(nameInput);
-                    await user.type(nameInput, 'John Smith');
-                    await user.click(updateButton);
-                });
-
+                await user.clear(nameInput);
+                await user.type(nameInput, 'John Smith');
+                await user.click(updateButton);
                 expect(await screen.findByText('Oops something went wrong.')).toBeInTheDocument();
             });
-        })
+        });
     });
     describe('when cancelled', () => {
         it('hides input fields for updating competitor', async () => {
@@ -245,17 +212,12 @@ describe('when a competitor is selected', () => {
                 customRender(<CompetitorsConsole />, model, controller);
             });
             const competitorCell = await screen.findByRole('cell', {name: /chris marshall/i});
-            await act(async () => {
-                await user.click(competitorCell);
-            });
+            await user.click(competitorCell);
             const nameInput = await screen.findByLabelText(/name/i);
             const cancelButton = screen.getByRole('button', {name: 'Cancel'});
-            await act(async () => {
-                await user.clear(nameInput);
-                await user.type(nameInput, 'John Smith');
-                await user.click(cancelButton);
-            });
-
+            await user.clear(nameInput);
+            await user.type(nameInput, 'John Smith');
+            await user.click(cancelButton);
             expect(screen.queryByLabelText(/name/i)).not.toBeInTheDocument();
             expect(screen.queryByRole('button', {name: /update/i})).not.toBeInTheDocument();
             expect(screen.queryByRole('button', {name: /cancel/i})).not.toBeInTheDocument();
