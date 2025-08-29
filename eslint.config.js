@@ -25,9 +25,7 @@ export default defineConfig([
       },
     },
     rules: {
-      // 'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
-      // 'no-unused-vars': ['warn', { varsIgnorePattern: '^[A-Z_]' }],
-      'no-unused-vars': ['warn'],
+      'no-unused-vars': ['warn', { varsIgnorePattern: '^[A-Z_]' }], // ignore JSX function imports
       'no-async-promise-executor': ['warn'],
       'no-unused-private-class-members': ['warn'],
       'no-unsafe-finally': ['warn'],
