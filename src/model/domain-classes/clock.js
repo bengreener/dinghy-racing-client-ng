@@ -18,9 +18,7 @@ class Clock {
     static _synchOffset = 0;
     static _broadcastChannel = new BroadcastChannel('DinghyRacingClock');
     static _synchEvent = false;
-
-    // fancy static initialisation to avoid need for Bable configuration; https://babeljs.io/docs/babel-plugin-transform-class-static-block
-    static #_ = (() => {
+    static {
         this._broadcastChannel.onmessage = ({ data }) => {
             switch (data.message) {
                 case 'synchToTime':
@@ -31,7 +29,7 @@ class Clock {
                     break;
             }
         };
-    })();
+    };
 
     _startTime
     _performanceTimerStartTime; // when the race is due to start based on the value of performance.now() when clock was initialised
@@ -131,7 +129,7 @@ class Clock {
         if (window.Worker) {
             const url = new URL('./tick-worker.js', import.meta.url);
             this._ticker = new Worker(url);
-            this._ticker.onmessage = (event) => {
+            this._ticker.onmessage = () => {
                     if (this._tickHandlers.size > 0) {
                         this._tickHandlers.forEach(callback => {
                         callback(); 
