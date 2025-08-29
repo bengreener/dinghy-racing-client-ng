@@ -567,7 +567,7 @@ function SignUp({ race }) {
         updateEntry();
     }
 
-    function handleSailNumberBlur(event) {
+    function handleSailNumberBlur() {
         updatePreviousEntries(sailNumber);
     }
 
