@@ -18,12 +18,16 @@ import DinghyRacingController from './dinghy-racing-controller.js';
 import DinghyRacingModel from '../model/dinghy-racing-model.js';
 import { httpRootURL, wsRootURL, competitorChrisMarshall, dinghyClassScorpion, dinghy1234, dinghy826, raceScorpionA, raceCometA, 
     entryChrisMarshallScorpionA1234, entryJillMyerCometA826, entriesScorpionA, competitorLouScrew, fleetHandicap, fleetScorpion } from '../model/__mocks__/test-data.js';
-// import { downloadRaceEntriesCSV } from '../utilities/csv-writer.js';
 import * as csvWriter from '../utilities/csv-writer.js';
 import NameFormat from './name-format.js';
 
 vi.mock('../model/dinghy-racing-model');
 vi.mock('../model/domain-classes/clock');
+
+afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+});
 
 describe('when creating a new Dinghy Class', () => {
     describe('when a name is not supplied for a new dinghy class', () => {
@@ -1245,8 +1249,13 @@ describe('when updating a lap for an entry', () => {
 
 describe('when writing race entries to a CSV file', () => {
     it('returns a promise that resolves to a result indicating success when operation is successful', async () => {
-        global.URL.createObjectURL = vi.fn(); // function does not exist in jsdom
-        global.URL.revokeObjectURL = vi.fn(); // function does not exist in jsdom
+         // JSDom will generate an error in the console when the test is run as a warning against navigating URLs during tests.
+         // I don't know how to block this but, don't believe it is an issue here.
+         // Error: Not implemented: navigation (except hash changes)
+        vi.stubGlobal('URL', {
+            createObjectURL: vi.fn(),
+            revokeObjectURL: vi.fn()
+        });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         const promise = dinghyRacingController.downloadRaceResults(raceScorpionA);
@@ -1264,8 +1273,10 @@ describe('when writing race entries to a CSV file', () => {
         expect(result).toEqual({'success': false, 'message': 'Unable to retrieve entries'});
     });
     it('calls downloadRaceEntriesCSV with options parameter passed in', async () => {
-        global.URL.createObjectURL = vi.fn(); // function does not exist in jsdom
-        global.URL.revokeObjectURL = vi.fn(); // function does not exist in jsdom
+        vi.stubGlobal('URL', {
+            createObjectURL: vi.fn(),
+            revokeObjectURL: vi.fn()
+        });
         const downloadRaceEntriesCSVSpy = vi.spyOn(csvWriter, 'downloadRaceEntriesCSV');
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         vi.spyOn(dinghyRacingModel, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});

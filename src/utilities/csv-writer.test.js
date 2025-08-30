@@ -20,22 +20,37 @@ import NameFormat from '../controller/name-format';
 
 vi.mock('../model/domain-classes/clock');
 
+afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+});
+
 // Testing requires coding of createObjectURL that would probably invalidate test
 it.skip('writes race entry data to a file', async () => {
     // ??
 });
 
 it('returns a promise indicating success', async () => {
-    global.URL.createObjectURL = vi.fn(); // function does not exist in jsdom
-    global.URL.revokeObjectURL = vi.fn(); // function does not exist in jsdom
+    // JSDom will generate an error in the console when the test is run as a warning against navigating URLs during tests.
+    // I don't know how to block this but, don't believe it is an issue here.
+    // Error: Not implemented: navigation (except hash changes)
+    vi.stubGlobal('URL', {
+        createObjectURL: vi.fn(),
+        revokeObjectURL: vi.fn()
+    });
     const promise = downloadRaceEntriesCSV(raceScorpionA, entriesScorpionA);
     expect(promise).toBeInstanceOf(Promise);
     expect(await promise).toEqual({'success': true});
 });
 
 it('returns a promise indicating failure and providing a message with the cause', async () => {
-    global.URL.createObjectURL = vi.fn(() => {throw new Error('Oops!')}); // function does not exist in jsdom
-    global.URL.revokeObjectURL = vi.fn(); // function does not exist in jsdom
+    // JSDom will generate an error in the console when the test is run as a warning against navigating URLs during tests.
+    // I don't know how to block this but, don't believe it is an issue here.
+    // Error: Not implemented: navigation (except hash changes)
+    vi.stubGlobal('URL', {
+        createObjectURL: vi.fn(() => {throw new Error('Oops!')}),
+        revokeObjectURL: vi.fn()
+    });
     const promise = downloadRaceEntriesCSV(raceScorpionA, entriesScorpionA);
     expect(promise).toBeInstanceOf(Promise);
     expect(await promise).toEqual({'success': false, 'message': 'Oops!'});
