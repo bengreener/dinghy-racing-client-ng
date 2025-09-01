@@ -21,4 +21,16 @@ The build is intended to be run deployed as part of the Dinghy Racing Client Con
 
 Can be run without using the Dinghy Racing Client Container by modifying authorisation.js and dinghy-racing-properties.js.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Development Dependencies
+From version 2025.8.4.dev the project has been migrated to use [Vite](https://vite.dev/) + [Vitest](https://vitest.dev/) rather than Create React App.  
+### Remove Create React App scripts
+npm uninstall react-scripts  
+### Install Vite
+npm install vite @vitejs/plugin-react --save-dev
+### Install Vitest and testing dependencies
+npm install vitest --save-dev  
+npm install jsdom- -save-dev  
+npm install @testing-library/react @testing-library/jest-dom --save-dev  
+### Setup ESLint
+npm install eslint vite-plugin-eslint --save-dev  
+npm install eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-react-refresh --save-dev
