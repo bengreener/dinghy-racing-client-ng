@@ -446,7 +446,7 @@ class DinghyRacingModel {
      */
     async updateLap(entry, time) {
         const lapNumber = entry.laps.length;
-        return this.update(entry.url + '/updateLap', {'number': lapNumber, 'time': time / 1000}); 
+        return this.update(entry.url + '/updateLap', {'number': lapNumber, 'time': time / 1000});
     }
 
     /**
@@ -1777,6 +1777,7 @@ class DinghyRacingModel {
             lastLapTime: raceHAL.leadEntry ? this.convertISO8601DurationToMilliseconds(raceHAL.leadEntry.lastLapTime) : null,
             averageLapTime: raceHAL.leadEntry ? this.convertISO8601DurationToMilliseconds(raceHAL.leadEntry.averageLapTime) : null,
             dinghyClasses: raceHAL.dinghyClasses,
+            clock: this.clock,
             url: raceHAL._links.self.href
         }
     }

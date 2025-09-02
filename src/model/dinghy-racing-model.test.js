@@ -407,10 +407,11 @@ describe('when creating a new race', () => {
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         vi.spyOn(dinghyRacingModel, 'getFleet').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleetScorpion})});
+        const local_raceScorpionA = {...raceScorpionA, clock: dinghyRacingModel.getClock()};
         const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00.000Z'), 'fleet': fleetScorpion, 'duration': 2700000, type:'FLEET', startType: 'CSCCLUBSTART'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, domainObject: raceScorpionA});
+        expect(result).toEqual({success: true, domainObject: local_raceScorpionA});
     });
     it('returns a promise that resolves to a result indicating success when race is created with http status 201', async () => {
         fetch.mockImplementationOnce((resource, options) => {// check format of data passed to fetch to reduce risk of false positive
@@ -433,10 +434,11 @@ describe('when creating a new race', () => {
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         vi.spyOn(dinghyRacingModel, 'getFleet').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleetScorpion})});
+        const local_raceScorpionA = {...raceScorpionA, clock: dinghyRacingModel.getClock()};
         const promise = dinghyRacingModel.createRace({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2021-10-14T14:10:00.000Z'), 'fleet': fleetScorpion, 'duration': 2700000, type:'FLEET', startType: 'CSCCLUBSTART'});
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, domainObject: raceScorpionA});
+        expect(result).toEqual({'success': true, domainObject: local_raceScorpionA});
     });
     it('returns a promise that resolves to a result indicating failure when race is not created with http status 400 and provides a message explaining the cause of failure', async () => {
         fetch.mockImplementationOnce(() => {
@@ -776,10 +778,11 @@ describe('when retrieving a list of races that start at or after a specified tim
         });
 
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const local_races = races.map(race => {return {...race, clock: dinghyRacingModel.getClock()}});
         const promise = dinghyRacingModel.getRacesOnOrAfterTime(new Date('2021-10-14T10:00:00.000Z'));
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, 'domainObject': races});
+        expect(result).toEqual({'success': true, 'domainObject': local_races});
     });
     describe('when there are more races than fit on a single page', () => {
         describe('when page and size are not supplied', () => {
@@ -874,16 +877,16 @@ describe('when retrieving a list of races that start at or after a specified tim
                 });
         
                 const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const local_races = races.map(race => {return {...race, clock: dinghyRacingModel.getClock()}});
                 const promise = dinghyRacingModel.getRacesOnOrAfterTime(new Date('2022-10-10T10:00:00.000Z'));
                 const result = await promise;
                 expect(promise).toBeInstanceOf(Promise);
-                expect(result).toEqual({'success': true, 'domainObject': races});
+                expect(result).toEqual({'success': true, 'domainObject': local_races});
             });
         });
         describe('when page number supplied', () => {
             it('returns only a single page of data', async () => {
                 const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
-                const races_p0 = [raceScorpionA, raceGraduateA];
                 fetch.mockImplementation((resource) => {
                     if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0&size=4') {
                         return Promise.resolve({
@@ -973,6 +976,7 @@ describe('when retrieving a list of races that start at or after a specified tim
                 });
         
                 const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const races_p0 = [{...raceScorpionA, clock: dinghyRacingModel.getClock()}, {...raceGraduateA, clock: dinghyRacingModel.getClock()}];
                 const promise = dinghyRacingModel.getRacesOnOrAfterTime(new Date('2022-10-10T10:00:00.000Z'), 0);
                 const result = await promise;
                 expect(promise).toBeInstanceOf(Promise);
@@ -982,7 +986,6 @@ describe('when retrieving a list of races that start at or after a specified tim
         describe('when size is supplied', () => {
             it('returns only a single page of data', async () => {
                 const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
-                const races_p0 = [raceScorpionA, raceGraduateA];
                 fetch.mockImplementation((resource) => {
                     if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0&size=4') {
                         return Promise.resolve({
@@ -1072,6 +1075,7 @@ describe('when retrieving a list of races that start at or after a specified tim
                 });
         
                 const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const races_p0 = [{...raceScorpionA, clock: dinghyRacingModel.getClock()}, {...raceGraduateA, clock: dinghyRacingModel.getClock()}];
                 const promise = dinghyRacingModel.getRacesOnOrAfterTime(new Date('2022-10-10T10:00:00.000Z'), null, 2);
                 const result = await promise;
                 expect(promise).toBeInstanceOf(Promise);
@@ -1081,7 +1085,6 @@ describe('when retrieving a list of races that start at or after a specified tim
         describe('when page and size supplied', () => {
             it('returns only a single page of data', async () => {
                 const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
-                const races_p0 = [raceScorpionA, raceGraduateA];
                 fetch.mockImplementation((resource) => {
                     if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0&size=4') {
                         return Promise.resolve({
@@ -1171,6 +1174,7 @@ describe('when retrieving a list of races that start at or after a specified tim
                 });
         
                 const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const races_p0 = [{...raceScorpionA, clock: dinghyRacingModel.getClock()}, {...raceGraduateA, clock: dinghyRacingModel.getClock()}];
                 const promise = dinghyRacingModel.getRacesOnOrAfterTime(new Date('2022-10-10T10:00:00.000Z'), 0, 2);
                 const result = await promise;
                 expect(promise).toBeInstanceOf(Promise);
@@ -4425,7 +4429,6 @@ describe('when searching for entries by race', () => {
 describe('when a race is requested', () => {
     it('returns a promise that resolves to a result indicating success and containing the race when the race is found', async () => {
         const raceScorpion_AHAL_withEntries = {...raceScorpion_AHAL, dinghyClasses: [{name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043}]};
-        const raceScorpionA_withEntries = {...raceScorpionA, dinghyClasses: [{name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043}]};
         fetch.mockImplementation((resource, options) => {
             if (resource === raceScorpionA.url) {
                 return Promise.resolve({
@@ -4504,16 +4507,15 @@ describe('when a race is requested', () => {
             }
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        // vi.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
+        const raceScorpionA_withEntries = {...raceScorpionA, dinghyClasses: [{name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043}], clock: dinghyRacingModel.getClock()};
         const promise = dinghyRacingModel.getRace(raceScorpionA.url);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, 'domainObject': raceScorpionA_withEntries, eTag: '"3"'});
+        expect(result).toEqual({success: true, domainObject: raceScorpionA_withEntries, eTag: '"3"'});
     });
     describe('when an entry has already sailed a lap', () => {
         it('returns a race that includes the number of laps sailed by the lead entry', async () => {
             const raceScorpion_lapsSailed_AHAL = {...raceScorpion_AHAL, leadEntry: {...raceScorpion_AHAL.leadEntry, lapsSailed: 3}};
-            const raceScorpion_lapsSailed = {...raceScorpionA, lapsSailed: 3};
             fetch.mockImplementation((resource) => {
                 if (resource === raceScorpionA.url) {
                     return Promise.resolve({
@@ -4587,6 +4589,7 @@ describe('when a race is requested', () => {
                 }
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const raceScorpion_lapsSailed = {...raceScorpionA, lapsSailed: 3, clock: dinghyRacingModel.getClock()};
             vi.spyOn(dinghyRacingModel, 'getDinghyClass').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion})});
             const promise = dinghyRacingModel.getRace(raceScorpion_lapsSailed.url);
             const result = await promise;
@@ -4752,7 +4755,7 @@ describe('when a race is requested', () => {
         const promise = dinghyRacingModel.getRace(raceGraduateA.url);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({success: true, domainObject: raceGraduateA, eTag: '"3"'});
+        expect(result).toEqual({success: true, domainObject: {...raceGraduateA, clock: dinghyRacingModel.getClock()}, eTag: '"3"'});
     });
     describe('when race has not changed from last time retrieved', () => {
         it('returns race from local store', async () => {
@@ -4786,7 +4789,6 @@ describe('when a race is requested', () => {
     describe('when race accessed via a relation from another entity so does not have a version ETag', () => {
         it('retrieves race and does not update local store', async () => {
             const raceScorpion_AHAL_withEntries = {...raceScorpion_AHAL, dinghyClasses: [{name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043}]};
-            const raceScorpionA_withEntries = {...raceScorpionA, dinghyClasses: [{name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043}]};
             fetch.mockImplementation((resource, options) => {
                 if (resource === raceScorpionA.url) {
                     return Promise.resolve({
@@ -4865,11 +4867,12 @@ describe('when a race is requested', () => {
                 }
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const raceScorpionA_withEntries = {...raceScorpionA, dinghyClasses: [{name: 'Scorpion', crewSize: 2, portsmouthNumber: 1043}], clock: dinghyRacingModel.getClock()};
             dinghyRacingModel.raceResultMap.set(raceScorpion_AHAL_withEntries._links.self.href, {success: true,domainObject: raceScorpion_AHAL_withEntries, eTag: '"3"'});
             const promise = dinghyRacingModel.getRace(raceScorpionA.url);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': true, 'domainObject': raceScorpionA_withEntries, eTag: null});
+            expect(result).toEqual({success: true, domainObject: raceScorpionA_withEntries, eTag: null});
         });
     });
 });
@@ -5432,10 +5435,11 @@ describe('when retrieving a list of races that start between the specified times
         });
     
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const local_races = races.map(race => {return {...race, clock: dinghyRacingModel.getClock()}});
         const promise = dinghyRacingModel.getRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'));
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, 'domainObject': races});
+        expect(result).toEqual({success: true, domainObject: local_races});
     });
     describe('when there are more races than fit on a single page', () => {
         describe('when page and size are not supplied', () => {
@@ -5530,16 +5534,16 @@ describe('when retrieving a list of races that start between the specified times
                 });
         
                 const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const local_races = races.map(race => {return {...race, clock: dinghyRacingModel.getClock()}});
                 const promise = dinghyRacingModel.getRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'));
                 const result = await promise;
                 expect(promise).toBeInstanceOf(Promise);
-                expect(result).toEqual({'success': true, 'domainObject': races});
+                expect(result).toEqual({success: true, domainObject: local_races});
             });
         });
         describe('when page number supplied', () => {
             it('returns only a single page of data', async () => {
                 const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
-                const races_p0 = [raceScorpionA, raceGraduateA];
                 fetch.mockImplementation((resource) => {
                     if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
                         return Promise.resolve({
@@ -5629,6 +5633,7 @@ describe('when retrieving a list of races that start between the specified times
                 });
         
                 const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const races_p0 = [{...raceScorpionA, clock: dinghyRacingModel.getClock()}, {...raceGraduateA, clock: dinghyRacingModel.getClock()}];
                 const promise = dinghyRacingModel.getRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), 0);
                 const result = await promise;
                 expect(promise).toBeInstanceOf(Promise);
@@ -5638,7 +5643,6 @@ describe('when retrieving a list of races that start between the specified times
         describe('when size is supplied', () => {
             it('returns only a single page of data', async () => {
                 const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
-                const races_p0 = [raceScorpionA, raceGraduateA];
                 fetch.mockImplementation((resource) => {
                     if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
                         return Promise.resolve({
@@ -5728,6 +5732,7 @@ describe('when retrieving a list of races that start between the specified times
                 });
         
                 const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const races_p0 = [{...raceScorpionA, clock: dinghyRacingModel.getClock()}, {...raceGraduateA, clock: dinghyRacingModel.getClock()}];
                 const promise = dinghyRacingModel.getRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), null, 2);
                 const result = await promise;
                 expect(promise).toBeInstanceOf(Promise);
@@ -5737,7 +5742,6 @@ describe('when retrieving a list of races that start between the specified times
         describe('when page and size supplied', () => {
             it('returns only a single page of data', async () => {
                 const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
-                const races_p0 = [raceScorpionA, raceGraduateA];
                 fetch.mockImplementation((resource) => {
                     if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
                         return Promise.resolve({
@@ -5827,6 +5831,7 @@ describe('when retrieving a list of races that start between the specified times
                 });
         
                 const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+                const races_p0 = [{...raceScorpionA, clock: dinghyRacingModel.getClock()}, {...raceGraduateA, clock: dinghyRacingModel.getClock()}];
                 const promise = dinghyRacingModel.getRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), 0, 2);
                 const result = await promise;
                 expect(promise).toBeInstanceOf(Promise);
@@ -5911,10 +5916,11 @@ describe('when retrieving a list of races that start between the specified times
                 }
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const local_races = races.map(race => {return {...race, clock: dinghyRacingModel.getClock()}});
             const promise = dinghyRacingModel.getRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': true, 'domainObject': races});
+            expect(result).toEqual({success: true, domainObject: local_races});
         });
     });
 });
