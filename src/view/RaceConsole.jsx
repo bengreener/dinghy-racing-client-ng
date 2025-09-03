@@ -77,6 +77,7 @@ function RaceConsole() {
         setRacesUpdateRequestAt(Date.now());
     }, []);
 
+    // get races between times for race type
     useEffect(() => {
         let ignoreFetch = false; // set to true if RaceConsole rerendered before fetch completes to avoid using out of date result
         model.getRacesBetweenTimesForType(new Date(sessionStart), new Date(sessionEnd), raceType).then(result => {
@@ -88,7 +89,6 @@ function RaceConsole() {
                 const options = []; // html option elements
                 const optionsRaceNames = []; // just the names of the races to match with previously selected races
                 result.domainObject.forEach(race => {
-                    race.clock = model.getClock();
                     map.set(race.name, race);
                     options.push(<option key={race.name + race.plannedStartTime.toISOString()} value={race.name} >{race.name}</option>);
                     optionsRaceNames.push(race.name);

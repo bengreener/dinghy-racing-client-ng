@@ -78,8 +78,9 @@ it('enables a race to be selected', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
+    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
     vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
     await act(async () => {
         customRender(<RaceConsole />, model, controller);
     });
@@ -92,8 +93,9 @@ it('enables more than one race to be selected', async () => {
     const user = userEvent.setup();
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
+    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
     vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
     await act(async () => {
         customRender(<RaceConsole />, model, controller);
     });
@@ -112,8 +114,9 @@ describe('when a race is selected', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
+        const local_races = races.map(race => {return {...race, clock: model.getClock()}});
         vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
         await act(async () => {
             customRender(<RaceConsole />, model, controller);
         });
@@ -127,10 +130,11 @@ describe('when a race is selected', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
+        const local_races = races.map(race => {return {...race, clock: model.getClock()}});
         vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
         vi.spyOn(model, 'startRace').mockImplementation(() => {return Promise.resolve({'success': true})});
-        const controllerStartRaceSpy = vi.spyOn(controller, 'startRace');
+        vi.spyOn(controller, 'startRace');
         await act(async () => {
             customRender(<RaceConsole />, model, controller);
         });
@@ -148,6 +152,7 @@ describe('when more than one race is selected', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
+        const local_races = races.map(race => {return {...race, clock: model.getClock()}});
         vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
             if (race.name === 'Scorpion A') {
                 return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
@@ -156,7 +161,7 @@ describe('when more than one race is selected', () => {
                 return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
             }
         });
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
         await act(async () => {
             customRender(<RaceConsole />, model, controller);
         });
@@ -172,6 +177,7 @@ describe('when more than one race is selected', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
+        const local_races = races.map(race => {return {...race, clock: model.getClock()}});
         vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
             if (race.name === 'Scorpion A') {
                 return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
@@ -180,9 +186,9 @@ describe('when more than one race is selected', () => {
                 return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
             }
         });
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
         vi.spyOn(model, 'startRace').mockImplementation(() => {return Promise.resolve({'success': true})});
-        const controllerStartRaceSpy = vi.spyOn(controller, 'startRace');
+        // vi.spyOn(controller, 'startRace');
         await act(async () => {
             customRender(<RaceConsole />, model, controller);
         });
@@ -202,6 +208,7 @@ describe('when a race is unselected', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
+        const local_races = races.map(race => {return {...race, clock: model.getClock()}});
         vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
             if (race.name === 'Scorpion A') {
                 return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
@@ -210,7 +217,7 @@ describe('when a race is unselected', () => {
                 return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
             }
         });
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
         await act(async () => {
             customRender(<RaceConsole />, model, controller);
         });        
@@ -228,6 +235,7 @@ describe('when a race is unselected', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
+        const local_races = races.map(race => {return {...race, clock: model.getClock()}});
         vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
             if (race.name === 'Scorpion A') {
                 return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
@@ -236,7 +244,7 @@ describe('when a race is unselected', () => {
                 return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
             }    
         });
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
         await act(async () => {
             customRender(<RaceConsole />, model, controller);
         });        
@@ -348,9 +356,9 @@ describe('when races within session are changed', () => {
 describe('when start time for the session is changed', () => {
     it('updates list of races', async () => {
         const user = userEvent.setup();
-        const races1 = [raceScorpionA];
-        const races2 = [raceScorpionA, raceGraduateA];
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const races1 = [{...raceScorpionA, clock: model.getClock()}];
+        const races2 = [{...raceScorpionA, clock: model.getClock()}, {...raceGraduateA, clock: model.getClock()}];
         vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races2})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': races1})});
         await act(async () => {
             customRender(<RaceConsole />, model);
