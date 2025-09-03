@@ -137,7 +137,6 @@ function RaceStartConsole () {
                 const options = []; // html option elements
                 const optionsRaceNames = []; // just the names of the races to match with previously selected races
                 result.domainObject.forEach(race => {
-                    race.clock = model.getClock();
                     map.set(race.name, race);
                     options.push(<option key={race.name + race.plannedStartTime.toISOString()} value={race.name} >{race.name}</option>);
                     optionsRaceNames.push(race.name);

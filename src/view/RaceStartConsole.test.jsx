@@ -99,7 +99,8 @@ describe('when no races selected', () => {
 it('displays races included in selected session', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
+    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
 
     await act(async () => {
         customRender(<RaceStartConsole />, model, controller);
@@ -113,7 +114,8 @@ it('displays races included in selected session', async () => {
 it('calls DinghyRacingModel.getRacesBetweenTimesForType with correct arguments', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    const getRacesBetweenTimesForTypeSpy = vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
+    const getRacesBetweenTimesForTypeSpy = vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
     const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
     sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
     const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000); // create as 18:00 UTC intially
@@ -128,21 +130,23 @@ it('calls DinghyRacingModel.getRacesBetweenTimesForType with correct arguments',
 it('calls DinghyRacingModel.getStartSequence with correct arguments', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
+    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
     const getStartSequenceSpy = vi.spyOn(model, 'getStartSequence');
     
     await act(async () => {        
         customRender(<RaceStartConsole />, model, controller);
     });
 
-    expect(getStartSequenceSpy).toHaveBeenCalledWith(races, RaceType.FLEET);
+    expect(getStartSequenceSpy).toHaveBeenCalledWith(local_races, RaceType.FLEET);
 });
 describe('when new value set for race type', () => {
     it('calls DinghyRacingModel.getRacesBetweenTimesForType with correct arguments', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        const getRacesBetweenTimesForTypeSpy = vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races, model})});
+        const local_races = races.map(race => {return {...race, clock: model.getClock()}});
+        const getRacesBetweenTimesForTypeSpy = vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
         const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
         sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
         const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000); // create as 18:00 UTC intially
@@ -162,7 +166,8 @@ describe('when new value set for race type', () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        const local_races = races.map(race => {return {...race, clock: model.getClock()}});
+        const getRacesBetweenTimesForTypeSpy = vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
         const getStartSequenceSpy = vi.spyOn(model, 'getStartSequence');
 
         await act(async () => {        
@@ -173,7 +178,7 @@ describe('when new value set for race type', () => {
             user.click(screen.getByLabelText(/pursuit/i));
         });
 
-        expect(getStartSequenceSpy).toHaveBeenCalledWith(races, RaceType.PURSUIT);
+        expect(getStartSequenceSpy).toHaveBeenCalledWith(local_races, RaceType.PURSUIT);
     });
 });
 it('defaults session start to 8:00 today', async () => {
@@ -203,7 +208,8 @@ it('defaults session end to 20:00 of today', async () => {
 it('provides countdown value and message to Countdown control', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
+    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
     vi.spyOn(model, 'getStartSequence').mockImplementation(() => {
         return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence([ raceScorpionA ], new Clock())});
     });
@@ -219,7 +225,8 @@ it('provides countdown value and message to Countdown control', async () => {
 it('displays race names and blue peter', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
+    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
     vi.spyOn(model, 'getStartSequence');
 
     await act(async () => {
@@ -236,7 +243,8 @@ it('displays race names and blue peter', async () => {
 it('displays initial state for each flag', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => Promise.resolve({success:true, domainObject: races}));
+    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
+    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
     vi.spyOn(model, 'getStartSequence');
 
     let container;
@@ -268,7 +276,8 @@ it('displays race headers for races in session', async () => {
 
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races, model})});
+    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
+    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
     vi.spyOn(model, 'getStartSequence');
 
     await act(async () => {
@@ -314,7 +323,8 @@ it('does not display in race data in race headers', async () => {
 
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races, model})});
+    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
+    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
     vi.spyOn(model, 'getStartSequence');
 
     await act(async () => {
@@ -491,7 +501,8 @@ describe('when clock ticks', () => {
 it('registers an interest in race updates for races in session', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races, model})});
+    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
+    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
     vi.spyOn(model, 'getStartSequence');
     const registerRaceUpdateCallbackSpy = vi.spyOn(model, 'registerRaceUpdateCallback');
 
@@ -526,14 +537,15 @@ describe('when races within session are changed', () => {
     it('removes a race that has had start time changed so it falls outside session time window', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races, model})});
+        const local_races = races.map(race => {return {...race, clock: model.getClock()}});
+        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
         vi.spyOn(model, 'getStartSequence');
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
         expect(screen.getAllByText('Handicap A')).toHaveLength(2);
-        const url = races[races.length -1].url;
-        races.pop();
+        const url = races[local_races.length -1].url;
+        local_races.pop();
         await act(async () => {
             vi.advanceTimersByTime(1000); // advance time so RaceStartConsole knows it needs to rerender
             model.handleRaceUpdate({'body': url});
@@ -544,7 +556,8 @@ describe('when races within session are changed', () => {
 it('registers an interest in fleet updates for races in session', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
     const controller = new DinghyRacingController(model);
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA]})});
+    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
+    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
     vi.spyOn(model, 'getStartSequence');
     const registerFleetUpdateCallbackSpy = vi.spyOn(model, 'registerFleetUpdateCallback');
 
@@ -564,7 +577,7 @@ describe('when the fleet associated with the race is changed', () => {
         const fleet = {...fleetHandicap, dinghyClasses: [dinghyClassComet, dinghyClassScorpion]};
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': [{...racePursuitA, fleet: fleet, dinghyClasses: [dinghyClassScorpion]}], model})});
+        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': [{...racePursuitA, fleet: fleet, dinghyClasses: [dinghyClassScorpion], clock: model.getClock()}], model})});
         vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence([{...racePursuitA, fleet: fleet, dinghyClasses: [dinghyClassScorpion]}], model.getClock())})});
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
@@ -617,7 +630,7 @@ describe('when 5 minutes 59 second before start of first race', () => {
         vi.setSystemTime(new Date('2021-10-14T10:24:01Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+        vi.spyOn(model, 'getStartSequence');
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
@@ -632,7 +645,7 @@ describe('when 1 second before start of first race', () => {
         vi.setSystemTime(new Date('2021-10-14T10:29:59Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+        vi.spyOn(model, 'getStartSequence');
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
@@ -647,7 +660,7 @@ describe('when start of first race', () => {
         vi.setSystemTime(new Date('2021-10-14T10:20:00Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+        vi.spyOn(model, 'getStartSequence');
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
@@ -662,7 +675,7 @@ describe('when 1 second after start of first race', () => {
         vi.setSystemTime(new Date('2021-10-14T10:30:01Z'));
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getStartSequence');//.mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new StartSequence(races, model)})});
+        vi.spyOn(model, 'getStartSequence');
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
         });
@@ -676,7 +689,8 @@ describe('when selected races changed', () => {
         const races = [raceScorpionA, raceGraduateA, raceCometA, {...raceHandicapA, duration: 2100000, plannedLaps: 3}];
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        const local_races = races.map(race => {return {...race, clock: model.getClock()}});
+        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
         vi.spyOn(model, 'getStartSequence');
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
@@ -693,9 +707,9 @@ describe('when selected races changed', () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        const races = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA]; // was dropping handicap race when full test suit run for some reason so redlcare as appears to resolve :-/
-        const selectedRaces = [raceGraduateA, raceCometA, raceHandicapA];
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        const local_races = races.map(race => {return {...race, clock: model.getClock()}});
+        const selectedRaces = [{...raceGraduateA, clock: model.getClock()}, {...raceCometA, clock: model.getClock()}, {...raceHandicapA, clock: model.getClock()}];
+        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
         const getStartSequenceSpy = vi.spyOn(model, 'getStartSequence');
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
@@ -708,10 +722,11 @@ describe('when selected races changed', () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        const selectedRaces = [raceGraduateA, raceCometA, raceHandicapA];
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
+        const local_races = races.map(race => {return {...race, clock: model.getClock()}});
+        const selectedRaces = [{...raceGraduateA, clock: model.getClock()}, {...raceCometA, clock: model.getClock()}, {...raceHandicapA, clock: model.getClock()}];
+        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
         vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve(
-            {'success': true, 'domainObject': new SessionStartSequence(selectedRaces, new Clock())})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, new Clock())}
+            {'success': true, 'domainObject': new SessionStartSequence(selectedRaces, new Clock())})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(local_races, new Clock())}
         )});
         await act(async () => {
             customRender(<RaceStartConsole />, model, controller);
@@ -727,9 +742,9 @@ describe('when selected races changed', () => {
     });
     it('displays actions to start races in session', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const races = [raceScorpionA, raceGraduateA];
-        const selectedRaces = [raceGraduateA];
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const races = [{...raceScorpionA, clock: model.getClock()}, {...raceGraduateA, clock: model.getClock()}];
+        const selectedRaces = [{...raceGraduateA, clock: model.getClock()}];
         vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
         const controller = new DinghyRacingController(model);
         vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve(
