@@ -648,36 +648,24 @@ describe('when removing an entry from fast group', () => {
 });
 describe('when adding a lap time', () => {
     it('calls controller add lap function with value of time sailed', async () => {
-        const entrySarahPascalScorpionA6745 = {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
-            {'number': 1, 'time': 1}, {'number': 2, 'time': 2}
-        ], 'sumOfLapTimes': 0,'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}};
-        const entriesScorpionA = [entrySarahPascalScorpionA6745];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        vi.spyOn(model, 'getClock').mockImplementation(() => {
+            return {getElapsedTime: () => 7}});
         const controller = new DinghyRacingController(model);
-        const clock = {getElapsedTime: () => {return 7}};
+        const local_raceScorpionA = {...raceScorpionA, clock: model.getClock()};
+        const entrySarahPascalScorpionA6745 = {helm: competitorSarahPascal, race: local_raceScorpionA, dinghy: dinghy6745, laps: [
+            {number: 1, time: 1}, {number: 2, time: 2}
+        ], sumOfLapTimes: 0, url: 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}};
+        const entriesScorpionA = [entrySarahPascalScorpionA6745];
         vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
         const addLapSpy = vi.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true, 'domainObject': {}})});
         await act(async () => {
-            customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
+            customRender(<RaceEntriesView races={[local_raceScorpionA]} />, model, controller);
         });
-        const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'});
+        const entry = screen.getByRole('status', {name: (content, node) => node.textContent === '6745'});
         await user.click(entry);
         expect(addLapSpy).toBeCalledWith(entrySarahPascalScorpionA6745, 7);
-    });
-    it('updates model', async () => {
-        const user = userEvent.setup();
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        const clock = {getElapsedTime: () => {return 7}};
-        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-        const addLapSpy = vi.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true, 'domainObject': {}})});
-        await act(async () => {
-            customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
-        });
-        const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
-        await user.click(entry);
-        expect(addLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234, 7);
     });
     it('refreshes display after addLap completed', async () => {
         const entriesScorpionAPre = [
@@ -705,61 +693,73 @@ describe('when adding a lap time', () => {
         expect(await screen.findByText('10:25')).toBeInTheDocument();
     });
     it('displays a message if there is a problem adding the lap time', async () => {
-        const entriesScorpionAPost = [{'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},{'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        vi.spyOn(model, 'getClock').mockImplementation(() => {
+            return {getElapsedTime: () => 312568}});
         const controller = new DinghyRacingController(model);
-        const clock = {getElapsedTime: () => {return 312568}};
+        const local_entriesScorpionA = entriesScorpionA.map(entry => {return {...entry, race: {...entry.race, clock: model.getClock()}}});
+        const entriesScorpionAPost = [
+            {helm: competitorChrisMarshall, race: {...raceScorpionA, clock: model.getClock()}, dinghy: dinghy1234, laps: [{number: 1, time: 312568}], sumOfLapTimes: 0, url: 'http://localhost:8081/dinghyracing/api/entries/10'},
+            {helm: competitorSarahPascal, race: {...raceScorpionA, clock: model.getClock()}, dinghy: dinghy6745, laps: [], url: 'http://localhost:8081/dinghyracing/api/entries/11'}
+        ];
         vi.spyOn(model, 'getEntriesByRace')
-            .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
-            .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-        vi.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
+            .mockImplementation((race) => {return Promise.resolve({success: true, domainObject: entriesScorpionAPost})})
+            .mockImplementationOnce((race) => {return Promise.resolve({success: true, domainObject: local_entriesScorpionA})});
+        vi.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({success: false, message: 'Oops!'})});
         await act(async () => {
-            customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
+            customRender(<RaceEntriesView races={[{...raceScorpionA, clock: model.getClock()}]} />, model, controller);
         });
-        const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
+        const entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await user.click(entry);
-        expect(await screen.findByText(/oops/i)).toBeInTheDocument();
+        expect(screen.getByText(/oops/i)).toBeInTheDocument();
     });    
     it('releases entry if there is a problem adding the lap time', async () => {
-        const entriesScorpionAPost = [{'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10'},{'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [],'url': 'http://localhost:8081/dinghyracing/api/entries/11'}];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        const clock = {getElapsedTime: () => {return 312568}};
+        vi.spyOn(model, 'getClock').mockImplementation(() => {
+            return {getElapsedTime: () => 312568}});
+        const local_entriesScorpionA = entriesScorpionA.map(entry => {return {...entry, race: {...entry.race, clock: model.getClock()}}});
+        const entriesScorpionAPost = [
+            {helm: competitorChrisMarshall, race: {...raceScorpionA, clock: model.getClock()}, dinghy: dinghy1234, laps: [{number: 1, time: 312568}], sumOfLapTimes: 0, url: 'http://localhost:8081/dinghyracing/api/entries/10'},
+            {helm: competitorSarahPascal, race: {...raceScorpionA, clock: model.getClock()}, dinghy: dinghy6745, laps: [], url: 'http://localhost:8081/dinghyracing/api/entries/11'}
+        ];
         vi.spyOn(model, 'getEntriesByRace')
-            .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
-            .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-        vi.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
+            .mockImplementation((race) => {return Promise.resolve({success: true, domainObject: entriesScorpionAPost})})
+            .mockImplementationOnce((race) => {return Promise.resolve({success: true, domainObject: local_entriesScorpionA})});
+        const controller = new DinghyRacingController(model);
+        vi.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({success: false, message: 'Oops!'})});
         await act(async () => {
-            customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
+            customRender(<RaceEntriesView races={[{...raceScorpionA, clock: model.getClock()}]} />, model, controller);
         });    
-        const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
+        const entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await user.click(entry);
         expect(entry.getAttribute('class')).not.toMatch(/disabled/i);
     });
     it('clears error message on success', async () => {
-        const entriesScorpionAPost = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 312568, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"2"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        vi.spyOn(model, 'getClock').mockImplementation(() => {
+            return {getElapsedTime: () => 312568}});
+        const local_entriesScorpionA = entriesScorpionA.map(entry => {return {...entry, race: {...entry.race, clock: model.getClock()}}});
+        const entriesScorpionAPost = [
+            {helm: competitorChrisMarshall,race: {...raceScorpionA, clock: model.getClock()},dinghy: dinghy1234, laps: [{number: 1, time: 312568}], sumOfLapTimes: 312568, url: 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"2"'}},
+            {helm: competitorSarahPascal,race: {...raceScorpionA, clock: model.getClock()},dinghy: dinghy6745, laps: [], sumOfLapTimes: 0, url: 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
+        ];
         const controller = new DinghyRacingController(model);
-        const clock = {getElapsedTime: () => {return 312568}};
         vi.spyOn(model, 'getEntriesByRace')
-            .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
-            .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-        vi.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true, 'domainObject': {}})}).mockImplementationOnce((entry, time) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
+            .mockImplementation((race) => {return Promise.resolve({success: true, domainObject: entriesScorpionAPost})})
+            .mockImplementationOnce((race) => {return Promise.resolve({success: true, domainObject: local_entriesScorpionA})});
+        vi.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({success: true, domainObject: {}})}).mockImplementationOnce((entry, time) => {return Promise.resolve({success: false, message: 'Oops!'})});
         await act(async () => {
-            customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
+            customRender(<RaceEntriesView races={[{...raceScorpionA, clock: model.getClock()}]} />, model, controller);
         });
-        const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
+        const entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await user.click(entry);
-        expect(await screen.findByText(/oops/i)).toBeInTheDocument();
+        expect(screen.getByText(/oops/i)).toBeInTheDocument();
         await user.click(entry);
         await act(async () => {
-            model.handleEntryUpdate({'body': entriesScorpionA[0].url});
+            model.handleEntryUpdate({body: local_entriesScorpionA[0].url});
         });
         expect(screen.queryByText(/oops/i)).not.toBeInTheDocument();
     });
@@ -1006,31 +1006,32 @@ describe('when updating a lap time', () => {
         expect(raceEntryView.getAttribute('class')).not.toMatch(/disabled/i);
     });
     it('clears error message on success', async () => {
-        const entriesScorpionAPre = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7000}], 'sumOfLapTimes': 7000, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"2"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0,'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}];
-        const entriesScorpionAPost = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 312568, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"3"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 312568,'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        const clock = {getElapsedTime: () => {return 312568}};
+        vi.spyOn(model, 'getClock').mockImplementation(() => {
+            return {getElapsedTime: () => 312568}});
+        const entriesScorpionAPre = [
+            {helm: competitorChrisMarshall, race: {...raceScorpionA, clock: model.getClock()}, dinghy: dinghy1234, laps: [{number: 1, time: 7000}], sumOfLapTimes: 7000, url: 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"2"'}},
+            {helm: competitorSarahPascal, race: {...raceScorpionA, clock: model.getClock()}, dinghy: dinghy6745, laps: [], sumOfLapTimes: 0,url: 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}];
+        const entriesScorpionAPost = [
+            {helm: competitorChrisMarshall, race: {...raceScorpionA, clock: model.getClock()}, dinghy: dinghy1234, laps: [{number: 1, time: 312568}], sumOfLapTimes: 312568, url: 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"3"'}},
+            {helm: competitorSarahPascal, race: {...raceScorpionA, clock: model.getClock()}, dinghy: dinghy6745, laps: [], sumOfLapTimes: 312568, url: 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
+        ];
         vi.spyOn(model, 'getEntriesByRace')
-            .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
-            .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+            .mockImplementation((race) => {return Promise.resolve({success: true, domainObject: entriesScorpionAPost})})
+            .mockImplementationOnce((race) => {return Promise.resolve({success: true, domainObject: entriesScorpionAPre})});
 
-        vi.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true, 'domainObject': {}})}).mockImplementationOnce((entry, time) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
+        vi.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({success: true, domainObject: {}})}).mockImplementationOnce((entry, time) => {return Promise.resolve({success: false, message: 'Oops!'})});
 
-        vi.spyOn(controller, 'updateLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true})});
+        vi.spyOn(controller, 'updateLap').mockImplementation((entry, time) => {return Promise.resolve({success: true})});
         await act(async () => {
-            customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
+            customRender(<RaceEntriesView races={[{...raceScorpionA, clock: model.getClock()}]} />, model, controller);
         });
-        const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'});
+        const entry = screen.getByRole('status', {name: (content, node) => node.textContent === '6745'});
         // after render perform update
         await user.click(entry);
-        expect(await screen.findByText(/oops/i)).toBeInTheDocument();
+        expect(screen.getByText(/oops/i)).toBeInTheDocument();
         let raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement.parentElement;
         let lapEntryCellOutput = within(raceEntryView).getByText('00:07');
         await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
