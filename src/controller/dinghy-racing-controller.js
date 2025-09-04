@@ -114,6 +114,10 @@ class DinghyRacingController {
         if (timeInMilliseconds <= 0) {
             return Promise.resolve({'success': false, 'message': 'Time must be greater than zero.'});   
         }
+        // time must be less than or equal to elapsed time of race
+        if (timeInMilliseconds > entry.race.clock.getElapsedTime(entry.race.plannedStartTime)) {
+            return Promise.resolve({'success': false, 'message': 'Time should be less than or equal to the elapsed time of the race.'});
+        }
         return this.model.updateLap(entry, this._calculateLapTime(timeInMilliseconds, entry.laps.toSpliced(entry.laps.length -1, 1)));
     }
 
