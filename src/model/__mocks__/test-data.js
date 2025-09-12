@@ -1,4 +1,5 @@
 import FlagState from '../domain-classes/flag-state';
+import Entry from '../domain-classes/entry';
 
 const httpRootURL = 'http://localhost:8081/dinghyracing/api';
 const wsRootURL = 'ws://localhost:8081/dinghyracing';
@@ -347,58 +348,30 @@ const racePursuitA = {name: 'Pursuit A', plannedStartTime: new Date('2021-10-14T
 
 const races = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA];
 
-const entryChrisMarshallScorpionA1234 = {
-	helm: competitorChrisMarshall,
-	race: raceScorpionA,
-	dinghy: dinghy1234,
-	crew: competitorLouScrew,
-	laps: [],
-	sumOfLapTimes: 0,
-	correctedTime: 0,
-	onLastLap: false,
-	finishedRace: false,
-	scoringAbbreviation: null, 
-	position: null,
-	url: 'http://localhost:8081/dinghyracing/api/entries/10',
-	metadata: {eTag: '"1"'}
-};
-const entrySarahPascalScorpionA6745 = {helm: competitorSarahPascal, crew: competitorOwainDavies, race: raceScorpionA, dinghy: dinghy6745, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
-	position: null, url: 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}};
+const entryChrisMarshallScorpionA1234 = new Entry (raceScorpionA, competitorChrisMarshall, competitorLouScrew, dinghy1234, [], 0, 0, false, false, null,  null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'}, null);
+
+const entrySarahPascalScorpionA6745 = new Entry(raceScorpionA, competitorSarahPascal, competitorOwainDavies, dinghy6745, [], 0, 0, false, false, null,  null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'}, null);
 
 const entriesScorpionA = [
 	entryChrisMarshallScorpionA1234,
 	entrySarahPascalScorpionA6745
 ];
 const entriesGraduateA = [
-	{helm: competitorJillMyer, crew: null, race: raceGraduateA, dinghy: dinghy2928, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null,
-		position: null, url: 'http://localhost:8081/dinghyracing/api/entries/12', metadata: {eTag: '"1"'}}
+	new Entry(raceGraduateA, competitorJillMyer, null, dinghy2928, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'}, null)
 ];
-const entryJillMyerCometA826 = {helm: competitorJillMyer, crew: null, race: raceCometA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
-	position: null, url: 'http://localhost:8081/dinghyracing/api/entries/19', metadata: {eTag: '"1"'}};
+
+const entryJillMyerCometA826 = new Entry(raceCometA, competitorJillMyer, null, dinghy826, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/19', {eTag: '"1"'}, null);
 const entriesCometA = [
 	entryJillMyerCometA826
 ];
-const entryChrisMarshallHandicapA1234 = {helm: competitorChrisMarshall, crew: competitorLouScrew, race: raceHandicapA, dinghy: dinghy1234, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
-	position: null, url: 'http://localhost:8081/dinghyracing/api/entries/20'};
+
+const entryChrisMarshallHandicapA1234 = new Entry(raceHandicapA, competitorChrisMarshall, competitorLouScrew, dinghy1234, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/20', null);
 const entriesHandicapA = [
 	entryChrisMarshallHandicapA1234, 
-	{helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
-		position: null, url: 'http://localhost:8081/dinghyracing/api/entries/21', metadata: {eTag: '"1"'}}
+	new Entry(raceHandicapA, competitorJillMyer, null, dinghy826, [], 0, 0, false, false, null,  null, 'http://localhost:8081/dinghyracing/api/entries/21', {eTag: '"1"'}, null)
 ];
 
-const entryChrisMarshallPursuitA1234 = {
-	helm: competitorChrisMarshall,
-	race: racePursuitA, dinghy: dinghy1234,
-	crew: competitorLouScrew,
-	laps: [], sumOfLapTimes: 0,
-	correctedTime: 0,
-	onLastLap: false,
-	finishedRace: false,
-	scoringAbbreviation: null, 
-	position: null,
-	url: 'http://localhost:8081/dinghyracing/api/entries/22',
-	metadata: {eTag: '"1"'}
-};
+const entryChrisMarshallPursuitA1234 = new Entry(racePursuitA, competitorChrisMarshall, competitorLouScrew, dinghy1234, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/22', {eTag: '"1"'}, null);
 
 const entriesPursuitA = [ entryChrisMarshallPursuitA1234 ];
 
