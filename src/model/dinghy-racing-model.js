@@ -75,7 +75,7 @@ class DinghyRacingModel {
      * Provide a blank entry template.
      */
     static entryTemplate() {
-        return new Entry(DinghyRacingModel.raceTemplate(), DinghyRacingModel.competitorTemplate(), null, DinghyRacingModel.dinghyTemplate(), [], 0, 0, false, false, null, null, '', null);
+        return new Entry(DinghyRacingModel.raceTemplate(), DinghyRacingModel.competitorTemplate(), null, DinghyRacingModel.dinghyTemplate(), [], 0, 0, false, false, null, null, '', null, null);
     }
 
     /**
@@ -1759,7 +1759,7 @@ class DinghyRacingModel {
         return new Entry(race, helm, crew, dinghy, laps, this.convertISO8601DurationToMilliseconds(entryHAL.sumOfLapTimes),
             entryHAL.correctedTime === 'PT2562047788015215H30M7S' ? 0 : this.convertISO8601DurationToMilliseconds(entryHAL.correctedTime),
             entryHAL.onLastLap, entryHAL.finishedRace, entryHAL.scoringAbbreviation, entryHAL.position, entryHAL._links.self.href,
-            metadata);
+            metadata, this);
     }
 
     _convertRaceHALToRace(raceHAL, fleet) {

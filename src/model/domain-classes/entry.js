@@ -14,6 +14,8 @@
  * limitations under the License. 
  */
 
+import DinghyRacingModel from '../dinghy-racing-model';
+
 /** Class representing an Entry in a Race. */
 class Entry {
     /**
@@ -31,8 +33,9 @@ class Entry {
      * @param {Integer} position of the entry in the race
      * @param {String} url The URL to the remote resource
      * @param {Metadata} metadata
+     * @param {DinghyRacingModel} model The model this entry is a part of
      */
-    constructor(race, helm, crew, dinghy, laps, sumOfLapTimes, correctedTime, onLastLap, finishedRace, scoringAbbreviation, position, url, metadata) {
+    constructor(race, helm, crew, dinghy, laps, sumOfLapTimes, correctedTime, onLastLap, finishedRace, scoringAbbreviation, position, url, metadata, model) {
         this.race = race;
         this.helm = helm;
         this.crew = crew;
@@ -46,6 +49,16 @@ class Entry {
         this.position = position;
         this.url = url;
         this.metadata = metadata;
+        this.model = model;
+        this._handleRaceUpdate = this._handleRaceUpdate.bind(this);
+        model?.registerRaceUpdateCallback(race.url, this._handleRaceUpdate);
+    }
+
+    async _handleRaceUpdate() {
+        const result = await this.model.getRace(this.race.url);
+        if (result.success) {
+            this.race = result.domainObject;
+        }
     }
 }
 
