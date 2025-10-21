@@ -734,7 +734,7 @@ describe('when retrieving a list of races that start at or after a specified tim
     // Can this test can be affected by BST, or other time zones (yes, if timezone changes test data (races) will need to be adjusted to reflect the change in the timezone (currently set up for British Summer Time))
     it('returns the races that start at or after the specified time', async () => {
         fetch.mockImplementation((resource) => {
-            if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeGreaterThanEqual?time=2021-10-14T10:00:00.000Z') {
+            if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=2021-10-14T10:00:00.000Z') {
                 return Promise.resolve({
                     ok: true,
                     status: 200, headers: new Headers(), 
@@ -816,9 +816,9 @@ describe('when retrieving a list of races that start at or after a specified tim
     describe('when there are more races than fit on a single page', () => {
         describe('when page and size are not supplied', () => {
             it('returns a success result containing all the races that start at or after the specified time', async () => {
-                const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
+                const racesCollectionHAL_p0 = {'_embedded':{'directRaces':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
                 fetch.mockImplementation((resource) => {
-                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0&size=4') {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0&size=4') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, headers: new Headers(), 
@@ -889,7 +889,7 @@ describe('when retrieving a list of races that start at or after a specified tim
                         });
                     }
                 }).mockImplementationOnce((resource) => {
-                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z') {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, headers: new Headers(), 
@@ -915,9 +915,9 @@ describe('when retrieving a list of races that start at or after a specified tim
         });
         describe('when page number supplied', () => {
             it('returns only a single page of data', async () => {
-                const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
+                const racesCollectionHAL_p0 = {'_embedded':{'directRaces':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
                 fetch.mockImplementation((resource) => {
-                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0&size=4') {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0&size=4') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, headers: new Headers(), 
@@ -988,7 +988,7 @@ describe('when retrieving a list of races that start at or after a specified tim
                         });
                     }
                 }).mockImplementationOnce((resource) => {
-                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0') {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, headers: new Headers(), 
@@ -1014,9 +1014,9 @@ describe('when retrieving a list of races that start at or after a specified tim
         });
         describe('when size is supplied', () => {
             it('returns only a single page of data', async () => {
-                const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
+                const racesCollectionHAL_p0 = {'_embedded':{'directRaces':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
                 fetch.mockImplementation((resource) => {
-                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0&size=4') {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0&size=4') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, headers: new Headers(), 
@@ -1087,7 +1087,7 @@ describe('when retrieving a list of races that start at or after a specified tim
                         });
                     }
                 }).mockImplementationOnce((resource) => {
-                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&size=2') {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&size=2') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, headers: new Headers(), 
@@ -1113,9 +1113,9 @@ describe('when retrieving a list of races that start at or after a specified tim
         });
         describe('when page and size supplied', () => {
             it('returns only a single page of data', async () => {
-                const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
+                const racesCollectionHAL_p0 = {'_embedded':{'directRaces':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
                 fetch.mockImplementation((resource) => {
-                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0&size=4') {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0&size=4') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, headers: new Headers(), 
@@ -1186,7 +1186,7 @@ describe('when retrieving a list of races that start at or after a specified tim
                         });
                     }
                 }).mockImplementationOnce((resource) => {
-                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0&size=2') {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0&size=2') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, headers: new Headers(), 
@@ -5597,7 +5597,7 @@ describe('when retrieving a list of races that start between the specified times
     // Can this test can be affected by BST, or other time zones (yes, if timezone changes test data (races) will need to be adjusted to reflect the change in the timezone (currently set up for British Summer Time))
     it('returns a collection of races that start between the specified times', async () => {
         fetch.mockImplementation((resource) => {
-            if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
+            if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
                 return Promise.resolve({
                     ok: true,
                     status: 200, headers: new Headers(), 
@@ -5679,9 +5679,9 @@ describe('when retrieving a list of races that start between the specified times
     describe('when there are more races than fit on a single page', () => {
         describe('when page and size are not supplied', () => {
             it('returns a success result containing all the races that start at or after the specified time', async () => {
-                const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
+                const racesCollectionHAL_p0 = {'_embedded':{'directRaces':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
                 fetch.mockImplementation((resource) => {
-                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&page=0&size=4') {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&page=0&size=4') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, headers: new Headers(), 
@@ -5752,7 +5752,7 @@ describe('when retrieving a list of races that start between the specified times
                         });
                     }
                 }).mockImplementationOnce((resource) => {
-                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, headers: new Headers(), 
@@ -5778,9 +5778,9 @@ describe('when retrieving a list of races that start between the specified times
         });
         describe('when page number supplied', () => {
             it('returns only a single page of data', async () => {
-                const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
+                const racesCollectionHAL_p0 = {'_embedded':{'directRaces':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
                 fetch.mockImplementation((resource) => {
-                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, headers: new Headers(), 
@@ -5851,7 +5851,7 @@ describe('when retrieving a list of races that start between the specified times
                         });
                     }
                 }).mockImplementationOnce((resource) => {
-                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&page=0') {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&page=0') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, headers: new Headers(), 
@@ -5877,9 +5877,9 @@ describe('when retrieving a list of races that start between the specified times
         });
         describe('when size is supplied', () => {
             it('returns only a single page of data', async () => {
-                const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
+                const racesCollectionHAL_p0 = {'_embedded':{'directRaces':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
                 fetch.mockImplementation((resource) => {
-                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, headers: new Headers(), 
@@ -5950,7 +5950,7 @@ describe('when retrieving a list of races that start between the specified times
                         });
                     }
                 }).mockImplementationOnce((resource) => {
-                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&size=2') {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&size=2') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, headers: new Headers(), 
@@ -5976,9 +5976,9 @@ describe('when retrieving a list of races that start between the specified times
         });
         describe('when page and size supplied', () => {
             it('returns only a single page of data', async () => {
-                const racesCollectionHAL_p0 = {'_embedded':{'races':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
+                const racesCollectionHAL_p0 = {'_embedded':{'directRaces':[raceScorpion_AHAL, raceGraduate_AHAL]},'_links':{'self':{'href':'http://localhost:8081/dinghyracing/api/races'},'profile':{'href':'http://localhost:8081/dinghyracing/api/profile/races'}},'page':{'size':2,'totalElements':4,'totalPages':1,'number':0}};
                 fetch.mockImplementation((resource) => {
-                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, headers: new Headers(), 
@@ -6049,7 +6049,7 @@ describe('when retrieving a list of races that start between the specified times
                         });
                     }
                 }).mockImplementationOnce((resource) => {
-                    if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&page=0&size=2') {
+                    if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&page=0&size=2') {
                         return Promise.resolve({
                             ok: true,
                             status: 200, headers: new Headers(), 
@@ -6079,7 +6079,7 @@ describe('when retrieving a list of races that start between the specified times
             // checking request is correctly structured
             // not checking a sorted collection is returned as that is the responsibility of the server
             fetch.mockImplementation((resource) => {
-                if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&sort=plannedStartTime,ASC') {
+                if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&sort=plannedStartTime,ASC') {
                     return Promise.resolve({
                         ok: true,
                         status: 200, headers: new Headers(), 

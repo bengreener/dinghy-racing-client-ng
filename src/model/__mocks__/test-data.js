@@ -142,7 +142,7 @@ const raceHandicap_AHAL = {
 
 const racePursuit_AHAL = {name: 'Pursuit A', plannedStartTime:'2021-10-14T10:45:00', duration: 'PT45M', type: 'PURSUIT', plannedLaps: 5, startType: 'RRS26', dinghyClasses: [], lapForecast: 5.0, leadEntry: {scoringAbbreviation: null, lastLapTime: 'PT0S', sumOfLapTimes: 'PT0S', averageLapTime: 'PT0S', finishedRace: false, onLastLap: false, lapsSailed: null }, _links:{self:{href:'http://localhost:8081/dinghyracing/api/races/9'},race:{href:'http://localhost:8081/dinghyracing/api/races/9'},signedUp:{href:'http://localhost:8081/dinghyracing/api/races/9/signedUp'},fleet:{href:'http://localhost:8081/dinghyracing/api/fleets/2'}}};
 
-const racesCollectionHAL = {_embedded:{races:[raceScorpion_AHAL, raceGraduate_AHAL, raceComet_AHAL, raceHandicap_AHAL]},_links:{self:{href:'http://localhost:8081/dinghyracing/api/races'},profile:{href:'http://localhost:8081/dinghyracing/api/profile/races'}},page:{size:20,totalElements:4,totalPages:1,number:0}};
+const racesCollectionHAL = {_embedded:{directRaces:[raceScorpion_AHAL, raceGraduate_AHAL, raceComet_AHAL, raceHandicap_AHAL]},_links:{self:{href:'http://localhost:8081/dinghyracing/api/directRaces'},profile:{href:'http://localhost:8081/dinghyracing/api/profile/directRaces'}},page:{size:20,totalElements:4,totalPages:1,number:0}};
 
 const entriesHAL = {_embedded:{entries:[
 	{

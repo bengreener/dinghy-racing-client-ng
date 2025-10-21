@@ -1407,7 +1407,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
     async getRacesOnOrAfterTime(startTime, page, size) {
-        const resource = this.httpRootURL + '/races/search/findByPlannedStartTimeGreaterThanEqual?time=' + startTime.toISOString();
+        const resource = this.httpRootURL + '/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=' + startTime.toISOString();
 
         return this.getRacesFromURL(resource, page, size);
     }
@@ -1422,7 +1422,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
     async getRacesBetweenTimes(startTime, endTime, page, size, sortParameters) {
-        const resource = this.httpRootURL + '/races/search/findByPlannedStartTimeBetween?startTime=' + startTime.toISOString() + '&endTime=' + endTime.toISOString();
+        const resource = this.httpRootURL + '/directRaces/search/findByPlannedStartTimeBetween?startTime=' + startTime.toISOString() + '&endTime=' + endTime.toISOString();
 
         return this.getRacesFromURL(resource, page, size, sortParameters);
     }
@@ -1438,7 +1438,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
      */
     async getRacesBetweenTimesForType(startTime, endTime, type, page, size, sortParameters) {
-        const resource = this.httpRootURL + '/races/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=' + startTime.toISOString() + '&endTime=' + endTime.toISOString() + '&type=' + type;
+        const resource = this.httpRootURL + '/directRaces/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=' + startTime.toISOString() + '&endTime=' + endTime.toISOString() + '&type=' + type;
 
         return this.getRacesFromURL(resource, page, size, sortParameters);
     }
@@ -1489,7 +1489,7 @@ class DinghyRacingModel {
             if (!hasPage && !hasSize && result.domainObject.page.totalElements > result.domainObject.page.size) {
                 return this.getRacesFromURL(url, 0, result.domainObject.page.totalElements);
             }
-            const racesHAL = result.domainObject._embedded.races;
+            const racesHAL = result.domainObject._embedded.directRaces;
             const fleetURLs = racesHAL.map(race => race._links.fleet.href);
             const fleetResults = await Promise.all(fleetURLs.map(url => this.getFleet(url)));
             
@@ -1511,7 +1511,7 @@ class DinghyRacingModel {
      * @returns {Promise<Result>}
      */
     async getRaceByNameAndPlannedStartTime(name, time) {
-        const resource = this.rootUrl + 'races/search?name=' + name + '&time='+ time.toISOString();
+        const resource = this.httpRootURL + '/directRaces/search?name=' + name + '&time='+ time.toISOString();
 
         return this.getRace(resource);
     }
