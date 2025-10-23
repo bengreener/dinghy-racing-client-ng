@@ -75,7 +75,7 @@ class DinghyRacingModel {
      * Provide a blank entry template.
      */
     static entryTemplate() {
-        return new Entry(DinghyRacingModel.raceTemplate(), DinghyRacingModel.competitorTemplate(), null, DinghyRacingModel.dinghyTemplate(), [], 0, 0, false, false, null, null, '', null, null);
+        return new Entry(DinghyRacingModel.competitorTemplate(), null, [], DinghyRacingModel.dinghyTemplate(), [], 0, 0, false, false, null, null, '', null, null);
     }
 
     /**

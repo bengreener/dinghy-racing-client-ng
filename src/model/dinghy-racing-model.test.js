@@ -4121,14 +4121,14 @@ it('provides a blank template for a race', () => {
 it('provides a blank template for a race entry', () => {
     const entry = DinghyRacingModel.entryTemplate();
     
-    const entryMatch = new Entry(DinghyRacingModel.raceTemplate(), DinghyRacingModel.competitorTemplate(), null, DinghyRacingModel.dinghyTemplate(),
+    const entryMatch = new Entry(DinghyRacingModel.competitorTemplate(), null, [], DinghyRacingModel.dinghyTemplate(),
         [], 0, 0, false, false, null, null, '',
-        null, null);
+        null);
 
     // expect.soft(entry).toEqual(entryMatch); // match fails. diff cannot identify a difference between the objects
-    expect(entry.race).toEqual(entryMatch.race);
     expect(entry.helm).toEqual(entryMatch.helm);
     expect(entry.crew).toEqual(entryMatch.crew);
+    expect(entry.signedUpTo).toEqual(entryMatch.signedUpTo);
     expect(entry.dinghy).toEqual(entryMatch.dinghy);
     expect(entry.laps).toEqual(entryMatch.laps);
     expect(entry.sumOfLapTimes).toEqual(entryMatch.sumOfLapTimes);
@@ -4139,7 +4139,6 @@ it('provides a blank template for a race entry', () => {
     expect(entry.position).toEqual(entryMatch.position);
     expect(entry.url).toEqual(entryMatch.url);
     expect(entry.metadata).toEqual(entryMatch.metadata);
-    expect(entry.model).toEqual(entryMatch.model);
 });
 
 it('provides a blank template for a lap', () => {

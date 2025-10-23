@@ -20,9 +20,9 @@ import DinghyRacingModel from '../dinghy-racing-model';
 class Entry {
     /**
      * Create an entry.
-     * @param {Race} race The race entered
      * @param {Competitor} helm The competitor entering the race as helm
-     * @param {Competitor} crew The copetitor entering the race as crew
+     * @param {Competitor} crew The competitor entering the race as crew
+     * @param {Array<SignedUp>} signedUpTo the races the entry is signedUpTo and the psoition in each race
      * @param {Dinghy} dinghy The dinghy that will be sailed in the race
      * @param {Array<Lap>} laps The laps for this entry in the race
      * @param {Integer} sumOfLapTimes
@@ -33,12 +33,11 @@ class Entry {
      * @param {Integer} position of the entry in the race
      * @param {String} url The URL to the remote resource
      * @param {Metadata} metadata
-     * @param {DinghyRacingModel} model The model this entry is a part of
      */
-    constructor(race, helm, crew, dinghy, laps, sumOfLapTimes, correctedTime, onLastLap, finishedRace, scoringAbbreviation, position, url, metadata, model) {
-        this.race = race;
+    constructor(helm, crew, signedUpTo, dinghy, laps, sumOfLapTimes, correctedTime, onLastLap, finishedRace, scoringAbbreviation, position, url, metadata) {
         this.helm = helm;
         this.crew = crew;
+        this.signedUpTo = signedUpTo;
         this.dinghy = dinghy;
         this.laps = laps;
         this.sumOfLapTimes = sumOfLapTimes;
@@ -49,16 +48,6 @@ class Entry {
         this.position = position;
         this.url = url;
         this.metadata = metadata;
-        this.model = model;
-        this._handleRaceUpdate = this._handleRaceUpdate.bind(this);
-        model?.registerRaceUpdateCallback(race.url, this._handleRaceUpdate);
-    }
-
-    async _handleRaceUpdate() {
-        const result = await this.model.getRace(this.race.url);
-        if (result.success) {
-            this.race = result.domainObject;
-        }
     }
 }
 
