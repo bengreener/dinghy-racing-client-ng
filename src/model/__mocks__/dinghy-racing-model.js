@@ -310,10 +310,9 @@ class DinghyRacingModel {
         return null;
     }
 
-    async createEntry(race, helm, dinghy) {
+    async signUp(race, helm, dinghy, crew = null) {
         return null;
     }
-
     async updateEntry(entry, helm, dinghy, crew = null) {
         return null;
     }

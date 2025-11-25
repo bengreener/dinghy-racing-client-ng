@@ -278,7 +278,7 @@ describe('when signing up to a race', () => {
         it('returns a promise that resolves to a result indicating success when operation is successful', async () => {
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
             const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
-            vi.spyOn(dinghyRacingModel, 'createEntry').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
+            vi.spyOn(dinghyRacingModel, 'signUp').mockImplementationOnce((race, helm, dinghy, crew = null) => {return Promise.resolve({'success': true})});
             const promise = dinghyRacingController.signupToRace(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
@@ -287,7 +287,7 @@ describe('when signing up to a race', () => {
         it('returns a promise that resolves to a result indicating failure when operation is unsuccessful and provides a message explaining the cause of failure', async () => {
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
             const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
-            vi.spyOn(dinghyRacingModel, 'createEntry').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
+            vi.spyOn(dinghyRacingModel, 'signUp').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
             const promise = dinghyRacingController.signupToRace(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
@@ -379,7 +379,7 @@ describe('when signing up to a race', () => {
             it('signup is successful', async () => {
                 const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
                 const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
-                vi.spyOn(dinghyRacingModel, 'createEntry').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
+                vi.spyOn(dinghyRacingModel, 'signUp').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
                 const promise = dinghyRacingController.signupToRace(raceCometA, competitorChrisMarshall, dinghy826);
                 const result = await promise;
                 expect(promise).toBeInstanceOf(Promise);
@@ -391,7 +391,7 @@ describe('when signing up to a race', () => {
         it('returns a promise that resolves to a result indicating success when operation is successful', async () => {
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
             const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
-            vi.spyOn(dinghyRacingModel, 'createEntry').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
+            vi.spyOn(dinghyRacingModel, 'signUp').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
             const promise = dinghyRacingController.signupToRace(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
@@ -400,7 +400,7 @@ describe('when signing up to a race', () => {
         it('returns a promise that resolves to a result indicating failure when operation is unsuccessful and provides a message explaining the cause of failure', async () => {
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
             const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
-            vi.spyOn(dinghyRacingModel, 'createEntry').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
+            vi.spyOn(dinghyRacingModel, 'signUp').mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Something went wrong'})});
             const promise = dinghyRacingController.signupToRace(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);

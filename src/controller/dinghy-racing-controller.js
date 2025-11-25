@@ -374,7 +374,7 @@ class DinghyRacingController {
             message += 'You have selected a dinghy with a crew. Please select a crew.';
         }
         if (validEntry) {
-            return this.model.createEntry(race, helm, dinghy, crew);
+            return this.model.signUp(race, helm, dinghy, crew);
         }
         else {
             return Promise.resolve({success: false, message: message});
