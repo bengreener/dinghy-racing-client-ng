@@ -20,6 +20,8 @@ import { httpRootURL, wsRootURL, competitorChrisMarshall, dinghyClassScorpion, d
     entryChrisMarshallScorpionA1234, entryJillMyerCometA826, entriesScorpionA, competitorLouScrew, fleetHandicap, fleetScorpion } from '../model/__mocks__/test-data.js';
 import * as csvWriter from '../utilities/csv-writer.js';
 import NameFormat from './name-format.js';
+import Entry from '../model/domain-classes/entry.js';
+import SignedUp from '../model/domain-classes/signed-up.js';
 
 vi.mock('../model/dinghy-racing-model');
 vi.mock('../model/domain-classes/clock');
@@ -1125,7 +1127,7 @@ describe('when updating a lap for an entry', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         vi.spyOn(dinghyRacingModel, 'updateLap').mockImplementationOnce((entry, time) => {return Promise.resolve({success: true})});
-        const promise = dinghyRacingController.updateLap({...entryChrisMarshallScorpionA1234, race: {...entryChrisMarshallScorpionA1234.race, clock: dinghyRacingModel.getClock()}}, 2000);
+        const promise = dinghyRacingController.updateLap({...raceScorpionA, clock: dinghyRacingModel.getClock()}, {...entryChrisMarshallScorpionA1234}, 2000);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({success: true});
@@ -1134,7 +1136,7 @@ describe('when updating a lap for an entry', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         vi.spyOn(dinghyRacingModel, 'updateLap').mockImplementationOnce((entry, time) => {return Promise.resolve({success: true})});
-        const promise = dinghyRacingController.updateLap({...entryChrisMarshallScorpionA1234, race: {...entryChrisMarshallScorpionA1234.race, clock: dinghyRacingModel.getClock()}}, '43');
+        const promise = dinghyRacingController.updateLap({...raceScorpionA, clock: dinghyRacingModel.getClock()}, {...entryChrisMarshallScorpionA1234}, '43');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({success: true});
@@ -1143,7 +1145,7 @@ describe('when updating a lap for an entry', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         vi.spyOn(dinghyRacingModel, 'updateLap').mockImplementationOnce((entry, time) => {return Promise.resolve({success: true})});
-        const promise = dinghyRacingController.updateLap({...entryChrisMarshallScorpionA1234, race: {...entryChrisMarshallScorpionA1234.race, clock: dinghyRacingModel.getClock()}}, '23:43');
+        const promise = dinghyRacingController.updateLap({...raceScorpionA, clock: dinghyRacingModel.getClock()}, {...entryChrisMarshallScorpionA1234}, '23:43');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({success: true});
@@ -1152,7 +1154,7 @@ describe('when updating a lap for an entry', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         vi.spyOn(dinghyRacingModel, 'updateLap').mockImplementationOnce((entry, time) => {return Promise.resolve({success: true})});
-        const promise = dinghyRacingController.updateLap({...entryChrisMarshallScorpionA1234, race: {...entryChrisMarshallScorpionA1234.race, clock: dinghyRacingModel.getClock()}}, '999:1:1');
+        const promise = dinghyRacingController.updateLap({...raceScorpionA, clock: dinghyRacingModel.getClock()}, {...entryChrisMarshallScorpionA1234}, '999:1:1');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({success: true});
@@ -1162,36 +1164,34 @@ describe('when updating a lap for an entry', () => {
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
             const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
             const updateLapSpy = vi.spyOn(dinghyRacingModel, 'updateLap').mockImplementationOnce((entry, time) => {return Promise.resolve({success: true})});
-            const local_entryChrisMarshallScorpionA1234 = {...entryChrisMarshallScorpionA1234, race: {...entryChrisMarshallScorpionA1234.race, clock: dinghyRacingModel.getClock()}};
-            dinghyRacingController.updateLap(local_entryChrisMarshallScorpionA1234, '47');
+            dinghyRacingController.updateLap({...raceScorpionA, clock: dinghyRacingModel.getClock()}, entryChrisMarshallScorpionA1234, '47');
             
-            expect(updateLapSpy).toBeCalledWith(local_entryChrisMarshallScorpionA1234, 47000);
+            expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234, 47000);
         });
         it('correctly converts a minutes and seconds value to milliseconds', async () => {
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
             const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
             const updateLapSpy = vi.spyOn(dinghyRacingModel, 'updateLap').mockImplementationOnce((entry, time) => {return Promise.resolve({success: true})});
-            const local_entryChrisMarshallScorpionA1234 = {...entryChrisMarshallScorpionA1234, race: {...entryChrisMarshallScorpionA1234.race, clock: dinghyRacingModel.getClock()}};
-            dinghyRacingController.updateLap(local_entryChrisMarshallScorpionA1234, '23:47');
+            dinghyRacingController.updateLap({...raceScorpionA, clock: dinghyRacingModel.getClock()}, entryChrisMarshallScorpionA1234, '23:47');
             
-            expect(updateLapSpy).toBeCalledWith(local_entryChrisMarshallScorpionA1234, 1427000);
+            expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234, 1427000);
         });
         it('correctly converts an hours, minutes and seconds value to milliseconds', async () => {
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
             const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
             const updateLapSpy = vi.spyOn(dinghyRacingModel, 'updateLap').mockImplementationOnce((entry, time) => {return Promise.resolve({success: true})});
-            const local_entryChrisMarshallScorpionA1234 = {...entryChrisMarshallScorpionA1234, race: {...entryChrisMarshallScorpionA1234.race, clock: dinghyRacingModel.getClock()}};
-            dinghyRacingController.updateLap(local_entryChrisMarshallScorpionA1234, '1:23:47');
+            dinghyRacingController.updateLap({...raceScorpionA, clock: dinghyRacingModel.getClock()}, entryChrisMarshallScorpionA1234, '1:23:47');
             
-            expect(updateLapSpy).toBeCalledWith(local_entryChrisMarshallScorpionA1234, 5027000);
+            expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234, 5027000);
         });
     });
     it('converts a cumulative time to a time for the last lap', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
-        const entryChrisMarshallScorpionA1234WithLaps = {...entryChrisMarshallScorpionA1234, laps: [{number: 1, time: 1000}, {number: 2, time: 1000}, {number: 3, time: 1000}], race: {...entryChrisMarshallScorpionA1234.race, clock: dinghyRacingModel.getClock()}}; 
+        const local_race = {...raceScorpionA, clock: dinghyRacingModel.getClock()};
+        const entryChrisMarshallScorpionA1234WithLaps = {...entryChrisMarshallScorpionA1234, laps: [{number: 1, time: 1000}, {number: 2, time: 1000}, {number: 3, time: 1000}]}; 
         const updateLapSpy = vi.spyOn(dinghyRacingModel, 'updateLap').mockImplementationOnce((entry, time) => {return Promise.resolve({success: true})});
-        dinghyRacingController.updateLap(entryChrisMarshallScorpionA1234WithLaps, '00:04');
+        dinghyRacingController.updateLap(local_race, entryChrisMarshallScorpionA1234WithLaps, '00:04');
         
         expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234WithLaps, 2000);
     });
@@ -1201,7 +1201,9 @@ describe('when updating a lap for an entry', () => {
             return {getElapsedTime: () => 1500}});
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         vi.spyOn(dinghyRacingModel, 'updateLap').mockImplementationOnce((entry, time) => {return Promise.resolve({success: true})});
-        const promise = dinghyRacingController.updateLap({...entryChrisMarshallScorpionA1234, race: {...entryChrisMarshallScorpionA1234.race, clock: dinghyRacingModel.getClock()}}, 2000);
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{number: 1, time: 2000}], 2000, 2000, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, dinghyRacingModel)];
+        const promise = dinghyRacingController.updateLap({...raceScorpionA, clock: dinghyRacingModel.getClock()}, entryChrisMarshallScorpionA1234, 2000);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({success: false, message: 'Time should be less than or equal to the elapsed time of the race.'});
@@ -1210,7 +1212,7 @@ describe('when updating a lap for an entry', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         vi.spyOn(dinghyRacingModel, 'updateLap').mockImplementationOnce((entry, time) => {return Promise.resolve({success: false, message: 'Something went wrong'})});
-        const promise = dinghyRacingController.updateLap({...entryChrisMarshallScorpionA1234, race: {...entryChrisMarshallScorpionA1234.race, clock: dinghyRacingModel.getClock()}}, 2000);
+        const promise = dinghyRacingController.updateLap({...raceScorpionA, clock: dinghyRacingModel.getClock()}, {...entryChrisMarshallScorpionA1234}, 2000);
         const result = await promise;
         expect(result).toEqual({success: false, message: 'Something went wrong'});
     });
@@ -1218,7 +1220,7 @@ describe('when updating a lap for an entry', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         vi.spyOn(dinghyRacingModel, 'updateLap').mockImplementationOnce((entry, time) => {return Promise.resolve({success: true})});
-        const promise = dinghyRacingController.updateLap(null, 2000);
+        const promise = dinghyRacingController.updateLap(raceScorpionA, null, 2000);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({success: false, message: 'A valid entry is required to update a lap time.'});
@@ -1245,7 +1247,7 @@ describe('when updating a lap for an entry', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         vi.spyOn(dinghyRacingModel, 'updateLap').mockImplementationOnce((entry, time) => {return Promise.resolve({success: true})});
-        const promise = dinghyRacingController.updateLap(entryChrisMarshallScorpionA1234, 0);
+        const promise = dinghyRacingController.updateLap(raceScorpionA, entryChrisMarshallScorpionA1234, 0);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({success: false, message: 'Time must be greater than zero.'});
@@ -1254,7 +1256,7 @@ describe('when updating a lap for an entry', () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
         const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
         vi.spyOn(dinghyRacingModel, 'updateLap').mockImplementationOnce((entry, time) => {return Promise.resolve({success: true})});
-        const promise = dinghyRacingController.updateLap(entryChrisMarshallScorpionA1234, -1);
+        const promise = dinghyRacingController.updateLap(raceScorpionA, entryChrisMarshallScorpionA1234, -1);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({success: false, message: 'Time must be greater than zero.'});
@@ -1615,7 +1617,7 @@ describe('when updating the position of an entry in a race', () => {
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
             vi.spyOn(dinghyRacingModel, 'updateEntryPosition').mockImplementationOnce(() => {return Promise.resolve({'success': true})});
             const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
-            const promise = dinghyRacingController.updateEntryPosition(entryChrisMarshallScorpionA1234, 2);
+            const promise = dinghyRacingController.updateEntryPosition(raceScorpionA, entryChrisMarshallScorpionA1234, 2);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
             expect(result).toEqual({'success': true});
@@ -1625,7 +1627,7 @@ describe('when updating the position of an entry in a race', () => {
         it('returns a promise that resolves to a result inficating failure and provides a message explaining the cause of failure', async () => {
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
             const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
-            const promise = dinghyRacingController.updateEntryPosition({...entryChrisMarshallScorpionA1234, race: {...raceScorpionA, url: undefined}}, 2);
+            const promise = dinghyRacingController.updateEntryPosition({...raceScorpionA, url: undefined}, {...entryChrisMarshallScorpionA1234}, 2);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
             expect(result).toEqual({'success': false, 'message': 'The race URL is required to update an entry position.'});
@@ -1635,7 +1637,7 @@ describe('when updating the position of an entry in a race', () => {
         it('returns a promise that resolves to a result inficating failure and provides a message explaining the cause of failure', async () => {
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
             const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
-            const promise = dinghyRacingController.updateEntryPosition({...entryChrisMarshallScorpionA1234, url: ''}, 2);
+            const promise = dinghyRacingController.updateEntryPosition(raceScorpionA, {...entryChrisMarshallScorpionA1234, url: ''}, 2);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
             expect(result).toEqual({'success': false, 'message': 'An entry with a URL is required to update an entry position.'});
@@ -1645,10 +1647,10 @@ describe('when updating the position of an entry in a race', () => {
         it('returns a promise that resolves to a result inficating failure and provides a message explaining the cause of failure', async () => {
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
             const dinghyRacingController = new DinghyRacingController(dinghyRacingModel);
-            const promise = dinghyRacingController.updateCompetitor(competitorChrisMarshall);
+            const promise = dinghyRacingController.updateEntryPosition(raceScorpionA, {...entryChrisMarshallScorpionA1234});
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': false, 'message': 'A new name is required for the competitor.'});
+            expect(result).toEqual({'success': false, 'message': 'A numeric new position greater than 0 is required to update an entry position.'});
         });
     });
 });

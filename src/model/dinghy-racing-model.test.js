@@ -27,12 +27,14 @@ import { httpRootURL, wsRootURL, competitorsCollectionHAL,
     races, racesCollectionHAL, raceScorpionA, raceGraduateA, raceCometA,
     competitorChrisMarshallHAL, competitorSarahPascalHAL, competitorJillMyerHAL, competitorLiuBaoHAL, competitorLouScrewHAL,
     competitorsCollection, competitorChrisMarshall, competitorLouScrew, competitorSarahPascal, competitorLiuBao, 
-    entriesScorpionAHAL, entriesCometAHAL, entryChrisMarshallDinghy1234HAL, entriesHandicapAHAL,
+    entriesScorpionAHAL, entriesCometAHAL, entryChrisMarshallDinghy1234HAL, entrySarahPascalScorpionADinghy6745HAL, entriesHandicapAHAL,
     entriesScorpionA, entriesCometA, entriesHandicapA,
+    signedUpChrisMarshallDinghy1234ScorpionAHAL,
     raceHandicapA, racePursuitA, entryChrisMarshallScorpionA1234, competitorJillMyer, 
     entrySarahPascalScorpionA6745, entryJillMyerCometA826, entryChrisMarshallHandicapA1234,
     dinghyScorpion1234Crews,
-    dinghyClassComet
+    dinghyClassComet,
+    competitorOwainDavies
 } from './__mocks__/test-data';
 import {
     findByRaceGraduate_AHAL_bigData, signedUpGraduateAHAL_bigData,
@@ -56,6 +58,8 @@ import FlagState from './domain-classes/flag-state';
 import RaceType from './domain-classes/race-type';
 import Clock from './domain-classes/clock';
 import Entry from './domain-classes/entry';
+import SignedUp from './domain-classes/signed-up';
+import { describe } from 'vitest';
 
 global.fetch = vi.fn();
 vi.mock('./domain-classes/clock');
@@ -1215,21 +1219,16 @@ describe('when retrieving a list of races that start at or after a specified tim
 
 describe('when signing up to a race', () => {
     it('if race exists and URL provided and helm exists and URL provided and dinghy exist and URL provided and crew exists and URL provided then creates race entry', async () => {
+        // expecting HTTP 204 No Content response
         fetch.mockImplementationOnce((resource, options) => {
-            const raceMatch = {'race': raceScorpionA.url, 'helm': competitorChrisMarshall.url, 'dinghy': dinghy1234.url, 'crew': competitorLouScrew.url};
-            if ((resource === 'http://localhost:8081/dinghyracing/api/entries') && (options.body === JSON.stringify(raceMatch))) {
+                if (resource === raceScorpionA.url + '/signUp' && options.body === '{"helm":"http://localhost:8081/dinghyracing/api/competitors/8","dinghy":"http://localhost:8081/dinghyracing/api/dinghies/2","crew":"http://localhost:8081/dinghyracing/api/competitors/12"}') {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(),
-                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                    status: 204, headers: new Headers()
                 });
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const entryMatch = new Entry(entryChrisMarshallScorpionA1234.race, entryChrisMarshallScorpionA1234.helm, entryChrisMarshallScorpionA1234.crew, entryChrisMarshallScorpionA1234.dinghy,
-            entryChrisMarshallScorpionA1234.laps, entryChrisMarshallScorpionA1234.sumOfLapTimes, entryChrisMarshallScorpionA1234.correctedTime, entryChrisMarshallScorpionA1234.onLastLap,
-            entryChrisMarshallScorpionA1234.finishedRace, entryChrisMarshallScorpionA1234.scoringAbbreviation, entryChrisMarshallScorpionA1234.position, entryChrisMarshallScorpionA1234.url,
-            null, dinghyRacingModel);
         vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
         vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
@@ -1240,42 +1239,22 @@ describe('when signing up to a race', () => {
             }
         });
         vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
-        vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
-        const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
+        const promise = dinghyRacingModel.signUp(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        // expect(result).toEqual({success: true, domainObject: entryMatch}); // fails. Unclear why :-/
-        expect(result.domainObject.race).toEqual(entryMatch.race);
-        expect(result.domainObject.helm).toEqual(entryMatch.helm);
-        expect(result.domainObject.crew).toEqual(entryMatch.crew);
-        expect(result.domainObject.dinghy).toEqual(entryMatch.dinghy);
-        expect(result.domainObject.laps).toEqual(entryMatch.laps);
-        expect(result.domainObject.sumOfLapTimes).toEqual(entryMatch.sumOfLapTimes);
-        expect(result.domainObject.correctedTime).toEqual(entryMatch.correctedTime);
-        expect(result.domainObject.onLastLap).toEqual(entryMatch.onLastLap);
-        expect(result.domainObject.finishedRace).toEqual(entryMatch.finishedRace);
-        expect(result.domainObject.scoringAbbreviation).toEqual(entryMatch.scoringAbbreviation);
-        expect(result.domainObject.position).toEqual(entryMatch.position);
-        expect(result.domainObject.url).toEqual(entryMatch.url);
-        expect(result.domainObject.metadata).toEqual(entryMatch.metadata);
-        expect(result.domainObject.model).toEqual(entryMatch.model);
+        expect(result.success).toBeTruthy();
     });
     it('if race exists and URL provided and helm exists and URL provided and dinghy exist and URL provided and crew not provided then creates race entry', async () => {
+        // expecting HTTP 204 No Content response
         fetch.mockImplementationOnce((resource, options) => {
-            const raceMatch = {'race': raceScorpionA.url, 'helm': competitorChrisMarshall.url, 'dinghy': dinghy1234.url};
-            if ((resource === 'http://localhost:8081/dinghyracing/api/entries') && (options.body === JSON.stringify(raceMatch))) {
+                if (resource === raceScorpionA.url + '/signUp' && options.body === '{"helm":"http://localhost:8081/dinghyracing/api/competitors/8","dinghy":"http://localhost:8081/dinghyracing/api/dinghies/2"}') {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(),
-                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                    status: 204, headers: new Headers()
                 });
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const entryMatch = new Entry(entryChrisMarshallScorpionA1234.race, entryChrisMarshallScorpionA1234.helm, entryChrisMarshallScorpionA1234.crew, entryChrisMarshallScorpionA1234.dinghy,
-            entryChrisMarshallScorpionA1234.laps, entryChrisMarshallScorpionA1234.sumOfLapTimes, entryChrisMarshallScorpionA1234.correctedTime, entryChrisMarshallScorpionA1234.onLastLap,
-            entryChrisMarshallScorpionA1234.finishedRace, entryChrisMarshallScorpionA1234.scoringAbbreviation, entryChrisMarshallScorpionA1234.position, entryChrisMarshallScorpionA1234.url,
-            null, dinghyRacingModel);
         vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
         vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
@@ -1286,45 +1265,26 @@ describe('when signing up to a race', () => {
             }
         });
         vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
-        vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
-        const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234);
+        const promise = dinghyRacingModel.signUp(raceScorpionA, competitorChrisMarshall, dinghy1234);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result.domainObject.race).toEqual(entryMatch.race);
-        expect(result.domainObject.helm).toEqual(entryMatch.helm);
-        expect(result.domainObject.crew).toEqual(entryMatch.crew);
-        expect(result.domainObject.dinghy).toEqual(entryMatch.dinghy);
-        expect(result.domainObject.laps).toEqual(entryMatch.laps);
-        expect(result.domainObject.sumOfLapTimes).toEqual(entryMatch.sumOfLapTimes);
-        expect(result.domainObject.correctedTime).toEqual(entryMatch.correctedTime);
-        expect(result.domainObject.onLastLap).toEqual(entryMatch.onLastLap);
-        expect(result.domainObject.finishedRace).toEqual(entryMatch.finishedRace);
-        expect(result.domainObject.scoringAbbreviation).toEqual(entryMatch.scoringAbbreviation);
-        expect(result.domainObject.position).toEqual(entryMatch.position);
-        expect(result.domainObject.url).toEqual(entryMatch.url);
-        expect(result.domainObject.metadata).toEqual(entryMatch.metadata);
-        expect(result.domainObject.model).toEqual(entryMatch.model);
+        expect(result.success).toBeTruthy();
     });
     it('if race exists and name and planned start time provided and helm exists and name provided and dinghy exists and sail number and class provided and crew exists and name provided then creates race entry', async () => {
         const race = {...raceScorpionA, 'url': ''};
         const helm = {...competitorChrisMarshall, 'url': null};
         const dinghy = {...dinghy1234, 'url': ''};
         const crew = {...competitorLouScrew, 'url': null};
+        // expecting HTTP 204 No Content response
         fetch.mockImplementationOnce((resource, options) => {
-            const raceMatch = {'race': raceScorpionA.url, 'helm': competitorChrisMarshall.url, 'dinghy': dinghy1234.url, 'crew': competitorLouScrew.url};
-            if ((resource === 'http://localhost:8081/dinghyracing/api/entries') && (options.body === JSON.stringify(raceMatch))) {
+                if (resource === raceScorpionA.url + '/signUp' && options.body === '{"helm":"http://localhost:8081/dinghyracing/api/competitors/8","dinghy":"http://localhost:8081/dinghyracing/api/dinghies/2","crew":"http://localhost:8081/dinghyracing/api/competitors/12"}') {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(),
-                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                    status: 204, headers: new Headers()
                 });
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const entryMatch = new Entry(entryChrisMarshallScorpionA1234.race, entryChrisMarshallScorpionA1234.helm, entryChrisMarshallScorpionA1234.crew, entryChrisMarshallScorpionA1234.dinghy,
-            entryChrisMarshallScorpionA1234.laps, entryChrisMarshallScorpionA1234.sumOfLapTimes, entryChrisMarshallScorpionA1234.correctedTime, entryChrisMarshallScorpionA1234.onLastLap,
-            entryChrisMarshallScorpionA1234.finishedRace, entryChrisMarshallScorpionA1234.scoringAbbreviation, entryChrisMarshallScorpionA1234.position, entryChrisMarshallScorpionA1234.url,
-            null, dinghyRacingModel);
         vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
         vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
@@ -1335,7 +1295,6 @@ describe('when signing up to a race', () => {
             }
         });
         vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
-        vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         vi.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': raceScorpionA}));
         vi.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
             if (name === 'Chris Marshall') {
@@ -1350,43 +1309,25 @@ describe('when signing up to a race', () => {
         });
         vi.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
         vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
-        const promise = dinghyRacingModel.createEntry(race, helm, dinghy, crew);
+        const promise = dinghyRacingModel.signUp(race, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result.domainObject.race).toEqual(entryMatch.race);
-        expect(result.domainObject.helm).toEqual(entryMatch.helm);
-        expect(result.domainObject.crew).toEqual(entryMatch.crew);
-        expect(result.domainObject.dinghy).toEqual(entryMatch.dinghy);
-        expect(result.domainObject.laps).toEqual(entryMatch.laps);
-        expect(result.domainObject.sumOfLapTimes).toEqual(entryMatch.sumOfLapTimes);
-        expect(result.domainObject.correctedTime).toEqual(entryMatch.correctedTime);
-        expect(result.domainObject.onLastLap).toEqual(entryMatch.onLastLap);
-        expect(result.domainObject.finishedRace).toEqual(entryMatch.finishedRace);
-        expect(result.domainObject.scoringAbbreviation).toEqual(entryMatch.scoringAbbreviation);
-        expect(result.domainObject.position).toEqual(entryMatch.position);
-        expect(result.domainObject.url).toEqual(entryMatch.url);
-        expect(result.domainObject.metadata).toEqual(entryMatch.metadata);
-        expect(result.domainObject.model).toEqual(entryMatch.model);
+        expect(result.success).toBeTruthy();
     });
     it('if race exists and name and planned start time provided and helm exists and name provided and dinghy exists and sail number and class provided and crew not provided then creates race entry', async () => {
         const race = {...raceScorpionA, 'url': null};
         const helm = {...competitorChrisMarshall, 'url': ''};
         const dinghy = {...dinghy1234, 'url': null};
+        // expecting HTTP 204 No Content response
         fetch.mockImplementationOnce((resource, options) => {
-            const raceMatch = {'race': raceScorpionA.url, 'helm': competitorChrisMarshall.url, 'dinghy': dinghy1234.url};
-            if ((resource === 'http://localhost:8081/dinghyracing/api/entries') && (options.body === JSON.stringify(raceMatch))) {
+                if (resource === raceScorpionA.url + '/signUp' && options.body === '{"helm":"http://localhost:8081/dinghyracing/api/competitors/8","dinghy":"http://localhost:8081/dinghyracing/api/dinghies/2"}') {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(),
-                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                    status: 204, headers: new Headers()
                 });
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const entryMatch = new Entry(entryChrisMarshallScorpionA1234.race, entryChrisMarshallScorpionA1234.helm, entryChrisMarshallScorpionA1234.crew, entryChrisMarshallScorpionA1234.dinghy,
-            entryChrisMarshallScorpionA1234.laps, entryChrisMarshallScorpionA1234.sumOfLapTimes, entryChrisMarshallScorpionA1234.correctedTime, entryChrisMarshallScorpionA1234.onLastLap,
-            entryChrisMarshallScorpionA1234.finishedRace, entryChrisMarshallScorpionA1234.scoringAbbreviation, entryChrisMarshallScorpionA1234.position, entryChrisMarshallScorpionA1234.url,
-            null, dinghyRacingModel);
         vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
         vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
@@ -1397,7 +1338,6 @@ describe('when signing up to a race', () => {
             }
         });
         vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
-        vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         vi.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': raceScorpionA}));
         vi.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
             if (name === 'Chris Marshall') {
@@ -1409,23 +1349,10 @@ describe('when signing up to a race', () => {
         });
         vi.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
         vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
-        const promise = dinghyRacingModel.createEntry(race, helm, dinghy);
+        const promise = dinghyRacingModel.signUp(race, helm, dinghy);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result.domainObject.race).toEqual(entryMatch.race);
-        expect(result.domainObject.helm).toEqual(entryMatch.helm);
-        expect(result.domainObject.crew).toEqual(entryMatch.crew);
-        expect(result.domainObject.dinghy).toEqual(entryMatch.dinghy);
-        expect(result.domainObject.laps).toEqual(entryMatch.laps);
-        expect(result.domainObject.sumOfLapTimes).toEqual(entryMatch.sumOfLapTimes);
-        expect(result.domainObject.correctedTime).toEqual(entryMatch.correctedTime);
-        expect(result.domainObject.onLastLap).toEqual(entryMatch.onLastLap);
-        expect(result.domainObject.finishedRace).toEqual(entryMatch.finishedRace);
-        expect(result.domainObject.scoringAbbreviation).toEqual(entryMatch.scoringAbbreviation);
-        expect(result.domainObject.position).toEqual(entryMatch.position);
-        expect(result.domainObject.url).toEqual(entryMatch.url);
-        expect(result.domainObject.metadata).toEqual(entryMatch.metadata);
-        expect(result.domainObject.model).toEqual(entryMatch.model);
+        expect(result.success).toBeTruthy();
     });
     it('race does not exist helm exists and URL provided dinghy exists and sail number and class provided crew exists and URL provided then does not create entry and provides message indicating cause of failure', async () => {
         const race = {...raceScorpionA, 'name': 'Race Nope', 'url': null};
@@ -1457,10 +1384,10 @@ describe('when signing up to a race', () => {
         });
         vi.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
         vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
-        const promise = dinghyRacingModel.createEntry(race, helm, dinghy, crew);
+        const promise = dinghyRacingModel.signUp(race, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': false, 'message': 'Race not found'}); 
+        expect(result).toEqual({'success': false, 'message': 'Race not found'});
     });
     it('race exists url provided helm does not exist dinghy exists url provided crew exists and name provided', async () => {
         const race = {...raceScorpionA};
@@ -1490,7 +1417,7 @@ describe('when signing up to a race', () => {
             }
         });
         vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
-        const promise = dinghyRacingModel.createEntry(race, helm, dinghy, crew);
+        const promise = dinghyRacingModel.signUp(race, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Competitor not found'});
@@ -1525,7 +1452,7 @@ describe('when signing up to a race', () => {
         });
         vi.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
         vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': false, 'message': 'Dinghy does not exist'}));
-        const promise = dinghyRacingModel.createEntry(race, helm, dinghy, crew);
+        const promise = dinghyRacingModel.signUp(race, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Dinghy does not exist'});
@@ -1555,7 +1482,7 @@ describe('when signing up to a race', () => {
             }
         });
         vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
-        const promise = dinghyRacingModel.createEntry(race, helm, dinghy, crew);
+        const promise = dinghyRacingModel.signUp(race, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({'success': false, 'message': 'Competitor not found: Lucy Liu'});
@@ -1563,58 +1490,58 @@ describe('when signing up to a race', () => {
     describe('when dinghy is already recorded for entry in race', () => {
         it('returns a clear error message to user', async () => {
             fetch.mockImplementationOnce((resource, options) => {
-                if (resource === 'http://localhost:8081/dinghyracing/api/entries') {
+                if (resource === 'http://localhost:8081/dinghyracing/api/races/4/signUp') {
                     return Promise.resolve({
                         ok: false,
                         status: 409,
                         statusText: 'Conflict',
-                        json: () => Promise.resolve({message: "could not execute statement [Duplicate entry '6-1' for key 'entry.UK_entry_dinghy_id_race_id'] [insert into entry (crew_id,dinghy_id,helm_id,race_id,scoring_abbreviation,version,id) values (?,?,?,?,?,?,?)]; SQL [insert into entry (crew_id,dinghy_id,helm_id,race_id,scoring_abbreviation,version,id) values (?,?,?,?,?,?,?)]; constraint [entry.UK_entry_dinghy_id_race_id]"})
+                        json: () => Promise.resolve({message: 'Dinghy [id=2, version=0, dinghyClass=Scorpion, sailNumber=1234] has already signed up for race.'})
                     });
                 };
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
+            const promise = dinghyRacingModel.signUp(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': false, message: 'A race entry already exists for the selected dinghy.'});
+            expect(result).toEqual({'success': false, message: 'HTTP Error: 409 Conflict Message: Dinghy [id=2, version=0, dinghyClass=Scorpion, sailNumber=1234] has already signed up for race.'});
         });
     });
     describe('when helm is already recorded for entry in race', () => {
         it('returns a clear error message to user', async () => {
             fetch.mockImplementationOnce((resource, options) => {
-                if (resource === 'http://localhost:8081/dinghyracing/api/entries') {
+                if (resource === 'http://localhost:8081/dinghyracing/api/races/4/signUp') {
                     return Promise.resolve({
                         ok: false,
                         status: 409,
                         statusText: 'Conflict',
-                        json: () => Promise.resolve({message: "could not execute statement [Duplicate entry '2-1' for key 'entry.UK_entry_helm_id_race_id'] [insert entry set crew_id=?,dinghy_id=?,helm_id=?,race_id=?,scoring_abbreviation=?,version=? where id=? and version=?]; SQL [insert entry set crew_id=?,dinghy_id=?,helm_id=?,race_id=?,scoring_abbreviation=?,version=? where id=? and version=?]; constraint [entry.UK_entry_helm_id_race_id]"})
+                        json: () => Promise.resolve({message: 'Competitor [id=1, version=0, name=Chris Marshall] has already signed up for race.'})
                     });
                 };
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
+            const promise = dinghyRacingModel.signUp(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': false, message: 'A race entry already exists for the selected helm.'});
+            expect(result).toEqual({'success': false, message: 'HTTP Error: 409 Conflict Message: Competitor [id=1, version=0, name=Chris Marshall] has already signed up for race.'});
         });
     });
     describe('when crew is already recorded for entry in race', () => {
         it('returns a clear error message to user', async () => {
             fetch.mockImplementationOnce((resource, options) => {
-                if (resource === 'http://localhost:8081/dinghyracing/api/entries') {
+                if (resource === 'http://localhost:8081/dinghyracing/api/races/4/signUp') {
                     return Promise.resolve({
                         ok: false,
                         status: 409,
                         statusText: 'Conflict',
-                        json: () => Promise.resolve({message: "could not execute statement [Duplicate entry '2-1' for key 'entry.UK_entry_helm_id_race_id'] [update entry set crew_id=?,dinghy_id=?,helm_id=?,race_id=?,scoring_abbreviation=?,version=? where id=? and version=?]; SQL [update entry set crew_id=?,dinghy_id=?,helm_id=?,race_id=?,scoring_abbreviation=?,version=? where id=? and version=?]; constraint [entry.UK_entry_crew_id_race_id]"})
+                        json: () => Promise.resolve({message: 'Competitor [id=1, version=0, name=Chris Marshall] has already signed up for race.'})
                     });
                 };
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
+            const promise = dinghyRacingModel.signUp(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': false, message: 'A race entry already exists for the selected crew.'});
+            expect(result).toEqual({'success': false, message: 'HTTP Error: 409 Conflict Message: Competitor [id=1, version=0, name=Chris Marshall] has already signed up for race.'});
         });
     });
 });
@@ -1622,214 +1549,166 @@ describe('when signing up to a race', () => {
 describe('when updating an entry for a race', () => {
     it('if entry exists and URL provided and helm exists and URL provided and dinghy exist and URL provided and crew exists and URL provided then updates entry', async () => {
         fetch.mockImplementationOnce((resource, options) => {
-            const bodyMatch = {'helm': competitorChrisMarshall.url, 'dinghy': dinghy1234.url, 'crew': competitorLouScrew.url};
+            const bodyMatch = {'helm': competitorSarahPascal.url, 'dinghy': dinghy6745.url, 'crew': competitorOwainDavies.url};
             if ((resource === 'http://localhost:8081/dinghyracing/api/entries/10') && (options.body === JSON.stringify(bodyMatch))) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(),
-                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                    status: 200, headers: new Headers([['ETag', '"1"']]),
+                    json: () => Promise.resolve(entrySarahPascalScorpionADinghy6745HAL)
                 });
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const entryMatch = new Entry(entryChrisMarshallScorpionA1234.race, entryChrisMarshallScorpionA1234.helm, entryChrisMarshallScorpionA1234.crew, entryChrisMarshallScorpionA1234.dinghy,
-            entryChrisMarshallScorpionA1234.laps, entryChrisMarshallScorpionA1234.sumOfLapTimes, entryChrisMarshallScorpionA1234.correctedTime, entryChrisMarshallScorpionA1234.onLastLap,
-            entryChrisMarshallScorpionA1234.finishedRace, entryChrisMarshallScorpionA1234.scoringAbbreviation, entryChrisMarshallScorpionA1234.position, entryChrisMarshallScorpionA1234.url,
-            null, dinghyRacingModel);
-        vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+        
         vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
-                return Promise.resolve({success: true, domainObject: competitorLouScrew});
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/11/helm') {
+                return Promise.resolve({success: true, domainObject: competitorSarahPascal});
             }
-            else {
-                return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/11/crew') {
+                return Promise.resolve({success: true, domainObject: competitorOwainDavies});
             }
         });
-        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy6745})});
         vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
-        const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, competitorChrisMarshall, dinghy1234, competitorLouScrew);
+        vi.spyOn(dinghyRacingModel, 'getSignedUpTo').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, competitorSarahPascal, dinghy6745, competitorOwainDavies);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result.domainObject.race).toEqual(entryMatch.race);
-        expect(result.domainObject.helm).toEqual(entryMatch.helm);
-        expect(result.domainObject.crew).toEqual(entryMatch.crew);
-        expect(result.domainObject.dinghy).toEqual(entryMatch.dinghy);
-        expect(result.domainObject.laps).toEqual(entryMatch.laps);
-        expect(result.domainObject.sumOfLapTimes).toEqual(entryMatch.sumOfLapTimes);
-        expect(result.domainObject.correctedTime).toEqual(entryMatch.correctedTime);
-        expect(result.domainObject.onLastLap).toEqual(entryMatch.onLastLap);
-        expect(result.domainObject.finishedRace).toEqual(entryMatch.finishedRace);
-        expect(result.domainObject.scoringAbbreviation).toEqual(entryMatch.scoringAbbreviation);
-        expect(result.domainObject.position).toEqual(entryMatch.position);
-        expect(result.domainObject.url).toEqual(entryMatch.url);
-        expect(result.domainObject.metadata).toEqual(entryMatch.metadata);
-        expect(result.domainObject.model).toEqual(entryMatch.model);
+        expect(result.domainObject).toEqual(entrySarahPascalScorpionA6745);
     });
     it('if entry exists and URL provided and helm exists and URL provided and dinghy exists and URL provided and crew not provided then updates entry', async () => {
         fetch.mockImplementationOnce((resource, options) => {
-            const bodyMatch = {'helm': competitorChrisMarshall.url, 'dinghy': dinghy1234.url, 'crew': null};
+            const bodyMatch = {'helm': competitorSarahPascal.url, 'dinghy': dinghy6745.url, 'crew': null};
             if ((resource === 'http://localhost:8081/dinghyracing/api/entries/10') && (options.body === JSON.stringify(bodyMatch))) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(),
-                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                    status: 200, headers: new Headers([['ETag', '"1"']]),
+                    json: () => Promise.resolve(entrySarahPascalScorpionADinghy6745HAL)
                 });
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const entryMatch = new Entry(entryChrisMarshallScorpionA1234.race, entryChrisMarshallScorpionA1234.helm, entryChrisMarshallScorpionA1234.crew, entryChrisMarshallScorpionA1234.dinghy,
-            entryChrisMarshallScorpionA1234.laps, entryChrisMarshallScorpionA1234.sumOfLapTimes, entryChrisMarshallScorpionA1234.correctedTime, entryChrisMarshallScorpionA1234.onLastLap,
-            entryChrisMarshallScorpionA1234.finishedRace, entryChrisMarshallScorpionA1234.scoringAbbreviation, entryChrisMarshallScorpionA1234.position, entryChrisMarshallScorpionA1234.url,
-            null, dinghyRacingModel);
-        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
-        vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
-        vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
+
         vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
-                return Promise.resolve({success: true, domainObject: competitorLouScrew});
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/11/helm') {
+                return Promise.resolve({success: true, domainObject: competitorSarahPascal});
             }
-            else {
-                return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/11/crew') {
+                return Promise.resolve({success: true, domainObject: competitorOwainDavies});
             }
         });
-        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy6745})});
         vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
-        const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, competitorChrisMarshall, dinghy1234);
+        vi.spyOn(dinghyRacingModel, 'getSignedUpTo').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, competitorSarahPascal, dinghy6745);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result.domainObject.race).toEqual(entryMatch.race);
-        expect(result.domainObject.helm).toEqual(entryMatch.helm);
-        expect(result.domainObject.crew).toEqual(entryMatch.crew);
-        expect(result.domainObject.dinghy).toEqual(entryMatch.dinghy);
-        expect(result.domainObject.laps).toEqual(entryMatch.laps);
-        expect(result.domainObject.sumOfLapTimes).toEqual(entryMatch.sumOfLapTimes);
-        expect(result.domainObject.correctedTime).toEqual(entryMatch.correctedTime);
-        expect(result.domainObject.onLastLap).toEqual(entryMatch.onLastLap);
-        expect(result.domainObject.finishedRace).toEqual(entryMatch.finishedRace);
-        expect(result.domainObject.scoringAbbreviation).toEqual(entryMatch.scoringAbbreviation);
-        expect(result.domainObject.position).toEqual(entryMatch.position);
-        expect(result.domainObject.url).toEqual(entryMatch.url);
-        expect(result.domainObject.metadata).toEqual(entryMatch.metadata);
-        expect(result.domainObject.model).toEqual(entryMatch.model);
+        expect(result.domainObject).toEqual(entrySarahPascalScorpionA6745);
     });
     it('if entry exists and URL provided and helm exists and name provided and dinghy exists and sail number and class provided and crew exists and name provided then updates entry', async () => {
-        const helm = {...competitorChrisMarshall, 'url': null};
-        const dinghy = {...dinghy1234, 'url': ''};
-        const crew = {...competitorLouScrew, 'url': null};
+        const helm = {...competitorSarahPascal, 'url': null};
+        const dinghy = {...dinghy6745, 'url': ''};
+        const crew = {...competitorOwainDavies, 'url': null};
         fetch.mockImplementationOnce((resource, options) => {
-            const bodyMatch = {'helm': competitorChrisMarshall.url, 'dinghy': dinghy1234.url, 'crew': competitorLouScrew.url};
+            const bodyMatch = {'helm': competitorSarahPascal.url, 'dinghy': dinghy6745.url, 'crew': competitorOwainDavies.url};
             if ((resource === 'http://localhost:8081/dinghyracing/api/entries/10') && (options.body === JSON.stringify(bodyMatch))) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(),
-                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                    status: 200, headers: new Headers([['ETag', '"1"']]),
+                    json: () => Promise.resolve(entrySarahPascalScorpionADinghy6745HAL)
                 });
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const entryMatch = new Entry(entryChrisMarshallScorpionA1234.race, entryChrisMarshallScorpionA1234.helm, entryChrisMarshallScorpionA1234.crew, entryChrisMarshallScorpionA1234.dinghy,
-            entryChrisMarshallScorpionA1234.laps, entryChrisMarshallScorpionA1234.sumOfLapTimes, entryChrisMarshallScorpionA1234.correctedTime, entryChrisMarshallScorpionA1234.onLastLap,
-            entryChrisMarshallScorpionA1234.finishedRace, entryChrisMarshallScorpionA1234.scoringAbbreviation, entryChrisMarshallScorpionA1234.position, entryChrisMarshallScorpionA1234.url,
-            null, dinghyRacingModel);
+        
         vi.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
-            if (name === 'Chris Marshall') {
-                return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
+            if (name === 'Sarah Pascal') {
+                return Promise.resolve({'success': true, 'domainObject': competitorSarahPascal});
             }
-            else if (name === 'Lou Screw') {
-                return Promise.resolve({'success': true, 'domainObject': competitorLouScrew});
+            else if (name === 'Owain Davies') {
+                return Promise.resolve({'success': true, 'domainObject': competitorOwainDavies});
             }
             else {
                 return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
             }
         });
-        vi.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
-        vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
-        vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
-                return Promise.resolve({success: true, domainObject: competitorLouScrew});
-            }
-            else {
-                return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
+        vi.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation((name) => {
+            if (name === 'Scorpion') {
+                return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion});
             }
         });
-        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation((sailNumber, dinghyClass) => {
+            if (sailNumber = '6745' && dinghyClass.url === 'http://localhost:8081/dinghyracing/api/dinghyClasses/1') {
+                return Promise.resolve({'success': true, 'domainObject': dinghy6745});
+            }
+        });
+        vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/11/helm') {
+                return Promise.resolve({success: true, domainObject: competitorSarahPascal});
+            }
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/11/crew') {
+                return Promise.resolve({success: true, domainObject: competitorOwainDavies});
+            }
+        });
+        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy6745})});
         vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        vi.spyOn(dinghyRacingModel, 'getSignedUpTo').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, helm, dinghy, crew);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result.domainObject.race).toEqual(entryMatch.race);
-        expect(result.domainObject.helm).toEqual(entryMatch.helm);
-        expect(result.domainObject.crew).toEqual(entryMatch.crew);
-        expect(result.domainObject.dinghy).toEqual(entryMatch.dinghy);
-        expect(result.domainObject.laps).toEqual(entryMatch.laps);
-        expect(result.domainObject.sumOfLapTimes).toEqual(entryMatch.sumOfLapTimes);
-        expect(result.domainObject.correctedTime).toEqual(entryMatch.correctedTime);
-        expect(result.domainObject.onLastLap).toEqual(entryMatch.onLastLap);
-        expect(result.domainObject.finishedRace).toEqual(entryMatch.finishedRace);
-        expect(result.domainObject.scoringAbbreviation).toEqual(entryMatch.scoringAbbreviation);
-        expect(result.domainObject.position).toEqual(entryMatch.position);
-        expect(result.domainObject.url).toEqual(entryMatch.url);
-        expect(result.domainObject.metadata).toEqual(entryMatch.metadata);
-        expect(result.domainObject.model).toEqual(entryMatch.model);
+        expect(result.domainObject).toEqual(entrySarahPascalScorpionA6745);
     });
-    it('if entry exists url provided and helm exists and name provided and dinghy exists and sail number and class provided and crew not provided then updates entry', async () => {
-        const helm = {...competitorChrisMarshall, 'url': ''};
-        const dinghy = {...dinghy1234, 'url': null};
+    it('if entry exists and URL provided and helm exists and name provided and dinghy exists and sail number and class provided and crew not provided then updates entry', async () => {
+        const helm = {...competitorSarahPascal, 'url': ''};
+        const dinghy = {...dinghy6745, 'url': null};
         fetch.mockImplementationOnce((resource, options) => {
-            const bodyMatch = {'helm': competitorChrisMarshall.url, 'dinghy': dinghy1234.url, 'crew': null};
+            const bodyMatch = {'helm': competitorSarahPascal.url, 'dinghy': dinghy6745.url, 'crew': null};
             if ((resource === 'http://localhost:8081/dinghyracing/api/entries/10') && (options.body === JSON.stringify(bodyMatch))) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(),
-                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                    status: 200, headers: new Headers([['ETag', '"1"']]),
+                    json: () => Promise.resolve(entrySarahPascalScorpionADinghy6745HAL)
                 });
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const entryMatch = new Entry(entryChrisMarshallScorpionA1234.race, entryChrisMarshallScorpionA1234.helm, entryChrisMarshallScorpionA1234.crew, entryChrisMarshallScorpionA1234.dinghy,
-            entryChrisMarshallScorpionA1234.laps, entryChrisMarshallScorpionA1234.sumOfLapTimes, entryChrisMarshallScorpionA1234.correctedTime, entryChrisMarshallScorpionA1234.onLastLap,
-            entryChrisMarshallScorpionA1234.finishedRace, entryChrisMarshallScorpionA1234.scoringAbbreviation, entryChrisMarshallScorpionA1234.position, entryChrisMarshallScorpionA1234.url,
-            null, dinghyRacingModel);
-        vi.spyOn(dinghyRacingModel, 'getRaceByNameAndPlannedStartTime').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': raceScorpionA}));
+
         vi.spyOn(dinghyRacingModel, 'getCompetitorByName').mockImplementation((name) => {
-            if (name === 'Chris Marshall') {
-                return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall})
+            if (name === 'Sarah Pascal') {
+                return Promise.resolve({'success': true, 'domainObject': competitorSarahPascal});
+            }
+            else if (name === 'Owain Davies') {
+                return Promise.resolve({'success': true, 'domainObject': competitorOwainDavies});
             }
             else {
                 return Promise.resolve({'success': false, 'message': `Competitor not found: ${name}`});
             }
         });
-        vi.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion}));
-        vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation(() => Promise.resolve({'success': true, 'domainObject': dinghy1234}));
-        vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
-        vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
-                return Promise.resolve({success: true, domainObject: competitorLouScrew});
-            }
-            else {
-                return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
+        vi.spyOn(dinghyRacingModel, 'getDinghyClassByName').mockImplementation((name) => {
+            if (name === 'Scorpion') {
+                return Promise.resolve({'success': true, 'domainObject': dinghyClassScorpion});
             }
         });
-        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
+        vi.spyOn(dinghyRacingModel, 'getDinghyBySailNumberAndDinghyClass').mockImplementation((sailNumber, dinghyClass) => {
+            if (sailNumber = '6745' && dinghyClass.url === 'http://localhost:8081/dinghyracing/api/dinghyClasses/1') {
+                return Promise.resolve({'success': true, 'domainObject': dinghy6745});
+            }
+        });
+        vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/11/helm') {
+                return Promise.resolve({success: true, domainObject: competitorSarahPascal});
+            }
+            if (url === 'http://localhost:8081/dinghyracing/api/entries/11/crew') {
+                return Promise.resolve({success: true, domainObject: competitorOwainDavies});
+            }
+        });
+        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy6745})});
         vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
+        vi.spyOn(dinghyRacingModel, 'getSignedUpTo').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
         const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, helm, dinghy);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result.domainObject.race).toEqual(entryMatch.race);
-        expect(result.domainObject.helm).toEqual(entryMatch.helm);
-        expect(result.domainObject.crew).toEqual(entryMatch.crew);
-        expect(result.domainObject.dinghy).toEqual(entryMatch.dinghy);
-        expect(result.domainObject.laps).toEqual(entryMatch.laps);
-        expect(result.domainObject.sumOfLapTimes).toEqual(entryMatch.sumOfLapTimes);
-        expect(result.domainObject.correctedTime).toEqual(entryMatch.correctedTime);
-        expect(result.domainObject.onLastLap).toEqual(entryMatch.onLastLap);
-        expect(result.domainObject.finishedRace).toEqual(entryMatch.finishedRace);
-        expect(result.domainObject.scoringAbbreviation).toEqual(entryMatch.scoringAbbreviation);
-        expect(result.domainObject.position).toEqual(entryMatch.position);
-        expect(result.domainObject.url).toEqual(entryMatch.url);
-        expect(result.domainObject.metadata).toEqual(entryMatch.metadata);
-        expect(result.domainObject.model).toEqual(entryMatch.model);
+        expect(result.domainObject).toEqual(entrySarahPascalScorpionA6745);
     });
     it('entry exists url provided helm does not exist dinghy exists url provided crew exists and name provided does not update entry and returns message explaining reason', async () => {
         const helm = {...competitorChrisMarshall, 'name': 'Lucy Liu', 'url': ''};
@@ -1938,7 +1817,7 @@ describe('when updating an entry for a race', () => {
                         ok: false,
                         status: 409,
                         statusText: 'Conflict',
-                        json: () => Promise.resolve({message: "could not execute statement [Duplicate entry '3-1' for key 'entry.UK_entry_dinghy_id_race_id'] [insert entry set crew_id=?,dinghy_id=?,helm_id=?,race_id=?,scoring_abbreviation=?,version=? where id=? and version=?]; SQL [insert entry set crew_id=?,dinghy_id=?,helm_id=?,race_id=?,scoring_abbreviation=?,version=? where id=? and version=?]; constraint [entry.UK_entry_dinghy_id_race_id]"})
+                        json: () => Promise.resolve({message: 'Dinghy [id=2, version=0, dinghyClass=Scorpion, sailNumber=1234] has already signed up for race.'})
                     });
                 };
             });
@@ -1946,46 +1825,45 @@ describe('when updating an entry for a race', () => {
             const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, competitorChrisMarshall, dinghy1234, competitorLouScrew);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            // let temp = {...entryChrisMarshallScorpionA1234};
-            expect(result).toEqual({'success': false, message: 'A race entry already exists for the selected dinghy.'});
+            expect(result).toEqual({'success': false, message: 'HTTP Error: 409 Conflict Message: Dinghy [id=2, version=0, dinghyClass=Scorpion, sailNumber=1234] has already signed up for race.'});
         });
     });
     describe('when helm is already recorded for entry in race', () => {
         it('returns a clear error message to user', async () => {
             fetch.mockImplementationOnce((resource, options) => {
-                if (resource === 'http://localhost:8081/dinghyracing/api/entries') {
+                if (resource === 'http://localhost:8081/dinghyracing/api/entries/10') {
                     return Promise.resolve({
                         ok: false,
                         status: 409,
                         statusText: 'Conflict',
-                        json: () => Promise.resolve({message: "could not execute statement [Duplicate entry '2-1' for key 'entry.UK_entry_helm_id_race_id'] [update entry set crew_id=?,dinghy_id=?,helm_id=?,race_id=?,scoring_abbreviation=?,version=? where id=? and version=?]; SQL [update entry set crew_id=?,dinghy_id=?,helm_id=?,race_id=?,scoring_abbreviation=?,version=? where id=? and version=?]; constraint [entry.UK_entry_helm_id_race_id]"})
+                        json: () => Promise.resolve({message: 'Competitor [id=1, version=0, name=Chris Marshall] has already signed up for race.'})
                     });
                 };
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
+            const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, competitorChrisMarshall, dinghy1234, competitorLouScrew);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': false, message: 'A race entry already exists for the selected helm.'});
+            expect(result).toEqual({'success': false, message: 'HTTP Error: 409 Conflict Message: Competitor [id=1, version=0, name=Chris Marshall] has already signed up for race.'});
         });
     });
     describe('when crew is already recorded for entry in race', () => {
         it('returns a clear error message to user', async () => {
             fetch.mockImplementationOnce((resource, options) => {
-                if (resource === 'http://localhost:8081/dinghyracing/api/entries') {
+                if (resource === 'http://localhost:8081/dinghyracing/api/entries/10') {
                     return Promise.resolve({
                         ok: false,
                         status: 409,
                         statusText: 'Conflict',
-                        json: () => Promise.resolve({message: "could not execute statement [Duplicate entry '5-1' for key 'entry.UK_entry_crew_id_race_id'] [update entry set crew_id=?,dinghy_id=?,helm_id=?,race_id=?,scoring_abbreviation=?,version=? where id=? and version=?]; SQL [update entry set crew_id=?,dinghy_id=?,helm_id=?,race_id=?,scoring_abbreviation=?,version=? where id=? and version=?]; constraint [entry.UK_entry_crew_id_race_id]"})
+                        json: () => Promise.resolve({message: 'Competitor [id=1, version=0, name=Chris Marshall] has already signed up for race.'})
                     });
                 };
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const promise = dinghyRacingModel.createEntry(raceScorpionA, competitorChrisMarshall, dinghy1234, competitorLouScrew);
+            const promise = dinghyRacingModel.updateEntry(entryChrisMarshallScorpionA1234, competitorChrisMarshall, dinghy1234, competitorLouScrew);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({'success': false, message: 'A race entry already exists for the selected crew.'});
+            expect(result).toEqual({'success': false, message: 'HTTP Error: 409 Conflict Message: Competitor [id=1, version=0, name=Chris Marshall] has already signed up for race.'});
         });
     });
 });
@@ -4161,7 +4039,8 @@ it('provides a blank template for a fleet', () => {
 
 describe('when searching for entries by race', () => {
     it('returns a promise that resolves to a result indicating success and containing the entries when entries are found and entries have crew recorded', async () => {
-        fetch.mockImplementationOnce(() => {
+        fetch.mockImplementationOnce((resource, options) => {
+            if (resource === 'http://localhost:8081/dinghyracing/api/entries/search/findBySignedUpToRace?race=http://localhost:8081/dinghyracing/api/races/4')
             return Promise.resolve({
                 ok: true,
                 status: 200, headers: new Headers(),
@@ -4212,130 +4091,43 @@ describe('when searching for entries by race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const entriesMatch = entriesHandicapA.map(entry => {
-            entry.model = dinghyRacingModel;
-            return entry;
-        });
-        entryChrisMarshallHandicapA1234.model = dinghyRacingModel;
         vi.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
             if (url === 'http://localhost:8081/dinghyracing/api/entries/20') {
                 return Promise.resolve({success: true, domainObject: entryChrisMarshallHandicapA1234});
             }
             if (url === 'http://localhost:8081/dinghyracing/api/entries/21') {
-                // return Promise.resolve({success: true, domainObject: {helm: competitorJillMyer, crew: null, race: raceHandicapA, dinghy: dinghy826, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
-                //     position: null, url: 'http://localhost:8081/dinghyracing/api/entries/21', metadata: {eTag: '"1"'}}});
-                return Promise.resolve({success: true, domainObject: new Entry(raceHandicapA, competitorJillMyer, null, dinghy826, [], 0, 0, false, false, null,  null, 'http://localhost:8081/dinghyracing/api/entries/21', {eTag: '"1"'}, dinghyRacingModel)});
+                return Promise.resolve({success: true, domainObject: new Entry(competitorJillMyer, null, [], dinghy826, [], 0, 0, false, false, null,  null, 'http://localhost:8081/dinghyracing/api/entries/21', {eTag: '"1"'}, dinghyRacingModel)});
             }
         });
         const promise = dinghyRacingModel.getEntriesByRace(raceHandicapA);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result.domainObject[0].race).toEqual(entriesMatch[0].race);
-        expect(result.domainObject[0].helm).toEqual(entriesMatch[0].helm);
-        expect(result.domainObject[0].crew).toEqual(entriesMatch[0].crew);
-        expect(result.domainObject[0].dinghy).toEqual(entriesMatch[0].dinghy);
-        expect(result.domainObject[0].laps).toEqual(entriesMatch[0].laps);
-        expect(result.domainObject[0].sumOfLapTimes).toEqual(entriesMatch[0].sumOfLapTimes);
-        expect(result.domainObject[0].correctedTime).toEqual(entriesMatch[0].correctedTime);
-        expect(result.domainObject[0].onLastLap).toEqual(entriesMatch[0].onLastLap);
-        expect(result.domainObject[0].finishedRace).toEqual(entriesMatch[0].finishedRace);
-        expect(result.domainObject[0].scoringAbbreviation).toEqual(entriesMatch[0].scoringAbbreviation);
-        expect(result.domainObject[0].position).toEqual(entriesMatch[0].position);
-        expect(result.domainObject[0].url).toEqual(entriesMatch[0].url);
-        expect(result.domainObject[0].metadata).toEqual(entriesMatch[0].metadata);
-        expect(result.domainObject[0].model).toEqual(entriesMatch[0].model);
-        expect(result.domainObject[1].race).toEqual(entriesMatch[1].race);
-        expect(result.domainObject[1].helm).toEqual(entriesMatch[1].helm);
-        expect(result.domainObject[1].crew).toEqual(entriesMatch[1].crew);
-        expect(result.domainObject[1].dinghy).toEqual(entriesMatch[1].dinghy);
-        expect(result.domainObject[1].laps).toEqual(entriesMatch[1].laps);
-        expect(result.domainObject[1].sumOfLapTimes).toEqual(entriesMatch[1].sumOfLapTimes);
-        expect(result.domainObject[1].correctedTime).toEqual(entriesMatch[1].correctedTime);
-        expect(result.domainObject[1].onLastLap).toEqual(entriesMatch[1].onLastLap);
-        expect(result.domainObject[1].finishedRace).toEqual(entriesMatch[1].finishedRace);
-        expect(result.domainObject[1].scoringAbbreviation).toEqual(entriesMatch[1].scoringAbbreviation);
-        expect(result.domainObject[1].position).toEqual(entriesMatch[1].position);
-        expect(result.domainObject[1].url).toEqual(entriesMatch[1].url);
-        expect(result.domainObject[1].metadata).toEqual(entriesMatch[1].metadata);
-        expect(result.domainObject[1].model).toEqual(entriesMatch[1].model);
-    });    
-    it('converts the value for lastLapTime to the correct value', async () => {
-        fetch.mockImplementationOnce(() => {
-            return Promise.resolve({
-                ok: true,
-                status: 200,
-                headers: new Headers(),
-                json: () => Promise.resolve(entriesScorpionAHAL)
-            });
-        });
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        vi.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/10') {
-                return Promise.resolve({success: true, domainObject: entryChrisMarshallScorpionA1234});
-            }
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/11') {
-                return Promise.resolve({success: true, domainObject: entrySarahPascalScorpionA6745});
-            }
-        });
-        const promise = dinghyRacingModel.getEntriesByRace(raceScorpionA);
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({'success': true, 'domainObject': entriesScorpionA});
-    });
-    it('converts the value for sumOfLapTimes to the correct value', async () => {
-        const entryHAL = {...entryChrisMarshallDinghy1234HAL, sumOfLapTimes: 'PT11M00S'};
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        vi.spyOn(dinghyRacingModel, 'read').mockImplementation((resource) => {
-            if (resource === raceScorpionA.url + '/signedUp') {
-                return Promise.resolve({success: true, domainObject: {_embedded: {entries: [entryHAL]}}});
-            }
-            if (resource === 'http://localhost:8081/dinghyracing/api/entries/10') {
-                return Promise.resolve({success: true, domainObject: entryHAL, eTag: '"1"'});
-            }
-        });
-        vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
-        vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
-                return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
-            }
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
-                return Promise.resolve({success: true, domainObject: competitorLouScrew});
-            }
-        });
-        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
-        vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
-        const promise = dinghyRacingModel.getEntriesByRace(raceScorpionA);
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        expect(result.domainObject[0].sumOfLapTimes).toBe(660000);
-    });    
-    it('converts the value for correctedLapTime to the correct value', async () => {
-        const entryHAL = {...entryChrisMarshallDinghy1234HAL, correctedTime: 'PT10M32.790S'};
-        const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        vi.spyOn(dinghyRacingModel, 'read').mockImplementation((resource) => {
-            if (resource === raceScorpionA.url + '/signedUp') {
-                return Promise.resolve({success: true, domainObject: {_embedded: {entries: [entryHAL]}}});
-            }
-            if (resource === 'http://localhost:8081/dinghyracing/api/entries/10') {
-                return Promise.resolve({success: true, domainObject: entryHAL, eTag: '"1"'});
-            }
-        });
-        vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({success: true, domainObject: raceScorpionA})});
-        vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
-                return Promise.resolve({success: true, domainObject: competitorChrisMarshall});
-            }
-            if (url === 'http://localhost:8081/dinghyracing/api/entries/10/crew') {
-                return Promise.resolve({success: true, domainObject: competitorLouScrew});
-            }
-        });
-        vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghy1234})});
-        vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
-        const promise = dinghyRacingModel.getEntriesByRace(raceScorpionA);
-        const result = await promise;
-        expect(promise).toBeInstanceOf(Promise);
-        // expect(result).toEqual({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234, correctedTime: 632790, metadata: {eTag: '"1"'}}]});
-        expect(result.domainObject[0].correctedTime).toBe(632790);
+        expect(result.domainObject[0].helm).toEqual(entriesHandicapA[0].helm);
+        expect(result.domainObject[0].crew).toEqual(entriesHandicapA[0].crew);
+        expect(result.domainObject[0].dinghy).toEqual(entriesHandicapA[0].dinghy);
+        expect(result.domainObject[0].laps).toEqual(entriesHandicapA[0].laps);
+        expect(result.domainObject[0].sumOfLapTimes).toEqual(entriesHandicapA[0].sumOfLapTimes);
+        expect(result.domainObject[0].correctedTime).toEqual(entriesHandicapA[0].correctedTime);
+        expect(result.domainObject[0].onLastLap).toEqual(entriesHandicapA[0].onLastLap);
+        expect(result.domainObject[0].finishedRace).toEqual(entriesHandicapA[0].finishedRace);
+        expect(result.domainObject[0].scoringAbbreviation).toEqual(entriesHandicapA[0].scoringAbbreviation);
+        expect(result.domainObject[0].position).toEqual(entriesHandicapA[0].position);
+        expect(result.domainObject[0].url).toEqual(entriesHandicapA[0].url);
+        expect(result.domainObject[0].metadata).toEqual(entriesHandicapA[0].metadata);
+        expect(result.domainObject[0].model).toEqual(entriesHandicapA[0].model);
+        expect(result.domainObject[1].helm).toEqual(entriesHandicapA[1].helm);
+        expect(result.domainObject[1].crew).toEqual(entriesHandicapA[1].crew);
+        expect(result.domainObject[1].dinghy).toEqual(entriesHandicapA[1].dinghy);
+        expect(result.domainObject[1].laps).toEqual(entriesHandicapA[1].laps);
+        expect(result.domainObject[1].sumOfLapTimes).toEqual(entriesHandicapA[1].sumOfLapTimes);
+        expect(result.domainObject[1].correctedTime).toEqual(entriesHandicapA[1].correctedTime);
+        expect(result.domainObject[1].onLastLap).toEqual(entriesHandicapA[1].onLastLap);
+        expect(result.domainObject[1].finishedRace).toEqual(entriesHandicapA[1].finishedRace);
+        expect(result.domainObject[1].scoringAbbreviation).toEqual(entriesHandicapA[1].scoringAbbreviation);
+        expect(result.domainObject[1].position).toEqual(entriesHandicapA[1].position);
+        expect(result.domainObject[1].url).toEqual(entriesHandicapA[1].url);
+        expect(result.domainObject[1].metadata).toEqual(entriesHandicapA[1].metadata);
+        expect(result.domainObject[1].model).toEqual(entriesHandicapA[1].model);
     });
     it('returns a promise that resolves to a result indicating success and containing the entries when entries are found and some entries are on the last lap', async () => {
         const entriesHandicapAHAL_onLastLap = { _embedded : { entries : [
@@ -4638,7 +4430,6 @@ describe('when searching for entries by race', () => {
             const promise = dinghyRacingModel.getEntriesByRace(raceGraduateA);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            // expect(result).toEqual({success: true, domainObject: entriesGraduateA_bigData});
             entriesGraduateA_bigData.forEach(entry => {
                 const entryMatch = entriesGraduateA_bigData.find(element => element.url === entry.url);
                 expect(entry.race).toEqual(entryMatch.race);
@@ -6521,7 +6312,7 @@ describe('when a websocket message callback has been set for dinghy class update
 });
 
 describe('when updating an entries position in the race', () => {
-    it('if race exists and entry exists and URLs provided and position provided then updates competitor', async () => {
+    it('if race exists and entry exists and URLs provided and position provided then updates position', async () => {
         fetch.mockImplementationOnce((resource, options) => {
             if (resource === 'http://localhost:8081/dinghyracing/api/races/4/updateEntryPosition?entry=http://localhost:8081/dinghyracing/api/entries/10&position=2') {
                 return Promise.resolve({
@@ -6533,23 +6324,21 @@ describe('when updating an entries position in the race', () => {
             };
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.updateEntryPosition({...entryChrisMarshallScorpionA1234}, 2);
+        const promise = dinghyRacingModel.updateEntryPosition(raceScorpionA, {...entryChrisMarshallScorpionA1234}, 2);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        let temp = {...entryChrisMarshallScorpionA1234};
         expect(result.success).toBeTruthy();
     });
     it('if race URL not provided and entry exists and URL provided then returns message explaining issue', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.updateEntryPosition({...entryChrisMarshallScorpionA1234, race: {...raceScorpionA, url: null}}, 2);
+        const promise = dinghyRacingModel.updateEntryPosition({...raceScorpionA, url: null}, {...entryChrisMarshallScorpionA1234}, 2);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        let temp = {...entryChrisMarshallScorpionA1234};
         expect(result).toEqual({'success': false, message: 'The race URL is required to update an entry position.'});
     });
     it('if race exists and URL provided and entry URL not provided then returns message explaining issue', async () => {
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.updateEntryPosition({...entryChrisMarshallScorpionA1234, url: ''}, 2);
+        const promise = dinghyRacingModel.updateEntryPosition(raceScorpionA, {...entryChrisMarshallScorpionA1234, url: ''}, 2);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         let temp = {...entryChrisMarshallScorpionA1234};
@@ -6565,7 +6354,7 @@ describe('when updating an entries position in the race', () => {
             });
         });
         const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const promise = dinghyRacingModel.updateEntryPosition({...entryChrisMarshallScorpionA1234}, 2);
+        const promise = dinghyRacingModel.updateEntryPosition(raceScorpionA, {...entryChrisMarshallScorpionA1234}, 2);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         let temp = {...entryChrisMarshallScorpionA1234};
@@ -6576,19 +6365,16 @@ describe('when updating an entries position in the race', () => {
 describe('when entry is requested', () => {
     describe('when dinghy has a crew', () => {
         it('returns a promise that resolves to a result indicating success and containing the entry when the entry is found', async () => {
-            fetch.mockImplementationOnce(() => {
-                return Promise.resolve({
-                    ok: true,
-                    status: 200, headers: new Headers([['ETag', '"3"']]),
-                    json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
-                });
+            fetch.mockImplementationOnce((resource, options) => {
+                if (resource === entryChrisMarshallScorpionA1234.url) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers([['ETag', '"1"']]),
+                        json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
+                    });
+                }
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const entryMatch = new Entry(entryChrisMarshallScorpionA1234.race, entryChrisMarshallScorpionA1234.helm, entryChrisMarshallScorpionA1234.crew, entryChrisMarshallScorpionA1234.dinghy,
-                entryChrisMarshallScorpionA1234.laps, entryChrisMarshallScorpionA1234.sumOfLapTimes, entryChrisMarshallScorpionA1234.correctedTime, entryChrisMarshallScorpionA1234.onLastLap,
-                entryChrisMarshallScorpionA1234.finishedRace, entryChrisMarshallScorpionA1234.scoringAbbreviation, entryChrisMarshallScorpionA1234.position, entryChrisMarshallScorpionA1234.url,
-                {eTag: '"3"'}, dinghyRacingModel);
-            vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceScorpionA})});
             vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
                     return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
@@ -6599,24 +6385,11 @@ describe('when entry is requested', () => {
             });
             vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghy1234})});
             vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
+            vi.spyOn(dinghyRacingModel, 'getSignedUpTo').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
             const promise = dinghyRacingModel.getEntry(entryChrisMarshallScorpionA1234.url);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            // expect(result).toEqual({success: true, domainObject: {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"3"'}}, eTag: '"3"'});
-            expect(result.domainObject.race).toEqual(entryMatch.race);
-            expect(result.domainObject.helm).toEqual(entryMatch.helm);
-            expect(result.domainObject.crew).toEqual(entryMatch.crew);
-            expect(result.domainObject.dinghy).toEqual(entryMatch.dinghy);
-            expect(result.domainObject.laps).toEqual(entryMatch.laps);
-            expect(result.domainObject.sumOfLapTimes).toEqual(entryMatch.sumOfLapTimes);
-            expect(result.domainObject.correctedTime).toEqual(entryMatch.correctedTime);
-            expect(result.domainObject.onLastLap).toEqual(entryMatch.onLastLap);
-            expect(result.domainObject.finishedRace).toEqual(entryMatch.finishedRace);
-            expect(result.domainObject.scoringAbbreviation).toEqual(entryMatch.scoringAbbreviation);
-            expect(result.domainObject.position).toEqual(entryMatch.position);
-            expect(result.domainObject.url).toEqual(entryMatch.url);
-            expect(result.domainObject.metadata).toEqual(entryMatch.metadata);
-            expect(result.domainObject.model).toEqual(entryMatch.model);
+            expect(result.domainObject).toEqual(entryChrisMarshallScorpionA1234);
         });
     });
     describe('when dinghy does not have a crew', () => {
@@ -6624,16 +6397,11 @@ describe('when entry is requested', () => {
             fetch.mockImplementationOnce(() => {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"3"']]), 
+                    status: 200, headers: new Headers([['ETag', '"1"']]), 
                     json: () => Promise.resolve(entryChrisMarshallDinghy1234HAL)
                 });
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const entryMatch = new Entry(entryChrisMarshallScorpionA1234.race, entryChrisMarshallScorpionA1234.helm, null, entryChrisMarshallScorpionA1234.dinghy,
-                entryChrisMarshallScorpionA1234.laps, entryChrisMarshallScorpionA1234.sumOfLapTimes, entryChrisMarshallScorpionA1234.correctedTime, entryChrisMarshallScorpionA1234.onLastLap,
-                entryChrisMarshallScorpionA1234.finishedRace, entryChrisMarshallScorpionA1234.scoringAbbreviation, entryChrisMarshallScorpionA1234.position, entryChrisMarshallScorpionA1234.url,
-                {eTag: '"3"'}, dinghyRacingModel);
-            vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceScorpionA})});
             vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
                     return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
@@ -6644,24 +6412,11 @@ describe('when entry is requested', () => {
             });
             vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghy1234})});
             vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
+            vi.spyOn(dinghyRacingModel, 'getSignedUpTo').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
             const promise = dinghyRacingModel.getEntry(entryChrisMarshallScorpionA1234.url);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            // expect(result).toEqual({success: true, domainObject: {...entryChrisMarshallScorpionA1234, crew: null, metadata: {eTag: '"3"'}}, eTag: '"3"'});
-            expect(result.domainObject.race).toEqual(entryMatch.race);
-            expect(result.domainObject.helm).toEqual(entryMatch.helm);
-            expect(result.domainObject.crew).toEqual(entryMatch.crew);
-            expect(result.domainObject.dinghy).toEqual(entryMatch.dinghy);
-            expect(result.domainObject.laps).toEqual(entryMatch.laps);
-            expect(result.domainObject.sumOfLapTimes).toEqual(entryMatch.sumOfLapTimes);
-            expect(result.domainObject.correctedTime).toEqual(entryMatch.correctedTime);
-            expect(result.domainObject.onLastLap).toEqual(entryMatch.onLastLap);
-            expect(result.domainObject.finishedRace).toEqual(entryMatch.finishedRace);
-            expect(result.domainObject.scoringAbbreviation).toEqual(entryMatch.scoringAbbreviation);
-            expect(result.domainObject.position).toEqual(entryMatch.position);
-            expect(result.domainObject.url).toEqual(entryMatch.url);
-            expect(result.domainObject.metadata).toEqual(entryMatch.metadata);
-            expect(result.domainObject.model).toEqual(entryMatch.model);
+            expect(result.domainObject).toEqual({...entryChrisMarshallScorpionA1234, crew: null});
         });
     });
     it('returns a promise that resolves to a result indicating failure when entry is not found', async () => {
@@ -6707,13 +6462,7 @@ describe('when entry is requested', () => {
                 });
             });
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const entryMatch = new Entry(entryChrisMarshallScorpionA1234.race, entryChrisMarshallScorpionA1234.helm, entryChrisMarshallScorpionA1234.crew, entryChrisMarshallScorpionA1234.dinghy,
-                entryChrisMarshallScorpionA1234.laps, entryChrisMarshallScorpionA1234.sumOfLapTimes, entryChrisMarshallScorpionA1234.correctedTime, entryChrisMarshallScorpionA1234.onLastLap,
-                entryChrisMarshallScorpionA1234.finishedRace, entryChrisMarshallScorpionA1234.scoringAbbreviation, entryChrisMarshallScorpionA1234.position, entryChrisMarshallScorpionA1234.url,
-                {eTag: '"3"'}, dinghyRacingModel);
-            dinghyRacingModel.entryResultMap.set(entryChrisMarshallDinghy1234HAL._links.self.href, {success: true, domainObject: entryMatch, eTag: '"3"'});
-            
-            vi.spyOn(dinghyRacingModel, 'getRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': raceScorpionA})});
+            dinghyRacingModel.entryResultMap.set(entryChrisMarshallDinghy1234HAL._links.self.href, {success: true, domainObject: entryChrisMarshallScorpionA1234, eTag: '"3"'});
             vi.spyOn(dinghyRacingModel, 'getCompetitor').mockImplementation((url) => {
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/10/helm') {
                     return Promise.resolve({'success': true, 'domainObject': competitorChrisMarshall});
@@ -6724,25 +6473,12 @@ describe('when entry is requested', () => {
             });
             vi.spyOn(dinghyRacingModel, 'getDinghy').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': dinghy1234})});
             vi.spyOn(dinghyRacingModel, 'getLaps').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': []})});
+            vi.spyOn(dinghyRacingModel, 'getSignedUpTo').mockImplementation(() => {return Promise.resolve({success: true, domainObject: []})});
             const promise = dinghyRacingModel.getEntry(entryChrisMarshallScorpionA1234.url);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            // expect(result).toEqual({success: true,domainObject: {...entryChrisMarshallScorpionA1234, metadata: null}, eTag: null});
-            expect(result.domainObject.race).toEqual(entryMatch.race);
-            expect(result.domainObject.helm).toEqual(entryMatch.helm);
-            expect(result.domainObject.crew).toEqual(entryMatch.crew);
-            expect(result.domainObject.dinghy).toEqual(entryMatch.dinghy);
-            expect(result.domainObject.laps).toEqual(entryMatch.laps);
-            expect(result.domainObject.sumOfLapTimes).toEqual(entryMatch.sumOfLapTimes);
-            expect(result.domainObject.correctedTime).toEqual(entryMatch.correctedTime);
-            expect(result.domainObject.onLastLap).toEqual(entryMatch.onLastLap);
-            expect(result.domainObject.finishedRace).toEqual(entryMatch.finishedRace);
-            expect(result.domainObject.scoringAbbreviation).toEqual(entryMatch.scoringAbbreviation);
-            expect(result.domainObject.position).toEqual(entryMatch.position);
-            expect(result.domainObject.url).toEqual(entryMatch.url);
-            expect(result.domainObject.metadata).toBeNull();
-            expect(result.domainObject.model).toEqual(entryMatch.model);
-            expect(dinghyRacingModel.entryResultMap.get(entryChrisMarshallDinghy1234HAL._links.self.href)).toEqual({success: true, domainObject: entryMatch, eTag: '"3"'});
+            expect(result.domainObject).toEqual({...entryChrisMarshallScorpionA1234, metadata: null});
+            expect(dinghyRacingModel.entryResultMap.get(entryChrisMarshallDinghy1234HAL._links.self.href)).toEqual({success: true, domainObject: entryChrisMarshallScorpionA1234, eTag: '"3"'});
         })
     });
 });
@@ -7040,3 +6776,109 @@ it('provides a clock', () => {
     const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
     expect(dinghyRacingModel.getClock()).toBeInstanceOf(Clock);
 });
+
+describe('when a signUp is requested', () => {
+    describe('when an entry is provided', () => {
+        it('returns a promise that resolves to a result indicating success and containing the signUp', async () => {
+            fetch.mockImplementationOnce((resource, options) => {
+                if (resource === 'http://localhost:8081/dinghyracing/api/entries/10/signedUpTo') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers(),
+                        json: () => Promise.resolve(signedUpChrisMarshallDinghy1234ScorpionAHAL)
+                    });
+                }
+            });
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            vi.spyOn(model, 'getRace').mockImplementation((url) => {
+                if (url === 'http://localhost:8081/dinghyracing/api/signedUps/1/race') {
+                    return Promise.resolve({success: true, domainObject: raceScorpionA});
+                }
+            });
+            const promise = model.getSignedUp(entryChrisMarshallDinghy1234HAL._links.signedUpTo.href, null, entryChrisMarshallScorpionA1234);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result.success).toBeTruthy();
+            expect(result.domainObject.race).toEqual(raceScorpionA);
+            expect(result.domainObject.entry).toEqual(entryChrisMarshallScorpionA1234);
+        });
+    });
+});
+
+describe('when signedUpTo is requested', () => {
+    describe('when an entry is provided', () => {
+        it('returns a promise that resolves to a result indicating success and containing an Array<SignedUp>', async () => {
+            const signedUpToHAL = {
+                _embedded:{
+                    signedUps:[
+                        signedUpChrisMarshallDinghy1234ScorpionAHAL,
+                        {
+                            position:null,
+                            _links:{
+                                self:{href:'http://localhost:8081/dinghyracing/api/signedUps/2'},
+                                race:{href:'http://localhost:8081/dinghyracing/api/signedUps/2/race'},
+                                entry:{href:'http://localhost:8081/dinghyracing/api/signedUps/2/entry'}
+                            }
+                        }
+                    ]
+                }
+            }
+            const signedUpChrisMarshallDinghy123EmbeddedAHAL = {
+                position:null,
+                _links:{
+                    self:{href:'http://localhost:8081/dinghyracing/api/signedUps/2'},
+                    race:{href:'http://localhost:8081/dinghyracing/api/signedUps/2/race'},
+                    entry:{href:'http://localhost:8081/dinghyracing/api/signedUps/2/entry'}
+                }
+            }
+            const raceEmbeddedA = { name: 'Embedded A', plannedStartTime: new Date('2021-10-14T10:30:00Z'), fleet: fleetScorpion, duration: 2700000, type: 'FLEET', plannedLaps: 5, startType: 'CSCCLUBSTART', lapsSailed: 0, lapForecast: 5.0, lastLapTime: 0, averageLapTime: 0, clock: null, dinghyClasses: [], url: 'http://localhost:8081/dinghyracing/api/races/5' };
+            const expectedResult = [
+                new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234),
+                new SignedUp(raceEmbeddedA, entryChrisMarshallScorpionA1234)
+            ]
+            fetch.mockImplementation((resource, options) => {
+                // signedUpTo
+                if (resource === 'http://localhost:8081/dinghyracing/api/entries/10/signedUpTo') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers(),
+                        json: () => Promise.resolve(signedUpToHAL)
+                    });
+                }
+                // signedUpTo Scorpion A
+                if (resource === 'http://localhost:8081/dinghyracing/api/signedUps/1') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers(),
+                        json: () => Promise.resolve(signedUpChrisMarshallDinghy1234ScorpionAHAL)
+                    });
+                }
+                // signedUpTo Embedded A
+                if (resource === 'http://localhost:8081/dinghyracing/api/signedUps/2') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers(),
+                        json: () => Promise.resolve(signedUpChrisMarshallDinghy123EmbeddedAHAL)
+                    });
+                }
+            })
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            vi.spyOn(model, 'getRace').mockImplementation((url) => {
+                if (url === 'http://localhost:8081/dinghyracing/api/signedUps/1/race') {
+                    return Promise.resolve({success: true, domainObject: raceScorpionA});
+                }
+                if (url === 'http://localhost:8081/dinghyracing/api/signedUps/2/race') {
+                    return Promise.resolve({success: true, domainObject: raceEmbeddedA});
+                }
+            });
+            const promise = model.getSignedUpTo('http://localhost:8081/dinghyracing/api/entries/10/signedUpTo', null, entryChrisMarshallHandicapA1234);
+            const result = await promise;
+            expect(promise).toBeInstanceOf(Promise);
+            expect(result.success).toBeTruthy();
+            expect(result.domainObject[0].race).toEqual(raceScorpionA);
+            expect(result.domainObject[0].entry).toEqual(entryChrisMarshallHandicapA1234);
+            expect(result.domainObject[1].race).toEqual(raceEmbeddedA);
+            expect(result.domainObject[1].entry).toEqual(entryChrisMarshallHandicapA1234);
+        });
+    });
+}) 

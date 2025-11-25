@@ -14,20 +14,22 @@
  * limitations under the License. 
  */
 
-import { act, fireEvent, getNodeText, screen, within } from '@testing-library/react';
+import { act, fireEvent, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import DinghyRacingModel from '../model/dinghy-racing-model';
 import { customRender } from '../test-utilities/custom-renders';
 import RaceEntriesView from './RaceEntriesView';
 import { httpRootURL, wsRootURL, 
-    competitorSarahPascal, competitorChrisMarshall, competitorJillMyer,
+    competitorSarahPascal, competitorChrisMarshall, competitorJillMyer, competitorOwainDavies,
     dinghy6745, dinghy1234, dinghy2928, dinghy2726,
-    raceScorpionA, raceGraduateA, raceCometA, racePursuitA,
-    entriesScorpionA, entriesGraduateA, entriesCometA, entriesPursuitA,
-    entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745, entryJillMyerCometA826,
-    competitorLouScrew} from '../model/__mocks__/test-data';
+    raceScorpionA, raceGraduateA, racePursuitA,
+    entriesScorpionA, entriesGraduateA, 
+    competitorLouScrew,
+    entrySarahPascalScorpionA6745} from '../model/__mocks__/test-data';
 import { entriesGraduateA_bigData } from '../model/__mocks__/test-data-more-data';
 import DinghyRacingController from '../controller/dinghy-racing-controller';
+import Entry from '../model/domain-classes/entry';
+import SignedUp from '../model/domain-classes/signed-up';
 
 vi.mock('../model/dinghy-racing-model');
 vi.mock('../model/domain-classes/clock');
@@ -42,7 +44,11 @@ afterEach(() => {
 
 it('renders', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+    const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+    const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+    entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+    entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+    vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]})});
     await act(async () => {
         customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
     });
@@ -57,8 +63,20 @@ it('renders', async () => {
 });
 it('displays entries for selected races', async () => {
     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getEntriesByRace').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
-    vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesGraduateA})});
+    const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+    const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+    const entryJillMyerGraduateA2928 = new Entry(raceGraduateA, competitorJillMyer, null, dinghy2928, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'})
+    entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+    entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+    entryJillMyerGraduateA2928.signedUpTo = [new SignedUp(raceGraduateA, entryJillMyerGraduateA2928, model)];
+    vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+        if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
+            return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
+        }
+        if (race.url === 'http://localhost:8081/dinghyracing/api/races/7') {
+            return Promise.resolve({'success': true, 'domainObject': [entryJillMyerGraduateA2928]});
+        }
+    });
     await act(async () => {
         customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
     });
@@ -81,7 +99,11 @@ describe('when entries cannot be loaded for a selected race', () => {
     });
     it('clears the error message when entries are successfully loaded', async () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesGraduateA})}).mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        vi.spyOn(model, 'getEntriesByRace').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]})}).mockImplementationOnce(() => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
         let render;
         await act(async () => {
             render = customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
@@ -97,19 +119,21 @@ describe('when entries cannot be loaded for a selected race', () => {
 });
 describe('when sorting entries', () => {
     it('sorts by the sailnumber', async () => {
-        const entriesScorpionA = [
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0,'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}},
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}}
-        ];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        const entryJillMyerGraduateA2928 = new Entry(raceGraduateA, competitorJillMyer, null, dinghy2928, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'})
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        entryJillMyerGraduateA2928.signedUpTo = [new SignedUp(raceGraduateA, entryJillMyerGraduateA2928, model)];
         vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
-            if (race.name === 'Scorpion A') {
-                return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
+                return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
             }
-            else if (race.name === 'Graduate A') {
-                return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
-            }    
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/7') {
+                return Promise.resolve({'success': true, 'domainObject': [entryJillMyerGraduateA2928]});
+            }
         });
         await act(async () => {
             customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
@@ -122,19 +146,21 @@ describe('when sorting entries', () => {
         expect(within(raceEntryViews[2]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
     });
     it('sorts by the dinghy class and sail number', async () => {
-        const entriesScorpionA = [
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}},
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}}
-        ];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        const entryJillMyerGraduateA2928 = new Entry(competitorJillMyer, null, [], dinghy2928, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'})
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        entryJillMyerGraduateA2928.signedUpTo = [new SignedUp(raceGraduateA, entryJillMyerGraduateA2928, model)];
         vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
-            if (race.name === 'Scorpion A') {
-                return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
+                return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
             }
-            else if (race.name === 'Graduate A') {
-                return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
-            }    
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/7') {
+                return Promise.resolve({'success': true, 'domainObject': [entryJillMyerGraduateA2928]});
+            }
         });
         await act(async () => {
             customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
@@ -146,47 +172,55 @@ describe('when sorting entries', () => {
         expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
         expect(within(raceEntryViews[2]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
     });
-    it('sorts by the number of laps and then race start time of dinghies in descending order', async () => {
-        const entries = [
-            {'helm': competitorJillMyer, 'crew': null, 'race': raceGraduateA,'dinghy': dinghy2928, 'laps': [
-                {'number': 1, 'time': 2}, {'number': 2, 'time': 2}, {'number': 3, 'time': 2}
-            ], 'sumOfLapTimes': 6, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/12', metadata: {eTag: '"1"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
-                {'number': 1, 'time': 2}, {'number': 2, 'time': 2}
-            ], 'sumOfLapTimes': 4, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}},
-            {'helm': competitorLouScrew,'race': raceGraduateA,'dinghy': dinghy2726, 'laps': [], 'sumOfLapTimes': 0, scoringAbbreviation: 'DNS', 'url': 'http://localhost:8081/dinghyracing/api/entries/13', metadata: {eTag: '"1"'}},
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [
-                {'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}
-            ], 'sumOfLapTimes': 3, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}}
-        ];
+    it('sorts by the number of laps and then by the time to complete the last lap in descending order', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entries})});
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}], 
+            3, 3, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}], 4, 4, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        const entryJillMyerGraduateA2928 = new Entry(competitorJillMyer, null, [], dinghy2928, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}, {'number': 3, 'time': 2}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'})
+        const entryLouScrewGraduateA2726 = new Entry(competitorLouScrew, null, [], dinghy2726, [], 0, 0, false, false, 'DNS', null, 'http://localhost:8081/dinghyracing/api/entries/13', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        entryJillMyerGraduateA2928.signedUpTo = [new SignedUp(raceGraduateA, entryJillMyerGraduateA2928, model)];
+        entryLouScrewGraduateA2726.signedUpTo = [new SignedUp(raceGraduateA, entryLouScrewGraduateA2726, model)];
+        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
+                return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
+            }
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/7') {
+                return Promise.resolve({'success': true, 'domainObject': [entryLouScrewGraduateA2726, entryJillMyerGraduateA2928]});
+            }
+        });
         await act(async () => {
-            customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
+            customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
         });
         const sortByLapTimeButton = screen.getByRole('button', {'name': /by lap time/i});
         await user.click(sortByLapTimeButton);
         const raceEntryViews = document.getElementsByClassName('race-entry-view');
+        // screen.debug();
         expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
         expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '2928'})).toBeInTheDocument();
         expect(within(raceEntryViews[2]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
         expect(within(raceEntryViews[3]).getByRole('status', {name: (content, node) => node.textContent === '2726'})).toBeInTheDocument();
     });
     it('sorts by estimation of next lap finish time', async () => {
-        const entriesScorpionA = [
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [{number: 1, time: 562000}], 'sumOfLapTimes': 562000,'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}},
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}}
-        ];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}], 
+            0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [{'number': 1, 'time': 562000}], 562000, 562000, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        const entryJillMyerGraduateA2928 = new Entry(competitorJillMyer, null, [], dinghy2928, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'})
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        entryJillMyerGraduateA2928.signedUpTo = [new SignedUp(raceGraduateA, entryJillMyerGraduateA2928, model)];
         vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
-            if (race.name === 'Scorpion A') {
-                return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
+                return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
             }
-            else if (race.name === 'Graduate A') {
-                return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
-            }    
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/7') {
+                return Promise.resolve({'success': true, 'domainObject': [entryJillMyerGraduateA2928]});
+            }
         });
         await act(async () => {
             customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
@@ -199,19 +233,17 @@ describe('when sorting entries', () => {
         expect(within(raceEntryViews[2]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
     });
     it('enables resorting by the same value after entries have been updated', async () => {
-        const entriesScorpionAPre = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 312568, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
-        const entriesScorpionAPost = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 312568, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"2"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [{'number': 1, 'time': 212568}], 'sumOfLapTimes': 212568, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"2"'}}
-        ];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 312568}], 312568, 312568, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745_pre = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745_post = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [{'number': 1, 'time': 212568}], 212568, 212568, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745_pre.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745_pre, model)];
+        entrySarahPascalScorpionA6745_post.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745_post, model)];
         vi.spyOn(model, 'getEntriesByRace')
-            .mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
-            .mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+            .mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745_post]})})
+            .mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745_pre]})});
         await act(async () => {
             customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
         });
@@ -229,20 +261,22 @@ describe('when sorting entries', () => {
     });
     describe('when sorting by position', () => {
         it('sorts by position in ascending order', async () => {
-            const entries = [
-                {'helm': competitorJillMyer, 'crew': null, 'race': raceGraduateA,'dinghy': dinghy2928, 'laps': [
-                    {'number': 1, 'time': 2}, {'number': 2, 'time': 2}, {'number': 3, 'time': 2}
-                ], 'sumOfLapTimes': 6, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, position: 2, 'url': 'http://localhost:8081/dinghyracing/api/entries/12', metadata: {eTag: '"1"'}},
-                {'helm': {name: 'Jane'},'race': raceScorpionA,'dinghy': {...dinghy1234, sailNumber: '8888'}, 'laps': [], 'sumOfLapTimes': 0, position: null, scoringAbbreviation: 'DNS', 'url': 'http://localhost:8081/dinghyracing/api/entries/13', metadata: {eTag: '"1"'}},
-                {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
-                    {'number': 1, 'time': 2}, {'number': 2, 'time': 2}
-                ], 'sumOfLapTimes': 4, position: 3, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}},
-                {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [
-                    {'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}
-                ], 'sumOfLapTimes': 3, position: 1, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}},
-                {'helm': {name: 'Bob'},'race': raceScorpionA,'dinghy': {...dinghy1234, sailNumber: '9999'}, 'laps': [], 'sumOfLapTimes': 0, position: null, 'url': 'http://localhost:8081/dinghyracing/api/entries/13', metadata: {eTag: '"1"'}},
-                {'helm': {name: 'Jane'},'race': raceScorpionA,'dinghy': {...dinghy1234, sailNumber: '8888'}, 'laps': [], 'sumOfLapTimes': 0, position: null, scoringAbbreviation: 'DNS', 'url': 'http://localhost:8081/dinghyracing/api/entries/13', metadata: {eTag: '"1"'}}
-            ];
+            const entryJillMyer = new Entry(competitorJillMyer, null, [], dinghy2928, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}, {'number': 3, 'time': 2}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'});
+            const entrySarahPascal = new Entry(competitorSarahPascal, null, [], dinghy6745, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}], 4, 4, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+            const entryChrisMarshall = new Entry(competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}], 3, 3, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            const entryBob = new Entry({name: 'Bob'}, null, [], {...dinghy1234, sailNumber: '9999'}, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/14', {eTag: '"1"'});
+            const entryJoan = new Entry({name: 'Joan'}, null, [], {...dinghy1234, sailNumber: '8888'}, [], 0, 0, false, false, 'DNS', 'http://localhost:8081/dinghyracing/api/entries/15', {eTag: '"1"'});
+            entryJillMyer.signedUpTo = [new SignedUp(raceGraduateA, entryJillMyer)];
+            entryJillMyer.signedUpTo[0].position = 2;
+            entrySarahPascal.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascal)];
+            entrySarahPascal.signedUpTo[0].position = 3;
+            entryChrisMarshall.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshall)];
+            entryChrisMarshall.signedUpTo[0].position = 1;
+            entryBob.signedUpTo = [new SignedUp(raceScorpionA, entryBob)];
+            entryBob.signedUpTo[0].position = null;
+            entryJoan.signedUpTo = [new SignedUp(raceScorpionA, entryJoan)];
+            entryJoan.signedUpTo[0].position = null;
+            const entries = [ entryJillMyer, entrySarahPascal, entryChrisMarshall, entryBob, entryJoan ];
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entries})});
@@ -259,29 +293,24 @@ describe('when sorting entries', () => {
             expect(within(raceEntryViews[4]).getByRole('status', {name: (content, node) => node.textContent === '8888'})).toBeInTheDocument();
         });
         it('sorts entries with a scoring abbreviation below other entries', async ()=> {
-            const entries = [
-                // position 5
-                {helm: competitorJillMyer, crew: null, race: raceGraduateA, dinghy: dinghy2928, laps: [], sumOfLapTimes: 6,
-                    position: 5, scoringAbbreviation: 'RET', onLastLap: false, finishedRace: false, url: 'http://localhost:8081/dinghyracing/api/entries/12', metadata: {eTag: '"1"'}},
-                // position 4
-                {helm: competitorSarahPascal,race: raceScorpionA, dinghy: dinghy6745, laps: [
-
-                ], sumOfLapTimes: 4, position: null, scoringAbbreviation: null, url: 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}},
-                // position 1
-                {helm: competitorChrisMarshall,race: raceScorpionA, dinghy: dinghy1234, laps: [
-                    {number: 1, time: 1}
-                ], sumOfLapTimes: 3, position: 1, url: 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}},
-                // position 2
-                {helm: {name: 'Bob'},race: raceScorpionA, dinghy: {...dinghy1234, sailNumber: '9999'}, laps: [
-
-                ], sumOfLapTimes: 0, position: null, scoringAbbreviation: null, url: 'http://localhost:8081/dinghyracing/api/entries/13', metadata: {eTag: '"1"'}},
-                // position 3
-                {helm: {name: 'Jane'},race: raceScorpionA, dinghy: {...dinghy1234, sailNumber: '8888'}, laps: [
-
-                ], sumOfLapTimes: 0, position: null, scoringAbbreviation: null, url: 'http://localhost:8081/dinghyracing/api/entries/13', metadata: {eTag: '"1"'}}
-            ];
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const entryJillMyer = new Entry(competitorJillMyer, null, [], dinghy2928, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}, {'number': 3, 'time': 2}], 6, 6, false, false, 'RET', 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'});
+            const entrySarahPascal = new Entry(competitorSarahPascal, null, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+            const entryChrisMarshall = new Entry(competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 1}], 1, 1, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            const entryBob = new Entry({name: 'Bob'}, null, [], {...dinghy1234, sailNumber: '9999'}, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/14', {eTag: '"1"'});
+            const entryJoan = new Entry({name: 'Joan'}, null, [], {...dinghy1234, sailNumber: '8888'}, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/15', {eTag: '"1"'});
+            entryJillMyer.signedUpTo = [new SignedUp(raceGraduateA, entryJillMyer)];
+            entryJillMyer.signedUpTo[0].position = 5;
+            entrySarahPascal.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascal)];
+            entrySarahPascal.signedUpTo[0].position = null;
+            entryChrisMarshall.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshall)];
+            entryChrisMarshall.signedUpTo[0].position = 1;
+            entryBob.signedUpTo = [new SignedUp(raceScorpionA, entryBob)];
+            entryBob.signedUpTo[0].position = null;
+            entryJoan.signedUpTo = [new SignedUp(raceScorpionA, entryJoan)];
+            entryJoan.signedUpTo[0].position = null;
+            const entries = [ entryJillMyer, entrySarahPascal, entryChrisMarshall, entryJoan, entryBob ];
             vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entries})});
             await act(async () => {
                 customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
@@ -291,19 +320,20 @@ describe('when sorting entries', () => {
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
             expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
             expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
-            expect(within(raceEntryViews[2]).getByRole('status', {name: (content, node) => node.textContent === '9999'})).toBeInTheDocument();
-            expect(within(raceEntryViews[3]).getByRole('status', {name: (content, node) => node.textContent === '8888'})).toBeInTheDocument();
+            expect(within(raceEntryViews[2]).getByRole('status', {name: (content, node) => node.textContent === '8888'})).toBeInTheDocument();
+            expect(within(raceEntryViews[3]).getByRole('status', {name: (content, node) => node.textContent === '9999'})).toBeInTheDocument();
             expect(within(raceEntryViews[4]).getByRole('status', {name: (content, node) => node.textContent === '2928'})).toBeInTheDocument();
         });
     });    
     describe('when sorting entries that include an entry that did not start', () => {
         it('sorts by the total recorded lap times of dinghies in ascending order except for DNS entry which is placed last', async () => {
-            const entriesScorpionA = [
-                {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}], 'sumOfLapTimes': 4, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}},
-                {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'scoringAbbreviation': 'DNS', 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}}];
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 4, 4, false, false, 'DNS',  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+            const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}], 3, 3, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+            entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+            vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]})});
             await act(async () => {
                 customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
             });
@@ -316,14 +346,13 @@ describe('when sorting entries', () => {
     });
     describe('when sorting entries that include an entry that retired', () => {
         it('sorts by the total recorded lap times of dinghies in ascending order except for RET entry which is placed last', async () => {
-            const entriesScorpionA = [
-                {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
-                    {'number': 1, 'time': 2}, {'number': 2, 'time': 2}
-                ], 'sumOfLapTimes': 4, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}},
-                {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'scoringAbbreviation': 'RET', 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}}];
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 4, 4, false, false, 'RET',  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+            const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}], 3, 3, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+            entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+            vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]})});
             await act(async () => {
                 customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
             });
@@ -336,14 +365,13 @@ describe('when sorting entries', () => {
     });
     describe('when sorting entries that include an entry that has been disqualified', () => {
         it('sorts by the total recorded lap times of dinghies in ascending order except for DSQ entry which is placed last', async () => {
-            const entriesScorpionA = [
-                {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
-                    {'number': 1, 'time': 2}, {'number': 2, 'time': 2}
-                ], 'sumOfLapTimes': 4, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}},
-                {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'scoringAbbreviation': 'DSQ', 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}}];
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 4, 4, false, false, 'DSQ',  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+            const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}], 3, 3, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+            entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+            vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]})});
             await act(async () => {
                 customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
             });
@@ -356,14 +384,13 @@ describe('when sorting entries', () => {
     });
     describe('when sorting entries that include an entry that was on course side', () => {
         it('sorts by the total recorded lap times of dinghies in ascending order except for OCS entry which is placed last', async () => {
-            const entriesScorpionA = [
-                {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
-                    {'number': 1, 'time': 2}, {'number': 2, 'time': 2}
-                ], 'sumOfLapTimes': 4, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}},
-                {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'scoringAbbreviation': 'OCS', 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}}];
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 4, 4, false, false, 'OCS',  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+            const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}], 3, 3, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+            entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+            vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]})});
             await act(async () => {
                 customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
             });
@@ -383,7 +410,11 @@ describe('when sorting entries', () => {
                 {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'scoringAbbreviation': 'DNF', 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}}];
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 4, 4, false, false, 'DNF',  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+            const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}], 3, 3, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+            entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+            vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]})});
             await act(async () => {
                 customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
             });
@@ -401,13 +432,19 @@ describe('when sorting entries', () => {
         ];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        const entryJillMyerGraduateA2928 = new Entry(competitorJillMyer, null, [], dinghy2928, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'})
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        entryJillMyerGraduateA2928.signedUpTo = [new SignedUp(raceGraduateA, entryJillMyerGraduateA2928, model)];
         vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
-            if (race.name === 'Scorpion A') {
-                return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
+                return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
             }
-            else if (race.name === 'Graduate A') {
-                return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
-            }    
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/7') {
+                return Promise.resolve({'success': true, 'domainObject': [entryJillMyerGraduateA2928]});
+            }
         });
         await act(async () => {
             customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
@@ -432,13 +469,14 @@ describe('when fast grouping entries', () => {
     it('moves first entry selected for fast group to top of entries list', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 	3, 3, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 4, 4, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
         vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
-            if (race.name === 'Scorpion A') {
-                return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
+                return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
             }
-            else if (race.name === 'Graduate A') {
-                return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
-            }    
         });
         await act(async () => {
             customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
@@ -451,22 +489,17 @@ describe('when fast grouping entries', () => {
         expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
     });
     it('displays entries not fast grouped in the same order as before an entry was fast grouped', async () => {
-        const entries = [
-            {'helm': competitorJillMyer, 'crew': null, 'race': raceGraduateA,'dinghy': dinghy2928, 'laps': [
-                {'number': 1, 'time': 2}, {'number': 2, 'time': 2}, {'number': 3, 'time': 2}
-            ], 'sumOfLapTimes': 6, 'onLastLap': false, 'finishedRace': false, 'scoringAbbreviation': null, 'url': 'http://localhost:8081/dinghyracing/api/entries/12', metadata: {eTag: '"1"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [
-                {'number': 1, 'time': 2}, {'number': 2, 'time': 2}
-            ], 'sumOfLapTimes': 4, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}},
-            {'helm': competitorLouScrew,'race': raceGraduateA,'dinghy': dinghy2726, 'laps': [
-            ], 'sumOfLapTimes': 0, scoringAbbreviation: 'DNS', 'url': 'http://localhost:8081/dinghyracing/api/entries/13', metadata: {eTag: '"1"'}},
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [
-                {'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}
-            ], 'sumOfLapTimes': 3, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}}
-        ];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entries})});
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}], 3, 3, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}], 4, 4, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        const entryJillMyerGraduateA2928 = new Entry(competitorJillMyer, null, [], dinghy2928, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}, {'number': 3, 'time': 2}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'}, null);
+        entryJillMyerGraduateA2928.signedUpTo = [new SignedUp(raceGraduateA, entryJillMyerGraduateA2928, model)];
+        const entryLouScrewGraduateA2726 = new Entry(competitorLouScrew, null, [], dinghy2726, [], 0, 0, false, false, 'DNS', 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'}, null);
+        entryLouScrewGraduateA2726.signedUpTo = [new SignedUp(raceGraduateA, entryLouScrewGraduateA2726, model)];
+        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745, entryJillMyerGraduateA2928, entryLouScrewGraduateA2726]})});
         await act(async () => {
             customRender(<RaceEntriesView races={[raceScorpionA]} />, model);
         });
@@ -511,13 +544,19 @@ describe('when fast grouping entries', () => {
     it('shows entries as fast group selected', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}], 	3, 3, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}], 4, 4, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        const entryJillMyerGraduateA2928 = new Entry(competitorJillMyer, null, [], dinghy2928, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}, {'number': 3, 'time': 2}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'})
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        entryJillMyerGraduateA2928.signedUpTo = [new SignedUp(raceGraduateA, entryJillMyerGraduateA2928, model)];
         vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
-            if (race.name === 'Scorpion A') {
-                return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
+                return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
             }
-            else if (race.name === 'Graduate A') {
-                return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
-            }    
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/7') {
+                return Promise.resolve({'success': true, 'domainObject': [entryJillMyerGraduateA2928]});
+            }
         });
         await act(async () => {
             customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
@@ -535,12 +574,15 @@ describe('when fast grouping entries', () => {
         expect(within(raceEntryViews[2]).getByRole('checkbox')).not.toBeChecked();
     });
     it('does not allow an entry with a scoring abbreviation to be fast grouped', async () => {
-        const entriesScorpionA_withSA = [{...entryChrisMarshallScorpionA1234, scoringAbbreviation: 'RET'}];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 	3, 3, false, false, 'RET',  null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 4, 4, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
         vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
             if (race.name === 'Scorpion A') {
-                return Promise.resolve({'success': true, 'domainObject': entriesScorpionA_withSA});
+                return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
             }
         });
         await act(async () => {
@@ -558,12 +600,18 @@ describe('when fast grouping entries', () => {
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             let render;
+            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}], 	3, 3, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}], 4, 4, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+            const entryJillMyerGraduateA2928 = new Entry(competitorJillMyer, null, [], dinghy2928, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}, {'number': 3, 'time': 2}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'})
+            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+            entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+            entryJillMyerGraduateA2928.signedUpTo = [new SignedUp(raceGraduateA, entryJillMyerGraduateA2928, model)];
             vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
-                if (race.name === 'Scorpion A') {
-                    return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+                if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
+                    return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
                 }
-                else if (race.name === 'Comet A') {
-                    return Promise.resolve({'success': true, 'domainObject': entriesCometA});
+                if (race.url === 'http://localhost:8081/dinghyracing/api/races/7') {
+                    return Promise.resolve({'success': true, 'domainObject': [entryJillMyerGraduateA2928]});
                 }
             });
             await act(async () => {
@@ -575,11 +623,11 @@ describe('when fast grouping entries', () => {
             await user.click(onFastGroupButton);
             // select additional race
             await act(async () => {
-                render.rerender(<RaceEntriesView races={[raceScorpionA, raceCometA]} />, model);
+                render.rerender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
             });
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
             expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
-            expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '826'})).toBeInTheDocument();
+            expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '2928'})).toBeInTheDocument();
             expect(within(raceEntryViews[2]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
         });
     });
@@ -588,19 +636,25 @@ describe('when fast grouping entries', () => {
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
             let render;
+            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}], 	3, 3, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}], 4, 4, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+            const entryJillMyerGraduateA2928 = new Entry(competitorJillMyer, null, [], dinghy2928, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}, {'number': 3, 'time': 2}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'})
+            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+            entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+            entryJillMyerGraduateA2928.signedUpTo = [new SignedUp(raceGraduateA, entryJillMyerGraduateA2928, model)];
             vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
-                if (race.name === 'Scorpion A') {
-                    return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+                if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
+                    return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
                 }
-                else if (race.name === 'Comet A') {
-                    return Promise.resolve({'success': true, 'domainObject': entriesCometA});
+                if (race.url === 'http://localhost:8081/dinghyracing/api/races/7') {
+                    return Promise.resolve({'success': true, 'domainObject': [entryJillMyerGraduateA2928]});
                 }
             });
             await act(async () => {
-                render = customRender(<RaceEntriesView races={[raceScorpionA, raceCometA]} />, model);
+                render = customRender(<RaceEntriesView races={[raceScorpionA, raceGraduateA]} />, model);
             });
             // fast group entries
-            let entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '826'})).parentElement.parentElement.parentElement;
+            let entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '2928'})).parentElement.parentElement.parentElement;
             let onFastGroupButton = within(entry).getByRole('checkbox');
             await user.click(onFastGroupButton);
             entry = (await screen.findByRole('status', {name: (content, node) => node.textContent === '6745'})).parentElement.parentElement.parentElement;
@@ -618,15 +672,15 @@ describe('when fast grouping entries', () => {
 });
 describe('when removing an entry from fast group', () => {
     it('moves entry to below fast group', async () => {
-        const entriesScorpionA = [
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}},
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}}
-        ];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
         vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
             if (race.name === 'Scorpion A') {
-                return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+                return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
             }
             else if (race.name === 'Graduate A') {
                 return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
@@ -650,15 +704,13 @@ describe('when adding a lap time', () => {
     it('calls controller add lap function with value of time sailed', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const controller = new DinghyRacingController(model);
         vi.spyOn(model, 'getClock').mockImplementation(() => {
             return {getElapsedTime: () => 7}});
-        const controller = new DinghyRacingController(model);
         const local_raceScorpionA = {...raceScorpionA, clock: model.getClock()};
-        const entrySarahPascalScorpionA6745 = {helm: competitorSarahPascal, race: local_raceScorpionA, dinghy: dinghy6745, laps: [
-            {number: 1, time: 1}, {number: 2, time: 2}
-        ], sumOfLapTimes: 0, url: 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}};
-        const entriesScorpionA = [entrySarahPascalScorpionA6745];
-        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [{number: 1, time: 1}, {number: 2, time: 2}], 3, 3, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(local_raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entrySarahPascalScorpionA6745]})});
         const addLapSpy = vi.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true, 'domainObject': {}})});
         await act(async () => {
             customRender(<RaceEntriesView races={[local_raceScorpionA]} />, model, controller);
@@ -668,44 +720,46 @@ describe('when adding a lap time', () => {
         expect(addLapSpy).toBeCalledWith(entrySarahPascalScorpionA6745, 7);
     });
     it('refreshes display after addLap completed', async () => {
-        const entriesScorpionAPre = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 312568, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
-        const entriesScorpionAPost = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}, {'number': 2, 'time': 312568}], 'sumOfLapTimes': 625136, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"2"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
         const clock = {getElapsedTime: () => {return 312568}};
+        const controller = new DinghyRacingController(model);
+        const entryChrisMarshallScorpionA1234_pre = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 312568}], 312568, 312568, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entryChrisMarshallScorpionA1234_post = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 312568}, {'number': 2, 'time': 312568}], 625136, 625136, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234_pre.signedUpTo = [new SignedUp({...raceScorpionA, clock: model.getClock()}, entryChrisMarshallScorpionA1234_pre, model)];
+        entryChrisMarshallScorpionA1234_post.signedUpTo = [new SignedUp({...raceScorpionA, clock: model.getClock()}, entryChrisMarshallScorpionA1234_post, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp({...raceScorpionA, clock: model.getClock()}, entrySarahPascalScorpionA6745, model)];
+        
         vi.spyOn(model, 'getEntriesByRace')
-            .mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
-            .mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+            .mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234_post, entrySarahPascalScorpionA6745]})})
+            .mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234_pre, entrySarahPascalScorpionA6745]})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
-        });    
-        const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
+        });
+        await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
         expect(await screen.queryByText('10:25')).not.toBeInTheDocument();
         await act(async () => {
-            model.handleEntryUpdate({'body': entriesScorpionA[0].url});
+            model.handleEntryUpdate({'body': entryChrisMarshallScorpionA1234_pre.url});
         });
         expect(await screen.findByText('10:25')).toBeInTheDocument();
     });
     it('displays a message if there is a problem adding the lap time', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getClock').mockImplementation(() => {
-            return {getElapsedTime: () => 312568}});
         const controller = new DinghyRacingController(model);
-        const local_entriesScorpionA = entriesScorpionA.map(entry => {return {...entry, race: {...entry.race, clock: model.getClock()}}});
-        const entriesScorpionAPost = [
-            {helm: competitorChrisMarshall, race: {...raceScorpionA, clock: model.getClock()}, dinghy: dinghy1234, laps: [{number: 1, time: 312568}], sumOfLapTimes: 0, url: 'http://localhost:8081/dinghyracing/api/entries/10'},
-            {helm: competitorSarahPascal, race: {...raceScorpionA, clock: model.getClock()}, dinghy: dinghy6745, laps: [], url: 'http://localhost:8081/dinghyracing/api/entries/11'}
-        ];
-        vi.spyOn(model, 'getEntriesByRace')
-            .mockImplementation((race) => {return Promise.resolve({success: true, domainObject: entriesScorpionAPost})})
-            .mockImplementationOnce((race) => {return Promise.resolve({success: true, domainObject: local_entriesScorpionA})});
+        vi.spyOn(model, 'getClock').mockImplementation(() => {
+            return {getElapsedTime: () => 312568}
+        });
+        const local_raceScorpionA = {...raceScorpionA, clock: model.getClock()};
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(local_raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(local_raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
+                return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
+            }
+        });
         vi.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({success: false, message: 'Oops!'})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: model.getClock()}]} />, model, controller);
@@ -717,17 +771,20 @@ describe('when adding a lap time', () => {
     it('releases entry if there is a problem adding the lap time', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getClock').mockImplementation(() => {
-            return {getElapsedTime: () => 312568}});
-        const local_entriesScorpionA = entriesScorpionA.map(entry => {return {...entry, race: {...entry.race, clock: model.getClock()}}});
-        const entriesScorpionAPost = [
-            {helm: competitorChrisMarshall, race: {...raceScorpionA, clock: model.getClock()}, dinghy: dinghy1234, laps: [{number: 1, time: 312568}], sumOfLapTimes: 0, url: 'http://localhost:8081/dinghyracing/api/entries/10'},
-            {helm: competitorSarahPascal, race: {...raceScorpionA, clock: model.getClock()}, dinghy: dinghy6745, laps: [], url: 'http://localhost:8081/dinghyracing/api/entries/11'}
-        ];
-        vi.spyOn(model, 'getEntriesByRace')
-            .mockImplementation((race) => {return Promise.resolve({success: true, domainObject: entriesScorpionAPost})})
-            .mockImplementationOnce((race) => {return Promise.resolve({success: true, domainObject: local_entriesScorpionA})});
         const controller = new DinghyRacingController(model);
+        vi.spyOn(model, 'getClock').mockImplementation(() => {
+            return {getElapsedTime: () => 312568}
+        });
+        const local_raceScorpionA = {...raceScorpionA, clock: model.getClock()};
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(local_raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(local_raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
+                return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
+            }
+        });
         vi.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({success: false, message: 'Oops!'})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: model.getClock()}]} />, model, controller);
@@ -741,37 +798,39 @@ describe('when adding a lap time', () => {
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         vi.spyOn(model, 'getClock').mockImplementation(() => {
             return {getElapsedTime: () => 312568}});
-        const local_entriesScorpionA = entriesScorpionA.map(entry => {return {...entry, race: {...entry.race, clock: model.getClock()}}});
-        const entriesScorpionAPost = [
-            {helm: competitorChrisMarshall,race: {...raceScorpionA, clock: model.getClock()},dinghy: dinghy1234, laps: [{number: 1, time: 312568}], sumOfLapTimes: 312568, url: 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"2"'}},
-            {helm: competitorSarahPascal,race: {...raceScorpionA, clock: model.getClock()},dinghy: dinghy6745, laps: [], sumOfLapTimes: 0, url: 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
         const controller = new DinghyRacingController(model);
+        const local_raceScorpionA = {...raceScorpionA, clock: model.getClock()};
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{number: 1, time: 312568}], 312568, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(local_raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(local_raceScorpionA, entrySarahPascalScorpionA6745, model)];
         vi.spyOn(model, 'getEntriesByRace')
-            .mockImplementation((race) => {return Promise.resolve({success: true, domainObject: entriesScorpionAPost})})
-            .mockImplementationOnce((race) => {return Promise.resolve({success: true, domainObject: local_entriesScorpionA})});
+            .mockImplementation((race) => {return Promise.resolve({success: true, domainObject: [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]})})
+            .mockImplementationOnce((race) => {return Promise.resolve({success: true, domainObject: [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]})});
         vi.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({success: true, domainObject: {}})}).mockImplementationOnce((entry, time) => {return Promise.resolve({success: false, message: 'Oops!'})});
         await act(async () => {
-            customRender(<RaceEntriesView races={[{...raceScorpionA, clock: model.getClock()}]} />, model, controller);
+            customRender(<RaceEntriesView races={[local_raceScorpionA]} />, model, controller);
         });
         const entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await user.click(entry);
         expect(screen.getByText(/oops/i)).toBeInTheDocument();
         await user.click(entry);
         await act(async () => {
-            model.handleEntryUpdate({body: local_entriesScorpionA[0].url});
+            model.handleEntryUpdate({body: entryChrisMarshallScorpionA1234.url});
         });
         expect(screen.queryByText(/oops/i)).not.toBeInTheDocument();
     });
 });
 describe('when removing a lap time', () => {
     it('updates model', async () => {
-        const entryChrisMarshallScorpionA1234Pre = {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7}], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}};
-        const entriesScorpionAPre = [entryChrisMarshallScorpionA1234Pre, {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0,'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 7}], 7, 7, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
         const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]})});
         const removeLapSpy = vi.spyOn(controller, 'removeLap').mockImplementation((entry, lap) => {return Promise.resolve({'success': true})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
@@ -779,19 +838,21 @@ describe('when removing a lap time', () => {
         const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
         await user.keyboard('{Control>}');
         await user.click(entry);
-        expect(removeLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234Pre, {'number': 1, 'time': 7});
+        expect(removeLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234, {'number': 1, 'time': 7});
     });
     it('refreshes display after lap time removed', async () => {
-        const entriesScorpionAPre = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 312568, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
+        const entryChrisMarshallScorpionA1234_pre = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 312568}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234_pre.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234_pre, model)];
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
         vi.spyOn(model, 'getEntriesByRace')
-            .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})})
-            .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+            .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]})})
+            .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234_pre, entrySarahPascalScorpionA6745]})});
         vi.spyOn(controller, 'removeLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
@@ -807,21 +868,15 @@ describe('when removing a lap time', () => {
         expect(lapTime).not.toBeInTheDocument();
     });
     it('displays a message if there is a problem removing the lap time', async () => {
-        const entriesScorpionAPre = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 312568, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
-        const entriesScorpionAPost = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 312568, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         const clock = {getElapsedTime: () => {return 312568}};
-        vi.spyOn(model, 'getEntriesByRace')
-            .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
-            .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 7}], 7, 7, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]})});
         vi.spyOn(controller, 'removeLap').mockImplementation((entry, time) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
@@ -832,21 +887,15 @@ describe('when removing a lap time', () => {
         expect(await screen.findByText(/oops/i)).toBeInTheDocument();
     });
     it('releases entry if there is a problem problem removing the lap time', async () => {
-        const entriesScorpionAPre = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 312568, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
-        const entriesScorpionAPost = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 312568, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         const clock = {getElapsedTime: () => {return 312568}};
-        vi.spyOn(model, 'getEntriesByRace')
-            .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
-            .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 312568}], 312568, 312568, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [{'number': 1, 'time': 312568}], 312568, 312568, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]})});
         vi.spyOn(controller, 'removeLap').mockImplementation((entry, time) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
@@ -857,21 +906,17 @@ describe('when removing a lap time', () => {
         expect(entry.getAttribute('class')).not.toMatch(/disabled/i);
     });
     it('clears error message on success', async () => {
-        const entriesScorpionAPre = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 312568, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes':  0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
-        const entriesScorpionAPost = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 312568}], 'sumOfLapTimes': 312568, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         const clock = {getElapsedTime: () => {return 312568}};
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp({...raceScorpionA, clock: clock}, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp({...raceScorpionA, clock: clock}, entrySarahPascalScorpionA6745, model)];
         vi.spyOn(model, 'getEntriesByRace')
-            .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
-            .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+            .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]})})
+            .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]})});
         vi.spyOn(controller, 'removeLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true})}).mockImplementationOnce((entry, time) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
@@ -883,22 +928,21 @@ describe('when removing a lap time', () => {
         await user.keyboard('{Control>}');
         await user.click(entry);
         await act(async () => {
-            model.handleEntryUpdate({'body': entriesScorpionA[0].url});
+            model.handleEntryUpdate({'body': entryChrisMarshallScorpionA1234.url});
         });
         expect(screen.queryByText(/oops/i)).not.toBeInTheDocument();
     });
 });
 describe('when updating a lap time', () => {
     it('updates model', async () => {
-        const entryChrisMarshallScorpionA1234Pre = {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7000}], 'sumOfLapTimes': 7000, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}};
-        const entriesScorpionAPre = [
-            entryChrisMarshallScorpionA1234Pre, 
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0,'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 7000}], 7000, 7000, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]})});
         const updateLapSpy = vi.spyOn(controller, 'updateLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
@@ -912,23 +956,21 @@ describe('when updating a lap time', () => {
         await user.clear(lapEntryCellInput);
         await user.type(lapEntryCellInput, '15:23');
         await user.keyboard('{Enter}');
-        expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234Pre, 923000);
+        expect(updateLapSpy).toBeCalledWith(entryChrisMarshallScorpionA1234, 923000);
     });
     it('refreshes display after lap time updated', async () => {
-        const entriesScorpionAPre = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7000}, {'number': 2, 'time': 7000}], 'sumOfLapTimes': 14000, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"3"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
-        const entriesScorpionAPost = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7000}, {'number': 2, 'time': 8000}], 'sumOfLapTimes': 15000, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"4"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
+        const entryChrisMarshallScorpionA1234_pre = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 7000}, {'number': 2, 'time': 7000}], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entryChrisMarshallScorpionA1234_post = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 7000}, {'number': 2, 'time': 8000}], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234_pre.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234_pre, model)];
+        entryChrisMarshallScorpionA1234_post.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234_post, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
         vi.spyOn(model, 'getEntriesByRace')
-            .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
-            .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+            .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234_post, entrySarahPascalScorpionA6745]})})
+            .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234_pre, entrySarahPascalScorpionA6745]})});
         vi.spyOn(controller, 'updateLap').mockImplementation((entry, time) => {return Promise.resolve({'success': true})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
@@ -943,25 +985,19 @@ describe('when updating a lap time', () => {
         await user.type(lapEntryCellInput, '00:15');
         await user.keyboard('{Enter}');
         await act(async () => {
-            model.handleEntryUpdate({'body': entriesScorpionA[0].url});
+            model.handleEntryUpdate({'body': entryChrisMarshallScorpionA1234_pre.url});
         });
         expect(await within(raceEntryView).findByText('00:15')).toBeInTheDocument();
     });
     it('displays a message if there is a problem updating the lap time', async () => {
-        const entriesScorpionAPre = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7000}], 'sumOfLapTimes': 7000, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"2"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
-        const entriesScorpionAPost = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 15000}], 'sumOfLapTimes': 15000, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"3"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getEntriesByRace')
-            .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
-            .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 7000}], 7000, 7000, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]})});
         vi.spyOn(controller, 'updateLap').mockImplementation((entry, time) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
@@ -977,20 +1013,14 @@ describe('when updating a lap time', () => {
         expect(await screen.findByText(/oops/i)).toBeInTheDocument();
     });
     it('releases entry if there is a problem updating the lap time', async () => {
-        const entriesScorpionAPre = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7000}], 'sumOfLapTimes': 7000, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"2"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
-        const entriesScorpionAPost = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 15000}], 'sumOfLapTimes': 15000, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"3"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getEntriesByRace')
-            .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
-            .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 7000}], 7000, 7000, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [{'number': 1, 'time': 312568}], 312568, 312568, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]})});
         vi.spyOn(controller, 'updateLap').mockImplementation((entry, time) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
@@ -1009,18 +1039,18 @@ describe('when updating a lap time', () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
+        const entryChrisMarshallScorpionA1234_pre = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 7000}, {'number': 2, 'time': 7000}], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entryChrisMarshallScorpionA1234_post = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 7000}, {'number': 2, 'time': 8000}], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234_pre.signedUpTo = [new SignedUp({...raceScorpionA, clock: model.getClock()}, entryChrisMarshallScorpionA1234_pre, model)];
+        entryChrisMarshallScorpionA1234_post.signedUpTo = [new SignedUp({...raceScorpionA, clock: model.getClock()}, entryChrisMarshallScorpionA1234_post, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp({...raceScorpionA, clock: model.getClock()}, entrySarahPascalScorpionA6745, model)];
         vi.spyOn(model, 'getClock').mockImplementation(() => {
-            return {getElapsedTime: () => 312568}});
-        const entriesScorpionAPre = [
-            {helm: competitorChrisMarshall, race: {...raceScorpionA, clock: model.getClock()}, dinghy: dinghy1234, laps: [{number: 1, time: 7000}], sumOfLapTimes: 7000, url: 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"2"'}},
-            {helm: competitorSarahPascal, race: {...raceScorpionA, clock: model.getClock()}, dinghy: dinghy6745, laps: [], sumOfLapTimes: 0,url: 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}];
-        const entriesScorpionAPost = [
-            {helm: competitorChrisMarshall, race: {...raceScorpionA, clock: model.getClock()}, dinghy: dinghy1234, laps: [{number: 1, time: 312568}], sumOfLapTimes: 312568, url: 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"3"'}},
-            {helm: competitorSarahPascal, race: {...raceScorpionA, clock: model.getClock()}, dinghy: dinghy6745, laps: [], sumOfLapTimes: 312568, url: 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
+            return {getElapsedTime: () => 312568}
+        });
         vi.spyOn(model, 'getEntriesByRace')
-            .mockImplementation((race) => {return Promise.resolve({success: true, domainObject: entriesScorpionAPost})})
-            .mockImplementationOnce((race) => {return Promise.resolve({success: true, domainObject: entriesScorpionAPre})});
+            .mockImplementation((race) => {return Promise.resolve({success: true, domainObject: [entryChrisMarshallScorpionA1234_post, entrySarahPascalScorpionA6745]})})
+            .mockImplementationOnce((race) => {return Promise.resolve({success: true, domainObject: [entryChrisMarshallScorpionA1234_pre, entrySarahPascalScorpionA6745]})});
 
         vi.spyOn(controller, 'addLap').mockImplementation((entry, time) => {return Promise.resolve({success: true, domainObject: {}})}).mockImplementationOnce((entry, time) => {return Promise.resolve({success: false, message: 'Oops!'})});
 
@@ -1041,25 +1071,19 @@ describe('when updating a lap time', () => {
         await user.type(lapEntryCellInput, '00:15');
         await user.keyboard('{Enter}');
         await act(async () => {
-            model.handleEntryUpdate({'body': entriesScorpionA[0].url});
+            model.handleEntryUpdate({'body': entryChrisMarshallScorpionA1234_pre.url});
         });
         expect(screen.queryByText(/oops/i)).not.toBeInTheDocument();
     });
     it('displays an error message when RaceEntryView fails validation of an updated lap time', async () => {
-        const entriesScorpionAPre = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 7000}], 'sumOfLapTimes': 7000, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"2"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
-        const entriesScorpionAPost = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [{'number': 1, 'time': 15000}], 'sumOfLapTimes': 15000, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"3'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getEntriesByRace')
-            .mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
-            .mockImplementationOnce((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 7000}], 7000, 7000, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
@@ -1078,7 +1102,20 @@ describe('when setting a scoring abbreviation', () => {
     it('call controller setScoringAbbreviation', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}], 	3, 3, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}], 4, 4, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        const entryJillMyerGraduateA2928 = new Entry(competitorJillMyer, null, [], dinghy2928, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}, {'number': 3, 'time': 2}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'})
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        entryJillMyerGraduateA2928.signedUpTo = [new SignedUp(raceGraduateA, entryJillMyerGraduateA2928, model)];
+        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
+                return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
+            }
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/7') {
+                return Promise.resolve({'success': true, 'domainObject': [entryJillMyerGraduateA2928]});
+            }
+        });
         const controller = new DinghyRacingController(model);
         const setScoringAbbreviationSpy = vi.spyOn(controller, 'setScoringAbbreviation').mockImplementation((entry, scoringAbbreviation) => {return Promise.resolve({'success': true})});
         await act(async () => {
@@ -1091,7 +1128,20 @@ describe('when setting a scoring abbreviation', () => {
     it('displays a message if there is a problem updating the lap time', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}], 	3, 3, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}], 4, 4, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        const entryJillMyerGraduateA2928 = new Entry(competitorJillMyer, null, [], dinghy2928, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}, {'number': 3, 'time': 2}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'})
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        entryJillMyerGraduateA2928.signedUpTo = [new SignedUp(raceGraduateA, entryJillMyerGraduateA2928, model)];
+        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
+                return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
+            }
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/7') {
+                return Promise.resolve({'success': true, 'domainObject': [entryJillMyerGraduateA2928]});
+            }
+        });
         const controller = new DinghyRacingController(model);
         vi.spyOn(controller, 'setScoringAbbreviation').mockImplementation((entry, scoringAbbreviation) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
         await act(async () => {
@@ -1104,7 +1154,20 @@ describe('when setting a scoring abbreviation', () => {
     it('releases entry if there is a problem updating the lap time', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}], 	3, 3, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}], 4, 4, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        const entryJillMyerGraduateA2928 = new Entry(competitorJillMyer, null, [], dinghy2928, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}, {'number': 3, 'time': 2}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'})
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        entryJillMyerGraduateA2928.signedUpTo = [new SignedUp(raceGraduateA, entryJillMyerGraduateA2928, model)];
+        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
+                return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
+            }
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/7') {
+                return Promise.resolve({'success': true, 'domainObject': [entryJillMyerGraduateA2928]});
+            }
+        });
         const controller = new DinghyRacingController(model);
         vi.spyOn(controller, 'setScoringAbbreviation').mockImplementation((entry, scoringAbbreviation) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
         await act(async () => {
@@ -1118,9 +1181,22 @@ describe('when setting a scoring abbreviation', () => {
     it('clears error message on success', async () => {
         const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionA})});
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 1}, {'number': 2, 'time': 1}, {'number': 3, 'time': 1}], 	3, 3, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}], 4, 4, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        const entryJillMyerGraduateA2928 = new Entry(competitorJillMyer, null, [], dinghy2928, [{'number': 1, 'time': 2}, {'number': 2, 'time': 2}, {'number': 3, 'time': 2}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'})
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        entryJillMyerGraduateA2928.signedUpTo = [new SignedUp(raceGraduateA, entryJillMyerGraduateA2928, model)];
+        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
+                return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
+            }
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/7') {
+                return Promise.resolve({'success': true, 'domainObject': [entryJillMyerGraduateA2928]});
+            }
+        });
         const controller = new DinghyRacingController(model);
-        const setScoringAbbreviationSpy = vi.spyOn(controller, 'setScoringAbbreviation').mockImplementation((entry, scoringAbbreviation) => {return Promise.resolve({'success': true})}).mockImplementationOnce((entry, scoringAbbreviation) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
+        vi.spyOn(controller, 'setScoringAbbreviation').mockImplementation((entry, scoringAbbreviation) => {return Promise.resolve({'success': true})}).mockImplementationOnce((entry, scoringAbbreviation) => {return Promise.resolve({'success': false, 'message': 'Oops!'})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
         });
@@ -1138,9 +1214,16 @@ describe('when setting a scoring abbreviation', () => {
 });
 describe('when user drags and drops an entry to a new position', () => {
     it('updates the display order to show the subject entry in the position above the target entry', async () => {
-        const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234, position: 4}, {...entrySarahPascalScorpionA6745, position: 3}]});})
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+        vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+            if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
+                return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
+            }
+        });
         const controller = new DinghyRacingController(model);
         vi.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': true})});
         await act(async () => {
@@ -1166,17 +1249,21 @@ describe('when user drags and drops an entry to a new position', () => {
             it('update subject entry race position', async () => {
                 const user = userEvent.setup();
                 const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                const raceScorpionAPursuit = {...raceScorpionA, type: 'PURSUIT'};
+                const racePursuitA = {...raceScorpionA, type: 'PURSUIT'};
+                const entryChrisMarshallPursuitA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null, 4, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+                const entrySarahPascalPursuitA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 3, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+                entryChrisMarshallPursuitA1234.signedUpTo = [new SignedUp(racePursuitA, entryChrisMarshallPursuitA1234, model)];
+                entrySarahPascalPursuitA6745.signedUpTo = [new SignedUp(racePursuitA, entrySarahPascalPursuitA6745, model)];
+                entrySarahPascalPursuitA6745.signedUpTo[0].position = 3;
                 vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
-                    return Promise.resolve({'success': true, 'domainObject': [
-                        {...entryChrisMarshallScorpionA1234, race: raceScorpionAPursuit, position: 4, metadata: {eTag: '"1"'}},
-                        {...entrySarahPascalScorpionA6745, race: raceScorpionAPursuit, position: 3, metadata: {eTag: '"1"'}}
-                    ]});
+                    if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
+                        return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallPursuitA1234, entrySarahPascalPursuitA6745]});
+                    }
                 });
                 const controller = new DinghyRacingController(model);
                 const setUpdateEntryPositionSpy = vi.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': true})});
                 await act(async () => {
-                    customRender(<RaceEntriesView races={[raceScorpionAPursuit]} />, model, controller);
+                    customRender(<RaceEntriesView races={[racePursuitA]} />, model, controller);
                 });
                 // sort by position to avoid position check error when dragging
                 const sortByPositionButton = screen.getByRole('button', {'name': /by position/i});
@@ -1192,29 +1279,32 @@ describe('when user drags and drops an entry to a new position', () => {
                 await act(async () => {
                     fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
                 });
-                expect(setUpdateEntryPositionSpy).toBeCalledWith({...entryChrisMarshallScorpionA1234, race: raceScorpionAPursuit, position: 4}, 3);
+                expect(setUpdateEntryPositionSpy).toBeCalledWith(entryChrisMarshallPursuitA1234, 3);
             });
         });
         describe('when dropped on a target entry in a different race that has a position', () => {
             it('does not update subject entry race position', async () => {
-                const user = userEvent.setup();
                 const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                const raceScorpionAPursuit = {...raceScorpionA, type: 'PURSUIT'};
-                const raceGraduateAPursuit = {...raceGraduateA, type: 'PURSUIT'};
-                const entryJillMyerGraduateA2928 = {helm: competitorJillMyer, crew: null, race: raceGraduateA, dinghy: dinghy2928, laps: [], sumOfLapTimes: 0, correctedTime: 0, onLastLap: false, finishedRace: false, scoringAbbreviation: null, 
-                    position: 3, url: 'http://localhost:8081/dinghyracing/api/entries/12', metadata: {eTag: '"3'}};
+                const racePursuitA = {...raceScorpionA, type: 'PURSUIT'};
+                const racePursuitB = {...raceGraduateA, type: 'PURSUIT'};
+                const entryChrisMarshallPursuitA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+                const entrySarahPascalPursuitA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+                const entryJillMyerPursauitB2928 = new Entry(competitorJillMyer, null, [], dinghy2928, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'})
+                entryChrisMarshallPursuitA1234.signedUpTo = [new SignedUp(racePursuitA, entryChrisMarshallPursuitA1234, model)];
+                entrySarahPascalPursuitA6745.signedUpTo = [new SignedUp(racePursuitA, entrySarahPascalPursuitA6745, model)];
+                entryJillMyerPursauitB2928.signedUpTo = [new SignedUp(racePursuitB, entryJillMyerPursauitB2928, model)];
                 vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
                     if (race.url === 'http://localhost:8081/dinghyracing/api/races/4') {
-                        return Promise.resolve({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234, position: 4}]});
+                        return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallPursuitA1234, entrySarahPascalPursuitA6745]});
                     }
                     if (race.url === 'http://localhost:8081/dinghyracing/api/races/7') {
-                        return Promise.resolve({'success': true, 'domainObject': [entryJillMyerGraduateA2928]});
+                        return Promise.resolve({'success': true, 'domainObject': [entryJillMyerPursauitB2928]});
                     }
                 });
                 const controller = new DinghyRacingController(model);
                 const setUpdateEntryPositionSpy = vi.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': true})});
                 await act(async () => {
-                    customRender(<RaceEntriesView races={[raceScorpionAPursuit, raceGraduateAPursuit]} />, model, controller);
+                    customRender(<RaceEntriesView races={[racePursuitA, racePursuitB]} />, model, controller);
                 });
                 const subjectREV = screen.getByText(/chris marshall/i).parentElement.parentElement.parentElement;
                 const targetREV = screen.getByText(/jill myer/i).parentElement.parentElement.parentElement;
@@ -1223,23 +1313,28 @@ describe('when user drags and drops an entry to a new position', () => {
                     setData(key, value) {this.data.set(key, value)},
                     getData(key) {return this.data.get(key)}
                 };
-                fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
-                fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
-                expect(setUpdateEntryPositionSpy).not.toBeCalledWith({...entryChrisMarshallScorpionA1234, position: 4}, 3);
+                await act(async () => {
+                    fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
+                    fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
+                });                
+                expect(setUpdateEntryPositionSpy).not.toBeCalledWith(entryChrisMarshallPursuitA1234, 3);
             });
         });
         describe('when position in race of target has not been set', () => {
             describe('when position of subject in race has been set', () => {
                 it('does not update subject entry race position', async () => {
-                    const user = userEvent.setup();
                     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234}, {...entrySarahPascalScorpionA6745, position: 3}]});})
+                    const racePursuitA = {...raceScorpionA, type: 'PURSUIT'};
+                    const entryChrisMarshallPursuitA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+                    const entrySarahPascalPursuitA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 3, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+                    entryChrisMarshallPursuitA1234.signedUpTo = [new SignedUp(racePursuitA, entryChrisMarshallPursuitA1234, model)];
+                    entrySarahPascalPursuitA6745.signedUpTo = [new SignedUp(racePursuitA, entrySarahPascalPursuitA6745, model)];
+                    vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallPursuitA1234, entrySarahPascalPursuitA6745]});})
                     const controller = new DinghyRacingController(model);
                     const setUpdateEntryPositionSpy = vi.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': true})});
                     await act(async () => {
-                        customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
+                        customRender(<RaceEntriesView races={[racePursuitA]} />, model, controller);
                     });
-                    // screen.debug();
                     const targetREV = screen.getByText(/chris marshall/i).parentElement.parentElement.parentElement;
                     const subjectREV = screen.getByText(/sarah pascal/i).parentElement.parentElement.parentElement;
                     const dataTransferObject = {
@@ -1247,19 +1342,26 @@ describe('when user drags and drops an entry to a new position', () => {
                         setData(key, value) {this.data.set(key, value)},
                         getData(key) {return this.data.get(key)}
                     };
-                    fireEvent.dragStart(targetREV, {dataTransfer: dataTransferObject});
-                    fireEvent.drop(subjectREV, {dataTransfer: dataTransferObject});
+                    await act(async () => {
+                        fireEvent.dragStart(targetREV, {dataTransfer: dataTransferObject});
+                        fireEvent.drop(subjectREV, {dataTransfer: dataTransferObject});
+                    });
                     expect(setUpdateEntryPositionSpy).not.toHaveBeenCalled();
                 });
             });
             describe('when position of subject has not been set', () => {
                 it('position of subject remains the same', async () => {
                     const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                    vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234}, {...entrySarahPascalScorpionA6745}]});})
+                    const racePursuitA = {...raceScorpionA, type: 'PURSUIT'};
+                    const entryChrisMarshallPursuitA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+                    const entrySarahPascalPursuitA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 3, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+                    entryChrisMarshallPursuitA1234.signedUpTo = [new SignedUp(racePursuitA, entryChrisMarshallPursuitA1234, model)];
+                    entrySarahPascalPursuitA6745.signedUpTo = [new SignedUp(racePursuitA, entrySarahPascalPursuitA6745, model)];
+                    vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallPursuitA1234, entrySarahPascalPursuitA6745]});})
                     const controller = new DinghyRacingController(model);
                     const setUpdateEntryPositionSpy = vi.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': true})});
                     await act(async () => {
-                        customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
+                        customRender(<RaceEntriesView races={[racePursuitA]} />, model, controller);
                     });
                     const rev1 = screen.getByText(/chris marshall/i).parentElement.parentElement.parentElement;
                     const rev2 = screen.getByText(/sarah pascal/i).parentElement.parentElement.parentElement;
@@ -1268,8 +1370,10 @@ describe('when user drags and drops an entry to a new position', () => {
                         setData(key, value) {this.data.set(key, value)},
                         getData(key) {return this.data.get(key)}
                     };
-                    fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
-                    fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
+                    await act(async () => {
+                        fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
+                        fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
+                    });
                     expect(setUpdateEntryPositionSpy).not.toHaveBeenCalled();
                     expect(document.getElementById('Scorpion-1234-Chris Marshall-position')).toHaveValue(' ');
                 });
@@ -1280,12 +1384,19 @@ describe('when user drags and drops an entry to a new position', () => {
                 const user = userEvent.setup();
                 const model = new DinghyRacingModel(httpRootURL, wsRootURL);
                 const raceScorpionAPursuit = {...raceScorpionA, type: 'PURSUIT'};
-                vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234, race: raceScorpionAPursuit, position: 4},
-                    {...entrySarahPascalScorpionA6745, race: raceScorpionAPursuit, position: 3}]})});
+                const entryChrisMarshallPursuitA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+                const entrySarahPascalPursuitA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+                entryChrisMarshallPursuitA1234.signedUpTo = [new SignedUp(raceScorpionAPursuit, entryChrisMarshallPursuitA1234, model)];
+                entrySarahPascalPursuitA6745.signedUpTo = [new SignedUp(raceScorpionAPursuit, entrySarahPascalPursuitA6745, model)];
+                entryChrisMarshallPursuitA1234.signedUpTo[0].position = 1;
+                entrySarahPascalPursuitA6745.signedUpTo[0].position = 2;
+                vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+                    return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallPursuitA1234, entrySarahPascalPursuitA6745]});
+                });
                 const controller = new DinghyRacingController(model);
                 vi.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': false, message: 'Any old nonsense'})});
                 await act(async () => {
-                    customRender(<RaceEntriesView races={[{...raceScorpionA}]} />, model, controller);
+                    customRender(<RaceEntriesView races={[raceScorpionAPursuit]} />, model, controller);
                 });
                 // sort by position to avoid position check error when dragging
                 const sortByPositionButton = screen.getByRole('button', {'name': /by position/i});
@@ -1299,16 +1410,23 @@ describe('when user drags and drops an entry to a new position', () => {
                     setData(key, value) {this.data.set(key, value)},
                     getData(key) {return this.data.get(key)}
                 };
-                fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
-                fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
+                await act(async () => {
+                    fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
+                    fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
+                });
                 expect(await screen.findByText(/any old nonsense/i)).toBeInTheDocument();
             });
             it('releases entry if there is a problem updating the position', async () => {
                 const user = userEvent.setup();
                 const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                const raceScorpionAPursuit = {...raceScorpionA, type: 'PURSUIT'};
-                vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234, race: raceScorpionAPursuit, position: 4},
-                    {...entrySarahPascalScorpionA6745, race: raceScorpionAPursuit, position: 3}]})});
+                const racePursuitA = {...raceScorpionA, type: 'PURSUIT'};
+                const entryChrisMarshallPursuitA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+                const entrySarahPascalPursuitA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 3, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+                entryChrisMarshallPursuitA1234.signedUpTo = [new SignedUp(racePursuitA, entryChrisMarshallPursuitA1234, model)];
+                entryChrisMarshallPursuitA1234.signedUpTo[0].position = 3;
+                entrySarahPascalPursuitA6745.signedUpTo = [new SignedUp(racePursuitA, entrySarahPascalPursuitA6745, model)];
+                entrySarahPascalPursuitA6745.signedUpTo[0].position = 4;
+                vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallPursuitA1234, entrySarahPascalPursuitA6745]})});
                 const controller = new DinghyRacingController(model);
                 vi.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': false, message: 'Any old nonsense'})});
                 await act(async () => {
@@ -1333,9 +1451,14 @@ describe('when user drags and drops an entry to a new position', () => {
             it('clears error message on success', async () => {
                 const user = userEvent.setup();
                 const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                const raceScorpionAPursuit = {...raceScorpionA, type: 'PURSUIT'};
-                vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234, race: raceScorpionAPursuit, position: 4},
-                    {...entrySarahPascalScorpionA6745, race: raceScorpionAPursuit, position: 3}]})});
+                const racePursuitA = {...raceScorpionA, type: 'PURSUIT'};
+                const entryChrisMarshallPursuitA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+                const entrySarahPascalPursuitA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+                entryChrisMarshallPursuitA1234.signedUpTo = [new SignedUp(racePursuitA, entryChrisMarshallPursuitA1234, model)];
+                entryChrisMarshallPursuitA1234.signedUpTo[0].position = 3;
+                entrySarahPascalPursuitA6745.signedUpTo = [new SignedUp(racePursuitA, entrySarahPascalPursuitA6745, model)];
+                entrySarahPascalPursuitA6745.signedUpTo[0].position = 4;
+                vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallPursuitA1234, entrySarahPascalPursuitA6745]})});
                 const controller = new DinghyRacingController(model);
                 vi.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': true})}).mockImplementationOnce((entry, newPosition) => {return Promise.resolve({'success': false, message: 'Any old nonsense'})});
                 await act(async () => {
@@ -1358,8 +1481,10 @@ describe('when user drags and drops an entry to a new position', () => {
                 fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
                 expect(await screen.findByText(/Any old nonsense/i)).toBeInTheDocument();
                 // after render perform update
+                await act(async () => {
                     fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
                     fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
+                });
                 await act(async () => {
                     model.handleEntryUpdate({'body': entriesScorpionA[0].url});
                 });
@@ -1372,7 +1497,15 @@ describe('when user drags and drops an entry to a new position', () => {
             it('does not update subject entry race position', async () => {
                 const user = userEvent.setup();
                 const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234, position: 4}, {...entrySarahPascalScorpionA6745, position: 3}]});})
+                const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+                const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+                entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+                entryChrisMarshallScorpionA1234.signedUpTo[0].position = 4;
+                entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+                entrySarahPascalScorpionA6745.signedUpTo[0].position = 3;
+                vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
+                    return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
+                });
                 const controller = new DinghyRacingController(model);
                 const setUpdateEntryPositionSpy = vi.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': true})});
                 await act(async () => {
@@ -1388,9 +1521,11 @@ describe('when user drags and drops an entry to a new position', () => {
                     setData(key, value) {this.data.set(key, value)},
                     getData(key) {return this.data.get(key)}
                 };
-                fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
-                fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
-                expect(setUpdateEntryPositionSpy).not.toBeCalledWith({...entryChrisMarshallScorpionA1234, position: 4}, 3);
+                await act(async () => {                
+                    fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
+                    fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
+                });
+                expect(setUpdateEntryPositionSpy).not.toBeCalledWith(entryChrisMarshallScorpionA1234, 3);
             });
         });
     });
@@ -1398,7 +1533,15 @@ describe('when user drags and drops an entry to a new position', () => {
         it('does not change the positions of the entries and advises user that the operation is not allowed', async () => {
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234}, {...entrySarahPascalScorpionA6745, position: 2, scoringAbbreviation: 'DNS'}]})});
+            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, 'RET', 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+            entryChrisMarshallScorpionA1234.signedUpTo[0].position = 4;
+            entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+            entrySarahPascalScorpionA6745.signedUpTo[0].position = 3;
+            vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve(
+                {'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
+            });
             const controller = new DinghyRacingController(model);
             const setUpdateEntryPositionSpy = vi.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': true})});
             await act(async () => {
@@ -1416,8 +1559,10 @@ describe('when user drags and drops an entry to a new position', () => {
                 setData(key, value) {this.data.set(key, value)},
                 getData(key) {return this.data.get(key)}
             };
-            fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
-            fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
+            await act(async () => {
+                fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
+                fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
+            });
             expect(setUpdateEntryPositionSpy).not.toBeCalled();
             expect(await screen.findByText(/cannot change position of an entry with a scoring abbreviation/i)).toBeInTheDocument();
         });
@@ -1425,8 +1570,15 @@ describe('when user drags and drops an entry to a new position', () => {
     describe('when entry with a scoring abbreviation is dragged onto another entry', () => {
         it('does not change the positions of the entries and advises user that the operation is not allowed', async () => {
             const user = userEvent.setup();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve({'success': true, 'domainObject': [{...entryChrisMarshallScorpionA1234, position: 2, scoringAbbreviation: 'DNS'}, {...entrySarahPascalScorpionA6745}]})});
+            const model = new DinghyRacingModel(httpRootURL, wsRootURL);const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, 'DNS',  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+            entryChrisMarshallScorpionA1234.signedUpTo[0].position = 4;
+            entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
+            entrySarahPascalScorpionA6745.signedUpTo[0].position = 3;
+            vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {return Promise.resolve(
+                {'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
+            });
             const controller = new DinghyRacingController(model);
             const setUpdateEntryPositionSpy = vi.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': true})});
             await act(async () => {
@@ -1444,23 +1596,25 @@ describe('when user drags and drops an entry to a new position', () => {
                 setData(key, value) {this.data.set(key, value)},
                 getData(key) {return this.data.get(key)}
             };
-            fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
-            fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
+            await act(async () => {
+                fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
+                fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
+            });
             expect(setUpdateEntryPositionSpy).not.toBeCalled();
             expect(await screen.findByText(/cannot change position of an entry with a scoring abbreviation/i)).toBeInTheDocument();
         });
     });
     describe('when a non-fast grouped entry is dropped onto a fast grouped entry', () => {
         it('inserts dropped entry into fast group at location of target and treats dropped entry as fast grouped', async () => {
-            const entriesScorpionA = [
-                {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}},
-                {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}}
-            ];
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+            const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+            entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
             vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
                 if (race.name === 'Scorpion A') {
-                    return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+                    return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
                 }
                 else if (race.name === 'Graduate A') {
                     return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
@@ -1482,8 +1636,10 @@ describe('when user drags and drops an entry to a new position', () => {
                 setData(key, value) {this.data.set(key, value)},
                 getData(key) {return this.data.get(key)}
             };
-            fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
-            fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
+            await act(async () => {
+                fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
+                fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
+            });
             expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
             expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
             expect(within(raceEntryViews[0]).getByRole('checkbox')).toBeChecked();
@@ -1492,18 +1648,15 @@ describe('when user drags and drops an entry to a new position', () => {
     });
     describe('when a fast grouped entry is dragged onto a non-fast grouped entry', () => {
         it('inserts dropped entry into display at location of target and removes dropped entry from fast group', async () => {
-            const entriesScorpionA = [
-                {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}},
-                {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}}
-            ];
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+            const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+            entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
             vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
                 if (race.name === 'Scorpion A') {
-                    return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
-                }
-                else if (race.name === 'Graduate A') {
-                    return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
+                    return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
                 }    
             });
             await act(async () => {
@@ -1522,8 +1675,10 @@ describe('when user drags and drops an entry to a new position', () => {
                 setData(key, value) {this.data.set(key, value)},
                 getData(key) {return this.data.get(key)}
             };
-            fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
-            fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
+            await act(async () => {
+                fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
+                fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
+            });
             expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
             expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
             expect(within(raceEntryViews[0]).getByRole('checkbox')).not.toBeChecked();
@@ -1532,15 +1687,15 @@ describe('when user drags and drops an entry to a new position', () => {
     });
     describe('when a fast grouped entry is dragged onto a fast grouped entry', () => {
         it('inserts dropped entry into fast group at location of target and treats dropped entry as fast grouped', async () => {
-            const entriesScorpionA = [
-                {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}},
-                {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}}
-            ];
             const user = userEvent.setup();
             const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234, model)];
+            const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+            entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
             vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
                 if (race.name === 'Scorpion A') {
-                    return Promise.resolve({'success': true, 'domainObject': entriesScorpionA});
+                    return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745]});
                 }
                 else if (race.name === 'Graduate A') {
                     return Promise.resolve({'success': true, 'domainObject': entriesGraduateA});
@@ -1564,8 +1719,10 @@ describe('when user drags and drops an entry to a new position', () => {
                 setData(key, value) {this.data.set(key, value)},
                 getData(key) {return this.data.get(key)}
             };
-            fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
-            fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
+            await act(async () => {
+                fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
+                fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
+            });
             const raceEntryViews = document.getElementsByClassName('race-entry-view');
             expect(within(raceEntryViews[0]).getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
             expect(within(raceEntryViews[1]).getByRole('status', {name: (content, node) => node.textContent === '6745'})).toBeInTheDocument();
@@ -1577,41 +1734,37 @@ describe('when user drags and drops an entry to a new position', () => {
 describe('when refresh button clicked', () => {
     it('refreshes entries', async () => {
         const user = userEvent.setup();
-        const entriesScorpionAPre = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [
-                {'number': 1, 'time': 312568}
-            ], 'sumOfLapTimes': 312568, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"1"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"1"'}}
-        ];
-        const entriesScorpionAPost = [
-            {'helm': competitorChrisMarshall,'race': raceScorpionA,'dinghy': dinghy1234, 'laps': [
-                {'number': 1, 'time': 312568},
-                {'number': 2, 'time': 312568}
-            ], 'sumOfLapTimes': 625136, 'url': 'http://localhost:8081/dinghyracing/api/entries/10', metadata: {eTag: '"2"'}},
-            {'helm': competitorSarahPascal,'race': raceScorpionA,'dinghy': dinghy6745, 'laps': [], 'sumOfLapTimes': 0, 'url': 'http://localhost:8081/dinghyracing/api/entries/11', metadata: {eTag: '"2"'}}
-        ];
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
         const clock = {getElapsedTime: () => {return 312568}};
+        const entryChrisMarshallScorpionA1234_pre = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 312568}], 312568, 312568, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234_pre.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234_pre, model)];
+        const entryChrisMarshallScorpionA1234_post = new Entry (competitorChrisMarshall, null, [], dinghy1234, [{'number': 1, 'time': 312568}, {'number': 2, 'time': 312568}], 625136, 625136, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234_post.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234_post, model)];
+        const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entrySarahPascalScorpionA6745.signedUpTo = [new SignedUp(raceScorpionA, entrySarahPascalScorpionA6745, model)];
         vi.spyOn(model, 'getEntriesByRace')
-            .mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPost})})
-            .mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': entriesScorpionAPre})});
+            .mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234_post, entrySarahPascalScorpionA6745]})})
+            .mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallScorpionA1234_pre, entrySarahPascalScorpionA6745]})});
         await act(async () => {
             customRender(<RaceEntriesView races={[{...raceScorpionA, clock: clock}]} />, model, controller);
         });
         const refreshButton = await screen.findByRole('button', {name: /refresh/i});
         expect(await screen.queryByText('10:25')).not.toBeInTheDocument();
-        user.click(refreshButton);
+        await act(async () => {
+            user.click(refreshButton);
+        });
         expect(await screen.findByText('10:25')).toBeInTheDocument();
     });
 });
 describe('when race is a pursuit race', () => {
     it('does not show option to fast group entries', async () => {
-        const user = userEvent.setup();
         const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallPursuitA1234 = new Entry(racePursuitA, competitorChrisMarshall, competitorLouScrew, dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/22', {eTag: '"1"'});
+        entryChrisMarshallPursuitA1234.signedUpTo = [new SignedUp(racePursuitA, entryChrisMarshallPursuitA1234, model)];
         vi.spyOn(model, 'getEntriesByRace').mockImplementation((race) => {
             if (race.name === 'Pursuit A') {
-                return Promise.resolve({'success': true, 'domainObject': entriesPursuitA});
+                return Promise.resolve({'success': true, 'domainObject': [entryChrisMarshallPursuitA1234]});
             }
         });
         await act(async () => {

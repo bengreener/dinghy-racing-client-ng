@@ -83,11 +83,12 @@ class DinghyRacingController {
 
     /**
      * Update the last lap time recorded for an entry in a race
+     * @param {Race} race
      * @param {Entry} entry
      * @param {Number | String} time The total time sailed to the end of the lap in milliseconds or a string in the format [hh:][mm:]ss
      * @returns {Promise<Result>}
      */
-    updateLap(entry, time) {
+    updateLap(race, entry, time) {
         let timeInMilliseconds = 0;
         // if time is a string convert to number of milliseconds
         if (!Number.isInteger(time)) {
@@ -115,7 +116,7 @@ class DinghyRacingController {
             return Promise.resolve({'success': false, 'message': 'Time must be greater than zero.'});   
         }
         // time must be less than or equal to elapsed time of race
-        if (timeInMilliseconds > entry.race.clock.getElapsedTime(entry.race.plannedStartTime)) {
+        if (timeInMilliseconds > race.clock.getElapsedTime(race.plannedStartTime)) {
             return Promise.resolve({'success': false, 'message': 'Time should be less than or equal to the elapsed time of the race.'});
         }
         return this.model.updateLap(entry, this._calculateLapTime(timeInMilliseconds, entry.laps.toSpliced(entry.laps.length -1, 1)));
@@ -449,13 +450,14 @@ class DinghyRacingController {
 
     /**
      * Update the position of an entry in a race
+     * @param {Race} race
      * @param {Entry} entry
      * @param {Integer} newPosition
      * @returns {Promise<Result}
      */
-    async updateEntryPosition(entry, newPosition) {
+    async updateEntryPosition(race, entry, newPosition) {
         let message = '';
-        if (!entry.race.url) {
+        if (!race.url) {
             message += 'The race URL is required to update an entry position.';
         }
         if (!entry.url) {

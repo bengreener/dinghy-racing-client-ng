@@ -319,7 +319,8 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
                     <output>{entry.helm.name}</output>
                 </div>
                 <div className='w3-col m1-half w3-padding-small' >
-                    <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'}>{entry.position != null ? entry.position : ' '}</output>
+                    {/* <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'}>{entry.position != null ? entry.position : ' '}</output> */}
+                    <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'}>{entry.getPositionInRace(entry.race) != null ? entry.getPositionInRace(entry.race) : ' '}</output>
                 </div>
                 <div className='w3-col m5 w3-hide-small'>
                     <div className='w3-cell-row bgis-cell' >

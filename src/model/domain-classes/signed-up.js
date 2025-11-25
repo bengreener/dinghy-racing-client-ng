@@ -14,13 +14,14 @@
  * limitations under the License. 
  */
 
-import DinghyRacingModel from '../dinghy-racing-model';
-
-/** Class representing an association between an Entry and a Race */
+/**
+ * Class representing an association between an Entry and a Race.
+*/
 class SignedUp {
     constructor(race, entry, model) {
         this.race = race;
         this.entry = entry;
+        this.position = null,
         this.model = model;
         this._handleRaceUpdate = this._handleRaceUpdate.bind(this);
         model?.registerRaceUpdateCallback(race.url, this._handleRaceUpdate);

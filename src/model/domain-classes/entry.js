@@ -22,7 +22,7 @@ class Entry {
      * Create an entry.
      * @param {Competitor} helm The competitor entering the race as helm
      * @param {Competitor} crew The competitor entering the race as crew
-     * @param {Array<SignedUp>} signedUpTo the races the entry is signedUpTo and the psoition in each race
+     * @param {Array<SignedUp>} signedUpTo the races the entry is signedUpTo and the position in each race
      * @param {Dinghy} dinghy The dinghy that will be sailed in the race
      * @param {Array<Lap>} laps The laps for this entry in the race
      * @param {Integer} sumOfLapTimes
@@ -34,7 +34,7 @@ class Entry {
      * @param {String} url The URL to the remote resource
      * @param {Metadata} metadata
      */
-    constructor(helm, crew, signedUpTo, dinghy, laps, sumOfLapTimes, correctedTime, onLastLap, finishedRace, scoringAbbreviation, position, url, metadata) {
+    constructor(helm, crew, signedUpTo, dinghy, laps, sumOfLapTimes, correctedTime, onLastLap, finishedRace, scoringAbbreviation, url, metadata) {
         this.helm = helm;
         this.crew = crew;
         this.signedUpTo = signedUpTo;
@@ -45,9 +45,17 @@ class Entry {
         this.onLastLap = onLastLap;
         this.finishedRace = finishedRace;
         this.scoringAbbreviation = scoringAbbreviation;
-        this.position = position;
         this.url = url;
         this.metadata = metadata;
+    }
+
+    get race() {
+        return this.signedUpTo[0].race;
+    }
+
+    getPositionInRace(race) {
+        const signedUp = this.signedUpTo.find(s => s.race.url === race.url);
+        return signedUp.position;
     }
 }
 

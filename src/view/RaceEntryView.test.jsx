@@ -17,8 +17,10 @@
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RaceEntryView from './RaceEntryView';
-import { raceScorpionA, entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745 } from '../model/__mocks__/test-data';
+import { raceScorpionA, competitorChrisMarshall, competitorSarahPascal, competitorLouScrew, competitorOwainDavies, dinghy1234, dinghy6745 } from '../model/__mocks__/test-data';
 import DinghyRacingModel from '../model/dinghy-racing-model';
+import Entry from '../model/domain-classes/entry';
+import SignedUp from '../model/domain-classes/signed-up';
 
 vi.mock('../model/domain-classes/clock');
 
@@ -35,54 +37,65 @@ afterEach(() => {
 });
 
 it('renders', () => {
-    render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} />);
+    const entryChrisMarshallScorpionA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+    entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+    render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
     const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
     expect(SMScorp1234entry).toBeInTheDocument();
 });
 
 it('displays lap times', async () => {
-    const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-    const entry = {...entryChrisMarshallScorpionA1234, laps: [{number: 1, time: 1234}], metadata: {eTag: '"1"'}};
-    render(<RaceEntryView entry={entry} />);
+    const entryChrisMarshallScorpionA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1234}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+    entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+    render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
     expect(screen.getByText('00:01')).toBeInTheDocument();
 });
 
 it('displays cumulative sum of lap times', async () => {
-    const entry = {...entryChrisMarshallScorpionA1234, laps: [{number: 1, time: 1234}, {number: 2, time: 1234}, {number: 3, time: 1234}], metadata: {eTag: '"1"'}};
-    render(<RaceEntryView entry={entry} />);
+    const entryChrisMarshallScorpionA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1234}, {number: 2, time: 1234}, {number: 3, time: 1234}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+    entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+    entryChrisMarshallScorpionA1234.signedUpTo[0].position = 5;
+    render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
     expect(screen.getByText('00:01')).toBeInTheDocument();
     expect(screen.getByText('00:02')).toBeInTheDocument();
     expect(screen.getByText('00:03')).toBeInTheDocument();
 });
 
 it('displays position', () => {
-    const entry = {...entryChrisMarshallScorpionA1234, laps: [{number: 1, time: 1234}, {number: 2, time: 1234}, {number: 3, time: 1234}], position: 5, metadata: {eTag: '"1"'}};
-    render(<RaceEntryView entry={entry} />);
+    const entryChrisMarshallScorpionA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1234}, {number: 2, time: 1234}, {number: 3, time: 1234}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+    entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+    entryChrisMarshallScorpionA1234.signedUpTo[0].position = 5;
+    render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
     expect(screen.getByText('5')).toBeInTheDocument();
 });
 
 describe('before race has started', () => {
     it('calls addLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, race: {...entryChrisMarshallScorpionA1234.race, plannedStartTime: new Date(Date.now() + 60000)}, metadata: {eTag: '"1"'}};
+        const race = {...raceScorpionA, plannedStartTime: new Date(Date.now() + 60000)};
+        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+        entry.signedUpTo = [new SignedUp(race, entry)];
         const addLapCallback = vi.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         user.click(SMScorp1234entry);
-        expect(addLapCallback).not.toBeCalledWith(entry);
+        // wait for async function in RaceEntryView
+        await vi.waitFor(async () => {
+            expect(addLapCallback).not.toBeCalledWith(entry);
+        });
     });
 });
 
 describe('after race has started', () => {
     it('calls addLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}};
+        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
         const addLapCallback = vi.fn(async (e) => {
             e.laps.push({'number': 1, 'time': 1234});
             return Promise.resolve({success: true});
         });
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
-        
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         user.click(SMScorp1234entry);
         // wait for async function in RaceEntryView
@@ -95,7 +108,8 @@ describe('after race has started', () => {
 describe('when a lap is removed from an entry', () => {
     it('calls removeLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}};
+        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1234}, {number: 2, time: 1234}, {number: 3, time: 1234}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
         const removeLapCallback = vi.fn((e) => {entry.laps.pop()});
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -108,7 +122,8 @@ describe('when a lap is removed from an entry', () => {
     });
     it('updates the display to show the delete lap instruction has been sent to the server', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}};
+        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
         const removeLapCallback = vi.fn((e) => {
             entry.laps.pop();
             return Promise.resolve({success: true});
@@ -125,7 +140,8 @@ describe('when a lap is removed from an entry', () => {
     describe('when lap removal fails', () => {
         it('entry view is enabled to accept input', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const entry = {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}};
+            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+            entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
             const removeLapCallback = vi.fn((e) => {
                 entry.laps.pop();
                 return Promise.resolve({success: false});
@@ -143,8 +159,8 @@ describe('when secondary mouse button is clicked', () => {
     describe('when a lap has been recorded for the entry', () => {
         it('accepts a new lap time input in the last field of the row', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const entry = {...entryChrisMarshallScorpionA1234, laps: [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}], 
-                'sumOfLapTimes': 6000, metadata: {eTag: '"1"'}};
+            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+            entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
             render(<RaceEntryView entry={entry} />);
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
@@ -164,7 +180,8 @@ describe('when secondary mouse button is clicked', () => {
         it('does not enter edit mode and accepts a lap time via left click', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
             const addLapCallback = vi.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
-            const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
+            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+            entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
             render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             user.pointer({target: raceEntryView, keys: '[MouseRight]'});
@@ -180,9 +197,9 @@ describe('when secondary mouse button is clicked', () => {
 describe('when editing a lap time', () => {
     it('does not add new lap when primary button clicked', async () => { 
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000},
-            {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}], metadata: {eTag: '"1"'}};
         const addLapCallback = vi.fn();
+        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1000}, {number: 2, time: 2000}, {number: 3, time: 3000}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
@@ -192,8 +209,8 @@ describe('when editing a lap time', () => {
     });
     it('does not remove last lap when ctrl+primary button clicked', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, 'laps': [{...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, {...DinghyRacingModel.lapTemplate(),
-            number: 2, time: 2000}, {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}], metadata: {eTag: '"1"'}};
+        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1000}, {number: 2, time: 2000}, {number: 3, time: 3000}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
         const removeLapCallback = vi.fn((e) => {entry.laps.pop()});
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -206,11 +223,8 @@ describe('when editing a lap time', () => {
     describe('when lap time has not changed', () => {
         it('does not update lap time', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
-                {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000},
-                {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000},
-                {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
-            ], metadata: {eTag: '"1"'}};
+            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1000}, {number: 2, time: 2000}, {number: 3, time: 3000}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+            entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
             const updateLapCallback = vi.fn((entry, value) => {});
             render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
@@ -230,11 +244,8 @@ describe('when editing a lap time', () => {
     });
     it('updates lap with new time supplied', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
-            {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, 
-            {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, 
-            {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
-        ], metadata: {eTag: '"1"'}};
+        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1000}, {number: 2, time: 2000}, {number: 3, time: 3000}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
         const updateLapCallback = vi.fn((entry, value) => {
             return Promise.resolve({success: true});
         });
@@ -257,11 +268,8 @@ describe('when editing a lap time', () => {
     });
     it('updates the display to show the edited lap time is being sent to the server', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
-            {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, 
-            {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, 
-            {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
-        ], metadata: {eTag: '"1"'}};
+        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1000}, {number: 2, time: 2000}, {number: 3, time: 3000}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
         const updateLapCallback = vi.fn((entry, value) => {
             return Promise.resolve({success: true});
         });
@@ -284,11 +292,8 @@ describe('when editing a lap time', () => {
     describe('when lap update fails', () => {
         it('entry view is enabled to accept input', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
-                {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, 
-                {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, 
-                {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
-            ], metadata: {eTag: '"1"'}};
+            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1000}, {number: 2, time: 2000}, {number: 3, time: 3000}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+            entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
             const updateLapCallback = vi.fn((entry, value) => {
                 return Promise.resolve({success: false});
             });
@@ -312,11 +317,8 @@ describe('when editing a lap time', () => {
     describe('when the new lap time is entered in an invalid format', () => {
         it('does not accept the incorrect format and keeps edit mode open', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
-                {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, 
-                {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, 
-                {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
-            ], metadata: {eTag: '"1"'}};
+            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1000}, {number: 2, time: 2000}, {number: 3, time: 3000}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
             const updateLapCallback = vi.fn((entry, value) => {});
             const showUserMessage = vi.fn((message) => {});
             render(<RaceEntryView entry={entry} updateLap={updateLapCallback} showUserMessage={showUserMessage} />);
@@ -335,11 +337,8 @@ describe('when editing a lap time', () => {
         });
         it('calls showUserMessage prop with message explainging error', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
-                {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000}, 
-                {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000}, 
-                {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
-            ], metadata: {eTag: '"1"'}};
+            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1000}, {number: 2, time: 2000}, {number: 3, time: 3000}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+            entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
             const updateLapCallback = vi.fn((entry, value) => {});
             const showUserMessage = vi.fn((message) => {});
             render(<RaceEntryView entry={entry} updateLap={updateLapCallback} showUserMessage={showUserMessage} />);
@@ -362,7 +361,8 @@ describe('when editing a lap time', () => {
 describe('when user taps row', () => {
     it('calls addLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
+        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
         const addLapCallback = vi.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -374,7 +374,8 @@ describe('when user taps row', () => {
     describe('when add lap fails', () => {
         it('entry view is enabled to accept input', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
+            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+            entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
             const addLapCallback = vi.fn((e) => {
                 return Promise.resolve({success: false});
             });
@@ -394,11 +395,8 @@ describe('when user taps and holds on row', () => {
     it('accepts a new lap time input in the last field of the row', async () => {
         const setTimeoutSpy = vi.spyOn(global, 'setTimeout');
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
-            {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000},
-            {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000},
-            {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
-        ], metadata: {eTag: '"1"'}};
+        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1000}, {number: 2, time: 2000}, {number: 3, time: 3000}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
         render(<RaceEntryView entry={entry} />);
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         await act(async () => {
@@ -441,8 +439,9 @@ describe('when user swipes left on row', () => {
 
 describe('when entry is on last lap', () => {
     it('has a class of on-last-lap', () => {
-        const entryOnLastLap = {...entryChrisMarshallScorpionA1234, laps: [], 'onLastLap': true, metadata: {eTag: '"1"'}};
-        render(<RaceEntryView entry={entryOnLastLap} />);
+        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 6, 6, true, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
+        render(<RaceEntryView entry={entry} />);
         const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
         expect(raceEntryView.getAttribute('class')).toMatch(/on-last-lap/i);
     });
@@ -450,7 +449,9 @@ describe('when entry is on last lap', () => {
 
 describe('when entry is not on last lap', () => {
     it('does not have a class of on-last-lap', () => {
-        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} />);
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement;
         expect(SMScorp1234entry.getAttribute('class')).not.toMatch(/on-last-lap/i);
     });
@@ -458,8 +459,9 @@ describe('when entry is not on last lap', () => {
 
 describe('when entry has finished race', () => {
     it('has a class of finished-race', () => {
-        const entryOnLastLap = {...entryChrisMarshallScorpionA1234, 'finishedRace': true, metadata: {eTag: '"1"'}};
-        render(<RaceEntryView entry={entryOnLastLap} />);
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, true, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
         const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
         expect(raceEntryView.getAttribute('class')).toMatch(/finished-race/i);
     });
@@ -467,7 +469,9 @@ describe('when entry has finished race', () => {
 
 describe('when entry has not finished race', () => {
     it('does not have a class of finished-race', () => {
-        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} />);
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement;
         expect(SMScorp1234entry.getAttribute('class')).not.toMatch(/finished-race/i);
     });
@@ -475,7 +479,9 @@ describe('when entry has not finished race', () => {
 
 describe('when a scoring abbreviation is not selected', () => {
     it('only has a classes of race-entry-view w3-row w3-border w3-hover-border-blue cursor-pointer preserve-whitespace', () => {
-        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} />);
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
         const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
         expect(raceEntryView.getAttribute('class')).toMatch(/^race-entry-view w3-row w3-border w3-hover-border-blue$/i);
     });
@@ -487,7 +493,9 @@ describe('when a scoring abbreviation is selected', () => {
             return Promise.resolve({success: true});
         });
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
         const selectSA = screen.getByRole('combobox');
         await act(async() => {
             user.selectOptions(selectSA, 'DNS');
@@ -499,7 +507,9 @@ describe('when a scoring abbreviation is selected', () => {
             return Promise.resolve({success: true});
         });
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
+        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
         const selectSA = screen.getByRole('combobox');
         await act(async () => {
             user.selectOptions(selectSA, 'DNS');
@@ -512,7 +522,9 @@ describe('when a scoring abbreviation is selected', () => {
                 return Promise.resolve({success: false});
             });
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
+            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+            render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
             const selectSA = screen.getByRole('combobox');
             user.selectOptions(selectSA, 'DNS');
             expect(screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).not.toMatch(/disabled/i);
@@ -520,48 +532,54 @@ describe('when a scoring abbreviation is selected', () => {
     });
     describe('when entry did not start the race', () => {
         it('has a class of did-not-start', () => {
-            const entryDNS = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DNS', metadata: {eTag: '"2"'}};
-            render(<RaceEntryView entry={entryDNS} />);
+            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, 'DNS',  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+            render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/did-not-start/i);
         });
     });
     describe('when entry retired', () => {
         it('has a class of retired', () => {
-            const entryRET = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'RET', metadata: {eTag: '"2"'}};
-            render(<RaceEntryView entry={entryRET} />);
+            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, 'RET',  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+            render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/retired/i);
         });
     });
     describe('when entry disqualified', () => {
         it('has a class of disqualified', () => {
-            const entryRET = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DSQ', metadata: {eTag: '"2"'}};
-            render(<RaceEntryView entry={entryRET} />);
+            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, 'DSQ',  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+            render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/disqualified/i);
         });
     });
     describe('when entry did not compete in the race', () => {
         it('has a class of did-not-start', () => {
-            const entryDNC = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DNC', metadata: {eTag: '"2"'}};
-            render(<RaceEntryView entry={entryDNC} />);
+            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, 'DNC',  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+            render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/did-not-compete/i);
         });
     });
     describe('when entry on course side at start of race', () => {
         it('has a class of on-course-side', () => {
-            const entryOCS = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'OCS', metadata: {eTag: '"2"'}};
-            render(<RaceEntryView entry={entryOCS} />);
+            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, 'OCS',  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+            render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/on-course-side/i);
         });
     });
     describe('when entry did not finish the race', () => {
         it('has a class of did-not-finish', () => {
-            const entryDNF = {...entryChrisMarshallScorpionA1234, 'scoringAbbreviation': 'DNF', metadata: {eTag: '"2"'}};
-            render(<RaceEntryView entry={entryDNF} />);
+            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, 'DNF',  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+            render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/did-not-finish/i);
         });
@@ -571,7 +589,8 @@ describe('when a scoring abbreviation is selected', () => {
 describe('when the entry is selected to add a new lap', () => {
     it('updates the display to show it has been selected', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}};
+        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
         const addLapCallback = vi.fn(() => {
             return Promise.resolve({success: true});
         });
@@ -584,7 +603,8 @@ describe('when the entry is selected to add a new lap', () => {
     });
     it('does not allow user to immediately add another lap time', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
+        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
         const addLapCallback = vi.fn(() => {
             return Promise.resolve({success: true});
         });
@@ -602,7 +622,8 @@ describe('when the entry is selected to add a new lap', () => {
     describe('when add lap fails', () => {
         it('entry view is enabled to accept input', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
+            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+            entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
             const addLapCallback = vi.fn((e) => {
                 return Promise.resolve({success: false});
             });
@@ -618,7 +639,8 @@ describe('when the entry is selected to add a new lap', () => {
     describe.skip('when confirmation is received of the recorded lap', () => {
         it('updates the display to show it can be selected for lap entry', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
+            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+            entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
             const addLapCallback = vi.fn();
             const { rerender } = render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
             const SMScorp1234entry = await screen.findByText(/1234/i);
@@ -636,7 +658,8 @@ describe('when the entry is selected to add a new lap', () => {
         });
         it('accepts selection to add a new lap time', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const entry = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
+            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+            entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
             const addLapCallback = vi.fn();
             const { rerender } = render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
             const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -660,8 +683,10 @@ describe('when user drags and drops an entry to a new position', () => {
     it('calls function passed to onRaceEntryDrop with subject key and target key ', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const onRaceEntryDropSpy = vi.fn();
-        const entry1 = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
-        const entry2 = {...entrySarahPascalScorpionA6745, metadata: {eTag: '"1"'}};
+        const entry1 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entry2 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entry1.signedUpTo = [new SignedUp(raceScorpionA, entry1)];
+        entry2.signedUpTo = [new SignedUp(raceScorpionA, entry2)];
         const addLapCallback = vi.fn();
         render(
             <div>
@@ -670,7 +695,7 @@ describe('when user drags and drops an entry to a new position', () => {
             </div>
         );
         const rev1 = screen.getByText(/chris marshall/i).parentElement.parentElement;
-        const rev2 = screen.getByText(/sarah pascal/i).parentElement.parentElement;
+        screen.getByText(/sarah pascal/i).parentElement.parentElement;
 
         await act(async () => {
             fireEvent.drop(rev1, {dataTransfer: {getData: () => {}}});
@@ -680,8 +705,10 @@ describe('when user drags and drops an entry to a new position', () => {
     it('calls function passed to onRaceEntryDrop with value set by dragStart event', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const onRaceEntryDropSpy = vi.fn();
-        const entry1 = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
-        const entry2 = {...entrySarahPascalScorpionA6745, metadata: {eTag: '"1"'}};
+        const entry1 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
+        const entry2 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+        entry1.signedUpTo = [new SignedUp(raceScorpionA, entry1)];
+        entry2.signedUpTo = [new SignedUp(raceScorpionA, entry2)];
         const addLapCallback = vi.fn();
         render(
             <div>
@@ -699,8 +726,6 @@ describe('when user drags and drops an entry to a new position', () => {
         };
         await act(async () => {
             fireEvent.dragStart(rev1, {dataTransfer: dataTransferObject});
-        });
-        await act(async () => {
             fireEvent.drop(rev2, {dataTransfer: dataTransferObject});
         });
         expect(onRaceEntryDropSpy).toHaveBeenCalled();
@@ -712,8 +737,10 @@ describe('when user drags and drops an entry to a new position', () => {
                 return Promise.resolve({success: true});
             });
             const raceScorpionAPursuit = {...raceScorpionA, type: 'PURSUIT'};
-            const entry1 = {...entryChrisMarshallScorpionA1234, race: raceScorpionAPursuit, laps: [], metadata: {eTag: '"1"'}};
-            const entry2 = {...entrySarahPascalScorpionA6745, race: raceScorpionAPursuit, metadata: {eTag: '"1"'}};
+            const entry1 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+            entry1.signedUpTo = [new SignedUp(raceScorpionAPursuit, entry1)];
+            const entry2 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+            entry2.signedUpTo = [new SignedUp(raceScorpionAPursuit, entry2)];
             render(
                 <div>
                     <RaceEntryView entry={entry1} onRaceEntryDrop={onRaceEntryDropSpy} />
@@ -729,8 +756,6 @@ describe('when user drags and drops an entry to a new position', () => {
             };
             await act(async () => {
                 fireEvent.dragStart(subjectREV, {dataTransfer: dataTransferObject});
-            });
-            await act(async () => {
                 fireEvent.drop(targetREV, {dataTransfer: dataTransferObject});
             });
             expect(targetREV.getAttribute('class')).toMatch(/disabled/i);
@@ -742,8 +767,10 @@ describe('when user drags and drops an entry to a new position', () => {
                     return Promise.resolve({success: false});
                 });
                 const raceScorpionAPursuit = {...raceScorpionA, type: 'PURSUIT'};
-                const entry1 = {...entryChrisMarshallScorpionA1234, race: raceScorpionAPursuit, laps: [], metadata: {eTag: '"1"'}};
-                const entry2 = {...entrySarahPascalScorpionA6745, race: raceScorpionAPursuit, metadata: {eTag: '"1"'}};
+                const entry1 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+                entry1.signedUpTo = [new SignedUp(raceScorpionA, entry1)];
+                const entry2 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+                entry2.signedUpTo = [new SignedUp(raceScorpionA, entry2)];
                 render(
                     <div>
                         <RaceEntryView entry={entry1} onRaceEntryDrop={onRaceEntryDropSpy} />
@@ -770,8 +797,10 @@ describe('when user drags and drops an entry to a new position', () => {
             it('does nothing', async () => {
                 const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
                 const onRaceEntryDropSpy = vi.fn();
-                const entry1 = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
-                const entry2 = {...entrySarahPascalScorpionA6745, metadata: {eTag: '"1"'}};
+                const entry1 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+                entry1.signedUpTo = [new SignedUp(raceScorpionA, entry1)];
+                const entry2 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+                entry2.signedUpTo = [new SignedUp(raceScorpionA, entry2)];
                 const addLapCallback = vi.fn();
                 render(
                     <div>
@@ -801,8 +830,10 @@ describe('when user drags and drops an entry to a new position', () => {
         it('does not update the display to show the position of the target entry is being updated', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
             const onRaceEntryDropSpy = vi.fn();
-            const entry1 = {...entryChrisMarshallScorpionA1234, laps: [], metadata: {eTag: '"1"'}};
-            const entry2 = {...entrySarahPascalScorpionA6745, metadata: {eTag: '"1"'}};
+            const entry1 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+            entry1.signedUpTo = [new SignedUp(raceScorpionA, entry1)];
+            const entry2 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
+            entry2.signedUpTo = [new SignedUp(raceScorpionA, entry2)];
             const addLapCallback = vi.fn();
             render(
                 <div>
@@ -832,16 +863,18 @@ describe('when user drags and drops an entry to a new position', () => {
 describe('when handler set for onFastGroup', () => {
     it('displays option to fast group entry', () => {
         const onFastGroupHandlerSpy = vi.fn();
-
-        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} onFastGroup={onFastGroupHandlerSpy} />);
+        const entryChrisMarshallScorpionA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} />);
         const fastGroupButton = screen.getByRole('checkbox');
         expect(fastGroupButton).toBeInTheDocument();
     });
     it('fast group option shows selected when inFastGroup prop is true', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const onFastGroupHandlerSpy = vi.fn();
-
-        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} onFastGroup={onFastGroupHandlerSpy} inFastGroup={true} />);
+        const entryChrisMarshallScorpionA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} inFastGroup={true} />);
         const fastGroupButton = screen.getByRole('checkbox');
         // await act(async () => {
         //     user.click(fastGroupButton);
@@ -852,8 +885,9 @@ describe('when handler set for onFastGroup', () => {
     it('fast group option shows unselected when inFastGroup prop is false', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const onFastGroupHandlerSpy = vi.fn();
-
-        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} onFastGroup={onFastGroupHandlerSpy} inFastGroup={false} />);
+        const entryChrisMarshallScorpionA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} inFastGroup={false} />);
         const fastGroupButton = screen.getByRole('checkbox');
 
         expect(fastGroupButton).not.toBeChecked();
@@ -861,8 +895,10 @@ describe('when handler set for onFastGroup', () => {
     it('calls handler with key for entry when fast group option is checked', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const onFastGroupHandlerSpy = vi.fn();
+        const entryChrisMarshallScorpionA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
 
-        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} onFastGroup={onFastGroupHandlerSpy} />);
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} />);
         const fastGroupButton = screen.getByRole('checkbox');
         await act(async () => {
             user.click(fastGroupButton);
@@ -874,7 +910,9 @@ describe('when handler set for onFastGroup', () => {
 
 describe('when handler not set for onFastGroup', () => {
     it('does not display option to fast group entry', () => {
-        render(<RaceEntryView entry={{...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}} />);
+        const entryChrisMarshallScorpionA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
+        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
         const fastGroupButton = screen.queryByRole('checkbox');
         expect(fastGroupButton).not.toBeInTheDocument();
     });

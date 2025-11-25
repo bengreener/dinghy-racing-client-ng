@@ -107,7 +107,23 @@ const raceScorpion_AHAL = {
 			fleet : { href :  'http://localhost:8081/dinghyracing/api/races/4/fleet' }
 		} 
 };
-const raceScorpion_ASignedUpHAL = {_embedded: {dinghies: [ {sailNumber: '1234', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' } } }, {sailNumber: '6745', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/3' }, dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/3' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass' } } } ] }, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/races/4/signedUp' } } };
+const raceScorpion_ASignedUpHAL = {_embedded: {
+	dinghies: [ 
+		{
+			sailNumber: '1234', _links: {
+				self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, 
+				dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, 
+				dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' } 
+			} 
+		}, 
+		{
+			sailNumber: '6745', _links: {
+				self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/3' }, 
+				dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/3' }, 
+				dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/3/dinghyClass' } 
+			} 
+		} 
+	] }, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/races/4/signedUp' } } };
 
 const raceGraduate_AHAL = {
 	name: 'Graduate A', plannedStartTime: '2021-10-14T10:35:00', duration: 'PT45M', type: 'FLEET', plannedLaps: 4, startType: 'CSCCLUBSTART', 
@@ -155,11 +171,11 @@ const entriesHAL = {_embedded:{entries:[
 		lastLapTime: 'PT0S', position: null, _links:{
 		self:{href:'http://localhost:8081/dinghyracing/api/entries/10'},
 		entry:{href:'http://localhost:8081/dinghyracing/api/entries/10'},
+		signedUpTo:{href:'http://localhost:8081/dinghyracing/api/entries/10/signedUpTo'},
 		dinghy:{href:'http://localhost:8081/dinghyracing/api/entries/10/dinghy'},
 		helm:{href:'http://localhost:8081/dinghyracing/api/entries/10/helm'},
 		crew:{href:'http://localhost:8081/dinghyracing/api/entries/10/crew'},
-		laps:{href:'http://localhost:8081/dinghyracing/api/entries/10/laps'},
-		race:{href:'http://localhost:8081/dinghyracing/api/entries/10/race'}
+		laps:{href:'http://localhost:8081/dinghyracing/api/entries/10/laps'}
 	}},
 	{
 		scoringAbbreviation: null,
@@ -171,11 +187,11 @@ const entriesHAL = {_embedded:{entries:[
 		lastLapTime: 'PT0S', position: null, _links:{
 		self:{href:'http://localhost:8081/dinghyracing/api/entries/11'},
 		entry:{href:'http://localhost:8081/dinghyracing/api/entries/11'},
+		signedUpTo:{href:'http://localhost:8081/dinghyracing/api/entries/11/signedUpTo'},
 		dinghy:{href:'http://localhost:8081/dinghyracing/api/entries/11/dinghy'},
 		helm:{href:'http://localhost:8081/dinghyracing/api/entries/11/helm'},
 		crew:{href:'http://localhost:8081/dinghyracing/api/entries/11/crew'},
-		laps:{href:'http://localhost:8081/dinghyracing/api/entries/11/laps'},
-		race:{href:'http://localhost:8081/dinghyracing/api/entries/11/race'}
+		laps:{href:'http://localhost:8081/dinghyracing/api/entries/11/laps'}
 	}},
 	{
 		scoringAbbreviation: null,
@@ -188,11 +204,11 @@ const entriesHAL = {_embedded:{entries:[
 		position: null, _links:{
 		self:{href:'http://localhost:8081/dinghyracing/api/entries/19'},
 		entry:{href:'http://localhost:8081/dinghyracing/api/entries/19'},
+		signedUpTo:{href:'http://localhost:8081/dinghyracing/api/entries/19/signedUpTo'},
 		dinghy:{href:'http://localhost:8081/dinghyracing/api/entries/19/dinghy'},
 		helm:{href:'http://localhost:8081/dinghyracing/api/entries/19/helm'},
 		crew:{href:'http://localhost:8081/dinghyracing/api/entries/19/crew'},
-		laps:{href:'http://localhost:8081/dinghyracing/api/entries/19/laps'},
-		race:{href:'http://localhost:8081/dinghyracing/api/entries/19/race'}
+		laps:{href:'http://localhost:8081/dinghyracing/api/entries/19/laps'}
 	}},
 	]},_links:{self:{href:'http://localhost:8081/dinghyracing/api/entries'},profile:{href:'http://localhost:8081/dinghyracing/api/profile/entries'}},page:{size:20,totalElements:2,totalPages:1,number:0}};
 const entriesScorpionAHAL = {_embedded: {entries: [
@@ -209,8 +225,8 @@ const entriesScorpionAHAL = {_embedded: {entries: [
 		entry: {href: 'http://localhost:8081/dinghyracing/api/entries/10' }, 
 		helm: {href: 'http://localhost:8081/dinghyracing/api/entries/10/helm' }, 
 		crew: {href: 'http://localhost:8081/dinghyracing/api/entries/10/crew' }, 
-		laps: {href: 'http://localhost:8081/dinghyracing/api/entries/10/laps' }, 
-		race: {href: 'http://localhost:8081/dinghyracing/api/entries/10/race' }, 
+		laps: {href: 'http://localhost:8081/dinghyracing/api/entries/10/laps' },
+		signedUpTo: {href: 'http://localhost:8081/dinghyracing/api/entries/10/signedUpTo' }, 
 		dinghy: {href: 'http://localhost:8081/dinghyracing/api/entries/10/dinghy' } } 
 	}, 
 	{ 
@@ -246,7 +262,7 @@ const entriesCometAHAL = {_embedded: {entries: [
 		helm:{href:'http://localhost:8081/dinghyracing/api/entries/19/helm'},
 		crew:{href:'http://localhost:8081/dinghyracing/api/entries/19/crew'},
 		laps:{href:'http://localhost:8081/dinghyracing/api/entries/19/laps'},
-		race:{href:'http://localhost:8081/dinghyracing/api/entries/19/race'} }
+		signedUpTo:{href:'http://localhost:8081/dinghyracing/api/entries/19/signedUpTo'} }
 	}
 ] }, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/races/17/signedUp' } } };
 const entriesHandicapAHAL = {_embedded: {entries: [
@@ -263,7 +279,7 @@ const entriesHandicapAHAL = {_embedded: {entries: [
 		helm: {href: 'http://localhost:8081/dinghyracing/api/entries/20/helm' }, 
 		crew: {href: 'http://localhost:8081/dinghyracing/api/entries/20/crew' }, 
 		laps: {href: 'http://localhost:8081/dinghyracing/api/entries/20/laps' }, 
-		race: {href: 'http://localhost:8081/dinghyracing/api/entries/20/race' }, 
+		signedUpTo: {href: 'http://localhost:8081/dinghyracing/api/entries/20/signedUpTo' }, 
 		dinghy: {href: 'http://localhost:8081/dinghyracing/api/entries/20/dinghy' } } 
 	}, 
 	{ 
@@ -279,7 +295,7 @@ const entriesHandicapAHAL = {_embedded: {entries: [
 		helm: {href: 'http://localhost:8081/dinghyracing/api/entries/21/helm' }, 
 		crew: {href: 'http://localhost:8081/dinghyracing/api/entries/21/crew' }, 
 		laps: {href: 'http://localhost:8081/dinghyracing/api/entries/21/laps' }, 
-		race: {href: 'http://localhost:8081/dinghyracing/api/entries/21/race' }, 
+		signedUpTo: {href: 'http://localhost:8081/dinghyracing/api/entries/21/signedUpTo' }, 
 		dinghy: {href: 'http://localhost:8081/dinghyracing/api/entries/21/dinghy' } }
 	} 
 ] }, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/races/8/signedUp' } }};
@@ -298,11 +314,74 @@ const entryChrisMarshallDinghy1234HAL = {
 		dinghy:{href:'http://localhost:8081/dinghyracing/api/entries/10/dinghy'},
 		helm:{href:'http://localhost:8081/dinghyracing/api/entries/10/helm'}, 
 		crew:{href:'http://localhost:8081/dinghyracing/api/entries/10/crew'}, 
-		race:{href:'http://localhost:8081/dinghyracing/api/entries/10/race'}, 
+		signedUpTo:{href:'http://localhost:8081/dinghyracing/api/entries/10/signedUpTo'}, 
 		laps:{href:'http://localhost:8081/dinghyracing/api/entries/10/laps'}
 	}
 };
+const entrySarahPascalScorpionADinghy6745HAL = {
+	scoringAbbreviation: null,
+	averageLapTime: 'PT0S',
+	sumOfLapTimes: 'PT0S',
+	correctedTime: 'PT0S',
+    onLastLap: false,
+    lastLapTime: 'PT0S',
+	finishedRace: false, 
+	position: null,
+	_links:{
+		self:{href:'http://localhost:8081/dinghyracing/api/entries/11'},
+		entry:{href:'http://localhost:8081/dinghyracing/api/entries/11'},
+		dinghy:{href:'http://localhost:8081/dinghyracing/api/entries/11/dinghy'},
+		helm:{href:'http://localhost:8081/dinghyracing/api/entries/11/helm'}, 
+		crew:{href:'http://localhost:8081/dinghyracing/api/entries/11/crew'}, 
+		signedUpTo:{href:'http://localhost:8081/dinghyracing/api/entries/11/signedUpTo'}, 
+		laps:{href:'http://localhost:8081/dinghyracing/api/entries/11/laps'}
+	}
+};
+const signedUpChrisMarshallDinghy1234ScorpionAHAL = {
+	position: null,
+	_links:{
+		self:{'href':'http://localhost:8081/dinghyracing/api/signedUps/1'},
+		race:{'href':'http://localhost:8081/dinghyracing/api/signedUps/1/race'},
+		entry:{'href':'http://localhost:8081/dinghyracing/api/signedUps/1/entry'}
+	}
+};
 
+const scorpionASignedUpHAL = {
+	'_embedded': {
+		'signedUps': [
+			{
+				'position': null,
+				'self': {
+					'href': 'http://localhost:8081/dinghyracing/api/signedUps/1'
+				},
+				'signedUp': {
+					'href': 'http://localhost:8081/dinghyracing/api/signedUps/1'
+				},
+				'entry': {
+					'href': 'http://localhost:8081/dinghyracing/api/signedUps/1/entry'
+				},
+				'race': {
+					'href': 'http://localhost:8081/dinghyracing/api/signedUps/1/race'
+				},
+			},
+			{
+				'position': null,
+				'self': {
+					'href': 'http://localhost:8081/dinghyracing/api/signedUps/2'
+				},
+				'signedUp': {
+					'href': 'http://localhost:8081/dinghyracing/api/signedUps/2'
+				},
+				'entry': {
+					'href': 'http://localhost:8081/dinghyracing/api/signedUps/2/entry'
+				},
+				'race': {
+					'href': 'http://localhost:8081/dinghyracing/api/signedUps/2/race'
+				},
+			}
+		]
+	}
+}
 const dinghyScorpion1234CrewAHAL = {helm: competitorChrisMarshallHAL, mate: competitorJillMyerHAL};
 const dinghyScorpion1234CrewBHAL = {helm: competitorLiuBaoHAL, mate: competitorLouScrewHAL};
 const dinghyScorpion1234CrewsHAL = {_embedded: {crews: [dinghyScorpion1234CrewAHAL, dinghyScorpion1234CrewBHAL]}, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/crews/search/findCrewsByDinghy?dinghy=http%3A%2F%2Flocalhost%3A8081%2Fdinghyracing%2Fapi%2Fdinghies%2F2'}}};
@@ -348,30 +427,30 @@ const racePursuitA = {name: 'Pursuit A', plannedStartTime: new Date('2021-10-14T
 
 const races = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA];
 
-const entryChrisMarshallScorpionA1234 = new Entry (raceScorpionA, competitorChrisMarshall, competitorLouScrew, dinghy1234, [], 0, 0, false, false, null,  null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'}, null);
+const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'}, null);
 
-const entrySarahPascalScorpionA6745 = new Entry(raceScorpionA, competitorSarahPascal, competitorOwainDavies, dinghy6745, [], 0, 0, false, false, null,  null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'}, null);
+const entrySarahPascalScorpionA6745 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'}, null);
 
 const entriesScorpionA = [
 	entryChrisMarshallScorpionA1234,
 	entrySarahPascalScorpionA6745
 ];
 const entriesGraduateA = [
-	new Entry(raceGraduateA, competitorJillMyer, null, dinghy2928, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'}, null)
+	new Entry(competitorJillMyer, null, [], dinghy2928, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/12', {eTag: '"1"'}, null)
 ];
 
-const entryJillMyerCometA826 = new Entry(raceCometA, competitorJillMyer, null, dinghy826, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/19', {eTag: '"1"'}, null);
+const entryJillMyerCometA826 = new Entry(competitorJillMyer, null, [], dinghy826, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/19', {eTag: '"1"'}, null);
 const entriesCometA = [
 	entryJillMyerCometA826
 ];
 
-const entryChrisMarshallHandicapA1234 = new Entry(raceHandicapA, competitorChrisMarshall, competitorLouScrew, dinghy1234, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/20', null);
+const entryChrisMarshallHandicapA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', null);
 const entriesHandicapA = [
 	entryChrisMarshallHandicapA1234, 
-	new Entry(raceHandicapA, competitorJillMyer, null, dinghy826, [], 0, 0, false, false, null,  null, 'http://localhost:8081/dinghyracing/api/entries/21', {eTag: '"1"'}, null)
+	new Entry(competitorJillMyer, null, [], dinghy826, [], 0, 0, false, false, null,  null, 'http://localhost:8081/dinghyracing/api/entries/21', {eTag: '"1"'}, null)
 ];
 
-const entryChrisMarshallPursuitA1234 = new Entry(racePursuitA, competitorChrisMarshall, competitorLouScrew, dinghy1234, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/22', {eTag: '"1"'}, null);
+const entryChrisMarshallPursuitA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/22', {eTag: '"1"'}, null);
 
 const entriesPursuitA = [ entryChrisMarshallPursuitA1234 ];
 
@@ -454,7 +533,7 @@ export {
 	raceHandicap_AHAL, raceComet_AHAL, racePursuit_AHAL,
 	// raceSchemaJSON, raceSchemaALPS,
 	
-	entriesHAL, entriesScorpionAHAL, entryChrisMarshallDinghy1234HAL, entriesCometAHAL, entriesHandicapAHAL,
+	entriesHAL, entriesScorpionAHAL, entryChrisMarshallDinghy1234HAL, entrySarahPascalScorpionADinghy6745HAL, entriesCometAHAL, entriesHandicapAHAL,
 
 	dinghyScorpion1234CrewAHAL, dinghyScorpion1234CrewBHAL, dinghyScorpion1234CrewsHAL,
 
@@ -472,6 +551,8 @@ export {
 	entryChrisMarshallHandicapA1234, entryChrisMarshallScorpionA1234, entrySarahPascalScorpionA6745, entryJillMyerCometA826, entryChrisMarshallPursuitA1234,
 	entriesScorpionA, entriesGraduateA, entriesCometA, entriesHandicapA, entriesPursuitA,
 
+	signedUpChrisMarshallDinghy1234ScorpionAHAL,
+	
 	dinghyScorpion1234Crews, dinghyGraduate1234Crews, dinghyComet1234Crews,
 
 	preparatoryFlag, preparatoryVisualSignal, preparatorySoundSignal, preparatorySignal,

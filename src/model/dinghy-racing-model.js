@@ -20,6 +20,7 @@ import RaceType from './domain-classes/race-type';
 import StartType from './domain-classes/start-type';
 import Clock from './domain-classes/clock';
 import Entry from './domain-classes/entry';
+import SignedUp from './domain-classes/signed-up';
 
 class DinghyRacingModel {
     httpRootURL;
@@ -683,7 +684,103 @@ class DinghyRacingModel {
      * @param {Competitor} [crew] Competitor entering race as the crew
      * @returns {Promise<Result>}
      */
-    async createEntry(race, helm, dinghy, crew = null) {
+    // async createEntry(race, helm, dinghy, crew = null) {
+    //     let dinghyClass;
+
+    //     // check if helm, crew, and dinghy have reference to remote resource and if not fetch
+    //     // assuming if a URL supplied resource exists in REST service
+    //     let promises = [];
+    //     let results = [];
+    //     // need race url
+    //     if (!race.url) {
+    //         promises.push(this.getRaceByNameAndPlannedStartTime(race.name, race.plannedStartTime));
+    //     }
+    //     else {
+    //         promises.push(Promise.resolve({'success': true, 'domainObject': race}));
+    //     }
+    //     // need helm url
+    //     if (!helm.url) {
+    //         // lookup helm
+    //         promises.push(this.getCompetitorByName(helm.name));
+    //     }
+    //     else {
+    //         // use supplied url
+    //         promises.push(Promise.resolve({'success': true, 'domainObject': helm}));
+    //     }
+    //     // need dinghy url
+    //     if (!dinghy.url) {
+    //         // Need dinghy class url to lookup dinghy
+    //         if (!dinghy.dinghyClass.url) {
+    //             const result = await this.getDinghyClassByName(dinghy.dinghyClass.name);
+    //             if (result.success) {
+    //                 dinghyClass = result.domainObject;
+    //             }
+    //             else {
+    //                 return Promise.resolve(result);
+    //             }
+    //         }
+    //         else {
+    //             dinghyClass = dinghy.dinghyClass;
+    //         }
+    //         // lookup dinghy
+    //         promises.push(this.getDinghyBySailNumberAndDinghyClass(dinghy.sailNumber, dinghyClass));
+    //     }
+    //     else {
+    //         // use supplied dinghy url
+    //         promises.push(Promise.resolve({'success': true, 'domainObject': dinghy}));
+    //     }
+    //     // if crew supplied need crew URL
+    //     if (crew && !crew.url) {
+    //         promises.push(this.getCompetitorByName(crew.name));
+    //     }
+    //     else {
+    //         // deal with a null crew later
+    //         promises.push(Promise.resolve({'success': true, 'domainObject': crew}));
+    //     }
+    //     // check if helm and dinghy retrieved via REST
+    //     // if fetch was not required use helm or dinghy passed as parameters
+    //     results = await Promise.all(promises);
+    //     // create new entry
+    //     if (results[0].success && results[1].success && results[2].success && results[3].success) {
+    //         let result;
+    //         if (crew) {
+    //             result = await this.create('entries', {'race': results[0].domainObject.url, 'helm': results[1].domainObject.url, 'dinghy': results[2].domainObject.url, 'crew': results[3].domainObject.url});
+    //         }
+    //         else {
+    //             result = await this.create('entries', {'race': results[0].domainObject.url, 'helm': results[1].domainObject.url, 'dinghy': results[2].domainObject.url});
+    //         }
+    //         if (result.success) {
+    //             return this._entryBuilder(result);
+    //         }
+    //         else {
+    //             return Promise.resolve(result);
+    //         }
+    //     }
+    //     else {
+    //         // combine failure messages and return failure
+    //         let message = '';
+    //         results.forEach(result => {
+    //             if (!result.success) {
+    //                 if (message) {
+    //                     message += '\n';
+    //                 }
+    //                 message += result.message;
+    //             }
+    //         })
+    //         return Promise.resolve({'success': false, 'message': message});
+    //     }
+    // }
+    /**
+     * 
+     * Sign up to a race
+     * Supplied race, helm, dinghy, and crew must exist
+     * @param {Race} race Race to enter
+     * @param {Competitor} helm Competitor entering race as the helm
+     * @param {Dinghy} dinghy Dinghy to be sailed in race
+     * @param {Competitor} [crew] Competitor entering race as the crew
+     * @returns {Promise<Result>}
+     */
+    async signUp(race, helm, dinghy, crew = null) {
         let dinghyClass;
 
         // check if helm, crew, and dinghy have reference to remote resource and if not fetch
@@ -739,20 +836,13 @@ class DinghyRacingModel {
         // check if helm and dinghy retrieved via REST
         // if fetch was not required use helm or dinghy passed as parameters
         results = await Promise.all(promises);
-        // if successful return success result
+        // Sign up
         if (results[0].success && results[1].success && results[2].success && results[3].success) {
-            let result;
             if (crew) {
-                result = await this.create('entries', {'race': results[0].domainObject.url, 'helm': results[1].domainObject.url, 'dinghy': results[2].domainObject.url, 'crew': results[3].domainObject.url});
+                return this.update(results[0].domainObject.url + '/signUp', {'helm': results[1].domainObject.url, 'dinghy': results[2].domainObject.url, 'crew': results[3].domainObject.url});
             }
             else {
-                result = await this.create('entries', {'race': results[0].domainObject.url, 'helm': results[1].domainObject.url, 'dinghy': results[2].domainObject.url});
-            }
-            if (result.success) {
-                return this._entryBuilder(result);
-            }
-            else {
-                return Promise.resolve(result);
+                return this.update(results[0].domainObject.url + '/signUp', {'helm': results[1].domainObject.url, 'dinghy': results[2].domainObject.url});
             }
         }
         else {
@@ -773,6 +863,7 @@ class DinghyRacingModel {
     /**
      * Update an entry to a race
      * Supplied entry, helm, dinghy, and crew must exist
+     * ON success returns a result containing the updated entry
      * @param {Entry} entry Entry to update
      * @param {Competitor} helm Competitor entering race as the helm
      * @param {Dinghy} dinghy Dinghy to be sailed in race
@@ -828,7 +919,7 @@ class DinghyRacingModel {
         // check if helm and dinghy retrieved via REST
         // if fetch was not required use helm or dinghy passed as parameters
         results = await Promise.all(promises);
-        // if successful return success result
+        // update entry
         if (results[0].success && results[1].success && results[2].success) {
             let result;
             if (crew) {
@@ -859,33 +950,62 @@ class DinghyRacingModel {
         }
     }
 
-    async _entryBuilder(entryResult) {
-        const raceResult = await this.getRace(entryResult.domainObject._links.race.href);
-        const helmResult = await this.getCompetitor(entryResult.domainObject._links.helm.href);
-        const dinghyResult = await this.getDinghy(entryResult.domainObject._links.dinghy.href);
-        const lapsResult = await this.getLaps(entryResult.domainObject._links.laps.href);
-        let crewResult = await this.getCompetitor(entryResult.domainObject._links.crew.href);
-        if (!raceResult.success) {
-            return Promise.resolve(raceResult);
+    /**
+     * Build an Entry
+     * @param {Result} entryResult 
+     * @param {Boolean} getSignedUpTo 
+     * @returns 
+     */
+    async _entryBuilder(entryResult, getSignedUpTo = true) {
+        const url = entryResult.domainObject._links.self.href;
+        if (this.entryResultMap.has(url) && this.entryResultMap.get(url).eTag === entryResult.eTag) {
+            return Promise.resolve(this.entryResultMap.get(url));
         }
-        if (!helmResult.success) {
-            return Promise.resolve(helmResult);
-        }
-        if (!dinghyResult.success) {
-            return Promise.resolve(dinghyResult);
-        }
-        if (!lapsResult.success) {
-            return Promise.resolve(lapsResult);
-        }
-        if (!crewResult.success) {
-            if (/404/.test(crewResult.message)) {
-                crewResult = {...crewResult, 'domainObject': null};
+        else {
+            // get race, helm, crew, and dinghy
+            const promises = [];
+            promises.push(this.getCompetitor(entryResult.domainObject._links.helm.href)); // helm
+            promises.push(this.getDinghy(entryResult.domainObject._links.dinghy.href)); // dinghy
+            promises.push(this.getCompetitor(entryResult.domainObject._links.crew.href)); // crew
+            promises.push(this.getLaps(entryResult.domainObject._links.laps.href)); // laps
+            const results = await Promise.all(promises);
+            // helm
+            if (!results[0].success) {
+                return Promise.resolve(results[1]);
             }
-            else {
-                return Promise.resolve(crewResult);
+            // dinghy
+            if (!results[1].success) {
+                return Promise.resolve(results[3]);
             }
+            // crew
+            if (!results[2].success) {
+                // entry may not have a crew
+                if (/404/.test(results[2].message)) {
+                    results[2] = {...results[2], 'domainObject': null};
+                }
+                else {
+                    return Promise.resolve(results[2]);
+                }
+            }
+            // laps
+            if (!results[3].success) {
+                return Promise.resolve(results[3]);
+            }
+            const entry = this._convertEntryHALtoEntry(entryResult.domainObject, [], results[0].domainObject, results[1].domainObject, results[2].domainObject, results[3].domainObject, entryResult.eTag ? {eTag: entryResult.eTag} : null);
+            // need to avoid infinite recursion when fetching signedUpTo
+            if (getSignedUpTo) {
+                const signedUpToResult = await this.getSignedUpTo(entryResult.domainObject._links.signedUpTo.href, null, entry);
+                if (!signedUpToResult.success) {
+                    return Promise.resolve(signedUpToResult);
+                }
+                entry.signedUpTo = signedUpToResult.domainObject;
+            }            
+            const newResult = {success: true, domainObject: entry, eTag: entryResult.eTag}
+            if (newResult.eTag) {
+                this.entryResultMap.set(url, newResult);
+            }
+            return Promise.resolve(newResult);
         }
-        return Promise.resolve({'success': true, 'domainObject': this._convertEntryHALtoEntry(entryResult.domainObject, raceResult.domainObject, helmResult.domainObject, dinghyResult.domainObject, crewResult.domainObject, lapsResult.domainObject, null)});
     }
 
     /**
@@ -899,13 +1019,14 @@ class DinghyRacingModel {
 
     /**
      * Update the position of an entry in a race
+     * @param {Race} race
      * @param {Entry} entry
      * @param {Integer} newPosition
      * @returns {Promise<Result}
      */
-    async updateEntryPosition(entry, newPosition) {
+    async updateEntryPosition(race, entry, newPosition) {
         let message = '';
-        if (!entry.race.url) {
+        if (!race.url) {
             message += 'The race URL is required to update an entry position.';
         }
         if (!entry.url) {
@@ -917,7 +1038,7 @@ class DinghyRacingModel {
         if (message !== '') {
             return Promise.resolve({success: false, message: message});
         }
-        return this.update(entry.race.url + '/updateEntryPosition?entry=' + entry.url + '&position=' + newPosition);
+        return this.update(race.url + '/updateEntryPosition?entry=' + entry.url + '&position=' + newPosition);
     }
 
     /**
@@ -1251,58 +1372,16 @@ class DinghyRacingModel {
     }
 
     /**
-     * Get entry
+     * Get an entry
+     * getSignedUpTo parameter limits retrieal of signedUpTo relations to races to avoid infinite regression
      * @param {String} url Address of the remote resource
+     * @param {Boolean} getSignedUpTo True if signedUpTo links to races should also be retrieved
      * @returns {Promise<Result>}
      */
-    async getEntry(url) {
+    async getEntry(url, getSignedUpTo = true) {
         const result = await this.read(url);
         if (result.success) {
-            if (this.entryResultMap.has(url) && this.entryResultMap.get(url).eTag === result.eTag) {
-                return Promise.resolve(this.entryResultMap.get(url));
-            }
-            else {
-                // get race, helm, crew, and dinghy
-                const promises = [];
-                promises.push(this.getRace(result.domainObject._links.race.href)); // race
-                promises.push(this.getCompetitor(result.domainObject._links.helm.href)); // helm
-                promises.push(this.getDinghy(result.domainObject._links.dinghy.href)); // dinghy
-                promises.push(this.getCompetitor(result.domainObject._links.crew.href)); // crew
-                promises.push(this.getLaps(result.domainObject._links.laps.href)); // laps
-                const results = await Promise.all(promises);
-                // race
-                if (!results[0].success) {
-                    return Promise.resolve(results[0]);
-                }
-                // helm
-                if (!results[1].success) {
-                    return Promise.resolve(results[1]);
-                }
-                // dinghy
-                if (!results[2].success) {
-                    return Promise.resolve(results[3]);
-                }
-                // crew
-                if (!results[3].success) {
-                    // entry may not have a crew
-                    if (/404/.test(results[3].message)) {
-                        results[3] = {...results[3], 'domainObject': null};
-                    }
-                    else {
-                        return Promise.resolve(results[3]);
-                    }
-                }
-                // laps
-                if (!results[4].success) {
-                    return Promise.resolve(results[4]);
-                }
-                const entry = this._convertEntryHALtoEntry(result.domainObject, results[0].domainObject, results[1].domainObject, results[2].domainObject, results[3].domainObject, results[4].domainObject, result.eTag ? {eTag: result.eTag} : null);
-                const newResult = {success: true, domainObject: entry, eTag: result.eTag}
-                if (newResult.eTag) {
-                    this.entryResultMap.set(url, newResult);
-                }
-                return Promise.resolve(newResult);
-            }
+            return this._entryBuilder(result, getSignedUpTo);
         }
         else {
             return Promise.resolve(result);
@@ -1321,8 +1400,9 @@ class DinghyRacingModel {
             return Promise.resolve({'success': false, 'message': 'Cannot retrieve race entries without URL for race.'});
         }
         // get entries
-        const resource = race.url + '/signedUp';
-        const result = await this.read(resource);
+        const resource = this.httpRootURL + '/entries/search/findBySignedUpToRace?race=' + race.url;
+        // const result = await this.read(resource);
+        const result = await this.getEntriesFromURL(resource);
         if (!result.success) {
             return Promise.resolve(result);
         }
@@ -1348,6 +1428,59 @@ class DinghyRacingModel {
     }
 
     /**
+    * Get entries from the specified resource location
+    * Supports interaction with server paging and sorting
+    * Result domainObject will be collection HAL so conversion to local model entities needs to be performed by another method
+    * @param {String} url to use to retrieve a collection of races
+    * @param {Integer} [page] number to return (0 indexed)
+    * @param {Integer} [size] number of elements to return per page
+    * @param {SortParameters} [sortParameters] and order for sorting the requested races
+    * @returns {Promise<Result>} If successful result domainObject will be Array<Race>
+    */
+    async getEntriesFromURL(url, page, size, sortParameters) {
+        const hasPage = Number.isInteger(page);
+        const hasSize = Number.isInteger(size);
+        const hasSort = !(sortParameters == null);
+        const hasParams = /\?/.test(url);
+        if ((hasPage || hasSize || hasSort) && !hasParams) {
+            url += '?';
+        }
+        if (hasPage) {
+            if (hasParams) {
+                url += '&page=' + page;
+            }
+            else {
+                url += 'page=' + page;
+            }
+        }
+        if (hasSize) {
+            if (hasParams || hasPage) {
+                url += '&size=' + size;
+            }
+            else {
+                url += 'size=' + size;
+            }
+        }
+        if (hasSort) {
+            if (hasParams || hasPage || hasSize) {
+                url += '&sort=' + sortParameters.by + ',' + (sortParameters.order || 'ASC');
+            }
+            else {
+                url += 'sort=' + sortParameters.by + ',' + (sortParameters.order || 'ASC');
+            }
+        }
+
+        const result = await this.read(url);
+        if (result.success) {
+            if (!hasPage && !hasSize && result.domainObject.page?.totalElements > result.domainObject.page?.size) {
+                return this.getRacesFromURL(url, 0, result.domainObject.page.totalElements);
+            }
+            return Promise.resolve({success: true, domainObject: result.domainObject});
+        }
+        return Promise.resolve(result);
+    }
+
+    /**
      * Get laps
      * On success result domain object will be an array of Lap types; {Array<Lap>}
      * @param {String} url Address of the remote resource
@@ -1365,6 +1498,81 @@ class DinghyRacingModel {
         // convert REST data to local format
         const laps = lapsCollectionHAL.map(lap => {return {...DinghyRacingModel.lapTemplate, 'number': lap.number, 'time': this.convertISO8601DurationToMilliseconds(lap.time)}});
         return Promise.resolve({'success': true, 'domainObject': laps});
+    }
+
+    /**
+     * Get a signedUp
+     * @param {string} url
+     * @param {Race} [race]
+     * @param {Entry} [entry]
+     * @returns {Promise<Result>}
+     */
+    async getSignedUp(url, race, entry) {
+        const result = await this.read(url);
+        if (result.success) {
+            if (!race) {
+                const raceResult = await this.getRace(result.domainObject._links.race.href);
+                if (raceResult.success) {
+                    race = raceResult.domainObject;
+                }
+                else {
+                    return Promise.resolve(raceResult);
+                }
+            }
+            if (!entry) {
+                const entryResult = await this.getEntry(result.domainObject._links.entry.href, false);
+                if (entryResult.success) {
+                    entry = entryResult.domainObject;
+                }
+                else {
+                    return Promise.resolve(entryResult);
+                }
+            }
+            const signedUp = new SignedUp(race, entry, this);
+            signedUp.position = result.domainObject.position;
+            return Promise.resolve({success: true, domainObject: signedUp});
+        }
+        else {
+            return Promise.resolve(result);
+        }
+    }
+
+    /**
+     * Get array of signedUp
+     * @param {string} url
+     * @param {Race} [race]
+     * @param {Entry} [entry]
+     * @returns {Promise<Result>}
+     */
+    async getSignedUpTo(url, race, entry) {
+        const signedUpToResult = await this.read(url);
+        let errorMessage;
+        const signedUpTo = []; 
+        if (signedUpToResult.success) {
+            const signedUpPromises = signedUpToResult.domainObject._embedded.signedUps.map((signedUpHAL) => {
+                return this.getSignedUp(signedUpHAL._links.self.href, race, entry);
+            });
+            const results = await Promise.all(signedUpPromises);
+            results.forEach(result => {
+                if (result.success) {
+                    signedUpTo.push(result.domainObject);
+                }
+                else {
+                    if (errorMessage) {
+                        errorMessage = errorMessage ? errorMessage + '/n' + result.message : result.message;
+                    }
+                }
+            });
+        }
+        else {
+            return Promise.resolve(signedUpToResult);
+        }
+        if (!errorMessage) {
+            return Promise.resolve({success: true, domainObject: signedUpTo})
+        }
+        else {
+            return Promise.resolve({success: false, message: errorMessage});
+        }
     }
 
     /**
@@ -1755,11 +1963,11 @@ class DinghyRacingModel {
             url: dinghyClassHAL._links.self.href};
     }
 
-    _convertEntryHALtoEntry(entryHAL, race, helm, dinghy, crew, laps, metadata = null) {
-        return new Entry(race, helm, crew, dinghy, laps, this.convertISO8601DurationToMilliseconds(entryHAL.sumOfLapTimes),
+    _convertEntryHALtoEntry(entryHAL, signedUpTo, helm, dinghy, crew, laps, metadata = null) {
+        return new Entry(helm, crew, signedUpTo, dinghy, laps, this.convertISO8601DurationToMilliseconds(entryHAL.sumOfLapTimes),
             entryHAL.correctedTime === 'PT2562047788015215H30M7S' ? 0 : this.convertISO8601DurationToMilliseconds(entryHAL.correctedTime),
-            entryHAL.onLastLap, entryHAL.finishedRace, entryHAL.scoringAbbreviation, entryHAL.position, entryHAL._links.self.href,
-            metadata, this);
+            entryHAL.onLastLap, entryHAL.finishedRace, entryHAL.scoringAbbreviation, entryHAL._links.self.href,
+            metadata);
     }
 
     _convertRaceHALToRace(raceHAL, fleet) {

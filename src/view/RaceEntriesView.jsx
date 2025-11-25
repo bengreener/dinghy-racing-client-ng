@@ -25,7 +25,7 @@ import RaceType from '../model/domain-classes/race-type';
 /**
  * Display race entries
  * @param {Object} props
- * @param {Array<Race>} props.raceScorpionA
+ * @param {Array<Race>} props.races
  * @returns {HTMLDivElement}
  */
 function RaceEntriesView({ races }) {
@@ -127,7 +127,7 @@ function RaceEntriesView({ races }) {
                     if (!(entry.scoringAbbreviation == null || entry.scoringAbbreviation === '')) {
                         weight = weight * 2;
                     }
-                    return (entry.position && weight === .5) ? entry.position : Date.now() * weight; // if entry doesn't have a position return a large number to put it to the bottom
+                    return (entry.getPositionInRace(entry.race) && weight === .5) ? entry.getPositionInRace(entry.race) : Date.now() * weight; // if entry doesn't have a position return a large number to put it to the bottom
                 });
                 break;
             case 'forecast':
@@ -292,7 +292,7 @@ function RaceEntriesView({ races }) {
             setDisplayOrder(newDisplayOrder);
             // If race type is pursuit and both entries in same race assign subject position from target position
             if (subjectEntry.race.type === RaceType.PURSUIT && subjectEntry.race.name === targetEntry.race.name) { // testiing equality directly on races will fail as different objects
-                updateEntryPosition(subjectEntry, targetEntry.position);
+                updateEntryPosition(subjectEntry, targetEntry.getPositionInRace(targetEntry.race));
             }
         }
         else {
