@@ -52,6 +52,9 @@ import {
     dinghy2931, dinghy2938, dinghy2969, dinghy2970, dinghy2971, dinghy2973, dinghy2985, dinghy2987, dinghy3006, dinghy3009, dinghy3014, dinghy3015, dinghy3020, dinghy3021,
     dinghy3022, dinghy3088,
 
+    entry1448, entry1450, entry1443, entry1435, entry1433, entry1444, entry1447, entry1441, entry1457, entry1456, entry1436, entry1434, entry1455, entry1440, entry1452, entry1438, entry1453, 
+    entry1445, entry1446, entry1430, entry1432, entry1437, entry1439, entry1454, entry1442, entry1431, entry1449, entry1458, entry1459, entry1451,
+
     entriesGraduateA_bigData
 } from './__mocks__/test-data-more-data';
 import FlagState from './domain-classes/flag-state';
@@ -4308,13 +4311,21 @@ describe('when searching for entries by race', () => {
     });
     describe('when there are more than 20 entries (default Spring page size) for a race', () => {
         it('returns all the entries', async () => {
-            fetch.mockImplementationOnce((resource) => {
-                if (resource === 'http://localhost:8081/dinghyracing/api/entries/search/findByRace?race=http://localhost:8081/dinghyracing/api/races/7') {
+            fetch.mockImplementation((resource) => {
+                if (resource === 'http://localhost:8081/dinghyracing/api/entries/search/findBySignedUpToRace?race=http://localhost:8081/dinghyracing/api/races/7') {
                     return Promise.resolve({
                         ok: true,
                         status: 200,
                         headers: new Headers(),
                         json: () => Promise.resolve(findByRaceGraduate_AHAL_bigData)
+                    });
+                }
+                else if (resource === 'http://localhost:8081/dinghyracing/api/entries/search/findBySignedUpToRace?race=http://localhost:8081/dinghyracing/api/races/7&page=0&size=30') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200,
+                        headers: new Headers(),
+                        json: () => Promise.resolve(signedUpGraduateAHAL_bigData)
                     });
                 }
                 else if (resource === 'http://localhost:8081/dinghyracing/api/races/7/signedUp') {
@@ -4337,99 +4348,103 @@ describe('when searching for entries by race', () => {
             const dinghyRacingModel = new DinghyRacingModel(httpRootURL, wsRootURL);
             vi.spyOn(dinghyRacingModel, 'getEntry').mockImplementation((url) => {
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1430') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorCarmenWhiting, competitorNoelHills, dinghy1, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1430', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1430});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1431') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorAjDavis, competitorDanielLittle, dinghy290, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1431', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1431});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1432') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorIvanPlatt, competitorAizaAustin, dinghy2009, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1432', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1432});
+
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1433') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorNellPowell, competitorWilliamMorrison, dinghy2097, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1433', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1433});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1434') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorGraceRees, competitorAugustKhan, dinghy2373, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1434', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1434});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1435') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorArranAshley, competitorYuvrajSheppard, dinghy2471, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1435', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1435});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1436') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorMacySmall, competitorMaximFlynn, dinghy2482, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1436', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1436});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1437') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorDestinyBourne, competitorCezarWhelan, dinghy2725, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1437', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1437});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1438') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorDominicBarnett, competitorBaileyPreston, dinghy2849, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1438', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1438});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1439') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorAlaraTaylor, competitorNadiaBarrow, dinghy2862, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1439', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1439});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1440') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorKieraDaniels, competitorZimalGrainger, dinghy2889, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1440', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1440});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1441') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorAmariBarber, competitorRuqayyahWhittle, dinghy2910, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1441', {eTag: '"1"'}, null)});
+                    
+                    return Promise.resolve({success: true, domainObject: entry1441});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1442') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorHazelWheeler, competitorJaysonGraves, dinghy2912, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1442', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1442});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1443') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorLucasMillward, competitorBellaBourne, dinghy2928, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1443', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1443});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1444') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorLouiseBarron, competitorCobieBaldwin, dinghy2931, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1444', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1444});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1445') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorAlastairKhatun, competitorIrisSandhu, dinghy2938, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1445', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1445});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1446') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorSamsonMcGowan, competitorEsmeHyde, dinghy2969, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1446', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1446});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1447') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorCalebParkinson, competitorDakotaMoss, dinghy2970, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1447', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1447});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1448') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorInayaRegan, competitorLeoEaton, dinghy2971, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1448', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1448});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1449') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorLeiaHaynes, competitorDarcyEmery, dinghy2973, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1449', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1449});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1450') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorNatanNewman, competitorDiegoHoughton, dinghy2985, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1450', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1450});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1451') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorJamesonSharpe, competitorShelbyMiller, dinghy2987, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1451', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1451});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1452') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorElifPugh, competitorMaceyVaughan, dinghy3006, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1452', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1452});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1453') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorWilfredMead, competitorLaineyAbbott, dinghy3009, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1453', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1453});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1454') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorFrankySheppard, competitorPaddyLowe, dinghy3014, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1454', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1454});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1455') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorLeniTyler, competitorBaaniManning, dinghy3015, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1455', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1455});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1456') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorMahnoorHope, competitorSarahPritchard, dinghy3020, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1456', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1456});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1457') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorAnthonyDillon, competitorLucienHoare, dinghy3021, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1457', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1457});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1458') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorZackaryLindsay, competitorSerenDuffy, dinghy3022, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1458', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1458});
                 }
                 if (url === 'http://localhost:8081/dinghyracing/api/entries/1459') {
-                    return Promise.resolve({success: true, domainObject: new Entry(raceGraduateA, competitorKhalilRushton, competitorBiancaSwan, dinghy3088, [], 0, 0, false, false, null, null, 'http://localhost:8081/dinghyracing/api/entries/1459', {eTag: '"1"'}, null)});
+                    return Promise.resolve({success: true, domainObject: entry1459});
                 }
             });
             const promise = dinghyRacingModel.getEntriesByRace(raceGraduateA);
             const result = await promise;
+            const entriesGraduateA_bigData = result.domainObject;
             expect(promise).toBeInstanceOf(Promise);
+            expect(entriesGraduateA_bigData).toHaveLength(30);
             entriesGraduateA_bigData.forEach(entry => {
                 const entryMatch = entriesGraduateA_bigData.find(element => element.url === entry.url);
                 expect(entry.race).toEqual(entryMatch.race);

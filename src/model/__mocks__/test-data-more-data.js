@@ -155,42 +155,76 @@ const dinghy3021 = {sailNumber: '3021', dinghyClass: dinghyClassGraduate, url: '
 const dinghy3022 = {sailNumber: '3022', dinghyClass: dinghyClassGraduate, url: 'http://localhost:8081/dinghyracing/api/dinghies/259'};
 const dinghy3088 = {sailNumber: '3088', dinghyClass: dinghyClassGraduate, url: 'http://localhost:8081/dinghyracing/api/dinghies/262'};
 
+const entry1448 = new Entry(competitorInayaRegan, competitorLeoEaton, [], dinghy2971, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1448', {eTag: '"1"'}, null);
+const entry1450 = new Entry(competitorNatanNewman, competitorDiegoHoughton, [], dinghy2985, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1450', {eTag: '"1"'}, null);
+const entry1443 = new Entry(competitorLucasMillward, competitorBellaBourne, [], dinghy2928, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1443', {eTag: '"1"'}, null);
+const entry1435 = new Entry(competitorArranAshley, competitorYuvrajSheppard, [], dinghy2471, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1435', {eTag: '"1"'}, null);
+const entry1433 = new Entry(competitorNellPowell, competitorWilliamMorrison, [], dinghy2097, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1433', {eTag: '"1"'}, null);
+const entry1444 = new Entry(competitorLouiseBarron, competitorCobieBaldwin, [], dinghy2931, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1444', {eTag: '"1"'}, null);
+const entry1447 = new Entry(competitorCalebParkinson, competitorDakotaMoss, [], dinghy2970, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1447', {eTag: '"1"'}, null);
+const entry1441 = new Entry(competitorAmariBarber, competitorRuqayyahWhittle, [], dinghy2910, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1441', {eTag: '"1"'}, null);
+const entry1457 = new Entry(competitorAnthonyDillon, competitorLucienHoare, [], dinghy3021, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1457', {eTag: '"1"'}, null);
+const entry1456 = new Entry(competitorMahnoorHope, competitorSarahPritchard, [], dinghy3020, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1456', {eTag: '"1"'}, null);
+const entry1436 = new Entry(competitorMacySmall, competitorMaximFlynn, [], dinghy2482, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1436', {eTag: '"1"'}, null);
+const entry1434 = new Entry(competitorGraceRees, competitorAugustKhan, [], dinghy2373, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1434', {eTag: '"1"'}, null);
+const entry1455 = new Entry(competitorLeniTyler, competitorBaaniManning, [], dinghy3015, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1455', {eTag: '"1"'}, null);
+const entry1440 = new Entry(competitorKieraDaniels, competitorZimalGrainger, [], dinghy2889, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1440', {eTag: '"1"'}, null);
+const entry1452 = new Entry(competitorElifPugh, competitorMaceyVaughan, [], dinghy3006, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1452', {eTag: '"1"'}, null);
+const entry1438 = new Entry(competitorDominicBarnett, competitorBaileyPreston, [], dinghy2849, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1438', {eTag: '"1"'}, null);
+const entry1453 = new Entry(competitorWilfredMead, competitorLaineyAbbott, [], dinghy3009, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1453', {eTag: '"1"'}, null);
+const entry1445 = new Entry(competitorAlastairKhatun, competitorIrisSandhu, [], dinghy2938, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1445', {eTag: '"1"'}, null);
+const entry1446 = new Entry(competitorSamsonMcGowan, competitorEsmeHyde, [], dinghy2969, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1446', {eTag: '"1"'}, null);
+const entry1430 = new Entry(competitorCarmenWhiting, competitorNoelHills, [], dinghy1, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1430', {eTag: '"1"'}, null);
+const entry1432 = new Entry(competitorIvanPlatt, competitorAizaAustin, [], dinghy2009, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1432', {eTag: '"1"'}, null);
+const entry1437 = new Entry(competitorDestinyBourne, competitorCezarWhelan,[], dinghy2725, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1437', {eTag: '"1"'}, null);
+const entry1439 = new Entry(competitorAlaraTaylor, competitorNadiaBarrow, [], dinghy2862, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1439', {eTag: '"1"'}, null);
+const entry1454 = new Entry(competitorFrankySheppard, competitorPaddyLowe, [], dinghy3014, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1454', {eTag: '"1"'}, null);
+const entry1442 = new Entry(competitorHazelWheeler, competitorJaysonGraves, [], dinghy2912, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1442', {eTag: '"1"'}, null);
+const entry1431 = new Entry(competitorAjDavis, competitorDanielLittle, [], dinghy290, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1431', {eTag: '"1"'}, null);
+const entry1449 = new Entry(competitorLeiaHaynes, competitorDarcyEmery, [], dinghy2973, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1449', {eTag: '"1"'}, null);
+const entry1458 = new Entry(competitorZackaryLindsay, competitorSerenDuffy, [], dinghy3022, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1458', {eTag: '"1"'}, null);
+const entry1459 = new Entry(competitorKhalilRushton, competitorBiancaSwan, [], dinghy3088, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1459', {eTag: '"1"'}, null);
+const entry1451 = new Entry(competitorJamesonSharpe, competitorShelbyMiller, [], dinghy2987, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1451', {eTag: '"1"'}, null);
+
+entry1448.signedUpTo[0] = new SignedUp(raceGraduateA, entry1448);
+entry1450.signedUpTo[0] = new SignedUp(raceGraduateA, entry1450);
+entry1443.signedUpTo[0] = new SignedUp(raceGraduateA, entry1443);
+entry1435.signedUpTo[0] = new SignedUp(raceGraduateA, entry1435);
+entry1433.signedUpTo[0] = new SignedUp(raceGraduateA, entry1433);
+entry1444.signedUpTo[0] = new SignedUp(raceGraduateA, entry1444);
+entry1447.signedUpTo[0] = new SignedUp(raceGraduateA, entry1447);
+entry1441.signedUpTo[0] = new SignedUp(raceGraduateA, entry1441);
+entry1457.signedUpTo[0] = new SignedUp(raceGraduateA, entry1457);
+entry1456.signedUpTo[0] = new SignedUp(raceGraduateA, entry1456);
+entry1436.signedUpTo[0] = new SignedUp(raceGraduateA, entry1436);
+entry1434.signedUpTo[0] = new SignedUp(raceGraduateA, entry1434);
+entry1455.signedUpTo[0] = new SignedUp(raceGraduateA, entry1455);
+entry1440.signedUpTo[0] = new SignedUp(raceGraduateA, entry1440);
+entry1452.signedUpTo[0] = new SignedUp(raceGraduateA, entry1452);
+entry1438.signedUpTo[0] = new SignedUp(raceGraduateA, entry1438);
+entry1453.signedUpTo[0] = new SignedUp(raceGraduateA, entry1453);
+entry1445.signedUpTo[0] = new SignedUp(raceGraduateA, entry1445);
+entry1446.signedUpTo[0] = new SignedUp(raceGraduateA, entry1446);
+entry1430.signedUpTo[0] = new SignedUp(raceGraduateA, entry1430);
+entry1432.signedUpTo[0] = new SignedUp(raceGraduateA, entry1432);
+entry1437.signedUpTo[0] = new SignedUp(raceGraduateA, entry1437);
+entry1439.signedUpTo[0] = new SignedUp(raceGraduateA, entry1439);
+entry1454.signedUpTo[0] = new SignedUp(raceGraduateA, entry1454);
+entry1442.signedUpTo[0] = new SignedUp(raceGraduateA, entry1442);
+entry1431.signedUpTo[0] = new SignedUp(raceGraduateA, entry1431);
+entry1449.signedUpTo[0] = new SignedUp(raceGraduateA, entry1449);
+entry1458.signedUpTo[0] = new SignedUp(raceGraduateA, entry1458);
+entry1459.signedUpTo[0] = new SignedUp(raceGraduateA, entry1459);
+entry1451.signedUpTo[0] = new SignedUp(raceGraduateA, entry1451);
+
 const entriesGraduateA_bigData = [
-    new Entry(competitorInayaRegan, competitorLeoEaton, [], dinghy2971, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1448', {eTag: '"1"'}, null),
-    new Entry(competitorNatanNewman, competitorDiegoHoughton, [], dinghy2985, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1450', {eTag: '"1"'}, null),
-    new Entry(competitorLucasMillward, competitorBellaBourne, [], dinghy2928, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1443', {eTag: '"1"'}, null),
-    new Entry(competitorArranAshley, competitorYuvrajSheppard, [], dinghy2471, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1435', {eTag: '"1"'}, null),
-    new Entry(competitorNellPowell, competitorWilliamMorrison, [], dinghy2097, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1433', {eTag: '"1"'}, null),
-    new Entry(competitorLouiseBarron, competitorCobieBaldwin, [], dinghy2931, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1444', {eTag: '"1"'}, null),
-    new Entry(competitorCalebParkinson, competitorDakotaMoss, [], dinghy2970, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1447', {eTag: '"1"'}, null),
-    new Entry(competitorAmariBarber, competitorRuqayyahWhittle, [], dinghy2910, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1441', {eTag: '"1"'}, null),
-    new Entry(competitorAnthonyDillon, competitorLucienHoare, [], dinghy3021, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1457', {eTag: '"1"'}, null),
-    new Entry(competitorMahnoorHope, competitorSarahPritchard, [], dinghy3020, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1456', {eTag: '"1"'}, null),
-    new Entry(competitorMacySmall, competitorMaximFlynn, [], dinghy2482, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1436', {eTag: '"1"'}, null),
-    new Entry(competitorGraceRees, competitorAugustKhan, [], dinghy2373, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1434', {eTag: '"1"'}, null),
-    new Entry(competitorLeniTyler, competitorBaaniManning, [], dinghy3015, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1455', {eTag: '"1"'}, null),
-    new Entry(competitorKieraDaniels, competitorZimalGrainger, [], dinghy2889, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1440', {eTag: '"1"'}, null),
-    new Entry(competitorElifPugh, competitorMaceyVaughan, [], dinghy3006, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1452', {eTag: '"1"'}, null),
-    new Entry(competitorDominicBarnett, competitorBaileyPreston, [], dinghy2849, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1438', {eTag: '"1"'}, null),
-    new Entry(competitorWilfredMead, competitorLaineyAbbott, [], dinghy3009, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1453', {eTag: '"1"'}, null),
-    new Entry(competitorAlastairKhatun, competitorIrisSandhu, [], dinghy2938, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1445', {eTag: '"1"'}, null),
-    new Entry(competitorSamsonMcGowan, competitorEsmeHyde, [], dinghy2969, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1446', {eTag: '"1"'}, null),
-    new Entry(competitorCarmenWhiting, competitorNoelHills, [], dinghy1, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1430', {eTag: '"1"'}, null),
-    new Entry(competitorIvanPlatt, competitorAizaAustin, [], dinghy2009, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1432', {eTag: '"1"'}, null),
-    new Entry(competitorDestinyBourne, competitorCezarWhelan,[], dinghy2725, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1437', {eTag: '"1"'}, null),
-    new Entry(competitorAlaraTaylor, competitorNadiaBarrow, [], dinghy2862, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1439', {eTag: '"1"'}, null),
-    new Entry(competitorFrankySheppard, competitorPaddyLowe, [], dinghy3014, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1454', {eTag: '"1"'}, null),
-    new Entry(competitorHazelWheeler, competitorJaysonGraves, [], dinghy2912, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1442', {eTag: '"1"'}, null),
-    new Entry(competitorAjDavis, competitorDanielLittle, [], dinghy290, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1431', {eTag: '"1"'}, null),
-    new Entry(competitorLeiaHaynes, competitorDarcyEmery, [], dinghy2973, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1449', {eTag: '"1"'}, null),
-    new Entry(competitorZackaryLindsay, competitorSerenDuffy, [], dinghy3022, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1458', {eTag: '"1"'}, null),
-    new Entry(competitorKhalilRushton, competitorBiancaSwan, [], dinghy3088, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1459', {eTag: '"1"'}, null),
-    new Entry(competitorJamesonSharpe, competitorShelbyMiller, [], dinghy2987, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/1451', {eTag: '"1"'}, null)
+    entry1448, entry1450, entry1443, entry1435, entry1433, entry1444, entry1447, entry1441, entry1457, entry1456, entry1436, entry1434, entry1455, entry1440, entry1452, entry1438, entry1453, 
+        entry1445, entry1446, entry1430, entry1432, entry1437, entry1439, entry1454, entry1442, entry1431, entry1449, entry1458, entry1459, entry1451
 ]
 
-for (let i = 0; i < entriesGraduateA_bigData.length; i++) {
-    entriesGraduateA_bigData[i].signedUpTo = [new SignedUp(raceGraduateA, entriesGraduateA_bigData[i])];    
-}
+// for (let i = 0; i < entriesGraduateA_bigData.length; i++) {
+//     entriesGraduateA_bigData[i].signedUpTo = [new SignedUp(raceGraduateA, entriesGraduateA_bigData[i])];    
+// }
 // entriesGraduateA_bigData[0].signedUpTo = new SignedUp(raceGraduateA, entriesGraduateA_bigData[0]);
 
 export {
@@ -209,5 +243,9 @@ export {
     dinghy2931, dinghy2938, dinghy2969, dinghy2970, dinghy2971, dinghy2973, dinghy2985, dinghy2987, dinghy3006, dinghy3009, dinghy3014, dinghy3015, dinghy3020, dinghy3021,
     dinghy3022, dinghy3088,
 
+    entry1448, entry1450, entry1443, entry1435, entry1433, entry1444, entry1447, entry1441, entry1457, entry1456, entry1436, entry1434, entry1455, entry1440, entry1452, entry1438, entry1453, 
+    entry1445, entry1446, entry1430, entry1432, entry1437, entry1439, entry1454, entry1442, entry1431, entry1449, entry1458, entry1459, entry1451,
+
     entriesGraduateA_bigData
+
 }

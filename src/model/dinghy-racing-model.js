@@ -1377,7 +1377,7 @@ class DinghyRacingModel {
         const result = await this.read(url);
         if (result.success) {
             if (!hasPage && !hasSize && result.domainObject.page?.totalElements > result.domainObject.page?.size) {
-                return this.getRacesFromURL(url, 0, result.domainObject.page.totalElements);
+                return this.getEntriesFromURL(url, 0, result.domainObject.page.totalElements);
             }
             return Promise.resolve({success: true, domainObject: result.domainObject});
         }
