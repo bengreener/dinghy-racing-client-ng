@@ -19,12 +19,10 @@
  * @param {String} resource URL of the server that will provide the properties
  * @returns {Promise<Object>}
  */
-// async function getDinghyRacingProperties(resource) {
-async function getDinghyRacingProperties() {
-    // const response =  await fetch(resource, {method: 'GET', headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}, 
-    //     cache: 'no-store'});
-    // return response.json();
-    return Promise.resolve({'httpRootURL':'http://localhost:8081/dinghyracing/api','wsRootURL':'ws://localhost:8081/dinghyracingws'});
+async function getDinghyRacingProperties(resource) {
+    const response =  await fetch(resource, {method: 'GET', headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}, 
+        cache: 'no-store'});
+    return response.json();
 }
 
 export default getDinghyRacingProperties;
