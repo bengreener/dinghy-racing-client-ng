@@ -16,8 +16,21 @@
 
 import NameFormat from './name-format';
 
-/**
- * Options for configuring a download file
- * @typedef DownloadOptions
- * @property {NameFormat} nameFormat
- */
+class DownloadOptions {
+
+    #nameFormat;
+
+    /**
+     * Create a DownloadOption
+     * @param {NameFormat} nameFormat 
+     */
+    constructor(nameFormat) {
+        this.#nameFormat = nameFormat;
+    }
+
+    get nameFormat() {
+        return this.#nameFormat;
+    }
+}
+
+export default DownloadOptions;

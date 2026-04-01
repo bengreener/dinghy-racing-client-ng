@@ -14,13 +14,36 @@
  * limitations under the License. 
  */
 
+import SylphModel from '../model/sylph-model';
 import { downloadRaceEntriesCSV, functionsForTestingOnly } from './csv-writer';
-import  { raceScorpionA, raceCometA, raceHandicapA, entriesScorpionA, racePursuitA, entriesCometA, entriesHandicapA, entriesPursuitA } from '../model/__mocks__/test-data';
+import Collection from '../model/collection';
+import Competitor from '../model/competitor';
+import Dinghy from '../model/dinghy';
+import DinghyClass from '../model/dinghy-class';
+import Entry from '../model/entry';
+import Fleet from '../model/fleet';
+import Lap from '../model/lap';
 import NameFormat from '../controller/name-format';
+import Race from '../model/race';
+import RaceType from '../model/race-type';
+import  { 
+    httpRootURL, wsRootURL,
+    entryChrisMarshall1234ScorpionAHAL, entryJillMyer826CometAHAL, entrySarahPascal6745ScorpionAHAL,
+    raceCometAHAL, raceHandicapAHAL, racePursuitAHAL, raceScorpionAHAL,
+    fleetScorpionHAL,
+    dinghyClassScorpionHAL,
+    competitorChrisMarshallHAL,
+    competitorSarahPascalHAL,
+    competitorLouScrewHAL,
+    competitorJillMyerHAL,
+    dinghy1234HAL,
+    dinghy6745HAL
+} from '../model/__mocks__/test-data';
 
-vi.mock('../model/domain-classes/clock');
+vi.mock('../model/sylph-model');
+vi.mock('../model/clock');
 
-afterEach(() => {
+beforeEach(() => {
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
 });
@@ -38,47 +61,74 @@ it('returns a promise indicating success', async () => {
         createObjectURL: vi.fn(),
         revokeObjectURL: vi.fn()
     });
-    const promise = downloadRaceEntriesCSV(raceScorpionA, entriesScorpionA);
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+    const entryChrisMarshall = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
+    const entrySarahPascal = new Entry(entrySarahPascal6745ScorpionAHAL, {version: '"0"'}, model);
+    vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
+    vi.spyOn(entrySarahPascal, 'getPositionInDirectRace').mockImplementation(async () => {return 2});
+    vi.spyOn(entryChrisMarshall, 'getLaps').mockImplementation(async () =>{return new Collection([], {size: 20,totalElements: 0, totalPages: 0,number: 0})});
+    vi.spyOn(entrySarahPascal, 'getLaps').mockImplementation(async () => {return new Collection([], {size: 20,totalElements: 0, totalPages: 0,number: 0})});
+    const promise = downloadRaceEntriesCSV(race, [entryChrisMarshall, entrySarahPascal]);
     expect(promise).toBeInstanceOf(Promise);
-    expect(await promise).toEqual({'success': true});
+    expect(await promise).toEqual(true);
 });
 
-it('returns a promise indicating failure and providing a message with the cause', async () => {
+it('throws an error on failure and provides a message explaining the cause', async () => {
     // JSDom will generate an error in the console when the test is run as a warning against navigating URLs during tests.
     // I don't know how to block this but, don't believe it is an issue here.
     // Error: Not implemented: navigation (except hash changes)
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.stubGlobal('URL', {
         createObjectURL: vi.fn(() => {throw new Error('Oops!')}),
         revokeObjectURL: vi.fn()
     });
-    const promise = downloadRaceEntriesCSV(raceScorpionA, entriesScorpionA);
-    expect(promise).toBeInstanceOf(Promise);
-    expect(await promise).toEqual({'success': false, 'message': 'Oops!'});
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+    const entryChrisMarshall = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
+    const entrySarahPascal = new Entry(entrySarahPascal6745ScorpionAHAL, {version: '"0"'}, model);
+    vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
+    vi.spyOn(entrySarahPascal, 'getPositionInDirectRace').mockImplementation(async () => {return 2});
+    vi.spyOn(entryChrisMarshall, 'getLaps').mockImplementation(async () =>{return new Collection([], {size: 20,totalElements: 0, totalPages: 0,number: 0})});
+    vi.spyOn(entrySarahPascal, 'getLaps').mockImplementation(async () => {return new Collection([], {size: 20,totalElements: 0, totalPages: 0,number: 0})});
+    await expect(() => downloadRaceEntriesCSV(race, [entryChrisMarshall, entrySarahPascal])).rejects.toThrowError('Oops!');
 });
 
 describe('when race is for fleet that includes dinghy classes with crew', () => {
-    it('provides a header row that includes crew name header', () => {
-        const entriesScorpionA_with_laps = [{...entriesScorpionA[0]}, {...entriesScorpionA[1]}];
-        entriesScorpionA_with_laps[0].laps = [{'number': 1, 'time': 1000}, {'number': 2, 'time': 1100}, {'number': 3, 'time': 1200}];
-        entriesScorpionA_with_laps[1].laps = [{'number': 1, 'time': 1010}, {'number': 2, 'time': 1110}, {'number': 3, 'time': 1210}];
-        entriesScorpionA_with_laps[0].sumOfLapTimes =  3300;
-        entriesScorpionA_with_laps[1].sumOfLapTimes =  3330;
-        entriesScorpionA_with_laps[0].position = 1;
-        entriesScorpionA_with_laps[1].position = 2;
-        const header = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceScorpionA, entriesScorpionA_with_laps)[0];
+    it('provides a header row that includes crew name header', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const entryChrisMarshall = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
+        const entrySarahPascal = new Entry(entrySarahPascal6745ScorpionAHAL, {version: '"0"'}, model);
+        vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
+        vi.spyOn(entrySarahPascal, 'getPositionInDirectRace').mockImplementation(async () => {return 2});
+
+        const records = await functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(race, [entryChrisMarshall, entrySarahPascal], true);
+        const header = records[0];
     
         expect(header).toEqual('HelmName,CrewName,SailNo,Class,Place,Elapsed,Laps,Code,RaceRating,Corrected\n');
     });
-    it('converts race entry data to an array of comma seperated value data with one row per entry in race', () => {
-        const entriesScorpionA_with_laps = [{...entriesScorpionA[0]}, {...entriesScorpionA[1]}];
-        entriesScorpionA_with_laps[0].laps = [{'number': 1, 'time': 923000}, {'number': 2, 'time': 896000}, {'number': 3, 'time': 934000}];
-        entriesScorpionA_with_laps[1].laps = [{'number': 1, 'time': 970000}, {'number': 2, 'time': 947000}, {'number': 3, 'time': 963000}];
-        entriesScorpionA_with_laps[0].sumOfLapTimes =  2753000;
-        entriesScorpionA_with_laps[1].sumOfLapTimes =  2880000;
-        entriesScorpionA_with_laps[0].position = 1;
-        entriesScorpionA_with_laps[1].position = 2;
-        const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceScorpionA, entriesScorpionA_with_laps);
-        expect(data.slice(1)).toEqual([
+    it('converts race entry data to an array of comma seperated value data with one row per entry in race', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT45M53S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+        const entrySarahPascal = new Entry({...entrySarahPascal6745ScorpionAHAL, sumOfLapTimes: 'PT48M0S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+        vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
+        vi.spyOn(entrySarahPascal, 'getPositionInDirectRace').mockImplementation(async () => {return 2});
+        vi.spyOn(entryChrisMarshall, 'getLaps').mockImplementation(async () =>{return new Collection([
+            new Lap(1, 923000, {version: '"0"'}, model),
+            new Lap(2, 896000, {version: '"0"'}, model),
+            new Lap(3, 934000, {version: '"0"'}, model)
+        ], {size: 20,totalElements: 3, totalPages: 0,number: 0})});
+        vi.spyOn(entrySarahPascal, 'getLaps').mockImplementation(async () => {return new Collection([
+            new Lap(1, 970000, {version: '"0"'}, model),
+            new Lap(2, 947000, {version: '"0"'}, model),
+            new Lap(3, 963000, {version: '"0"'}, model)
+        ], {size: 20,totalElements: 0, totalPages: 0,number: 0})});
+
+        const records = await functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(race, [entryChrisMarshall, entrySarahPascal], true);
+
+        expect(records.slice(1)).toEqual([
             'Chris Marshall,Lou Screw,1234,SCORPION,1,2753,3,,1043,0\n',
             'Sarah Pascal,Owain Davies,6745,SCORPION,2,2880,3,,1043,0\n'
         ]);
@@ -86,49 +136,70 @@ describe('when race is for fleet that includes dinghy classes with crew', () => 
 });
 
 describe('when race is for fleet that includes only dinghy classes without crew', () => {
-    it('provides a header row without crew name header', () => {
-        const entriesCometA_with_laps = entriesCometA;
-        entriesCometA_with_laps[0].laps = [{'number': 1, 'time': 1000}, {'number': 2, 'time': 1100}, {'number': 3, 'time': 1200}];
-        entriesCometA_with_laps[0].sumOfLapTimes =  3300;
-        const header = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceCometA, entriesCometA_with_laps)[0];
+    it('provides a header row without crew name header', async () => {const model = new SylphModel(httpRootURL, wsRootURL);
+        const race = new Race(raceCometAHAL, {version: '"0"'}, model);
+        const entryJillMyer = new Entry(entryJillMyer826CometAHAL, {version: '"0"'}, model);
+        vi.spyOn(entryJillMyer, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
+
+        const records = await functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(race, [entryJillMyer], false);
+        const header = records[0];
     
         expect(header).toEqual('HelmName,SailNo,Class,Place,Elapsed,Laps,Code,RaceRating,Corrected\n');
     });
-    it('converts race entry data to an array of comma seperated value data with one row per entry in race', () => {
-        const entriesCometA_with_laps = entriesCometA;
-        entriesCometA_with_laps[0].laps = [{'number': 1, 'time': 1000}, {'number': 2, 'time': 1100}, {'number': 3, 'time': 1200}];
-        entriesCometA_with_laps[0].sumOfLapTimes =  3300;
-        entriesCometA_with_laps[0].position = 1;
-        const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceCometA, entriesCometA_with_laps);
-        expect(data.slice(1)).toEqual([
+    it('converts race entry data to an array of comma seperated value data with one row per entry in race', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const race = new Race(raceCometAHAL, {version: '"0"'}, model);
+        const entryJillMyer = new Entry({...entryJillMyer826CometAHAL, sumOfLapTimes: 'PT0M3S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+        vi.spyOn(entryJillMyer, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
+        vi.spyOn(entryJillMyer, 'getLaps').mockImplementation(async () =>{return new Collection([
+            new Lap(1, 1000, {version: '"0"'}, model),
+            new Lap(2, 1100, {version: '"0"'}, model),
+            new Lap(3, 1200, {version: '"0"'}, model)
+        ], {size: 20,totalElements: 3, totalPages: 0,number: 0})});
+
+        const records = await functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(race, [entryJillMyer], false);
+
+        expect(records.slice(1)).toEqual([
             'Jill Myer,826,Comet,1,3,3,,1210,0\n'
         ]);
     });
 });
 
 describe('when race is a handicap race', () => {
-    it('provides a header row that includes crew name header', () => {
-        const entriesScorpionA_with_laps = [{...entriesScorpionA[0]}, {...entriesScorpionA[1]}];
-        entriesScorpionA_with_laps[0].laps = [{'number': 1, 'time': 1000}, {'number': 2, 'time': 1100}, {'number': 3, 'time': 1200}];
-        entriesScorpionA_with_laps[1].laps = [{'number': 1, 'time': 1010}, {'number': 2, 'time': 1110}, {'number': 3, 'time': 1210}];
-        entriesScorpionA_with_laps[0].sumOfLapTimes =  3300;
-        entriesScorpionA_with_laps[1].sumOfLapTimes =  3330;
-        entriesScorpionA_with_laps[0].position =  1;
-        entriesScorpionA_with_laps[1].position =  2;
-        const header = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceScorpionA, entriesScorpionA_with_laps)[0];
+    it('provides a header row that includes crew name header', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+        const entryChrisMarshall = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
+        const entryJillMyer = new Entry(entryJillMyer826CometAHAL, {version: '"0"'}, model);
+        vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
+        vi.spyOn(entryJillMyer, 'getPositionInDirectRace').mockImplementation(async () => {return 2});
+
+        const records = await functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(race, [entryChrisMarshall, entryJillMyer], true);
+        const header = records[0];
     
         expect(header).toEqual('HelmName,CrewName,SailNo,Class,Place,Elapsed,Laps,Code,RaceRating,Corrected\n');
     });
-    it('converts race entry data to an array of comma seperated value data with one row per entry in race', () => {
-        const entriesHandicapA_with_laps = entriesHandicapA;
-        entriesHandicapA_with_laps[0].laps = [{'number': 1, 'time': 975000}, {'number': 2, 'time': 956000}, {'number': 3, 'time': 1246000}];
-        entriesHandicapA_with_laps[1].laps = [{'number': 1, 'time': 1340000}, {'number': 2, 'time': 1019000}, {'number': 3, 'time': 1362000}];
-        entriesHandicapA_with_laps[0].sumOfLapTimes =  3177000;
-        entriesHandicapA_with_laps[1].sumOfLapTimes =  3721000;
-        entriesHandicapA_with_laps[0].position =  1;
-        entriesHandicapA_with_laps[1].position =  2;
-        const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceHandicapA, entriesHandicapA_with_laps);
-        expect(data.slice(1)).toEqual([
+    it('converts race entry data to an array of comma seperated value data with one row per entry in race', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+        const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT52M57S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+        const entryJillMyer = new Entry({...entryJillMyer826CometAHAL, sumOfLapTimes: 'PT1H2M1S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+        vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
+        vi.spyOn(entryJillMyer, 'getPositionInDirectRace').mockImplementation(async () => {return 2});
+        vi.spyOn(entryChrisMarshall, 'getLaps').mockImplementation(async () =>{return new Collection([
+            new Lap(1, 975000, {version: '"0"'}, model),
+            new Lap(2, 956000, {version: '"0"'}, model),
+            new Lap(3, 1246000, {version: '"0"'}, model)
+        ], {size: 20,totalElements: 3, totalPages: 0,number: 0})});
+        vi.spyOn(entryJillMyer, 'getLaps').mockImplementation(async () =>{return new Collection([
+            new Lap(1, 1340000, {version: '"0"'}, model),
+            new Lap(2, 1019000, {version: '"0"'}, model),
+            new Lap(3, 1362000, {version: '"0"'}, model)
+        ], {size: 20,totalElements: 3, totalPages: 0,number: 0})});
+
+        const records = await functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(race, [entryChrisMarshall, entryJillMyer], true);
+        
+        expect(records.slice(1)).toEqual([
             'Chris Marshall,Lou Screw,1234,SCORPION,1,3177,3,,1043,0\n',
             'Jill Myer,,826,Comet,2,3721,3,,1210,0\n'
         ]);
@@ -136,51 +207,80 @@ describe('when race is a handicap race', () => {
 });
 
 describe('when an entry has a scoring abbreviation set', () => {
-    it('converts race entry data to an array of comma seperated value data with one row per entry in race including scoring abbreviation', () => {
-        const entriesScorpionA_with_laps = [{...entriesScorpionA[0]}, {...entriesScorpionA[1]}];
-        entriesScorpionA_with_laps[0].laps = [{'number': 1, 'time': 1000}, {'number': 2, 'time': 1100}, {'number': 3, 'time': 1200}];
-        entriesScorpionA_with_laps[0].sumOfLapTimes =  3300;
-        entriesScorpionA_with_laps[1].laps = [];
-        entriesScorpionA_with_laps[1].sumOfLapTimes =  0;
-        entriesScorpionA_with_laps[1].scoringAbbreviation = 'DNS';
-        entriesScorpionA_with_laps[0].position =  1;
-        entriesScorpionA_with_laps[1].position =  2;
-        const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceScorpionA, entriesScorpionA_with_laps);
-        expect(data.slice(1)).toEqual([
+    it('converts race entry data to an array of comma seperated value data with one row per entry in race including scoring abbreviation', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT3S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+        const entrySarahPascal = new Entry({...entrySarahPascal6745ScorpionAHAL, sumOfLapTimes: 'PT0S', correctedTime: 'PT0M0S', scoringAbbreviation: 'DNS'}, {version: '"0"'}, model);
+        vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
+        vi.spyOn(entrySarahPascal, 'getPositionInDirectRace').mockImplementation(async () => {return 2});
+        vi.spyOn(entryChrisMarshall, 'getLaps').mockImplementation(async () =>{return new Collection([
+            new Lap(1, 1000, {version: '"0"'}, model),
+            new Lap(2, 1100, {version: '"0"'}, model),
+            new Lap(3, 9120034000, {version: '"0"'}, model)
+        ], {size: 20,totalElements: 3, totalPages: 0,number: 0})});
+        vi.spyOn(entrySarahPascal, 'getLaps').mockImplementation(async () => {return new Collection([], {size: 20,totalElements: 0, totalPages: 0,number: 0})});
+
+        const records = await functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(race, [entryChrisMarshall, entrySarahPascal], true);
+
+        expect(records.slice(1)).toEqual([
             'Chris Marshall,Lou Screw,1234,SCORPION,1,3,3,,1043,0\n',
             'Sarah Pascal,Owain Davies,6745,SCORPION,,0,0,DNS,1043,0\n'
         ]);
+    
     });
 });
 
 describe('when download options are provided', () => {
     describe('when name format option provided is firstname surname', () => {
-        it('outputs name as firstname surname', () => {
-            const entriesScorpionA_with_laps = [{...entriesScorpionA[0]}, {...entriesScorpionA[1]}];
-            entriesScorpionA_with_laps[0].laps = [{'number': 1, 'time': 923000}, {'number': 2, 'time': 896000}, {'number': 3, 'time': 934000}];
-            entriesScorpionA_with_laps[1].laps = [{'number': 1, 'time': 970000}, {'number': 2, 'time': 947000}, {'number': 3, 'time': 963000}];
-            entriesScorpionA_with_laps[0].sumOfLapTimes =  2753000;
-            entriesScorpionA_with_laps[1].sumOfLapTimes =  2880000;
-            entriesScorpionA_with_laps[0].position = 1;
-            entriesScorpionA_with_laps[1].position = 2;
-            const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceScorpionA, entriesScorpionA_with_laps, {nameFormat: NameFormat.FIRSTNAMESURNAME});
-            expect(data.slice(1)).toEqual([
+        it('outputs name as firstname surname', async () => {
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+            const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT45M53S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+            const entrySarahPascal = new Entry({...entrySarahPascal6745ScorpionAHAL, sumOfLapTimes: 'PT48M0S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+            vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
+            vi.spyOn(entrySarahPascal, 'getPositionInDirectRace').mockImplementation(async () => {return 2});
+            vi.spyOn(entryChrisMarshall, 'getLaps').mockImplementation(async () =>{return new Collection([
+                new Lap(1, 923000, {version: '"0"'}, model),
+                new Lap(2, 896000, {version: '"0"'}, model),
+                new Lap(3, 934000, {version: '"0"'}, model)
+            ], {size: 20,totalElements: 3, totalPages: 0,number: 0})});
+            vi.spyOn(entrySarahPascal, 'getLaps').mockImplementation(async () => {return new Collection([
+                new Lap(1, 970000, {version: '"0"'}, model),
+                new Lap(2, 947000, {version: '"0"'}, model),
+                new Lap(3, 963000, {version: '"0"'}, model)
+            ], {size: 20,totalElements: 0, totalPages: 0,number: 0})});
+
+            const records = await functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(race, [entryChrisMarshall, entrySarahPascal], true, {nameFormat: NameFormat.FIRSTNAMESURNAME});
+
+            expect(records.slice(1)).toEqual([
                 'Chris Marshall,Lou Screw,1234,SCORPION,1,2753,3,,1043,0\n',
                 'Sarah Pascal,Owain Davies,6745,SCORPION,2,2880,3,,1043,0\n'
             ]);
         });
     });
     describe('when name format option provided is surname firstname', () => {
-        it('outputs name as surname, firstname and wraps in quotation marks', () => {
-            const entriesScorpionA_with_laps = [{...entriesScorpionA[0]}, {...entriesScorpionA[1]}];
-            entriesScorpionA_with_laps[0].laps = [{'number': 1, 'time': 923000}, {'number': 2, 'time': 896000}, {'number': 3, 'time': 934000}];
-            entriesScorpionA_with_laps[1].laps = [{'number': 1, 'time': 970000}, {'number': 2, 'time': 947000}, {'number': 3, 'time': 963000}];
-            entriesScorpionA_with_laps[0].sumOfLapTimes =  2753000;
-            entriesScorpionA_with_laps[1].sumOfLapTimes =  2880000;
-            entriesScorpionA_with_laps[0].position = 1;
-            entriesScorpionA_with_laps[1].position = 2;
-            const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(raceScorpionA, entriesScorpionA_with_laps, {nameFormat: NameFormat.SURNAMEFIRSTNAME});
-            expect(data.slice(1)).toEqual([
+        it('outputs name as surname, firstname and wraps in quotation marks', async () => {
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+            const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT45M53S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+            const entrySarahPascal = new Entry({...entrySarahPascal6745ScorpionAHAL, sumOfLapTimes: 'PT48M0S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+            vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
+            vi.spyOn(entrySarahPascal, 'getPositionInDirectRace').mockImplementation(async () => {return 2});
+            vi.spyOn(entryChrisMarshall, 'getLaps').mockImplementation(async () =>{return new Collection([
+                new Lap(1, 923000, {version: '"0"'}, model),
+                new Lap(2, 896000, {version: '"0"'}, model),
+                new Lap(3, 934000, {version: '"0"'}, model)
+            ], {size: 20,totalElements: 3, totalPages: 0,number: 0})});
+            vi.spyOn(entrySarahPascal, 'getLaps').mockImplementation(async () => {return new Collection([
+                new Lap(1, 970000, {version: '"0"'}, model),
+                new Lap(2, 947000, {version: '"0"'}, model),
+                new Lap(3, 963000, {version: '"0"'}, model)
+            ], {size: 20,totalElements: 0, totalPages: 0,number: 0})});
+
+            const records = await functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(race, [entryChrisMarshall, entrySarahPascal], true, {nameFormat: NameFormat.SURNAMEFIRSTNAME});
+
+            expect(records.slice(1)).toEqual([
                 '"Marshall, Chris","Screw, Lou",1234,SCORPION,1,2753,3,,1043,0\n',
                 '"Pascal, Sarah","Davies, Owain",6745,SCORPION,2,2880,3,,1043,0\n'
             ]);
@@ -189,24 +289,43 @@ describe('when download options are provided', () => {
 });
 
 describe('when race is a pursuit race', () => {
-    it('provides a header row that does not includes elapsed, laps, or corrected headers', () => {
-        const entriesPursuitA_with_laps = [{...entriesPursuitA[0]}];
-        entriesPursuitA_with_laps[0].laps = [{'number': 1, 'time': 923000}, {'number': 2, 'time': 896000}, {'number': 3, 'time': 934000}];
-        entriesPursuitA_with_laps[0].sumOfLapTimes =  2753000;
-        entriesPursuitA_with_laps[0].position = 1;
-        const header = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(racePursuitA, entriesPursuitA_with_laps)[0];
-    
-        expect(header).not.toContain('Elapsed');
-        expect(header).not.toContain('Laps');
-        expect(header).not.toContain('Corrected');
+    it('provides a header row that does not includes elapsed, laps, or corrected headers', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const race = new Race(racePursuitAHAL, {version: '"0"'}, model);
+        const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT45M53S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+        vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
+        vi.spyOn(entryChrisMarshall, 'getLaps').mockImplementation(async () =>{return new Collection([
+            new Lap(1, 923000, {version: '"0"'}, model),
+            new Lap(2, 896000, {version: '"0"'}, model),
+            new Lap(3, 934000, {version: '"0"'}, model)
+        ], {size: 20,totalElements: 3, totalPages: 0,number: 0})});
+        const entryJillMyer = new Entry({...entryJillMyer826CometAHAL, sumOfLapTimes: 'PT0M3S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+        vi.spyOn(entryJillMyer, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
+        vi.spyOn(entryJillMyer, 'getLaps').mockImplementation(async () =>{return new Collection([
+            new Lap(1, 1000, {version: '"0"'}, model),
+            new Lap(2, 1100, {version: '"0"'}, model),
+            new Lap(3, 1200, {version: '"0"'}, model)
+        ], {size: 20,totalElements: 3, totalPages: 0,number: 0})});
+
+        const records = await functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(race, [entryChrisMarshall, entryJillMyer], true);
+        expect(records[0]).not.toContain('Elapsed');
+        expect(records[0]).not.toContain('Laps');
+        expect(records[0]).not.toContain('Corrected');
+
     });
-    it('converts race entry data to an array of comma seperated value data with one row per entry in race', () => {
-        const entriesPursuitA_with_laps = [{...entriesPursuitA[0]}];
-        entriesPursuitA_with_laps[0].laps = [{'number': 1, 'time': 923000}, {'number': 2, 'time': 896000}, {'number': 3, 'time': 934000}];
-        entriesPursuitA_with_laps[0].sumOfLapTimes =  2753000;
-        entriesPursuitA_with_laps[0].position = 1;
-        const data = functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(racePursuitA, entriesPursuitA_with_laps);
-        expect(data.slice(1)).toEqual([
+    it('converts race entry data to an array of comma seperated value data with one row per entry in race', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const race = new Race(racePursuitAHAL, {version: '"0"'}, model);
+        const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT45M53S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+        vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
+        vi.spyOn(entryChrisMarshall, 'getLaps').mockImplementation(async () =>{return new Collection([
+            new Lap(1, 923000, {version: '"0"'}, model),
+            new Lap(2, 896000, {version: '"0"'}, model),
+            new Lap(3, 934000, {version: '"0"'}, model)
+        ], {size: 20,totalElements: 3, totalPages: 0,number: 0})});
+
+        const records = await functionsForTestingOnly.convertRaceEntriesToCSVArrayFTO(race, [entryChrisMarshall], true);
+        expect(records.slice(1)).toEqual([
             'Chris Marshall,Lou Screw,1234,SCORPION,1,,1043\n'
         ]);
     });

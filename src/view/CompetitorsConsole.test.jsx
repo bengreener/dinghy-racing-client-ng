@@ -14,22 +14,24 @@
  * limitations under the License. 
  */
 
-import { act, screen } from '@testing-library/react';
-import { customRender } from '../test-utilities/custom-renders';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import DinghyRacingModel from '../model/dinghy-racing-model';
-import DinghyRacingController from '../controller/dinghy-racing-controller';
 import CompetitorsConsole from './CompetitorsConsole';
-import { httpRootURL, wsRootURL, competitorsCollection, competitorChrisMarshall } from '../model/__mocks__/test-data';
+import SylphModel from '../model/sylph-model';
+import SylphController from '../controller/sylph-controller';
+import Collection from '../model/collection';
+import Competitor from '../model/competitor';
+import { httpRootURL, wsRootURL, competitorsCollection, competitorsCollectionHAL, competitorChrisMarshallHAL, competitorSarahPascalHAL, competitorJillMyerHAL, competitorLouScrewHAL, 
+	competitorOwainDaviesHAL, competitorLiuBaoHAL } from '../model/__mocks__/test-data';
 
-vi.mock('../model/dinghy-racing-model');
-vi.mock('../controller/dinghy-racing-controller');
-vi.mock('../model/domain-classes/clock');
+vi.mock('../model/sylph-model');
+vi.mock('../controller/sylph-controller');
+vi.mock('../model/clock');
 
 it('renders', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
+    const model = new SylphModel(httpRootURL, wsRootURL);
     await act( async () => {
-        customRender(<CompetitorsConsole />, model);
+        render(<CompetitorsConsole model={model} />);
     });
     expect(screen.getByRole('heading', {name: 'Competitors'})).toBeInTheDocument();
     expect(screen.getByRole('columnheader', {name: 'Competitors'}));
@@ -37,25 +39,24 @@ it('renders', async () => {
 
 describe('when there are competitors', () => {
     it('displays list of competitors', async () => {
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+        const model = new SylphModel(httpRootURL, wsRootURL);
         await act( async () => {
-            customRender(<CompetitorsConsole />, model);
+            render(<CompetitorsConsole model={model} />);
         });
         expect(await screen.findByRole('cell', {name: /chris marshall/i})).toBeInTheDocument();
         expect(await screen.findByRole('cell', {name: /Sarah Pascal/i})).toBeInTheDocument();
     });
     describe('when successfully retrieves competitors', () => {
         it('clears any error message', async () => {
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})}).mockImplementationOnce(() => {return Promise.resolve({success: false, message: 'Oops!'})});
-            let render;
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            vi.spyOn(model, 'getCompetitors').mockImplementationOnce(async () => {throw new Error('Oops!')});
+            let renderResult;
             await act( async () => {
-                render = customRender(<CompetitorsConsole />, model);
+                renderResult = render(<CompetitorsConsole model={model} />);
             });
             expect(await screen.findByText(/oops/i)).toBeInTheDocument();
             await act(async () => {
-                render.rerender(<CompetitorsConsole />, model);
+                renderResult.rerender(<CompetitorsConsole model={model} />);
             });
             expect(screen.queryByText('Oops!')).not.toBeInTheDocument();
         })
@@ -63,22 +64,20 @@ describe('when there are competitors', () => {
 });
 describe('when there is a problem retrieving competitors', () => {
     it('displays error message', async () => {
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        vi.spyOn(model, 'getCompetitors').mockImplementation(async () => {throw new Error('Oops!')});
         await act( async () => {
-            customRender(<CompetitorsConsole />, model);
+            render(<CompetitorsConsole model={model} />);
         });
         expect(await screen.findByText(/oops/i)).toBeInTheDocument();
     });
 });
-
 describe('when a competitor is selected', () => {
     it('displays competitor details for editing', async () => {
         const user = userEvent.setup();
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+        const model = new SylphModel(httpRootURL, wsRootURL);
         await act( async () => {
-            customRender(<CompetitorsConsole />, model);
+            render(<CompetitorsConsole model={model} />);
         });
         const competitorCell = await screen.findByRole('cell', {name: /chris marshall/i});
         await user.click(competitorCell);
@@ -88,12 +87,11 @@ describe('when a competitor is selected', () => {
     });
     it('clears any error message', async () => {
         const user = userEvent.setup();
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
-        vi.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        vi.spyOn(controller, 'updateCompetitor').mockImplementation(async () => {throw new Error('Oops!')});
         await act( async () => {
-            customRender(<CompetitorsConsole />, model, controller);
+            render(<CompetitorsConsole model={model} controller={controller} />);
         });
         const competitorCell = await screen.findByRole('cell', {name: /chris marshall/i});
         await user.click(competitorCell);
@@ -109,10 +107,9 @@ describe('when a competitor is selected', () => {
     describe('when name is changed', () => {
         it('displays new name', async () => {
             const user = userEvent.setup();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+            const model = new SylphModel(httpRootURL, wsRootURL);
             await act( async () => {
-                customRender(<CompetitorsConsole />, model);
+                render(<CompetitorsConsole model={model} />);
             });
             const competitorCell = await screen.findByRole('cell', {name: /chris marshall/i});
             await user.click(competitorCell);
@@ -125,12 +122,11 @@ describe('when a competitor is selected', () => {
     describe('when update button clicked', () => {
         it('updates competitor details in system with new value provided', async () => {
             const user = userEvent.setup();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
-            const updateCompetitorSpy = vi.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: true})});
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
+            const updateCompetitorSpy = vi.spyOn(controller, 'updateCompetitor').mockImplementation(async () => {return new Competitor({...competitorChrisMarshallHAL, name: 'John Smith'}, {version: '"1"'}, model)});
             await act( async () => {
-                customRender(<CompetitorsConsole />, model, controller);
+                render(<CompetitorsConsole model={model} controller={controller} />);
             });
             const competitorCell = await screen.findByRole('cell', {name: /chris marshall/i});
             await user.click(competitorCell);
@@ -139,17 +135,16 @@ describe('when a competitor is selected', () => {
             await user.clear(nameInput);
             await user.type(nameInput, 'John Smith');
             await user.click(updateButton);
-            expect(updateCompetitorSpy).toBeCalledWith(competitorChrisMarshall, 'John Smith');
+            expect(updateCompetitorSpy).toBeCalledWith(new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model), 'John Smith');
         });
         describe('when update is successful', () => {
             it('hides input fields for updating competitor', async () => {
                 const user = userEvent.setup();
-                const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                const controller = new DinghyRacingController(model);
-                vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
-                vi.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: true})});
+                const model = new SylphModel(httpRootURL, wsRootURL);
+                const controller = new SylphController(model);
+                vi.spyOn(controller, 'updateCompetitor').mockImplementation(async () => {return new Competitor({...competitorChrisMarshallHAL, name: 'John Smith'}, {version: '"1"'}, model)});
                 await act( async () => {
-                    customRender(<CompetitorsConsole />, model, controller);
+                    render(<CompetitorsConsole model={model} controller={controller} />);
                 });
                 const competitorCell = await screen.findByRole('cell', {name: /chris marshall/i});
                 await user.click(competitorCell);
@@ -163,12 +158,20 @@ describe('when a competitor is selected', () => {
             });
             it('refreshes competitor list', async () => {
                 const user = userEvent.setup();
-                const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                const controller = new DinghyRacingController(model);
-                vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [{...competitorChrisMarshall, name: 'John Smith'}]})}).mockImplementationOnce(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+                const model = new SylphModel(httpRootURL, wsRootURL);
+                const controller = new SylphController(model);
+                const competitorChrisMarshall = new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, this);
+                const competitorJillMyer = new Competitor(competitorJillMyerHAL, {version: '"0"'}, this);
+                const competitorLiuBao = new Competitor(competitorLiuBaoHAL, {version: '"0"'}, this);
+                const competitorLouScrew = new Competitor(competitorLouScrewHAL, {version: '"0"'}, this);
+                const competitorOwainDavies = new Competitor(competitorOwainDaviesHAL, {version: '"0"'}, this);
+                const competitorSarahPascal = new Competitor(competitorSarahPascalHAL, {version: '"0"'}, this);
+                const competitorJohnSmith = new Competitor({...competitorChrisMarshallHAL, name: 'John Smith'}, {version: '"1"'}, this);
+                let competitors = [competitorChrisMarshall, competitorJillMyer, competitorLiuBao, competitorLouScrew, competitorOwainDavies, competitorSarahPascal];
+                vi.spyOn(model, 'getCompetitors').mockImplementation(async () => {return new Collection(competitors, {size: 20, totalElements: 6, totalPages: 0, number: 0})});
                 vi.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: true})});
                 await act( async () => {
-                    customRender(<CompetitorsConsole />, model, controller);
+                    render(<CompetitorsConsole model={model} controller={controller} />);
                 });
                 const competitorCell = await screen.findByRole('cell', {name: /chris marshall/i});
                 await user.click(competitorCell);
@@ -176,7 +179,11 @@ describe('when a competitor is selected', () => {
                 const updateButton = screen.getByRole('button', {name: 'Update'});
                 await user.clear(nameInput);
                 await user.type(nameInput, 'John Smith');
+                competitors = [competitorJohnSmith, competitorJillMyer, competitorLiuBao, competitorLouScrew, competitorOwainDavies, competitorSarahPascal];
                 await user.click(updateButton);
+                await act(async () => {
+                    model.handleCompetitorUpdate({'body': competitorChrisMarshall.url});
+                });
                 expect(await screen.findByRole('cell', {name: /john smith/i})).toBeInTheDocument();
                 expect(screen.queryByRole('cell', {name: /chris marshall/i})).not.toBeInTheDocument();
             });
@@ -184,12 +191,11 @@ describe('when a competitor is selected', () => {
         describe('when there is a problem updating competitor', () => {
             it('provides a message expalining cause of issue', async () => {
                 const user = userEvent.setup();
-                const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                const controller = new DinghyRacingController(model);
-                vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
-                vi.spyOn(controller, 'updateCompetitor').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops something went wrong.'})});
+                const model = new SylphModel(httpRootURL, wsRootURL);
+                const controller = new SylphController(model);
+                vi.spyOn(controller, 'updateCompetitor').mockImplementation(async () => {throw new Error('Oops something went wrong.')});
                 await act( async () => {
-                    customRender(<CompetitorsConsole />, model, controller);
+                    render(<CompetitorsConsole model={model} controller={controller} />);
                 });
                 const competitorCell = await screen.findByRole('cell', {name: /chris marshall/i});
                 await user.click(competitorCell);
@@ -205,11 +211,10 @@ describe('when a competitor is selected', () => {
     describe('when cancelled', () => {
         it('hides input fields for updating competitor', async () => {
             const user = userEvent.setup();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            vi.spyOn(model, 'getCompetitors').mockImplementation(() => {return Promise.resolve({success: true, domainObject: competitorsCollection})});
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
             await act( async () => {
-                customRender(<CompetitorsConsole />, model, controller);
+                render(<CompetitorsConsole model={model} controller={controller} />);
             });
             const competitorCell = await screen.findByRole('cell', {name: /chris marshall/i});
             await user.click(competitorCell);

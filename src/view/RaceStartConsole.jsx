@@ -14,28 +14,25 @@
  * limitations under the License. 
  */
 
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import ModelContext from './ModelContext';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import RaceType from '../model/race-type';
+import CollapsableContainer from './CollapsableContainer';
+import CountdownDisplayControl from './CountdownDisplayControl';
 import SelectSession from './SelectSession';
+import SignalsPanel from './SignalsPanel';
 import RaceHeaderView from './RaceHeaderView';
 import ActionListView from './ActionListView';
-import CollapsableContainer from './CollapsableContainer';
-import SignalPanel from './SignalsPanel';
-import RaceType from '../model/domain-classes/race-type';
-import CountdownDisplayControl from './CountdownDisplayControl';
-import { SortOrder } from '../model/dinghy-racing-model';
 import { storageAvailable } from '../utilities/storage-utilities';
+import { SortOrder } from '../model/sylph-model';
 
 /**
  * Provide Race Officer with information needed to successfully start races in a session
  * @returns {HTMLDivElement}
  */
-function RaceStartConsole () {
-    const model = useContext(ModelContext);
+function RaceStartConsole ({ model, controller }) {
     const sessionStorageAvailable = useMemo(() => storageAvailable('sessionStorage'), []);
-    const [selectedRaces, setSelectedRaces] = useState([]); // selection of race names made by user
+
     const [raceMap, setRaceMap] = useState(new Map()); // map of race names to races
-    const [message, setMessage] = useState(''); // feedback to user
     const [sessionStart, setSessionStart] = useState(() => {
         let sessionStart;
         if (sessionStorageAvailable) {
@@ -64,8 +61,6 @@ function RaceStartConsole () {
         }
         return sessionEnd;
     });
-    const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(model.getClock().getTime()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
-    const [fleetUpdateRequestAt, setFleetUpdateRequestAt] = useState(model.getClock().getTime()); // time of last request to fetch fleet from server. change triggers calculation of a new start sequence
     const [raceType, setRaceType] = useState(() => {
         let raceType;
         if (sessionStorageAvailable) {
@@ -79,112 +74,112 @@ function RaceStartConsole () {
         }
         return raceType;
     });
+    const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState();
+    const [fleetUpdateRequestAt, setFleetUpdateRequestAt] = useState();
     const [signals, setSignals] = useState([]);
     const [timestamp, setTimestamp] = useState(model.getClock().getTime());
-    const sessionStartSequence = useRef(null);
-    const prepareAudioRef = useRef(null);
-    if (prepareAudioRef.current === null) {
-        prepareAudioRef.current = new Audio('./sounds/prepare_alert.mp3');
-    }
-    const actAudioRef = useRef(null);
-    if (actAudioRef.current === null) {
-        actAudioRef.current = new Audio('./sounds/act_alert.mp3');
-    }
-    const audioContext = useRef(null);
-    if (audioContext.current === null) {
-        audioContext.current = new AudioContext();
-    }
-    const actTrack = useRef(null);
-    if (actTrack === null && audioContext != null && actAudioRef != null) {
-        actTrack.current = audioContext.createMediaElementSource(actAudioRef.current);
-        actTrack.current(audioContext.current.destination);
-    }
-    const prepareTrack = useRef(null);
-    if (prepareTrack === null && audioContext != null && prepareAudioRef != null) {
-        prepareTrack.current = audioContext.createMediaElementSource(prepareAudioRef.current);
-        prepareTrack.current(audioContext.current.destination);
-    }
-
-    const handleRaceUpdate = useCallback(() => {
-        setRacesUpdateRequestAt(model.getClock().getTime());
+    const [selectedRaces, setSelectedRaces] = useState([]);
+    const [sessionStartSequence, setSessionStartSequence] = useState();
+    const [message, setMessage] = useState(''); // feedback to user
+    const [prepareAudioRef] = useState(new Audio('./sounds/prepare_alert.mp3'));
+    const [actAudioRef] = useState(new Audio('./sounds/act_alert.mp3'));
+    
+    const handleClockTick = useCallback(() => {
+        setTimestamp(model.getClock().getTimeToSecondPrecision());
     }, [model]);
 
     const handleFleetUpdate = useCallback(() => {
         setFleetUpdateRequestAt(model.getClock().getTime());
     }, [model]);
 
+    const handleRaceUpdate = useCallback(() => {
+        setRacesUpdateRequestAt(model.getClock().getTime());
+    }, [model]);
+
     const prepareForRaceSignalHandler = useCallback(() => {
-        prepareAudioRef.current.play();
-    }, []);
+        prepareAudioRef.play();
+    }, [prepareAudioRef]);
 
     const makeRaceStartSignalHandler = useCallback(() => {
-        actAudioRef.current.play();
-    }, []);
-
-    const handleClockTick = useCallback(() => {
-        setTimestamp(model.getClock().getTimeToSecondPrecision());
-    }, [model]);
+        actAudioRef.play();
+    }, [actAudioRef]);
 
     // get races for selected session
     useEffect(() => {
-        let ignoreFetch = false;
-        model.getRacesBetweenTimesForType(new Date(sessionStart), new Date(sessionEnd), raceType, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING}).then(result => {
-            if (!ignoreFetch && !result.success) {
-                setMessage('Unable to load races\n' + result.message);
-            }
-            else if (!ignoreFetch) {
+        let cancel = false;
+
+        if (!cancel) {
+            model.getRacesBetweenTimesForType(new Date(sessionStart), new Date(sessionEnd), raceType, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING}).then(raceCollection => {
                 const map = new Map();
-                const options = []; // html option elements
-                const optionsRaceNames = []; // just the names of the races to match with previously selected races
-                result.domainObject.forEach(race => {
+                raceCollection.entities.map(race => {
                     map.set(race.name, race);
-                    options.push(<option key={race.name + race.plannedStartTime.toISOString()} value={race.name} >{race.name}</option>);
-                    optionsRaceNames.push(race.name);
                 });
                 setRaceMap(map);
-                if (selectedRaces.length === 0) {
-                    // if no races selected then select all the races as default
-                    setSelectedRaces(optionsRaceNames);
-                }
-                else {
-                    setSelectedRaces(s => s.filter(selectedRaceName => optionsRaceNames.includes(selectedRaceName))); // remove any previously selected races that are no longer available from race selectedRaces
-                }
-            }
-        });
-
-        return () => {
-            ignoreFetch = true;
-            setMessage('');
+                // setSelectedRaces(Array.from(map.values()).map(race => race.name));
+                const optionsRaceNames = Array.from(map.values()).map(race => race.name);
+                setSelectedRaces(s => {
+                    const updatedSelection = s.filter(selectedRaceName => {
+                        return optionsRaceNames.includes(selectedRaceName);
+                    });
+                    if (optionsRaceNames.length === 0) {
+                        // no races selected
+                        return [];
+                    }
+                    // has selection changed?
+                    if (updatedSelection.length > 0 && !(updatedSelection.length === s.length)) {
+                        // some races in previous selection but, not all
+                        return updatedSelection;
+                    }
+                    if (updatedSelection.length === 0) {
+                        // all races are new
+                        return optionsRaceNames;
+                    }
+                    // optionsRaceNames.length > 0 && selection.length > 0 && selection.length === s.length
+                    // selection the same as before (don't change selection)
+                    return s;
+                });
+            }).catch((error) => {
+                setMessage(error.message);
+            });
         }
-    }, [model, sessionStart, sessionEnd, raceType, racesUpdateRequestAt, selectedRaces.length]);
+
+        return (() => {
+            cancel = true;
+        });
+    }, [model, raceType, racesUpdateRequestAt, sessionEnd, sessionStart]);
 
     // Setup session start sequence
     useEffect(() => {
-        let ignoreFetch = false;
-        model.getStartSequence(selectedRaces.map(raceName => raceMap.get(raceName)), raceType).then(result => {
-            if (!ignoreFetch && !result.success) {
-                setMessage('Unable to load start sequence\n' + result.message);
-            }
-            else if (!ignoreFetch) {
-                sessionStartSequence.current = result.domainObject;
-                sessionStartSequence.current.addPrepareForRaceStartSignalHandler(prepareForRaceSignalHandler);
-                sessionStartSequence.current.addMakeRaceStartSignalHandler(makeRaceStartSignalHandler);
-                setSignals(sessionStartSequence.current.getSignals());
+        let cancel = false;
+        let startSequence;
+        
+        if (!cancel) {
+            startSequence = model.getStartSequence(
+                selectedRaces.map((raceName) => {
+                    return raceMap.get(raceName);
+                })
+            );
+            startSequence.addPrepareForRaceStartSignalHandler(prepareForRaceSignalHandler);
+            startSequence.addMakeRaceStartSignalHandler(makeRaceStartSignalHandler);
+            startSequence.getSignals().then((signals) => {
+                setSessionStartSequence(startSequence);
+                setSignals(signals);
                 setMessage('');
-            }
-        });
+            }).catch((error) => {
+                console.error(error);
+                setMessage(error.message, error);
+            });
+        }
 
-        return () => {
-            ignoreFetch = true;
-            if (sessionStartSequence.current) {
-                sessionStartSequence.current.removePrepareForRaceStartSignalHandler(prepareForRaceSignalHandler);
-                sessionStartSequence.current.removeMakeRaceStartSignalHandler(makeRaceStartSignalHandler);
-                sessionStartSequence.current.dispose();
-            }
-    }
-    }, [model, selectedRaces, raceType, raceMap, racesUpdateRequestAt, fleetUpdateRequestAt, sessionStartSequence, makeRaceStartSignalHandler, prepareForRaceSignalHandler]);
-
-    // register for DinghyRacingModel clock ticks
+        return(() => {
+            cancel = true;
+            startSequence.removePrepareForRaceStartSignalHandler(prepareForRaceSignalHandler);
+            startSequence.removeMakeRaceStartSignalHandler(makeRaceStartSignalHandler);
+            startSequence?.dispose();
+        })
+    },[model, fleetUpdateRequestAt, makeRaceStartSignalHandler, prepareForRaceSignalHandler, raceMap, selectedRaces])
+    
+    // register for clock ticks
     useEffect(() => {
         model.getClock().addTickHandler(handleClockTick);
 
@@ -209,22 +204,18 @@ function RaceStartConsole () {
 
     // register on update callbacks for fleet
     useEffect(() => {
-        const races = Array.from(raceMap.values());
-        races.forEach(race => {
-            model.registerFleetUpdateCallback(race.fleet.url, handleFleetUpdate);
+        let fleets = [];
+        Promise.all(Array.from(raceMap.values().map(race => race.getFleet()))).then((result) => {
+            fleets = result;
+            fleets.forEach(fleet => model.registerFleetUpdateCallback(fleet.url, handleFleetUpdate));
         });
         // cleanup before effect runs and before form close
         return () => {
-            races.forEach(race => {
-                model.unregisterFleetUpdateCallback(race.fleet.url, handleFleetUpdate);
+            fleets.forEach(fleet => {
+                model.unregisterFleetUpdateCallback(fleet.url, handleFleetUpdate);
             });
         }
     }, [model, raceMap, handleFleetUpdate])
-
-    function handleRaceSelect(event) {
-        const options = [...event.target.selectedOptions]; // convert from HTMLCollection to Array; trying to go direct to value results in event.target.selectedOptions.value is not iterable error
-        setSelectedRaces(options.map(option => option.value));
-    }
 
     function handleSessionStartInputChange(date) {
         if (sessionStorageAvailable) {
@@ -247,28 +238,32 @@ function RaceStartConsole () {
         setRaceType(RaceType.from(target.value));
     }
 
+    function handleRaceSelect(event) {
+        const options = [...event.target.selectedOptions]; // convert from HTMLCollection to Array; trying to go direct to value results in event.target.selectedOptions.value is not iterable error
+        setSelectedRaces(options.map(option => option.value));
+    }
+
     function userMessageClasses() {
         return !message ? 'hidden' : 'console-error-message';
     }
 
     function buildStartCountdown() {
-        if (sessionStartSequence.current) {
-            const nextRaceToStart = sessionStartSequence.current.getNextRaceToStart(new Date(timestamp));
-            let countdown;
-            if (nextRaceToStart) {
-                const timeLeft = nextRaceToStart.plannedStartTime.getTime() - model.getClock().getTimeToSecondPrecision();
-                const playAudio = timeLeft <= 10000 && timeLeft > 0;
-                countdown = <CountdownDisplayControl title={'Start Countdown'} message={nextRaceToStart.name} time={timeLeft} beep={playAudio} />;
-            }
-            else {
-                countdown = <CountdownDisplayControl title={'Start Countdown'} message={''} time={0} />;
-            }
-            return (
-                <CollapsableContainer heading={'Start Countdown'}>
-                    {countdown}
-                </CollapsableContainer>
-            )
+        // const nextRaceToStart = model.getStartSequence(selectedRaces.map(raceName => raceMap.get(raceName))).getNextRaceToStart(new Date(timestamp));
+        const nextRaceToStart = sessionStartSequence?.getNextRaceToStart(new Date(timestamp));
+        let countdown;
+        if (nextRaceToStart) {
+            const timeLeft = nextRaceToStart.plannedStartTime.getTime() - model.getClock().getTimeToSecondPrecision();
+            const playAudio = timeLeft <= 10000 && timeLeft > 0;
+            countdown = <CountdownDisplayControl title={'Start Countdown'} message={nextRaceToStart.name} time={timeLeft} beep={playAudio} />;
         }
+        else {
+            countdown = <CountdownDisplayControl title={'Start Countdown'} message={''} time={0} />;
+        }
+        return (
+            <CollapsableContainer heading={'Start Countdown'}>
+                {countdown}
+            </CollapsableContainer>
+        )
     }
 
     return (
@@ -291,26 +286,28 @@ function RaceStartConsole () {
                             </div>
                         </fieldset>
                     <label htmlFor='race-select' className='w3-left w3-col' >Select Race</label>
-                    <select id='race-select' name='race' multiple={true} className='w3-col w3-third' onChange={handleRaceSelect} value={selectedRaces}>{Array.from(raceMap.values()).map(race => <option key={race.name + race.plannedStartTime.toISOString()} value={race.name} >{race.name}</option>)}</select>
+                    <select id='race-select' name='race' multiple={true} className='w3-col w3-third' onChange={handleRaceSelect} value={selectedRaces}>
+                        {Array.from(raceMap.values()).map(race => <option key={race.name + race.plannedStartTime.toISOString()} value={race.name} >{race.name}</option>)}
+                    </select>
                     </div>
                 </form>
                 <p className={userMessageClasses()}>{message}</p>
             </CollapsableContainer>
             {buildStartCountdown()}
             <div className='scrollable'>
-            <CollapsableContainer heading={'Flags'}>
-                <SignalPanel signals={signals} />
-            </CollapsableContainer>
-            <CollapsableContainer heading={'Races'}>
-                {selectedRaces.map(raceName => {
-                    const race = raceMap.get(raceName);
-                    return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} showInRaceData={false} />
-                })}
-            </CollapsableContainer>
-            <ActionListView signals={signals} clock={model.getClock()} />
+                <CollapsableContainer heading={'Flags'}>
+                    <SignalsPanel signals={signals} clock={model.getClock()} />
+                </CollapsableContainer>
+                <CollapsableContainer heading={'Races'}>
+                    {selectedRaces.map(raceName => {
+                        const race = raceMap.get(raceName);
+                        return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} model={model} controller={controller} showInRaceData={false} />
+                    })}
+                </CollapsableContainer>
+                <ActionListView signals={signals} clock={model.getClock()} />
             </div>
         </div>
-    );
-};
+    )
+}
 
 export default RaceStartConsole;

@@ -14,23 +14,20 @@
  * limitations under the License. 
  */
 
-import { customRender } from '../test-utilities/custom-renders';
-import { within } from '@testing-library/react';
-import SignalPanel from './SignalsPanel';
-import DinghyRacingModel from '../model/dinghy-racing-model';
-import FlagState from '../model/domain-classes/flag-state';
+import { render, within } from '@testing-library/react';
+import SignalsPanel from './SignalsPanel';
+import Clock from '../model/clock';
+import FlagState from '../model/flag-state';
 import { httpRootURL, wsRootURL } from '../model/__mocks__/test-data';
 
-vi.mock('../model/domain-classes/clock');
+vi.mock('../model/clock');
 
 it('displays signal indicators in order of time of first signal managed by each indicator', () => {
     const signals = [
         {meaning: 'test signal 2', time: new Date(Date.now() + 60000), soundSignal: null, visualSignal: {flags: [{name: 'flag 2'}], flagsState: FlagState.RAISED}},
         {meaning: 'test signal 1', time: new Date(), soundSignal: null, visualSignal: {flags: [{name: 'flag 1'}, {name: 'flag 3'}], flagsState: FlagState.RAISED}}
     ];
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-
-    const { container } = customRender(<SignalPanel signals={signals} />, model);
+    const { container } = render(<SignalsPanel signals={signals}  clock={new Clock()} />);
     const signalIndicators = container.getElementsByClassName('signal-indicator');
 
     expect(within(signalIndicators[0]).getByText('flag 1 flag 3')).toBeInTheDocument();
@@ -44,9 +41,8 @@ it('displays one signal indicator for each set of flags used', () => {
         {meaning: 'test signal 3', time: new Date(Date.now() + 240000), soundSignal: null, visualSignal: {flags: [{name: 'flag 2'}, {name: 'flag 3'}], flagsState: FlagState.LOWERED}},
         {meaning: 'test signal 4', time: new Date(Date.now() + 360000), soundSignal: null, visualSignal: {flags: [{name: 'flag 1'}], flagsState: FlagState.LOWERED}}
     ];
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
-    const { container } = customRender(<SignalPanel signals={signals} />, model);
+    const { container } = render(<SignalsPanel signals={signals} clock={new Clock()} />);
     const signalIndicators = container.getElementsByClassName('signal-indicator');
 
     expect(signalIndicators.length).toBe(2);
@@ -60,9 +56,7 @@ describe('when time is before any signals are due to have been made', () => {
             {meaning: 'test signal 3', time: new Date(Date.now() + 241000), soundSignal: null, visualSignal: {flags: [{name: 'flag 2'}, {name: 'flag 3'}], flagsState: FlagState.LOWERED}},
             {meaning: 'test signal 4', time: new Date(Date.now() + 301000), soundSignal: null, visualSignal: {flags: [{name: 'flag 1'}], flagsState: FlagState.LOWERED}}
         ];
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    
-        const { container } = customRender(<SignalPanel signals={signals} />, model);
+        const { container } = render(<SignalsPanel signals={signals} clock={new Clock()} />);
         const signalIndicators = container.getElementsByClassName('signal-indicator');
     
         expect(within(signalIndicators[0]).getByText('flag 1')).toBeInTheDocument();
@@ -82,9 +76,7 @@ describe('when after time of first signal amd before time of all other signals',
             {meaning: 'test signal 3', time: new Date(Date.now() + 239000), soundSignal: null, visualSignal: {flags: [{name: 'flag 2'}, {name: 'flag 3'}], flagsState: FlagState.LOWERED}},
             {meaning: 'test signal 4', time: new Date(Date.now() + 299000), soundSignal: null, visualSignal: {flags: [{name: 'flag 1'}], flagsState: FlagState.LOWERED}}
         ];
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    
-        const { container } = customRender(<SignalPanel signals={signals} />, model);
+        const { container } = render(<SignalsPanel signals={signals} clock={new Clock()} />);
         const signalIndicators = container.getElementsByClassName('signal-indicator');
         
         expect(within(signalIndicators[0]).getByText('flag 1')).toBeInTheDocument();

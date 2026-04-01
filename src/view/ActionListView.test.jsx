@@ -16,10 +16,10 @@
 
 import { act, render, screen, within } from '@testing-library/react';
 import ActionListView from './ActionListView';
-import FlagState from '../model/domain-classes/flag-state';
-import Clock from '../model/domain-classes/clock';
+import FlagState from '../model/flag-state';
+import Clock from '../model/clock';
 
-vi.mock('../model/domain-classes/clock');
+vi.mock('../model/clock');
 
 const formatOptions = {
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,

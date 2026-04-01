@@ -14,14 +14,12 @@
  * limitations under the License. 
  */
 
-import React, { useContext, useEffect, useState, useRef, useCallback } from 'react';
-import Clock from '../model/domain-classes/clock';
-import ModelContext from './ModelContext';
-import ControllerContext from './ControllerContext';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import Clock from '../model/clock';
 import PostponeRaceForm from './PostponeRaceForm';
 import ModalDialog from './ModalDialog';
 import AdjustCourseForm from './AdjustCourseForm';
-import RaceType from '../model/domain-classes/race-type';
+import RaceType from '../model/race-type';
 
 /**
  * Present summary information ablout a race
@@ -30,13 +28,10 @@ import RaceType from '../model/domain-classes/race-type';
  * @param {boolean} [showInRaceData = true] enables or disables display of remaining duration, estimated laps, last lap time for lead boat, and average lap time for lead boat
  * @returns {HTMLDivElement}
  */
-function RaceHeaderView({ race, showInRaceData = true }) {
-    const model = useContext(ModelContext);
-    const controller = useContext(ControllerContext);
-    const [updatedRace, setUpdatedRace] = useState(race);
-    const [elapsedTime, setElapsedTime] = useState(race.clock.getElapsedTime(race.plannedStartTime));
+function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
+    const [updatedRace, setUpdatedRace] = useState(race); // used to get current lead entry information for race after a lap recorded. May not reflect chnages to planned start time or planned laps
+    const [elapsedTime, setElapsedTime] = useState(model.getClock().getElapsedTime(race.plannedStartTime));
     const [message, setMessage] = useState('');
-    const previousRace = useRef(); // enables removal of tickHandler from previous race when rendered with new race
     const [showPostponeRace, setShowPostponeRace] = useState(false);
     const [showShortenCourse, setShowShortenCourse] = useState(false);
     const audioContext = useRef(new AudioContext());
@@ -45,34 +40,35 @@ function RaceHeaderView({ race, showInRaceData = true }) {
     const pursuitEndWarningTrack = useRef(null);
     const pursuitEndTrack = useRef(null);
 
-    if (pursuitEndWarningAudioRef.current === null && race.type === RaceType.PURSUIT) {
-        pursuitEndWarningAudioRef.current = new Audio('./sounds/prepare_alert.mp3');
-    }
-    if (pursuitEndAudioRef.current === null && race.type === RaceType.PURSUIT) {
-        pursuitEndAudioRef.current = new Audio('./sounds/act_alert.mp3');
-    }
-    if (pursuitEndWarningTrack === null && audioContext != null && pursuitEndWarningAudioRef.current != null) {
-        pursuitEndWarningTrack.current = audioContext.createMediaElementSource(pursuitEndWarningAudioRef.current);
-        pursuitEndWarningTrack.current(audioContext.current.destination);
-    }
-    if (pursuitEndTrack === null && audioContext != null && pursuitEndAudioRef.current != null) {
-        pursuitEndTrack.current = audioContext.createMediaElementSource(pursuitEndAudioRef.current);
-        pursuitEndTrack.current(audioContext.current.destination);
-    }
+    useEffect(() => {
+        if (pursuitEndWarningAudioRef.current === null && race.type === RaceType.PURSUIT) {
+            pursuitEndWarningAudioRef.current = new Audio('./sounds/prepare_alert.mp3');
+        }
+        if (pursuitEndAudioRef.current === null && race.type === RaceType.PURSUIT) {
+            pursuitEndAudioRef.current = new Audio('./sounds/act_alert.mp3');
+        }
+        if (pursuitEndWarningTrack === null && audioContext != null && pursuitEndWarningAudioRef.current != null) {
+            pursuitEndWarningTrack.current = audioContext.createMediaElementSource(pursuitEndWarningAudioRef.current);
+            pursuitEndWarningTrack.current(audioContext.current.destination);
+        }
+        if (pursuitEndTrack === null && audioContext != null && pursuitEndAudioRef.current != null) {
+            pursuitEndTrack.current = audioContext.createMediaElementSource(pursuitEndAudioRef.current);
+            pursuitEndTrack.current(audioContext.current.destination);
+        }
+    }, [race.type]);
+    
 
     const handleRaceEntryLapsUpdate = useCallback(() => {
         model.getRace(race.url).then(result => {
-            if (!result.success) {
-                setMessage('Unable to update race\n' + result.message);
-            }
-            else {
-                setUpdatedRace(result.domainObject);
-            }
+            setUpdatedRace(result);
+        })
+        .catch(error => {
+            setMessage('Unable to update race\n' + error.message);
         });
     }, [model, race]);
 
     const tickHandler = useCallback(() => {
-        const currentElapsedTime = race.clock.getElapsedTime(race.plannedStartTime); // ensure state calculated on current time uses the same value
+        const currentElapsedTime = model.getClock().getElapsedTime(race.plannedStartTime); // ensure state calculated on current time uses the same value
         setElapsedTime(currentElapsedTime); // takes effect next render so can't be used to drive caluclations of other state updates based on time in this handler
         if (pursuitEndWarningAudioRef.current != null && (Math.floor(currentElapsedTime / 1000) * 1000) === race.duration - 60000) {
             pursuitEndWarningAudioRef.current.play();
@@ -80,7 +76,7 @@ function RaceHeaderView({ race, showInRaceData = true }) {
         if (pursuitEndAudioRef.current != null && (Math.floor(currentElapsedTime / 1000) * 1000) === race.duration) {
             pursuitEndAudioRef.current.play();
         }
-    }, [race.clock, race.plannedStartTime, race.duration]);
+    }, [model, race.plannedStartTime, race.duration]);
 
     function handleRacePostponeClick() {
         setShowPostponeRace(true);
@@ -101,29 +97,21 @@ function RaceHeaderView({ race, showInRaceData = true }) {
     }
 
     useEffect(() => {
-        let ignoreFetch = false; // set to true if RaceEntriewView rerendered before fetch completes to avoid using out of date result
-        if (!ignoreFetch) {
-            model.registerRaceEntryLapsUpdateCallback(race.url, handleRaceEntryLapsUpdate);
-        }
-        // cleanup before effect runs and before form close
+        race.registerRaceEntryLapsUpdateCallback(handleRaceEntryLapsUpdate);
+        
         return () => {
-            ignoreFetch = true;
-            model.unregisterEntryUpdateCallback(race.url, handleRaceEntryLapsUpdate);
+            race.unregisterRaceEntryLapsUpdateCallback(handleRaceEntryLapsUpdate);
         }
-    }, [model, race, handleRaceEntryLapsUpdate]);
+    }, [race, handleRaceEntryLapsUpdate]);
 
     // add tick handler
     useEffect(() => {
-        if (previousRace.current && previousRace.current.clock) {
-            previousRace.current.clock.removeTickHandler(tickHandler);
-        }
-        race.clock.addTickHandler(tickHandler);
-        previousRace.current = race;
+        model.getClock().addTickHandler(tickHandler);
 
         return (() => {
-            race.clock.removeTickHandler(tickHandler);
+            model.getClock().removeTickHandler(tickHandler);
         });
-    }, [race, tickHandler]);
+    }, [model, tickHandler]);
 
     function closePostponeRaceFormDialog() {
         setShowPostponeRace(false);
@@ -140,7 +128,7 @@ function RaceHeaderView({ race, showInRaceData = true }) {
     return (
         <div className='race-header-view' >
             <div className='w3-row' >
-                <label  className='w3-col m2' ><b>{race.name}</b></label>
+                <label  className='w3-col m2' ><b>{updatedRace.name}</b></label>
                 <div className='w3-col m1 s6'>
                     {race.type !== RaceType.PURSUIT ? <label htmlFor={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >Laps</label> : null}
                     {race.type !== RaceType.PURSUIT ? <output id={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{race.plannedLaps}</output> : null}
@@ -154,29 +142,29 @@ function RaceHeaderView({ race, showInRaceData = true }) {
                     {showInRaceData && elapsedTime >= 0 ? <output id={'race-elapsed-time-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{Clock.formatDuration(elapsedTime)}</output> : null}
                 </div>
                 <div className='w3-col m2 s6'>
-                    <label htmlFor={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{(elapsedTime < 0) ? 'Countdown' : 'Remaining'}</label>
+                    <label htmlFor={'race-duration-remaining-' + updatedRace.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{(elapsedTime < 0) ? 'Countdown' : 'Remaining'}</label>
                     {/** When formatting time remaining adjust elapsed time to prevent formatted time remaining from being one second fast after formatting */}
-                    <output id={'race-duration-remaining-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{(elapsedTime < 0) ? Clock.formatDuration(elapsedTime, false, true) : Clock.formatDuration(race.duration - (Math.floor(elapsedTime /1000) * 1000))}</output>
+                    <output id={'race-duration-remaining-' + updatedRace.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{(elapsedTime < 0) ? Clock.formatDuration(elapsedTime, false, true) : Clock.formatDuration(race.duration - (Math.floor(elapsedTime /1000) * 1000))}</output>
                 </div>
                 <div className='w3-col m1 s6'>
-                    {showInRaceData && race.type !== RaceType.PURSUIT && updatedRace.lastLapTime > 0 ? <label htmlFor={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >Laps estimate</label> : null}
-                    {showInRaceData && race.type !== RaceType.PURSUIT && updatedRace.lastLapTime > 0 ? <output id={'estmated-race-laps-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{Number(updatedRace.lapForecast).toFixed(2)}</output> : null}
+                    {showInRaceData && updatedRace.type !== RaceType.PURSUIT && updatedRace.leadEntryLastLapTime > 0 ? <label htmlFor={'estmated-race-laps-' + updatedRace.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >Laps estimate</label> : null}
+                    {showInRaceData && updatedRace.type !== RaceType.PURSUIT && updatedRace.leadEntryLastLapTime > 0 ? <output id={'estmated-race-laps-' + updatedRace.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{Number(updatedRace.lapForecast).toFixed(2)}</output> : null}
                 </div>
                 <div className='w3-col m1 s6'>
-                    {showInRaceData && race.type !== RaceType.PURSUIT && updatedRace.lastLapTime > 0 ? <label htmlFor={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >Last lap time</label> : null}
-                    {showInRaceData && race.type !== RaceType.PURSUIT && updatedRace.lastLapTime > 0 ? <output id={'last-lap-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{Clock.formatDuration(updatedRace.lastLapTime)}</output> : null}
+                    {showInRaceData && updatedRace.type !== RaceType.PURSUIT && updatedRace.leadEntryLastLapTime > 0 ? <label htmlFor={'last-lap-' + updatedRace.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >Last lap time</label> : null}
+                    {showInRaceData && updatedRace.type !== RaceType.PURSUIT && updatedRace.leadEntryLastLapTime > 0 ? <output id={'last-lap-' + updatedRace.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{Clock.formatDuration(updatedRace.leadEntryLastLapTime)}</output> : null}
                 </div>
                 <div className='w3-col m1 s6'>
-                    {showInRaceData && race.type !== RaceType.PURSUIT && updatedRace.lastLapTime > 0 ? <label htmlFor={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >Average lap time</label> : null}
-                    {showInRaceData && race.type !== RaceType.PURSUIT && updatedRace.lastLapTime > 0 ? <output id={'average-lap-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{Clock.formatDuration(updatedRace.averageLapTime)}</output> : null}
+                    {showInRaceData && updatedRace.type !== RaceType.PURSUIT && updatedRace.leadEntryLastLapTime > 0 ? <label htmlFor={'average-lap-' + updatedRace.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >Average lap time</label> : null}
+                    {showInRaceData && updatedRace.type !== RaceType.PURSUIT && updatedRace.leadEntryLastLapTime > 0 ? <output id={'average-lap-' + updatedRace.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{Clock.formatDuration(updatedRace.leadEntryAverageLapTime)}</output> : null}
                 </div>
                 <div className='w3-col m1 s6'>
-                    {showInRaceData && race.type !== RaceType.PURSUIT && updatedRace.lapsSailed < updatedRace.plannedLaps ? <button id='shorten-course-button' className='w3-col' onClick={handleShortenCourseClick}>Shorten Course</button> : null}
-                    {!showInRaceData && race.type !== RaceType.PURSUIT ? <button id='adjust-course-button' className='w3-col' onClick={handleShortenCourseClick}>Adjust Laps</button> : null}
+                    {showInRaceData && updatedRace.type !== RaceType.PURSUIT && updatedRace.leadEntryLapsSailed < updatedRace.plannedLaps ? <button id='shorten-course-button' className='w3-col' onClick={handleShortenCourseClick}>Shorten Course</button> : null}
+                    {!showInRaceData && updatedRace.type !== RaceType.PURSUIT ? <button id='adjust-course-button' className='w3-col' onClick={handleShortenCourseClick}>Adjust Laps</button> : null}
                 </div>
                 <div className='w3-col m1 s6'>
                     {elapsedTime < 0 ? <button id='race-postpone-button' className='w3-col' onClick={handleRacePostponeClick}>Postpone Start</button> : null}
-                    {(elapsedTime >= 0 && (updatedRace.lapsSailed == null || updatedRace?.lapsSailed < 1)) ? <button id='race-restart-button' className='w3-col' onClick={handleRacePostponeClick}>Restart Race</button> : null}
+                    {(elapsedTime >= 0 && (updatedRace.leadEntryLapsSailed == null || updatedRace.leadEntryLapsSailed < 1)) ? <button id='race-restart-button' className='w3-col' onClick={handleRacePostponeClick}>Restart Race</button> : null}
                 </div>
                 <div className='w3-col m1 s6'>
                     {elapsedTime < 0 ? <button id='race-start-button' className='w3-col' onClick={handleRaceStartClick}>Start Now</button> : null}
@@ -187,11 +175,11 @@ function RaceHeaderView({ race, showInRaceData = true }) {
             </div>
             <p className={userMessageClasses()}>{message}</p>
             <ModalDialog show={showPostponeRace} onClose={() => setShowPostponeRace(false)} testid={'postpone-race-dialog'} >
-                <PostponeRaceForm race={race} onPostpone={controller.postponeRace} closeParent={closePostponeRaceFormDialog} />
+                <PostponeRaceForm race={updatedRace} onPostpone={controller.postponeRace} closeParent={closePostponeRaceFormDialog} />
             </ModalDialog>
             <ModalDialog show={showShortenCourse} onClose={closeShortenCourseDialog} testid={'shorten-course-dialog'}>
-                {showInRaceData ? <AdjustCourseForm race={race} minLaps={Math.max(1, updatedRace.lapsSailed)} maxLaps={updatedRace.plannedLaps - 1} initialValue={Math.max(1, updatedRace.plannedLaps - 1)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} /> :
-                    <AdjustCourseForm race={race} minLaps={Math.max(1, updatedRace.lapsSailed)} initialValue={Math.max(1, updatedRace.plannedLaps)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} />}
+                {showInRaceData ? <AdjustCourseForm race={updatedRace} minLaps={Math.max(1, updatedRace.leadEntryLapsSailed)} maxLaps={updatedRace.plannedLaps - 1} initialValue={Math.max(1, updatedRace.plannedLaps - 1)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} /> :
+                    <AdjustCourseForm race={updatedRace} minLaps={Math.max(1, updatedRace.leadEntryLapsSailed)} initialValue={Math.max(1, updatedRace.plannedLaps)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} />}
             </ModalDialog>
         </div>
     );

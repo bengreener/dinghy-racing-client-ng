@@ -14,22 +14,21 @@
  * limitations under the License. 
  */
 
-import { customRender } from '../test-utilities/custom-renders';
-import { act, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RaceStartConsole from './RaceStartConsole';
-import DinghyRacingModel from '../model/dinghy-racing-model';
-import DinghyRacingController from '../controller/dinghy-racing-controller';
-import { httpRootURL, wsRootURL, races, raceScorpionA, raceGraduateA, raceCometA, raceHandicapA, dinghyClassScorpion, dinghyClassComet, racePursuitA, fleetHandicap } from '../model/__mocks__/test-data';
-import SessionStartSequence from '../model/domain-classes/session-start-sequence';
-import RaceType from '../model/domain-classes/race-type';
-import { SortOrder } from '../model/dinghy-racing-model';
-import Clock from '../model/domain-classes/clock';
+import SylphModel from '../model/sylph-model';
+import { SortOrder } from '../model/sylph-model';
+import SylphController from '../controller/sylph-controller';
+import Collection from '../model/collection';
+import Race from '../model/race';
+import RaceType from '../model/race-type';
 import * as storageUtilities from '../utilities/storage-utilities';
+import { httpRootURL, wsRootURL, fleetHandicapHAL, raceCometAHAL, raceGraduateAHAL, raceHandicapAHAL, raceScorpionAHAL, racePursuitAHAL } from '../model/__mocks__/test-data';
 
-vi.mock('../model/dinghy-racing-model');
-vi.mock('../controller/dinghy-racing-controller');
-vi.mock('../model/domain-classes/clock');
+vi.mock('../model/sylph-model');
+vi.mock('../controller/sylph-controller');
+vi.mock('../model/clock');
 
 HTMLDialogElement.prototype.close = vi.fn();
 HTMLMediaElement.prototype.play = vi.fn();
@@ -43,25 +42,29 @@ const formatOptions = {
 };
 const timeFormat = new Intl.DateTimeFormat('utc', formatOptions);
 
+
 beforeEach(() => {
-    vi.restoreAllMocks();
     vi.useFakeTimers().setSystemTime(new Date('2021-10-14T10:25:00Z'));
+    vi.restoreAllMocks();
 });
 
 afterEach(async () => {
-    await act(async() => {vi.runOnlyPendingTimers();});
-    vi.useRealTimers();
+    // running pending timers will trigger state updates. Wrap in act to avoid warnings
+    await act(async () => {
+        vi.runOnlyPendingTimers();
+    });    
     sessionStorage.removeItem('sessionStart');
     sessionStorage.removeItem('sessionEnd');
     sessionStorage.removeItem('raceType');
+    vi.useRealTimers();
 });
 
 it('renders', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const controller = new DinghyRacingController(model);
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const controller = new SylphController(model);
     
     await act(async () => {
-        customRender(<RaceStartConsole />, model, controller);
+        render(<RaceStartConsole model={model} controller={controller} />);
     });
 
     const selectSessionStart = screen.getByLabelText(/session start/i);
@@ -77,11 +80,11 @@ it('renders', async () => {
 });
 describe('when no races selected', () => {
     it('renders', async () => {
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
 
         await act(async () => {
-            customRender(<RaceStartConsole />, model, controller);
+            render(<RaceStartConsole model={model} controller={controller} />);
         });
 
         const selectSessionStart = screen.getByLabelText(/session start/i);
@@ -97,13 +100,10 @@ describe('when no races selected', () => {
     });
 });
 it('displays races included in selected session', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const controller = new DinghyRacingController(model);
-    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
-
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const controller = new SylphController(model);
     await act(async () => {
-        customRender(<RaceStartConsole />, model, controller);
+        render(<RaceStartConsole model={model} controller={controller} />);
     });
     const optionScorpion = screen.getByRole('option', {'name': /Scorpion A/i});
     const optionsGraduate = screen.getByRole('option', {'name': /Graduate A/i});
@@ -111,49 +111,51 @@ it('displays races included in selected session', async () => {
     expect(optionScorpion).toBeInTheDocument();
     expect(optionsGraduate).toBeInTheDocument();
 });
-it('calls DinghyRacingModel.getRacesBetweenTimesForType with correct arguments', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const controller = new DinghyRacingController(model);
-    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
-    const getRacesBetweenTimesForTypeSpy = vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
+it('calls SylphModel.getRacesBetweenTimesForType with correct arguments', async () => {
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const controller = new SylphController(model);
+    const getRacesBetweenTimesForTypeSpy = vi.spyOn(model, 'getRacesBetweenTimesForType');
     const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
     sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
     const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000); // create as 18:00 UTC intially
     sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
     
     await act(async () => {        
-        customRender(<RaceStartConsole />, model, controller);
+        render(<RaceStartConsole model={model} controller={controller} />);
     });
 
     expect(getRacesBetweenTimesForTypeSpy).toHaveBeenCalledWith(sessionStart, sessionEnd, RaceType.FLEET, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
 });
-it('calls DinghyRacingModel.getStartSequence with correct arguments', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const controller = new DinghyRacingController(model);
-    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
+it('calls SylphModel.getStartSequence with correct arguments', async () => {
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const controller = new SylphController(model);
     const getStartSequenceSpy = vi.spyOn(model, 'getStartSequence');
+    const raceCometA = new Race(raceCometAHAL, {version: '"0"'}, model);
+    const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
+    const raceHandicapA = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+    const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+
+    const collection = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA ];
     
     await act(async () => {        
-        customRender(<RaceStartConsole />, model, controller);
+        render(<RaceStartConsole model={model} controller={controller} />);
     });
 
-    expect(getStartSequenceSpy).toHaveBeenCalledWith(local_races, RaceType.FLEET);
+    expect(getStartSequenceSpy).toHaveBeenCalledWith(collection);
 });
 describe('when new value set for race type', () => {
-    it('calls DinghyRacingModel.getRacesBetweenTimesForType with correct arguments', async () => {
+    it('calls SylphModel.getRacesBetweenTimesForType with correct arguments', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        const local_races = races.map(race => {return {...race, clock: model.getClock()}});
-        const getRacesBetweenTimesForTypeSpy = vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        const getRacesBetweenTimesForTypeSpy = vi.spyOn(model, 'getRacesBetweenTimesForType');
         const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
         sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
         const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000); // create as 18:00 UTC intially
         sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
         
         await act(async () => {        
-            customRender(<RaceStartConsole />, model, controller);
+            render(<RaceStartConsole model={model} controller={controller} />);
         });
         
         await act(async () => {
@@ -162,60 +164,55 @@ describe('when new value set for race type', () => {
     
         expect(getRacesBetweenTimesForTypeSpy).toHaveBeenCalledWith(sessionStart, sessionEnd, RaceType.PURSUIT, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
     });
-    it('calls DinghyRacingModel.getStartSequence with correct arguments', async () => {
+    it('calls SylphModel.getStartSequence with correct arguments', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        const local_races = races.map(race => {return {...race, clock: model.getClock()}});
-        const getRacesBetweenTimesForTypeSpy = vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
         const getStartSequenceSpy = vi.spyOn(model, 'getStartSequence');
+        const racePursuitA = new Race(racePursuitAHAL, {version: '"0"'}, model);
 
         await act(async () => {        
-            customRender(<RaceStartConsole />, model, controller);
+            render(<RaceStartConsole model={model} controller={controller} />);
         });
 
         await act(async () => {
             user.click(screen.getByLabelText(/pursuit/i));
         });
-
-        expect(getStartSequenceSpy).toHaveBeenCalledWith(local_races, RaceType.PURSUIT);
+        // without this act() useEffect that calls getStartSequence does not complete before test exits
+        await act(async () => {});
+        expect(getStartSequenceSpy).toHaveBeenCalledWith([racePursuitA]);
     });
 });
 it('defaults session start to 8:00 today', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const controller = new DinghyRacingController(model);
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const controller = new SylphController(model);
     vi.spyOn(model, 'getStartSequence');
     
     await act(async () => {        
-        customRender(<RaceStartConsole />, model, controller);
+        render(<RaceStartConsole model={model} controller={controller} />);
     });
 
     const selectSessionStart = screen.getByLabelText(/session start/i);
     expect(selectSessionStart).toHaveValue(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000).toISOString().substring(0, 16));
 });
 it('defaults session end to 20:00 of today', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const controller = new DinghyRacingController(model);
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const controller = new SylphController(model);
     vi.spyOn(model, 'getStartSequence');
     
     await act(async () => {        
-        customRender(<RaceStartConsole />, model, controller);
+        render(<RaceStartConsole model={model} controller={controller} />);
     });
 
     const selectSessionEnd = screen.getByLabelText(/session end/i);
     expect(selectSessionEnd).toHaveValue(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000).toISOString().substring(0, 16));
 });
 it('provides countdown value and message to Countdown control', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const controller = new DinghyRacingController(model);
-    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
-    vi.spyOn(model, 'getStartSequence').mockImplementation(() => {
-        return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence([ raceScorpionA ], new Clock())});
-    });
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const controller = new SylphController(model);
 
     await act(async () => {
-        customRender(<RaceStartConsole />, model, controller);
+        render(<RaceStartConsole model={model} controller={controller} />);
     });
 
     const countdownControl = screen.getByText('Start Countdown').parentElement;
@@ -223,14 +220,11 @@ it('provides countdown value and message to Countdown control', async () => {
     expect(within(countdownControl).getByText(/5:00/i)).toBeInTheDocument();
 });
 it('displays race names and blue peter', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const controller = new DinghyRacingController(model);
-    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
-    vi.spyOn(model, 'getStartSequence');
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const controller = new SylphController(model);
 
     await act(async () => {
-        customRender(<RaceStartConsole />, model, controller);
+        render(<RaceStartConsole model={model} controller={controller} />);
     });
 
     const flagIndicators = (screen.getByRole('heading', {name: 'Flags'})).parentNode;
@@ -241,29 +235,23 @@ it('displays race names and blue peter', async () => {
     expect(within(flagIndicators).getByText(/comet class/i)).toBeInTheDocument();
 });
 it('displays initial state for each flag', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const controller = new DinghyRacingController(model);
-    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
-    vi.spyOn(model, 'getStartSequence');
-
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const controller = new SylphController(model);
     let container;
     await act(async () => {
-        ({ container } = customRender(<RaceStartConsole />, model, controller));
+        ({ container } = render(<RaceStartConsole model={model} controller={controller} />));
     });
-
     const signalsPanel = container.getElementsByClassName('signals-panel')[0];
     expect(within(signalsPanel).getAllByText(/raised/i)).toHaveLength(3);
     expect(within(signalsPanel).getAllByText(/lowered/i)).toHaveLength(2);
 });
 it('displays time to next flag state change for each flag', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const controller = new DinghyRacingController(model);
-    vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, model.getClock())})});
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const controller = new SylphController(model);
 
     let container;
     await act(async () => {
-        ({ container } = customRender(<RaceStartConsole />, model, controller));
+        ({ container } = render(<RaceStartConsole model={model} controller={controller}  />));
     });
 
     const signalsPanel = container.getElementsByClassName('signals-panel')[0];
@@ -272,16 +260,12 @@ it('displays time to next flag state change for each flag', async () => {
     expect(within(signalsPanel).getAllByText(/10:00/i)).toHaveLength(1);
 });
 it('displays race headers for races in session', async () => {
-    const races = [raceScorpionA, raceGraduateA, raceCometA, {...raceHandicapA, duration: 2100000, plannedLaps: 3}];
 
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const controller = new DinghyRacingController(model);
-    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
-    vi.spyOn(model, 'getStartSequence');
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const controller = new SylphController(model);
 
     await act(async () => {
-        customRender(<RaceStartConsole />, model, controller);
+        render(<RaceStartConsole model={model} controller={controller} />);
     });
 
     const raceHeaders = (screen.getByRole('heading', {name: /^races$/i})).parentNode;
@@ -312,23 +296,18 @@ it('displays race headers for races in session', async () => {
 
     expect(within(raceHeaders).getByText(/handicap a/i)).toBeInTheDocument();
     const raceD = within(raceHeaders).getByText(/handicap a/i).parentNode.parentNode.parentNode;
-    expect(within(raceD).getByLabelText(/^laps$/i)).toHaveValue('3');
-    expect(within(raceD).getByLabelText(/duration/i)).toHaveValue('35:00');
+    expect(within(raceD).getByLabelText(/^laps$/i)).toHaveValue('5');
+    expect(within(raceD).getByLabelText(/duration/i)).toHaveValue('45:00');
     expect(within(raceD).getByLabelText(/countdown/i)).toHaveValue('20:00');
     expect(within(raceD).getByRole('button', {name: /postpone/i})).toBeInTheDocument();
     expect(within(raceD).getByRole('button', {name: /start now/i})).toBeInTheDocument();
 });
 it('does not display in race data in race headers', async () => {
-    const races = [raceScorpionA];
-
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const controller = new DinghyRacingController(model);
-    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
-    vi.spyOn(model, 'getStartSequence');
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const controller = new SylphController(model);
 
     await act(async () => {
-        customRender(<RaceStartConsole />, model, controller);
+        render(<RaceStartConsole model={model} controller={controller} />);
     });
 
     const raceHeaders = (screen.getByRole('heading', {name: /^races$/i})).parentNode;
@@ -340,14 +319,17 @@ it('does not display in race data in race headers', async () => {
     expect(within(raceA).queryByLabelText(/average/i)).not.toBeInTheDocument();
 });
 it('displays actions to start races in session', async () => {
-    const races = [raceScorpionA, raceGraduateA];
-
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const controller = new DinghyRacingController(model);
-    vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, new Clock())})});
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
+    const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+    const collection = [raceScorpionA, raceGraduateA];
+    const controller = new SylphController(model);
+    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(async () => {
+        return new Collection(collection, {size: 20, totalElements: 2, totalPages: 0, number: 0})
+    });
 
     await act(async () => {
-        customRender(<RaceStartConsole />, model, controller);
+        render(<RaceStartConsole model={model} controller={controller} />);
     });
     const actionRows = screen.getAllByRole('row');
     expect(actionRows).toHaveLength(4);
@@ -364,60 +346,45 @@ it('displays actions to start races in session', async () => {
 });
 describe('when clock ticks', () => {
     it('updates time to next flag state change', async () => {
-        const races = [raceScorpionA, raceGraduateA];
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, model.getClock())})});
-
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
         await act(async () => {
-            customRender(<RaceStartConsole />, model, controller);
+            render(<RaceStartConsole model={model} controller={controller} />);
         });
-
         await act(async () => {
             vi.advanceTimersByTime(1000);
         });
 
         const flagIndicators = (screen.getByRole('heading', {name: 'Flags'})).parentNode;
-        expect(within(flagIndicators).getAllByText(/04:59/i)).toHaveLength(1);
+        expect(within(flagIndicators).getAllByText(/04:59/i)).toHaveLength(2);
         expect(within(flagIndicators).getAllByText(/09:59/i)).toHaveLength(2);
 	});
     describe('when a flag state change is triggered', () => {
         it('updates the displayed flag state to the new flag state', async () => {
-            const races = [raceScorpionA, raceGraduateA];
-
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, model.getClock())})});
-
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
             await act(async () => {
-                customRender(<RaceStartConsole />, model, controller);
+                render(<RaceStartConsole model={model} controller={controller} />);
             });
-
             await act(async () => {
                 vi.advanceTimersByTime(300000);
             });
 
-            expect(screen.getAllByText(/raised/i)).toHaveLength(2);
-            expect(screen.getAllByText(/lowered/i)).toHaveLength(1);
+            expect(screen.getAllByText(/raised/i)).toHaveLength(3);
+            expect(screen.getAllByText(/lowered/i)).toHaveLength(2);
         });
     });
     it('updates countdown for actions', async () => {
-        const races = [raceScorpionA, raceGraduateA];
-
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, model.getClock())})});
-
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
         await act(async () => {
-            customRender(<RaceStartConsole />, model, controller);
+            render(<RaceStartConsole model={model} controller={controller} />);
         });
-
         await act(async () => {
             vi.advanceTimersByTime(1000);
         });
-
         const actionRows = screen.getAllByRole('row');
-        expect(actionRows).toHaveLength(3);
+        expect(actionRows).toHaveLength(5);
         expect(within(actionRows[1]).getByText(timeFormat.format(new Date('2021-10-14T10:30:00Z')))).toBeInTheDocument();
         expect(within(actionRows[1]).getByText(/lower scorpion class flag/i)).toBeInTheDocument();
         expect(within(actionRows[1]).getByText(/04:59/i)).toBeInTheDocument();
@@ -430,11 +397,11 @@ describe('when clock ticks', () => {
         it.skip('prepare for race start state change audio is present in document', async () => {
             const races = [{...raceScorpionA}, raceGraduateA];
             vi.setSystemTime(new Date('2021-10-14T10:23:59Z'));
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
             vi.spyOn(model, 'getStartSequence');
             await act(async () => {
-                customRender(<RaceStartConsole />, model, controller);
+                render(<RaceStartConsole model={model} controller={controller} />);
             });
             await act(async () => {
                 vi.advanceTimersByTime(1000);
@@ -448,11 +415,11 @@ describe('when clock ticks', () => {
         it.skip('prepare for race start state change audio is not present in document', async () => {
             const races = [{...raceScorpionA}, raceGraduateA];
             vi.setSystemTime(new Date('2021-10-14T10:24:00Z'));
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
             vi.spyOn(model, 'getStartSequence');
             await act(async () => {
-                customRender(<RaceStartConsole />, model, controller);
+                render(<RaceStartConsole model={model} controller={controller} />);
             });
             await act(async () => {
                 vi.advanceTimersByTime(1000);
@@ -466,11 +433,11 @@ describe('when clock ticks', () => {
         it.skip('race start state change audio is present in document', async () => {
             const races = [{...raceScorpionA}, {...raceGraduateA}];
             vi.setSystemTime(new Date('2021-10-14T10:24:59Z'));
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
             vi.spyOn(model, 'getStartSequence');
             await act(async () => {
-                customRender(<RaceStartConsole />, model, controller);
+                render(<RaceStartConsole model={model} controller={controller} />);
             });
             await act(async () => {
                 vi.advanceTimersByTime(1000);
@@ -484,11 +451,11 @@ describe('when clock ticks', () => {
         it.skip('race start state change audio is not present in document', async () => {
             const races = [{...raceScorpionA}, {...raceGraduateA}];
             vi.setSystemTime(new Date('2021-10-14T10:25:00Z'));
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
             vi.spyOn(model, 'getStartSequence');
             await act(async () => {
-                customRender(<RaceStartConsole />, model, controller);
+                render(<RaceStartConsole model={model} controller={controller} />);
             });
             await act(async () => {
                 vi.advanceTimersByTime(1000);
@@ -499,53 +466,59 @@ describe('when clock ticks', () => {
     })
 });
 it('registers an interest in race updates for races in session', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const controller = new DinghyRacingController(model);
-    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
-    vi.spyOn(model, 'getStartSequence');
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const controller = new SylphController(model);
     const registerRaceUpdateCallbackSpy = vi.spyOn(model, 'registerRaceUpdateCallback');
 
     await act(async () => {
-        customRender(<RaceStartConsole />, model, controller);
+        render(<RaceStartConsole model={model} controller={controller} />);
     });
     screen.getAllByText(/scorpion a/i);
 
-    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/races/4', expect.any(Function));
-    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(2, 'http://localhost:8081/dinghyracing/api/races/7', expect.any(Function));
-    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(3, 'http://localhost:8081/dinghyracing/api/races/17', expect.any(Function));
-    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(4, 'http://localhost:8081/dinghyracing/api/races/8', expect.any(Function));
+    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/directRaces/4', expect.any(Function));
+    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(2, 'http://localhost:8081/dinghyracing/api/directRaces/7', expect.any(Function));
+    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(3, 'http://localhost:8081/dinghyracing/api/directRaces/17', expect.any(Function));
+    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(4, 'http://localhost:8081/dinghyracing/api/directRaces/8', expect.any(Function));
 });
 describe('when races within session are changed', () => {
     it('updates recorded details', async () => {
-        const races_copy = [...races];
-        races_copy[0] = {...races[0]};
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races_copy, model.getClock())})});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const racePopeyeSpecial = new Race({...raceScorpionAHAL, name: 'Popeye Special'}, {version: '"1"'}, model);
+        let collection = [raceScorpionA, raceGraduateA];
+        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(async () => {
+            return new Collection(collection, {size: 20, totalElements: 2, totalPages: 0, number: 0})
+        });
+        const controller = new SylphController(model);
         await act(async () => {
-            customRender(<RaceStartConsole />, model, controller);
+            render(<RaceStartConsole model={model} controller={controller} />);
         });
         expect(screen.getAllByText('Scorpion A')[0]).toBeInTheDocument();
-        races_copy[0].name = 'Popeye Special';
+        collection = [racePopeyeSpecial, raceGraduateA];
         await act(async () => {
             vi.advanceTimersByTime(1000); // advance time so RaceStartConsole knows it needs to rerender
-            model.handleRaceUpdate({'body': races_copy[0].url});
+            model.handleRaceUpdate({'body': raceScorpionA.url});
         });
         expect(screen.getAllByText('Popeye Special')[0]).toBeInTheDocument();
     });
     it('removes a race that has had start time changed so it falls outside session time window', async () => {
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        const local_races = races.map(race => {return {...race, clock: model.getClock()}});
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
-        vi.spyOn(model, 'getStartSequence');
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const raceCometA = new Race(raceCometAHAL, {version: '"0"'}, model);
+        const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
+        const raceHandicapA = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const collection = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA ];
+        const controller = new SylphController(model);
+        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(async () => {
+            return new Collection(collection, {size: 20, totalElements: collection.length, totalPages: 0, number: 0})
+        });
         await act(async () => {
-            customRender(<RaceStartConsole />, model, controller);
+            render(<RaceStartConsole model={model} controller={controller} />);
         });
         expect(screen.getAllByText('Handicap A')).toHaveLength(2);
-        const url = races[local_races.length -1].url;
-        local_races.pop();
+        const url = collection[collection.length -1].url;
+        collection.pop();
         await act(async () => {
             vi.advanceTimersByTime(1000); // advance time so RaceStartConsole knows it needs to rerender
             model.handleRaceUpdate({'body': url});
@@ -554,19 +527,13 @@ describe('when races within session are changed', () => {
     });
 });
 it('registers an interest in fleet updates for races in session', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const controller = new DinghyRacingController(model);
-    const local_races = races.map(race => {return {...race, clock: model.getClock()}});
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
-    vi.spyOn(model, 'getStartSequence');
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const controller = new SylphController(model);
     const registerFleetUpdateCallbackSpy = vi.spyOn(model, 'registerFleetUpdateCallback');
-
     await act(async () => {
-        customRender(<RaceStartConsole />, model, controller);
+        render(<RaceStartConsole model={model} controller={controller} />);
     });
-    
     screen.getAllByText(/scorpion a/i);
-
     expect(registerFleetUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/fleets/1', expect.any(Function));
     expect(registerFleetUpdateCallbackSpy).toHaveBeenNthCalledWith(2, 'http://localhost:8081/dinghyracing/api/fleets/3', expect.any(Function));
     expect(registerFleetUpdateCallbackSpy).toHaveBeenNthCalledWith(3, 'http://localhost:8081/dinghyracing/api/fleets/4', expect.any(Function));
@@ -574,23 +541,18 @@ it('registers an interest in fleet updates for races in session', async () => {
 });
 describe('when the fleet associated with the race is changed', () => {
     it('displays updated start sequence', async () => {
-        const fleet = {...fleetHandicap, dinghyClasses: [dinghyClassComet, dinghyClassScorpion]};
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': [{...racePursuitA, fleet: fleet, dinghyClasses: [dinghyClassScorpion], clock: model.getClock()}], model})});
-        vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence([{...racePursuitA, fleet: fleet, dinghyClasses: [dinghyClassScorpion]}], model.getClock())})});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        const getstartSequenceSpy = vi.spyOn(model, 'getStartSequence');
         await act(async () => {
-            customRender(<RaceStartConsole />, model, controller);
+            render(<RaceStartConsole model={model} controller={controller} />);
         });
-        expect(screen.queryAllByText(/scorpion/i)[0]).toBeInTheDocument();
-
-        fleet.dinghyClasses = [dinghyClassScorpion];
+        expect(getstartSequenceSpy).toHaveBeenCalledTimes(2);
         await act(async () => {
             vi.advanceTimersByTime(1000); // advance time so RaceStartConsole knows it needs to rerender
-            model.handleFleetUpdate({'body': fleet.url});
+            model.handleFleetUpdate({'body': fleetHandicapHAL._links.self.href});
         });
-        
-        expect(screen.queryAllByText(/scorpion/i)).toHaveLength(0);
+        expect(getstartSequenceSpy).toHaveBeenCalledTimes(3);
     });
 });
 describe('when 6 minutes 1 second before start of first race', () => {
@@ -598,11 +560,11 @@ describe('when 6 minutes 1 second before start of first race', () => {
     it.skip('prepare for race start state change audio is not present in document', async () => {
         const races = [{...raceScorpionA}, raceGraduateA];
         vi.setSystemTime(new Date('2021-10-14T10:23:59Z'));
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
         vi.spyOn(model, 'getStartSequence');
         await act(async () => {
-            customRender(<RaceStartConsole />, model, controller);
+            render(<RaceStartConsole model={model} controller={controller} />);
         });
         const audio = screen.queryByTestId('prepare-sound-warning-audio');
         expect(audio).not.toBeInTheDocument();
@@ -613,11 +575,11 @@ describe('when 6 minutes before start of first race', () => {
     it.skip('prepare for race start state change audio is present in document', async () => {
         const races = [{...raceScorpionA}, raceGraduateA];
         vi.setSystemTime(new Date('2021-10-14T10:24:00Z'));
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
         vi.spyOn(model, 'getStartSequence');
         await act(async () => {
-            customRender(<RaceStartConsole />, model, controller);
+            render(<RaceStartConsole model={model} controller={controller} />);
         });
         const audio = screen.queryByTestId('prepare-sound-warning-audio');
         expect(audio).toBeInTheDocument();
@@ -628,11 +590,11 @@ describe('when 5 minutes 59 second before start of first race', () => {
     it.skip('prepare for race start state change audio is not present in document', async () => {
         const races = [{...raceScorpionA}, raceGraduateA];
         vi.setSystemTime(new Date('2021-10-14T10:24:01Z'));
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
         vi.spyOn(model, 'getStartSequence');
         await act(async () => {
-            customRender(<RaceStartConsole />, model, controller);
+            render(<RaceStartConsole model={model} controller={controller} />);
         });
         const audio = screen.queryByTestId('prepare-sound-warning-audio');
         expect(audio).not.toBeInTheDocument();
@@ -643,11 +605,11 @@ describe('when 1 second before start of first race', () => {
     it.skip('race start state change audio is not present in document', async () => {
         const races = [{...raceScorpionA}, {...raceGraduateA}];
         vi.setSystemTime(new Date('2021-10-14T10:29:59Z'));
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
         vi.spyOn(model, 'getStartSequence');
         await act(async () => {
-            customRender(<RaceStartConsole />, model, controller);
+            render(<RaceStartConsole model={model} controller={controller} />);
         });
         const audio = screen.queryByTestId('act-sound-warning-audio');
         expect(audio).not.toBeInTheDocument();
@@ -658,11 +620,11 @@ describe('when start of first race', () => {
     it.skip('race start state change audio is present in document', async () => {
         const races = [{...raceScorpionA}, {...raceGraduateA}];
         vi.setSystemTime(new Date('2021-10-14T10:20:00Z'));
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
         vi.spyOn(model, 'getStartSequence');
         await act(async () => {
-            customRender(<RaceStartConsole />, model, controller);
+            render(<RaceStartConsole model={model} controller={controller} />);
         });
         const audio = screen.queryByTestId('act-sound-warning-audio');
         expect(audio).toBeInTheDocument();
@@ -673,11 +635,11 @@ describe('when 1 second after start of first race', () => {
     it.skip('prepare for race start state change audio is not present in document', async () => {
         const races = [{...raceScorpionA}, {...raceGraduateA}];
         vi.setSystemTime(new Date('2021-10-14T10:30:01Z'));
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
         vi.spyOn(model, 'getStartSequence');
         await act(async () => {
-            customRender(<RaceStartConsole />, model, controller);
+            render(<RaceStartConsole model={model} controller={controller} />);
         });
         const audio = screen.queryByTestId('act-sound-warning-audio');
         expect(audio).not.toBeInTheDocument();
@@ -686,14 +648,10 @@ describe('when 1 second after start of first race', () => {
 describe('when selected races changed', () => {
     it('displays race headers for selected races', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const races = [raceScorpionA, raceGraduateA, raceCometA, {...raceHandicapA, duration: 2100000, plannedLaps: 3}];
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        const local_races = races.map(race => {return {...race, clock: model.getClock()}});
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
-        vi.spyOn(model, 'getStartSequence');
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
         await act(async () => {
-            customRender(<RaceStartConsole />, model, controller);
+            render(<RaceStartConsole model={model} controller={controller} />);
         });
         const raceHeaders = (screen.getByRole('heading', {name: /^races$/i})).parentNode;
         let raceA = within(raceHeaders).getByText(/scorpion a/i);
@@ -703,36 +661,33 @@ describe('when selected races changed', () => {
         raceA = within(raceHeaders).queryByText(/scorpion a/i);
         expect(raceA).not.toBeInTheDocument();
     });
-    it('calls DinghyRacingModel.getStartSequence with correct arguments', async () => {
+    it('calls SylphModel.getStartSequence with correct arguments', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        const local_races = races.map(race => {return {...race, clock: model.getClock()}});
-        const selectedRaces = [{...raceGraduateA, clock: model.getClock()}, {...raceCometA, clock: model.getClock()}, {...raceHandicapA, clock: model.getClock()}];
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
         const getStartSequenceSpy = vi.spyOn(model, 'getStartSequence');
         await act(async () => {
-            customRender(<RaceStartConsole />, model, controller);
-        });
-        const selectRace = await screen.getByLabelText(/Race/i);
-        user.deselectOptions(selectRace, ['Scorpion A']);
-        expect(getStartSequenceSpy).toHaveBeenLastCalledWith(selectedRaces, RaceType.FLEET);
-    });
-    it('displays race names and blue peter', async () => {
-        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        const local_races = races.map(race => {return {...race, clock: model.getClock()}});
-        const selectedRaces = [{...raceGraduateA, clock: model.getClock()}, {...raceCometA, clock: model.getClock()}, {...raceHandicapA, clock: model.getClock()}];
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': local_races})});
-        vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve(
-            {'success': true, 'domainObject': new SessionStartSequence(selectedRaces, new Clock())})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(local_races, new Clock())}
-        )});
-        await act(async () => {
-            customRender(<RaceStartConsole />, model, controller);
+            render(<RaceStartConsole model={model} controller={controller} />);
         });
         const selectRace = screen.getByLabelText(/Race/i);
         user.deselectOptions(selectRace, ['Scorpion A']);
+        expect(getStartSequenceSpy).toHaveBeenLastCalledWith([
+            new Race(raceGraduateAHAL, {version: '"0"'}, model),
+            new Race(raceCometAHAL, {version: '"0"'}, model),
+            new Race(raceHandicapAHAL, {version: '"0"'}, model)
+        ]);
+    });
+    it('displays race names and blue peter', async () => {
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        await act(async () => {
+            render(<RaceStartConsole model={model} controller={controller} />);
+        });
+        const selectRace = screen.getByLabelText(/Race/i);
+        user.deselectOptions(selectRace, ['Scorpion A']);
+        await act(async () => {});
+        
         const flagIndicators = (screen.getByRole('heading', {name: 'Flags'})).parentNode;
         expect(within(flagIndicators).queryByText(/scorpion class/i)).not.toBeInTheDocument();
         expect(within(flagIndicators).getByText(/blue peter/i)).toBeInTheDocument();
@@ -742,42 +697,37 @@ describe('when selected races changed', () => {
     });
     it('displays actions to start races in session', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const races = [{...raceScorpionA, clock: model.getClock()}, {...raceGraduateA, clock: model.getClock()}];
-        const selectedRaces = [{...raceGraduateA, clock: model.getClock()}];
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': races})});
-        const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getStartSequence').mockImplementation(() => {return Promise.resolve(
-            {'success': true, 'domainObject': new SessionStartSequence(selectedRaces, new Clock())})}).mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': new SessionStartSequence(races, new Clock())}
-        )});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
         await act(async () => {
-            customRender(<RaceStartConsole />, model, controller);
+            render(<RaceStartConsole model={model} controller={controller} />);
         });
         const selectRace = screen.getByLabelText(/Race/i);
         user.deselectOptions(selectRace, ['Scorpion A']);
         const actionRows = screen.getAllByRole('row');
-        expect(actionRows).toHaveLength(4);
+        expect(actionRows).toHaveLength(6);
         expect(within(actionRows[1]).getByText(timeFormat.format(new Date('2021-10-14T10:25:00Z')))).toBeInTheDocument();
         expect(within(actionRows[1]).getByText(/raise graduate class flag/i)).toBeInTheDocument();
+        expect(within(actionRows[1]).getByText(/raise blue peter/i)).toBeInTheDocument();
         expect(within(actionRows[1]).getByText(/00:00/i)).toBeInTheDocument();
         expect(within(actionRows[2]).getByText(timeFormat.format(new Date('2021-10-14T10:30:00Z')))).toBeInTheDocument();
-        expect(within(actionRows[2]).getByText(/raise blue peter/i)).toBeInTheDocument();
         expect(within(actionRows[2]).getByText(/05:00/i)).toBeInTheDocument();
-        expect(within(actionRows[3]).getByText(timeFormat.format(new Date('2021-10-14T10:35:00Z')))).toBeInTheDocument();
-        expect(within(actionRows[3]).getByText(/lower graduate class flag/i)).toBeInTheDocument();
-        expect(within(actionRows[3]).getByText(/lower blue peter/i)).toBeInTheDocument();
-        expect(within(actionRows[3]).getByText(/10:00/i)).toBeInTheDocument();
+        expect(within(actionRows[2]).getByText(/lower scorpion class flag/i)).toBeInTheDocument();
+        expect(within(actionRows[5]).getByText(timeFormat.format(new Date('2021-10-14T10:45:00Z')))).toBeInTheDocument();
+        expect(within(actionRows[5]).getByText(/lower handicap class flag/i)).toBeInTheDocument();
+        expect(within(actionRows[5]).getByText(/lower blue peter/i)).toBeInTheDocument();
+        expect(within(actionRows[5]).getByText(/20:00/i)).toBeInTheDocument();
     });
 });
 describe('when session storage is available', () => {
     describe('when start session time has been changed from default this sesssion', () => {
         it('uses value set for session start by user', async () => {
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
             vi.spyOn(model, 'getStartSequence');
             sessionStorage.setItem('sessionStart', '2024-08-15T14:00:00Z');
             await act(async () => {        
-                customRender(<RaceStartConsole />, model, controller);
+                render(<RaceStartConsole model={model} controller={controller} />);
             });
             const selectSessionStart = screen.getByLabelText(/session start/i);
             expect(selectSessionStart).toHaveValue('2024-08-15T15:00');
@@ -785,12 +735,12 @@ describe('when session storage is available', () => {
     });
     describe('when end session time has been changed from default this sesssion', () => {
         it('uses value set for session end by user', async () => {
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
             vi.spyOn(model, 'getStartSequence');
             sessionStorage.setItem('sessionEnd', '2024-08-15T10:00:00Z');
             await act(async () => {        
-                customRender(<RaceStartConsole />, model, controller);
+                render(<RaceStartConsole model={model} controller={controller} />);
             });
             const selectSessionEnd = screen.getByLabelText(/session end/i);
             expect(selectSessionEnd).toHaveValue('2024-08-15T11:00');
@@ -798,12 +748,12 @@ describe('when session storage is available', () => {
     });
     describe('when race type has been changed from default this session', () => {
         it('uses value set for race type by user', async () => {
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
             vi.spyOn(model, 'getStartSequence');
             sessionStorage.setItem('raceType', 'PURSUIT');
             await act(async () => {        
-                customRender(<RaceStartConsole />, model, controller);
+                render(<RaceStartConsole model={model} controller={controller} />);
             });
             const checkboxPursuit = screen.getByLabelText(/pursuit/i);
             expect(checkboxPursuit).toBeChecked();
@@ -813,14 +763,14 @@ describe('when session storage is available', () => {
 describe('when session storage is not available', () => {
     describe('when start session time has been changed from default this sesssion', () => {
         it('uses default value for session start', async () => {
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
             vi.spyOn(model, 'getStartSequence');
             vi.spyOn(storageUtilities, 'storageAvailable').mockImplementation(() => false);    
             sessionStorage.setItem('sessionStart', '2024-08-15T14:00:00Z');
             
             await act(async () => {        
-                customRender(<RaceStartConsole />, model, controller);
+                render(<RaceStartConsole model={model} controller={controller} />);
             });
     
             const selectSessionStart = screen.getByLabelText(/session start/i);
@@ -829,13 +779,13 @@ describe('when session storage is not available', () => {
     });
     describe('when end session time has been changed from default this sesssion', () => {
         it('uses default value for session end', async () => {
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
             vi.spyOn(model, 'getStartSequence');
             vi.spyOn(storageUtilities, 'storageAvailable').mockImplementation(() => false);    
             sessionStorage.setItem('sessionEnd', '2024-08-15T10:00:00Z');
             await act(async () => {        
-                customRender(<RaceStartConsole />, model, controller);
+                render(<RaceStartConsole model={model} controller={controller} />);
             });
             const selectSessionEnd = screen.getByLabelText(/session end/i);
             expect(selectSessionEnd).toHaveValue(new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000).toISOString().substring(0, 16));
@@ -843,13 +793,13 @@ describe('when session storage is not available', () => {
     });
     describe('when race type has been changed from default this session', () => {
         it('uses default value for race type', async () => {
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
             vi.spyOn(model, 'getStartSequence');
             vi.spyOn(storageUtilities, 'storageAvailable').mockImplementation(() => false);
             sessionStorage.setItem('raceType', 'PURSUIT');
             await act(async () => {
-                customRender(<RaceStartConsole />, model, controller);
+                render(<RaceStartConsole model={model} controller={controller} />);
             });
             const checkboxPursuit = screen.getByLabelText(/pursuit/i);
             expect(checkboxPursuit).not.toBeChecked();

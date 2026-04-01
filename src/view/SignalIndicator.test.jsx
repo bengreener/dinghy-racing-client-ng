@@ -14,102 +14,92 @@
  * limitations under the License. 
  */
 
-import { act, screen } from '@testing-library/react';
-import { customRender } from '../test-utilities/custom-renders';
+import { act, render, screen } from '@testing-library/react';
 import SignalIndicator from './SignalIndicator';
-import DinghyRacingModel from '../model/dinghy-racing-model';
+import Clock from '../model/clock';
+import FlagState from '../model/flag-state';
 import { httpRootURL, wsRootURL } from '../model/__mocks__/test-data';
-import { raceScorpionA, scorpionWarningSignal, scorpionStartSignal } from '../model/__mocks__/test-data';
+import { raceScorpionAHAL } from '../model/__mocks__/test-data';
 
-vi.mock('../model/domain-classes/clock');
+vi.mock('../model/clock');
 vi.useFakeTimers();
+
+const scorpionClassFlag = {name: 'Scorpion Class Flag'};
+const scorpionWarningVisualSignal = {flags: [scorpionClassFlag], flagsState: FlagState.RAISED};
+const scorpionStartVisualSignal = {flags: [scorpionClassFlag], flagsState: FlagState.LOWERED};
+const scorpionStartSoundSignal = {description: 'One'};
+const scorpionWarningSoundSignal = {description: 'One'};
+const scorpionWarningSignal = {meaning: 'Warning signal', time: new Date(raceScorpionAHAL.plannedStartTime).getTime() - 600000, soundSignal: scorpionWarningSoundSignal, visualSignal: scorpionWarningVisualSignal};
+const scorpionStartSignal = {meaning: 'Starting signal', time: new Date(raceScorpionAHAL.plannedStartTime).getTime(), soundSignal: scorpionStartSoundSignal, visualSignal: scorpionStartVisualSignal};
 
 describe('when signals use flags', () => {
     it('displays the name of the flags', () => {
-        vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 600001));
+        vi.setSystemTime(new Date(raceScorpionAHAL.plannedStartTime).getTime() - 600001);
         const signals = [scorpionWarningSignal, scorpionStartSignal];
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-
-        customRender(<SignalIndicator signals={signals} />, model);
+        render(<SignalIndicator signals={signals} clock={new Clock()} />);
 
         expect(screen.getByText(/scorpion class flag/i)).toBeInTheDocument();
     });
     describe('when before time of first signal', () => {
         it('displays flags as lowered', () => {
-            vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 600001));
+             vi.setSystemTime(new Date(raceScorpionAHAL.plannedStartTime).getTime() - 600001);
             const signals = [scorpionWarningSignal, scorpionStartSignal];
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-
-            customRender(<SignalIndicator signals={signals} />, model);
+            render(<SignalIndicator signals={signals} clock={new Clock()} />);
 
             expect(screen.getByText(/lowered/i)).toBeInTheDocument();
         });
         it('displays time to next signal', () => {
-            vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 600001));
+             vi.setSystemTime(new Date(raceScorpionAHAL.plannedStartTime).getTime() - 600001);
             const signals = [scorpionWarningSignal, scorpionStartSignal];
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-
-            customRender(<SignalIndicator signals={signals} />, model);
+            render(<SignalIndicator signals={signals} clock={new Clock()} />);
 
             expect(screen.getByText(/00:01/i)).toBeInTheDocument();
         });
     });
     describe('when time of first signal', () => {
         it('shows flag state for first signal', () => {
-            vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 600000));
+            vi.setSystemTime(new Date(raceScorpionAHAL.plannedStartTime).getTime() - 600000);
             const signals = [scorpionWarningSignal, scorpionStartSignal];
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-
-            customRender(<SignalIndicator signals={signals} />, model);
+            render(<SignalIndicator signals={signals} clock={new Clock()} />);
 
             expect(screen.getByText(/raised/i)).toBeInTheDocument();
         });
         it('shows 0:00 for time to next signal', () => {
-            vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 600000));
+            vi.setSystemTime(new Date(raceScorpionAHAL.plannedStartTime).getTime() - 600000);
             const signals = [scorpionWarningSignal, scorpionStartSignal];
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-
-            customRender(<SignalIndicator signals={signals} />, model);
+            render(<SignalIndicator signals={signals} clock={new Clock()} />);
 
             expect(screen.getByText(/00:00/i)).toBeInTheDocument();
         });
     });
     describe('when after time fo first signal and before time of next signal', () => {
         it('shows flag state for first signal', () => {
-            vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 300001));
+            vi.setSystemTime(new Date(raceScorpionAHAL.plannedStartTime).getTime() - 300001);
             const signals = [scorpionWarningSignal, scorpionStartSignal];
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-
-            customRender(<SignalIndicator signals={signals} />, model);
+            render(<SignalIndicator signals={signals} clock={new Clock()} />);
 
             expect(screen.getByText(/raised/i)).toBeInTheDocument();
         });
         it('shows time to next signal', () => {
-            vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 60000));
+            vi.setSystemTime(new Date(raceScorpionAHAL.plannedStartTime).getTime() - 60000);
             const signals = [scorpionWarningSignal, scorpionStartSignal];
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-
-            customRender(<SignalIndicator signals={signals} />, model);
+            render(<SignalIndicator signals={signals} clock={new Clock()} />);
 
             expect(screen.getByText(/01:00/i)).toBeInTheDocument();
         });
     });
     describe('when after time of last signal', () => {
         it('shows flag sate for last signal', () => {
-            vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() + 100000));
+            vi.setSystemTime(new Date(raceScorpionAHAL.plannedStartTime).getTime() + 100000);
             const signals = [scorpionWarningSignal, scorpionStartSignal];
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-
-            customRender(<SignalIndicator signals={signals} />, model);
+            render(<SignalIndicator signals={signals} clock={new Clock()} />);
 
             expect(screen.getByText(/lowered/i)).toBeInTheDocument();
         });
         it('shows no time to next signal', () => {
-            vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() + 100000));
+            vi.setSystemTime(new Date(raceScorpionAHAL.plannedStartTime).getTime() + 100000);
             const signals = [scorpionWarningSignal, scorpionStartSignal];
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-
-            customRender(<SignalIndicator signals={signals} />, model);
+            render(<SignalIndicator signals={signals} clock={new Clock()} />);
 
             expect(screen.getByLabelText(/change in/i)).toHaveValue('00:00');
         });
@@ -119,15 +109,17 @@ describe('when signals use flags', () => {
 describe('when clock ticks', () => {
     it('updates time', async () => {
         // check time to next signal is updated
-        vi.setSystemTime(new Date(raceScorpionA.plannedStartTime.getTime() - 600001));
+        vi.setSystemTime(new Date(raceScorpionAHAL.plannedStartTime).getTime() - 600001);
+        const clock = new Clock();
+        // clock.start();
         const signals = [scorpionWarningSignal, scorpionStartSignal];
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
 
-        customRender(<SignalIndicator signals={signals} />, model);
+        render(<SignalIndicator signals={signals} clock={clock} />);
 
-        await act(() => {
+        await act(async () => {
             vi.runOnlyPendingTimers();
-        });
+        })
+        
         expect(screen.getByText(/00:00/i)).toBeInTheDocument();
     });
 });

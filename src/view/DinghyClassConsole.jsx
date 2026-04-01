@@ -14,31 +14,28 @@
  * limitations under the License. 
  */
 
-import { useCallback, useContext, useEffect, useRef, useState, } from 'react';
-import ModelContext from './ModelContext';
-import DinghyRacingModel from '../model/dinghy-racing-model';
-import ControllerContext from './ControllerContext';
+import { useCallback, useEffect, useRef, useState, } from 'react';
+import DinghyClass from '../model/dinghy-class';
+// import SylphModel from '../model/sylph-model';
 
 /**
  * Get information required to create a new dinghy class
  * @returns {HTMLDivElement}
  */
-function DinghyClassConsole() {
-    const model = useContext(ModelContext);
-    const controller = useContext(ControllerContext);
+function DinghyClassConsole({ model, controller }) {
     const [dinghyClassMap, setDinghyClassMap] = useState(new Map());
     const [selectedDinghyClass, setSelectedDinghyClass] = useState();
-    const [dinghyClass, setDinghyClass] = useState({...DinghyRacingModel.dinghyClassTemplate(), portsmouthNumber: 1000});
+    const [dinghyClassInput, setDinghyClassInput] = useState({name: '', crewSize: 1, portsmouthNumber: 1000, externalName: ''});
     const [message, setMessage] = useState('');
-    const [dinghyClassUpdateRequestAt, setDinghyClassUpdateRequestAt] = useState(Date.now());
+    const [dinghyClassUpdateRequestAt, setDinghyClassInputUpdateRequestAt] = useState();
     const dinghyClassNameInputRef = useRef(null);
 
     const handleDinghyClassUpdate = useCallback(() => {
-        setDinghyClassUpdateRequestAt(Date.now());
+        setDinghyClassInputUpdateRequestAt(Date.now());
     }, []);
     
     const clear = useCallback(() => {
-        setDinghyClass({...DinghyRacingModel.dinghyClassTemplate(), portsmouthNumber: 1000});
+        setDinghyClassInput(new DinghyClass({name: '', crewSize: 1, portsmouthNumber: 1000, externalName: ''}));
         setSelectedDinghyClass(null);
         dinghyClassNameInputRef.current.focus();
         setMessage('');
@@ -47,18 +44,17 @@ function DinghyClassConsole() {
     // get dinghy classes
     useEffect(() => {
         let ignoreFetch = false; // set to true if DinghyClassConsole rerendered before fetch completes to avoid using out of date result
-        model.getDinghyClasses().then(result => {
-            if (!ignoreFetch && !result.success) {
-                setMessage('Unable to load dinghy classes\n' + result.message);
-            }
-            else if (!ignoreFetch) {
+        if (!ignoreFetch) {
+            model.getDinghyClasses().then(result => {
                 const map = new Map();
-                result.domainObject.forEach(dinghyClass => {
+                result.entities.forEach(dinghyClass => {
                     map.set(dinghyClass.url, dinghyClass);
                 });
                 setDinghyClassMap(map);
-            }
-        });
+            }).catch((error) => {
+                setMessage('Unable to load dinghy classes\n' + error.message);
+            });
+        }
         // cleanup before effect runs and before form close
         return () => {
             ignoreFetch = true;
@@ -90,7 +86,7 @@ function DinghyClassConsole() {
     }, [model, dinghyClassMap, handleDinghyClassUpdate]);
 
     async function createDinghyClass() {
-        const result = await controller.createDinghyClass(dinghyClass);
+        const result = await controller.createDinghyClass(dinghyClassInput.name, dinghyClassInput.crewSize, dinghyClassInput.portsmouthNumber, dinghyClassInput.externalName);
         if (result.success) {
             clear();
         }
@@ -100,43 +96,48 @@ function DinghyClassConsole() {
     }
 
     async function updateDinghyClass() {
-        const result = await controller.updateDinghyClass(dinghyClass);
-        if (result.success) {
+        try {
+            await controller.updateDinghyClass(selectedDinghyClass, dinghyClassInput.name, dinghyClassInput.crewSize, dinghyClassInput.portsmouthNumber, dinghyClassInput.externalName);
             clear();
         }
-        else {
-            setMessage(result.message);
+        catch (error) {
+            setMessage(error.message);
         }
     }
 
     function handleCreate(event) {
         event.preventDefault();
-        createDinghyClass(dinghyClass);
+        createDinghyClass();
     }
 
     function handleUpdate(event) {
         event.preventDefault();
-        updateDinghyClass(dinghyClass);
+        updateDinghyClass();
     }
 
     function handleDinghyClassRowClick({ currentTarget }) {
-        const dinghyClass = {...dinghyClassMap.get(currentTarget.id)};
+        const dinghyClass = dinghyClassMap.get(currentTarget.id);
         setSelectedDinghyClass(dinghyClass);
         // portsmouthNumber should be a numeric value greater than 0
         if (!dinghyClass.portsmouthNumber) {
             dinghyClass.portsmouthNumber = 1000;
         }
-        setDinghyClass(dinghyClass);
+        const name = dinghyClass.name;
+        const crewSize = dinghyClass.crewSize;
+        const portsmouthNumber = dinghyClass.portsmouthNumber;
+        const externalName = dinghyClass.externalName;
+        // setDinghyClassInput({name: dinghyClass.name, crewSize: dinghyClass.crewSize, portsmouthNumber: dinghyClass.portsmouthNumber, externalName: dinghyClass.externalName});
+        setDinghyClassInput({name: name, crewSize: crewSize, portsmouthNumber: portsmouthNumber, externalName: externalName});
         dinghyClassNameInputRef.current.focus();
         setMessage('');
     }
 
     function handleChange({target}) {
         if (target.name === 'crewSize' || target.name === 'portsmouthNumber') {
-            setDinghyClass({...dinghyClass, [target.name]: Number(target.value)});
+            setDinghyClassInput({...dinghyClassInput, [target.name]: Number(target.value)});
         }
         else {
-            setDinghyClass({...dinghyClass, [target.name]: target.value});    
+            setDinghyClassInput({...dinghyClassInput, [target.name]: target.value});    
         }
     }
 
@@ -163,19 +164,19 @@ function DinghyClassConsole() {
             <form className='w3-container' action='' method='get'>
                 <div className='w3-row' >
                     <label htmlFor='dinghy-class-input' className='w3-col m2' >Class Name</label>
-                    <input id='dinghy-class-input' ref={dinghyClassNameInputRef} name='name' className='w3-half' type='text' onChange={handleChange} value={dinghyClass.name} autoFocus />
+                    <input id='dinghy-class-input' ref={dinghyClassNameInputRef} name='name' className='w3-half' type='text' onChange={handleChange} value={dinghyClassInput.name} autoFocus />
                 </div>
                 <div className='w3-row' >
                     <label htmlFor='crew-size-input' className='w3-col m2' >Crew Size</label>
-                    <input id='crew-size-input' name='crewSize' className='w3-half' type='number' min='1' onChange={handleChange} value={dinghyClass.crewSize} />
+                    <input id='crew-size-input' name='crewSize' className='w3-half' type='number' min='1' onChange={handleChange} value={dinghyClassInput.crewSize} />
                 </div>
                 <div className='w3-row' >
                     <label htmlFor='portsmouth-number-input' className='w3-col m2' >Portsmouth Number</label>
-                    <input id='portsmouth-number-input' name='portsmouthNumber' className='w3-half' type='number' onChange={handleChange} value={dinghyClass.portsmouthNumber} />
+                    <input id='portsmouth-number-input' name='portsmouthNumber' className='w3-half' type='number' onChange={handleChange} value={dinghyClassInput.portsmouthNumber} />
                 </div>
                 <div className='w3-row' >
                     <label htmlFor='external-name-input' className='w3-col m2' >External Name</label>
-                    <input id='external-name-input' name='externalName' className='w3-half' type='text' onChange={handleChange} value={dinghyClass.externalName} />
+                    <input id='external-name-input' name='externalName' className='w3-half' type='text' onChange={handleChange} value={dinghyClassInput.externalName} />
                 </div>
                 <div className='w3-row' >
                     <div className='w3-col m8' >

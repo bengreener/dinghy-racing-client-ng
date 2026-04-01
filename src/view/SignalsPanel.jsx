@@ -22,7 +22,7 @@ import SignalIndicator from './SignalIndicator';
  * @param {Array<Signal>} [props.signals]
  * @returns {HTMLDivElement}
  */
-function SignalPanel({ signals = [] }) {
+function SignalsPanel({ signals = [], clock }) {
     // build a map with keyed by flags used and with an order based on timing of first signal using the flags
     const flagsMap = new Map();
     signals.filter(signal => signal.visualSignal).sort((a, b) => a.time - b.time).forEach(signal => {
@@ -47,9 +47,9 @@ function SignalPanel({ signals = [] }) {
 
     return (
         <div className='signals-panel'>
-            {Array.from(flagsMap.values()).map((signals, index) => <SignalIndicator key={index} signals={signals} />)}
+            {Array.from(flagsMap.values()).map((signals, index) => <SignalIndicator key={index} signals={signals} clock={clock} />)}
         </div>
     );
 }
 
-export default SignalPanel;
+export default SignalsPanel;

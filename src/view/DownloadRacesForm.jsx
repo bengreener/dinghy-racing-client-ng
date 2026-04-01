@@ -14,36 +14,30 @@
  * limitations under the License. 
  */
 
-import { useContext, useCallback, useEffect, useState } from 'react';
-import ModelContext from './ModelContext';
-import ControllerContext from './ControllerContext';
+import { useCallback, useEffect, useState } from 'react';
 import SelectSession from './SelectSession';
 import DownloadRace from './DownloadRace';
 
 /**
  * Select races to download results for.
  */
-function DownloadRacesForm() {
-    const model = useContext(ModelContext);
-    const controller = useContext(ControllerContext);
+function DownloadRacesForm({ model, controller }) {
     const [sessionStart, setSessionStart] = useState(() => {
         const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
         sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
         return sessionStart;
     });
     const [sessionEnd, setSessionEnd] = useState(() => {
-        const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 75600000); // create as 18:00 UTC intially
-        sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
+        const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 75600000); // create as 21:00 UTC intially
+        sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 21:00 local time
         return sessionEnd;
     });
     const [races, setRaces] = useState([]);
     const [message, setMessage] = useState(''); // feedback to user
 
     const handleRaceResultDownloadClick = useCallback((race, options) => {
-        controller.downloadRaceResults(race, options).then(result => {
-            if (!result.success) {
-                setMessage('Unable to download results\n' + result.message);
-            }
+        controller.downloadRaceResults(race, options).catch(error => {
+            setMessage('Unable to download results\n' + error.message);
         });
     }, [controller]);
 
@@ -57,14 +51,14 @@ function DownloadRacesForm() {
 
     useEffect(() => {
         let ignoreFetch = false; // set to true if RaceConsole rerendered before fetch completes to avoid using out of date result
-        model.getRacesBetweenTimes(sessionStart, sessionEnd).then(result => {
-            if (!ignoreFetch && !result.success) {
-                setMessage('Unable to load races\n' + result.message);
-            }
-            else if (!ignoreFetch) {
-                setRaces(result.domainObject);
-            }
-        });
+        if (!ignoreFetch) {
+            model.getRacesBetweenTimes(sessionStart, sessionEnd).then(result => {
+                setRaces(result.entities);
+                setMessage('');
+            }).catch((error) => {
+                setMessage('Unable to load races\n' + error.message);
+            });
+        }
 
         return () => {
             ignoreFetch = true;

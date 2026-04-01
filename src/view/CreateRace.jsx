@@ -15,80 +15,80 @@
  */
 
 import React from 'react';
-import { useContext, useRef, useState } from 'react';
-import DinghyRacingModel from '../model/dinghy-racing-model';
-import ModelContext from './ModelContext';
-import RaceType from '../model/domain-classes/race-type';
-import StartType from '../model/domain-classes/start-type';
+import { useEffect, useRef, useState } from 'react';
+import RaceType from '../model/race-type';
+import StartType from '../model/start-type';
 
-function CreateRace({ onCreate }) {
-    const model = useContext(ModelContext);
-    const [race, setRace] = React.useState({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000, 'plannedLaps': 5, type: RaceType.FLEET, startType: StartType.CSCCLUBSTART});
-    const [result, setResult] = React.useState({'message': ''});
+function CreateRace({ model, onCreate }) {
+    const [raceInput, setRaceInput] = React.useState(() => {
+        return {name: '', 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * - 1000).toISOString().substring(0, 16), 'duration': 2700000, 'plannedLaps': 5, fleet: null, type: RaceType.FLEET, startType: StartType.CSCCLUBSTART}
+    });
     const [fleetMap, setFleetMap] = React.useState(new Map());
     const [fleetOptions, setFleetOptions] = React.useState([]);
     const [message, setMessage] = useState('');
     const raceNameInputRef = useRef(null);
 
     const clear = React.useCallback(() => {
-        setRace({...DinghyRacingModel.raceTemplate(), 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * -1000).toISOString().substring(0, 16), 'duration': 2700000, 'plannedLaps': 5, type: RaceType.FLEET, startType: StartType.CSCCLUBSTART});
+        setRaceInput({name: '', 'plannedStartTime': new Date(Date.now() + 60 * new Date().getTimezoneOffset() * - 1000).toISOString().substring(0, 16), 'duration': 2700000, 'plannedLaps': 5, fleet: null, type: RaceType.FLEET, startType: StartType.CSCCLUBSTART});
         setMessage('');
         raceNameInputRef.current.focus();
     }, []);
 
-    React.useEffect(() => {
-        model.getFleets().then(result => {
-            if (result.success) {
+    useEffect(() => {
+        let cancel = false;
+        if (!cancel) {
+            model.getFleets().then(result => {
                 // build fleet options
                 let options = [];
                 let map = new Map();
                 // set a blank option for default and to clear input fields
-			    options.push(<option key='blank' value={null}></option> );
+                options.push(<option key='blank' value={null}></option> );
                 // set fleets
-                result.domainObject.forEach(fleet => {
+                result.entities.forEach(fleet => {
                     options.push(<option key={fleet.name} value={fleet.name}>{fleet.name}</option>);
                     map.set(fleet.name, fleet);
                 });
                 setFleetMap(map);
                 setFleetOptions(options);
-            }
-            else {
-                setMessage('Unable to load fleets\n' + result.message);
-            }
-        });
+            }).catch((error) => {
+                setMessage('Unable to load fleets\n' + error.message);
+            });
+        }
+        
+        return () => {
+            cancel = true;
+        }
     }, [model]);
-
-    React.useEffect(() => {
-        if (result && result.success) {
-            clear();
-        }
-        if (result && !result.success) {
-            setMessage(result.message);
-        }
-    }, [result, clear]);
-
+    
     async function handleCreate(event) {
         event.preventDefault();
-        const newRace = {...race, 'plannedStartTime': new Date(race.plannedStartTime)};
-        setResult(await onCreate(newRace));
+        if (onCreate) {
+            try {
+                await onCreate(raceInput.name, new Date(raceInput.plannedStartTime), raceInput.fleet, raceInput.duration, raceInput.plannedLaps, raceInput.type, raceInput.startType);
+                clear();
+            }
+            catch (error) {
+                setMessage(error.message);
+            }
+        }
     }
 
     function handleChange({target}) {
         if (target.name === 'fleet') {
             if (target.value === '') {
-                setRace({...race, 'fleet': DinghyRacingModel.fleetTemplate()});
+                setRaceInput({...raceInput, 'fleet': null});
             } else {
-                setRace({...race, 'fleet': fleetMap.get(target.value)});
+                setRaceInput({...raceInput, 'fleet': fleetMap.get(target.value)});
             }
         }
         else if (target.name === 'duration') {
-            setRace({...race, [target.name]: target.value * 60000});
+            setRaceInput({...raceInput, [target.name]: target.value * 60000});
         }
         else if (target.name === 'plannedLaps') {
-            setRace({...race, [target.name]: Number(target.value)});
+            setRaceInput({...raceInput, [target.name]: Number(target.value)});
         }
         else {
-            setRace({...race, [target.name]: target.value});
+            setRaceInput({...raceInput, [target.name]: target.value});
         }
     }
 
@@ -102,34 +102,34 @@ function CreateRace({ onCreate }) {
             <form className='w3-container' action='' method='post'>
                 <div className='w3-row'>
                     <label htmlFor='race-name-input' className='w3-col m2' >Race Name</label>
-                    <input id='race-name-input' ref={raceNameInputRef} name='name' className='w3-half' type='text' onChange={handleChange} value={race.name} autoFocus />
+                    <input id='race-name-input' ref={raceNameInputRef} name='name' className='w3-half' type='text' onChange={handleChange} value={raceInput.name} autoFocus />
                 </div>
                 <div className='w3-row'>
                     <label htmlFor='race-time-input' className='w3-col m2' >Start Time</label>
-                    <input id='race-time-input' name='plannedStartTime' className='w3-half' type='datetime-local' onChange={handleChange} value={race.plannedStartTime} />
+                    <input id='race-time-input' name='plannedStartTime' className='w3-half' type='datetime-local' onChange={handleChange} value={raceInput.plannedStartTime} />
                 </div>
                 <div className='w3-row'>
                     <label htmlFor='race-duration-input' className='w3-col m2' >Duration</label>
-                    <input id='race-duration-input' name='duration' className='w3-half' type='number' onChange={handleChange} value={race.duration / 60000} />
+                    <input id='race-duration-input' name='duration' className='w3-half' type='number' onChange={handleChange} value={raceInput.duration / 60000} />
                     </div>
                 <div className='w3-row'>
                     <label htmlFor='race-laps-input' className='w3-col m2' >Laps</label>
-                    <input id='race-laps-input' name='plannedLaps' className='w3-half' type='number' min='1' onChange={handleChange} value={race.plannedLaps ? race.plannedLaps : ''} />
+                    <input id='race-laps-input' name='plannedLaps' className='w3-half' type='number' min='1' onChange={handleChange} value={raceInput.plannedLaps ? raceInput.plannedLaps : ''} />
                 </div>
                 <div className='w3-row'>
                     <label htmlFor='race-fleet-select' className='w3-col m2' >Fleet</label>
-                    <select id='race-fleet-select' name='fleet' className='w3-half' multiple={false} onChange={handleChange} value={race.fleet ? race.fleet.name : ''} >{fleetOptions}</select>
+                    <select id='race-fleet-select' name='fleet' className='w3-half' multiple={false} onChange={handleChange} value={raceInput.fleet ? raceInput.fleet.name : ''} >{fleetOptions}</select>
                 </div>
                 <div className='w3-row'>
                     <label htmlFor='race-type-select' className='w3-col m2' >Type</label>
-                    <select id='race-type-select' name='type' className='w3-half' multiple={false} onChange={handleChange} value={race.type} >
+                    <select id='race-type-select' name='type' className='w3-half' multiple={false} onChange={handleChange} value={raceInput.type} >
                         <option value='FLEET'>Fleet</option>
                         <option value='PURSUIT'>Pursuit</option>
                     </select>
                 </div>
                 <div className='w3-row'>
                     <label htmlFor='race-start-type-select' className='w3-col m2' >Start Sequence</label>
-                    <select id='race-start-type-select' name='startType' className='w3-half' multiple={false} onChange={handleChange} value={race.startType} >
+                    <select id='race-start-type-select' name='startType' className='w3-half' multiple={false} onChange={handleChange} value={raceInput.startType} >
                         <option value='CSCCLUBSTART'>10-5-GO</option>
                         <option value='RRS26'>5-4-1-GO</option>
                     </select>

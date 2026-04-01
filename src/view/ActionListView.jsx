@@ -15,8 +15,8 @@
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
-import Clock from '../model/domain-classes/clock';
-import FlagState from '../model/domain-classes/flag-state';
+import Clock from '../model/clock';
+import FlagState from '../model/flag-state';
 
 /**
  * Provide a list, withing timings, of the actions that need to be completed to start the races

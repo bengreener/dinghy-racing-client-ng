@@ -150,26 +150,32 @@ export class Client {
               if (key === '/topic/createDinghyClass') {
                 value.forEach(cb => cb({body: 'http://localhost:8081/dinghyracing/api/dinghyClasses/99'}));
               }
+              if (key === '/topic/createEntry') {
+                value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/entries/10'}));
+              }
               if (key === '/topic/createFleet') {
                 value.forEach(cb => cb({body: 'http://localhost:8081/dinghyracing/api/fleet/1'}));
+              }
+              if (key === '/topic/deleteEntry') {
+                value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/entries/10'}));
+              }
+              if (key === '/topic/updateCompetitor') {
+                value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/competitor/10'}));
+              }
+              if (key === '/topic/updateDinghyClass') {
+                value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/dinghyClasses/1'}));
+              }
+              if (key === '/topic/updateEntry') {
+                value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/entries/10'}));
+              }
+              if (key === '/topic/updateFleet') {
+                value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/fleet/1'}));
               }
               if (key === '/topic/updateRace') {
                 value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/races/4'}));
               }
               if (key === '/topic/updateRaceEntryLaps') {
                 value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/races/4'}));
-              }
-              if (key === '/topic/updateEntry') {
-                value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/entries/10'}));
-              }
-              if (key === '/topic/deleteEntry') {
-                value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/entries/10'}));
-              }
-              if (key === '/topic/updateDinghyClass') {
-                value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/dinghyClasses/1'}));
-              }
-              if (key === '/topic/updateFleet') {
-                value.forEach(cb => cb({'body': 'http://localhost:8081/dinghyracing/api/fleet/1'}));
               }
             });
         }

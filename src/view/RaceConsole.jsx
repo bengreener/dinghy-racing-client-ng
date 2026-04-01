@@ -14,19 +14,18 @@
  * limitations under the License. 
  */
 
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import ModelContext from './ModelContext';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import RaceEntriesView from './RaceEntriesView';
 import RaceHeaderView from './RaceHeaderView';
 import CollapsableContainer from './CollapsableContainer';
 import SelectSession from './SelectSession';
-import RaceType from '../model/domain-classes/race-type';
+import RaceType from '../model/race-type';
+import { SortOrder } from '../model/sylph-model';
 import { storageAvailable } from '../utilities/storage-utilities';
 
-function RaceConsole() {
-    const model = useContext(ModelContext);
+function RaceConsole({ model, controller }) {
     const sessionStorageAvailable = useMemo(() => storageAvailable('sessionStorage'), []);
-    const [selectedRaces, setSelectedRaces] = useState([]); // selection of race names made by user
+    const [selectedRaces, setSelectedRaces] = useState([]); // array of race names selected by user
     const [raceOptions, setRaceOptions] = useState([]); // list of names of races names for selection
     const [raceMap, setRaceMap] = useState(new Map()); // map of race names to races
     const [message, setMessage] = useState(''); // feedback to user
@@ -58,7 +57,7 @@ function RaceConsole() {
             }
             return sessionEnd;
         });
-    const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
+    const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
     const [raceType, setRaceType] = useState(() => {
         let raceType;
         if (sessionStorageAvailable) {
@@ -79,16 +78,13 @@ function RaceConsole() {
 
     // get races between times for race type
     useEffect(() => {
-        let ignoreFetch = false; // set to true if RaceConsole rerendered before fetch completes to avoid using out of date result
-        model.getRacesBetweenTimesForType(new Date(sessionStart), new Date(sessionEnd), raceType).then(result => {
-            if (!ignoreFetch && !result.success) {
-                setMessage('Unable to load races\n' + result.message);
-            }
-            else if (!ignoreFetch) {
+        let cancel = false; // set to true if RaceConsole rerendered before fetch completes to avoid using out of date result
+        if (!cancel) {
+            model.getRacesBetweenTimesForType(new Date(sessionStart), new Date(sessionEnd), raceType, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING}).then(result => {
                 const map = new Map();
                 const options = []; // html option elements
                 const optionsRaceNames = []; // just the names of the races to match with previously selected races
-                result.domainObject.forEach(race => {
+                result.entities.forEach(race => {
                     map.set(race.name, race);
                     options.push(<option key={race.name + race.plannedStartTime.toISOString()} value={race.name} >{race.name}</option>);
                     optionsRaceNames.push(race.name);
@@ -96,11 +92,14 @@ function RaceConsole() {
                 setRaceMap(map);
                 setSelectedRaces(s => s.filter(selectedRaceName => optionsRaceNames.includes(selectedRaceName))); // remove any previously selected races that are no longer available from race selectedRaces  
                 setRaceOptions(options);
-            }
-        });
+            }).catch((error) => {
+                console.error(error.message, error);
+                setMessage('Unable to load races\n' + error.message);
+            });
+        }
 
         return () => {
-            ignoreFetch = true;
+            cancel = true;
             setMessage('');
         }
     }, [model, sessionStart, sessionEnd, raceType, racesUpdateRequestAt]);
@@ -180,10 +179,10 @@ function RaceConsole() {
             <CollapsableContainer heading={'Races'}>
                 {selectedRaces.map(selectedRace => {
                     const race = raceMap.get(selectedRace);
-                    return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} />
+                    return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} model={model} controller={controller} />
                 })}
             </CollapsableContainer>
-            <RaceEntriesView races={selectedRaces.map(selectedRace => raceMap.get(selectedRace))} />
+            <RaceEntriesView races={selectedRaces.map(selectedRace => raceMap.get(selectedRace))} model={model} controller={controller} />
         </div>
     );
 }

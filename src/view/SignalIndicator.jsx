@@ -14,10 +14,9 @@
  * limitations under the License. 
  */
 
-import { useCallback, useContext, useEffect, useState } from 'react';
-import ModelContext from './ModelContext';
-import Clock from '../model/domain-classes/clock';
-import FlagState from '../model/domain-classes/flag-state';
+import { useCallback, useEffect, useState } from 'react';
+import Clock from '../model/clock';
+import FlagState from '../model/flag-state';
 
 /**
  * Display information about a signal, or signals where the same flags are used, in starting a race or session of races
@@ -25,22 +24,21 @@ import FlagState from '../model/domain-classes/flag-state';
  * @param {Array<Signal>} [props.signals]
  * @returns {HTMLDivElement}
  */
-function SignalIndicator({ signals }) {
-    const model = useContext(ModelContext);
-    const [time, setTime] = useState(model.getClock().getTimeToSecondPrecision());
+function SignalIndicator({ signals, clock }) {
+    const [time, setTime] = useState(clock.getTimeToSecondPrecision());
 
     const tickHandler = useCallback(() => {
-        setTime(model.getClock().getTimeToSecondPrecision());
-    }, [model]);
+        setTime(clock.getTimeToSecondPrecision());
+}, [clock]);
 
     //set tick handler
     useEffect(() => {
-        model.getClock().addTickHandler(tickHandler);
+        clock.addTickHandler(tickHandler);
 
         return(() => {
-            model.getClock().removeTickHandler(tickHandler);
-        })
-    }, [model, tickHandler]);
+            clock.removeTickHandler(tickHandler);
+        });
+}, [clock, tickHandler]);
 
     const flags = signals[0]?.visualSignal.flags;
     const lastSignal = signals.findLast(signal => signal.time <= time); // only works when there are no more than 2 signals

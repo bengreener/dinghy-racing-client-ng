@@ -15,7 +15,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import Clock from '../model/domain-classes/clock';
+import Clock from '../model/clock';
 
 /**
  * Display a formatted time

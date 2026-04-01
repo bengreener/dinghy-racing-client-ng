@@ -14,39 +14,38 @@
  * limitations under the License. 
  */
 
-import { useContext, useEffect, useState } from 'react';
-import ModelContext from './ModelContext';
-import ControllerContext from './ControllerContext';
+import { useCallback, useEffect, useState } from 'react';
 
 /**
  * Display a list of competitors and enable editing of the details for a selected competitor
  * @param {Object} props
  * @returns {HTMLDivElement}
  */
-function CompetitorsConsole() {
-    const model = useContext(ModelContext);
-    const controller = useContext(ControllerContext);
+function CompetitorsConsole({ model, controller }) {
     const [competitorsMap, setCompetitorsMap] = useState(new Map());
     const [selectedCompetitor, setSelectedCompetitor] = useState();
     const [competitorName, setCompetitorName] = useState();
     const [message, setMessage] = useState('');
-    const [competitorUpdateRequestAt, setCompetitorUpdateRequestAt] = useState(Date.now());
+    const [competitorUpdateRequestAt, setCompetitorUpdateRequestAt] = useState();
+
+    const handleCompetitorUpdate = useCallback(() => {
+        setCompetitorUpdateRequestAt(Date.now());
+    }, []);
 
     // get competitors
     useEffect(() => {
         let ignoreFetch = false; // set to true if CompetitorsConsole rerendered before fetch completes to avoid using out of date result
-        model.getCompetitors().then(result => {
-            if (!ignoreFetch && !result.success) {
-                setMessage('Unable to load competitors\n' + result.message);
-            }
-            else if (!ignoreFetch) {
+        if (!ignoreFetch) {
+            model.getCompetitors().then(result => {
                 const map = new Map();
-                result.domainObject.forEach(competitor => {
+                result.entities.forEach(competitor => {
                     map.set(competitor.url, competitor);
                 });
                 setCompetitorsMap(map);
-            }
-        });
+            }).catch((error) => {
+                setMessage('Unable to load competitors\n' + error.message);
+            });
+        }        
         // cleanup before effect runs and before form close
         return () => {
             ignoreFetch = true;
@@ -54,14 +53,37 @@ function CompetitorsConsole() {
         }
     }, [model, competitorUpdateRequestAt])
 
-    async function updateCompetitor(competitor, name) {
-        const result = await controller.updateCompetitor(competitor, name);
-        if (result.success) {
-            clearSelectedCompetitor();
-            setCompetitorUpdateRequestAt(Date.now());
+    // register on creation callback for competitors
+    useEffect(() => {
+        model.registerCompetitorCreationCallback(handleCompetitorUpdate);
+        // cleanup before effect runs and before form close
+        return () => {
+            model.unregisterCompetitorCreationCallback(handleCompetitorUpdate);
         }
-        else {
-            setMessage(result.message);
+    }, [model, handleCompetitorUpdate]);
+
+    // register on update callbacks for competitors
+    useEffect(() => {
+        const competitors = Array.from(competitorsMap.values());
+        competitors.forEach(competitor => {
+            model.registerCompetitorUpdateCallback(competitor.url, handleCompetitorUpdate);
+
+        });
+        // cleanup before effect runs and before form close
+        return () => {
+            competitors.forEach(competitor => {
+                model.unregisterCompetitorUpdateCallback(competitor.url, handleCompetitorUpdate);
+            });
+        }
+    }, [model, competitorsMap, handleCompetitorUpdate]);
+
+    async function updateCompetitor(competitor, name) {
+        try {
+            await controller.updateCompetitor(competitor, name);
+            clearSelectedCompetitor();
+        }
+        catch (error) {
+            setMessage(error.message);
         }
     }
 

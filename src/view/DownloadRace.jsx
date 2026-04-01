@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import NameFormat from '../controller/name-format';
 
 /**
@@ -25,7 +25,22 @@ import NameFormat from '../controller/name-format';
  * @returns 
  */
 function DownloadRace({ race, downloadFunction }) {
+    const [fleet, setFleet] = useState();
     const [selectedNameFormat, setSelectedNameFormat] = useState(NameFormat.FIRSTNAMESURNAME);
+
+    useEffect(() => {
+        let cancel = false;
+
+        if (!cancel) {
+            race.getFleet().then((fleet) => {
+                setFleet(fleet);
+            });
+        }
+
+        return(() => {
+            cancel = true;
+        });
+    });
 
     function handleOptionChange({ target }) {
         setSelectedNameFormat(target.value);
@@ -41,7 +56,7 @@ function DownloadRace({ race, downloadFunction }) {
         <form className='download-race w3-container w3-padding w3-border w3-margin' action='' method='get'>
             <div className='w3-row'>
                 <label className='w3-col m3' >{race.name}</label>
-                <label className='w3-col m2' >{race.dinghyClass ? race.dinghyClass.name : ''}</label>
+                <label className='w3-col m2' >{fleet?.name}</label>
                 <output id={'race-start-' + race.name.replace(/ /g, '-').toLowerCase()}>
                     {new Intl.DateTimeFormat(navigator.language, {dateStyle: 'medium', timeStyle: 'medium', hour12: false}).format(race.plannedStartTime)}
                 </output>

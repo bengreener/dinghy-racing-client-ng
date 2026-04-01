@@ -17,14 +17,15 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import LapView from './LapView';
 import ScoringAbbreviation from './ScoringAbbreviation';
-import RaceType from '../model/domain-classes/race-type';
+import RaceType from '../model/race-type';
 
 /**
  * Display the details of a race entry
  * @param {Object} props
+ * @param {SynchronousEntry} entry
  * @param {Function} props.addLap
  * @param {function} props.removeLap
- * @param {function} props.updateLap
+ * @param {updateLap} props.updateLap
  * @param {function} props.setScoringAbbreviation
  * @param {function} props.onRaceEntryDrop
  * @param {function} [props.onFastGroup]
@@ -35,7 +36,8 @@ import RaceType from '../model/domain-classes/race-type';
 function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviation, onRaceEntryDrop, onFastGroup, inFastGroup = false, showUserMessage}) {
     const [editMode, setEditMode] = useState(false);
     const [disabled, setDisabled] = useState(false);
-    const prevETag = useRef(entry.metadata.eTag);
+    const prevVersion = useRef(entry.entry.metadata.version);
+    const prevSignedUpVersion = useRef(entry.signedUp.metadata.version);
     const lapsView = [];
     let classes = 'race-entry-view w3-row w3-border w3-hover-border-blue';
 
@@ -70,12 +72,12 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
                     return;
                 }
                 // only update lap time if value has changed. Otherwise entry will remain disabled and not reenabled as response will not have changed value.
-                const oldTime = entry.laps.reduce((a, b) => {return {time: a.time + b.time}}).time;
+                const oldTime = entry.laps.entities.reduce((a, b) => {return {time: a.time + b.time}}).time;
                 if (oldTime !== timeInMilliseconds) {
                     setDisabled(true);
                     setEditMode(false);
                     const result = await updateLap(entry, timeInMilliseconds);
-                    if (!result?.success) {
+                    if (!result) {
                         setDisabled(false);
                     }
                 }
@@ -94,9 +96,10 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     }, []);
 
     useEffect(() => {
-        if (prevETag.current !== entry.metadata.eTag) {
+        if (prevVersion.current !== entry.entry.metadata.version || prevSignedUpVersion.current !== entry.signedUp.metadata.version) {
             setDisabled(false);
-            prevETag.current = entry.metadata.eTag;
+            prevVersion.current = entry.entry.metadata.version;
+            prevSignedUpVersion.current = entry.signedUp.metadata.version;
         }
     }, [entry]);
 
@@ -115,7 +118,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
                     result = await addLap(entry);
                 }
             }
-            if (!result?.success) {
+            if (!result) {
                 setDisabled(false);
             }
         }
@@ -124,7 +127,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     function handleAuxClick() {
         if (!editMode && !disabled) {
             // do not enter edit mode if there is no lap time to edit
-            if (entry.laps.length > 0) {
+            if (entry.laps.entities.length > 0) {
                 setEditMode(true);
             }
         }
@@ -144,7 +147,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         touchTimeoutId = setTimeout(() => {
             if (!editMode && !disabled) {
                 // do not enter edit mode if there is no lap time to edit
-                if (entry.laps.length > 0) {
+                if (entry.laps.entities.length > 0) {
                     setEditMode(true);
                 }
                 tracking = false;
@@ -205,7 +208,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         if (setScoringAbbreviation) {
             setDisabled(true);
             const result = await setScoringAbbreviation(entry, event.target.value);
-            if (!result?.success) {
+            if (!result) {
                 setDisabled(false);
             }
         }
@@ -240,23 +243,23 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
                 setDisabled(true);
             }
             const result = await onRaceEntryDrop(event.dataTransfer.getData('text/html'), entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
-            if (!result?.success) {
+            if (!result) {
                 setDisabled(false);
             }
         }
     }
 
     let cumulativeLapTimes = 0;
-    if (entry.laps.length === 0) {
+    if (entry.laps.entities.length === 0) {
         // insert an 'empty' element to expand containing div and align scoring abbreviation to right
         lapsView.push(<div key=' ' className='w3-cell w3-left w3-padding-small'><output> </output></div>);
     }
     else {
-        for (let i = 0; i < entry.laps.length; i++) {
-            const lap = entry.laps[i];
+        for (let i = 0; i < entry.laps.entities.length; i++) {
+            const lap = entry.laps.entities[i];
             cumulativeLapTimes += lap.time;
             let lapView;
-            if (i === (entry.laps.length - 1)) {
+            if (i === (entry.laps.entities.length - 1)) {
                 if (editMode) {
                     lapView = <LapView key={lap.number} value={cumulativeLapTimes} editable={true} keyup={handleLastLapCellKeyUp} focusout={handleLastLapCellFocusOut} />
                 }
@@ -319,8 +322,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
                     <output>{entry.helm.name}</output>
                 </div>
                 <div className='w3-col m1-half w3-padding-small' >
-                    {/* <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'}>{entry.position != null ? entry.position : ' '}</output> */}
-                    <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'}>{entry.getPositionInRace(entry.race) != null ? entry.getPositionInRace(entry.race) : ' '}</output>
+                    <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'}>{entry.position != null ? entry.position : ' '}</output>
                 </div>
                 <div className='w3-col m5 w3-hide-small'>
                     <div className='w3-cell-row bgis-cell' >
@@ -335,5 +337,13 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
         </div>
     )
 }
+
+/**
+ * Action to take when PostponeRaceDialog postpone button clicked
+ * @callback RaceEntryView~updateLap
+ * @param {SynchronousEntry} entry 
+ * @param {Number | String} value 
+ * @returns {Boolean}
+ */
 
 export default RaceEntryView;

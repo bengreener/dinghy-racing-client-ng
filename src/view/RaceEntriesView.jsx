@@ -15,12 +15,11 @@
  */
 
 // import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
-import ModelContext from './ModelContext';
+import { useCallback, useEffect, useState } from 'react';
 import RaceEntryView from './RaceEntryView';
-import { sortArray } from '../utilities/array-utilities';
-import ControllerContext from './ControllerContext';
-import RaceType from '../model/domain-classes/race-type';
+import RaceType from '../model/race-type';
+import { buildSynchronousEntries } from './synchronous-model/synchronous-model';
+import SynchronousEntry from './synchronous-model/synchronous-entry';
 
 /**
  * Display race entries
@@ -28,13 +27,11 @@ import RaceType from '../model/domain-classes/race-type';
  * @param {Array<Race>} props.races
  * @returns {HTMLDivElement}
  */
-function RaceEntriesView({ races }) {
-    const model = useContext(ModelContext);
-    const controller = useContext(ControllerContext);
+function RaceEntriesView({ races, controller, model }) {
     const [entriesMap, setEntriesMap] = useState(new Map());
     const [message, setMessage] = useState('');
     const [sortOrder, setSortOrder] = useState('default');
-    const [entriesUpdateRequestAt, setEntriesUpdateRequestAt] = useState(Date.now()); // time of last request to fetch entries from server. change triggers a new fetch; for instance when server notifies an entry has been updated
+    const [entriesUpdateRequestAt, setEntriesUpdateRequestAt] = useState(); // time of last request to fetch entries from server. change triggers a new fetch; for instance when server notifies an entry has been updated
     const [displayOrder, setDisplayOrder] = useState([]); // holds entriesMap keys in the order they are to be displayed
     const [fastGroup, setFastGroup] = useState([]); // holds the entriesMap keys of entries that have been fast grouped
 
@@ -44,42 +41,40 @@ function RaceEntriesView({ races }) {
 
     // get entries
     useEffect(() => {
-        let ignoreFetch = false; // set to true if RaceEntriewView rerendered before fetch completes to avoid using out of date result
+        let cancel = false;
         const entriesMap = new Map();
-        // build promises
-        const promises = races.map(race => {
-            if (!race || (!race.name && !race.url)) {
-                return Promise.resolve({'success': true, 'domainObject': []});
-            }
-            return model.getEntriesByRace(race);
-        });
-        if (!ignoreFetch) {
-            Promise.all(promises).then(results => {
-                results.forEach(result => {
-                    if (!result.success) {
-                        setMessage('Unable to load entries\n' + result.message);
-                    }
-                    else {
-                        result.domainObject.forEach(entry => {
-                            entriesMap.set(entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name, entry);
-                            model.registerEntryUpdateCallback(entry.url, updateEntries);
-                        });
-                    }
-                });
-                if (!ignoreFetch) {
-                    setEntriesMap(entriesMap);
-                }
+        buildSynchronousEntries(races).then((entries) => {
+            entries.forEach(sEntry => {
+                entriesMap.set(sEntry.dinghy.dinghyClass.name + sEntry.dinghy.sailNumber + sEntry.helm.name, sEntry);
             });
-        };
-        // cleanup before effect runs and before form close
+            if (!cancel) {
+                setEntriesMap(entriesMap);
+                setMessage('');
+            }
+        }).catch((error) => {
+            if (!cancel) {
+                console.error(error.message, error);
+                setMessage('Unable to load entries\n' + error.message);
+            }
+        });
+
+        return (() => {
+            cancel = true;
+        })
+    }, [entriesUpdateRequestAt, model, races]);
+
+    // register entries update callbacks
+    useEffect(() => {
+        entriesMap.forEach(entry => {
+            entry.registerEntryUpdateCallback(updateEntries);
+        });
+
         return () => {
             entriesMap.forEach(entry => {
-                model.unregisterEntryUpdateCallback(entry.url, updateEntries);
+                entry.unregisterEntryUpdateCallback(updateEntries);
             });
-            ignoreFetch = true;
-            setMessage(''); // clear any previous message
         }
-    }, [model, races, updateEntries, entriesUpdateRequestAt]);
+    }, [entriesMap, updateEntries]);
 
     function handleRefreshClick() {
         setEntriesUpdateRequestAt(Date.now());
@@ -89,99 +84,196 @@ function RaceEntriesView({ races }) {
     function sorted(entries, order) {
         let ordered = [];
         switch (order) {
-            case 'lastThree':
-                ordered = sortArray(entries, (entry) => {
-                    const sn = entry.dinghy.sailNumber;
-                    const snEndDigits = sn.substring(sn.length - 3, sn.length);
-                    return Number(snEndDigits);
-                });
-                break;
-            case 'classLastThree':
-                ordered = sortArray(entries, (entry) => {
-                    const sn = entry.dinghy.sailNumber;
-                    const snEndDigits = sn.substring(sn.length - 3, sn.length);
-                    return [entry.dinghy.dinghyClass.name, Number(snEndDigits)];
-                });
-                break;
             case 'sailNumber':
-                ordered = sortArray(entries, (entry) => {
-                    // some boats have been known to use non-numeric 'sail numbers'
-                    return isNaN(entry.dinghy.sailNumber) ? entry.dinghy.sailNumber : Number(entry.dinghy.sailNumber);
+                ordered = entries.sort((a, b) => {
+                    const sailNumberA = Number.isNaN(a.dinghy.sailNumber) ? a.dinghy.sailNumber : Number(a.dinghy.sailNumber);
+                    const sailNumberB = Number.isNaN(b.dinghy.sailNumber) ? b.dinghy.sailNumber : Number(b.dinghy.sailNumber);
+                    if (sailNumberA < sailNumberB) {
+                        return -1;
+                    }
+                    if (sailNumberA > sailNumberB) {
+                        return 1;
+                    }
+                    return 0;
                 });
                 break;
             case 'classSailNumber':
-                ordered = sortArray(entries, (entry) => {
-                    return [entry.dinghy.dinghyClass.name, isNaN(entry.dinghy.sailNumber) ? entry.dinghy.sailNumber : Number(entry.dinghy.sailNumber)];
+                ordered = entries.sort((a, b) => {
+                    const sailNumberA = Number.isNaN(a.dinghy.sailNumber) ? a.dinghy.sailNumber : Number(a.dinghy.sailNumber);
+                    const sailNumberB = Number.isNaN(b.dinghy.sailNumber) ? b.dinghy.sailNumber : Number(b.dinghy.sailNumber);
+                    
+                    if (a.dinghy.dinghyClass.name < b.dinghy.dinghyClass.name) {
+                        return -1;
+                    }
+                    else if (a.dinghy.dinghyClass.name > b.dinghy.dinghyClass.name) {
+                        return 1;
+                    }
+                    if (sailNumberA < sailNumberB) {
+                        return -1;
+                    }
+                    if (sailNumberA > sailNumberB) {
+                        return 1;
+                    }
+                    return 0;
                 });
                 break;
             // sort by number of laps and then by time to complete last lap
             case 'lapTimes':
-                ordered = sortArray(entries, (entry) => {
-                    const weighting = (!(entry.scoringAbbreviation == null || entry.scoringAbbreviation === '')) ? - Date.now() : 0;
-                    return [entry.laps.length + weighting, - entry.sumOfLapTimes];
-                }, true);
+                ordered = entries.sort((a, b) => {
+                    const aWeighting = (!(a.scoringAbbreviation == null || a.scoringAbbreviation === '')) ? Date.now() : 0;
+                    const bWeighting = (!(b.scoringAbbreviation == null || b.scoringAbbreviation === '')) ? Date.now() : 0;
+                    let aWeighted = [a.laps.entities.length - aWeighting, a.sumOfLapTimes];
+                    let bWeighted = [b.laps.entities.length - bWeighting, b.sumOfLapTimes];
+                    
+                    if (aWeighted[0] < bWeighted[0]) {
+                        return 1;
+                    }
+                    else if (aWeighted[0] > bWeighted[0]) {
+                        return -1;
+                    }
+                    if (aWeighted[1] < bWeighted[1]) {
+                        return -1;
+                    }
+                    else if (aWeighted[1] > bWeighted[1]) {
+                        return 1;
+                    }
+                    return 0;
+                });
                 break;
             case 'position':
-                ordered = sortArray(entries, (entry) => {
-                    let weight = .5;
-                    if (!(entry.scoringAbbreviation == null || entry.scoringAbbreviation === '')) {
-                        weight = weight * 2;
+                ordered = entries.sort((a, b) => {
+                    let aWeight = .5;
+                    let bWeight = .5;
+                    if (!(a.scoringAbbreviation == null || a.scoringAbbreviation === '')) {
+                        aWeight = aWeight * 2;
                     }
-                    return (entry.getPositionInRace(entry.race) && weight === .5) ? entry.getPositionInRace(entry.race) : Date.now() * weight; // if entry doesn't have a position return a large number to put it to the bottom
+                    if (!(b.scoringAbbreviation == null || b.scoringAbbreviation === '')) {
+                        bWeight = bWeight * 2;
+                    }
+                    let aWeighted = (a.position && aWeight === .5) ? a.position : Date.now() * aWeight; // if entry doesn't have a position return a large number to put it to the bottom
+                    let bWeighted = (b.position && bWeight === .5) ? b.position : Date.now() * bWeight; // if entry doesn't have a position return a large number to put it to the bottom
+                    return aWeighted - bWeighted;
                 });
                 break;
             case 'forecast':
-                ordered = sortArray(entries, (entry) => {
-                    let weight = 1;
-                    if (!(entry.scoringAbbreviation == null || entry.scoringAbbreviation === '')) {
-                        weight = weight * 2;
+                ordered = entries.sort((a, b) => {
+                    let aWeight = 1;
+                    let bWeight = 1;
+                    if (!(a.scoringAbbreviation == null || a.scoringAbbreviation === '')) {
+                        aWeight = aWeight * 2;
                     }
-                    const lastLapTime = entry.sumOfLapTimes ? entry.sumOfLapTimes : 0;
-                    return (entry.race.plannedStartTime.getTime() + lastLapTime + ((entry.race.duration / entry.race.plannedLaps) * entry.dinghy.dinghyClass.portsmouthNumber / 1000)) * weight;
+                    if (!(b.scoringAbbreviation == null || b.scoringAbbreviation === '')) {
+                        bWeight = bWeight * 2;
+                    }
+                    const aLastLapTime = a.sumOfLapTimes ? a.sumOfLapTimes : 0;
+                    const bLastLapTime = b.sumOfLapTimes ? b.sumOfLapTimes : 0;
+                    let aWeighted = (a.race.plannedStartTime.getTime() + aLastLapTime + ((a.race.duration / a.race.plannedLaps) * a.dinghy.dinghyClass.portsmouthNumber / 1000)) * aWeight;
+                    let bWeighted = (b.race.plannedStartTime.getTime() + bLastLapTime + ((b.race.duration / b.race.plannedLaps) * b.dinghy.dinghyClass.portsmouthNumber / 1000)) * bWeight;
+                    
+                    if (aWeighted < bWeighted) {
+                        return -1;
+                    }
+                    else if (aWeighted > bWeighted) {
+                        return 1;
+                    }
+                    return 0;
                 });
                 break;
             default:
-                ordered = sortArray(entries, (entry) => {
-                    return [entry.dinghy.dinghyClass.name, isNaN(entry.dinghy.sailNumber) ? entry.dinghy.sailNumber : Number(entry.dinghy.sailNumber)];
+                ordered = entries.sort((a, b) => {
+                    const snEndDigitsA = a.dinghy.sailNumber.substring(a.dinghy.sailNumber.length - 3, a.dinghy.sailNumber.length);
+                    const snEndDigitsB = b.dinghy.sailNumber.substring(b.dinghy.sailNumber.length - 3, b.dinghy.sailNumber.length);
+                    const sailNumberA = Number.isNaN(snEndDigitsA) ? snEndDigitsA : Number(snEndDigitsA);
+                    const sailNumberB = Number.isNaN(snEndDigitsB) ? snEndDigitsB : Number(snEndDigitsB);
+                    
+                    if (a.dinghy.dinghyClass.name < b.dinghy.dinghyClass.name) {
+                        return -1;
+                    }
+                    else if (a.dinghy.dinghyClass.name > b.dinghy.dinghyClass.name) {
+                        return 1;
+                    }
+                    if (sailNumberA < sailNumberB) {
+                        return -1;
+                    }
+                    if (sailNumberA > sailNumberB) {
+                        return 1;
+                    }
+                    return 0;
                 });
         }
         return ordered.map(entry => entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
     }
 
+    /**
+     * Add a lap to an entry in a race
+     * @param {SynchronousEntry} entry
+     */
     async function addLap(entry) {
-        const resultPromise = controller.addLap(entry, entry.race.clock.getElapsedTime(entry.race.plannedStartTime));
-        const result = await resultPromise;
-        if (!result.success) {
-            setMessage(result.message);
+        const lapTimes = entry.laps.entities.reduce((accumulator, initialValue) => {
+            return accumulator + initialValue.time;
+        }, 0);
+        try {
+            await controller.addLap(entry.entry, entry.race.clock.getElapsedTime(entry.race.plannedStartTime) - lapTimes);
+            return true;
         }
-        return resultPromise;
+        catch (error) {
+            console.error(error.message, error);
+            setMessage(error.message);
+            return false;
+        }
     }
 
+    /**
+     * 
+     * @param {SynchronousEntry} entry 
+     * @returns {Boolean}
+     */
     async function removeLap(entry) {
-        const resultPromise = controller.removeLap(entry, entry.laps[entry.laps.length - 1]);
-        const result = await resultPromise;
-        if (!result.success) {
-            setMessage(result.message);
+        try {
+            await controller.removeLap(entry.entry, entry.laps.entities[entry.laps.entities.length - 1]);
+            return true;
         }
-        return resultPromise;
+        catch (error) {
+            setMessage(error.message);
+            return false
+        }
     }
 
+    /**
+     * 
+     * @param {SynchronousEntry} entry 
+     * @param {Number | String} value 
+     * @returns {Boolean}
+     */
     async function updateLap(entry, value) {
-        const resultPromise = controller.updateLap(entry, value);
-        const result = await resultPromise;
-        if (!result.success) {
-            setMessage(result.message);
+        try {
+            await controller.updateLap(entry.entry, value);
+            return true;
         }
-        return resultPromise;
+        catch (error) {
+            console.error(error.message, error);
+            setMessage(error.message);
+            return false;
+        }
     }
 
+    /**
+     * Add a scoring abbreviation to an entry in a race
+     * @param {SynchronousEntry} entry
+     * @param {String} value scoring abbreviation to set
+     * @returns {Boolean}
+     * @throws {Error}
+     */
     async function setScoringAbbreviation(entry, value) {
-        const resultPromise = controller.setScoringAbbreviation(entry, value);
-        const result = await resultPromise;
-        if (!result.success) {
-            setMessage(result.message);
+        try {
+            await controller.setScoringAbbreviation(entry.entry, value);
+            return true;
         }
-        return resultPromise;
+        catch (error) {
+            console.error(error.message, error);
+            setMessage(error.message);
+            return false;
+        }
     }
 
     function showChildUserMessage(message) {
@@ -213,54 +305,35 @@ function RaceEntriesView({ races }) {
         }
     };
 
-    function getLastEntryPosition() {
-        let lowestPosition = 0;
-        entriesMap.forEach(entry => {
-            if (entry.position > lowestPosition) {
-                lowestPosition = entry.position;
-            }
-        });
-        return lowestPosition;
-    };
-
     /**
      * Update the position of an entry in the race
      * @param {Entry} entry 
-     * @param {(Integer|PositionConstant)} newPosition 
+     * @param {(Integer | PositionConstant)} position 
+     * @returns {Promise<Boolean>}
      */
-    async function updateEntryPosition(entry, newPosition) {
-        let result;
-        if (!newPosition) {
+    async function updateEntryPosition(entry, position) {
+        if (!position) {
             setMessage('No position to set');
-            return;
+            return false;
         }
-        switch (newPosition) {
-            case PositionConstant.MOVEUPONE:
-                if (entry.position != null) {
-                    result = await controller.updateEntryPosition(entry, entry.position - 1);
-                }
-                else {
-                    const lastEntryPosition = getLastEntryPosition();
-                    result = await controller.updateEntryPosition(entry, lastEntryPosition || 1);
-                }
-                break;
-            case PositionConstant.MOVEDOWNONE:
-                if (entry.position != null) {
-                    result = await controller.updateEntryPosition(entry, entry.position + 1);
-                }
-                else {
-                    result = await controller.updateEntryPosition(entry, getLastEntryPosition() + 1);
-                }
-                break;
-            default:
-                result = await controller.updateEntryPosition(entry, newPosition);
+        try {
+            await controller.updateEntryPosition(entry.entry, position);
+            setMessage('');
+            return true;
         }
-        if (!result.success) {
-            setMessage(result.message);
+        catch (error) {
+            setMessage(error.message);
+            return false;
         }
     }
 
-    function onRaceEntryPositionSetByDrag(subjectKey, targetKey) {
+    /**
+     * 
+     * @param {String} subjectKey 
+     * @param {String} targetKey 
+     * @returns {Promise<Boolean>}
+     */
+    async function handleRaceEntryDrop(subjectKey, targetKey) {
         const subjectEntry = entriesMap.get(subjectKey);
         const targetEntry = entriesMap.get(targetKey);
         let newDisplayOrder = [];
@@ -292,11 +365,12 @@ function RaceEntriesView({ races }) {
             setDisplayOrder(newDisplayOrder);
             // If race type is pursuit and both entries in same race assign subject position from target position
             if (subjectEntry.race.type === RaceType.PURSUIT && subjectEntry.race.name === targetEntry.race.name) { // testiing equality directly on races will fail as different objects
-                updateEntryPosition(subjectEntry, targetEntry.getPositionInRace(targetEntry.race));
+                return updateEntryPosition(subjectEntry, targetEntry.position);
             }
         }
         else {
             setMessage('Cannot change position of an entry with a scoring abbreviation');
+            return false;
         }
     }
 
@@ -334,11 +408,11 @@ function RaceEntriesView({ races }) {
             if (!entry) return null; // allow for display keys that map to a non existent entry after a race is removed from the selection; fixed by next render
             if (entry.race.type === RaceType.FLEET) {
                 return <RaceEntryView key={key} entry={entry} addLap={addLap}
-                    removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} onFastGroup={onFastGroup} inFastGroup={fastGroup.includes(key)} showUserMessage={showChildUserMessage} />
+                    removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={handleRaceEntryDrop} onFastGroup={onFastGroup} inFastGroup={fastGroup.includes(key)} showUserMessage={showChildUserMessage} />
             }
             else {
                 return <RaceEntryView key={key} entry={entry} addLap={addLap}
-                    removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={onRaceEntryPositionSetByDrag} />
+                    removeLap={removeLap} updateLap={updateLap} setScoringAbbreviation={setScoringAbbreviation} onRaceEntryDrop={handleRaceEntryDrop} />
             }
         });
     }
@@ -381,13 +455,4 @@ function RaceEntriesView({ races }) {
     );
 }
 
-/**
- * Class providng enumeration of constants for use instead of numeric postion value when updating an entries position
- */
-class PositionConstant {
-    static MOVEUPONE = 'moveUpOne';
-    static MOVEDOWNONE = 'moveDownOne';
-}
-
 export default RaceEntriesView;
-export { PositionConstant };

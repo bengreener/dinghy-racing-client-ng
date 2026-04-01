@@ -14,22 +14,27 @@
  * limitations under the License. 
  */
 
-import { act, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { customRender } from '../test-utilities/custom-renders';
 import CreateRace from './CreateRace';
-import DinghyRacingModel from '../model/dinghy-racing-model';
-import { httpRootURL, wsRootURL, dinghyClasses, fleetScorpion, fleets } from '../model/__mocks__/test-data';
-import RaceType from '../model/domain-classes/race-type';
-import StartType from '../model/domain-classes/start-type';
+import SylphModel from '../model/sylph-model';
+import Fleet from '../model/fleet';
+import RaceType from '../model/race-type';
+import StartType from '../model/start-type';
+import { httpRootURL, wsRootURL, fleetScorpionHAL } from '../model/__mocks__/test-data';
 
-vi.mock('../model/dinghy-racing-model');
+vi.mock('../model/sylph-model');
+vi.mock('../model/clock');
+
+beforeEach(() => {
+	vi.clearAllMocks();
+    vi.restoreAllMocks();
+});
 
 it('renders', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
+    const model = new SylphModel(httpRootURL, wsRootURL);
     await act(async () => {
-        customRender(<CreateRace />, model);
+        render(<CreateRace model={model} />);
     });
     const inputName = screen.getByLabelText(/name/i);
     const inputTime = screen.getByLabelText(/time/i);
@@ -47,31 +52,28 @@ it('renders', async () => {
     expect(inputStartType).toBeInTheDocument();
 });
 it('displays the available fleets', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
+    const model = new SylphModel(httpRootURL, wsRootURL);
     await act(async () => {
-        customRender(<CreateRace />, model);
+        render(<CreateRace model={model} />);
     });
     const inputFleet = screen.getByLabelText(/fleet/i);
     const options = await within(inputFleet).findAllByRole('option');
     const optionsAvailable = options.map(element => {return {'text': element.text, 'value': element.value}});
-    expect(optionsAvailable).toEqual([{'text': '', 'value': ''}, {'text': 'Comet', 'value': 'Comet'}, {'text': 'Graduate', 'value': 'Graduate'}, {'text': 'Handicap', 'value': 'Handicap'}, {'text': 'Scorpion', 'value': 'Scorpion'}]);
+    expect(optionsAvailable).toEqual([{'text': '', 'value': ''}, {'text': 'Comet', 'value': 'Comet'}, {'text': 'Handicap', 'value': 'Handicap'}, {'text': 'Graduate', 'value': 'Graduate'}, {'text': 'Scorpion', 'value': 'Scorpion'}]);
 });
 it('provides a default option of 5 for the number of laps for the race', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
+    const model = new SylphModel(httpRootURL, wsRootURL);
     await act(async () => {
-        customRender(<CreateRace />, model);
+        render(<CreateRace model={model} />);
     });
     const inputLaps = screen.getByLabelText(/laps/i);
     expect(inputLaps).toHaveValue(5);
 });
 it('accepts the name for a race', async () => {
     const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve(dinghyClasses)});
+    const model = new SylphModel(httpRootURL, wsRootURL);
     await act(async () => {
-        customRender(<CreateRace />, model);
+        render(<CreateRace model={model} />);
     });
     const txtRaceName = await screen.findByLabelText('Race Name');
     await user.type(txtRaceName, 'Graduate Helms');
@@ -79,10 +81,9 @@ it('accepts the name for a race', async () => {
 });
 it('accepts the time for the race', async () => {
     const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve(dinghyClasses)});
+    const model = new SylphModel(httpRootURL, wsRootURL);
     await act(async () => {
-        customRender(<CreateRace />, model);
+        render(<CreateRace model={model} />);
     });
     const inputTime = screen.getByLabelText(/time/i);
     await user.clear(inputTime); // clear input to avoid errors when typing in new value
@@ -91,10 +92,9 @@ it('accepts the time for the race', async () => {
 });
 it('accepts the fleet for the race', async () => {
     const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
+    const model = new SylphModel(httpRootURL, wsRootURL);
     await act(async () => {
-        customRender(<CreateRace />, model);
+        render(<CreateRace model={model} />);
     });
     const selectFleet = screen.getByLabelText('Fleet');
     await screen.findAllByRole('option');
@@ -103,10 +103,9 @@ it('accepts the fleet for the race', async () => {
 });
 it('accepts the duration of the race', async () => {
     const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
+    const model = new SylphModel(httpRootURL, wsRootURL);
     await act(async () => {
-        customRender(<CreateRace />, model);
+        render(<CreateRace model={model} />);
     });
     const inputDuration = screen.getByLabelText(/duration/i);
     await user.clear(inputDuration);
@@ -115,10 +114,9 @@ it('accepts the duration of the race', async () => {
 });
 it('accepts the number of laps for the race', async () => {
     const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
+    const model = new SylphModel(httpRootURL, wsRootURL);
     await act(async () => {
-        customRender(<CreateRace />, model);
+        render(<CreateRace model={model} />);
     });
     const inputLaps = screen.getByLabelText(/laps/i);
     await user.clear(inputLaps);
@@ -127,10 +125,9 @@ it('accepts the number of laps for the race', async () => {
 });
 it('accepts the type for the race', async () => {
     const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
+    const model = new SylphModel(httpRootURL, wsRootURL);
     await act(async () => {
-        customRender(<CreateRace />, model);
+        render(<CreateRace model={model} />);
     });
     const inputType = screen.getByLabelText(/^type/i);
     await user.selectOptions(inputType, 'Pursuit');
@@ -138,10 +135,9 @@ it('accepts the type for the race', async () => {
 });
 it('accepts the start type for the race', async () => {
     const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
+    const model = new SylphModel(httpRootURL, wsRootURL);
     await act(async () => {
-        customRender(<CreateRace />, model);
+        render(<CreateRace model={model} />);
     });
     const inputStartType = screen.getByLabelText(/start sequence/i);
     await user.selectOptions(inputStartType, '5-4-1-GO');
@@ -150,10 +146,9 @@ it('accepts the start type for the race', async () => {
 it('calls the function passed in to onCreate prop', async () => {
     const user = userEvent.setup();
     const fnOnCreate = vi.fn((fleet) => {return Promise.resolve({'success': true})});
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
+    const model = new SylphModel(httpRootURL, wsRootURL);
     await act(async () => {
-        customRender(<CreateRace onCreate={fnOnCreate} />, model);
+        render(<CreateRace model={model} onCreate={fnOnCreate} />);
     });
     const btnCreate = screen.getByRole('button', {'name': 'Create'});
     await user.click(btnCreate);
@@ -163,10 +158,9 @@ it('calls the function passed in to onCreate prop', async () => {
 it('calls the function passed in to onCreate prop with new race as parameter', async () => {
     const user = userEvent.setup();
     const fnOnCreate = vi.fn((fleet) => {return Promise.resolve({'success': true})});
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
+    const model = new SylphModel(httpRootURL, wsRootURL);
     await act(async () => {
-        customRender(<CreateRace onCreate={fnOnCreate} />, model);
+        render(<CreateRace model={model} onCreate={fnOnCreate} />);
     });
     const inputName = screen.getByLabelText(/name/i);
     const inputTime = screen.getByLabelText(/time/i);
@@ -186,18 +180,15 @@ it('calls the function passed in to onCreate prop with new race as parameter', a
     await user.selectOptions(selectFleet, 'Scorpion');
     await user.selectOptions(inputType, 'Pursuit');
     await user.click(btnCreate);
-    expect(fnOnCreate).toBeCalledWith({...DinghyRacingModel.raceTemplate(), 'name': 'Scorpion A', 'plannedStartTime': new Date('2020-05-12T12:30'), 'fleet': fleetScorpion, 'plannedLaps': 7, 'duration': 3900000, type: RaceType.PURSUIT, startType: StartType.CSCCLUBSTART});
+    expect(fnOnCreate).toBeCalledWith('Scorpion A', new Date('2020-05-12T12:30'), new Fleet(fleetScorpionHAL, {version: '"0"'}, model), 3900000, 7, RaceType.PURSUIT, StartType.CSCCLUBSTART);
 });
 describe('when creating a new race', () => {
     it('clears the input on success', async () => {
         const user = userEvent.setup();
         const fnOnCreate = vi.fn(() => {return Promise.resolve({'success': true})});
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
-        vi.spyOn(DinghyRacingModel, 'dinghyClassTemplate').mockImplementation(() => {return Promise.resolve({'name': '', 'url': ''})});
-        vi.spyOn(DinghyRacingModel, 'raceTemplate').mockImplementation(() => {return {'name': '', 'plannedStartTime': null, 'dinghyClass': DinghyRacingModel.dinghyClassTemplate(), 'url': ''}});
+        const model = new SylphModel(httpRootURL, wsRootURL);
         await act(async () => {
-            customRender(<CreateRace onCreate={fnOnCreate} />, model);
+            render(<CreateRace model={model} onCreate={fnOnCreate} />);
         });
         const inputName = screen.getByLabelText(/name/i);
         const inputTime = screen.getByLabelText(/time/i);
@@ -225,11 +216,10 @@ describe('when creating a new race', () => {
     });
     it('displays the failure message on failure', async () => {
         const user = userEvent.setup();
-        const fnOnCreate = vi.fn(() => {return Promise.resolve({'success': false, 'message': 'That was a bust!'})});
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getFleets').mockImplementationOnce(() => {return Promise.resolve({'success': true, 'domainObject': fleets})});
+        const fnOnCreate = vi.fn(async () => {throw new Error('That was a bust!')});
+        const model = new SylphModel(httpRootURL, wsRootURL);
         await act(async () => {
-            customRender(<CreateRace onCreate={fnOnCreate} />, model);
+            render(<CreateRace model={model} onCreate={fnOnCreate} />);
         });
         const btnCreate = screen.getByRole('button', {'name': 'Create'});
         await user.click(btnCreate);

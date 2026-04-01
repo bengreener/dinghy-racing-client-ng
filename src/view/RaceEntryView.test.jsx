@@ -17,12 +17,23 @@
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RaceEntryView from './RaceEntryView';
-import { raceScorpionA, competitorChrisMarshall, competitorSarahPascal, competitorLouScrew, competitorOwainDavies, dinghy1234, dinghy6745 } from '../model/__mocks__/test-data';
-import DinghyRacingModel from '../model/dinghy-racing-model';
-import Entry from '../model/domain-classes/entry';
-import SignedUp from '../model/domain-classes/signed-up';
+import { httpRootURL, wsRootURL, competitorChrisMarshallHAL, competitorSarahPascalHAL, entryChrisMarshall1234ScorpionAHAL, entrySarahPascal6745ScorpionAHAL, 
+    dinghy1234HAL, dinghy6745HAL, dinghyClassScorpionHAL, racePursuitAHAL, raceScorpionAHAL,
+    signedUpChrisMarshallDinghy1234ScorpionAHAL } from '../model/__mocks__/test-data';
+import SylphModel from '../model/sylph-model';
+import Competitor from '../model/competitor';
+import Collection from '../model/collection';
+import Dinghy from '../model/dinghy';
+import DinghyClass from '../model/dinghy-class';
+import Entry from '../model/entry';
+import Lap from '../model/lap';
+import Race from '../model/race';
+import SignedUp from '../model/signed-up';
+import SynchronousDinghy from './synchronous-model/synchronous-dinghy';
+import SynchronousEntry from './synchronous-model/synchronous-entry';
 
-vi.mock('../model/domain-classes/clock');
+vi.mock('../model/sylph-model');
+vi.mock('../model/clock');
 
 const entryRowLastCellLapTimeCellOffset = 4;
 
@@ -37,24 +48,48 @@ afterEach(() => {
 });
 
 it('renders', () => {
-    const entryChrisMarshallScorpionA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-    entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+        new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+        new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+        new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+        new Race(raceScorpionAHAL, {version: '"0"'}, model),
+        new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+        new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+    );
     render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
     const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
     expect(SMScorp1234entry).toBeInTheDocument();
 });
 
 it('displays lap times', async () => {
-    const entryChrisMarshallScorpionA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1234}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-    entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+        new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+        new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+        new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+        new Race(raceScorpionAHAL, {version: '"0"'}, model),
+        new Collection([new Lap({number: 1, time: 'PT0M01S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
+        new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+    );
     render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
     expect(screen.getByText('00:01')).toBeInTheDocument();
 });
 
 it('displays cumulative sum of lap times', async () => {
-    const entryChrisMarshallScorpionA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1234}, {number: 2, time: 1234}, {number: 3, time: 1234}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-    entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
-    entryChrisMarshallScorpionA1234.signedUpTo[0].position = 5;
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+        new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+        new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+        new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+        new Race(raceScorpionAHAL, {version: '"0"'}, model),
+        new Collection([
+            new Lap({number: 1, time: 'PT0M01S'}, {version: '"0"'}, model),
+            new Lap({number: 2, time: 'PT0M01S'}, {version: '"0"'}, model),
+            new Lap({number: 3, time: 'PT0M01S'}, {version: '"0"'}, model)
+        ], {size: 20, totalElements: 3, totalPages: 0,number: 0}),
+        new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+    );
     render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
     expect(screen.getByText('00:01')).toBeInTheDocument();
     expect(screen.getByText('00:02')).toBeInTheDocument();
@@ -62,9 +97,15 @@ it('displays cumulative sum of lap times', async () => {
 });
 
 it('displays position', () => {
-    const entryChrisMarshallScorpionA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1234}, {number: 2, time: 1234}, {number: 3, time: 1234}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-    entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
-    entryChrisMarshallScorpionA1234.signedUpTo[0].position = 5;
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+        new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+        new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+        new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+        new Race(raceScorpionAHAL, {version: '"0"'}, model),
+        new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+        new SignedUp({...signedUpChrisMarshallDinghy1234ScorpionAHAL, position: 5}, {version: '"0"'}, model)
+    );
     render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
     expect(screen.getByText('5')).toBeInTheDocument();
 });
@@ -72,16 +113,22 @@ it('displays position', () => {
 describe('before race has started', () => {
     it('calls addLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const race = {...raceScorpionA, plannedStartTime: new Date(Date.now() + 60000)};
-        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-        entry.signedUpTo = [new SignedUp(race, entry)];
-        const addLapCallback = vi.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
-        render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
+        const addLapCallback = vi.fn();
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
+        render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         user.click(SMScorp1234entry);
         // wait for async function in RaceEntryView
         await vi.waitFor(async () => {
-            expect(addLapCallback).not.toBeCalledWith(entry);
+            expect(addLapCallback).not.toBeCalledWith(entryChrisMarshallScorpionA1234);
         });
     });
 });
@@ -89,12 +136,16 @@ describe('before race has started', () => {
 describe('after race has started', () => {
     it('calls addLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
-        const addLapCallback = vi.fn(async (e) => {
-            e.laps.push({'number': 1, 'time': 1234});
-            return Promise.resolve({success: true});
-        });
+        const addLapCallback = vi.fn();
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         user.click(SMScorp1234entry);
@@ -108,49 +159,65 @@ describe('after race has started', () => {
 describe('when a lap is removed from an entry', () => {
     it('calls removeLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1234}, {number: 2, time: 1234}, {number: 3, time: 1234}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
-        const removeLapCallback = vi.fn((e) => {entry.laps.pop()});
+        const removeLapCallback = vi.fn();
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         user.keyboard('{Control>}');
-        user.click(SMScorp1234entry);
-        // wait for async function in RaceEntryView
-        await vi.waitFor(async () => {
-            expect(removeLapCallback).toBeCalledWith(entry);
+        await act(async () => {
+            user.click(SMScorp1234entry);
         });
+        expect(removeLapCallback).toBeCalledWith(entry);
     });
     it('updates the display to show the delete lap instruction has been sent to the server', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
-        const removeLapCallback = vi.fn((e) => {
-            entry.laps.pop();
-            return Promise.resolve({success: true});
-        });
+        const removeLapCallback = vi.fn(async () => true);
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         user.keyboard('{Control>}');
-        user.click(SMScorp1234entry);
-        // wait for async function in RaceEntryView
-        await vi.waitFor(async () => {
-            expect(screen.getByText((content, node) => /^Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).toMatch(/disabled/i);
+        await act(async () => {
+            user.click(SMScorp1234entry);
         });
+        expect(screen.getByText((content, node) => /^Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).toMatch(/disabled/i);
     });
     describe('when lap removal fails', () => {
         it('entry view is enabled to accept input', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-            entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
-            const removeLapCallback = vi.fn((e) => {
-                entry.laps.pop();
-                return Promise.resolve({success: false});
-            });
+            const removeLapCallback = vi.fn(async () => false);
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entry = new SynchronousEntry(
+                new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );
             render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
             const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
             user.keyboard('{Control>}');
-            user.click(SMScorp1234entry);
-            expect(screen.getByText((content, node) => /^Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).not.toMatch(/disabled/i);
+            await act(async () => {
+                user.click(SMScorp1234entry);
+            });
+            await (act(async () => {}));
+            expect(screen.getByText((content, node) => /^Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).not.toMatch(/disabled/i);
         });
     });
 });
@@ -159,8 +226,17 @@ describe('when secondary mouse button is clicked', () => {
     describe('when a lap has been recorded for the entry', () => {
         it('accepts a new lap time input in the last field of the row', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-            entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entry = new SynchronousEntry(
+                new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new Collection([
+                    new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)
+                ], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );
             render(<RaceEntryView entry={entry} />);
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
@@ -168,28 +244,33 @@ describe('when secondary mouse button is clicked', () => {
                 user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
             });
             const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
-            user.clear(lapEntryCellInput);
-            user.type(lapEntryCellInput, '00:15');
-            // wait for async function in RaceEntryView
-            await vi.waitFor(async () => {
-                expect(lapEntryCellInput).toHaveValue('00:15');
+            await act(async () => {
+                user.clear(lapEntryCellInput);
+                user.type(lapEntryCellInput, '00:15');
             });
+            expect(lapEntryCellInput).toHaveValue('00:15');
         });
     });
     describe('when a lap has not been recorded for the entry', () => {
         it('does not enter edit mode and accepts a lap time via left click', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const addLapCallback = vi.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
-            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-            entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
+            const addLapCallback = vi.fn();
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entry = new SynchronousEntry(
+                new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );
             render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             user.pointer({target: raceEntryView, keys: '[MouseRight]'});
-            user.click(raceEntryView);
-            // wait for async function in RaceEntryView
-            await vi.waitFor(async () => {
-                expect(addLapCallback).toBeCalledWith(entry);
+            await act(async () => {
+                user.click(raceEntryView);
             });
+            expect(addLapCallback).toBeCalledWith(entry);
         });
     });
 });
@@ -198,34 +279,61 @@ describe('when editing a lap time', () => {
     it('does not add new lap when primary button clicked', async () => { 
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const addLapCallback = vi.fn();
-        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1000}, {number: 2, time: 2000}, {number: 3, time: 3000}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
-        render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
+        render(<RaceEntryView entry={entry} addLap={addLapCallback} updateLap={vi.fn()} />);
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
-        user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
-        user.click(raceEntryView);
+        await act(async () => {
+            user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+        });
+        await act(async () => {
+            user.click(lapEntryCellOutput);
+        });
         expect(addLapCallback).not.toHaveBeenCalled();
     });
     it('does not remove last lap when ctrl+primary button clicked', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1000}, {number: 2, time: 2000}, {number: 3, time: 3000}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
-        const removeLapCallback = vi.fn((e) => {entry.laps.pop()});
-        render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
-        const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
-        const lastCell = SMScorp1234entry.parentElement.lastChild;
+        const removeLapCallback = vi.fn();
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
+        render(<RaceEntryView entry={entry} updateLap={vi.fn()} removeLap={removeLapCallback} />);
+        const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+        const lastCell = within(SMScorp1234entry).getByText('00:06');
         user.pointer({target: lastCell, keys: '[MouseRight]'});
-        user.keyboard('{Control>}');
-        user.click(SMScorp1234entry);
+        await act(async () => {
+            user.keyboard('{Control>}');
+            user.click(lastCell);
+        });
         expect(removeLapCallback).not.toHaveBeenCalled();
     });
     describe('when lap time has not changed', () => {
         it('does not update lap time', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1000}, {number: 2, time: 2000}, {number: 3, time: 3000}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-            entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
-            const updateLapCallback = vi.fn((entry, value) => {});
+            const updateLapCallback = vi.fn();
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entry = new SynchronousEntry(
+                new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new Collection([new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );
             render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
@@ -244,11 +352,16 @@ describe('when editing a lap time', () => {
     });
     it('updates lap with new time supplied', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1000}, {number: 2, time: 2000}, {number: 3, time: 3000}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
-        const updateLapCallback = vi.fn((entry, value) => {
-            return Promise.resolve({success: true});
-        });
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const updateLapCallback = vi.fn();
+        const entry = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
@@ -268,13 +381,18 @@ describe('when editing a lap time', () => {
     });
     it('updates the display to show the edited lap time is being sent to the server', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1000}, {number: 2, time: 2000}, {number: 3, time: 3000}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
-        const updateLapCallback = vi.fn((entry, value) => {
-            return Promise.resolve({success: true});
-        });
+        const updateLapCallback = vi.fn(async (entry, value) => {return true});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
-        const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall 00:0100:0300:06OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
+        const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall100:06OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
         const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
         await act(async () => {
             user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
@@ -292,15 +410,20 @@ describe('when editing a lap time', () => {
     describe('when lap update fails', () => {
         it('entry view is enabled to accept input', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1000}, {number: 2, time: 2000}, {number: 3, time: 3000}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-            entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
-            const updateLapCallback = vi.fn((entry, value) => {
-                return Promise.resolve({success: false});
-            });
+            const updateLapCallback = vi.fn((entry, value) => {return false});
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entry = new SynchronousEntry(
+                new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new Collection([new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );
             await act(async () => {
                 render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
             });
-            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall 00:0100:0300:06OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
+            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall100:06OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
             await act(async () => {
                 user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
@@ -317,12 +440,17 @@ describe('when editing a lap time', () => {
     describe('when the new lap time is entered in an invalid format', () => {
         it('does not accept the incorrect format and keeps edit mode open', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1000}, {number: 2, time: 2000}, {number: 3, time: 3000}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
-            const updateLapCallback = vi.fn((entry, value) => {});
-            const showUserMessage = vi.fn((message) => {});
-            render(<RaceEntryView entry={entry} updateLap={updateLapCallback} showUserMessage={showUserMessage} />);
-            const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entry = new SynchronousEntry(
+                new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new Collection([new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );
+            render(<RaceEntryView entry={entry} updateLap={vi.fn()} />);
+            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall100:06OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
             await act(async () => {
                 user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
@@ -337,11 +465,17 @@ describe('when editing a lap time', () => {
         });
         it('calls showUserMessage prop with message explainging error', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1000}, {number: 2, time: 2000}, {number: 3, time: 3000}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-            entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
-            const updateLapCallback = vi.fn((entry, value) => {});
-            const showUserMessage = vi.fn((message) => {});
-            render(<RaceEntryView entry={entry} updateLap={updateLapCallback} showUserMessage={showUserMessage} />);
+            const showUserMessage = vi.fn();
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entry = new SynchronousEntry(
+                new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new Collection([new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );
+            render(<RaceEntryView entry={entry} updateLap={vi.fn()} showUserMessage={showUserMessage} />);
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
             await act(async () => {
@@ -361,9 +495,16 @@ describe('when editing a lap time', () => {
 describe('when user taps row', () => {
     it('calls addLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
-        const addLapCallback = vi.fn((e) => {e.laps.push({'number': 1, 'time': 1234})});
+        const addLapCallback = vi.fn();
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
@@ -374,17 +515,23 @@ describe('when user taps row', () => {
     describe('when add lap fails', () => {
         it('entry view is enabled to accept input', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-            entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
-            const addLapCallback = vi.fn((e) => {
-                return Promise.resolve({success: false});
-            });
+            const addLapCallback = vi.fn(() => {return false});
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entry = new SynchronousEntry(
+                new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );
             let container;
             ({ container } = render(<RaceEntryView entry={entry} addLap={addLapCallback} />));
             const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
             await act(async () => {
                 user.pointer([{keys: '[TouchA]', target: SMScorp1234entry}]);
             });
+            await act(async () => {});
             const raceEntryView = container.getElementsByClassName('race-entry-view')[0];
             expect(raceEntryView.getAttribute('class')).not.toMatch(/disabled/i);
         });
@@ -393,16 +540,22 @@ describe('when user taps row', () => {
 
 describe('when user taps and holds on row', () => {
     it('accepts a new lap time input in the last field of the row', async () => {
-        const setTimeoutSpy = vi.spyOn(global, 'setTimeout');
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 1000}, {number: 2, time: 2000}, {number: 3, time: 3000}], 6, 6, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         render(<RaceEntryView entry={entry} />);
-        const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
+        const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall100:06OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view')).children[0];
         await act(async () => {
             user.pointer({target: raceEntryView, keys: '[TouchA>]'});
         });
-        act(() => {
+        await act(async () => {
             vi.advanceTimersByTime(500);
         });
         const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
@@ -420,9 +573,9 @@ describe('when user swipes left on row', () => {
     it.skip('calls removeLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
-            {...DinghyRacingModel.lapTemplate(), number: 1, time: 1000},
-            {...DinghyRacingModel.lapTemplate(), number: 2, time: 2000},
-            {...DinghyRacingModel.lapTemplate(), number: 3, time: 3000}
+            {...SylphModel.lapTemplate(), number: 1, time: 1000},
+            {...SylphModel.lapTemplate(), number: 2, time: 2000},
+            {...SylphModel.lapTemplate(), number: 3, time: 3000}
         ], metadata: {eTag: '"1"'}};
         const removeLapCallback = vi.fn((e) => {entry.laps.pop()});
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
@@ -439,18 +592,32 @@ describe('when user swipes left on row', () => {
 
 describe('when entry is on last lap', () => {
     it('has a class of on-last-lap', () => {
-        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 6, 6, true, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new SynchronousEntry(
+            new Entry({...entryChrisMarshall1234ScorpionAHAL, onLastLap: true}, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         render(<RaceEntryView entry={entry} />);
-        const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
+        const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
         expect(raceEntryView.getAttribute('class')).toMatch(/on-last-lap/i);
     });
 });
 
 describe('when entry is not on last lap', () => {
     it('does not have a class of on-last-lap', () => {
-        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
-        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement;
         expect(SMScorp1234entry.getAttribute('class')).not.toMatch(/on-last-lap/i);
@@ -459,18 +626,32 @@ describe('when entry is not on last lap', () => {
 
 describe('when entry has finished race', () => {
     it('has a class of finished-race', () => {
-        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, true, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
-        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry({...entryChrisMarshall1234ScorpionAHAL, finishedRace: true}, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
-        const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
+        const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
         expect(raceEntryView.getAttribute('class')).toMatch(/finished-race/i);
     });
 });
 
 describe('when entry has not finished race', () => {
     it('does not have a class of finished-race', () => {
-        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
-        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement;
         expect(SMScorp1234entry.getAttribute('class')).not.toMatch(/finished-race/i);
@@ -479,108 +660,170 @@ describe('when entry has not finished race', () => {
 
 describe('when a scoring abbreviation is not selected', () => {
     it('only has a classes of race-entry-view w3-row w3-border w3-hover-border-blue cursor-pointer preserve-whitespace', () => {
-        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
-        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
-        const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
+        const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
         expect(raceEntryView.getAttribute('class')).toMatch(/^race-entry-view w3-row w3-border w3-hover-border-blue$/i);
     });
 });
 
 describe('when a scoring abbreviation is selected', () => {
     it('calls setScoringAbbreviation callback provided as prop', async () => {
-        const setScoringAbbreviationSpy = vi.fn(() => {
-            return Promise.resolve({success: true});
-        });
+        const setScoringAbbreviationSpy = vi.fn(async () => {return true});
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
-        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
         const selectSA = screen.getByRole('combobox');
         await act(async() => {
             user.selectOptions(selectSA, 'DNS');
         });
-        expect(setScoringAbbreviationSpy).toHaveBeenCalledWith({...entryChrisMarshallScorpionA1234, metadata: {eTag: '"1"'}}, 'DNS');
+        expect(setScoringAbbreviationSpy).toHaveBeenCalledWith(entryChrisMarshallScorpionA1234, 'DNS');
     });
     it('updates the display to show a scoring abbreviation is being sent to the server', async () => {
-        const setScoringAbbreviationSpy = vi.fn(() => {
-            return Promise.resolve({success: true});
-        });
+        const setScoringAbbreviationSpy = vi.fn(async () => {return true});
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
-        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
         const selectSA = screen.getByRole('combobox');
         await act(async () => {
             user.selectOptions(selectSA, 'DNS');
         });
-        expect(screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).toMatch(/disabled/i);
+        expect(screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).toMatch(/disabled/i);
     });
     describe('when adding scoring abbreviation fails', () => {
         it('entry view is enabled to accept input', async () => {
-            const setScoringAbbreviationSpy = vi.fn(() => {
-                return Promise.resolve({success: false});
-            });
+            const setScoringAbbreviationSpy = vi.fn(async () => {return false});
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
-            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+                new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );
             render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
             const selectSA = screen.getByRole('combobox');
             user.selectOptions(selectSA, 'DNS');
-            expect(screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).not.toMatch(/disabled/i);
+            expect(screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).not.toMatch(/disabled/i);
         });
     });
     describe('when entry did not start the race', () => {
         it('has a class of did-not-start', () => {
-            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, 'DNS',  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
-            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+                new Entry({entryChrisMarshall1234ScorpionAHAL, scoringAbbreviation: 'DNS'}, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );
             render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
-            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
+            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/did-not-start/i);
         });
     });
     describe('when entry retired', () => {
         it('has a class of retired', () => {
-            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, 'RET',  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
-            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+                new Entry({entryChrisMarshall1234ScorpionAHAL, scoringAbbreviation: 'RET'}, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );
             render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
-            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
+            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/retired/i);
         });
     });
     describe('when entry disqualified', () => {
         it('has a class of disqualified', () => {
-            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, 'DSQ',  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
-            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
-            render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
-            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+                new Entry({entryChrisMarshall1234ScorpionAHAL, scoringAbbreviation: 'DSQ'}, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
+            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/disqualified/i);
         });
     });
     describe('when entry did not compete in the race', () => {
         it('has a class of did-not-start', () => {
-            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, 'DNC',  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
-            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
-            render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
-            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+                new Entry({entryChrisMarshall1234ScorpionAHAL, scoringAbbreviation: 'DNC'}, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new Collection([], {size: 20, totalElements: 0, totalPages: 0, number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
+            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/did-not-compete/i);
         });
     });
     describe('when entry on course side at start of race', () => {
         it('has a class of on-course-side', () => {
-            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, 'OCS',  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
-            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+                new Entry({entryChrisMarshall1234ScorpionAHAL, scoringAbbreviation: 'OCS'}, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new Collection([], {size: 20, totalElements: 0, totalPages: 0, number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );
             render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
-            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
+            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/on-course-side/i);
         });
     });
     describe('when entry did not finish the race', () => {
         it('has a class of did-not-finish', () => {
-            const entryChrisMarshallScorpionA1234 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, 'DNF',  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
-            entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+                new Entry({entryChrisMarshall1234ScorpionAHAL, scoringAbbreviation: 'DNF'}, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new Collection([], {size: 20, totalElements: 0, totalPages: 0, number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );
             render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
-            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
+            const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/did-not-finish/i);
         });
     });
@@ -589,25 +832,35 @@ describe('when a scoring abbreviation is selected', () => {
 describe('when the entry is selected to add a new lap', () => {
     it('updates the display to show it has been selected', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
-        const addLapCallback = vi.fn(() => {
-            return Promise.resolve({success: true});
-        });
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
+        const addLapCallback = vi.fn(() => {return true});
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
             user.click(raceEntryView);
         });
-        expect(screen.getByText((content, node) => /Scorpion1234Chris Marshall  OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).toMatch(/disabled/i);
+        expect(screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).toMatch(/disabled/i);
     });
     it('does not allow user to immediately add another lap time', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-        const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-        entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
-        const addLapCallback = vi.fn(() => {
-            return Promise.resolve({success: true});
-        });
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
+        const addLapCallback = vi.fn(() => {return true});
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
@@ -622,11 +875,16 @@ describe('when the entry is selected to add a new lap', () => {
     describe('when add lap fails', () => {
         it('entry view is enabled to accept input', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-            entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
-            const addLapCallback = vi.fn((e) => {
-                return Promise.resolve({success: false});
-            });
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entry = new SynchronousEntry(
+                new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );
+            const addLapCallback = vi.fn(() => {return false});
             let container;
             ({ container } = render(<RaceEntryView entry={entry} addLap={addLapCallback} />));
             const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -680,13 +938,26 @@ describe('when the entry is selected to add a new lap', () => {
 
 describe('when user drags and drops an entry to a new position', () => {
     // seems like a forced test but, couldn't get pointer events to trigger drag and drop API events :-(
-    it('calls function passed to onRaceEntryDrop with subject key and target key ', async () => {
+    it('calls function passed to onRaceEntryDrop with subject key and target key', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const onRaceEntryDropSpy = vi.fn();
-        const entry1 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
-        const entry2 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
-        entry1.signedUpTo = [new SignedUp(raceScorpionA, entry1)];
-        entry2.signedUpTo = [new SignedUp(raceScorpionA, entry2)];
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry1 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
+        const entry2 = new SynchronousEntry(
+            new Entry(entrySarahPascal6745ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy6745HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorSarahPascalHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         const addLapCallback = vi.fn();
         render(
             <div>
@@ -705,10 +976,23 @@ describe('when user drags and drops an entry to a new position', () => {
     it('calls function passed to onRaceEntryDrop with value set by dragStart event', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const onRaceEntryDropSpy = vi.fn();
-        const entry1 = new Entry (competitorChrisMarshall, null, [], dinghy1234, [], 0, 0, false, false, null,  'http://localhost:8081/dinghyracing/api/entries/10', {eTag: '"1"'});
-        const entry2 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
-        entry1.signedUpTo = [new SignedUp(raceScorpionA, entry1)];
-        entry2.signedUpTo = [new SignedUp(raceScorpionA, entry2)];
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry1 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
+        const entry2 = new SynchronousEntry(
+            new Entry(entrySarahPascal6745ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy6745HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorSarahPascalHAL, {version: '"0"'}, model),
+            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         const addLapCallback = vi.fn();
         render(
             <div>
@@ -732,15 +1016,24 @@ describe('when user drags and drops an entry to a new position', () => {
     });
     describe('when race is a pursuit race', () => {
         it('updates the display to show the position of the target entry is being updated', async () => {
-            const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-            const onRaceEntryDropSpy = vi.fn(() => {
-                return Promise.resolve({success: true});
-            });
-            const raceScorpionAPursuit = {...raceScorpionA, type: 'PURSUIT'};
-            const entry1 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-            entry1.signedUpTo = [new SignedUp(raceScorpionAPursuit, entry1)];
-            const entry2 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
-            entry2.signedUpTo = [new SignedUp(raceScorpionAPursuit, entry2)];
+            const onRaceEntryDropSpy = vi.fn(async () => true);
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entry1 = new SynchronousEntry(
+                new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                new Race(racePursuitAHAL, {version: '"0"'}, model),
+                new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );
+            const entry2 = new SynchronousEntry(
+                new Entry(entrySarahPascal6745ScorpionAHAL, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy6745HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorSarahPascalHAL, {version: '"0"'}, model),
+                new Race(racePursuitAHAL, {version: '"0"'}, model),
+                new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );
             render(
                 <div>
                     <RaceEntryView entry={entry1} onRaceEntryDrop={onRaceEntryDropSpy} />
@@ -762,15 +1055,24 @@ describe('when user drags and drops an entry to a new position', () => {
         });
         describe('when entry drop fails', () => {
             it('entry view is enabled to accept input', async () => {
-                const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
-                const onRaceEntryDropSpy = vi.fn(() => {
-                    return Promise.resolve({success: false});
-                });
-                const raceScorpionAPursuit = {...raceScorpionA, type: 'PURSUIT'};
-                const entry1 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-                entry1.signedUpTo = [new SignedUp(raceScorpionA, entry1)];
-                const entry2 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
-                entry2.signedUpTo = [new SignedUp(raceScorpionA, entry2)];
+                const onRaceEntryDropSpy = vi.fn(async () => false);
+                const model = new SylphModel(httpRootURL, wsRootURL);
+                const entry1 = new SynchronousEntry(
+                    new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+                    new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                    new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                    new Race(racePursuitAHAL, {version: '"0"'}, model),
+                    new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+                    new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+                );
+                const entry2 = new SynchronousEntry(
+                    new Entry(entrySarahPascal6745ScorpionAHAL, {version: '"0"', model}), 
+                    new SynchronousDinghy(new Dinghy(dinghy6745HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                    new Competitor(competitorSarahPascalHAL, {version: '"0"'}, model),
+                    new Race(racePursuitAHAL, {version: '"0"'}, model),
+                    new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+                    new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+                );
                 render(
                     <div>
                         <RaceEntryView entry={entry1} onRaceEntryDrop={onRaceEntryDropSpy} />
@@ -795,17 +1097,19 @@ describe('when user drags and drops an entry to a new position', () => {
         });
         describe('when entry is dropped on itself', () => {
             it('does nothing', async () => {
-                const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
                 const onRaceEntryDropSpy = vi.fn();
-                const entry1 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-                entry1.signedUpTo = [new SignedUp(raceScorpionA, entry1)];
-                const entry2 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
-                entry2.signedUpTo = [new SignedUp(raceScorpionA, entry2)];
-                const addLapCallback = vi.fn();
+                const model = new SylphModel(httpRootURL, wsRootURL);
+                const entry1 = new SynchronousEntry(
+                    new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+                    new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                    new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                    new Race(racePursuitAHAL, {version: '"0"'}, model),
+                    new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+                    new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+                );
                 render(
                     <div>
-                        <RaceEntryView entry={entry1} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
-                        <RaceEntryView entry={entry2} addLap={addLapCallback} onRaceEntryDrop={onRaceEntryDropSpy} />
+                        <RaceEntryView entry={entry1} onRaceEntryDrop={onRaceEntryDropSpy} />
                     </div>
                 );
                 const subjectREV = screen.getByText(/chris marshall/i).parentElement.parentElement;
@@ -828,12 +1132,24 @@ describe('when user drags and drops an entry to a new position', () => {
     });
     describe('when race is not a pursuit race', () => {
         it('does not update the display to show the position of the target entry is being updated', async () => {
-            const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
             const onRaceEntryDropSpy = vi.fn();
-            const entry1 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-            entry1.signedUpTo = [new SignedUp(raceScorpionA, entry1)];
-            const entry2 = new Entry(competitorSarahPascal, competitorOwainDavies, [], dinghy6745, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/11', {eTag: '"1"'});
-            entry2.signedUpTo = [new SignedUp(raceScorpionA, entry2)];
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entry1 = new SynchronousEntry(
+                new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                new Race(racePursuitAHAL, {version: '"0"'}, model),
+                new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );
+            const entry2 = new SynchronousEntry(
+                new Entry(entrySarahPascal6745ScorpionAHAL, {version: '"0"', model}), 
+                new SynchronousDinghy(new Dinghy(dinghy6745HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorSarahPascalHAL, {version: '"0"'}, model),
+                new Race(racePursuitAHAL, {version: '"0"'}, model),
+                new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );
             const addLapCallback = vi.fn();
             render(
                 <div>
@@ -863,30 +1179,45 @@ describe('when user drags and drops an entry to a new position', () => {
 describe('when handler set for onFastGroup', () => {
     it('displays option to fast group entry', () => {
         const onFastGroupHandlerSpy = vi.fn();
-        const entryChrisMarshallScorpionA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(racePursuitAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} />);
         const fastGroupButton = screen.getByRole('checkbox');
         expect(fastGroupButton).toBeInTheDocument();
     });
     it('fast group option shows selected when inFastGroup prop is true', async () => {
-        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const onFastGroupHandlerSpy = vi.fn();
-        const entryChrisMarshallScorpionA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(racePursuitAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} inFastGroup={true} />);
         const fastGroupButton = screen.getByRole('checkbox');
-        // await act(async () => {
-        //     user.click(fastGroupButton);
-        // });
-
         expect(fastGroupButton).toBeChecked();
     });
     it('fast group option shows unselected when inFastGroup prop is false', async () => {
-        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const onFastGroupHandlerSpy = vi.fn();
-        const entryChrisMarshallScorpionA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(racePursuitAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} inFastGroup={false} />);
         const fastGroupButton = screen.getByRole('checkbox');
 
@@ -895,9 +1226,15 @@ describe('when handler set for onFastGroup', () => {
     it('calls handler with key for entry when fast group option is checked', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const onFastGroupHandlerSpy = vi.fn();
-        const entryChrisMarshallScorpionA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
-
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(racePursuitAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} />);
         const fastGroupButton = screen.getByRole('checkbox');
         await act(async () => {
@@ -910,8 +1247,15 @@ describe('when handler set for onFastGroup', () => {
 
 describe('when handler not set for onFastGroup', () => {
     it('does not display option to fast group entry', () => {
-        const entryChrisMarshallScorpionA1234 = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [{number: 1, time: 6000}], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
-        entryChrisMarshallScorpionA1234.signedUpTo = [new SignedUp(raceScorpionA, entryChrisMarshallScorpionA1234)];
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new Race(racePursuitAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
         const fastGroupButton = screen.queryByRole('checkbox');
         expect(fastGroupButton).not.toBeInTheDocument();

@@ -14,8 +14,8 @@
  * limitations under the License. 
  */
 
-import Clock from '../model/domain-classes/clock';
-import { useRef } from 'react';
+import Clock from '../model/clock';
+import { useState } from 'react';
 
 /**
  * Display a formatted time countdown and a message
@@ -25,10 +25,10 @@ import { useRef } from 'react';
  * @param {Boolean} [prop.beep = false]
  */
 function CountdownDisplayControl({ time, message, beep = false }) {
-    const beepAudio = useRef(new Audio('./sounds/beep_2000hz_100ms_mono.wav'));
+    const [beepAudio] = useState(new Audio('./sounds/beep_2000hz_100ms_mono.wav'));
 
     if (beep) {
-        beepAudio.current.play();
+        beepAudio.play();
     }
 
     return (

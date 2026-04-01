@@ -14,32 +14,28 @@
  * limitations under the License. 
  */
 
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import ModelContext from './ModelContext';
-import DinghyRacingModel from '../model/dinghy-racing-model';
-import ControllerContext from './ControllerContext';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * 
  * @returns 
  */
-function FleetConsole() {
-    const model = useContext(ModelContext);
-    const controller = useContext(ControllerContext);
-    const [fleet, setFleet] = useState(DinghyRacingModel.fleetTemplate());
+function FleetConsole({ model, controller }) {
+    const [fleetInput, setFleetInput] = useState({name: '', dinghyClasses: []});
+    const [selectedFleet, setSelectedFleet] = useState();
     const [fleetMap, setFleetMap] = useState(new Map());
     const [dinghyClassMap, setDinghyClassMap] = useState(new Map());
     const [message, setMessage] = useState('');
     const fleetNameInputRef = useRef(null);
     const [updatingFleet, setUpdatingFleet] = useState(false);
-    const [fleetUpdateRequestAt, setFleetUpdateRequestAt] = useState(Date.now());
+    const [fleetUpdateRequestAt, setFleetUpdateRequestAt] = useState();
 
     const handleFleetUpdate = useCallback(() => {
         setFleetUpdateRequestAt(Date.now());
     }, []);
 
     const clear = useCallback(() => {
-        setFleet(DinghyRacingModel.fleetTemplate());
+        setFleetInput({name: '', dinghyClasses: []});
         setUpdatingFleet(false);
         fleetNameInputRef.current.focus();
         setMessage('');
@@ -68,20 +64,20 @@ function FleetConsole() {
         }
     }, [model, fleetMap, handleFleetUpdate]);
 
+    // get fleets
     useEffect(() => {
         let ignoreFetch = false;
-        model.getFleets().then(result => {
-            if (!ignoreFetch && !result.success) {
-                setMessage('Unable to load fleets\n' + result.message);
-            }
-            else if (!ignoreFetch) {
+        if (!ignoreFetch) {
+            model.getFleets().then(result => {
                 const map = new Map();
-                result.domainObject.forEach(fleet => {
+                result.entities.forEach(fleet => {
                     map.set(fleet.url, fleet);
                 });
                 setFleetMap(map);
-            }
-        });
+            }).catch((error) => {
+                setMessage('Unable to load fleets\n' + error.message);
+            })
+        }
         // cleanup before effect runs and before form close
         return () => {
             ignoreFetch = true;
@@ -89,65 +85,64 @@ function FleetConsole() {
         }
     }, [model, fleetUpdateRequestAt]);
 
+    // get dinghy classes
     useEffect(() => {
-        let ignoreFetch = false;
+        let cancel = false;
+        if (!cancel)
         model.getDinghyClasses().then(result => {
-            if (!ignoreFetch && !result.success) {
-                setMessage('Unable to load dinghy classes\n' + result.message);
-            }
-            else if (!ignoreFetch) {
-                const map = new Map();
-                result.domainObject.forEach(dinghyClass => {
-                    map.set(dinghyClass.url, dinghyClass);
-                });
-                setDinghyClassMap(map);
-            }
+            const map = new Map();
+            result.entities.forEach(dinghyClass => {
+                map.set(dinghyClass.url, dinghyClass);
+            });
+            setDinghyClassMap(map);
+        }).catch((error) => {
+            setMessage('Unable to load dinghy classes\n' + error.message);
         });
         // cleanup before effect runs and before form close
         return () => {
-            ignoreFetch = true;
+            cancel = true;
             setMessage(''); // clear any previous message
         }
     }, [model]);
 
-    async function createFleet(fleet) {
-        const result = await controller.createFleet(fleet);
-        if (result.success) {
+    async function createFleet(name, dinghyClasses) {
+        try {
+            await controller.createFleet(name, dinghyClasses);
             clear();
         }
-        else {
-            setMessage(result.message);
+        catch (error) {
+            setMessage(error.message);
         }
     }
 
-    async function updateFleet(fleet) {
-        const result = await controller.updateFleet(fleet);
-        if (result.success) {
+    async function updateFleet(fleet, name, dinghyClasses) {
+        try {
+            await controller.updateFleet(fleet, name, dinghyClasses);
             clear();
         }
-        else {
-            setMessage(result.message);
+        catch (error) {
+            setMessage(error.message);
         }
     }
 
     function handleChange({ target }) {
-        setFleet({...fleet, name: target.value});
+        setFleetInput({...fleetInput, name: target.value});
     }
 
     function handleDinghyClassSelect(event) {
         const options = [...event.target.selectedOptions]; // convert from HTMLCollection to Array; trying to go direct to value results in event.target.selectedOptions.value is not iterable error
         const selectedDinghyClasses = options.map(option => dinghyClassMap.get(option.value));
-        setFleet({...fleet, dinghyClasses: selectedDinghyClasses});
+        setFleetInput({...fleetInput, dinghyClasses: selectedDinghyClasses});
     }
 
     function handleCreateButtonClick(event) {
         event.preventDefault();
-        createFleet(fleet);
+        createFleet(fleetInput.name, fleetInput.dinghyClasses);
     }
 
     function handleUpdateButtonClick(event) {
         event.preventDefault();
-        updateFleet(fleet);
+        updateFleet(selectedFleet, fleetInput.name, fleetInput.dinghyClasses);
     }
 
     function userMessageClasses() {
@@ -162,9 +157,11 @@ function FleetConsole() {
         )});
     }
 
-    function handleFleetRowClick({ currentTarget }) {
-        const fleet = {...fleetMap.get(currentTarget.id)};
-        setFleet(fleet);
+    async function handleFleetRowClick({ currentTarget }) {
+        const fleet = fleetMap.get(currentTarget.id);
+        const dinghyClasses = await fleet.getDinghyClasses();
+        setSelectedFleet(fleet);
+        setFleetInput({name: fleet.name, dinghyClasses: dinghyClasses.entities});
         setUpdatingFleet(true);
         fleetNameInputRef.current.focus();
         setMessage('');
@@ -176,10 +173,10 @@ function FleetConsole() {
             <form className='w3-container' action='' method='post'>
                 <div className='w3-row'>
                     <label htmlFor='name-input' className='w3-col m2' >Fleet Name</label>
-                    <input id='name-input' ref={fleetNameInputRef} name='name' className='w3-half' type='text' value={fleet.name} onChange={handleChange} autoFocus />
+                    <input id='name-input' ref={fleetNameInputRef} name='name' className='w3-half' type='text' value={fleetInput.name} onChange={handleChange} autoFocus />
                     <label htmlFor='dinghy-class-select' className='w3-left w3-col' >Select Dinghy Class</label>
-                    <select id='dinghy-class-select' name='dinghy-classes' multiple={true} className='w3-col w3-third' onChange={handleDinghyClassSelect} value={fleet.dinghyClasses.map(dc => dc.url)} >
-                        {Array.from(dinghyClassMap.values()).map((dinghyClass) => { return (<option key={dinghyClass.url} value={dinghyClass.url}>{dinghyClass.name}</option>)})}
+                    <select id='dinghy-class-select' name='dinghy-classes' multiple={true} className='w3-col w3-third' onChange={handleDinghyClassSelect} value={fleetInput.dinghyClasses.map(dc => dc.url)} >
+                        {Array.from(dinghyClassMap.values()).map((dinghyClass) => {return (<option key={dinghyClass.url} value={dinghyClass.url}>{dinghyClass.name}</option>)})}
                 </select>
                 </div>
                 <div className='w3-row'>

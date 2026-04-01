@@ -17,15 +17,6 @@
 import { render, screen, prettyDOM } from '@testing-library/react';
 import ErrorBoundary from './ErrorBoundary';
 
-// beforeEach(() => {
-//     vi.spyOn(console, 'error');
-//     console.error.mockImplementation(() => {});
-// })
-
-// afterEach(() => {
-//     console.error.mockRestore();
-// })
-
 describe('when there is no error', () => {
     it('renders children', () => {
         render(<ErrorBoundary children={<h1>Child Prop</h1>}/>);

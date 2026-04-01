@@ -16,9 +16,9 @@
 
 import ClockDisplay from './ClockDisplay';
 import { act, render, screen } from '@testing-library/react';
-import Clock from '../model/domain-classes/clock';
+import Clock from '../model/clock';
 
-vi.mock('../model/domain-classes/clock');
+vi.mock('../model/clock');
 
 const resolvedOptions = Intl.DateTimeFormat().resolvedOptions();
 const formatOptions = {

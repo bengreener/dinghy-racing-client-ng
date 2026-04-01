@@ -14,27 +14,26 @@
  * limitations under the License. 
  */
 
-import { act, screen, within } from '@testing-library/react';
-import { customRender } from '../test-utilities/custom-renders';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import FleetConsole from './FleetConsole';
-import { dinghyClassComet, dinghyClassScorpion, fleets, fleetScorpion, fleetHandicap, httpRootURL } from '../model/__mocks__/test-data';
-import { wsRootURL } from '../model/__mocks__/test-data';
-import DinghyRacingModel from '../model/dinghy-racing-model';
-import DinghyRacingController from '../controller/dinghy-racing-controller';
-import { dinghyClasses } from '../model/__mocks__/test-data';
+import { httpRootURL, wsRootURL, dinghyClassCometHAL, dinghyClassScorpionHAL, 
+    fleetCometHAL, fleetGraduateHAL, fleetHandicapHAL, fleetScorpionHAL } from '../model/__mocks__/test-data';
+import SylphModel from '../model/sylph-model';
+import SylphController from '../controller/sylph-controller';
+import Collection from '../model/collection';
+import DinghyClass from '../model/dinghy-class';
+import Fleet from '../model/fleet';
 
-vi.mock('../model/dinghy-racing-model');
-vi.mock('../controller/dinghy-racing-controller');
-vi.mock('../model/domain-classes/clock');
+vi.mock('../model/sylph-model');
+vi.mock('../controller/sylph-controller');
+vi.mock('../model/clock');
 
 it('renders', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const controller = new DinghyRacingController(model);
-    vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-    vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const controller = new SylphController(model);
     await act(async () => {
-        customRender(<FleetConsole />, model, controller);
+        render(<FleetConsole model={model} controller={controller} />);
     });
     expect(screen.getByRole('heading', {name: 'Fleets'})).toBeInTheDocument();
     expect(screen.getByLabelText(/fleet name/i)).toBeInTheDocument();
@@ -42,12 +41,10 @@ it('renders', async () => {
     expect(screen.getByRole('button', {name: /cancel/i})).toBeInTheDocument();
 });
 it('displays list of dinghy classes', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const controller = new DinghyRacingController(model);
-    vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-    vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const controller = new SylphController(model);
     await act( async () => {
-        customRender(<FleetConsole />, model, controller);
+        render(<FleetConsole model={model} controller={controller} />);
     });
     const dinghyClassesSelect = screen.getByRole('listbox');
     expect(within(dinghyClassesSelect).getByText(/scorpion/i)).toBeInTheDocument();
@@ -56,12 +53,10 @@ it('displays list of dinghy classes', async () => {
 describe('when a dinghy class is selected', () => {
     it('displays the selected dinghy class', async () => {
         const user = userEvent.setup();
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-        vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
         await act( async () => {
-            customRender(<FleetConsole />, model, controller);
+            render(<FleetConsole model={model} controller={controller} />);
         });
         const selectDinghyClass = await screen.findByLabelText(/dinghy class/i);
         await user.selectOptions(selectDinghyClass, ['Scorpion']);
@@ -72,12 +67,10 @@ describe('when a dinghy class is selected', () => {
 describe('when more than one dinghy class is selected', () => {
     it('displays the selected dinghy classes', async () => {
         const user = userEvent.setup();
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-        vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
         await act( async () => {
-            customRender(<FleetConsole />, model, controller);
+            render(<FleetConsole model={model} controller={controller} />);
         });
         const selectDinghyClass = await screen.findByLabelText(/dinghy class/i);
         await user.selectOptions(selectDinghyClass, ['Scorpion', 'Comet']);
@@ -92,12 +85,10 @@ describe('when more than one dinghy class is selected', () => {
 });
 it('accepts the name of a fleet', async () => {
     const user = userEvent.setup();
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const controller = new DinghyRacingController(model);
-    vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-    vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const controller = new SylphController(model);
     await act( async () => {
-        customRender(<FleetConsole />, model, controller);
+        render(<FleetConsole model={model} controller={controller} />);
     });
     const txtFleetName = await screen.findByLabelText(/fleet name/i);
     await user.type(txtFleetName, 'Scorpion');
@@ -106,13 +97,11 @@ it('accepts the name of a fleet', async () => {
 describe('when update button clicked', () => {
     it('creates fleet', async () => {
         const user = userEvent.setup();
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-        vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
         const createFleetSpy = vi.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({success: true})});
         await act( async () => {
-            customRender(<FleetConsole />, model, controller);
+            render(<FleetConsole model={model} controller={controller} />);
         });
         const btnCreate = screen.getByRole('button', {'name': 'Create'});
         await user.click(btnCreate);
@@ -121,13 +110,11 @@ describe('when update button clicked', () => {
     describe('when a dinghy class is selected', () => {
         it('creates the fleet with the selected dinghy classes', async () => {
             const user = userEvent.setup();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-            vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
             const createFleetSpy = vi.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({success: true})});
             await act( async () => {
-                customRender(<FleetConsole />, model, controller);
+                render(<FleetConsole model={model} controller={controller} />);
             });
             const inputFleetName = screen.getByLabelText(/name/i)
             const selectDinghyClass = screen.getByLabelText(/dinghy class/i);
@@ -135,17 +122,14 @@ describe('when update button clicked', () => {
             await user.type(inputFleetName, 'Scorpion');
             await user.selectOptions(selectDinghyClass, ['Scorpion']);
             await user.click(btnCreate);
-            expect(createFleetSpy).toBeCalledWith({...fleetScorpion, url: ''});
+            expect(createFleetSpy).toBeCalledWith('Scorpion', [new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)]);
         });
         it('clears the input on success', async () => {
             const user = userEvent.setup();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-            vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-            vi.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true, domainObject: fleetScorpion})});
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
             await act( async () => {
-                customRender(<FleetConsole />, model, controller);
+                render(<FleetConsole model={model} controller={controller} />);
             });
             const btnCreate = screen.getByRole('button', {'name': 'Create'});
             const txtFleetName = await screen.findByLabelText(/fleet name/i);
@@ -160,13 +144,11 @@ describe('when update button clicked', () => {
     describe('when more than one dinghy class is selected', () => {
         it('displays the selected dinghy classes', async () => {
             const user = userEvent.setup();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-            vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
             const createFleetSpy = vi.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({success: true})});
             await act( async () => {
-                customRender(<FleetConsole />, model, controller);
+                render(<FleetConsole model={model} controller={controller} />);
             });
             const inputFleetName = screen.getByLabelText(/name/i)
             const selectDinghyClass = await screen.findByLabelText(/dinghy class/i);
@@ -174,17 +156,14 @@ describe('when update button clicked', () => {
             await user.selectOptions(selectDinghyClass, ['Scorpion', 'Comet']);
             const btnCreate = screen.getByRole('button', {'name': 'Create'});
             await user.click(btnCreate);
-            expect(createFleetSpy).toBeCalledWith({...fleetHandicap, dinghyClasses: [dinghyClassScorpion, dinghyClassComet], url: ''});
+            expect(createFleetSpy).toBeCalledWith('Handicap', [new DinghyClass(dinghyClassCometHAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)]);
         });
         it('clears the input on success', async () => {
             const user = userEvent.setup();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-            vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-            vi.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true, domainObject: fleetScorpion})});
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
             await act( async () => {
-                customRender(<FleetConsole />, model, controller);
+                render(<FleetConsole model={model} controller={controller} />);
             });
             const btnCreate = screen.getByRole('button', {'name': 'Create'});
             const txtFleetName = await screen.findByLabelText(/fleet name/i);
@@ -196,31 +175,27 @@ describe('when update button clicked', () => {
             expect(selectDinghyClass.selectedOptions.length).toBe(0);
         });
     });
-    it('calls the controller createDinghyClass with new dinghy class as parameter', async () => {
+    it('calls the controller createFleet with new fleet name and selected dinghy class as parameter', async () => {
         const user = userEvent.setup();
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-        vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-        const createFleetSpy = vi.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true})});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        const createFleetSpy = vi.spyOn(controller, 'createFleet').mockImplementation(async () => {return new Fleet(fleetScorpionHAL, {version: ''}, this)});
         await act( async () => {
-            customRender(<FleetConsole />, model, controller);
+            render(<FleetConsole model={model} controller={controller} />);
         });
         const btnCreate = screen.getByRole('button', {'name': 'Create'});
         const txtFleetName = await screen.findByLabelText(/fleet name/i);
         await user.type(txtFleetName, 'Scorpion');
         await user.click(btnCreate);
-        expect(createFleetSpy).toBeCalledWith({...DinghyRacingModel.fleetTemplate(), name: 'Scorpion'});
+        expect(createFleetSpy).toBeCalledWith('Scorpion', []);
     });
     it('displays the failure message on failure', async () => {
         const user = userEvent.setup();
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-        vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-        vi.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': false, message: 'That was a bust!'})});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        vi.spyOn(controller, 'createFleet').mockImplementation(async () => {throw new Error('That was a bust!')});
         await act( async () => {
-            customRender(<FleetConsole />, model, controller);
+            render(<FleetConsole model={model} controller={controller} />);
         });
         const btnCreate = screen.getByRole('button', {'name': 'Create'});
         const txtFleetName = await screen.findByLabelText(/fleet name/i);
@@ -233,13 +208,10 @@ describe('when update button clicked', () => {
 describe('when cancel button is clicked', () => {
     it('clears entered data and selections from form', async () => {
         const user = userEvent.setup();
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-        vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-        vi.spyOn(controller, 'createFleet').mockImplementation(() => {return Promise.resolve({'success': true, domainObject: fleetScorpion})});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
         await act( async () => {
-            customRender(<FleetConsole />, model, controller);
+            render(<FleetConsole model={model} controller={controller} />);
         });
         const btnCancel = screen.getByRole('button', {'name': /cancel/i});
         const txtFleetName = await screen.findByLabelText(/fleet name/i);
@@ -252,12 +224,10 @@ describe('when cancel button is clicked', () => {
     })
 });
 it('displays existing fleets', async () => {
-    const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-    const controller = new DinghyRacingController(model);
-    vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-    vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const controller = new SylphController(model);
     await act( async () => {
-        customRender(<FleetConsole />, model, controller);
+        render(<FleetConsole model={model} controller={controller} />);
     });
     const fleetTable = screen.getByRole('table');
     expect(within(fleetTable).getByText(/scorpion/i)).toBeInTheDocument();
@@ -266,17 +236,13 @@ it('displays existing fleets', async () => {
 describe('when a fleet is selected', () => {
     it('displays fleet details for editing', async () => {
         const user = userEvent.setup();
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-        vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+        const model = new SylphModel(httpRootURL, wsRootURL);
         await act( async () => {
-            customRender(<FleetConsole />, model);
+            render(<FleetConsole model={model} />);
         });
         const fleetCell = await screen.findByRole('cell', {name: /scorpion/i});
         const selectDinghyClass = await screen.findByLabelText(/dinghy class/i);
-        await act(async () => {
-            await user.click(fleetCell);
-        });
+        await user.click(fleetCell);
         expect(await screen.findByLabelText(/name/i)).toHaveValue('Scorpion');
         expect(selectDinghyClass.selectedOptions.length).toBe(1);
         expect(selectDinghyClass.value).toBe('http://localhost:8081/dinghyracing/api/dinghyClasses/1');
@@ -285,13 +251,11 @@ describe('when a fleet is selected', () => {
     });
     it('clears any error message', async () => {
         const user = userEvent.setup();
-        const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-        const controller = new DinghyRacingController(model);
-        vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-        vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-        vi.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops!'})});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        vi.spyOn(controller, 'updateFleet').mockImplementation(async () => {throw new Error('Oops!')});
         await act( async () => {
-            customRender(<FleetConsole />, model, controller);
+            render(<FleetConsole model={model} controller={controller} />);
         });
         const fleetCell = await screen.findByRole('cell', {name: /scorpion/i});
         await user.click(fleetCell);
@@ -307,11 +271,9 @@ describe('when a fleet is selected', () => {
     describe('when values are changed', () => {
         it('displays new values', async () => {
             const user = userEvent.setup();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-            vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+            const model = new SylphModel(httpRootURL, wsRootURL);
             await act( async () => {
-                customRender(<FleetConsole />, model);
+                render(<FleetConsole model={model} />);
             });
             const fleetCell = await screen.findByRole('cell', {name: /scorpion/i});
             await user.click(fleetCell);
@@ -328,13 +290,11 @@ describe('when a fleet is selected', () => {
     describe('when update button clicked', () => {
         it('updates dinghy class details in system with new values provided', async () => {
             const user = userEvent.setup();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-            vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-            const updateFleetSpy = vi.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: true, domainObject: {...fleetScorpion, name: 'Scorp Pro', dinghyClasses: [dinghyClassComet]}})});
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
+            const updateFleetSpy = vi.spyOn(controller, 'updateFleet').mockImplementation(async () => {return new Fleet({...fleetScorpionHAL, name: 'Scorp Pro'}, {version: '"1"'}, model)});
             await act( async () => {
-                customRender(<FleetConsole />, model, controller);
+                render(<FleetConsole model={model} controller={controller} />);
             });
             const fleetCell = await screen.findByRole('cell', {name: /scorpion/i});
             await user.click(fleetCell);
@@ -346,18 +306,15 @@ describe('when a fleet is selected', () => {
             await user.deselectOptions(selectDinghyClass, ['Scorpion']);
             await user.selectOptions(selectDinghyClass, ['Comet']);
             await user.click(updateButton);
-            expect(updateFleetSpy).toBeCalledWith({...fleetScorpion, name: 'Scorp Pro', dinghyClasses: [dinghyClassComet]});
+            expect(updateFleetSpy).toBeCalledWith(new Fleet(fleetScorpionHAL, {version: '"0"'}, model), 'Scorp Pro', [new DinghyClass(dinghyClassCometHAL, {version: '"0"'}, model)]);
         });
         describe('when update is successful', () => {
             it('clears input fields', async () => {
                 const user = userEvent.setup();
-                const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                const controller = new DinghyRacingController(model);
-                vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-                vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-                vi.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: true, domainObject: {...fleetScorpion, name: 'Scorp Pro', dinghyClasses: [dinghyClassComet]}})});
+                const model = new SylphModel(httpRootURL, wsRootURL);
+                const controller = new SylphController(model);
                 await act( async () => {
-                    customRender(<FleetConsole />, model, controller);
+                    render(<FleetConsole model={model} controller={controller} />);
                 });
                 const fleetCell = await screen.findByRole('cell', {name: /scorpion/i});
                 await user.click(fleetCell);
@@ -374,14 +331,18 @@ describe('when a fleet is selected', () => {
             });
             it('refreshes fleet list', async () => {
                 const user = userEvent.setup();
-                const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                const controller = new DinghyRacingController(model);
-                vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success:true, domainObject: [{...fleets[0], name: 'Scorp Pro', dingyClasses: [dinghyClassComet]}, fleets[1]]})})
-                    .mockImplementationOnce(() => {return Promise.resolve({success: true, domainObject: fleets})});
-                vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-                vi.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: true, domainObject: {...fleetScorpion, name: 'Scorp Pro', dinghyClasses: [dinghyClassComet]}})});
+                const model = new SylphModel(httpRootURL, wsRootURL);
+                const controller = new SylphController(model);
+                const fleetComet = new Fleet(fleetCometHAL, {version: '"0"'}, model);
+                const fleetGraduate = new Fleet(fleetGraduateHAL, {version: '"0"'}, model);
+                const fleetHandicap = new Fleet(fleetHandicapHAL, {version: '"0"'}, model);
+                const fleetScorpion = new Fleet(fleetScorpionHAL, {version: '"0"'}, model);
+                const fleetScorpionPro = new Fleet({...fleetScorpionHAL, name: 'Scorp Pro'}, {version: '"0"'}, this);
+                vi.spyOn(model, 'getFleets').mockImplementation(async () => {return new Collection([fleetComet, fleetHandicap, fleetGraduate, fleetScorpionPro], {size: 20, totalElements: 4, totalPages: 0, number: 0})})
+                    .mockImplementationOnce(async () => {return new Collection([fleetComet, fleetHandicap, fleetGraduate, fleetScorpion], {size: 20, totalElements: 4, totalPages: 0, number: 0})});
+                vi.spyOn(controller, 'updateFleet').mockImplementation(async () => {return new Fleet({...fleetScorpionHAL, name: 'Scorp Pro'})});
                 await act( async () => {
-                    customRender(<FleetConsole />, model, controller);
+                    render(<FleetConsole model={model} controller={controller} />);
                 });
                 const dinghyClassCell = await screen.findByRole('cell', {name: /scorpion/i});
                 await user.click(dinghyClassCell);
@@ -394,7 +355,7 @@ describe('when a fleet is selected', () => {
                 await user.deselectOptions(selectDinghyClass, ['Scorpion']);
                 await user.selectOptions(selectDinghyClass, ['Comet']);
                 await act(async () => {
-                    model.handleFleetUpdate({'body': fleets[0].url});
+                    model.handleFleetUpdate({'body': fleetScorpion.url});
                 });
                 expect(await screen.findByRole('cell', {name: /scorp pro/i})).toBeInTheDocument();
             });
@@ -402,13 +363,11 @@ describe('when a fleet is selected', () => {
         describe('when there is a problem updating dinghy class', () => {
             it('provides a message expalining cause of issue', async () => {
                 const user = userEvent.setup();
-                const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-                const controller = new DinghyRacingController(model);
-                vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-                vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
-                vi.spyOn(controller, 'updateFleet').mockImplementation(() => {return Promise.resolve({success: false, message: 'Oops something went wrong.'})});
+                const model = new SylphModel(httpRootURL, wsRootURL);
+                const controller = new SylphController(model);
+                vi.spyOn(controller, 'updateFleet').mockImplementation(async () => {throw new Error('Oops something went wrong.')});
                 await act( async () => {
-                    customRender(<FleetConsole />, model, controller);
+                    render(<FleetConsole model={model} controller={controller} />);
                 });
                 const fleetCell = await screen.findByRole('cell', {name: /scorpion/i});
                 await user.click(fleetCell);
@@ -424,12 +383,10 @@ describe('when a fleet is selected', () => {
     describe('when cancelled', () => {
         it('clears input fields', async () => {
             const user = userEvent.setup();
-            const model = new DinghyRacingModel(httpRootURL, wsRootURL);
-            const controller = new DinghyRacingController(model);
-            vi.spyOn(model, 'getFleets').mockImplementation(() => {return Promise.resolve({success: true, domainObject: fleets})});
-            vi.spyOn(model, 'getDinghyClasses').mockImplementation(() => {return Promise.resolve({success: true, domainObject: dinghyClasses})});
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
             await act( async () => {
-                customRender(<FleetConsole />, model, controller);
+                render(<FleetConsole model={model} controller={controller} />);
             });
             const fleetCell = await screen.findByRole('cell', {name: /scorpion/i});
             await user.click(fleetCell);
