@@ -25,16 +25,19 @@ function PreviousEntries({ sailNumber, dinghyClasses, model, onSelectPreviousEnt
         const updatePreviousEntries = async () => {
             const peMap = new Map();
             try {
-                const dinghyResults = await Promise.allSettled(dinghyClasses.map(dinghyClass => {return model.getDinghyBySailNumberAndDinghyClass(sailNumber, dinghyClass)})); // some may fail as no dinghies with sail number in class
-                const filteredDinghies = dinghyResults.filter(result => result.status === 'fulfilled').map(result => result.value);
-                const synchronousDinghies = await Promise.all(filteredDinghies.map(dinghy => {
-                    return buildSynchronousDinghy(dinghy);
-                }));
-                const crewCollections = await Promise.all(filteredDinghies.map(dinghy => dinghy.getCrews()));
-                for (let i = 0; i < synchronousDinghies.length; i++) {
-                    for (const crew of crewCollections[i].entities) {
-                        peMap.set(synchronousDinghies[i].url + crew.helm.url + crew?.mate?.url, {dinghy: synchronousDinghies[i], dinghyClass: synchronousDinghies[i].dinghyClass, crew: crew});
-                    }
+                if (sailNumber != "") {
+                    const dinghyResults = await Promise.allSettled(dinghyClasses.map(dinghyClass => {return model.getDinghyBySailNumberAndDinghyClass(sailNumber, dinghyClass)}));
+                    // filter out results where no dinghy found with sail number in class
+                    const filteredDinghies = dinghyResults.filter(result => result.status === 'fulfilled').map(result => result.value);
+                    const synchronousDinghies = await Promise.all(filteredDinghies.map(dinghy => {
+                        return buildSynchronousDinghy(dinghy);
+                    }));
+                    const crewCollections = await Promise.all(filteredDinghies.map(dinghy => dinghy.getCrews()));
+                    for (let i = 0; i < synchronousDinghies.length; i++) {
+                        for (const crew of crewCollections[i].entities) {
+                            peMap.set(synchronousDinghies[i].url + crew.helm.url + crew?.mate?.url, {dinghy: synchronousDinghies[i], dinghyClass: synchronousDinghies[i].dinghyClass, crew: crew});
+                        }
+                    }    
                 }
             }
             catch(error) {
