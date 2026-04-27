@@ -137,7 +137,6 @@ const entryChrisMarshall1234ScorpionAHAL = {
 	scoringAbbreviation: null,
 	leadEntryAverageLapTime: 'PT16M40S',
 	sumOfLapTimes: 'PT33M20S',
-	correctedTime: 'PT2562047788015215H30M7S',
     onLastLap: false,
     leadEntryLastLapTime: 'PT16M40S',
 	finishedRace: false, 
@@ -156,7 +155,6 @@ const entryChrisMarshall1234HandicapAHAL = {
 	scoringAbbreviation: null,
 	leadEntryAverageLapTime: 'PT0M0S',
 	sumOfLapTimes: 'PT0M0S',
-	correctedTime: 'PT2562047788015215H30M7S',
     onLastLap: false,
     leadEntryLastLapTime: 'PT0M0S',
 	finishedRace: false, 
@@ -175,7 +173,6 @@ const entryChrisMarshall1234PursuitAHAL = {
 	scoringAbbreviation: null,
 	leadEntryAverageLapTime: 'PT16M40S',
 	sumOfLapTimes: 'PT33M20S',
-	correctedTime: 'PT2562047788015215H30M7S',
     onLastLap: false,
     leadEntryLastLapTime: 'PT16M40S',
 	finishedRace: false, 
@@ -196,7 +193,6 @@ const entryJillMyer826PursuitAHAL = {
     finishedRace: false,
     onLastLap: false,
     sumOfLapTimes: 'PT0S',
-    correctedTime: 'PT2562047788015215H30M7S',
     leadEntryLastLapTime: 'PT0S', 
     position: null, 
 	_links:{
@@ -215,7 +211,6 @@ const entryJillMyer826CometAHAL = {
     finishedRace: false,
     onLastLap: false,
     sumOfLapTimes: 'PT0S',
-    correctedTime: 'PT2562047788015215H30M7S',
     leadEntryLastLapTime: 'PT0S', 
     position: null, 
 	_links:{
@@ -234,7 +229,6 @@ const entryJillMyer826HandicapAHAL = {
     finishedRace: false,
     onLastLap: false,
     sumOfLapTimes: 'PT0S',
-    correctedTime: 'PT2562047788015215H30M7S',
     leadEntryLastLapTime: 'PT0S', 
     position: null, 
 	_links:{
@@ -253,7 +247,6 @@ const entryLiuBao2726GraduateAHAL = {
     finishedRace: false,
     onLastLap: false,
     sumOfLapTimes: 'PT31M26S',
-    correctedTime: 'PT2562047788015215H30M7S',
     leadEntryLastLapTime: 'PT15M59S', 
     position: null, 
 	_links:{
@@ -270,7 +263,6 @@ const entrySarahPascal6745ScorpionAHAL = {
 	scoringAbbreviation: null,
 	leadEntryAverageLapTime: 'PT0S',
 	sumOfLapTimes: 'PT17M26S',
-	correctedTime: 'PT0S',
     onLastLap: false,
     leadEntryLastLapTime: 'PT17M26S',
 	finishedRace: false, 
@@ -289,7 +281,6 @@ const entrySarahPascal6745HandicapAHAL = {
 	scoringAbbreviation: null,
 	leadEntryAverageLapTime: 'PT0S',
 	sumOfLapTimes: 'PT0M0S',
-	correctedTime: 'PT0S',
     onLastLap: false,
     leadEntryLastLapTime: 'PT0M0S',
 	finishedRace: false, 
@@ -314,6 +305,7 @@ const dinghyScorpion1234CrewBHAL = {helm: competitorLiuBaoHAL, mate: competitorL
 const dinghyScorpion1234CrewsHAL = {_embedded: {crews: [dinghyScorpion1234CrewAHAL, dinghyScorpion1234CrewBHAL]}, _links: {self: {href: 'http://localhost:8081/dinghyracing/api/crews/search/findCrewsByDinghy?dinghy=http%3A%2F%2Flocalhost%3A8081%2Fdinghyracing%2Fapi%2Fdinghies%2F2'}}};
 
 const signedUpChrisMarshallDinghy1234ScorpionAHAL = {
+    correctedTime: 'PT2562047788015215H30M7S',
 	position: 1,
 	_links:{
 		self:{'href':'http://localhost:8081/dinghyracing/api/signedUps/1'},
@@ -322,6 +314,7 @@ const signedUpChrisMarshallDinghy1234ScorpionAHAL = {
 	}
 };
 const signedUpChrisMarshallDinghy1234PursuitAHAL = {
+    correctedTime: 'PT0S',
 	position: 1,
 	_links:{
 		self:{'href':'http://localhost:8081/dinghyracing/api/signedUps/5'},
@@ -330,6 +323,7 @@ const signedUpChrisMarshallDinghy1234PursuitAHAL = {
 	}
 };
 const signedUpChrisMarshallDinghy1234HandicapAHAL = {
+    correctedTime: 'PT0S',
 	position: 1,
 	_links:{
 		self:{'href':'http://localhost:8081/dinghyracing/api/signedUps/9'},
@@ -338,6 +332,7 @@ const signedUpChrisMarshallDinghy1234HandicapAHAL = {
 	}
 };
 const signedUpJillMyerDinghy826CometAHAL = {
+    correctedTime: 'PT0S',
 	position: null,
 	_links:{
 		self:{'href':'http://localhost:8081/dinghyracing/api/signedUps/3'},
@@ -346,6 +341,7 @@ const signedUpJillMyerDinghy826CometAHAL = {
 	}
 };
 const signedUpJillMyerDinghy826PursuitAHAL = {
+    correctedTime: 'PT0S',
 	position: null,
 	_links:{
 		self:{'href':'http://localhost:8081/dinghyracing/api/signedUps/6'},
@@ -354,6 +350,7 @@ const signedUpJillMyerDinghy826PursuitAHAL = {
 	}
 };
 const signedUpJillMyerDinghy826HandicapAHAL = {
+    correctedTime: 'PT0S',
 	position: null,
 	_links:{
 		self:{'href':'http://localhost:8081/dinghyracing/api/signedUps/7'},
@@ -362,6 +359,7 @@ const signedUpJillMyerDinghy826HandicapAHAL = {
 	}
 };
 const signedUpLiuBaoDinghy2726GraduateAHAL = {
+    correctedTime: 'PT0S',
 	position: 1,
 	_links:{
 		self:{'href':'http://localhost:8081/dinghyracing/api/signedUps/4'},
@@ -370,6 +368,7 @@ const signedUpLiuBaoDinghy2726GraduateAHAL = {
 	}
 };
 const signedUpSarahPascalDinghy6745ScorpionAHAL = {
+    correctedTime: 'PT0S',
 	position: 2,
 	_links:{
 		self:{'href':'http://localhost:8081/dinghyracing/api/signedUps/2'},
@@ -378,6 +377,7 @@ const signedUpSarahPascalDinghy6745ScorpionAHAL = {
 	}
 };
 const signedUpSarahPascalDinghy6745HandicapAHAL = {
+    correctedTime: 'PT0S',
 	position: 2,
 	_links:{
 		self:{'href':'http://localhost:8081/dinghyracing/api/signedUps/8'},

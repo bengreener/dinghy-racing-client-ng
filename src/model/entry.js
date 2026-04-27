@@ -14,7 +14,6 @@
 * limitations under the License. 
 */
 
-import Collection from './collection';
 import EmbeddedRace from './embedded-race';
 import Entity from './entity';
 import Race from './race';
@@ -23,10 +22,6 @@ class Entry extends Entity {
 
     constructor(hal, metadata, model) {
         super(hal, metadata, model);
-    }
-
-    get correctedTime() {
-        return this.model.convertISO8601DurationToMilliseconds(this.hal.correctedTime);
     }
 
     get finishedRace() {
@@ -43,6 +38,11 @@ class Entry extends Entity {
 
     get sumOfLapTimes() {
         return this.model.convertISO8601DurationToMilliseconds(this.hal.sumOfLapTimes);
+    }
+
+    async getCorrectedTimeInDirectRace() {
+        const signedUp = await this.getSignedUpToDirectRace();
+        return signedUp.correctedTime;
     }
 
     async getCrew() {

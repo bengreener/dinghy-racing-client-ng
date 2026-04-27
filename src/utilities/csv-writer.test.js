@@ -111,8 +111,10 @@ describe('when race is for fleet that includes dinghy classes with crew', () => 
     it('converts race entry data to an array of comma seperated value data with one row per entry in race', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
-        const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT45M53S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
-        const entrySarahPascal = new Entry({...entrySarahPascal6745ScorpionAHAL, sumOfLapTimes: 'PT48M0S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+        const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT45M53S'}, {version: '"0"'}, model);
+        vi.spyOn(entryChrisMarshall, 'getCorrectedTimeInDirectRace').mockImplementation(async () => 0);
+        const entrySarahPascal = new Entry({...entrySarahPascal6745ScorpionAHAL, sumOfLapTimes: 'PT48M0S'}, {version: '"0"'}, model);
+        vi.spyOn(entrySarahPascal, 'getCorrectedTimeInDirectRace').mockImplementation(async () => 0);
         vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
         vi.spyOn(entrySarahPascal, 'getPositionInDirectRace').mockImplementation(async () => {return 2});
         vi.spyOn(entryChrisMarshall, 'getLaps').mockImplementation(async () =>{return new Collection([
@@ -185,7 +187,9 @@ describe('when race is a handicap race', () => {
         const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT52M57S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
         const entryJillMyer = new Entry({...entryJillMyer826CometAHAL, sumOfLapTimes: 'PT1H2M1S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
         vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
+        vi.spyOn(entryChrisMarshall, 'getCorrectedTimeInDirectRace').mockImplementation(async () => 0);
         vi.spyOn(entryJillMyer, 'getPositionInDirectRace').mockImplementation(async () => {return 2});
+        vi.spyOn(entryJillMyer, 'getCorrectedTimeInDirectRace').mockImplementation(async () => 0);
         vi.spyOn(entryChrisMarshall, 'getLaps').mockImplementation(async () =>{return new Collection([
             new Lap(1, 975000, {version: '"0"'}, model),
             new Lap(2, 956000, {version: '"0"'}, model),
@@ -213,6 +217,7 @@ describe('when an entry has a scoring abbreviation set', () => {
         const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT3S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
         const entrySarahPascal = new Entry({...entrySarahPascal6745ScorpionAHAL, sumOfLapTimes: 'PT0S', correctedTime: 'PT0M0S', scoringAbbreviation: 'DNS'}, {version: '"0"'}, model);
         vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
+        vi.spyOn(entryChrisMarshall, 'getCorrectedTimeInDirectRace').mockImplementation(async () => 0);
         vi.spyOn(entrySarahPascal, 'getPositionInDirectRace').mockImplementation(async () => {return 2});
         vi.spyOn(entryChrisMarshall, 'getLaps').mockImplementation(async () =>{return new Collection([
             new Lap(1, 1000, {version: '"0"'}, model),
@@ -239,7 +244,9 @@ describe('when download options are provided', () => {
             const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT45M53S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
             const entrySarahPascal = new Entry({...entrySarahPascal6745ScorpionAHAL, sumOfLapTimes: 'PT48M0S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
             vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
+            vi.spyOn(entryChrisMarshall, 'getCorrectedTimeInDirectRace').mockImplementation(async () => 0);
             vi.spyOn(entrySarahPascal, 'getPositionInDirectRace').mockImplementation(async () => {return 2});
+            vi.spyOn(entrySarahPascal, 'getCorrectedTimeInDirectRace').mockImplementation(async () => 0);
             vi.spyOn(entryChrisMarshall, 'getLaps').mockImplementation(async () =>{return new Collection([
                 new Lap(1, 923000, {version: '"0"'}, model),
                 new Lap(2, 896000, {version: '"0"'}, model),
@@ -266,7 +273,9 @@ describe('when download options are provided', () => {
             const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT45M53S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
             const entrySarahPascal = new Entry({...entrySarahPascal6745ScorpionAHAL, sumOfLapTimes: 'PT48M0S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
             vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
+            vi.spyOn(entryChrisMarshall, 'getCorrectedTimeInDirectRace').mockImplementation(async () => 0);
             vi.spyOn(entrySarahPascal, 'getPositionInDirectRace').mockImplementation(async () => {return 2});
+            vi.spyOn(entrySarahPascal, 'getCorrectedTimeInDirectRace').mockImplementation(async () => 0);
             vi.spyOn(entryChrisMarshall, 'getLaps').mockImplementation(async () =>{return new Collection([
                 new Lap(1, 923000, {version: '"0"'}, model),
                 new Lap(2, 896000, {version: '"0"'}, model),

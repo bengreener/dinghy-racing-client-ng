@@ -22,6 +22,10 @@ class SignedUp extends Entity {
         super(hal, metadata, model);
     }
 
+    get correctedTime() {
+        return this.model.convertISO8601DurationToMilliseconds(this.hal.correctedTime);
+    }
+
     get position() {
         return this.hal.position;
     }
