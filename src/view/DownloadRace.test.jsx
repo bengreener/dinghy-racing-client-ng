@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { act, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { httpRootURL, wsRootURL, fleetScorpionHAL, raceScorpionAHAL } from '../model/__mocks__/test-data';
 import SylphModel from '../model/sylph-model';

@@ -17,14 +17,12 @@
 import userEvent from '@testing-library/user-event';
 import { act, render, screen, within } from '@testing-library/react';
 import RaceConsole from './RaceConsole';
-import { httpRootURL, wsRootURL, races, raceScorpionAHAL, raceGraduateAHAL, raceHandicapAHAL, raceCometAHAL, racePursuitAHAL } from '../model/__mocks__/test-data';
+import { httpRootURL, wsRootURL, raceScorpionAHAL, raceGraduateAHAL, raceHandicapAHAL, raceCometAHAL } from '../model/__mocks__/test-data';
 import SylphModel from '../model/sylph-model';
 import SylphController from '../controller/sylph-controller';
 import Collection from '../model/collection';
 import Race from '../model/race';
 import RaceType from '../model/race-type';
-import Entry from '../model/entry';
-import SignedUp from '../model/signed-up';
 import * as storageUtilities from '../utilities/storage-utilities';
 
 vi.mock('../model/sylph-model');
