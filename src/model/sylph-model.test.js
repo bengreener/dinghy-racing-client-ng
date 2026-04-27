@@ -2821,6 +2821,40 @@ describe('when a race is requested', () => {
     });
 });
 
+describe('when an embedded race is requested', () => {
+    it('returns a promise that resolves to the embedded race', async () => {
+        fetch.mockImplementation((resource, options) => {
+            if (resource === raceScorpionAHAL._links.self.href) {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    headers: new Headers([['ETag', '"3"']]),
+                    json: () => Promise.resolve(raceScorpionAHAL)
+                });
+            }
+        });
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const promise = model.getRace(raceScorpionAHAL._links.self.href);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({hal: raceScorpionAHAL, metadata: {version: '"3"'}, model});
+    });
+    it('throws an error when race is not returned', async () => {
+        fetch.mockImplementation((resource) => {
+            if (resource === raceScorpionAHAL._links.self.href) {
+                return Promise.resolve({
+                    ok: false,
+                    status: 404,
+                    statusText: 'Not Found',
+                    json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
+                });
+            }
+        });
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        await expect(() => model.getRace(raceScorpionAHAL._links.self.href)).rejects.toThrowError('HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404');
+    });
+});
+
 describe('when a competitor is requested', () => {
     it('returns a promise that resolves to the competitor', async () => {
         fetch.mockImplementation(() => {

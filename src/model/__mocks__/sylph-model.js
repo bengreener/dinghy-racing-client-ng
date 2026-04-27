@@ -21,6 +21,7 @@ import Competitor from '../competitor';
 import Crew from '../crew';
 import Dinghy from '../dinghy';
 import DinghyClass from '../dinghy-class';
+import EmbeddedRace from '../embedded-race';
 import Entry from '../entry';
 import Fleet from '../fleet';
 import Lap from '../lap';
@@ -33,6 +34,7 @@ import {
     crews1234ScorpionHAL,
     dinghyClassCometHAL, dinghyClassGraduateHAL, dinghyClassScorpionHAL, 
     dinghy826HAL, dinghy1234HAL, dinghy2726HAL, dinghy6745HAL,
+    embeddedRaceVeteransAHAL, embeddedRaceLadiesAHAL,
     entryLiuBao2726GraduateAHAL, entryChrisMarshall1234PursuitAHAL, entryJillMyer826PursuitAHAL,
     entryChrisMarshall1234HandicapAHAL, entryChrisMarshall1234ScorpionAHAL,
     entryJillMyer826CometAHAL, entryJillMyer826HandicapAHAL,
@@ -40,7 +42,7 @@ import {
     fleetCometHAL, fleetScorpionHAL, 
     raceScorpionAHAL, raceCometAHAL, raceGraduateAHAL, raceHandicapAHAL, racePursuitAHAL,
     fleetGraduateHAL, fleetHandicapHAL,
-    signedUpChrisMarshallDinghy1234HandicapAHAL, signedUpChrisMarshallDinghy1234ScorpionAHAL, signedUpChrisMarshallDinghy1234PursuitAHAL,
+    signedUpChrisMarshallDinghy1234HandicapAHAL, signedUpChrisMarshallDinghy1234ScorpionAHAL, signedUpChrisMarshallDinghy1234VeteransAHAL, signedUpChrisMarshallDinghy1234PursuitAHAL,
     signedUpJillMyerDinghy826CometAHAL, signedUpJillMyerDinghy826HandicapAHAL, signedUpJillMyerDinghy826PursuitAHAL,
     signedUpSarahPascalDinghy6745HandicapAHAL, signedUpSarahPascalDinghy6745ScorpionAHAL, signedUpLiuBaoDinghy2726GraduateAHAL,
 } from './test-data';
@@ -304,6 +306,18 @@ class SylphModel {
         return new Collection(dinghies, {size: 20, totalElements: dinghies.length, totalPages: 0, number: 0});
     }
 
+    async getEmbeddedRacesInRace(race) {
+        let embeddedRaces = [];
+        const embeddedRaceVeteransA = new EmbeddedRace(embeddedRaceVeteransAHAL, {version: '"0"'}, this);
+        const embeddedRaceLadiesA = new EmbeddedRace(embeddedRaceLadiesAHAL, {version: '"0"'}, this);
+
+        if (race.url === raceHandicapAHAL._links.self.href) {
+            embeddedRaces = [embeddedRaceVeteransA, embeddedRaceLadiesA];
+        }
+
+        return new Collection(embeddedRaces, {size: 20, totalElements: embeddedRaces.length, totalPages: 0, number: 0});
+    }
+
     async getEntriesByRace(race) {
         return this.getEntriesFromURL(this.httpRootURL + '/entries/search/findBySignedUpToRace?race=' + race.url);
     }
@@ -341,6 +355,14 @@ class SylphModel {
             ];
         }
         return new Collection(collection, {size: 20, totalElements: collection.length, totalPages: 0, number: 0});
+    }
+    
+    async getEntry(url) {
+        return new Entry({}, {version: ''}, this);
+    }
+
+    async getEntryByRaceAndDinghy(race, dinghy) {
+        return new Entry({}, {version: ''}, this);
     }
 
     async getFleet(url) {
@@ -428,6 +450,11 @@ class SylphModel {
             raceHAL = raceHandicapAHAL;
             version = {version: '"0"'};
         }
+        else if (url === signedUpChrisMarshallDinghy1234VeteransAHAL._links.race.href) {
+            raceHAL = embeddedRaceVeteransAHAL;
+            version = {version: '"0"'};
+            return new EmbeddedRace(raceHAL, version, this);
+        }
         return new Race(raceHAL, version, this);
     }
 
@@ -471,6 +498,11 @@ class SylphModel {
 
         return new Collection(collection, {size: 20, totalElements: totalElements, totalPages: 0, number: 0});
     }
+    
+    async getSignedUp(url) {
+        version = {version: '"0"'};
+        return new SignedUp({}, version, this);
+    }
 
     async getSignedUpTo(url) {
         const signedUpChrisMarshallDinghy1234HandicapA = new SignedUp(signedUpChrisMarshallDinghy1234HandicapAHAL, {version: '"0"'}, this);
@@ -513,6 +545,11 @@ class SylphModel {
         }
 
         return new Collection(signedUpCollection, {size: 20,totalElements: signedUpCollection.length, totalPages: 0,number: 0});
+    }
+
+    async getSignedUpToRaceForEntry(race, entry) {
+        version = {version: '"0"'};
+        return new SignedUp({}, version, this);
     }
 
     getStartSequence(races) {
@@ -679,6 +716,10 @@ class SylphModel {
         return new Race({}, {version: ''}, this);
     }
 
+    async signUpToEmbeddedRace(embddedRace, entry) {
+        return new EmbeddedRace({}, {version: ''}, this);
+    }
+
     unregisterCompetitorCreationCallback(callback) {
         this.#competitorCreationCallbacks.delete(callback);
     }
@@ -770,6 +811,10 @@ class SylphModel {
     }
     
     async withdrawEntry(entry) {
+        return true; // failure to delete results in an error
+    }
+
+    async withdrawEmbeddedSignUp(signedUp) {
         return true; // failure to delete results in an error
     }
 }

@@ -28,7 +28,9 @@ function SignUpConsole({ race, model, controller }) {
     return (
         <div className='sign-up-console w3-container console'>
             <h1>{race.name}</h1>
-            <SignUpForm race={race} model={model} entry={selectedEntry} onCreateCompetitor={controller.createCompetitor} onCreateDinghy={controller.createDinghy} onSignUp={controller.signUpToRace} onUpdate={controller.updateEntry} />
+            <SignUpForm race={race} model={model} entry={selectedEntry} onCreateCompetitor={controller.createCompetitor} 
+                onCreateDinghy={controller.createDinghy} onSignUp={controller.signUpToRace} onUpdate={controller.updateEntry} onEmbeddedSignUp={controller.signUpToEmbeddedRace} 
+                onWithdrawEmbeddedSignUp={controller.withdrawEmbeddedSignUp} />
             <h3>Signed-up</h3>
             <CurrentEntries race={race} model={model} onEntrySelected={handleEntrySelected} onWithdrawEntry={controller.withdrawEntry} />
         </div>

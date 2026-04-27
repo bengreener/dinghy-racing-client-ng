@@ -14,7 +14,10 @@
 * limitations under the License. 
 */
 
+import Collection from './collection';
+import EmbeddedRace from './embedded-race';
 import Entity from './entity';
+import Race from './race';
 
 class Entry extends Entity {
 
@@ -69,8 +72,19 @@ class Entry extends Entity {
         const signedUpTo = await this.model.getSignedUpTo(this.hal._links.signedUpTo.href);
         const races = await Promise.all(signedUpTo.entities.map((signedUp) => signedUp.getRace()));
 
-        // const regex = /directRaces/;
         return races.find((race) => /directRaces/.test(race.url));
+    }
+
+    /**
+     * Get a collection of the embedded races the entry is signed up to
+     * @returns {Promise<Array<EmbeddedRace>>}
+     */
+    async getEmbeddedRaces() {
+        // get signedup
+        const signedUpTo = await this.model.getSignedUpTo(this.hal._links.signedUpTo.href);
+        const races = await Promise.all(signedUpTo.entities.map((signedUp) => signedUp.getRace()));
+
+        return races.filter((race) => /embeddedRaces/.test(race.url));
     }
 
     async getHelm() {
@@ -82,11 +96,6 @@ class Entry extends Entity {
     }
 
     async getPositionInDirectRace() {
-        // const signedUpTo = await this.model.getSignedUpTo(this.hal._links.signedUpTo.href);
-        // const races = await Promise.all(signedUpTo.entities.map((signedUp) => signedUp.getRace()));
-
-        // // const regex = /directRaces/;
-        // return signedUpTo.entities[races.findIndex((race) => /directRaces/.test(race.url))].position;
         const signedUp = await this.getSignedUpToDirectRace();
         return signedUp.position;
     }
@@ -95,7 +104,6 @@ class Entry extends Entity {
         const signedUpTo = await this.model.getSignedUpTo(this.hal._links.signedUpTo.href);
         const races = await Promise.all(signedUpTo.entities.map((signedUp) => signedUp.getRace()));
 
-        // const regex = /directRaces/;
         return signedUpTo.entities[races.findIndex((race) => /directRaces/.test(race.url))];
     }
 

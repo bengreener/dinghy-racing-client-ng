@@ -24,6 +24,7 @@ import Competitor from './competitor';
 import Crew from './crew';
 import Dinghy from './dinghy';
 import DinghyClass from './dinghy-class';
+import EmbeddedRace from './embedded-race';
 import Entry from './entry';
 import SignedUp from './signed-up';
 import RaceType from './race-type';
@@ -79,6 +80,7 @@ class SylphModel {
         this.getEntriesByRace = this.getEntriesByRace.bind(this);
         this.getEntriesFromURL = this.getEntriesFromURL.bind(this);
         this.getEntry = this.getEntry.bind(this);
+        this.getEntryByRaceAndDinghy = this.getEntryByRaceAndDinghy.bind(this);
         this.getFleet = this.getFleet.bind(this);
         this.getFleets = this.getFleets.bind(this);
         this.getLap = this.getLap.bind(this);
@@ -101,6 +103,7 @@ class SylphModel {
         this.updateLap = this.updateLap.bind(this);
         this.updateRace = this.updateRace.bind(this);
         this.withdrawEntry = this.withdrawEntry.bind(this);
+        this.withdrawEmbeddedSignUp = this.withdrawEmbeddedSignUp.bind(this);
         this.convertISO8601DurationToMilliseconds = this.convertISO8601DurationToMilliseconds.bind(this);
         this.getClock = this.getClock.bind(this);
         this.getStartSequence = this.getStartSequence.bind(this);
@@ -527,6 +530,46 @@ class SylphModel {
     }
 
     /**
+     * Gat an embedded race
+     * @param {String} url 
+     * @returns {<Promise<EmbeddedRace>>}
+     * @throws {Error}
+     */
+    async getEmbeddedRace(url) {
+        const result = await this._read(url);
+        return new EmbeddedRace(result.hal, result.metadata, this);
+    }
+
+    /**
+     * Get races from the specified resource location
+     * @param {String} url to use to retrieve a collection of races
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
+     * @param {SortParameters} [sortParameters] order for sorting the requested races
+     * @returns {Promise<Collection<EmbeddedRace>>}
+     * @throws {Error}
+     */
+    async getEmbeddedRacesFromURL(url, page, size, sortParameters) {
+        const result = await this.getCollection(url, page, size, sortParameters);
+    
+        const promises = [];
+        for (let i = 0; i < result.hal._embedded.embeddedRaces.length; i++  ) {
+            promises.push(this.getRace(result.hal._embedded.embeddedRaces[i]._links.self.href));
+        };
+        const races = await Promise.all(promises);
+        return new Collection(races, result.hal.page);
+    }
+
+    /**
+     * Get embedded races hosted in Race
+     * @param {Race} race
+     * @returns {Promise<Collection<EmbeddedRace>>}
+     */
+    async getEmbeddedRacesInRace(race) {
+        return this.getEmbeddedRacesFromURL(this.httpRootURL + '/embeddedRaces/search/findByHosts?host=' + race.url);
+    }
+
+    /**
      * Get entries for a race
      * On success result domain object will be an array of Entry types; {Array<Entry>}
      * @param {Race} race
@@ -567,6 +610,18 @@ class SylphModel {
     async getEntry(url) {
         const result = await this._read(url);
         return new Entry(result.hal, result.metadata, this);
+    }
+
+    /**
+     * Get an entry by the race signed up to and dinghy signed up with
+     * @param {Race} race the diraect race the entry has signed up to
+     * @param {Dinghy} dinghy to be sailed in race
+     * @returns {Promise<Entry>}
+     * @throws {Error}
+     */
+    async getEntryByRaceAndDinghy(race, dinghy) {
+        const result = await this._read(this.httpRootURL + '/entries/search/findBySignedUpToRaceAndDinghy?race=' + race.url + '&dinghy=' + dinghy.url);
+        return this.getEntry(result.hal._links.self.href);
     }
 
     /**
@@ -629,12 +684,16 @@ class SylphModel {
 
     /**
      * Gat a race
+     * Don't know when this is called if return value wil be a direct or embedded race
      * @param {String} url 
-     * @returns {<Promise<Race>>}
+     * @returns {<Promise<Race | EmbeddedRace>>}
      * @throws {Error}
      */
     async getRace(url) {
         const result = await this._read(url);
+        if (/embeddedRace/.test(result.hal._links.self.href)) {
+            return new EmbeddedRace(result.hal, result.metadata, this);
+        }
         return new Race(result.hal, result.metadata, this);
     }
 
@@ -727,6 +786,17 @@ class SylphModel {
             return this.getSignedUp(hal._links.self.href);
         }));
         return new Collection(signedUps, result.hal.page);
+    }
+
+    /**
+     * Get the SignedUp to race for entry
+     * @param {Race | EmbeddedRace} race
+     * @param {Entry} entry
+     * @returns {SignedUp}
+     */
+    async getSignedUpToRaceForEntry(race, entry) {
+        const url = this.httpRootURL + '/signedUps/search/findByRaceAndEntry?race=' + race.url + '&entry=' + entry.url;
+        return this.getSignedUp(url);
     }
 
     /**
@@ -1037,6 +1107,19 @@ class SylphModel {
     }
 
     /**
+     * Sign up to an embedded race
+     * Supplied race, helm, dinghy, and crew must exist
+     * @param {EmbeddedRace} embeddedrace to enter
+     * @param {Entry} entry to a direct race to sign up with
+     * @returns {Promise<EmbeddedRace>}
+     * @throws {Error}
+     */
+    async signUpToEmbeddedRace(embeddedRace, entry) {
+        const result = await this._update(embeddedRace.url + '/signUp?entry=' + entry.url);
+        return new EmbeddedRace(result.hal, result.metadata, this);
+    }
+
+    /**
      * Unregister a callback for when a new competitor is created
      * @param {Function} callback
      */
@@ -1270,6 +1353,18 @@ class SylphModel {
      */
     async withdrawEntry(entry) {
         await this._delete(entry.url);
+        return true; // failure to delete results in an error
+    }
+
+    /**
+     * Remove a signed up between an an entry and a race
+     * Intended for use to remove connection to embedded races.
+     * If used to remove connection between an entry and a direct race will result in orphaned entries.
+     * @param {SignedUp} signedup 
+     * @returns {Promise<Boolean>}
+     */
+    async withdrawEmbeddedSignUp(signedUp) {
+        await this._delete(signedUp.url);
         return true; // failure to delete results in an error
     }
 

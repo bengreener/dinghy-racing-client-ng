@@ -17,24 +17,29 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PreviousEntries from './PreviousEntries';
 import CurrentEntries from './CurrentEntries';
+import EmbeddedRacesPanel from './EmbeddedRacesPanel';
+import EmbeddedRace from '../model/embedded-race';
 
-function SignUpForm({ race, model, entry, onCreateCompetitor, onCreateDinghy, onSignUp, onUpdate }) {
-    const [fleet, setFleet] = useState();
-    const [dinghyClassMap, setDinghyClassMap] = useState(new Map());
-    const [dinghyClassOptions, setDinghyClassOptions] = useState([]);
-    const [dinghyClassName, setDinghyClassName] = useState('');
-    const [helmName, setHelmName] = useState('');
-    const [crewName, setCrewName] = useState('');
-    const [sailNumber, setSailNumber] = useState('');
+function SignUpForm({ race, model, entry, onCreateCompetitor, onCreateDinghy, onSignUp, onUpdate, onEmbeddedSignUp, onWithdrawEmbeddedSignUp }) {
     const [competitorMap, setCompetitorMap] = useState(new Map());
     const [competitorOptions, setCompetitorOptions] = useState([]);
-    const [dinghyMap, setDinghyMap] = useState(new Map());
-    const [dinghyOptions, setDinghyOptions] = useState([]);
-    const [message, setMessage] = useState(''); // feedback to user
+    const [crewName, setCrewName] = useState('');
     const [competitorUpdateAt, setCompetitorUpdateAt] = useState();
     const [dinghyUpdateAt, setDinghyUpdateAt] = useState();
     const [dinghyClassUpdateAt, setDinghyClassUpdateAt] = useState();
+    const [dinghyMap, setDinghyMap] = useState(new Map());
+    const [dinghyOptions, setDinghyOptions] = useState([]);
+    const [dinghyClassMap, setDinghyClassMap] = useState(new Map());
+    const [dinghyClassOptions, setDinghyClassOptions] = useState([]);
+    const [dinghyClassName, setDinghyClassName] = useState('');
+    const [embeddedRaces, setEmbeddedRaces]  = useState([]);
+    const [fleet, setFleet] = useState();
     const [fleetUpdateAt, setFleetUpdateAt] = useState();
+    const [helmName, setHelmName] = useState('');
+    const [message, setMessage] = useState(''); // feedback to user
+    const [sailNumber, setSailNumber] = useState('');
+    const [selectedEmbeddedRaces, setSelectedEmbeddedRaces] = useState([]);
+    const initalEmbeddedRaceSelection = useRef([]);
 
     const helmInput = useRef(null);
     const dinghyClassSelect = useRef(null);
@@ -134,19 +139,29 @@ function SignUpForm({ race, model, entry, onCreateCompetitor, onCreateDinghy, on
         return () => { cancel = true; }
     }, [dinghyClassMap, dinghyClassName, model, dinghyUpdateAt])
 
+    // get embedded races
+    useEffect(() => {
+        let cancel = false;
+        race.getEmbeddedRaces().then(embeddedCollection => {
+            if (!cancel) {
+                setEmbeddedRaces(embeddedCollection.entities);
+            }
+        });
+
+        return () => { cancel = true; }
+    }, [race]);
+
     // if existing entry provided get entry details
     useEffect(() => {
         const getAll = async (entry) => {
             try {
-                const [helm, dinghy, crew] = await Promise.all([entry.getHelm(), entry.getDinghy(), entry.getCrew()]);
-                const dinghyClass = await dinghy.getDinghyClass();
-                if (dinghyClass.crewSize > 1 && !crew) {
+                const resultArray = await Promise.all([entry.getHelm(), entry.getDinghy(), entry.getCrew(), entry.getEmbeddedRaces()]);
+                const dinghyClass = await resultArray[1].getDinghyClass();
+                if (dinghyClass.crewSize > 1 && !resultArray[3]) {
                     throw new Error('Entry should have a crew but no crew found.');
                 }
-                setDinghyClassName(dinghyClass.name);
-                setHelmName(helm.name);
-                setSailNumber(dinghy.sailNumber);
-                setCrewName(crew ? crew.name : '');
+                resultArray.splice(2, 0, dinghyClass);
+                return resultArray;
             }
             catch (error) {
                 console.error(error.message);
@@ -155,10 +170,19 @@ function SignUpForm({ race, model, entry, onCreateCompetitor, onCreateDinghy, on
         }
 
         let cancel = false;
-        if (entry && !cancel) {
-            getAll(entry);
+        if (entry) {
+            getAll(entry).then(([helm, dinghy, dinghyClass, crew, embeddedRaces]) => {
+                if (!cancel) {
+                    setDinghyClassName(dinghyClass.name);
+                    setHelmName(helm.name);
+                    setSailNumber(dinghy.sailNumber);
+                    setCrewName(crew ? crew.name : '');
+                    setSelectedEmbeddedRaces(embeddedRaces);
+                    initalEmbeddedRaceSelection.current = embeddedRaces;
+                }
+            });
         }
-
+        
         return (() => {
             cancel = true;
         });
@@ -226,6 +250,14 @@ function SignUpForm({ race, model, entry, onCreateCompetitor, onCreateDinghy, on
         event.preventDefault();
         updateEntry();
     }
+
+    /**
+     * Handle a change of embedded races selection in EmbeddedRacesPanel
+     * @param {Array<EmbeddedRace>} selectedRaces 
+     */
+    function handleEmbeddedRaceSelectionChanged(selectedRaces) {
+        setSelectedEmbeddedRaces(selectedRaces);
+    }
     
     function handleSelectPreviousEntry(entry) {
         // const previousEntry = previousEntriesMap.get(currentTarget.id);
@@ -290,6 +322,26 @@ function SignUpForm({ race, model, entry, onCreateCompetitor, onCreateDinghy, on
                     await onSignUp(race, results[0], results[1], results[2]);
                 }
             }
+            // handle embedded races
+            if (embeddedRaceSelectionChanged()) {
+                // selected embedded races has changed
+                let localEntry;
+                if (entry) {
+                    localEntry = entry;
+                }
+                else {
+                    localEntry = await model.getEntryByRaceAndDinghy(race, results[1]);
+                }
+                const initialSelectedEmbeddedRaceNames = initalEmbeddedRaceSelection.current.map(iser => iser.name);
+                const selectedEmbeddedRaceNames = selectedEmbeddedRaces.map(ser => ser.name);
+                // get races to withdraw from; previously but no longer selected                
+                const withdrawArray = initalEmbeddedRaceSelection.current.filter(iser => !(selectedEmbeddedRaceNames.includes(iser.name)));
+                // get races to sign up to; not previously selected but, now selected
+                const signUpArray = selectedEmbeddedRaces.filter(ser => !(initialSelectedEmbeddedRaceNames.includes(ser.name)));
+                const embeddedWithdrawals = withdrawArray.map(embeddedRace => onWithdrawEmbeddedSignUp(embeddedRace, localEntry));
+                const embeddedSignUps = signUpArray.map(embeddedRace => onEmbeddedSignUp(embeddedRace, localEntry));
+                await Promise.all(embeddedSignUps.toSpliced(embeddedSignUps.length, 0, ...embeddedWithdrawals));
+            }
             clear();
         }
         catch (error) {
@@ -309,6 +361,7 @@ function SignUpForm({ race, model, entry, onCreateCompetitor, onCreateDinghy, on
         setSailNumber('');
         setDinghyClassName('');
         setMessage('');
+        setSelectedEmbeddedRaces([]);
         // setSelectedEntry(null);
         if (dinghyClassMap.size === 1) {
             setDinghyClassName(dinghyClassMap.values().next().value.name);
@@ -402,10 +455,16 @@ function SignUpForm({ race, model, entry, onCreateCompetitor, onCreateDinghy, on
         return !message ? 'hidden' : 'console-error-message';
     }
 
+    function embeddedRaceSelectionChanged() {
+        const intitalEmbeddedRaceNames = initalEmbeddedRaceSelection.current.map(er => er.name);
+        const currentEmbeddedRaceNames = selectedEmbeddedRaces.map(er => er.name);
+        return !(intitalEmbeddedRaceNames.length === currentEmbeddedRaceNames.length && intitalEmbeddedRaceNames.every(name => currentEmbeddedRaceNames.includes(name)));
+    }
+
     return (
         <form className='w3-container' action='' method='get'>
-        <datalist id='competitor-datalist'>{competitorOptions}</datalist>
-        <datalist id='dinghy-datalist'>{dinghyOptions}</datalist>
+            <datalist id='competitor-datalist'>{competitorOptions}</datalist>
+            <datalist id='dinghy-datalist'>{dinghyOptions}</datalist>
             {dinghyClassInput(race)}
             {buildHelmInput()}
             {buildCrewInput()}
@@ -413,6 +472,7 @@ function SignUpForm({ race, model, entry, onCreateCompetitor, onCreateDinghy, on
                 <label htmlFor='sail-number-input' className='w3-col m2' >Sail Number</label>
                 <input id='sail-number-input' name='sailNumber' className='w3-half' list='dinghy-datalist' onChange={handleChange} value={sailNumber} />
             </div>
+            <EmbeddedRacesPanel embeddedRaces={embeddedRaces} selectedRaces={selectedEmbeddedRaces} onRaceSelectionChanged={handleEmbeddedRaceSelectionChanged} />
             <div className='w3-row' >
                 <div className='w3-col m8' >
                     <button id='entry-update-button' className='w3-right' type='button' onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>

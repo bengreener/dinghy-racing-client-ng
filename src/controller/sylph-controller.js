@@ -19,6 +19,7 @@ import MissingParameter from '../errors/missing-parameter';
 import Competitor from '../model/competitor';
 import Dinghy from '../model/dinghy';
 import DinghyClass from '../model/dinghy-class';
+import EmbeddedRace from '../model/embedded-race';
 import Entry from '../model/entry';
 import Fleet from '../model/fleet';
 import Lap from '../model/lap';
@@ -41,6 +42,7 @@ class SylphController {
         this.removeLap = this.removeLap.bind(this);
         this.setScoringAbbreviation = this.setScoringAbbreviation.bind(this);
         this.signUpToRace = this.signUpToRace.bind(this);
+        this.signUpToEmbeddedRace = this.signUpToEmbeddedRace.bind(this);
         this.startRace = this.startRace.bind(this);
         this.updateCompetitor = this.updateCompetitor.bind(this);
         this.updateDinghyClass = this.updateDinghyClass.bind(this);
@@ -50,6 +52,7 @@ class SylphController {
         this.updateLap = this.updateLap.bind(this);
         this.updateRacePlannedLaps =this.updateRacePlannedLaps.bind(this);
         this.withdrawEntry = this.withdrawEntry.bind(this);
+        this.withdrawEmbeddedSignUp =this.withdrawEmbeddedSignUp.bind(this);
     }
 
     /**
@@ -310,6 +313,24 @@ class SylphController {
     }
 
     /**
+     * Sign up to an embedded race
+     * Embedded race and entry must exist
+     * @param {EmbeddedRace} embeddedrace to enter
+     * @param {Entry} entry to a direct race to sign up with
+     * @returns {Promise<EmbeddedRace>}
+     * @throws {Error}
+     */
+    async signUpToEmbeddedRace(embeddedRace, entry) {
+        if (!(embeddedRace instanceof EmbeddedRace)) {
+            throw new MissingParameter('An embedded race is required for a new embedded race entry.');
+        }
+        if (!(entry instanceof Entry)) {
+            throw new MissingParameter('An entry in a race is required to sign up to an embedded race.');
+        }
+        return this.model.signUpToEmbeddedRace(embeddedRace, entry);
+    }
+
+    /**
      * Start a race
      * @param {Race} race to start
      * @return {Promise<Race>}
@@ -319,7 +340,8 @@ class SylphController {
         if (!(race instanceof Race)) {
             throw new MissingParameter('A race to start is required.');
         }
-        return this.model.updateRace(race, race.name, new Date(), race.fleet, race.duration, race.plannedLaps, race.type, race.startType);
+        const fleet = await race.getFleet();
+        return this.model.updateRace(race, race.name, new Date(), fleet, race.duration, race.plannedLaps, race.type, race.startType);
     }
 
     /**
@@ -518,6 +540,24 @@ class SylphController {
             throw new MissingParameter('An entry to withdraw is required.');
         }
         return this.model.withdrawEntry(entry);
+    }
+
+    /**
+     * Withdraw a sign up to the embedded race for the entry
+     * @param {EmbeddedRace} embeddedRace
+     * @param {Entry} entry
+     * @returns {Boolean}
+     * @throws {MissingParameter}
+     */
+    async withdrawEmbeddedSignUp(embeddedRace, entry) {
+        if (!(embeddedRace instanceof EmbeddedRace)) {
+            throw new MissingParameter('An EmbeddedRace is required to withdraw from.');
+        }
+        if (!(entry instanceof Entry)) {
+            throw new MissingParameter('An entry to withdraw from the embedded race is required.');
+        }
+        const signUp = await this.model.getSignedUpToRaceForEntry(embeddedRace, entry);
+        return this.model.withdrawEmbeddedSignUp(signUp);
     }
 
     /**

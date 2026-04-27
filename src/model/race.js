@@ -76,6 +76,10 @@ class Race extends Entity {
         return this.model.getDinghyClassesInRace(this);
     }
 
+    async getEmbeddedRaces() {
+        return this.model.getEmbeddedRacesInRace(this);
+    }
+
     getElapsedTime() {
         return this.model.getClock().getElapsedTime(this.plannedStartTime);
     }

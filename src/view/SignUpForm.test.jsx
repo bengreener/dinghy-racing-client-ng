@@ -23,13 +23,20 @@ import Collection from '../model/collection';
 import Competitor from '../model/competitor';
 import Dinghy from '../model/dinghy';
 import DinghyClass from '../model/dinghy-class';
+import EmbeddedRace from '../model/embedded-race';
 import Entry from '../model/entry';
 import Race from '../model/race';
 import MissingParameter from '../errors/missing-parameter';
 import InvalidParameter from '../errors/invalid-parameter';
-import { httpRootURL, wsRootURL, fleetHandicapHAL, raceCometAHAL, raceScorpionAHAL, raceHandicapAHAL, racePursuitAHAL,
+import { httpRootURL, wsRootURL, fleetHandicapHAL, 
+    raceCometAHAL, raceScorpionAHAL, raceHandicapAHAL, racePursuitAHAL,
+    embeddedRaceVeteransAHAL, embeddedRaceLadiesAHAL,
     dinghyClassCometHAL, dinghyClassGraduateHAL, dinghyClassScorpionHAL, dinghy826HAL, dinghy1234HAL,
-    competitorChrisMarshallHAL, competitorLouScrewHAL, entryChrisMarshall1234ScorpionAHAL } from '../model/__mocks__/test-data';
+    competitorChrisMarshallHAL, competitorLouScrewHAL, entryChrisMarshall1234ScorpionAHAL, 
+    entryChrisMarshall1234HandicapAHAL,
+    signedUpChrisMarshallDinghy1234HandicapAHAL, signedUpChrisMarshallDinghy1234VeteransAHAL } from '../model/__mocks__/test-data';
+import SignedUp from '../model/signed-up';
+import { expect } from 'vitest';
 
 vi.mock('../model/sylph-model');
 vi.mock('../controller/sylph-controller');
@@ -217,7 +224,7 @@ describe('when sign-up button clicked', () => {
             return race;
         });
         await act(async () => {
-            render(<SignUpForm  model={model} race={race} onSignUp={controller.signUpToRace} />);
+            render(<SignUpForm model={model} race={race} onSignUp={controller.signUpToRace} />);
         });
         const inputHelm = screen.getByLabelText(/helm/i);
         const inputSailNumber = screen.getByLabelText(/sail/i);
@@ -228,7 +235,7 @@ describe('when sign-up button clicked', () => {
         const signUpButton = screen.getByRole('button', {'name': /sign-up/i});
         await user.click(signUpButton);
         expect(signUpToRaceSpy).toHaveBeenCalledWith(race, new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model), new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new Competitor(competitorLouScrewHAL, {version: '"0"'}, model));
-    }); 
+    });
     it('clears form on success', async () => {
         const user = userEvent.setup();
         const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
@@ -986,3 +993,172 @@ describe('when a previous entry is selected', () => {
         expect(inputSailNumber).toHaveValue('1234');
     });
 });
+describe('when race has embedded races', () => {
+    it('displays embedded races', async () => {
+        const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+        await act(async () => {
+            render(<SignUpForm  model={model} race={race}/>);
+        });
+        expect(screen.getByText(/veterans a/i)).toBeInTheDocument();
+    });
+    describe('when sign up button clicked', () => {
+        it('signs up to embedded race', async () => {
+            const user = userEvent.setup();
+            const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+            const embeddedRace = new EmbeddedRace(embeddedRaceVeteransAHAL, {version: '"0"'}, model);
+            const entryChrisMarshall1234HandicapA = new Entry(entryChrisMarshall1234HandicapAHAL, {version: '"1"'}, model);
+            vi.spyOn(controller, 'signUpToRace').mockImplementation(async (race, helm, dinghy, crew) => {
+                return race;
+            });
+            const signUpToEmbeddedRaceSpy = vi.spyOn(controller, 'signUpToEmbeddedRace').mockImplementation(async (race, entry) => race);
+            vi.spyOn(model, 'getEntryByRaceAndDinghy').mockImplementation(async (race, dinghy) => {return entryChrisMarshall1234HandicapA});
+            await act(async () => {
+                render(<SignUpForm model={model} race={race} onSignUp={controller.signUpToRace} onEmbeddedSignUp={signUpToEmbeddedRaceSpy} />);
+            });
+            const inputHelm = screen.getByLabelText(/helm/i);
+            const inputSailNumber = screen.getByLabelText(/sail/i);
+            const inputCrew = screen.getByLabelText(/crew/i);
+            await user.click(screen.getByLabelText(/veterans a/i));
+            await (user.selectOptions(screen.getByLabelText('Dinghy Class'), 'Scorpion'));
+            await user.type(inputHelm, 'Chris Marshall');
+            await user.type(inputSailNumber, '1234');
+            await user.type(inputCrew, 'Lou Screw');
+            const signUpButton = screen.getByRole('button', {'name': /sign-up/i});
+            await user.click(signUpButton);
+            expect(signUpToEmbeddedRaceSpy).toHaveBeenCalledWith(embeddedRace, entryChrisMarshall1234HandicapA);
+        });
+        it('clears form on success', async () => {
+            const user = userEvent.setup();
+            const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+            // const embeddedRace = new EmbeddedRace(embeddedRaceVeteransAHAL, {version: '"0"'}, model);
+            const entryChrisMarshall1234HandicapA = new Entry(entryChrisMarshall1234HandicapAHAL, {version: '"1"'}, model);
+            vi.spyOn(controller, 'signUpToRace').mockImplementation(async (race, helm, dinghy, crew) => {
+                return race;
+            });
+            const signUpToEmbeddedRaceSpy = vi.spyOn(controller, 'signUpToEmbeddedRace').mockImplementation(async (race, entry) => race);
+            vi.spyOn(model, 'getEntryByRaceAndDinghy').mockImplementation(async (race, dinghy) => {return entryChrisMarshall1234HandicapA});
+            await act(async () => {
+                render(<SignUpForm model={model} race={race} onSignUp={controller.signUpToRace} onEmbeddedSignUp={signUpToEmbeddedRaceSpy} />);
+            });
+            const inputHelm = screen.getByLabelText(/helm/i);
+            const inputSailNumber = screen.getByLabelText(/sail/i);
+            const inputCrew = screen.getByLabelText(/crew/i);
+            await user.click(screen.getByLabelText(/veterans a/i));
+            await (user.selectOptions(screen.getByLabelText('Dinghy Class'), 'Scorpion'));
+            await user.type(inputHelm, 'Chris Marshall');
+            await user.type(inputSailNumber, '1234');
+            await user.type(inputCrew, 'Lou Screw');
+            const signUpButton = screen.getByRole('button', {'name': /sign-up/i});
+            await user.click(signUpButton);
+            await act(async () => {});
+            const previousEntries = within(screen.getByTestId('previous-entries'));
+            expect(inputHelm).toHaveValue('');
+            expect(inputCrew).toHaveValue('');
+            expect(inputSailNumber).toHaveValue('');
+            expect(screen.getByLabelText(/veterans a/i)).not.toBeChecked();
+            expect(previousEntries.getAllByRole('row')).toHaveLength(1);
+            expect(screen.getByRole('button', {'name': /sign-up/i})).toBeInTheDocument();
+        });
+    });
+    describe('when updating an existing entry', () => {
+        it('displays details for existing entry', async () => {
+            const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+            const entry = new Entry(entryChrisMarshall1234HandicapAHAL, {version: '"0"'}, model);
+            vi.spyOn(model, 'getSignedUpTo').mockImplementation((url) => {
+                const signedUpChrisMarshallDinghy1234HandicapA = new SignedUp(signedUpChrisMarshallDinghy1234HandicapAHAL, {version: '"0"'}, model);
+                const signedUpChrisMarshallDinghy1234VeteransA = new SignedUp(signedUpChrisMarshallDinghy1234VeteransAHAL, {version: '"0"'}, model);
+                const signedUpCollection = [signedUpChrisMarshallDinghy1234HandicapA, signedUpChrisMarshallDinghy1234VeteransA];
+                return new Collection(signedUpCollection, {size: 20,totalElements: signedUpCollection.length, totalPages: 0,number: 0});
+            });
+            await act(async () => {
+                render(<SignUpForm  model={model} race={race} entry={entry} />);
+            });
+            expect(await screen.findByLabelText(/helm/i)).toHaveValue('Chris Marshall');
+            expect(screen.getByLabelText(/crew/i)).toHaveValue('Lou Screw');
+            expect(screen.getByLabelText(/sail/i)).toHaveValue('1234');
+            expect(screen.getByLabelText(/veterans a/i)).toBeChecked();
+        });
+        describe('when update button clicked', () => {
+            describe('when embedded race selection has not changed', () => {
+                it('does not sign up to embedded race', async () => {
+                    const user = userEvent.setup();
+                    const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+                    const entry = new Entry(entryChrisMarshall1234HandicapAHAL, {version: '"0"'}, model);
+                    vi.spyOn(model, 'getSignedUpTo').mockImplementation((url) => {
+                        const signedUpChrisMarshallDinghy1234HandicapA = new SignedUp(signedUpChrisMarshallDinghy1234HandicapAHAL, {version: '"0"'}, model);
+                        const signedUpChrisMarshallDinghy1234VeteransA = new SignedUp(signedUpChrisMarshallDinghy1234VeteransAHAL, {version: '"0"'}, model);
+                        const signedUpCollection = [signedUpChrisMarshallDinghy1234HandicapA, signedUpChrisMarshallDinghy1234VeteransA];
+                        return new Collection(signedUpCollection, {size: 20,totalElements: signedUpCollection.length, totalPages: 0,number: 0});
+                    });
+                    const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(async () => entry);
+                    const signUpToEmbeddedRaceSpy = vi.spyOn(controller, 'signUpToEmbeddedRace').mockImplementation(async (race, entry) => race);
+                    await act(async () => {
+                        render(<SignUpForm  model={model} race={race} entry={entry} onUpdate={updateEntrySpy} onEmbeddedSignUp={signUpToEmbeddedRaceSpy} />);
+                    });
+                    const buttonUpdate = screen.getByRole('button', {'name': /update/i});
+                    await user.click(buttonUpdate);
+                    expect(signUpToEmbeddedRaceSpy).not.toHaveBeenCalled();
+                });
+            });
+            describe('when previously selected embedded race unselected', () => {
+                it('removes sign up to removed embedded race', async () => {
+                    const user = userEvent.setup();
+                    const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+                    const entry = new Entry(entryChrisMarshall1234HandicapAHAL, {version: '"0"'}, model);
+                    vi.spyOn(model, 'getSignedUpTo').mockImplementation((url) => {
+                        const signedUpChrisMarshallDinghy1234HandicapA = new SignedUp(signedUpChrisMarshallDinghy1234HandicapAHAL, {version: '"0"'}, model);
+                        const signedUpChrisMarshallDinghy1234VeteransA = new SignedUp(signedUpChrisMarshallDinghy1234VeteransAHAL, {version: '"0"'}, model);
+                        const signedUpCollection = [signedUpChrisMarshallDinghy1234HandicapA, signedUpChrisMarshallDinghy1234VeteransA];
+                        return new Collection(signedUpCollection, {size: 20,totalElements: signedUpCollection.length, totalPages: 0,number: 0});
+                    });
+                    const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(async () => entry);
+                    const signUpToEmbeddedRaceSpy = vi.spyOn(controller, 'signUpToEmbeddedRace').mockImplementation(async (race, entry) => race);
+                    const withdrawEmbeddedSignUpSpy = vi.spyOn(controller, 'withdrawEmbeddedSignUp').mockImplementation(async (race, entry) => true);
+                    await act(async () => {
+                        render(<SignUpForm  model={model} race={race} entry={entry} onUpdate={updateEntrySpy} onEmbeddedSignUp={signUpToEmbeddedRaceSpy} onWithdrawEmbeddedSignUp={withdrawEmbeddedSignUpSpy}  />);
+                    });
+                    await user.click(screen.getByLabelText(/veterans a/i));
+                    const buttonUpdate = screen.getByRole('button', {'name': /update/i});
+                    await user.click(buttonUpdate);
+                    expect(withdrawEmbeddedSignUpSpy).toHaveBeenCalled();
+                });
+            });
+            describe('when additonal embedded races selected', () => {
+                it('signs up to additional embedded races', async () => {
+                    const user = userEvent.setup();
+                    const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+                    const embeddedRace = new EmbeddedRace(embeddedRaceLadiesAHAL, {version: '"0"'}, model);
+                    const entry = new Entry(entryChrisMarshall1234HandicapAHAL, {version: '"0"'}, model);
+                    vi.spyOn(model, 'getSignedUpTo').mockImplementation((url) => {
+                        const signedUpChrisMarshallDinghy1234HandicapA = new SignedUp(signedUpChrisMarshallDinghy1234HandicapAHAL, {version: '"0"'}, model);
+                        const signedUpChrisMarshallDinghy1234VeteransA = new SignedUp(signedUpChrisMarshallDinghy1234VeteransAHAL, {version: '"0"'}, model);
+                        const signedUpCollection = [signedUpChrisMarshallDinghy1234HandicapA, signedUpChrisMarshallDinghy1234VeteransA];
+                        return new Collection(signedUpCollection, {size: 20,totalElements: signedUpCollection.length, totalPages: 0,number: 0});
+                    });
+                    const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(async () => entry);
+                    const signUpToEmbeddedRaceSpy = vi.spyOn(controller, 'signUpToEmbeddedRace').mockImplementation(async (race, entry) => race);
+                    const withdrawEmbeddedSignUpSpy = vi.spyOn(controller, 'withdrawEmbeddedSignUp').mockImplementation(async (race, entry) => true);
+                    await act(async () => {
+                        render(<SignUpForm  model={model} race={race} entry={entry} onUpdate={updateEntrySpy} onEmbeddedSignUp={signUpToEmbeddedRaceSpy} onWithdrawEmbeddedSignUp={withdrawEmbeddedSignUpSpy}  />);
+                    });
+                    await user.click(screen.getByLabelText(/ladies a/i));
+                    const buttonUpdate = screen.getByRole('button', {'name': /update/i});
+                    await user.click(buttonUpdate);
+                    expect(signUpToEmbeddedRaceSpy).toHaveBeenCalledWith(embeddedRace, entry);
+                });
+            })
+            it('updates entry with values entered into form', async () => {
+                const user = userEvent.setup();
+                const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+                const entry = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
+                const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(async () => entry);
+                await act(async () => {
+                    render(<SignUpForm  model={model} race={race} entry={entry} onUpdate={updateEntrySpy} />);
+                });
+                const buttonUpdate = screen.getByRole('button', {'name': /update/i});
+                await user.click(buttonUpdate);
+                expect(updateEntrySpy).toHaveBeenCalledWith(entry, new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model), new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new Competitor(competitorLouScrewHAL, {version: '"0"'}, model));
+            });
+        });
+    });
+})
