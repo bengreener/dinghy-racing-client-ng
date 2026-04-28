@@ -80,7 +80,7 @@ function RaceConsole({ model, controller }) {
     useEffect(() => {
         let cancel = false; // set to true if RaceConsole rerendered before fetch completes to avoid using out of date result
         if (!cancel) {
-            model.getRacesBetweenTimesForType(new Date(sessionStart), new Date(sessionEnd), raceType, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING}).then(result => {
+            model.getDirectRacesBetweenTimesForType(new Date(sessionStart), new Date(sessionEnd), raceType, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING}).then(result => {
                 const map = new Map();
                 const options = []; // html option elements
                 const optionsRaceNames = []; // just the names of the races to match with previously selected races

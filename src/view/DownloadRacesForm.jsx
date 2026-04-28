@@ -52,7 +52,7 @@ function DownloadRacesForm({ model, controller }) {
     useEffect(() => {
         let ignoreFetch = false; // set to true if RaceConsole rerendered before fetch completes to avoid using out of date result
         if (!ignoreFetch) {
-            model.getRacesBetweenTimes(sessionStart, sessionEnd).then(result => {
+            model.getDirectRacesBetweenTimes(sessionStart, sessionEnd).then(result => {
                 setRaces(result.entities);
                 setMessage('');
             }).catch((error) => {

@@ -86,8 +86,8 @@ class SylphModel {
         this.getLap = this.getLap.bind(this);
         this.getLaps = this.getLaps.bind(this);
         this.getRace = this.getRace.bind(this);
-        this.getRacesBetweenTimes = this.getRacesBetweenTimes.bind(this);
-        this.getRacesBetweenTimesForType = this.getRacesBetweenTimesForType.bind(this);
+        this.getDirectRacesBetweenTimes = this.getDirectRacesBetweenTimes.bind(this);
+        this.getDirectRacesBetweenTimesForType = this.getDirectRacesBetweenTimesForType.bind(this);
         this.getRacesFromURL = this.getRacesFromURL.bind(this);
         this.getRacesOnOrAfterTime = this.getRacesOnOrAfterTime.bind(this);
         this.getSignedUp = this.getSignedUp.bind(this);
@@ -707,7 +707,7 @@ class SylphModel {
      * @returns {Promise<Collection<DirectRace>>}
      * @throws {Error}
      */
-    async getRacesBetweenTimes(startTime, endTime, page, size, sortParameters) {
+    async getDirectRacesBetweenTimes(startTime, endTime, page, size, sortParameters) {
         const resource = this.httpRootURL + '/directRaces/search/findByPlannedStartTimeBetween?startTime=' + startTime.toISOString() + '&endTime=' + endTime.toISOString();
         return this.getRacesFromURL(resource, page, size, sortParameters);
     }
@@ -723,7 +723,7 @@ class SylphModel {
      * @returns {Promise<Collection<DirectRace>>} If successful result domainObject will be Array<DirectRace>
      * @throws {Error}
      */
-    async getRacesBetweenTimesForType(startTime, endTime, type, page, size, sortParameters) {
+    async getDirectRacesBetweenTimesForType(startTime, endTime, type, page, size, sortParameters) {
         const resource = this.httpRootURL + '/directRaces/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=' + startTime.toISOString() + '&endTime=' + endTime.toISOString() + '&type=' + type;
         return this.getRacesFromURL(resource, page, size, sortParameters);
     }

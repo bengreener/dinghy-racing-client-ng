@@ -50,7 +50,7 @@ function UpcomingRacesConsole({ model, showSignUpConsole }) {
         let ignoreFetch = false;
         let races = [];
         if (!ignoreFetch) {
-            model.getRacesBetweenTimes(sessionStart, sessionEnd).then(result => {
+            model.getDirectRacesBetweenTimes(sessionStart, sessionEnd).then(result => {
                     let map = new Map();
                     races = result.entities;
                     races.forEach(race => {

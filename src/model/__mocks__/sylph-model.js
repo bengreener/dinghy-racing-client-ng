@@ -458,11 +458,11 @@ class SylphModel {
         return new DirectRace(raceHAL, version, this);
     }
 
-    async getRacesBetweenTimes(startTime, endTime, page, size, sortParameters) {
+    async getDirectRacesBetweenTimes(startTime, endTime, page, size, sortParameters) {
         return this.getRacesFromURL();
     }
     
-    async getRacesBetweenTimesForType(startTime, endTime, type, page, size, sortParameters) {
+    async getDirectRacesBetweenTimesForType(startTime, endTime, type, page, size, sortParameters) {
         let collection = [];
         const raceCometA = new DirectRace(raceCometAHAL, {version: '"0"'}, this);
         const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, this);

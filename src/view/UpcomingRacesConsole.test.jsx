@@ -90,7 +90,7 @@ describe('when start time is changed', () => {
     it('gets the races that fall into the new time period', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve(new Collection([new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0, number: 0}))});
+        vi.spyOn(model, 'getDirectRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve(new Collection([new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0, number: 0}))});
         render(<UpcomingRacesConsole model={model}/>);
         
         let cells = await screen.findAllByRole('cell');
@@ -109,7 +109,7 @@ describe('when end time is changed', () => {
     it('gets the races that fall into the new time period', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve(new Collection([new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0, number: 0}))});
+        vi.spyOn(model, 'getDirectRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve(new Collection([new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0, number: 0}))});
         await act(async () => {
             render(<UpcomingRacesConsole model={model}/>);
         });
@@ -141,7 +141,7 @@ describe('when a race is selected', () => {
 describe('when races fail to load', () => {
     it('displays the error message', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(async () => {throw Error('That was a bust!')});
+        vi.spyOn(model, 'getDirectRacesBetweenTimes').mockImplementationOnce(async () => {throw Error('That was a bust!')});
         // await act(async () => {
             render(<UpcomingRacesConsole model={model}/>);
         // });
@@ -169,7 +169,7 @@ describe('when races within session are changed', () => {
         const races = [
             raceCometA, raceGraduateA, raceHandicapA, raceScorpionA
         ];
-        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementation(async () => {
+        vi.spyOn(model, 'getDirectRacesBetweenTimes').mockImplementation(async () => {
             return new Collection(races, {size: 20, totalElements: 4, totalPages: 0, number: 0})
         });
         await act(async () => {        
@@ -191,7 +191,7 @@ describe('when races within session are changed', () => {
         const races = [
             raceCometA, raceGraduateA, raceHandicapA, raceScorpionA
         ];
-        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementation(async () => {
+        vi.spyOn(model, 'getDirectRacesBetweenTimes').mockImplementation(async () => {
             return new Collection(races, {size: 20, totalElements: 4, totalPages: 0, number: 0})
         });
         await act(async () => {        

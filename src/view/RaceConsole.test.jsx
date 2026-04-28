@@ -63,7 +63,7 @@ it('displays races available for selection', async () => {
 it('notifies user if races cannot be retrieved', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const model = new SylphModel(httpRootURL, wsRootURL);
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(async () => {throw new Error('Http 404 Error')});
+    vi.spyOn(model, 'getDirectRacesBetweenTimesForType').mockImplementationOnce(async () => {throw new Error('Http 404 Error')});
     render(<RaceConsole model={model} />);
     const message = await screen.findByText(/Unable to load races/i);
     expect(message).toBeInTheDocument();
@@ -194,7 +194,7 @@ describe('when an error is received', () => {
     it('displays error message', async () => {
         vi.spyOn(console, 'error').mockImplementation(() => {});
         const model = new SylphModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(async () => {throw new Error('Oops!')});
+        vi.spyOn(model, 'getDirectRacesBetweenTimesForType').mockImplementation(async () => {throw new Error('Oops!')});
         await act(async () => {        
             render(<RaceConsole model={model} />);
         });
@@ -204,7 +204,7 @@ describe('when an error is received', () => {
     it('clears error message when a successful response is received', async () => {
         vi.spyOn(console, 'error').mockImplementation(() => {});
         const model = new SylphModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementationOnce(async () => {throw new Error('Oops!')});
+        vi.spyOn(model, 'getDirectRacesBetweenTimesForType').mockImplementationOnce(async () => {throw new Error('Oops!')});
         let renderResult;
         await act(async () => {        
             renderResult = render(<RaceConsole key={Date.now()} model={model} />);
@@ -255,7 +255,7 @@ describe('when races within session are changed', () => {
         const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const racePopeyeSpecial = new DirectRace({...raceScorpionAHAL, name: 'Popeye Special'}, {version: '"0"'}, model);
         let collection = [ raceScorpionA, raceGraduateA, raceCometA, raceHandicapA ];
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(async () => {return new Collection(collection, {size: 20, totalElements: collection.length, totalPages: 0, number: 0})});
+        vi.spyOn(model, 'getDirectRacesBetweenTimesForType').mockImplementation(async () => {return new Collection(collection, {size: 20, totalElements: collection.length, totalPages: 0, number: 0})});
         await act(async () => {        
             render(<RaceConsole model={model} />);
         });
@@ -273,7 +273,7 @@ describe('when races within session are changed', () => {
         const raceHandicapA = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
         const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const collection = [ raceScorpionA, raceGraduateA, raceCometA, raceHandicapA ];
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(async () => {return new Collection(collection, {size: 20, totalElements: collection.length, totalPages: 0, number: 0})});
+        vi.spyOn(model, 'getDirectRacesBetweenTimesForType').mockImplementation(async () => {return new Collection(collection, {size: 20, totalElements: collection.length, totalPages: 0, number: 0})});
         await act(async () => {        
             render(<RaceConsole model={model} />);
         });
@@ -292,7 +292,7 @@ describe('when start time for the session is changed', () => {
         const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
         const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         let collection = [ raceScorpionA ];
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(async () => {return new Collection(collection, {size: 20, totalElements: collection.length, totalPages: 0, number: 0})});
+        vi.spyOn(model, 'getDirectRacesBetweenTimesForType').mockImplementation(async () => {return new Collection(collection, {size: 20, totalElements: collection.length, totalPages: 0, number: 0})});
         await act(async () => {
             render(<RaceConsole model={model} />);
         });
@@ -314,7 +314,7 @@ describe('when end time for the session is changed', () => {
         const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         let collection = [ raceScorpionA ];
         const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 74800000); // create as 18:00 UTC intially
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(async () => {return new Collection(collection, {size: 20, totalElements: collection.length, totalPages: 0, number: 0})});
+        vi.spyOn(model, 'getDirectRacesBetweenTimesForType').mockImplementation(async () => {return new Collection(collection, {size: 20, totalElements: collection.length, totalPages: 0, number: 0})});
         await act(async () => {
             render(<RaceConsole model={model} />);
         });
@@ -329,10 +329,10 @@ describe('when end time for the session is changed', () => {
     });
 });
 describe('when new value set for race type', () => {
-    it('calls getRacesBetweenTimesForType with correct arguments', async () => {
+    it('calls getDirectRacesBetweenTimesForType with correct arguments', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const getRacesBetweenTimesForTypeSpy = vi.spyOn(model, 'getRacesBetweenTimesForType');
+        const getRacesBetweenTimesForTypeSpy = vi.spyOn(model, 'getDirectRacesBetweenTimesForType');
         const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
         sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
         const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000); // create as 18:00 UTC intially
@@ -370,7 +370,7 @@ describe('when a lap is added to an entry in a race in session', () => {
         const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const racePopeyeSpecial = new DirectRace({...raceScorpionAHAL, name: 'Popeye Special'}, {version: '"0"'}, model);
         let collection = [ raceScorpionA, raceGraduateA, raceCometA, raceHandicapA ];
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(async () => {return new Collection(collection, {size: 20, totalElements: collection.length, totalPages: 0, number: 0})});
+        vi.spyOn(model, 'getDirectRacesBetweenTimesForType').mockImplementation(async () => {return new Collection(collection, {size: 20, totalElements: collection.length, totalPages: 0, number: 0})});
         await act(async () => {
             render(<RaceConsole model={model} />);
         });

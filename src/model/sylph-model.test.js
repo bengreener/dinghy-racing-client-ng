@@ -939,7 +939,7 @@ describe('when retrieving a list of races that start between the specified times
         });
     
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const promise = model.getRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'));
+        const promise = model.getDirectRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'));
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual(new Collection([
@@ -1000,7 +1000,7 @@ describe('when retrieving a list of races that start between the specified times
                 });
         
                 const model = new SylphModel(httpRootURL, wsRootURL);
-                const promise = model.getRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'));
+                const promise = model.getDirectRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'));
                 const result = await promise;
                 expect(promise).toBeInstanceOf(Promise);
                 expect(result).toEqual(new Collection([
@@ -1061,7 +1061,7 @@ describe('when retrieving a list of races that start between the specified times
                 });
         
                 const model = new SylphModel(httpRootURL, wsRootURL);
-                const promise = model.getRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), 0);
+                const promise = model.getDirectRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), 0);
                 const result = await promise;
                 expect(promise).toBeInstanceOf(Promise);
                 expect(result).toEqual(new Collection([
@@ -1120,7 +1120,7 @@ describe('when retrieving a list of races that start between the specified times
                 });
         
                 const model = new SylphModel(httpRootURL, wsRootURL);
-                const promise = model.getRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), null, 2);
+                const promise = model.getDirectRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), null, 2);
                 const result = await promise;
                 expect(promise).toBeInstanceOf(Promise);
                 expect(result).toEqual(new Collection([
@@ -1179,7 +1179,7 @@ describe('when retrieving a list of races that start between the specified times
                 });
         
                 const model = new SylphModel(httpRootURL, wsRootURL);
-                const promise = model.getRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), 0, 2);
+                const promise = model.getDirectRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), 0, 2);
                 const result = await promise;
                 expect(promise).toBeInstanceOf(Promise);
                 expect(result).toEqual(new Collection([
@@ -1231,7 +1231,7 @@ describe('when retrieving a list of races that start between the specified times
                 }
             });
             const model = new SylphModel(httpRootURL, wsRootURL);
-            const promise = model.getRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
+            const promise = model.getDirectRacesBetweenTimes(new Date('2022-10-10T10:00:00.000Z'), new Date('2022-10-10T11:00:00.000Z'), null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING});
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
             expect(result).toEqual(new Collection([
@@ -1250,7 +1250,7 @@ describe('when retrieving a list of races of a specific type that start between 
         const getRacesFromURLSpy = vi.spyOn(model, 'getRacesFromURL').mockImplementation(vi.fn());
         const startTime = new Date(Date.now() - 100000);
         const endTime = new Date();
-        await model.getRacesBetweenTimesForType(startTime, endTime, RaceType.FLEET);
+        await model.getDirectRacesBetweenTimesForType(startTime, endTime, RaceType.FLEET);
         const resource = httpRootURL + '/directRaces/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime='+ startTime.toISOString() + '&endTime=' + endTime.toISOString() + '&type=' + RaceType.FLEET;
         expect(getRacesFromURLSpy).toHaveBeenCalledWith(resource, undefined, undefined, undefined);
     });
@@ -1267,7 +1267,7 @@ describe('when retrieving a list of races of a specific type that start between 
         vi.spyOn(model, 'getRacesFromURL').mockImplementation(() => racesCollection);
         const startTime = new Date(Date.now() - 100000);
         const endTime = new Date();
-        const result = await model.getRacesBetweenTimesForType(startTime, endTime, RaceType.FLEET);
+        const result = await model.getDirectRacesBetweenTimesForType(startTime, endTime, RaceType.FLEET);
         expect(result).toEqual(racesCollection);
     })
 })

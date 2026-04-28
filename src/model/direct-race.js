@@ -14,9 +14,9 @@
 * limitations under the License. 
 */
 
-import Entity from './entity';
+import Race from './race';
 
-class DirectRace extends Entity {
+class DirectRace extends Race {
     
     constructor(hal, metadata, model) {
         super(hal, metadata, model);
@@ -50,10 +50,6 @@ class DirectRace extends Entity {
 
     get leadEntryLapsSailed() {
         return this.hal.leadEntry.lapsSailed;
-    }
-
-    get name() {
-        return this.hal.name;
     }
 
     get plannedLaps() {

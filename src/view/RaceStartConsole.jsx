@@ -109,7 +109,7 @@ function RaceStartConsole ({ model, controller }) {
         let cancel = false;
 
         if (!cancel) {
-            model.getRacesBetweenTimesForType(new Date(sessionStart), new Date(sessionEnd), raceType, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING}).then(raceCollection => {
+            model.getDirectRacesBetweenTimesForType(new Date(sessionStart), new Date(sessionEnd), raceType, null, null, {by: 'plannedStartTime', order: SortOrder.ASCENDING}).then(raceCollection => {
                 const map = new Map();
                 raceCollection.entities.map(race => {
                     map.set(race.name, race);

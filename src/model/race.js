@@ -14,13 +14,17 @@
 * limitations under the License. 
 */
 
-import Race from './race';
+import Entity from './entity';
 
-class EmbeddedRace extends Race {
+class Race extends Entity {
 
     constructor(hal, metadata, model) {
         super(hal, metadata, model);
     }
+
+    get name() {
+        return this.hal.name;
+    }
 }
 
-export default EmbeddedRace;
+export default Race;

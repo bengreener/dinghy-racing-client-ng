@@ -111,10 +111,10 @@ it('displays races included in selected session', async () => {
     expect(optionScorpion).toBeInTheDocument();
     expect(optionsGraduate).toBeInTheDocument();
 });
-it('calls SylphModel.getRacesBetweenTimesForType with correct arguments', async () => {
+it('calls SylphModel.getDirectRacesBetweenTimesForType with correct arguments', async () => {
     const model = new SylphModel(httpRootURL, wsRootURL);
     const controller = new SylphController(model);
-    const getRacesBetweenTimesForTypeSpy = vi.spyOn(model, 'getRacesBetweenTimesForType');
+    const getRacesBetweenTimesForTypeSpy = vi.spyOn(model, 'getDirectRacesBetweenTimesForType');
     const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
     sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
     const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000); // create as 18:00 UTC intially
@@ -144,11 +144,11 @@ it('calls SylphModel.getStartSequence with correct arguments', async () => {
     expect(getStartSequenceSpy).toHaveBeenCalledWith(collection);
 });
 describe('when new value set for race type', () => {
-    it('calls SylphModel.getRacesBetweenTimesForType with correct arguments', async () => {
+    it('calls SylphModel.getDirectRacesBetweenTimesForType with correct arguments', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
-        const getRacesBetweenTimesForTypeSpy = vi.spyOn(model, 'getRacesBetweenTimesForType');
+        const getRacesBetweenTimesForTypeSpy = vi.spyOn(model, 'getDirectRacesBetweenTimesForType');
         const sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
         sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
         const sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000); // create as 18:00 UTC intially
@@ -324,7 +324,7 @@ it('displays actions to start races in session', async () => {
     const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
     const collection = [raceScorpionA, raceGraduateA];
     const controller = new SylphController(model);
-    vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(async () => {
+    vi.spyOn(model, 'getDirectRacesBetweenTimesForType').mockImplementation(async () => {
         return new Collection(collection, {size: 20, totalElements: 2, totalPages: 0, number: 0})
     });
 
@@ -487,7 +487,7 @@ describe('when races within session are changed', () => {
         const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const racePopeyeSpecial = new DirectRace({...raceScorpionAHAL, name: 'Popeye Special'}, {version: '"1"'}, model);
         let collection = [raceScorpionA, raceGraduateA];
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(async () => {
+        vi.spyOn(model, 'getDirectRacesBetweenTimesForType').mockImplementation(async () => {
             return new Collection(collection, {size: 20, totalElements: 2, totalPages: 0, number: 0})
         });
         const controller = new SylphController(model);
@@ -510,7 +510,7 @@ describe('when races within session are changed', () => {
         const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const collection = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA ];
         const controller = new SylphController(model);
-        vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(async () => {
+        vi.spyOn(model, 'getDirectRacesBetweenTimesForType').mockImplementation(async () => {
             return new Collection(collection, {size: 20, totalElements: collection.length, totalPages: 0, number: 0})
         });
         await act(async () => {
