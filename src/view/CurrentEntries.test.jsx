@@ -19,7 +19,7 @@ import userEvent from '@testing-library/user-event';
 import CurrentEntries from './CurrentEntries';
 import SylphModel from '../model/sylph-model';
 import Entry from '../model/entry';
-import Race from '../model/race';
+import DirectRace from '../model/direct-race';
 import { httpRootURL, wsRootURL, raceCometAHAL, raceHandicapAHAL, raceScorpionAHAL, entryChrisMarshall1234ScorpionAHAL } from '../model/__mocks__/test-data';
 import { buildSynchronousEntries } from './synchronous-model/synchronous-model';
 
@@ -32,7 +32,7 @@ beforeEach(() => {
 });
 it('renders', async () => {
     const model = new SylphModel(httpRootURL, wsRootURL);
-    const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+    const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
     await act(async () => {
         render(<CurrentEntries race={race} />);
     });
@@ -40,7 +40,7 @@ it('renders', async () => {
 });
 it('shows number of entries for each dinghy class', async () => {
     const model = new SylphModel(httpRootURL, wsRootURL);
-    const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+    const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
     await act(async () => {
         render(<CurrentEntries race={race} />);
     });
@@ -55,7 +55,7 @@ describe('when an entry is selected', () => {
     it('calls onSelect handler with entry', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const onEntrySelectedSpy = vi.fn();
         await act(async () => {
             render(<CurrentEntries race={race} onEntrySelected={onEntrySelectedSpy} />);
@@ -68,7 +68,7 @@ describe('when an entry is selected for withdrawal', () => {
     it('calls onWithdrawEntry handler with entry', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const onWithdrawEntrySpy = vi.fn();
         await act(async () => {
             render(<CurrentEntries race={race} onWithdrawEntry={onWithdrawEntrySpy} />);
@@ -81,7 +81,7 @@ describe('when an entry is selected for withdrawal', () => {
 describe('when race is for dinghies with crew', () => {
     it('shows helm, sail number, class, and crew', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<CurrentEntries race={race} />);
         });
@@ -92,7 +92,7 @@ describe('when race is for dinghies with crew', () => {
     });
     it('displays entry details', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<CurrentEntries race={race} />);
         });
@@ -105,7 +105,7 @@ describe('when race is for dinghies with crew', () => {
 describe('when race is for dinghies without crew', () => {
     it('shows helm, sail number, and class', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const race = new Race(raceCometAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceCometAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<CurrentEntries race={race} />);
         });
@@ -116,7 +116,7 @@ describe('when race is for dinghies without crew', () => {
     });
     it('displays entry details', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const race = new Race(raceCometAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceCometAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<CurrentEntries race={race} />);
         });
@@ -129,7 +129,7 @@ describe('when race is for dinghies without crew', () => {
 describe('when a race is updated', () => {
     it('updates display', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<CurrentEntries race={race} />);
         });
@@ -142,7 +142,7 @@ describe('when a race is updated', () => {
 describe('when an entry is signed up to the race', () => {
     it('updates display', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<CurrentEntries race={race} />);
         });
@@ -155,7 +155,7 @@ describe('when an entry is signed up to the race', () => {
 describe('when an entry in the race is updated', () => {
     it('updates display', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<CurrentEntries race={race} />);
         });
@@ -168,7 +168,7 @@ describe('when an entry in the race is updated', () => {
 describe('when an entry in the race is withdrawn', () => {
     it('updates display', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<CurrentEntries race={race} />);
         });

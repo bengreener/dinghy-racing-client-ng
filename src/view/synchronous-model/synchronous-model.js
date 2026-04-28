@@ -37,7 +37,7 @@ async function buildSynchronousEntry(entry) {
 
 /**
  * 
- * @param {Array<Race>} races 
+ * @param {Array<DirectRace>} races 
  * @returns {Array<SynchronousEntry>}
  */
 async function buildSynchronousEntries(races) {

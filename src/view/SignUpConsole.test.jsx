@@ -20,7 +20,7 @@ import SignUpConsole from './SignUpConsole';
 import SylphModel from '../model/sylph-model';
 import SylphController from '../controller/sylph-controller';
 import Entry from '../model/entry';
-import Race from '../model/race';
+import DirectRace from '../model/direct-race';
 import { httpRootURL, wsRootURL, raceScorpionAHAL, entryChrisMarshall1234ScorpionAHAL } from '../model/__mocks__/test-data';
 
 vi.mock('../model/sylph-model');
@@ -29,7 +29,7 @@ vi.mock('../model/clock');
 it('renders', async () => {
     const model = new SylphModel(httpRootURL, wsRootURL);
     const controller = new SylphController(model);
-    const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+    const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
     await act(async () => {
         render(<SignUpConsole model={model} controller={controller} race={race} />);
     });
@@ -40,7 +40,7 @@ describe('when the withdraw button for an entry is clicked', () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const withdrawEntrySpy = vi.spyOn(controller, 'withdrawEntry');
         await act(async () => {
             render(<SignUpConsole  model={model} controller={controller} race={race}/>);

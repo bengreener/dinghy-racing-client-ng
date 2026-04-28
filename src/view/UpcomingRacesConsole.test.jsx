@@ -18,7 +18,7 @@ import { act, render, screen, within} from '@testing-library/react';
 import { userEvent} from '@testing-library/user-event';
 import SylphModel from '../model/sylph-model';
 import Collection from '../model/collection';
-import Race from '../model/race';
+import DirectRace from '../model/direct-race';
 import UpcomingRacesConsole from './UpcomingRacesConsole';
 import { httpRootURL, wsRootURL, raceCometAHAL, raceGraduateAHAL, raceHandicapAHAL, raceScorpionAHAL } from '../model/__mocks__/test-data';
 
@@ -90,7 +90,7 @@ describe('when start time is changed', () => {
     it('gets the races that fall into the new time period', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve(new Collection([new Race(raceScorpionAHAL, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0, number: 0}))});
+        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve(new Collection([new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0, number: 0}))});
         render(<UpcomingRacesConsole model={model}/>);
         
         let cells = await screen.findAllByRole('cell');
@@ -109,7 +109,7 @@ describe('when end time is changed', () => {
     it('gets the races that fall into the new time period', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve(new Collection([new Race(raceScorpionAHAL, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0, number: 0}))});
+        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(() => {return Promise.resolve(new Collection([new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0, number: 0}))});
         await act(async () => {
             render(<UpcomingRacesConsole model={model}/>);
         });
@@ -162,10 +162,10 @@ it('registers an interest in race updates for races in selected period', async (
 describe('when races within session are changed', () => {
     it('updates recorded details', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceCometA = new Race(raceCometAHAL, {version: '"0"'}, model);
-        const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
-        const raceHandicapA = new Race(raceHandicapAHAL, {version: '"0"'}, model);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceCometA = new DirectRace(raceCometAHAL, {version: '"0"'}, model);
+        const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
+        const raceHandicapA = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const races = [
             raceCometA, raceGraduateA, raceHandicapA, raceScorpionA
         ];
@@ -184,10 +184,10 @@ describe('when races within session are changed', () => {
     });
     it('removes a race that has had start time changed so it falls outside session time window', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceCometA = new Race(raceCometAHAL, {version: '"0"'}, model);
-        const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
-        const raceHandicapA = new Race(raceHandicapAHAL, {version: '"0"'}, model);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceCometA = new DirectRace(raceCometAHAL, {version: '"0"'}, model);
+        const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
+        const raceHandicapA = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const races = [
             raceCometA, raceGraduateA, raceHandicapA, raceScorpionA
         ];

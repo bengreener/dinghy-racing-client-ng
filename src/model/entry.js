@@ -16,7 +16,7 @@
 
 import EmbeddedRace from './embedded-race';
 import Entity from './entity';
-import Race from './race';
+import DirectRace from './direct-race';
 
 class Entry extends Entity {
 
@@ -65,7 +65,7 @@ class Entry extends Entity {
     /**
      * Get the direct race the entry is signed up to.
      * Each entry can signup to one direct race and any number of other races embedded in that direct race.
-     * @returns {Promise<Race>}
+     * @returns {Promise<DirectRace>}
      */
     async getDirectRace() {
         // get signedup

@@ -22,7 +22,7 @@ import { buildSynchronousEntries, buildSynchronousRace } from './synchronous-mod
 /**
  * 
  * @param {Object} props
- * @param {Race} props.race
+ * @param {DirectRace} props.race
  * @param {Function} onEntrySelected
  * @returns {HTMLDivElement}
  */

@@ -20,7 +20,7 @@ import RaceHeaderView from './RaceHeaderView';
 import SylphModel from '../model/sylph-model';
 import SylphController from '../controller/sylph-controller';
 import Clock from '../model/clock';
-import Race from '../model/race';
+import DirectRace from '../model/direct-race';
 import { httpRootURL, wsRootURL, raceCometAHAL, raceScorpionAHAL, raceGraduateAHAL, racePursuitAHAL, } from '../model/__mocks__/test-data';
 
 vi.mock('../model/sylph-model');
@@ -47,19 +47,19 @@ describe('when rendered', () => {
         it('displays race name', () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
             const controller = new SylphController(model);
-            render(<RaceHeaderView model={model} controller={controller} race={new Race(raceScorpionAHAL, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
             expect(screen.getByText(/scorpion a/i)).toBeInTheDocument();
         });    
         it('displays number of laps', async () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
             const controller = new SylphController(model);
-            render(<RaceHeaderView model={model} controller={controller} race={new Race(raceScorpionAHAL, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
             expect(screen.getByLabelText(/^laps$/i)).toHaveValue('5');
         });
         it('displays initial race duration', () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
             const controller = new SylphController(model);
-            render(<RaceHeaderView model={model} controller={controller} race={new Race(raceScorpionAHAL, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
             expect(screen.getByLabelText(/duration/i)).toHaveValue('45:00');
         });
         it('displays remaining race duration', () => {
@@ -70,7 +70,7 @@ describe('when rendered', () => {
                 getElapsedTime: () => 30000,
                 removeTickHandler: vi.fn()
             }});
-            render(<RaceHeaderView model={model} controller={controller} race={new Race(raceScorpionAHAL, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
             expect(screen.getByLabelText(/remaining/i)).toHaveValue('44:30');
         });
         describe('when race is in progress', () => {
@@ -82,7 +82,7 @@ describe('when rendered', () => {
                     getElapsedTime: () => 30000,
                     removeTickHandler: vi.fn()
                 }});
-                render(<RaceHeaderView model={model} controller={controller} race={new Race(raceScorpionAHAL, {version: '"0"'}, model)} />);
+                render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
                 expect(screen.getByLabelText(/elapsed/i)).toHaveValue('00:30');
             });
         })
@@ -90,38 +90,38 @@ describe('when rendered', () => {
             it('displays estimate for number of laps that will be completed', () => {
                 const model = new SylphModel(httpRootURL, wsRootURL);
                 const controller = new SylphController(model);
-                render(<RaceHeaderView  model={model} controller={controller} race={new Race({...raceScorpionAHAL, lapForecast: 3.69, leadEntry: {...raceScorpionAHAL.leadEntry, lastLapTime: 'PT12M12S'}}, {version: '"0"'}, model)} />);
+                render(<RaceHeaderView  model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, lapForecast: 3.69, leadEntry: {...raceScorpionAHAL.leadEntry, lastLapTime: 'PT12M12S'}}, {version: '"0"'}, model)} />);
                 expect(screen.getByLabelText(/estimate/i)).toHaveValue('3.69');
             });
             it('displays the last lap time for the lead entry', () => {
                 const model = new SylphModel(httpRootURL, wsRootURL);
                 const controller = new SylphController(model);
-                render(<RaceHeaderView model={model} controller={controller} race={new Race({...raceScorpionAHAL, leadEntry: {...raceScorpionAHAL.leadEntry, lastLapTime: 'PT12M12S'}}, {version: '"0"'}, model)} />);
+                render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, leadEntry: {...raceScorpionAHAL.leadEntry, lastLapTime: 'PT12M12S'}}, {version: '"0"'}, model)} />);
                 expect(screen.getByLabelText(/last/i)).toHaveValue('12:12');
             });
             it('displays the average lap time for the lead entry', () => {
                 const model = new SylphModel(httpRootURL, wsRootURL);
                 const controller = new SylphController(model);
-                render(<RaceHeaderView model={model} controller={controller} race={new Race({...raceScorpionAHAL, leadEntry: {...raceScorpionAHAL.leadEntry, lastLapTime: 'PT12M12S', averageLapTime: 'PT12M12S'}}, {version: '"0"'}, model)} />);
+                render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, leadEntry: {...raceScorpionAHAL.leadEntry, lastLapTime: 'PT12M12S', averageLapTime: 'PT12M12S'}}, {version: '"0"'}, model)} />);
                 expect(screen.getByLabelText(/average/i)).toHaveValue('12:12');
             });
         });
         it('displays postpone race button', () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
             const controller = new SylphController(model);
-            render(<RaceHeaderView model={model} controller={controller} race={new Race({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
             expect(screen.getByRole('button', {name: /postpone start/i})).toBeInTheDocument();
         });
         it('displays start race button', () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
             const controller = new SylphController(model);
-            render(<RaceHeaderView model={model} controller={controller} race={new Race({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
             expect(screen.getByRole('button', {name: /start now/i})).toBeInTheDocument();
         });
         it('displays lap sheet button', () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
             const controller = new SylphController(model);
-            render(<RaceHeaderView model={model} controller={controller} race={new Race({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
             expect(screen.getByRole('button', {name: /lap sheet/i})).toBeInTheDocument();
         });
     });
@@ -129,13 +129,13 @@ describe('when rendered', () => {
         it('displays race name', () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
             const controller = new SylphController(model);
-            render(<RaceHeaderView model={model} controller={controller} race={new Race(racePursuitAHAL, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(racePursuitAHAL, {version: '"0"'}, model)} />);
             expect(screen.getByText(/pursuit a/i)).toBeInTheDocument();
         });    
         it('does not display number of laps', () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
             const controller = new SylphController(model);
-            render(<RaceHeaderView model={model} controller={controller} race={new Race(racePursuitAHAL, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(racePursuitAHAL, {version: '"0"'}, model)} />);
             expect(screen.queryByLabelText(/^laps$/i)).not.toBeInTheDocument();
         });
         it('displays initial race duration', () => {
@@ -146,7 +146,7 @@ describe('when rendered', () => {
                 getElapsedTime: () => 30000,
                 removeTickHandler: vi.fn()
             }});
-            render(<RaceHeaderView model={model} controller={controller} race={new Race(racePursuitAHAL, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(racePursuitAHAL, {version: '"0"'}, model)} />);
             expect(screen.getByLabelText(/duration/i)).toHaveValue('45:00');
         });
         it('displays remaining race duration', () => {
@@ -158,7 +158,7 @@ describe('when rendered', () => {
                 getElapsedTime: () => 30000,
                 removeTickHandler: vi.fn()
             }});    
-            render(<RaceHeaderView model={model} controller={controller} race={new Race(racePursuitAHAL, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(racePursuitAHAL, {version: '"0"'}, model)} />);
             expect(screen.getByLabelText(/remaining/i)).toHaveValue('44:30');
         });
         describe('when race is in progress', () => {
@@ -170,7 +170,7 @@ describe('when rendered', () => {
                     getElapsedTime: () => 30000,
                     removeTickHandler: vi.fn()
                 }});    
-                render(<RaceHeaderView model={model} controller={controller} race={new Race(racePursuitAHAL, {version: '"0"'}, model)} />);
+                render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(racePursuitAHAL, {version: '"0"'}, model)} />);
                 expect(screen.getByLabelText(/elapsed/i)).toHaveValue('00:30');
             });
         });
@@ -178,38 +178,38 @@ describe('when rendered', () => {
             it('does not display estimate for number of laps that will be completed', () => {
                 const model = new SylphModel(httpRootURL, wsRootURL);
                 const controller = new SylphController(model);
-                render(<RaceHeaderView model={model} controller={controller} race={new Race({...racePursuitAHAL, leadEntryLastLapTime: 'PT12M12S', lapForecast: 3.69}, {version: '"0"'}, model)} />);
+                render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...racePursuitAHAL, leadEntryLastLapTime: 'PT12M12S', lapForecast: 3.69}, {version: '"0"'}, model)} />);
                 expect(screen.queryByLabelText(/estimate/i)).not.toBeInTheDocument();
             });
             it('does not display the last lap time for the lead entry', () => {
                 const model = new SylphModel(httpRootURL, wsRootURL);
                 const controller = new SylphController(model);
-                render(<RaceHeaderView model={model} controller={controller} race={new Race({...racePursuitAHAL, leadEntryLastLapTime: 'PT12M12S'}, {version: '"0"'}, model)} />);
+                render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...racePursuitAHAL, leadEntryLastLapTime: 'PT12M12S'}, {version: '"0"'}, model)} />);
                 expect(screen.queryByLabelText(/last/i)).not.toBeInTheDocument();
             });
             it('does not display the average lap time for the lead entry', () => {
                 const model = new SylphModel(httpRootURL, wsRootURL);
                 const controller = new SylphController(model);
-                render(<RaceHeaderView model={model} controller={controller} race={new Race({...racePursuitAHAL, leadEntryLastLapTime: 'PT12M12S', leadEntry: {...raceScorpionAHAL.leadEntry, leadEntryAverageLapTime: 'PT12M12S'}}, {version: '"0"'}, model)} />);
+                render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...racePursuitAHAL, leadEntryLastLapTime: 'PT12M12S', leadEntry: {...raceScorpionAHAL.leadEntry, leadEntryAverageLapTime: 'PT12M12S'}}, {version: '"0"'}, model)} />);
                 expect(screen.queryByLabelText(/average/i)).not.toBeInTheDocument();
             });
         });
         it('displays postpone race button', () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
             const controller = new SylphController(model);
-            render(<RaceHeaderView model={model} controller={controller} race={new Race({...racePursuitAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...racePursuitAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
             expect(screen.getByRole('button', {name: /postpone start/i})).toBeInTheDocument();
         });
         it('displays start race button', () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
             const controller = new SylphController(model);
-            render(<RaceHeaderView model={model} controller={controller} race={new Race({...racePursuitAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...racePursuitAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
             expect(screen.getByRole('button', {name: /start now/i})).toBeInTheDocument();
         });
         it('displays lap sheet button', () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
             const controller = new SylphController(model);
-            render(<RaceHeaderView model={model} controller={controller} race={new Race({...racePursuitAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...racePursuitAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
             expect(screen.getByRole('button', {name: /lap sheet/i})).toBeInTheDocument();
         });
     });
@@ -219,7 +219,7 @@ describe('when showInRaceData is false', () => {
     it('does not display additional elements', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
-        render(<RaceHeaderView model={model} controller={controller} race={new Race({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000).toISOString().replaceAll('Z', '')}, {version: '"0"'}, model)} showInRaceData={false} />);
+        render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000).toISOString().replaceAll('Z', '')}, {version: '"0"'}, model)} showInRaceData={false} />);
         expect(screen.getByText(/scorpion a/i)).toBeInTheDocument();
         expect(screen.getByLabelText(/^laps$/i)).toHaveValue('5');
         expect(screen.getByLabelText(/duration/i)).toHaveValue('45:00');
@@ -233,7 +233,7 @@ describe('when showInRaceData is false', () => {
     it('displays adjust course button', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
-        render(<RaceHeaderView model={model} controller={controller} race={new Race({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000).toISOString().replaceAll('Z', '')}, {version: '"0"'}, model)} showInRaceData={false} />);
+        render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000).toISOString().replaceAll('Z', '')}, {version: '"0"'}, model)} showInRaceData={false} />);
         expect(screen.queryByRole('button', {name: /shorten course/i})).not.toBeInTheDocument();
         expect(screen.getByRole('button', {name: /adjust laps/i})).toBeInTheDocument();
     })
@@ -248,7 +248,7 @@ describe('when race has not yet started', () => {
             getElapsedTime: () => -60000,
             removeTickHandler: vi.fn()
         }});
-        render(<RaceHeaderView model={model} controller={controller} race={new Race({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 60000)}, {version: '"0"'}, model)} showInRaceData={false} />);
+        render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 60000)}, {version: '"0"'}, model)} showInRaceData={false} />);
         
         const outputRemaining = screen.getByLabelText(/countdown/i);
         expect(outputRemaining).toHaveValue('01:00');
@@ -264,7 +264,7 @@ describe('when a race has started', () => {
             getElapsedTime: () => 6000,
             removeTickHandler: vi.fn()
         }});
-        render(<RaceHeaderView model={model} controller={controller} race={new Race(raceScorpionAHAL, {version: '"0"'}, model)} />);
+        render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
 
         const outputRemaining = screen.getByLabelText(/remaining/i);
         expect(outputRemaining).toHaveValue('44:54');
@@ -277,7 +277,7 @@ describe('when a race has started', () => {
             getElapsedTime: () => 6000,
             removeTickHandler: vi.fn()
         }});
-        render(<RaceHeaderView model={model} controller={controller} race={new Race(raceScorpionAHAL, {version: '"0"'}, model)} />);
+        render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
         expect(screen.queryByText(/postpone start/i)).not.toBeInTheDocument();
     });
     it('no longer shows option to start race', () => {
@@ -288,7 +288,7 @@ describe('when a race has started', () => {
             getElapsedTime: () => 6000,
             removeTickHandler: vi.fn()
         }});
-        render(<RaceHeaderView model={model} controller={controller} race={new Race(raceScorpionAHAL, {version: '"0"'}, model)} />);
+        render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
         expect(screen.queryByText(/start now/i)).not.toBeInTheDocument();
     });
 });
@@ -303,9 +303,9 @@ it('updates values when a new race is selected', async () => {
         getElapsedTime: () => 5000,
         removeTickHandler: vi.fn()
     }});
-    const {rerender} = render(<RaceHeaderView key={raceScorpionAHAL.name+raceScorpionAHAL.plannedStartTime} model={model} controller={controller} race={new Race(raceScorpionAHAL, {version: '"0"'}, model)} />);
+    const {rerender} = render(<RaceHeaderView key={raceScorpionAHAL.name+raceScorpionAHAL.plannedStartTime} model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
     expect(screen.getByText(/scorpion a/i)).toBeInTheDocument();
-    rerender(<RaceHeaderView key={raceGraduateAHAL.name+raceGraduateAHAL.plannedStartTime} model={model} controller={controller} race={new Race({...raceGraduateAHAL, duration: 'PT22M30S'}, {version: '"0"'}, model)} />);
+    rerender(<RaceHeaderView key={raceGraduateAHAL.name+raceGraduateAHAL.plannedStartTime} model={model} controller={controller} race={new DirectRace({...raceGraduateAHAL, duration: 'PT22M30S'}, {version: '"0"'}, model)} />);
     
     expect(screen.getByText(/graduate a/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^laps$/i)).toHaveValue('4');
@@ -318,7 +318,7 @@ describe('when postpone race button clicked', () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
-        render(<RaceHeaderView model={model} controller={controller} race={new Race({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 60000)}, {version: '"0"'}, model)} />);
+        render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 60000)}, {version: '"0"'}, model)} />);
         act(() => {
             user.click(screen.getByRole('button', {'name': /postpone start/i}));
         });
@@ -330,21 +330,21 @@ describe('when postpone race button clicked', () => {
 });
 
 describe('when race has started and no entries have sailed a lap', () => {
-    it('displays Restart Race button', () => {
+    it('displays Restart DirectRace button', () => {
         vi.setSystemTime(new Date('2021-10-14T10:35:00Z'));
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
-        render(<RaceHeaderView model={model} controller={controller} race={new Race(raceScorpionAHAL, {version: '"0"'}, model)} />);
+        render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
         expect(screen.getByRole('button', {name: /restart/i})).toBeInTheDocument();    
     });
 });
 
 describe('when race has started and an entry has sailed a lap', () => {
-    it('does not display Restart Race button', async () => {
+    it('does not display Restart DirectRace button', async () => {
         vi.setSystemTime(new Date('2021-10-14T10:35:00Z'));
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
-        render(<RaceHeaderView model={model} controller={controller} race={new Race({...raceScorpionAHAL, leadEntry: {...raceScorpionAHAL.leadEntry, lapsSailed: 1}, plannedStartTime: new Date(Date.now() - 60000)}, {version: '"0"'}, model)} />);
+        render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, leadEntry: {...raceScorpionAHAL.leadEntry, lapsSailed: 1}, plannedStartTime: new Date(Date.now() - 60000)}, {version: '"0"'}, model)} />);
         expect(screen.queryByRole('button', {name: /restart/i})).not.toBeInTheDocument();    
     });
 });
@@ -355,7 +355,7 @@ describe('when restart race button clicked', () => {
         vi.setSystemTime(new Date('2021-10-14T10:35:00Z'));
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
-        render(<RaceHeaderView model={model} controller={controller} race={new Race(raceScorpionAHAL, {version: '"0"'}, model)} />);
+        render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
         act(() => {
             user.click(screen.getByRole('button', {'name': /restart/i}));
         });
@@ -373,7 +373,7 @@ describe('when start now button clicked', () => {
         const controller = new SylphController(model);
         const startRaceSpy = vi.spyOn(controller, 'startRace');
         await act(async () => {
-            render(<RaceHeaderView model={model} controller={controller} race={new Race({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
         });
         const startRaceButton = screen.getByRole('button', {'name': /start now/i});
         await act(async () => {
@@ -391,7 +391,7 @@ describe('when shorten course button clicked', () => {
         const controller = new SylphController(model);
         await act(async () => {
             // render(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))} } />, model, controller);
-            render(<RaceHeaderView model={model} controller={controller} race={new Race({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() - 10000)}, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() - 10000)}, {version: '"0"'}, model)} />);
         });
         
         await act(async () => {
@@ -415,7 +415,7 @@ describe('when lap sheet button clicked', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
         await act(async () => {
-            render(<RaceHeaderView model={model} controller={controller} race={new Race({...raceScorpionAHAL, 'plannedStartTime': new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, 'plannedStartTime': new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
         });
         await act(async () => {
             user.click(screen.getByRole('button', {name: /lap sheet/i}));
@@ -482,10 +482,10 @@ describe('when a lap is added to the race', () => {
     it('updates race', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         vi.spyOn(model, 'getRace').mockImplementation(async () => {
-            return new Race(raceCometAHAL, {version: '"0"'}, model)
+            return new DirectRace(raceCometAHAL, {version: '"0"'}, model)
         });
         const controller = new SylphController(model);
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         render(<RaceHeaderView model={model} controller={controller} race={race} />);
         await act(async () => {
             model.handleRaceEntryLapsUpdate({'body': race.url});

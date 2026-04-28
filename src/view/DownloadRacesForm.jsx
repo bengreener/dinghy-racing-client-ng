@@ -81,7 +81,7 @@ function DownloadRacesForm({ model, controller }) {
                 {races.map(race => <DownloadRace key={race.name+race.plannedStartTime.toISOString()} race={race} downloadFunction={handleRaceResultDownloadClick} />)}
             </div>
         </div>
-    );
+    )
 }
 
 export default DownloadRacesForm;

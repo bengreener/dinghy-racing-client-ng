@@ -29,7 +29,7 @@ class SynchronousEntry{
     //  * @param {Entry} entry 
     //  * @param {SynchronousDinghy} dinghy 
     //  * @param {Competitor} helm 
-    //  * @param {Race} race 
+    //  * @param {DirectRace} race 
     //  * @param {Collection<Lap>} laps 
     //  * @param {Integer} position 
     //  * @param {Competitor} [crew]
@@ -48,7 +48,7 @@ class SynchronousEntry{
      * @param {Entry} entry 
      * @param {SynchronousDinghy} dinghy 
      * @param {Competitor} helm 
-     * @param {Race} race 
+     * @param {DirectRace} race 
      * @param {Collection<Lap>} laps 
      * @param {SignedUp} signedUp to the race
      * @param {Competitor} [crew]

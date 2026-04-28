@@ -25,7 +25,7 @@ import Dinghy from '../model/dinghy';
 import DinghyClass from '../model/dinghy-class';
 import EmbeddedRace from '../model/embedded-race';
 import Entry from '../model/entry';
-import Race from '../model/race';
+import DirectRace from '../model/direct-race';
 import MissingParameter from '../errors/missing-parameter';
 import InvalidParameter from '../errors/invalid-parameter';
 import { httpRootURL, wsRootURL, fleetHandicapHAL, 
@@ -51,7 +51,7 @@ beforeEach(() => {
 });
 
 it('renders', async () => {
-    const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+    const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
     await act(async () => {
         render(<SignUpForm  model={model} race={race}/>);
     });
@@ -67,7 +67,7 @@ it('renders', async () => {
     expect(btnCancel).toBeInTheDocument();
 });
 it('only provides the option to select dinghy classes that are allowed for the race', async () => {
-    const race = new Race(racePursuitAHAL, {version: '"0"'}, model);
+    const race = new DirectRace(racePursuitAHAL, {version: '"0"'}, model);
     vi.spyOn(model, 'getDinghyClassesFromURL').mockImplementation(async (url) => {
         let dinghyClasses = [];
         if (url === fleetHandicapHAL._links.dinghyClasses.href) {
@@ -87,7 +87,7 @@ it('only provides the option to select dinghy classes that are allowed for the r
     expect(within(inputDinghyClass).getByRole('option', {name: ''})).toBeInTheDocument();
 });
 it('presents dinghy classes in ascending alphabetical order', async () => {
-    const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+    const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
     await act(async () => {
         render(<SignUpForm  model={model} race={race}/>);
     });
@@ -98,7 +98,7 @@ it('presents dinghy classes in ascending alphabetical order', async () => {
 });
 it('displays helm name', async () => {
     const user = userEvent.setup();
-    const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+    const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
     await act(async () => {
         render(<SignUpForm  model={model} race={race}/>);
     });
@@ -108,7 +108,7 @@ it('displays helm name', async () => {
 });
 it('displays sail number', async () => {
     const user = userEvent.setup();
-    const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+    const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
     await act(async () => {
         render(<SignUpForm  model={model} race={race}/>);
     });
@@ -120,7 +120,7 @@ describe('when a sail number is entered', () => {
     it('displays dinghy class and previous crews for boats with that sail number', async () => {
         vi.spyOn(console, 'error').mockImplementation(vi.fn());
         const user = userEvent.setup();
-        const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
         // vi.spyOn(model, 'getDinghiesBySailNumber').mockImplementation(() => {return Promise.resolve({success: true, domainObject: [ dinghy1234, dinghy1234Graduate ]})});
         await act(async () => {
             render(<SignUpForm  model={model} race={race}/>);
@@ -138,7 +138,7 @@ describe('when a sail number is entered', () => {
     it('only displays entries that are eligible to sail based on the fleet for the race', async () => {
         vi.spyOn(console, 'error').mockImplementation(vi.fn());
         const user = userEvent.setup();
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         vi.spyOn(model, 'getDinghyBySailNumberAndDinghyClass').mockImplementation((sailNumber, dinghyClass) => {
             let hal;
             if (sailNumber === '1234' && dinghyClass.url === 'http://localhost:8081/dinghyracing/api/dinghyClasses/16') {
@@ -170,7 +170,7 @@ describe('when a sail number is entered', () => {
     describe('when a dinghy class has been selected', () => {
         it('only displays previous entries for that dinghy class and sail number', async () => {
             const user = userEvent.setup();
-            const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+            const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
             const dinghyClassComet = new DinghyClass(dinghyClassCometHAL, {version: '"0"'}, model);
             const dinghyClassGraduate = new DinghyClass(dinghyClassGraduateHAL, {version: '"0"'}, model);
             const dinghyClassScorpion = new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model);
@@ -188,7 +188,7 @@ describe('when a sail number is entered', () => {
 });
 it('displays crew name', async () => {
     const user = userEvent.setup();
-    const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+    const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
     await act(async () => {
         render(<SignUpForm  model={model} race={race}/>);
     });
@@ -200,9 +200,9 @@ it('displays crew name', async () => {
 describe('when sign-up button clicked', () => {
     it('signs up to race', async () => {
         const user = userEvent.setup();
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const signUpToRaceSpy = vi.spyOn(controller, 'signUpToRace').mockImplementation(async (race, helm, dinghy, crew) => {
-            if (!(race instanceof Race)) {
+            if (!(race instanceof DirectRace)) {
                 throw new MissingParameter('A race is required for a new race entry.');
             }
             if (!(helm instanceof Competitor)) {
@@ -238,9 +238,9 @@ describe('when sign-up button clicked', () => {
     });
     it('clears form on success', async () => {
         const user = userEvent.setup();
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         vi.spyOn(controller, 'signUpToRace').mockImplementation(async (race, helm, dinghy, crew) => {
-            if (!(race instanceof Race)) {
+            if (!(race instanceof DirectRace)) {
                 throw new MissingParameter('A race is required for a new race entry.');
             }
             if (!(helm instanceof Competitor)) {
@@ -284,7 +284,7 @@ describe('when sign-up button clicked', () => {
         it('displays failure message and entered values remain on form', async () => {
             vi.spyOn(console, 'error').mockImplementation(vi.fn());
             const user = userEvent.setup();
-            const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+            const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
             vi.spyOn(controller, 'signUpToRace').mockImplementation(async (race, helm, dinghy, crew) => {
                 throw new Error('Some error')
             });
@@ -309,7 +309,7 @@ describe('when sign-up button clicked', () => {
 describe('when helm does not exist', () => {
     it('displays add helm & update button', async () => {
         const user = userEvent.setup();
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<SignUpForm  model={model} race={race}/>);
         });
@@ -326,9 +326,9 @@ describe('when helm does not exist', () => {
     });
     describe('when add helm and sign-up button clicked', () => {
         it('creates helm and signs up to race', async () => {
-            const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+            const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
             const signUpToRaceSpy = vi.spyOn(controller, 'signUpToRace').mockImplementation(async (race, helm, dinghy, crew) => {
-                if (!(race instanceof Race)) {
+                if (!(race instanceof DirectRace)) {
                     throw new MissingParameter('A race is required for a new race entry.');
                 }
                 if (!(helm instanceof Competitor)) {
@@ -370,7 +370,7 @@ describe('when helm does not exist', () => {
         describe('when helm not created', () => {
             it('displays failure message and entered values remain on form', async () => {
                 vi.spyOn(console, 'error').mockImplementation(vi.fn());
-                const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+                const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
                 const createCompetitorSpy = vi.spyOn(controller, 'createCompetitor').mockImplementation(async () => {
                     throw new Error('Some error');
                 });
@@ -397,7 +397,7 @@ describe('when helm does not exist', () => {
 describe('when dinghy does not exist', () => {
     it('displays add dinghy and sign-up button', async () => {
         const user = userEvent.setup();
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<SignUpForm  model={model} race={race}/>);
         });
@@ -411,9 +411,9 @@ describe('when dinghy does not exist', () => {
     });
     describe('when add dinghy and sign-up button clicked', () => {
         it('creates dinghy and then updates entry with values entered into form', async () => {
-            const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+            const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
             const signUpToRaceSpy = vi.spyOn(controller, 'signUpToRace').mockImplementation(async (race, helm, dinghy, crew) => {
-                if (!(race instanceof Race)) {
+                if (!(race instanceof DirectRace)) {
                     throw new MissingParameter('A race is required for a new race entry.');
                 }
                 if (!(helm instanceof Competitor)) {
@@ -456,7 +456,7 @@ describe('when dinghy does not exist', () => {
         describe('when dinghy not created', () => {
             it('displays failure message and entered values remain on form', async () => {
                 vi.spyOn(console, 'error').mockImplementation(vi.fn());
-                const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+                const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
                 vi.spyOn(controller, 'createDinghy').mockImplementation(() => {
                     throw new Error('Some error');
                 });
@@ -480,7 +480,7 @@ describe('when dinghy does not exist', () => {
 describe('when crew does not exist', () => {
     it('displays add crew and sign-up button', async () => {
         const user = userEvent.setup();
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<SignUpForm  model={model} race={race} />);
         });
@@ -494,9 +494,9 @@ describe('when crew does not exist', () => {
     });
     describe('when add crew and sign-up button clicked', () => {
         it('creates crew and then updates entry with values entered into form', async () => {
-            const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+            const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
             const signUpToRaceSpy = vi.spyOn(controller, 'signUpToRace').mockImplementation(async (race, helm, dinghy, crew) => {
-                if (!(race instanceof Race)) {
+                if (!(race instanceof DirectRace)) {
                     throw new MissingParameter('A race is required for a new race entry.');
                 }
                 if (!(helm instanceof Competitor)) {
@@ -538,7 +538,7 @@ describe('when crew does not exist', () => {
         describe('when crew not created', () => {
             it('displays failure message and entered values remain on form', async () => {
                 vi.spyOn(console, 'error').mockImplementation(vi.fn());
-                const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+                const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
                 vi.spyOn(controller, 'createCompetitor').mockImplementation(async () => {
                     throw new Error('Some error');
                 });
@@ -564,7 +564,7 @@ describe('when crew does not exist', () => {
 });
 describe('when race for a fleet that includes only dinghy classes with no crew', () => {
     it('does not request entry of crew', async () => {
-        const race = new Race(raceCometAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceCometAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<SignUpForm  model={model} race={race}/>);
         });
@@ -574,7 +574,7 @@ describe('when race for a fleet that includes only dinghy classes with no crew',
 });    
 describe('when race for a fleet that includes only a single dinghy class', () => {
     it('does not request entry of dinghy class', async () => {
-        const race = new Race(raceScorpionAHAL, {version: '"0'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0'}, model);
         await act(async () => {
             render(<SignUpForm  model={model} race={race}/>);
         });
@@ -584,7 +584,7 @@ describe('when race for a fleet that includes only a single dinghy class', () =>
 });
 it('has an option to cancel update that clears selected entry values to allow new entry to sign up', async () => {
     const user = userEvent.setup();
-    const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+    const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
     await act(async () => {
         render(<SignUpForm  model={model} race={race}/>);
     });
@@ -603,7 +603,7 @@ it('has an option to cancel update that clears selected entry values to allow ne
 });
 describe('when updating an existing entry', () => {
     it('displays details for existing entry', async () => {
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const entry = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<SignUpForm  model={model} race={race} entry={entry} />);
@@ -618,7 +618,7 @@ describe('when updating an existing entry', () => {
     describe('when helm and dinghy and crew exist', () => {
         it('displays update button', async () => {
             const user = userEvent.setup();
-            const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+            const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
             const entry = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
             await act(async () => {
                 render(<SignUpForm  model={model} race={race} entry={entry}/>);
@@ -628,7 +628,7 @@ describe('when updating an existing entry', () => {
         describe('when update button clicked', () => {
             it('updates entry with values entered into form', async () => {
                 const user = userEvent.setup();
-                const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+                const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
                 const entry = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
                 const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(async () => entry);
                 await act(async () => {
@@ -644,7 +644,7 @@ describe('when updating an existing entry', () => {
 describe('when neither helm nor dinghy exist', () => {
     it('displays create helm and dinghy and update button', async () => {
         const user = userEvent.setup();
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<SignUpForm  model={model} race={race}/>);
         });
@@ -659,9 +659,9 @@ describe('when neither helm nor dinghy exist', () => {
     describe('when sign-up button clicked', () => {
         it('creates helm and dinghy and then updates entry with values entered into form', async () => {
             const user = userEvent.setup();
-            const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+            const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
             const signUpToRaceSpy = vi.spyOn(controller, 'signUpToRace').mockImplementation(async (race, helm, dinghy, crew) => {
-                if (!(race instanceof Race)) {
+                if (!(race instanceof DirectRace)) {
                     throw new MissingParameter('A race is required for a new race entry.');
                 }
                 if (!(helm instanceof Competitor)) {
@@ -704,7 +704,7 @@ describe('when neither helm nor dinghy exist', () => {
 describe('when neither helm nor crew exist', () => {
     it('displays add helm & crew & update button', async () => {
         const user = userEvent.setup();
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<SignUpForm  model={model} race={race}/>);
         });
@@ -719,9 +719,9 @@ describe('when neither helm nor crew exist', () => {
     describe('when update button clicked', () => {
         it('creates helm and crew and then updates entry with values entered into form', async () => {
             const user = userEvent.setup();
-            const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+            const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
             const signUpToRaceSpy = vi.spyOn(controller, 'signUpToRace').mockImplementation(async (race, helm, dinghy, crew) => {
-                if (!(race instanceof Race)) {
+                if (!(race instanceof DirectRace)) {
                     throw new MissingParameter('A race is required for a new race entry.');
                 }
                 if (!(helm instanceof Competitor)) {
@@ -770,7 +770,7 @@ describe('when neither helm nor crew exist', () => {
 describe('when neither dinghy nor crew exist', () => {
     it('displays add dinghy and crew and update button', async () => {
         const user = userEvent.setup();
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<SignUpForm  model={model} race={race} />);
         });
@@ -785,9 +785,9 @@ describe('when neither dinghy nor crew exist', () => {
     describe('when update button clicked', () => {
         it('creates dinghy and crew and then updates entry with values entered into form', async () => {
             const user = userEvent.setup();
-            const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+            const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
             const signUpToRaceSpy = vi.spyOn(controller, 'signUpToRace').mockImplementation(async (race, helm, dinghy, crew) => {
-                if (!(race instanceof Race)) {
+                if (!(race instanceof DirectRace)) {
                     throw new MissingParameter('A race is required for a new race entry.');
                 }
                 if (!(helm instanceof Competitor)) {
@@ -830,7 +830,7 @@ describe('when neither dinghy nor crew exist', () => {
 describe('when neither helm nor dinghy nor crew exist', () => {
     it('displays add helm and dinghy and crew and update button', async () => {
         const user = userEvent.setup();
-        const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<SignUpForm  model={model} race={race} />);
         });
@@ -845,9 +845,9 @@ describe('when neither helm nor dinghy nor crew exist', () => {
     describe('when update button clicked', () => {
         it('creates helm and dinghy and crew and then updates entry with values entered into form', async () => {
             const user = userEvent.setup();
-            const race = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+            const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
             const signUpToRaceSpy = vi.spyOn(controller, 'signUpToRace').mockImplementation(async (race, helm, dinghy, crew) => {
-                if (!(race instanceof Race)) {
+                if (!(race instanceof DirectRace)) {
                     throw new MissingParameter('A race is required for a new race entry.');
                 }
                 if (!(helm instanceof Competitor)) {
@@ -897,7 +897,7 @@ describe('when neither helm nor dinghy nor crew exist', () => {
 });
 describe('when a new competitor is created', () => {
     it('updates competitors', async () => {
-        const race = new Race(raceCometAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceCometAHAL, {version: '"0"'}, model);
         const getCompetitorsSpy = vi.spyOn(model, 'getCompetitors');
         await act(async () => {
             render(<SignUpForm  model={model} race={race} />);
@@ -910,7 +910,7 @@ describe('when a new competitor is created', () => {
 });
 describe('when a new dinghy is created', () => {
     it('updates dinghies', async () => {
-        const race = new Race(raceCometAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceCometAHAL, {version: '"0"'}, model);
         const getDinghiesInDinghyClassSpy = vi.spyOn(model, 'getDinghiesInDinghyClass');
         // wrap in act to ensure initial useEffects complete before dinghy creation update
         await act(async () => {
@@ -924,7 +924,7 @@ describe('when a new dinghy is created', () => {
 });
 describe('when a new dinghy class is created', () => {
     it('updates the list of dinghy classes', async () => {
-        const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
         const getDinghyClassesSpy = vi.spyOn(model, 'getDinghyClasses');
         await act(async () => {
             render(<SignUpForm  model={model} race={race}/>);
@@ -937,7 +937,7 @@ describe('when a new dinghy class is created', () => {
 });
 describe('when the fleet associated with the race is changed', () => {
     it('updates the list of dinghy classes', async () => {
-        const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
         const getDinghyClassesSpy = vi.spyOn(model, 'getDinghyClasses');
         await act(async () => {
             render(<SignUpForm  model={model} race={race} />);
@@ -951,7 +951,7 @@ describe('when the fleet associated with the race is changed', () => {
 describe('when a previous entry is selected', () => {
     it('populates the signup form with details from the previous entry', async () => {
         const user = userEvent.setup();
-        const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<SignUpForm  model={model} race={race} />);
         });
@@ -969,7 +969,7 @@ describe('when a previous entry is selected', () => {
     });
     it('overwrites any previously entered values removing any value entered for mate if mate in selected record is null', async () => {
         const user = userEvent.setup();
-        const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<SignUpForm  model={model} race={race} />);
         });
@@ -995,7 +995,7 @@ describe('when a previous entry is selected', () => {
 });
 describe('when race has embedded races', () => {
     it('displays embedded races', async () => {
-        const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+        const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<SignUpForm  model={model} race={race}/>);
         });
@@ -1004,7 +1004,7 @@ describe('when race has embedded races', () => {
     describe('when sign up button clicked', () => {
         it('signs up to embedded race', async () => {
             const user = userEvent.setup();
-            const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+            const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
             const embeddedRace = new EmbeddedRace(embeddedRaceVeteransAHAL, {version: '"0"'}, model);
             const entryChrisMarshall1234HandicapA = new Entry(entryChrisMarshall1234HandicapAHAL, {version: '"1"'}, model);
             vi.spyOn(controller, 'signUpToRace').mockImplementation(async (race, helm, dinghy, crew) => {
@@ -1029,7 +1029,7 @@ describe('when race has embedded races', () => {
         });
         it('clears form on success', async () => {
             const user = userEvent.setup();
-            const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+            const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
             // const embeddedRace = new EmbeddedRace(embeddedRaceVeteransAHAL, {version: '"0"'}, model);
             const entryChrisMarshall1234HandicapA = new Entry(entryChrisMarshall1234HandicapAHAL, {version: '"1"'}, model);
             vi.spyOn(controller, 'signUpToRace').mockImplementation(async (race, helm, dinghy, crew) => {
@@ -1062,7 +1062,7 @@ describe('when race has embedded races', () => {
     });
     describe('when updating an existing entry', () => {
         it('displays details for existing entry', async () => {
-            const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+            const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
             const entry = new Entry(entryChrisMarshall1234HandicapAHAL, {version: '"0"'}, model);
             vi.spyOn(model, 'getSignedUpTo').mockImplementation((url) => {
                 const signedUpChrisMarshallDinghy1234HandicapA = new SignedUp(signedUpChrisMarshallDinghy1234HandicapAHAL, {version: '"0"'}, model);
@@ -1082,7 +1082,7 @@ describe('when race has embedded races', () => {
             describe('when embedded race selection has not changed', () => {
                 it('does not sign up to embedded race', async () => {
                     const user = userEvent.setup();
-                    const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+                    const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
                     const entry = new Entry(entryChrisMarshall1234HandicapAHAL, {version: '"0"'}, model);
                     vi.spyOn(model, 'getSignedUpTo').mockImplementation((url) => {
                         const signedUpChrisMarshallDinghy1234HandicapA = new SignedUp(signedUpChrisMarshallDinghy1234HandicapAHAL, {version: '"0"'}, model);
@@ -1103,7 +1103,7 @@ describe('when race has embedded races', () => {
             describe('when previously selected embedded race unselected', () => {
                 it('removes sign up to removed embedded race', async () => {
                     const user = userEvent.setup();
-                    const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+                    const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
                     const entry = new Entry(entryChrisMarshall1234HandicapAHAL, {version: '"0"'}, model);
                     vi.spyOn(model, 'getSignedUpTo').mockImplementation((url) => {
                         const signedUpChrisMarshallDinghy1234HandicapA = new SignedUp(signedUpChrisMarshallDinghy1234HandicapAHAL, {version: '"0"'}, model);
@@ -1126,7 +1126,7 @@ describe('when race has embedded races', () => {
             describe('when additonal embedded races selected', () => {
                 it('signs up to additional embedded races', async () => {
                     const user = userEvent.setup();
-                    const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+                    const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
                     const embeddedRace = new EmbeddedRace(embeddedRaceLadiesAHAL, {version: '"0"'}, model);
                     const entry = new Entry(entryChrisMarshall1234HandicapAHAL, {version: '"0"'}, model);
                     vi.spyOn(model, 'getSignedUpTo').mockImplementation((url) => {
@@ -1149,7 +1149,7 @@ describe('when race has embedded races', () => {
             })
             it('updates entry with values entered into form', async () => {
                 const user = userEvent.setup();
-                const race = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+                const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
                 const entry = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
                 const updateEntrySpy = vi.spyOn(controller, 'updateEntry').mockImplementation(async () => entry);
                 await act(async () => {

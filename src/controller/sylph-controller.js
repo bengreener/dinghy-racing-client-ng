@@ -23,7 +23,7 @@ import EmbeddedRace from '../model/embedded-race';
 import Entry from '../model/entry';
 import Fleet from '../model/fleet';
 import Lap from '../model/lap';
-import Race from '../model/race';
+import DirectRace from '../model/direct-race';
 import DownloadOptions from './download-options';
 import { downloadRaceEntriesCSV } from '../utilities/csv-writer'
 
@@ -178,7 +178,7 @@ class SylphController {
      * @param {Integer} plannedLaps
      * @param {RaceType} type
      * @param {StartType} startType
-     * @returns {Promise<Race>}
+     * @returns {Promise<DirectRace>}
      * @throws {MissingParameter}
      * @throws {Error}
      */
@@ -209,13 +209,13 @@ class SylphController {
 
     /**
      * Download a file containing the results for race
-     * @param {Race} race to donwload results for
+     * @param {DirectRace} race to donwload results for
      * @param {DownloadOptions} [options]
      * @return {Promise<Boolean>}
      */
     async downloadRaceResults(race, options) {
         // check valid race (a URL is sufficient, otherwise a name and start time is required)
-        if (!(race instanceof Race)) {
+        if (!(race instanceof DirectRace)) {
             throw new MissingParameter('Please provide a race to download.');
         }
         const result = await this.model.getEntriesByRace(race);
@@ -229,7 +229,7 @@ class SylphController {
      */
     async postponeRace(race, duration) {
         // check valid race (a URL is sufficient, otherwise a name and start time is required)
-        if (!(race instanceof Race)) {
+        if (!(race instanceof DirectRace)) {
             throw new MissingParameter('A race to postpone is required.');
         }
         if (!(Number.isInteger(duration))) {
@@ -280,17 +280,17 @@ class SylphController {
 
     /**
      * Sign up to a race
-     * @param {Race} race Race to sign up to
+     * @param {DirectRace} race DirectRace to sign up to
      * @param {Competitor} helm Competitor signing up to helm dinghy
      * @param {Dinghy} dinghy Dinghy to be sailed in race
      * @param {Competitor} [crew] Competitor who will crew dinghy
-     * @returns {Promise<Race>}
+     * @returns {Promise<DirectRace>}
      * @throws {MissingParameter}
      * @throws {InvalidParameter}
      * @throws {Error}
      */
     async signUpToRace(race, helm, dinghy, crew) {
-        if (!(race instanceof Race)) {
+        if (!(race instanceof DirectRace)) {
             throw new MissingParameter('A race is required for a new race entry.');
         }
         if (!(helm instanceof Competitor)) {
@@ -332,12 +332,12 @@ class SylphController {
 
     /**
      * Start a race
-     * @param {Race} race to start
-     * @return {Promise<Race>}
+     * @param {DirectRace} race to start
+     * @return {Promise<DirectRace>}
      */
     async startRace(race) {
         // check valid race (a URL is sufficient, otherwise a name and start time is required)
-        if (!(race instanceof Race)) {
+        if (!(race instanceof DirectRace)) {
             throw new MissingParameter('A race to start is required.');
         }
         const fleet = await race.getFleet();
@@ -512,13 +512,13 @@ class SylphController {
 
     /**
      * Update the start sequence state of a race
-     * @param {Race} race to start
+     * @param {DirectRace} race to start
      * @param {Integer} plannedLaps new value for the number of laps to be completed
-     * @return {Promise<Race>}
+     * @return {Promise<DirectRace>}
      */
     async updateRacePlannedLaps(race, plannedLaps) {
         // check valid race (a URL is sufficient, otherwise a name and start time is required)
-        if (!(race instanceof Race)) {
+        if (!(race instanceof DirectRace)) {
             throw new MissingParameter('A race to update is required.');
         }
         if (!(Number.isInteger(plannedLaps)) || !(plannedLaps > 0)) {

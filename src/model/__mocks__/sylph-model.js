@@ -25,7 +25,7 @@ import EmbeddedRace from '../embedded-race';
 import Entry from '../entry';
 import Fleet from '../fleet';
 import Lap from '../lap';
-import Race from '../race';
+import DirectRace from '../direct-race';
 import RaceType from '../race-type';
 import SessionStartSequence from '../session-start-sequence';
 import SignedUp from '../signed-up';
@@ -123,7 +123,7 @@ class SylphModel {
     }
     
     async createRace(name, plannedStartTime, fleet, duration, plannedLaps, type, startType) {
-        return new Race({}, {version: ''}, this);
+        return new DirectRace({}, {version: ''}, this);
     }
 
     getClock() {
@@ -455,7 +455,7 @@ class SylphModel {
             version = {version: '"0"'};
             return new EmbeddedRace(raceHAL, version, this);
         }
-        return new Race(raceHAL, version, this);
+        return new DirectRace(raceHAL, version, this);
     }
 
     async getRacesBetweenTimes(startTime, endTime, page, size, sortParameters) {
@@ -464,11 +464,11 @@ class SylphModel {
     
     async getRacesBetweenTimesForType(startTime, endTime, type, page, size, sortParameters) {
         let collection = [];
-        const raceCometA = new Race(raceCometAHAL, {version: '"0"'}, this);
-        const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, this);
-        const raceHandicapA = new Race(raceHandicapAHAL, {version: '"0"'}, this);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, this);
-        const racePursuitA = new Race(racePursuitAHAL, {version: '"0"'}, this);
+        const raceCometA = new DirectRace(raceCometAHAL, {version: '"0"'}, this);
+        const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, this);
+        const raceHandicapA = new DirectRace(raceHandicapAHAL, {version: '"0"'}, this);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, this);
+        const racePursuitA = new DirectRace(racePursuitAHAL, {version: '"0"'}, this);
 
         if (type === RaceType.FLEET) {
             collection = [
@@ -486,10 +486,10 @@ class SylphModel {
     async getRacesFromURL(url, page, size, sortParameters) {
         let collection = [];
         let totalElements = 0;
-        const raceCometA = new Race(raceCometAHAL, {version: '"0"'}, this);
-        const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, this);
-        const raceHandicapA = new Race(raceHandicapAHAL, {version: '"0"'}, this);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, this);
+        const raceCometA = new DirectRace(raceCometAHAL, {version: '"0"'}, this);
+        const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, this);
+        const raceHandicapA = new DirectRace(raceHandicapAHAL, {version: '"0"'}, this);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, this);
 
         collection = [
             raceCometA, raceGraduateA, raceHandicapA, raceScorpionA
@@ -713,7 +713,7 @@ class SylphModel {
     }
     
     async signUpToRace(race, helm, dinghy, crew) {
-        return new Race({}, {version: ''}, this);
+        return new DirectRace({}, {version: ''}, this);
     }
 
     async signUpToEmbeddedRace(embddedRace, entry) {
@@ -807,7 +807,7 @@ class SylphModel {
     }
 
     async updateRace(race, name, plannedStartTime, fleet, duration, plannedLaps, type, startType) {
-        return new Race({}, {version: ''}, this);
+        return new DirectRace({}, {version: ''}, this);
     }
     
     async withdrawEntry(entry) {

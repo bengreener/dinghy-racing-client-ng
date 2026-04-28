@@ -17,7 +17,7 @@
 import { Client } from '@stomp/stompjs';
 import Fleet from './fleet';
 import Metadata from './metadata';
-import Race from './race';
+import DirectRace from './direct-race';
 import Clock from './clock';
 import Collection from './collection';
 import Competitor from './competitor';
@@ -267,7 +267,7 @@ class SylphModel {
      * @param {Integer} plannedLaps
      * @param {RaceType} type
      * @param {StartType} startType
-     * @returns {Promise<Race>}
+     * @returns {Promise<DirectRace>}
      * @throws {Error}
      */
     async createRace(name, plannedStartTime, fleet, duration, plannedLaps, type, startType) {
@@ -276,7 +276,7 @@ class SylphModel {
             type: type, startType: startType
         };
         const result = await this._create(this.httpRootURL + '/directRaces', race);
-        return new Race(result.hal, result.metadata, this);
+        return new DirectRace(result.hal, result.metadata, this);
     }
 
     /**
@@ -502,8 +502,8 @@ class SylphModel {
 
     /**
      * Get dinghy classes for dinghies that have signed up to race
-     * @param {Race} race
-     * @returns {Promise<Collection<Race>>}
+     * @param {DirectRace} race
+     * @returns {Promise<Collection<DirectRace>>}
      * @throws {Error}
      */
     async getDinghyClassesInRace(race) {
@@ -561,8 +561,8 @@ class SylphModel {
     }
 
     /**
-     * Get embedded races hosted in Race
-     * @param {Race} race
+     * Get embedded races hosted in DirectRace
+     * @param {DirectRace} race
      * @returns {Promise<Collection<EmbeddedRace>>}
      */
     async getEmbeddedRacesInRace(race) {
@@ -572,7 +572,7 @@ class SylphModel {
     /**
      * Get entries for a race
      * On success result domain object will be an array of Entry types; {Array<Entry>}
-     * @param {Race} race
+     * @param {DirectRace} race
      * @returns {Promise<Collection<Entry>>}
      * @throws {Error}
      */
@@ -588,7 +588,7 @@ class SylphModel {
     * @param {Integer} [page] number to return (0 indexed)
     * @param {Integer} [size] number of elements to return per page
     * @param {SortParameters} [sortParameters] and order for sorting the requested races
-    * @returns {Promise<Collection<Entry>>} If successful result domainObject will be Array<Race>
+    * @returns {Promise<Collection<Entry>>} If successful result domainObject will be Array<DirectRace>
     * @throws {Error}
     */
     async getEntriesFromURL(url, page, size, sortParameters) {
@@ -614,7 +614,7 @@ class SylphModel {
 
     /**
      * Get an entry by the race signed up to and dinghy signed up with
-     * @param {Race} race the diraect race the entry has signed up to
+     * @param {DirectRace} race the diraect race the entry has signed up to
      * @param {Dinghy} dinghy to be sailed in race
      * @returns {Promise<Entry>}
      * @throws {Error}
@@ -686,7 +686,7 @@ class SylphModel {
      * Gat a race
      * Don't know when this is called if return value wil be a direct or embedded race
      * @param {String} url 
-     * @returns {<Promise<Race | EmbeddedRace>>}
+     * @returns {<Promise<DirectRace | EmbeddedRace>>}
      * @throws {Error}
      */
     async getRace(url) {
@@ -694,7 +694,7 @@ class SylphModel {
         if (/embeddedRace/.test(result.hal._links.self.href)) {
             return new EmbeddedRace(result.hal, result.metadata, this);
         }
-        return new Race(result.hal, result.metadata, this);
+        return new DirectRace(result.hal, result.metadata, this);
     }
 
     /**
@@ -704,7 +704,7 @@ class SylphModel {
      * @param {Integer} [page] number to return (0 indexed)
      * @param {Integer} [size] number of elements to return per page
      * @param {SortParameters} [sortParameters] and order for sorting the requested races
-     * @returns {Promise<Collection<Race>>}
+     * @returns {Promise<Collection<DirectRace>>}
      * @throws {Error}
      */
     async getRacesBetweenTimes(startTime, endTime, page, size, sortParameters) {
@@ -720,7 +720,7 @@ class SylphModel {
      * @param {Integer} [page] number to return (0 indexed)
      * @param {Integer} [size] number of elements to return per page
      * @param {SortParameters} [sortParameters] and order for sorting the requested races
-     * @returns {Promise<Collection<Race>>} If successful result domainObject will be Array<Race>
+     * @returns {Promise<Collection<DirectRace>>} If successful result domainObject will be Array<DirectRace>
      * @throws {Error}
      */
     async getRacesBetweenTimesForType(startTime, endTime, type, page, size, sortParameters) {
@@ -734,7 +734,7 @@ class SylphModel {
      * @param {Integer} [page] number to return (0 indexed)
      * @param {Integer} [size] number of elements to return per page
      * @param {SortParameters} [sortParameters] order for sorting the requested races
-     * @returns {Promise<Collection<Race>>}
+     * @returns {Promise<Collection<DirectRace>>}
      * @throws {Error}
      */
     async getRacesFromURL(url, page, size, sortParameters) {
@@ -753,7 +753,7 @@ class SylphModel {
      * @param {Date} startTime The start time of the race
      * @param {Integer} [page] number to return (0 indexed)
      * @param {Integer} [size] number of elements to return per page
-     * @returns {Promise<Collection<Race>>}
+     * @returns {Promise<Collection<DirectRace>>}
      * @throws {Error}
      */
     async getRacesOnOrAfterTime(startTime, page, size) {
@@ -790,7 +790,7 @@ class SylphModel {
 
     /**
      * Get the SignedUp to race for entry
-     * @param {Race | EmbeddedRace} race
+     * @param {DirectRace | EmbeddedRace} race
      * @param {Entry} entry
      * @returns {SignedUp}
      */
@@ -802,7 +802,7 @@ class SylphModel {
     /**
      * Get a start sequence for starting races during a session
      * Only one type of race can be included in the start sequence
-     * @param {Array<Race>} races Races to build the start sequence for
+     * @param {Array<DirectRace>} races Races to build the start sequence for
      * @returns {StartSequence}
      * @throws {InvalidParameter}
      */
@@ -1088,11 +1088,11 @@ class SylphModel {
     /**
      * Sign up to a race
      * Supplied race, helm, dinghy, and crew must exist
-     * @param {Race} race Race to enter
+     * @param {DirectRace} race DirectRace to enter
      * @param {Competitor} helm Competitor entering race as the helm
      * @param {Dinghy} dinghy Dinghy to be sailed in race
      * @param {Competitor} [crew] Competitor entering race as the crew
-     * @returns {Promise<Race>}
+     * @returns {Promise<DirectRace>}
      * @throws {Error}
      */
     async signUpToRace(race, helm, dinghy, crew) {
@@ -1103,7 +1103,7 @@ class SylphModel {
         else {
             result = await this._update(race.url + '/signUp', {'helm': helm.url, 'dinghy': dinghy.url});
         }
-        return new Race(result.hal, result.metadata, this);
+        return new DirectRace(result.hal, result.metadata, this);
     }
 
     /**
@@ -1287,16 +1287,16 @@ class SylphModel {
 
     /**
      * Update the position of an entry in a race
-     * @param {Race} race
+     * @param {DirectRace} race
      * @param {Entry} entry
      * @param {Integer} newPosition
-     * @returns {Promise<Race>}
+     * @returns {Promise<DirectRace>}
      * @throws {InvalidParameter}
      * @throws {Error}
      */
     async updateEntryPosition(race, entry, newPosition) {
         const result = await this._update(race.url + '/updateEntryPosition?entry=' + entry.url + '&position=' + newPosition);
-        return new Race(result.hal, result.metadata, this);
+        return new DirectRace(result.hal, result.metadata, this);
     }
 
     /**
@@ -1313,7 +1313,7 @@ class SylphModel {
 
     /**
      * Update race
-     * @param {Race} race
+     * @param {DirectRace} race
      * @param {String} name
      * @param {Date} plannedStartTime
      * @param {Fleet} fleet
@@ -1321,7 +1321,7 @@ class SylphModel {
      * @param {Integer} plannedLaps
      * @param {RaceType} type
      * @param {StartType} startType
-     * @returns {Promise<Race>}
+     * @returns {Promise<DirectRace>}
      * @throws {Error}
      */
     async updateRace(race, name, plannedStartTime, fleet, duration, plannedLaps, type, startType) {
@@ -1330,7 +1330,7 @@ class SylphModel {
             type: type, startType: startType
         };
         const result = await this._update(race.url, updatedRace);
-        return new Race(result.hal, result.metadata, this);
+        return new DirectRace(result.hal, result.metadata, this);
     }
 
     /**

@@ -21,7 +21,7 @@ import SylphModel from '../model/sylph-model';
 import { SortOrder } from '../model/sylph-model';
 import SylphController from '../controller/sylph-controller';
 import Collection from '../model/collection';
-import Race from '../model/race';
+import DirectRace from '../model/direct-race';
 import RaceType from '../model/race-type';
 import * as storageUtilities from '../utilities/storage-utilities';
 import { httpRootURL, wsRootURL, fleetHandicapHAL, raceCometAHAL, raceGraduateAHAL, raceHandicapAHAL, raceScorpionAHAL, racePursuitAHAL } from '../model/__mocks__/test-data';
@@ -130,10 +130,10 @@ it('calls SylphModel.getStartSequence with correct arguments', async () => {
     const model = new SylphModel(httpRootURL, wsRootURL);
     const controller = new SylphController(model);
     const getStartSequenceSpy = vi.spyOn(model, 'getStartSequence');
-    const raceCometA = new Race(raceCometAHAL, {version: '"0"'}, model);
-    const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
-    const raceHandicapA = new Race(raceHandicapAHAL, {version: '"0"'}, model);
-    const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+    const raceCometA = new DirectRace(raceCometAHAL, {version: '"0"'}, model);
+    const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
+    const raceHandicapA = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
+    const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
 
     const collection = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA ];
     
@@ -169,7 +169,7 @@ describe('when new value set for race type', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
         const getStartSequenceSpy = vi.spyOn(model, 'getStartSequence');
-        const racePursuitA = new Race(racePursuitAHAL, {version: '"0"'}, model);
+        const racePursuitA = new DirectRace(racePursuitAHAL, {version: '"0"'}, model);
 
         await act(async () => {        
             render(<RaceStartConsole model={model} controller={controller} />);
@@ -320,8 +320,8 @@ it('does not display in race data in race headers', async () => {
 });
 it('displays actions to start races in session', async () => {
     const model = new SylphModel(httpRootURL, wsRootURL);
-    const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
-    const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+    const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
+    const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
     const collection = [raceScorpionA, raceGraduateA];
     const controller = new SylphController(model);
     vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(async () => {
@@ -483,9 +483,9 @@ it('registers an interest in race updates for races in session', async () => {
 describe('when races within session are changed', () => {
     it('updates recorded details', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
-        const racePopeyeSpecial = new Race({...raceScorpionAHAL, name: 'Popeye Special'}, {version: '"1"'}, model);
+        const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        const racePopeyeSpecial = new DirectRace({...raceScorpionAHAL, name: 'Popeye Special'}, {version: '"1"'}, model);
         let collection = [raceScorpionA, raceGraduateA];
         vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(async () => {
             return new Collection(collection, {size: 20, totalElements: 2, totalPages: 0, number: 0})
@@ -504,10 +504,10 @@ describe('when races within session are changed', () => {
     });
     it('removes a race that has had start time changed so it falls outside session time window', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceCometA = new Race(raceCometAHAL, {version: '"0"'}, model);
-        const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
-        const raceHandicapA = new Race(raceHandicapAHAL, {version: '"0"'}, model);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceCometA = new DirectRace(raceCometAHAL, {version: '"0"'}, model);
+        const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
+        const raceHandicapA = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const collection = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA ];
         const controller = new SylphController(model);
         vi.spyOn(model, 'getRacesBetweenTimesForType').mockImplementation(async () => {
@@ -656,7 +656,7 @@ describe('when selected races changed', () => {
         const raceHeaders = (screen.getByRole('heading', {name: /^races$/i})).parentNode;
         let raceA = within(raceHeaders).getByText(/scorpion a/i);
         expect(raceA).toBeInTheDocument();
-        const selectRace = screen.getByLabelText(/Race/i);
+        const selectRace = screen.getByLabelText(/DirectRace/i);
         user.deselectOptions(selectRace, ['Scorpion A']);
         raceA = within(raceHeaders).queryByText(/scorpion a/i);
         expect(raceA).not.toBeInTheDocument();
@@ -669,12 +669,12 @@ describe('when selected races changed', () => {
         await act(async () => {
             render(<RaceStartConsole model={model} controller={controller} />);
         });
-        const selectRace = screen.getByLabelText(/Race/i);
+        const selectRace = screen.getByLabelText(/DirectRace/i);
         user.deselectOptions(selectRace, ['Scorpion A']);
         expect(getStartSequenceSpy).toHaveBeenLastCalledWith([
-            new Race(raceGraduateAHAL, {version: '"0"'}, model),
-            new Race(raceCometAHAL, {version: '"0"'}, model),
-            new Race(raceHandicapAHAL, {version: '"0"'}, model)
+            new DirectRace(raceGraduateAHAL, {version: '"0"'}, model),
+            new DirectRace(raceCometAHAL, {version: '"0"'}, model),
+            new DirectRace(raceHandicapAHAL, {version: '"0"'}, model)
         ]);
     });
     it('displays race names and blue peter', async () => {
@@ -684,7 +684,7 @@ describe('when selected races changed', () => {
         await act(async () => {
             render(<RaceStartConsole model={model} controller={controller} />);
         });
-        const selectRace = screen.getByLabelText(/Race/i);
+        const selectRace = screen.getByLabelText(/DirectRace/i);
         user.deselectOptions(selectRace, ['Scorpion A']);
         await act(async () => {});
         
@@ -702,7 +702,7 @@ describe('when selected races changed', () => {
         await act(async () => {
             render(<RaceStartConsole model={model} controller={controller} />);
         });
-        const selectRace = screen.getByLabelText(/Race/i);
+        const selectRace = screen.getByLabelText(/DirectRace/i);
         user.deselectOptions(selectRace, ['Scorpion A']);
         const actionRows = screen.getAllByRole('row');
         expect(actionRows).toHaveLength(6);

@@ -113,6 +113,6 @@ export default UpcomingRacesConsole;
 
 /**
  * @callback ViewUpcomingRaces~showSignUpConsole
- * @param {Race} race The race to sign up to
+ * @param {DirectRace} race The race to sign up to
  * @param {Model} model
  */

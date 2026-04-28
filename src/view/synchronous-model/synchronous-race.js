@@ -24,7 +24,7 @@ class SynchronousRace {
 
     /**
      * 
-     * @param {Race} race 
+     * @param {DirectRace} race 
      * @param {SynchronousFleet} fleet 
      * @param {Array<SynchronousEntry>} entries 
      */

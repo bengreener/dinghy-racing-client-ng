@@ -22,7 +22,7 @@ import DownloadOptions from '../controller/download-options';
 /**
  * Write race, entries, and any recorded laps to a CSV file
  * File will be saved via browsers URL file download feature
- * @param {Race} race
+ * @param {DirectRace} race
  * @param {Array<Entry>} entries
  * @param {DownloadOptions} [options]
  * @returns {Promise<Boolean>}
@@ -68,7 +68,7 @@ async function downloadRaceEntriesCSV(race, entries, options) {
 
 /**
  * Create header record for csv file
- * @param {Race} race 
+ * @param {DirectRace} race 
  * @param {Boolean} includeCrew
  * @returns {String}
  */

@@ -27,7 +27,7 @@ import Dinghy from '../model/dinghy';
 import DinghyClass from '../model/dinghy-class';
 import Entry from '../model/entry';
 import Lap from '../model/lap';
-import Race from '../model/race';
+import DirectRace from '../model/direct-race';
 import SignedUp from '../model/signed-up';
 import SynchronousDinghy from './synchronous-model/synchronous-dinghy';
 import SynchronousEntry from './synchronous-model/synchronous-entry';
@@ -53,7 +53,7 @@ it('renders', () => {
         new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
         new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
         new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-        new Race(raceScorpionAHAL, {version: '"0"'}, model),
+        new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
         new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
         new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
     );
@@ -68,7 +68,7 @@ it('displays lap times', async () => {
         new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
         new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
         new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-        new Race(raceScorpionAHAL, {version: '"0"'}, model),
+        new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
         new Collection([new Lap({number: 1, time: 'PT0M01S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
         new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
     );
@@ -82,7 +82,7 @@ it('displays cumulative sum of lap times', async () => {
         new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
         new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
         new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-        new Race(raceScorpionAHAL, {version: '"0"'}, model),
+        new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
         new Collection([
             new Lap({number: 1, time: 'PT0M01S'}, {version: '"0"'}, model),
             new Lap({number: 2, time: 'PT0M01S'}, {version: '"0"'}, model),
@@ -102,7 +102,7 @@ it('displays position', () => {
         new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
         new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
         new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-        new Race(raceScorpionAHAL, {version: '"0"'}, model),
+        new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
         new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
         new SignedUp({...signedUpChrisMarshallDinghy1234ScorpionAHAL, position: 5}, {version: '"0"'}, model)
     );
@@ -119,7 +119,7 @@ describe('before race has started', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -142,7 +142,7 @@ describe('after race has started', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -165,7 +165,7 @@ describe('when a lap is removed from an entry', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -185,7 +185,7 @@ describe('when a lap is removed from an entry', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -206,7 +206,7 @@ describe('when a lap is removed from an entry', () => {
                 new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
                 new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );
@@ -231,7 +231,7 @@ describe('when secondary mouse button is clicked', () => {
                 new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
                 new Collection([
                     new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)
                 ], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
@@ -260,7 +260,7 @@ describe('when secondary mouse button is clicked', () => {
                 new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
                 new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );
@@ -284,7 +284,7 @@ describe('when editing a lap time', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -307,7 +307,7 @@ describe('when editing a lap time', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -330,7 +330,7 @@ describe('when editing a lap time', () => {
                 new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
                 new Collection([new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );
@@ -358,7 +358,7 @@ describe('when editing a lap time', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -387,7 +387,7 @@ describe('when editing a lap time', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -416,7 +416,7 @@ describe('when editing a lap time', () => {
                 new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
                 new Collection([new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );
@@ -445,7 +445,7 @@ describe('when editing a lap time', () => {
                 new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
                 new Collection([new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );
@@ -471,7 +471,7 @@ describe('when editing a lap time', () => {
                 new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
                 new Collection([new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );
@@ -501,7 +501,7 @@ describe('when user taps row', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -521,7 +521,7 @@ describe('when user taps row', () => {
                 new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
                 new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );
@@ -546,7 +546,7 @@ describe('when user taps and holds on row', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -597,7 +597,7 @@ describe('when entry is on last lap', () => {
             new Entry({...entryChrisMarshall1234ScorpionAHAL, onLastLap: true}, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -614,7 +614,7 @@ describe('when entry is not on last lap', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -631,7 +631,7 @@ describe('when entry has finished race', () => {
             new Entry({...entryChrisMarshall1234ScorpionAHAL, finishedRace: true}, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -648,7 +648,7 @@ describe('when entry has not finished race', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -665,7 +665,7 @@ describe('when a scoring abbreviation is not selected', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -684,7 +684,7 @@ describe('when a scoring abbreviation is selected', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -703,7 +703,7 @@ describe('when a scoring abbreviation is selected', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -723,7 +723,7 @@ describe('when a scoring abbreviation is selected', () => {
                 new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
                 new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );
@@ -740,7 +740,7 @@ describe('when a scoring abbreviation is selected', () => {
                 new Entry({entryChrisMarshall1234ScorpionAHAL, scoringAbbreviation: 'DNS'}, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
                 new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );
@@ -756,7 +756,7 @@ describe('when a scoring abbreviation is selected', () => {
                 new Entry({entryChrisMarshall1234ScorpionAHAL, scoringAbbreviation: 'RET'}, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
                 new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );
@@ -772,7 +772,7 @@ describe('when a scoring abbreviation is selected', () => {
                 new Entry({entryChrisMarshall1234ScorpionAHAL, scoringAbbreviation: 'DSQ'}, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
                 new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
@@ -787,7 +787,7 @@ describe('when a scoring abbreviation is selected', () => {
                 new Entry({entryChrisMarshall1234ScorpionAHAL, scoringAbbreviation: 'DNC'}, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
                 new Collection([], {size: 20, totalElements: 0, totalPages: 0, number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
@@ -802,7 +802,7 @@ describe('when a scoring abbreviation is selected', () => {
                 new Entry({entryChrisMarshall1234ScorpionAHAL, scoringAbbreviation: 'OCS'}, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
                 new Collection([], {size: 20, totalElements: 0, totalPages: 0, number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );
@@ -818,7 +818,7 @@ describe('when a scoring abbreviation is selected', () => {
                 new Entry({entryChrisMarshall1234ScorpionAHAL, scoringAbbreviation: 'DNF'}, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
                 new Collection([], {size: 20, totalElements: 0, totalPages: 0, number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );
@@ -837,7 +837,7 @@ describe('when the entry is selected to add a new lap', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -856,7 +856,7 @@ describe('when the entry is selected to add a new lap', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -880,7 +880,7 @@ describe('when the entry is selected to add a new lap', () => {
                 new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                new Race(raceScorpionAHAL, {version: '"0"'}, model),
+                new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
                 new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );
@@ -946,7 +946,7 @@ describe('when user drags and drops an entry to a new position', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -954,7 +954,7 @@ describe('when user drags and drops an entry to a new position', () => {
             new Entry(entrySarahPascal6745ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy6745HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorSarahPascalHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -981,7 +981,7 @@ describe('when user drags and drops an entry to a new position', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -989,7 +989,7 @@ describe('when user drags and drops an entry to a new position', () => {
             new Entry(entrySarahPascal6745ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy6745HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorSarahPascalHAL, {version: '"0"'}, model),
-            new Race(raceScorpionAHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -1022,7 +1022,7 @@ describe('when user drags and drops an entry to a new position', () => {
                 new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                new Race(racePursuitAHAL, {version: '"0"'}, model),
+                new DirectRace(racePursuitAHAL, {version: '"0"'}, model),
                 new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );
@@ -1030,7 +1030,7 @@ describe('when user drags and drops an entry to a new position', () => {
                 new Entry(entrySarahPascal6745ScorpionAHAL, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy6745HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorSarahPascalHAL, {version: '"0"'}, model),
-                new Race(racePursuitAHAL, {version: '"0"'}, model),
+                new DirectRace(racePursuitAHAL, {version: '"0"'}, model),
                 new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );
@@ -1061,7 +1061,7 @@ describe('when user drags and drops an entry to a new position', () => {
                     new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
                     new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                     new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                    new Race(racePursuitAHAL, {version: '"0"'}, model),
+                    new DirectRace(racePursuitAHAL, {version: '"0"'}, model),
                     new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
                     new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
                 );
@@ -1069,7 +1069,7 @@ describe('when user drags and drops an entry to a new position', () => {
                     new Entry(entrySarahPascal6745ScorpionAHAL, {version: '"0"', model}), 
                     new SynchronousDinghy(new Dinghy(dinghy6745HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                     new Competitor(competitorSarahPascalHAL, {version: '"0"'}, model),
-                    new Race(racePursuitAHAL, {version: '"0"'}, model),
+                    new DirectRace(racePursuitAHAL, {version: '"0"'}, model),
                     new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
                     new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
                 );
@@ -1103,7 +1103,7 @@ describe('when user drags and drops an entry to a new position', () => {
                     new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
                     new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                     new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                    new Race(racePursuitAHAL, {version: '"0"'}, model),
+                    new DirectRace(racePursuitAHAL, {version: '"0"'}, model),
                     new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
                     new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
                 );
@@ -1138,7 +1138,7 @@ describe('when user drags and drops an entry to a new position', () => {
                 new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-                new Race(racePursuitAHAL, {version: '"0"'}, model),
+                new DirectRace(racePursuitAHAL, {version: '"0"'}, model),
                 new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );
@@ -1146,7 +1146,7 @@ describe('when user drags and drops an entry to a new position', () => {
                 new Entry(entrySarahPascal6745ScorpionAHAL, {version: '"0"', model}), 
                 new SynchronousDinghy(new Dinghy(dinghy6745HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
                 new Competitor(competitorSarahPascalHAL, {version: '"0"'}, model),
-                new Race(racePursuitAHAL, {version: '"0"'}, model),
+                new DirectRace(racePursuitAHAL, {version: '"0"'}, model),
                 new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );
@@ -1184,7 +1184,7 @@ describe('when handler set for onFastGroup', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(racePursuitAHAL, {version: '"0"'}, model),
+            new DirectRace(racePursuitAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -1199,7 +1199,7 @@ describe('when handler set for onFastGroup', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(racePursuitAHAL, {version: '"0"'}, model),
+            new DirectRace(racePursuitAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -1214,7 +1214,7 @@ describe('when handler set for onFastGroup', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(racePursuitAHAL, {version: '"0"'}, model),
+            new DirectRace(racePursuitAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -1231,7 +1231,7 @@ describe('when handler set for onFastGroup', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(racePursuitAHAL, {version: '"0"'}, model),
+            new DirectRace(racePursuitAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );
@@ -1252,7 +1252,7 @@ describe('when handler not set for onFastGroup', () => {
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
             new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
             new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
-            new Race(racePursuitAHAL, {version: '"0"'}, model),
+            new DirectRace(racePursuitAHAL, {version: '"0"'}, model),
             new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
             new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
         );

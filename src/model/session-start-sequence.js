@@ -87,7 +87,7 @@ class SessionStartSequence {
     /**
      * Return the next race to start on or after time
      * @param {DateTime} time
-     * @returns {Race | null | undefined}
+     * @returns {DirectRace | null | undefined}
      */
     getNextRaceToStart(time) {
         const upcomingRaces = [];

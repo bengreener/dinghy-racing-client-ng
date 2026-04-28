@@ -28,7 +28,7 @@ import DinghyRacingController from '../controller/sylph-controller';
 import Collection from '../model/collection';
 import Entry from '../model/entry';
 import Lap from '../model/lap';
-import Race from '../model/race';
+import DirectRace from '../model/direct-race';
 import SignedUp from '../model/signed-up';
 import SylphController from '../controller/sylph-controller';
 import Competitor from '../model/competitor';
@@ -47,7 +47,7 @@ afterEach(() => {
 it('renders', async () => {
     const model = new SylphModel(httpRootURL, wsRootURL);
     await act(async () => {
-        render(<RaceEntriesView model={model} races={[new Race(raceScorpionAHAL, {version: '"0"'}, model)]} />);
+        render(<RaceEntriesView model={model} races={[new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)]} />);
     });
     expect(screen.getByRole('button', {name: /by sail number/i})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: /by class & sail number/i})).toBeInTheDocument();
@@ -60,8 +60,8 @@ it('renders', async () => {
 });
 it('displays entries for selected races', async () => {
     const model = new SylphModel(httpRootURL, wsRootURL);
-    const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
-    const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
+    const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+    const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
     await act(async () => {
         render(<RaceEntriesView model={model} races={[raceScorpionA, raceGraduateA]} />);
     });
@@ -76,7 +76,7 @@ describe('when entries cannot be loaded for a selected race', () => {
     it('displays an error message', async () => {
         vi.spyOn(console, 'error').mockImplementation(vi.fn());
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         vi.spyOn(model, 'getEntriesByRace').mockImplementation(async () => {throw new Error('Oops!')});
         await act(async () => {
             render(<RaceEntriesView model={model} races={[raceScorpionA]} />);
@@ -87,7 +87,7 @@ describe('when entries cannot be loaded for a selected race', () => {
     it('clears the error message when entries are successfully loaded', async () => {
         vi.spyOn(console, 'error').mockImplementation(vi.fn());
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         vi.spyOn(model, 'getEntriesByRace').mockImplementationOnce(async () => {throw new Error('Oops!')});
         let renderResult;
         await act(async () => {
@@ -106,8 +106,8 @@ describe('when sorting entries', () => {
     it('sorts by the sailnumber', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
-        const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<RaceEntriesView model={model} races={[raceScorpionA, raceGraduateA]} />);
         });
@@ -121,8 +121,8 @@ describe('when sorting entries', () => {
     it('sorts by the dinghy class and sail number', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
-        const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<RaceEntriesView model={model} races={[raceScorpionA, raceGraduateA]} />);
         });
@@ -136,8 +136,8 @@ describe('when sorting entries', () => {
     it('sorts by the number of laps and then by the time to complete the last lap in descending order', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
-        const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<RaceEntriesView model={model} races={[raceScorpionA, raceGraduateA]} />);
         });
@@ -151,8 +151,8 @@ describe('when sorting entries', () => {
     it('sorts by estimation of next lap finish time', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
-        const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<RaceEntriesView model={model} races={[raceScorpionA, raceGraduateA]} />);
         });
@@ -166,7 +166,7 @@ describe('when sorting entries', () => {
     it('enables resorting by the same value after entries have been updated', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         vi.spyOn(model, 'getEntriesByRace').mockImplementation(async (url) => {
             const entryCollection = [
                 new Entry({...entryChrisMarshall1234ScorpionAHAL, leadEntryAverageLapTime: 'PT5M12.568S', sumOfLapTimes: 'PT5M12.568S', correctedTime: 'PT4M59.681S', leadEntryLastLapTime: 'PT5M12.568S'}, {version: '"0"'}, model),
@@ -232,7 +232,7 @@ describe('when sorting entries', () => {
         it('sorts by position in ascending order', async () => {
             const user = userEvent.setup();
             const model = new SylphModel(httpRootURL, wsRootURL);
-            const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+            const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
             await act(async () => {
                 render(<RaceEntriesView model={model} races={[raceScorpionA]} />);
             });
@@ -252,7 +252,7 @@ describe('when sorting entries', () => {
                 ];
                 return new Collection(entryCollection, {size: 20, totalElements: entryCollection.length, totalPages: 0, number: 0});
             });
-            const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+            const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
             await act(async () => {
                 render(<RaceEntriesView model={model} races={[raceScorpionA]} />);
             });
@@ -269,8 +269,8 @@ describe('when sorting entries', () => {
         vi.spyOn(model, 'getLaps').mockImplementation(async (url) => {
             return new Collection([], {size: 20,totalElements: 0, totalPages: 0,number: 0});
         });
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
-        const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<RaceEntriesView model={model} races={[raceScorpionA, raceGraduateA]} />);
         });
@@ -297,7 +297,7 @@ describe('when fast grouping entries', () => {
         vi.spyOn(model, 'getLaps').mockImplementation(async (url) => {
             return new Collection([], {size: 20,totalElements: 0, totalPages: 0,number: 0});
         })
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<RaceEntriesView model={model} races={[raceScorpionA]} />);
         });
@@ -311,9 +311,9 @@ describe('when fast grouping entries', () => {
     it('displays entries not fast grouped in the same order as before an entry was fast grouped', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
-        const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
-        const raceCometA = new Race(raceCometAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
+        const raceCometA = new DirectRace(raceCometAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<RaceEntriesView model={model} races={[raceCometA, raceGraduateA, raceScorpionA]} />);
         });
@@ -333,8 +333,8 @@ describe('when fast grouping entries', () => {
     it('shows entries in order selected with first entry selected at the top', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
-        const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<RaceEntriesView model={model} races={[raceGraduateA, raceScorpionA]} />);
         });
@@ -355,8 +355,8 @@ describe('when fast grouping entries', () => {
     it('shows entries as fast group selected', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
-        const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<RaceEntriesView model={model} races={[raceScorpionA, raceGraduateA]} />);
         });
@@ -385,7 +385,7 @@ describe('when fast grouping entries', () => {
         vi.spyOn(model, 'getLaps').mockImplementation(async (url) => {
             return new Collection([], {size: 20,totalElements: 0, totalPages: 0,number: 0});
         });
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<RaceEntriesView model={model} races={[raceScorpionA]} />);
         });
@@ -400,8 +400,8 @@ describe('when fast grouping entries', () => {
         it('shows fast grouped entries at top of display order', async () => {
             const user = userEvent.setup();
             const model = new SylphModel(httpRootURL, wsRootURL);
-            const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
-            const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
+            const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+            const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
             let renderResult;
             await act(async () => {
                 renderResult = render(<RaceEntriesView model={model} races={[raceScorpionA]} />);
@@ -424,8 +424,8 @@ describe('when fast grouping entries', () => {
         it('shows fast grouped entries at top of display order', async () => {
             const user = userEvent.setup();
             const model = new SylphModel(httpRootURL, wsRootURL);
-            const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
-            const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
+            const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+            const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
             let renderResult;
             await act(async () => {
                 renderResult = render(<RaceEntriesView model={model} races={[raceScorpionA, raceGraduateA]} />);
@@ -451,7 +451,7 @@ describe('when removing an entry from fast group', () => {
     it('moves entry to below fast group', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<RaceEntriesView model={model} races={[raceScorpionA]} />);
         });
@@ -478,7 +478,7 @@ describe('when adding a lap time', () => {
         });
         const controller = new DinghyRacingController(model);
         const addLapSpy = vi.spyOn(controller, 'addLap');
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<RaceEntriesView model={model} controller={controller} races={[raceScorpionA]} />);
         });
@@ -499,7 +499,7 @@ describe('when adding a lap time', () => {
             return {getElapsedTime: () => 312568};
         });
         const controller = new DinghyRacingController(model);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<RaceEntriesView model={model} controller={controller} races={[raceScorpionA]} />);
         });
@@ -518,7 +518,7 @@ describe('when adding a lap time', () => {
         vi.spyOn(model, 'getClock').mockImplementation(() => {
             return {getElapsedTime: () => 312568}
         });
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         vi.spyOn(controller, 'addLap').mockImplementation(async (entry, time) => {throw new Error('Oops!')});
         await act(async () => {
             render(<RaceEntriesView model={model} controller={controller} races={[raceScorpionA]} />);
@@ -535,7 +535,7 @@ describe('when adding a lap time', () => {
         vi.spyOn(model, 'getClock').mockImplementation(() => {
             return {getElapsedTime: () => 312568}
         });
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         vi.spyOn(controller, 'addLap').mockImplementation(async (entry, time) => {throw new Error('Oops!')});
         await act(async () => {
             render(<RaceEntriesView model={model} controller={controller} races={[raceScorpionA]} />);
@@ -552,7 +552,7 @@ describe('when adding a lap time', () => {
             return {getElapsedTime: () => 312568};
         });
         const controller = new DinghyRacingController(model);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         vi.spyOn(controller, 'addLap').mockImplementationOnce(async (entry, time) => {throw new Error('Oops!')});
         await act(async () => {
             render(<RaceEntriesView model={model} controller={controller} races={[raceScorpionA]} />);
@@ -572,7 +572,7 @@ describe('when removing a lap time', () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const entryChrisMarshallDinghy1234 = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
         const removeLapSpy = vi.spyOn(controller, 'removeLap').mockImplementation(async (entry, lap) => {return entryChrisMarshallDinghy1234});
         render(<RaceEntriesView model={model} controller={controller}races={[raceScorpionA]} />);
@@ -601,7 +601,7 @@ describe('when removing a lap time', () => {
             return new Collection(lapsCollection, {size: 20,totalElements: lapsCollection.length, totalPages: 0,number: 0});
         });
         const controller = new DinghyRacingController(model);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const entryChrisMarshallDinghy1234 = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
         vi.spyOn(controller, 'removeLap').mockImplementation(async (entry, lap) => {return entryChrisMarshallDinghy1234});
         render(<RaceEntriesView model={model} controller={controller}races={[raceScorpionA]} />);
@@ -619,7 +619,7 @@ describe('when removing a lap time', () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         vi.spyOn(controller, 'removeLap').mockImplementation(async (entry, time) => {throw new Error('Oops!')});
         render(<RaceEntriesView model={model} controller={controller}races={[raceScorpionA]} />);
         const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -631,7 +631,7 @@ describe('when removing a lap time', () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         vi.spyOn(controller, 'removeLap').mockImplementation(async (entry, time) => {throw new Error('Oops!')});
         render(<RaceEntriesView model={model} controller={controller}races={[raceScorpionA]} />);
         const entry = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -643,7 +643,7 @@ describe('when removing a lap time', () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const entryChrisMarshallDinghy1234 = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
         vi.spyOn(controller, 'removeLap').mockImplementation(async (entry, time) => {return new Entry}).mockImplementationOnce(async (entry, time) => {throw new Error('Oops!')});
         await act(async () => {
@@ -666,7 +666,7 @@ describe('when updating a lap time', () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const entryChrisMarshallDinghy1234 = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
         const updateLapSpy = vi.spyOn(controller, 'updateLap').mockImplementation(async (entry, time) => {return entryChrisMarshallDinghy1234});
         await act(async () => {
@@ -704,7 +704,7 @@ describe('when updating a lap time', () => {
             return new Collection(lapsCollection, {size: 20,totalElements: lapsCollection.length, totalPages: 0,number: 0});
         });
         const controller = new DinghyRacingController(model);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const entryChrisMarshallDinghy1234 = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
         vi.spyOn(controller, 'updateLap').mockImplementation(async (entry, time) => {return entryChrisMarshallDinghy1234});
         await act(async () => {
@@ -729,7 +729,7 @@ describe('when updating a lap time', () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         vi.spyOn(controller, 'updateLap').mockImplementation(async (entry, time) => {return entryChrisMarshallDinghy1234}).mockImplementation(async (entry, time) => {throw new Error('Oops!')});
         await act(async () => {
             render(<RaceEntriesView model={model} controller={controller}races={[raceScorpionA]} />);
@@ -749,7 +749,7 @@ describe('when updating a lap time', () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         vi.spyOn(controller, 'updateLap').mockImplementation(async (entry, time) => {throw new Error('Oops!')});
         await act(async () => {
             render(<RaceEntriesView model={model} controller={controller}races={[raceScorpionA]} />);
@@ -769,7 +769,7 @@ describe('when updating a lap time', () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const entryChrisMarshallDinghy1234 = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
         vi.spyOn(controller, 'updateLap').mockImplementationOnce(async (entry, time) => {throw new Error('Oops!')});
         await act(async () => {
@@ -799,7 +799,7 @@ describe('when updating a lap time', () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new DinghyRacingController(model);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<RaceEntriesView model={model} controller={controller} races={[raceScorpionA]} />);
         });
@@ -818,7 +818,7 @@ describe('when setting a scoring abbreviation', () => {
     it('call controller setScoringAbbreviation', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const entryChrisMarshallDinghy1234 = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
         const controller = new DinghyRacingController(model);
         const setScoringAbbreviationSpy = vi.spyOn(controller, 'setScoringAbbreviation').mockImplementation(async (entry, scoringAbbreviation) => {return entry});
@@ -833,7 +833,7 @@ describe('when setting a scoring abbreviation', () => {
         vi.spyOn(console, 'error').mockImplementation(vi.fn());
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const controller = new DinghyRacingController(model);
         vi.spyOn(controller, 'setScoringAbbreviation').mockImplementation((entry, scoringAbbreviation) => {throw new Error('Oops!')});
         await act(async () => {
@@ -847,7 +847,7 @@ describe('when setting a scoring abbreviation', () => {
         vi.spyOn(console, 'error').mockImplementation(vi.fn());
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const controller = new DinghyRacingController(model);
         vi.spyOn(controller, 'setScoringAbbreviation').mockImplementation((entry, scoringAbbreviation) => {throw new Error('Oops!')});
         await act(async () => {
@@ -862,7 +862,7 @@ describe('when setting a scoring abbreviation', () => {
         vi.spyOn(console, 'error').mockImplementation(vi.fn());
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const entryChrisMarshallDinghy1234 = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
         const controller = new DinghyRacingController(model);
         vi.spyOn(controller, 'setScoringAbbreviation').mockImplementation((entry, scoringAbbreviation) => {return entryChrisMarshallDinghy1234}).mockImplementationOnce((entry, scoringAbbreviation) => {throw new Error('Oops!')});
@@ -884,7 +884,7 @@ describe('when setting a scoring abbreviation', () => {
 describe('when user drags and drops an entry to a new position', () => {
     it('updates the display order to show the subject entry in the position above the target entry', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const controller = new DinghyRacingController(model);
         vi.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': true})});
         await act(async () => {
@@ -923,7 +923,7 @@ describe('when user drags and drops an entry to a new position', () => {
                     return new Collection(signedUpCollection, {size: 20,totalElements: signedUpCollection.length, totalPages: 0,number: 0});
                 });
                 const controller = new DinghyRacingController(model);
-                const racePursuitA = new Race(racePursuitAHAL, {version: '"0"'}, model);
+                const racePursuitA = new DirectRace(racePursuitAHAL, {version: '"0"'}, model);
                 const entryChrisMarshallPursuitA1234 = new Entry(entryChrisMarshall1234PursuitAHAL, {version: '"0"'}, model);
                 const setUpdateEntryPositionSpy = vi.spyOn(controller, 'updateEntryPosition').mockImplementation(async (entry, newPosition) => {return });
                 await act(async () => {
@@ -950,8 +950,8 @@ describe('when user drags and drops an entry to a new position', () => {
             it('does not update subject entry race position', async () => {
                 const model = new SylphModel(httpRootURL, wsRootURL);
                 const controller = new DinghyRacingController(model);
-                const racePursuitA = new Race(racePursuitAHAL, {version: '"0"'}, model);
-                const racePursuitB = new Race({...racePursuitAHAL, name: 'Pursuit B', _links:{
+                const racePursuitA = new DirectRace(racePursuitAHAL, {version: '"0"'}, model);
+                const racePursuitB = new DirectRace({...racePursuitAHAL, name: 'Pursuit B', _links:{
                     self:{href:'http://localhost:8081/dinghyracing/api/directRaces/10'},
                     directRace:{href:'http://localhost:8081/dinghyracing/api/directRaces/10'},
                     signedUp:{href:'http://localhost:8081/dinghyracing/api/races/10/signedUp'},
@@ -1000,7 +1000,7 @@ describe('when user drags and drops an entry to a new position', () => {
                         raceHAL = racePursuitAHAL;
                         version = {version: '"0"'};
                     }
-                    return new Race(raceHAL, version, model);
+                    return new DirectRace(raceHAL, version, model);
                 });
                 const setUpdateEntryPositionSpy = vi.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return });
                 await act(async () => {
@@ -1038,7 +1038,7 @@ describe('when user drags and drops an entry to a new position', () => {
                     });
                     const controller = new DinghyRacingController(model);
                     const setUpdateEntryPositionSpy = vi.spyOn(controller, 'updateEntryPosition').mockImplementation(async (entry, newPosition) => {return signedUpChrisMarshallDinghy1234PursuitAHAL});
-                    const racePursuitA = new Race(racePursuitAHAL, {version: '"0"'}, model);
+                    const racePursuitA = new DirectRace(racePursuitAHAL, {version: '"0"'}, model);
                     await act(async () => {
                         render(<RaceEntriesView model={model} controller={controller} races={[racePursuitA]} />);
                     });
@@ -1073,7 +1073,7 @@ describe('when user drags and drops an entry to a new position', () => {
                     });
                     const controller = new DinghyRacingController(model);
                     const setUpdateEntryPositionSpy = vi.spyOn(controller, 'updateEntryPosition').mockImplementation(async (entry, newPosition) => {return signedUpChrisMarshallDinghy1234PursuitAHAL});
-                    const racePursuitA = new Race(racePursuitAHAL, {version: '"0"'}, model);
+                    const racePursuitA = new DirectRace(racePursuitAHAL, {version: '"0"'}, model);
                     await act(async () => {
                         render(<RaceEntriesView model={model} controller={controller}races={[racePursuitA]} />);
                     });
@@ -1109,7 +1109,7 @@ describe('when user drags and drops an entry to a new position', () => {
                     }
                     return new Collection(signedUpCollection, {size: 20,totalElements: signedUpCollection.length, totalPages: 0,number: 0});
                 });
-                const racePursuitA = new Race(racePursuitAHAL, {version: '"0"'}, model);
+                const racePursuitA = new DirectRace(racePursuitAHAL, {version: '"0"'}, model);
                 const controller = new DinghyRacingController(model);
                 vi.spyOn(controller, 'updateEntryPosition').mockImplementation(async (entry, newPosition) => {throw new Error('Any old nonsense')});
                 await act(async () => {
@@ -1148,7 +1148,7 @@ describe('when user drags and drops an entry to a new position', () => {
                     }
                     return new Collection(signedUpCollection, {size: 20,totalElements: signedUpCollection.length, totalPages: 0,number: 0});
                 });
-                const racePursuitA = new Race(racePursuitAHAL, {version: '"0"'}, model);
+                const racePursuitA = new DirectRace(racePursuitAHAL, {version: '"0"'}, model);
                 const controller = new DinghyRacingController(model);
                 vi.spyOn(controller, 'updateEntryPosition').mockImplementation(async (entry, newPosition) => {throw new Error('Any old nonsense')});
                 await act(async () => {
@@ -1185,7 +1185,7 @@ describe('when user drags and drops an entry to a new position', () => {
                     }
                     return new Collection(signedUpCollection, {size: 20,totalElements: signedUpCollection.length, totalPages: 0,number: 0});
                 });
-                const racePursuitA = new Race(racePursuitAHAL, {version: '"0"'}, model);
+                const racePursuitA = new DirectRace(racePursuitAHAL, {version: '"0"'}, model);
                 const controller = new DinghyRacingController(model);
                 vi.spyOn(controller, 'updateEntryPosition').mockImplementation(async (entry, newPosition) => {return entryChrisMarshall1234PursuitAHAL}).mockImplementationOnce(async (entry, newPosition) => {throw new Error('Any old nonsense')});
                 await act(async () => {
@@ -1222,7 +1222,7 @@ describe('when user drags and drops an entry to a new position', () => {
                 const user = userEvent.setup();
                 const model = new SylphModel(httpRootURL, wsRootURL);
                 const controller = new DinghyRacingController(model);
-                const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+                const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
                 const entryChrisMarshallDinghy1234 = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
                 const setUpdateEntryPositionSpy = vi.spyOn(controller, 'updateEntryPosition').mockImplementation((entry, newPosition) => {return Promise.resolve({'success': true})});
                 await act(async () => {
@@ -1258,7 +1258,7 @@ describe('when user drags and drops an entry to a new position', () => {
                 return new Collection(entryCollection, {size: 20, totalElements: entryCollection.length, totalPages: 0, number: 0});
             });
             const controller = new DinghyRacingController(model);
-            const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+            const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
             const entryChrisMarshallDinghy1234 = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
             const setUpdateEntryPositionSpy = vi.spyOn(controller, 'updateEntryPosition').mockImplementation(async (entry, newPosition) => {return entryChrisMarshallDinghy1234});
             await act(async () => {
@@ -1295,7 +1295,7 @@ describe('when user drags and drops an entry to a new position', () => {
                 ];
                 return new Collection(entryCollection, {size: 20, totalElements: entryCollection.length, totalPages: 0, number: 0});
             });
-            const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+            const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
             const controller = new DinghyRacingController(model);
             const setUpdateEntryPositionSpy = vi.spyOn(controller, 'updateEntryPosition').mockImplementation(async (entry, newPosition) => {return new Entry({...entryChrisMarshall1234ScorpionAHAL, scoringAbbreviation: 'DSQ'}, {version: '"0"'}, model)});
             await act(async () => {
@@ -1325,7 +1325,7 @@ describe('when user drags and drops an entry to a new position', () => {
         it('inserts dropped entry into fast group at location of target and treats dropped entry as fast grouped', async () => {
             const user = userEvent.setup();
             const model = new SylphModel(httpRootURL, wsRootURL);
-            const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+            const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
             await act(async () => {
                 render(<RaceEntriesView model={model} races={[raceScorpionA]} />);
             });
@@ -1356,8 +1356,8 @@ describe('when user drags and drops an entry to a new position', () => {
         it('inserts dropped entry into display at location of target and removes dropped entry from fast group', async () => {
             const user = userEvent.setup();
             const model = new SylphModel(httpRootURL, wsRootURL);
-            const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
-            const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
+            const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+            const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
             await act(async () => {
                 render(<RaceEntriesView model={model} races={[raceScorpionA]} />);
             });
@@ -1390,7 +1390,7 @@ describe('when user drags and drops an entry to a new position', () => {
             const model = new SylphModel(httpRootURL, wsRootURL);vi.spyOn(model, 'getLaps').mockImplementation(async (url) => {
                 return new Collection([], {size: 20,totalElements: 0, totalPages: 0,number: 0});
             });
-            const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+            const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
             await act(async () => {
                 render(<RaceEntriesView model={model} races={[raceScorpionA]} />);
             });
@@ -1434,7 +1434,7 @@ describe('when refresh button clicked', () => {
         vi.spyOn(model, 'getCompetitor').mockImplementation(async () => {return new Competitor({...competitorChrisMarshallHAL, name: 'Batman'}, '"1"', model)})
             .mockImplementationOnce(async () => {return new Competitor(competitorChrisMarshallHAL, '"0"', model)});
         const controller = new DinghyRacingController(model);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<RaceEntriesView model={model} controller={controller} races={[raceScorpionA]} />);
         });
@@ -1449,7 +1449,7 @@ describe('when refresh button clicked', () => {
 describe('when race is a pursuit race', () => {
     it('does not show option to fast group entries', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const racePursuitA = new Race(racePursuitAHAL, {version: '"0"'}, model);
+        const racePursuitA = new DirectRace(racePursuitAHAL, {version: '"0"'}, model);
         await act(async () => {
             render(<RaceEntriesView model={model} races={[racePursuitA]} />, model);
         });

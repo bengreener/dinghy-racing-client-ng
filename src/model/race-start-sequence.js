@@ -88,7 +88,7 @@ class RaceStartSequence {
     /**
      * Return the next race to start on or after time
      * @param {Date} time
-     * @returns {Race | null | undefined}
+     * @returns {DirectRace | null | undefined}
      */
     getNextRaceToStart(time) {
         return this._race.plannedStartTime >= time ? this._race : null;
@@ -107,7 +107,7 @@ class RaceStartSequence {
 
     /**
      * Identify signals required to start race
-     * @param {Race} race 
+     * @param {DirectRace} race 
      * @returns {Promise<<Array<Signal>>}
      */
     async _generateSignals(race) {

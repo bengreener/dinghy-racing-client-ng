@@ -19,7 +19,7 @@ import { useState } from 'react';
 /**
  * Provide a form to get the new number of laps that will be sailed when a course is shortened
  * @param {Object} props
- * @param {Race} props.race to update
+ * @param {DirectRace} props.race to update
  * @param {Number} props.minLaps The minimum number of laps that can be set; default is 1
  * @param {Number} props.maxLaps The maximum number of laps that can be set; default is 100
  * @param {Number} props.initialValue to display for new laps value; default is minLaps
@@ -63,6 +63,6 @@ export default AdjustCourseForm;
 /**
  * Action to take when AdjustCourseForm update laps button clicked
  * @callback ShortenCouraseForm~updateLaps
- * @param {Race} race to update
+ * @param {DirectRace} race to update
  * @param {Number} laps to set as new number of planned laps
  */

@@ -16,7 +16,7 @@
 
 import Entity from './entity';
 
-class Race extends Entity {
+class DirectRace extends Entity {
     
     constructor(hal, metadata, model) {
         super(hal, metadata, model);
@@ -87,7 +87,7 @@ class Race extends Entity {
     /**
      * Get entries for a race
      * On success result domain object will be an array of Entry types; {Array<Entry>}
-     * @param {Race} race
+     * @param {DirectRace} race
      * @returns {Promise<Collection<Entry>>}
      * @throws {Error}
      */
@@ -148,4 +148,4 @@ class Race extends Entity {
     }
 }
 
-export default Race;
+export default DirectRace;

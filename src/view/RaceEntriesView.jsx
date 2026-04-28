@@ -24,7 +24,7 @@ import SynchronousEntry from './synchronous-model/synchronous-entry';
 /**
  * Display race entries
  * @param {Object} props
- * @param {Array<Race>} props.races
+ * @param {Array<DirectRace>} props.races
  * @returns {HTMLDivElement}
  */
 function RaceEntriesView({ races, controller, model }) {

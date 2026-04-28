@@ -75,7 +75,7 @@ it('accepts the name for a race', async () => {
     await act(async () => {
         render(<CreateRace model={model} />);
     });
-    const txtRaceName = await screen.findByLabelText('Race Name');
+    const txtRaceName = await screen.findByLabelText('DirectRace Name');
     await user.type(txtRaceName, 'Graduate Helms');
     expect(txtRaceName).toHaveValue('Graduate Helms');
 });

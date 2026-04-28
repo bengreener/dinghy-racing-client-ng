@@ -20,7 +20,7 @@ import { httpRootURL, wsRootURL, raceScorpionAHAL } from '../model/__mocks__/tes
 import SylphModel from '../model/sylph-model';
 import SylphController from '../controller/sylph-controller';
 import Collection from '../model/collection';
-import Race from '../model/race';
+import DirectRace from '../model/direct-race';
 import NameFormat from '../controller/name-format';
 import DownloadRacesForm from './DownloadRacesForm';
 
@@ -173,20 +173,20 @@ describe('when download results button clicked', () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
-        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementation(async () => {return new Collection([new Race(raceScorpionAHAL, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0, number: 0})});
+        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementation(async () => {return new Collection([new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0, number: 0})});
         const downloadFunctionSpy = vi.spyOn(controller, 'downloadRaceResults').mockImplementation(async () => {return {'success': true}});
         act(() => {
             render(<DownloadRacesForm model={model} controller={controller}/>);
         });
         await user.click(await screen.findByText(/download results/i));
         expect(downloadFunctionSpy).toBeCalledTimes(1);
-        expect(downloadFunctionSpy).toBeCalledWith(new Race(raceScorpionAHAL, {version: '"0"'}, model), {nameFormat: NameFormat.FIRSTNAMESURNAME});
+        expect(downloadFunctionSpy).toBeCalledWith(new DirectRace(raceScorpionAHAL, {version: '"0"'}, model), {nameFormat: NameFormat.FIRSTNAMESURNAME});
     });
     it('displays the error message if the request to download is unsuccessful', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
-        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementation(async () => {return new Collection([new Race(raceScorpionAHAL, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0, number: 0})});
+        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementation(async () => {return new Collection([new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0, number: 0})});
         vi.spyOn(controller, 'downloadRaceResults').mockImplementation(async () => {throw new Error('Oops!')});
         act(() => {
             render(<DownloadRacesForm model={model} controller={controller}/>);

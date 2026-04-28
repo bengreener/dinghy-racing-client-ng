@@ -20,7 +20,7 @@ import { useState } from 'react';
  * Provide a form to get the duration of a race postponement
  * Time is set in 5 minute intervals with an initial value of 30 minutes
  * @param {Object} props
- * @param {Race} props.race to postpone
+ * @param {DirectRace} props.race to postpone
  * @param {PostponeRaceForm~postponeRace} props.onPostpone called when postpone button clicked
  * @param {ModalDialog~closeDialog} props.closeParent call this to close a dialog containing this form
  * @returns {HTMLFormElement}
@@ -61,6 +61,6 @@ export default PostponeRaceForm;
 /**
  * Action to take when PostponeRaceDialog postpone button clicked
  * @callback PostponeRaceForm~postponeRace
- * @param {Race} race to postpone
+ * @param {DirectRace} race to postpone
  * @param {Number} duration in milliseconds, by which to delay the race
  */

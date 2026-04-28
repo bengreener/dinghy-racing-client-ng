@@ -20,7 +20,7 @@ import NameFormat from '../controller/name-format';
 /**
  * Provide an interface to support downloading race results
  * @param {Object} props
- * @param {Race} props.race
+ * @param {DirectRace} props.race
  * @param {DownloadRace~downloadFunction} props.downloadFunction
  * @returns 
  */
@@ -91,6 +91,6 @@ export default DownloadRace;
 /**
  * Action to take when Download Results button clicked
  * @callback DownloadRace~downloadFunction
- * @param {Race} race to download
+ * @param {DirectRace} race to download
  * @param {DownloadOptions} options to configure download file
  */

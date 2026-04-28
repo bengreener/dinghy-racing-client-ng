@@ -27,7 +27,7 @@ import FlagState from './flag-state';
 import Fleet from './fleet';
 import Lap from './lap';
 import Metadata from './metadata';
-import Race from './race';
+import DirectRace from './direct-race';
 import RaceType from './race-type';
 import SignedUp from './signed-up';
 import StartType from './start-type';
@@ -350,7 +350,7 @@ describe('when creating a new race', () => {
             }
         );
     });
-    it('returns a promise that resolves to the new Race when race is successfully created', async () => {
+    it('returns a promise that resolves to the new DirectRace when race is successfully created', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,
@@ -1256,10 +1256,10 @@ describe('when retrieving a list of races of a specific type that start between 
     });
     it('returns requested races', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const raceCometA = new Race(raceCometAHAL, {version: '"0"'}, this);
-        const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, this);
-        const raceHandicapA = new Race(raceHandicapAHAL, {version: '"0"'}, this);
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, this);
+        const raceCometA = new DirectRace(raceCometAHAL, {version: '"0"'}, this);
+        const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, this);
+        const raceHandicapA = new DirectRace(raceHandicapAHAL, {version: '"0"'}, this);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, this);
         const collection = [
             raceScorpionA, raceGraduateA, raceCometA, raceHandicapA
         ];
@@ -1285,7 +1285,7 @@ describe('when signing up to a race', () => {
             };
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const promise = model.signUpToRace(new Race(raceScorpionAHAL, {version: '"1"'}, model), new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model), 
+        const promise = model.signUpToRace(new DirectRace(raceScorpionAHAL, {version: '"1"'}, model), new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model), 
             new Dinghy(dinghy1234HAL, {version: '"1"'}, model), new Competitor(competitorLouScrewHAL, {version: '"1"'}, model));
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -1303,7 +1303,7 @@ describe('when signing up to a race', () => {
             };
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const promise = model.signUpToRace(new Race(raceScorpionAHAL, {version: '"1"'}, model), new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model), 
+        const promise = model.signUpToRace(new DirectRace(raceScorpionAHAL, {version: '"1"'}, model), new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model), 
             new Dinghy(dinghy1234HAL, {version: '"1"'}, model));
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
@@ -1321,7 +1321,7 @@ describe('when signing up to a race', () => {
                 });
             });
             const model = new SylphModel(httpRootURL, wsRootURL);
-            const race = new Race(raceScorpionAHAL, {version: '"1"'}, model);
+            const race = new DirectRace(raceScorpionAHAL, {version: '"1"'}, model);
             const helm = new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model);
             const dinghy = new Dinghy(dinghy1234HAL, {version: '"1"'}, model);
             const crew = new Competitor(competitorLouScrewHAL, {version: '"1"'}, model);
@@ -1341,7 +1341,7 @@ describe('when signing up to a race', () => {
                 };
             });
             const model = new SylphModel(httpRootURL, wsRootURL);
-            const race = new Race(raceScorpionAHAL, {version: '"1"'}, model);
+            const race = new DirectRace(raceScorpionAHAL, {version: '"1"'}, model);
             const helm = new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model);
             const dinghy = new Dinghy(dinghy1234HAL, {version: '"1"'}, model);
             const crew = new Competitor(competitorLouScrewHAL, {version: '"1"'}, model);
@@ -1361,7 +1361,7 @@ describe('when signing up to a race', () => {
                 };
             });
             const model = new SylphModel(httpRootURL, wsRootURL);
-            const race = new Race(raceScorpionAHAL, {version: '"1"'}, model);
+            const race = new DirectRace(raceScorpionAHAL, {version: '"1"'}, model);
             const helm = new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model);
             const dinghy = new Dinghy(dinghy1234HAL, {version: '"1"'}, model);
             const crew = new Competitor(competitorLouScrewHAL, {version: '"1"'}, model);
@@ -2777,7 +2777,7 @@ describe('when searching for entries by race', () => {
                 return Promise.resolve(new Entry(entrySarahPascal6745ScorpionAHAL, {version: '"0"'}, model));
             }
         });
-        const promise = model.getEntriesByRace(new Race(raceScorpionAHAL, {version: '"0"'}, model));
+        const promise = model.getEntriesByRace(new DirectRace(raceScorpionAHAL, {version: '"0"'}, model));
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual(new Collection([
@@ -2952,7 +2952,7 @@ describe('when updating a race', () => {
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const promise = model.updateRace(new Race(raceScorpionAHAL, {version: '"0"'}, model), 'Scorpion A', new Date(), new Fleet(fleetScorpionHAL, {version: '"0"'}, model), 2700000, 5, RaceType.FLEET, StartType.CSCCLUBSTART);
+        const promise = model.updateRace(new DirectRace(raceScorpionAHAL, {version: '"0"'}, model), 'Scorpion A', new Date(), new Fleet(fleetScorpionHAL, {version: '"0"'}, model), 2700000, 5, RaceType.FLEET, StartType.CSCCLUBSTART);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({hal: raceScorpionAHAL, metadata: {version: ''}, model});
@@ -2967,7 +2967,7 @@ describe('when updating a race', () => {
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.updateRace(new Race(raceScorpionAHAL, {version: '"0"'}, model), 'Scorpion A', new Date(), new Fleet(fleetScorpionHAL, {version: '"0"'}, model), 2700000, 5, RaceType.FLEET, StartType.CSCCLUBSTART))
+        await expect(() => model.updateRace(new DirectRace(raceScorpionAHAL, {version: '"0"'}, model), 'Scorpion A', new Date(), new Fleet(fleetScorpionHAL, {version: '"0"'}, model), 2700000, 5, RaceType.FLEET, StartType.CSCCLUBSTART))
             .rejects.toThrowError('HTTP Error: 404 Not Found');
     });
     // TODO: Test expected parameters are supplied
@@ -3181,10 +3181,10 @@ describe('when a StartSequence is requested', () => {
                     return null;
             }
         });
-        const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
-        const raceGraduateA = new Race(raceGraduateAHAL, {version: '"0"'}, model);
-        const raceCometA = new Race(raceCometAHAL, {version: '"0"'}, model);
-        const raceHandicapA = new Race(raceHandicapAHAL, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, model);
+        const raceCometA = new DirectRace(raceCometAHAL, {version: '"0"'}, model);
+        const raceHandicapA = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
 
         const races = [raceScorpionA, raceGraduateA, raceCometA, raceHandicapA];
 
@@ -3267,7 +3267,7 @@ describe('when a StartSequence is requested', () => {
                             ], {"size": 20, "totalElements": 3, "totalPages": 1, "number": 0}));
                     }
                 });
-                const racePursuitA = new Race(racePursuitAHAL, {version: '"0"'}, model);
+                const racePursuitA = new DirectRace(racePursuitAHAL, {version: '"0"'}, model);
 
                 const handicapClassFlag = {name: 'Handicap Class Flag'};
                 const preparatoryFlag = {name: 'Blue Peter'};
@@ -3304,8 +3304,8 @@ describe('when a StartSequence is requested', () => {
     describe('when races are of different types', () => {
         it('throws error', () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
-            const raceScorpionA = new Race(raceScorpionAHAL, {version: '"0"'}, model);
-            const racePursuitA = new Race(racePursuitAHAL, {version: '"0"'}, model);
+            const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+            const racePursuitA = new DirectRace(racePursuitAHAL, {version: '"0"'}, model);
             const races = [raceScorpionA, racePursuitA];
             expect(() => model.getStartSequence(races)).toThrow('All races in a start sequence must be of the same type.');
         })
@@ -3324,7 +3324,7 @@ describe('when updating an entries position in the race', () => {
             };
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const promise = model.updateEntryPosition(new Race(raceScorpionAHAL, {version: '"0"'}, model), new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 2);
+        const promise = model.updateEntryPosition(new DirectRace(raceScorpionAHAL, {version: '"0"'}, model), new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 2);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual({hal: raceScorpionAHAL, metadata: {version: ''}, model});
@@ -3339,7 +3339,7 @@ describe('when updating an entries position in the race', () => {
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(model.updateEntryPosition(new Race(raceScorpionAHAL, {version: '"0"'}, model), new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 2)).rejects.toThrowError('HTTP Error: 500 Internal Server Error');
+        await expect(model.updateEntryPosition(new DirectRace(raceScorpionAHAL, {version: '"0"'}, model), new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 2)).rejects.toThrowError('HTTP Error: 500 Internal Server Error');
     });
 });
 describe('when entry is requested', () => {
