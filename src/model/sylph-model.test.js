@@ -663,7 +663,7 @@ describe('when retrieving a list of races that start at or after a specified tim
             }
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const promise = model.getRacesOnOrAfterTime(new Date('2021-10-14T10:00:00.000Z'));
+        const promise = model.getDirectRacesOnOrAfterTime(new Date('2021-10-14T10:00:00.000Z'));
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toEqual(new Collection([
@@ -730,7 +730,7 @@ describe('when retrieving a list of races that start at or after a specified tim
                     }
                 });
                 const model = new SylphModel(httpRootURL, wsRootURL);
-                const promise = model.getRacesOnOrAfterTime(new Date('2022-10-10T10:00:00.000Z'));
+                const promise = model.getDirectRacesOnOrAfterTime(new Date('2022-10-10T10:00:00.000Z'));
                 const result = await promise;
                 expect(promise).toBeInstanceOf(Promise);
                 expect(result).toEqual(new Collection([
@@ -785,7 +785,7 @@ describe('when retrieving a list of races that start at or after a specified tim
                     }
                 });
                 const model = new SylphModel(httpRootURL, wsRootURL);
-                const promise = model.getRacesOnOrAfterTime(new Date('2022-10-10T10:00:00.000Z'), 0);
+                const promise = model.getDirectRacesOnOrAfterTime(new Date('2022-10-10T10:00:00.000Z'), 0);
                 const result = await promise;
                 expect(promise).toBeInstanceOf(Promise);
                 expect(result).toEqual(new Collection([
@@ -834,7 +834,7 @@ describe('when retrieving a list of races that start at or after a specified tim
                 });
         
                 const model = new SylphModel(httpRootURL, wsRootURL);
-                const promise = model.getRacesOnOrAfterTime(new Date('2022-10-10T10:00:00.000Z'), null, 2);
+                const promise = model.getDirectRacesOnOrAfterTime(new Date('2022-10-10T10:00:00.000Z'), null, 2);
                 const result = await promise;
                 expect(promise).toBeInstanceOf(Promise);
                 expect(result).toEqual(new Collection([
@@ -883,7 +883,7 @@ describe('when retrieving a list of races that start at or after a specified tim
                 });
         
                 const model = new SylphModel(httpRootURL, wsRootURL);
-                const promise = model.getRacesOnOrAfterTime(new Date('2022-10-10T10:00:00.000Z'), 0, 2);
+                const promise = model.getDirectRacesOnOrAfterTime(new Date('2022-10-10T10:00:00.000Z'), 0, 2);
                 const result = await promise;
                 expect(promise).toBeInstanceOf(Promise);
                 expect(result).toEqual(new Collection([

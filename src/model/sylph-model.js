@@ -89,7 +89,7 @@ class SylphModel {
         this.getDirectRacesBetweenTimes = this.getDirectRacesBetweenTimes.bind(this);
         this.getDirectRacesBetweenTimesForType = this.getDirectRacesBetweenTimesForType.bind(this);
         this.getRacesFromURL = this.getRacesFromURL.bind(this);
-        this.getRacesOnOrAfterTime = this.getRacesOnOrAfterTime.bind(this);
+        this.getDirectRacesOnOrAfterTime = this.getDirectRacesOnOrAfterTime.bind(this);
         this.getSignedUp = this.getSignedUp.bind(this);
         this.getSignedUpTo = this.getSignedUpTo.bind(this);
         this.removeLap = this.removeLap.bind(this);
@@ -756,7 +756,7 @@ class SylphModel {
      * @returns {Promise<Collection<DirectRace>>}
      * @throws {Error}
      */
-    async getRacesOnOrAfterTime(startTime, page, size) {
+    async getDirectRacesOnOrAfterTime(startTime, page, size) {
         const resource = this.httpRootURL + '/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=' + startTime.toISOString();
 
         return this.getRacesFromURL(resource, page, size);
