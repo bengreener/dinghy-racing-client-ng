@@ -741,8 +741,14 @@ class SylphModel {
         const result = await this.getCollection(url, page, size, sortParameters);
     
         const promises = [];
-        for (let i = 0; i < result.hal._embedded.directRaces.length; i++  ) {
+        for (let i = 0; i < result.hal._embedded.races?.length; i++) {
+            promises.push(this.getRace(result.hal._embedded.races[i]._links.self.href));
+        }
+        for (let i = 0; i < result.hal._embedded.directRaces?.length; i++  ) {
             promises.push(this.getRace(result.hal._embedded.directRaces[i]._links.self.href));
+        };
+        for (let i = 0; i < result.hal._embedded.embeddedRaces?.length; i++  ) {
+            promises.push(this.getRace(result.hal._embedded.embeddedRaces[i]._links.self.href));
         };
         const races = await Promise.all(promises);
         return new Collection(races, result.hal.page);
