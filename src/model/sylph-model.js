@@ -530,6 +530,37 @@ class SylphModel {
     }
 
     /**
+     * Get races scheduled to start between the specified times
+     * @param {Date} startTime The start time of the first race
+     * @param {Date} endTime The start time of the last race
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
+     * @param {SortParameters} [sortParameters] and order for sorting the requested races
+     * @returns {Promise<Collection<DirectRace>>}
+     * @throws {Error}
+     */
+    async getDirectRacesBetweenTimes(startTime, endTime, page, size, sortParameters) {
+        const resource = this.httpRootURL + '/directRaces/search/findByPlannedStartTimeBetween?startTime=' + startTime.toISOString() + '&endTime=' + endTime.toISOString();
+        return this.getRacesFromURL(resource, page, size, sortParameters);
+    }
+
+    /**
+     * Get races of a specific type that are scheduled to start between the specified times
+     * @param {Date} startTime The start time of the first race
+     * @param {Date} endTime The start time of the last race
+     * @param {RaceType} type The type of race
+     * @param {Integer} [page] number to return (0 indexed)
+     * @param {Integer} [size] number of elements to return per page
+     * @param {SortParameters} [sortParameters] and order for sorting the requested races
+     * @returns {Promise<Collection<DirectRace>>} If successful result domainObject will be Array<DirectRace>
+     * @throws {Error}
+     */
+    async getDirectRacesBetweenTimesForType(startTime, endTime, type, page, size, sortParameters) {
+        const resource = this.httpRootURL + '/directRaces/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=' + startTime.toISOString() + '&endTime=' + endTime.toISOString() + '&type=' + type;
+        return this.getRacesFromURL(resource, page, size, sortParameters);
+    }
+
+    /**
      * Gat an embedded race
      * @param {String} url 
      * @returns {<Promise<EmbeddedRace>>}
@@ -704,27 +735,11 @@ class SylphModel {
      * @param {Integer} [page] number to return (0 indexed)
      * @param {Integer} [size] number of elements to return per page
      * @param {SortParameters} [sortParameters] and order for sorting the requested races
-     * @returns {Promise<Collection<DirectRace>>}
+     * @returns {Promise<Collection<EmbeddedRace | DirectRace>>}
      * @throws {Error}
      */
-    async getDirectRacesBetweenTimes(startTime, endTime, page, size, sortParameters) {
-        const resource = this.httpRootURL + '/directRaces/search/findByPlannedStartTimeBetween?startTime=' + startTime.toISOString() + '&endTime=' + endTime.toISOString();
-        return this.getRacesFromURL(resource, page, size, sortParameters);
-    }
-
-    /**
-     * Get races of a specific type that are scheduled to start between the specified times
-     * @param {Date} startTime The start time of the first race
-     * @param {Date} endTime The start time of the last race
-     * @param {RaceType} type The type of race
-     * @param {Integer} [page] number to return (0 indexed)
-     * @param {Integer} [size] number of elements to return per page
-     * @param {SortParameters} [sortParameters] and order for sorting the requested races
-     * @returns {Promise<Collection<DirectRace>>} If successful result domainObject will be Array<DirectRace>
-     * @throws {Error}
-     */
-    async getDirectRacesBetweenTimesForType(startTime, endTime, type, page, size, sortParameters) {
-        const resource = this.httpRootURL + '/directRaces/search/findByPlannedStartTimeBetweenAndTypeEquals?startTime=' + startTime.toISOString() + '&endTime=' + endTime.toISOString() + '&type=' + type;
+    async getRacesBetweenTimes(startTime, endTime, page, size, sortParameters) {
+        const resource = this.httpRootURL + '/races/search/findByPlannedStartTimeBetween?startTime=' + startTime.toISOString() + '&endTime=' + endTime.toISOString();
         return this.getRacesFromURL(resource, page, size, sortParameters);
     }
 
