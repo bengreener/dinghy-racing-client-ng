@@ -306,6 +306,41 @@ class SylphModel {
         return new Collection(dinghies, {size: 20, totalElements: dinghies.length, totalPages: 0, number: 0});
     }
 
+    async getDirectRacesBetweenTimes(startTime, endTime, page, size, sortParameters) {
+        let collection = [];
+        const raceCometA = new DirectRace(raceCometAHAL, {version: '"0"'}, this);
+        const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, this);
+        const raceHandicapA = new DirectRace(raceHandicapAHAL, {version: '"0"'}, this);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, this);
+        const racePursuitA = new DirectRace(racePursuitAHAL, {version: '"0"'}, this);
+
+        collection = [
+            raceScorpionA, raceGraduateA, raceCometA, raceHandicapA, racePursuitA
+        ];
+        return new Collection(collection, {size: 20, totalElements: collection.length, totalPages: 0, number: 0});
+    }
+    
+    async getDirectRacesBetweenTimesForType(startTime, endTime, type, page, size, sortParameters) {
+        let collection = [];
+        const raceCometA = new DirectRace(raceCometAHAL, {version: '"0"'}, this);
+        const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, this);
+        const raceHandicapA = new DirectRace(raceHandicapAHAL, {version: '"0"'}, this);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, this);
+        const racePursuitA = new DirectRace(racePursuitAHAL, {version: '"0"'}, this);
+
+        if (type === RaceType.FLEET) {
+            collection = [
+                raceScorpionA, raceGraduateA, raceCometA, raceHandicapA
+            ];
+        }
+        else {
+            collection = [
+                racePursuitA
+            ];
+        }
+        return new Collection(collection, {size: 20, totalElements: collection.length, totalPages: 0, number: 0});
+    }
+
     async getEmbeddedRacesInRace(race) {
         let embeddedRaces = [];
         const embeddedRaceVeteransA = new EmbeddedRace(embeddedRaceVeteransAHAL, {version: '"0"'}, this);
@@ -458,28 +493,18 @@ class SylphModel {
         return new DirectRace(raceHAL, version, this);
     }
 
-    async getDirectRacesBetweenTimes(startTime, endTime, page, size, sortParameters) {
-        return this.getRacesFromURL();
-    }
-    
-    async getDirectRacesBetweenTimesForType(startTime, endTime, type, page, size, sortParameters) {
+    async getRacesBetweenTimes(startTime, endTime, page, size, sortParameters) {
         let collection = [];
         const raceCometA = new DirectRace(raceCometAHAL, {version: '"0"'}, this);
         const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, this);
         const raceHandicapA = new DirectRace(raceHandicapAHAL, {version: '"0"'}, this);
         const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, this);
-        const racePursuitA = new DirectRace(racePursuitAHAL, {version: '"0"'}, this);
+        const embeddedRaceVeteransA = new EmbeddedRace(embeddedRaceVeteransAHAL, {version: '"0"'}, this);
+        const embeddedRaceLadiesA = new EmbeddedRace(embeddedRaceLadiesAHAL, {version: '"0"'}, this);
 
-        if (type === RaceType.FLEET) {
-            collection = [
-                raceScorpionA, raceGraduateA, raceCometA, raceHandicapA
-            ];
-        }
-        else {
-            collection = [
-                racePursuitA
-            ];
-        }
+        collection = [
+            raceCometA, raceGraduateA, raceHandicapA, raceScorpionA, embeddedRaceLadiesA, embeddedRaceVeteransA
+        ];
         return new Collection(collection, {size: 20, totalElements: collection.length, totalPages: 0, number: 0});
     }
 

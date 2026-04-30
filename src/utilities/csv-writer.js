@@ -100,9 +100,9 @@ async function buildRecord(race, entry, includeCrew, options) {
     const helm = await entry.getHelm();
     const dinghy = await entry.getDinghy();
     const dinghyClass = await dinghy.getDinghyClass();
-    // const signedUp = 
-    const position = await entry.getPositionInDirectRace();
-    const correctedTime = await entry.getCorrectedTimeInDirectRace();
+    const signedUp = await race.getSignedUpToForEntry(entry);
+    const position = signedUp.position;
+    const correctedTime = signedUp.correctedTime;
     const laps = await entry.getLaps();
     let crew;
     if (includeCrew && dinghyClass.crewSize > 1) {
@@ -125,7 +125,6 @@ async function buildRecord(race, entry, includeCrew, options) {
     }
     record += dinghy.sailNumber + ',';
     record += ((dinghyClass.externalName == null || dinghyClass.externalName === '') ? dinghyClass.name : dinghyClass.externalName) + ',';
-    // record += (entry.scoringAbbreviation ? '' : signedUp.position) + ',';
     record += (entry.scoringAbbreviation ? '' : position) + ',';
     if (race.type !== RaceType.PURSUIT) {
         record += Clock.formatDurationAsSeconds(entry.sumOfLapTimes) + ',';

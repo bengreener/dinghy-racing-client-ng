@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import NameFormat from '../controller/name-format';
 
 /**
@@ -25,22 +25,7 @@ import NameFormat from '../controller/name-format';
  * @returns 
  */
 function DownloadRace({ race, downloadFunction }) {
-    const [fleet, setFleet] = useState();
     const [selectedNameFormat, setSelectedNameFormat] = useState(NameFormat.FIRSTNAMESURNAME);
-
-    useEffect(() => {
-        let cancel = false;
-
-        if (!cancel) {
-            race.getFleet().then((fleet) => {
-                setFleet(fleet);
-            });
-        }
-
-        return(() => {
-            cancel = true;
-        });
-    });
 
     function handleOptionChange({ target }) {
         setSelectedNameFormat(target.value);
@@ -56,10 +41,6 @@ function DownloadRace({ race, downloadFunction }) {
         <form className='download-race w3-container w3-padding w3-border w3-margin' action='' method='get'>
             <div className='w3-row'>
                 <label className='w3-col m3' >{race.name}</label>
-                <label className='w3-col m2' >{fleet?.name}</label>
-                <output id={'race-start-' + race.name.replace(/ /g, '-').toLowerCase()}>
-                    {new Intl.DateTimeFormat(navigator.language, {dateStyle: 'medium', timeStyle: 'medium', hour12: false}).format(race.plannedStartTime)}
-                </output>
             </div>
             <div className='w3-row'>
                 <fieldset className='w3-half' >
@@ -67,12 +48,12 @@ function DownloadRace({ race, downloadFunction }) {
                     <div className='w3-cell-row'>
                         {/** name of radio buttons in a group needs to be unique among all radio button groups on page; for example multiple DownloadRace componenent */}
                         <div className='w3-cell'>
-                            <input id={race.name + '-' + race.plannedStartTime.toISOString() + '-firstname-surname'} name={race.name + '-' + race.plannedStartTime.toISOString() + '-name-format'} type="radio" value={NameFormat.FIRSTNAMESURNAME} checked={selectedNameFormat === NameFormat.FIRSTNAMESURNAME} onChange={handleOptionChange} />
-                            <label htmlFor={race.name + '-' + race.plannedStartTime.toISOString() + '-firstname-surname'}>Firstname Surname</label>
+                            <input id={race.name + '-firstname-surname'} name={race.name + '-name-format'} type="radio" value={NameFormat.FIRSTNAMESURNAME} checked={selectedNameFormat === NameFormat.FIRSTNAMESURNAME} onChange={handleOptionChange} />
+                            <label htmlFor={race.name + '-firstname-surname'}>Firstname Surname</label>
                         </div>
                         <div className='w3-cell'>
-                            <input id={race.name + '-' + race.plannedStartTime.toISOString() + '-surname-firstname'} name={race.name + '-' + race.plannedStartTime.toISOString() + '-name-format'} type="radio" value={NameFormat.SURNAMEFIRSTNAME} checked={selectedNameFormat === NameFormat.SURNAMEFIRSTNAME} onChange={handleOptionChange} />
-                            <label htmlFor={race.name + '-' + race.plannedStartTime.toISOString() + '-surname-firstname'}>Surname, Firstname</label>
+                            <input id={race.name + '-surname-firstname'} name={race.name + '-name-format'} type="radio" value={NameFormat.SURNAMEFIRSTNAME} checked={selectedNameFormat === NameFormat.SURNAMEFIRSTNAME} onChange={handleOptionChange} />
+                            <label htmlFor={race.name + '-surname-firstname'}>Surname, Firstname</label>
                         </div>
                     </div>
                 </fieldset>

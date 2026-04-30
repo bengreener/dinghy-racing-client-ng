@@ -83,7 +83,7 @@ it('accepts a change to the get races in window start time', async () => {
 });
 it('calls model get races between times with values set for start and end of window', async () => {
     const model = new SylphModel(httpRootURL, wsRootURL);
-    const getRacesBetweenTimesSpy = vi.spyOn(model, 'getDirectRacesBetweenTimes');
+    const getRacesBetweenTimesSpy = vi.spyOn(model, 'getRacesBetweenTimes');
     const startTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000);
     startTime.setMinutes(startTime.getMinutes() + startTime.getTimezoneOffset());
     const endTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 75600000);
@@ -98,7 +98,7 @@ describe('when start time for races window changes', () => {
     it('calls model get races between times with new time set for start and end of window', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const getRacesBetweenTimesSpy = vi.spyOn(model, 'getDirectRacesBetweenTimes');
+        const getRacesBetweenTimesSpy = vi.spyOn(model, 'getRacesBetweenTimes');
         const startTime = new Date('2020-02-12T12:10');
         startTime.setMinutes(startTime.getMinutes() + startTime.getTimezoneOffset());
         const endTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 75600000);
@@ -116,7 +116,7 @@ describe('when end time for races window changes', () => {
     it('calls model get races between times with start time and new time set for end of window', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const getRacesBetweenTimesSpy = vi.spyOn(model, 'getDirectRacesBetweenTimes');
+        const getRacesBetweenTimesSpy = vi.spyOn(model, 'getRacesBetweenTimes');
         const startTime = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000);
         startTime.setMinutes(startTime.getMinutes() + startTime.getTimezoneOffset());
         act(() => {
@@ -131,7 +131,7 @@ describe('when end time for races window changes', () => {
 describe('when an error is received', () => {
     it('displays error message', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getDirectRacesBetweenTimes').mockImplementationOnce(async () => {throw new Error('Oops!')});
+        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(async () => {throw new Error('Oops!')});
         act(() => {
             render(<DownloadRacesForm model={model} />);
         });
@@ -139,7 +139,7 @@ describe('when an error is received', () => {
     });
     it('clears error message when a successful response is received', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
-        vi.spyOn(model, 'getDirectRacesBetweenTimes').mockImplementationOnce(async () => {
+        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementationOnce(async () => {
             throw new Error('Oops!')
         });
         let renderResult
@@ -160,11 +160,6 @@ it('displays races that start within the time window specified', async () => {
         render(<DownloadRacesForm model={model} />);
     });
     expect(await screen.findByText(/scorpion a/i)).toBeInTheDocument();
-    expect(screen.getByText(new Intl.DateTimeFormat(navigator.language, {
-        dateStyle: 'medium',
-        timeStyle: 'medium',
-        hour12: false
-    }).format(new Date('2021-10-14T10:30:00Z')))).toBeInTheDocument();
     expect(screen.getByText(/comet a/i)).toBeInTheDocument();
     expect(screen.getByText(/handicap a/i)).toBeInTheDocument();
 });
@@ -173,7 +168,7 @@ describe('when download results button clicked', () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
-        vi.spyOn(model, 'getDirectRacesBetweenTimes').mockImplementation(async () => {return new Collection([new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0, number: 0})});
+        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementation(async () => {return new Collection([new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0, number: 0})});
         const downloadFunctionSpy = vi.spyOn(controller, 'downloadRaceResults').mockImplementation(async () => {return {'success': true}});
         act(() => {
             render(<DownloadRacesForm model={model} controller={controller}/>);
@@ -186,7 +181,7 @@ describe('when download results button clicked', () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
-        vi.spyOn(model, 'getDirectRacesBetweenTimes').mockImplementation(async () => {return new Collection([new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0, number: 0})});
+        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementation(async () => {return new Collection([new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0, number: 0})});
         vi.spyOn(controller, 'downloadRaceResults').mockImplementation(async () => {throw new Error('Oops!')});
         act(() => {
             render(<DownloadRacesForm model={model} controller={controller}/>);

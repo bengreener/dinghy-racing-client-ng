@@ -25,6 +25,14 @@ class Race extends Entity {
     get name() {
         return this.hal.name;
     }
+
+    async getFleet() {
+        return this.model.getFleet(this.hal._links.fleet.href);
+    }
+
+    async getSignedUpToForEntry(entry) {
+        return this.model.getSignedUpToRaceForEntry(this, entry);
+    }
 }
 
 export default Race;

@@ -19,12 +19,13 @@ import MissingParameter from '../errors/missing-parameter';
 import Competitor from '../model/competitor';
 import Dinghy from '../model/dinghy';
 import DinghyClass from '../model/dinghy-class';
+import DirectRace from '../model/direct-race';
+import DownloadOptions from './download-options';
 import EmbeddedRace from '../model/embedded-race';
 import Entry from '../model/entry';
 import Fleet from '../model/fleet';
 import Lap from '../model/lap';
-import DirectRace from '../model/direct-race';
-import DownloadOptions from './download-options';
+import Race from '../model/race';
 import { downloadRaceEntriesCSV } from '../utilities/csv-writer'
 
 class SylphController {
@@ -215,7 +216,7 @@ class SylphController {
      */
     async downloadRaceResults(race, options) {
         // check valid race (a URL is sufficient, otherwise a name and start time is required)
-        if (!(race instanceof DirectRace)) {
+        if (!(race instanceof Race)) {
             throw new MissingParameter('Please provide a race to download.');
         }
         const result = await this.model.getEntriesByRace(race);

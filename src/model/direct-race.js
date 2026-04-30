@@ -89,10 +89,6 @@ class DirectRace extends Race {
      */
     async getEntries() {
         return this.model.getEntriesByRace(this);
-    }    
-
-    async getFleet() {
-        return this.model.getFleet(this.hal._links.fleet.href);
     }
 
     /**

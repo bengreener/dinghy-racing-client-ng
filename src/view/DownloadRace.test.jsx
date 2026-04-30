@@ -37,16 +37,6 @@ it('displays race fleet', async () => {
     render(<DownloadRace race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
     expect(screen.findByText(/fleet name here/i));
 });
-it('displays race start time', () => {
-    const model = new SylphModel(httpRootURL, wsRootURL);
-    render(<DownloadRace race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
-    const expectedPlannedTime = new Intl.DateTimeFormat(navigator.language, {
-        dateStyle: 'medium',
-        timeStyle: 'medium',
-        hour12: false
-    }).format(new Date(raceScorpionAHAL.plannedStartTime + 'Z'));
-    expect(screen.getByText(expectedPlannedTime));
-});
 it('displays options to output name as firstname surname or surname, firstname', () => {
     const model = new SylphModel(httpRootURL, wsRootURL);
     render(<DownloadRace race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);

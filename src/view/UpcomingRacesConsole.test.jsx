@@ -154,10 +154,10 @@ it('registers an interest in race updates for races in selected period', async (
     const registerRaceUpdateCallbackSpy = vi.spyOn(model, 'registerRaceUpdateCallback');
     render(<UpcomingRacesConsole model={model}/>);
     await screen.findAllByRole('cell');
-    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/directRaces/17', expect.any(Function));
+    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(1, 'http://localhost:8081/dinghyracing/api/directRaces/4', expect.any(Function));
     expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(2, 'http://localhost:8081/dinghyracing/api/directRaces/7', expect.any(Function));
-    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(3, 'http://localhost:8081/dinghyracing/api/directRaces/8', expect.any(Function));
-    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(4, 'http://localhost:8081/dinghyracing/api/directRaces/4', expect.any(Function));
+    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(3, 'http://localhost:8081/dinghyracing/api/directRaces/17', expect.any(Function));
+    expect(registerRaceUpdateCallbackSpy).toHaveBeenNthCalledWith(4, 'http://localhost:8081/dinghyracing/api/directRaces/8', expect.any(Function));
 });
 describe('when races within session are changed', () => {
     it('updates recorded details', async () => {
