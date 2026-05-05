@@ -17,27 +17,25 @@
 import SylphModel from '../model/sylph-model';
 import { downloadRaceEntriesCSV, functionsForTestingOnly } from './csv-writer';
 import Collection from '../model/collection';
-import Competitor from '../model/competitor';
-import Dinghy from '../model/dinghy';
-import DinghyClass from '../model/dinghy-class';
 import Entry from '../model/entry';
-import Fleet from '../model/fleet';
 import Lap from '../model/lap';
 import NameFormat from '../controller/name-format';
 import DirectRace from '../model/direct-race';
-import RaceType from '../model/race-type';
+import SignedUp from '../model/signed-up';
 import  { 
     httpRootURL, wsRootURL,
     entryChrisMarshall1234ScorpionAHAL, entryJillMyer826CometAHAL, entrySarahPascal6745ScorpionAHAL,
     raceCometAHAL, raceHandicapAHAL, racePursuitAHAL, raceScorpionAHAL,
-    fleetScorpionHAL,
-    dinghyClassScorpionHAL,
-    competitorChrisMarshallHAL,
-    competitorSarahPascalHAL,
-    competitorLouScrewHAL,
-    competitorJillMyerHAL,
-    dinghy1234HAL,
-    dinghy6745HAL
+    signedUpChrisMarshallDinghy1234ScorpionAHAL, signedUpSarahPascalDinghy6745ScorpionAHAL,
+    signedUpJillMyerDinghy826PursuitAHAL,
+    entryChrisMarshall1234PursuitAHAL,
+    signedUpChrisMarshallDinghy1234PursuitAHAL,
+    entryJillMyer826PursuitAHAL,
+    signedUpJillMyerDinghy826HandicapAHAL,
+    signedUpChrisMarshallDinghy1234HandicapAHAL,
+    entryChrisMarshall1234HandicapAHAL,
+    entryJillMyer826HandicapAHAL,
+    signedUpJillMyerDinghy826CometAHAL
 } from '../model/__mocks__/test-data';
 
 vi.mock('../model/sylph-model');
@@ -63,6 +61,14 @@ it('returns a promise indicating success', async () => {
     });
     const model = new SylphModel(httpRootURL, wsRootURL);
     const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+    vi.spyOn(race, 'getSignedUpToForEntry').mockImplementation((entry) => {
+        if (entry.url === entryChrisMarshall1234ScorpionAHAL._links.self.href) {
+            return new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model);
+        }
+        if (entry.url === entrySarahPascal6745ScorpionAHAL._links.self.href) {
+            return new SignedUp(signedUpSarahPascalDinghy6745ScorpionAHAL, {version: '"0"'}, model);
+        }
+    });
     const entryChrisMarshall = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
     const entrySarahPascal = new Entry(entrySarahPascal6745ScorpionAHAL, {version: '"0"'}, model);
     vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
@@ -85,6 +91,14 @@ it('throws an error on failure and provides a message explaining the cause', asy
     });
     const model = new SylphModel(httpRootURL, wsRootURL);
     const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+    vi.spyOn(race, 'getSignedUpToForEntry').mockImplementation((entry) => {
+        if (entry.url === entryChrisMarshall1234ScorpionAHAL._links.self.href) {
+            return new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model);
+        }
+        if (entry.url === entrySarahPascal6745ScorpionAHAL._links.self.href) {
+            return new SignedUp(signedUpSarahPascalDinghy6745ScorpionAHAL, {version: '"0"'}, model);
+        }
+    });
     const entryChrisMarshall = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
     const entrySarahPascal = new Entry(entrySarahPascal6745ScorpionAHAL, {version: '"0"'}, model);
     vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
@@ -98,6 +112,14 @@ describe('when race is for fleet that includes dinghy classes with crew', () => 
     it('provides a header row that includes crew name header', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        vi.spyOn(race, 'getSignedUpToForEntry').mockImplementation((entry) => {
+            if (entry.url === entryChrisMarshall1234ScorpionAHAL._links.self.href) {
+                return new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model);
+            }
+            if (entry.url === entrySarahPascal6745ScorpionAHAL._links.self.href) {
+                return new SignedUp(signedUpSarahPascalDinghy6745ScorpionAHAL, {version: '"0"'}, model);
+            }
+        });
         const entryChrisMarshall = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
         const entrySarahPascal = new Entry(entrySarahPascal6745ScorpionAHAL, {version: '"0"'}, model);
         vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
@@ -111,6 +133,14 @@ describe('when race is for fleet that includes dinghy classes with crew', () => 
     it('converts race entry data to an array of comma seperated value data with one row per entry in race', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        vi.spyOn(race, 'getSignedUpToForEntry').mockImplementation((entry) => {
+            if (entry.url === entryChrisMarshall1234ScorpionAHAL._links.self.href) {
+                return new SignedUp({...signedUpChrisMarshallDinghy1234ScorpionAHAL, correctedTime: 'PT0S'}, {version: '"0"'}, model);
+            }
+            if (entry.url === entrySarahPascal6745ScorpionAHAL._links.self.href) {
+                return new SignedUp(signedUpSarahPascalDinghy6745ScorpionAHAL, {version: '"0"'}, model);
+            }
+        });
         const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT45M53S'}, {version: '"0"'}, model);
         vi.spyOn(entryChrisMarshall, 'getCorrectedTimeInDirectRace').mockImplementation(async () => 0);
         const entrySarahPascal = new Entry({...entrySarahPascal6745ScorpionAHAL, sumOfLapTimes: 'PT48M0S'}, {version: '"0"'}, model);
@@ -140,6 +170,11 @@ describe('when race is for fleet that includes dinghy classes with crew', () => 
 describe('when race is for fleet that includes only dinghy classes without crew', () => {
     it('provides a header row without crew name header', async () => {const model = new SylphModel(httpRootURL, wsRootURL);
         const race = new DirectRace(raceCometAHAL, {version: '"0"'}, model);
+        vi.spyOn(race, 'getSignedUpToForEntry').mockImplementation((entry) => {
+            if (entry.url === entryJillMyer826CometAHAL._links.self.href) {
+                return new SignedUp(signedUpJillMyerDinghy826CometAHAL, {version: '"0"'}, model);
+            }
+        });
         const entryJillMyer = new Entry(entryJillMyer826CometAHAL, {version: '"0"'}, model);
         vi.spyOn(entryJillMyer, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
 
@@ -151,6 +186,11 @@ describe('when race is for fleet that includes only dinghy classes without crew'
     it('converts race entry data to an array of comma seperated value data with one row per entry in race', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const race = new DirectRace(raceCometAHAL, {version: '"0"'}, model);
+        vi.spyOn(race, 'getSignedUpToForEntry').mockImplementation((entry) => {
+            if (entry.url === entryJillMyer826CometAHAL._links.self.href) {
+                return new SignedUp({...signedUpJillMyerDinghy826CometAHAL, position: 1}, {version: '"0"'}, model);
+            }
+        });
         const entryJillMyer = new Entry({...entryJillMyer826CometAHAL, sumOfLapTimes: 'PT0M3S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
         vi.spyOn(entryJillMyer, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
         vi.spyOn(entryJillMyer, 'getLaps').mockImplementation(async () =>{return new Collection([
@@ -171,8 +211,16 @@ describe('when race is a handicap race', () => {
     it('provides a header row that includes crew name header', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
-        const entryChrisMarshall = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
-        const entryJillMyer = new Entry(entryJillMyer826CometAHAL, {version: '"0"'}, model);
+        vi.spyOn(race, 'getSignedUpToForEntry').mockImplementation((entry) => {
+            if (entry.url === entryChrisMarshall1234HandicapAHAL._links.self.href) {
+                return new SignedUp({...signedUpChrisMarshallDinghy1234HandicapAHAL, correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+            }
+            if (entry.url === entryJillMyer826HandicapAHAL._links.self.href) {
+                return new SignedUp({...signedUpJillMyerDinghy826HandicapAHAL, position: 2, correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+            }
+        });
+        const entryChrisMarshall = new Entry({...entryChrisMarshall1234HandicapAHAL, sumOfLapTimes: 'PT52M57S'}, {version: '"0"'}, model);
+        const entryJillMyer = new Entry({...entryJillMyer826HandicapAHAL, sumOfLapTimes: 'PT1H2M1S'}, {version: '"0"'}, model);
         vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
         vi.spyOn(entryJillMyer, 'getPositionInDirectRace').mockImplementation(async () => {return 2});
 
@@ -184,8 +232,16 @@ describe('when race is a handicap race', () => {
     it('converts race entry data to an array of comma seperated value data with one row per entry in race', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const race = new DirectRace(raceHandicapAHAL, {version: '"0"'}, model);
-        const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT52M57S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
-        const entryJillMyer = new Entry({...entryJillMyer826CometAHAL, sumOfLapTimes: 'PT1H2M1S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+        vi.spyOn(race, 'getSignedUpToForEntry').mockImplementation((entry) => {
+            if (entry.url === entryChrisMarshall1234HandicapAHAL._links.self.href) {
+                return new SignedUp({...signedUpChrisMarshallDinghy1234HandicapAHAL, correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+            }
+            if (entry.url === entryJillMyer826HandicapAHAL._links.self.href) {
+                return new SignedUp({...signedUpJillMyerDinghy826HandicapAHAL, position: 2, correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+            }
+        });
+        const entryChrisMarshall = new Entry({...entryChrisMarshall1234HandicapAHAL, sumOfLapTimes: 'PT52M57S'}, {version: '"0"'}, model);
+        const entryJillMyer = new Entry({...entryJillMyer826HandicapAHAL, sumOfLapTimes: 'PT1H2M1S'}, {version: '"0"'}, model);
         vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
         vi.spyOn(entryChrisMarshall, 'getCorrectedTimeInDirectRace').mockImplementation(async () => 0);
         vi.spyOn(entryJillMyer, 'getPositionInDirectRace').mockImplementation(async () => {return 2});
@@ -214,8 +270,16 @@ describe('when an entry has a scoring abbreviation set', () => {
     it('converts race entry data to an array of comma seperated value data with one row per entry in race including scoring abbreviation', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
-        const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT3S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
-        const entrySarahPascal = new Entry({...entrySarahPascal6745ScorpionAHAL, sumOfLapTimes: 'PT0S', correctedTime: 'PT0M0S', scoringAbbreviation: 'DNS'}, {version: '"0"'}, model);
+        vi.spyOn(race, 'getSignedUpToForEntry').mockImplementation((entry) => {
+            if (entry.url === entryChrisMarshall1234ScorpionAHAL._links.self.href) {
+                return new SignedUp({...signedUpChrisMarshallDinghy1234ScorpionAHAL, correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+            }
+            if (entry.url === entrySarahPascal6745ScorpionAHAL._links.self.href) {
+                return new SignedUp({...signedUpSarahPascalDinghy6745ScorpionAHAL, correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+            }
+        });
+        const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT3S'}, {version: '"0"'}, model);
+        const entrySarahPascal = new Entry({...entrySarahPascal6745ScorpionAHAL, sumOfLapTimes: 'PT0S', scoringAbbreviation: 'DNS'}, {version: '"0"'}, model);
         vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
         vi.spyOn(entryChrisMarshall, 'getCorrectedTimeInDirectRace').mockImplementation(async () => 0);
         vi.spyOn(entrySarahPascal, 'getPositionInDirectRace').mockImplementation(async () => {return 2});
@@ -241,8 +305,16 @@ describe('when download options are provided', () => {
         it('outputs name as firstname surname', async () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
             const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
-            const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT45M53S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
-            const entrySarahPascal = new Entry({...entrySarahPascal6745ScorpionAHAL, sumOfLapTimes: 'PT48M0S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+            vi.spyOn(race, 'getSignedUpToForEntry').mockImplementation((entry) => {
+                if (entry.url === entryChrisMarshall1234ScorpionAHAL._links.self.href) {
+                    return new SignedUp({...signedUpChrisMarshallDinghy1234ScorpionAHAL, correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+                }
+                if (entry.url === entrySarahPascal6745ScorpionAHAL._links.self.href) {
+                    return new SignedUp({...signedUpSarahPascalDinghy6745ScorpionAHAL, correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+                }
+            });
+            const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT45M53S'}, {version: '"0"'}, model);
+            const entrySarahPascal = new Entry({...entrySarahPascal6745ScorpionAHAL, sumOfLapTimes: 'PT48M0S'}, {version: '"0"'}, model);
             vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
             vi.spyOn(entryChrisMarshall, 'getCorrectedTimeInDirectRace').mockImplementation(async () => 0);
             vi.spyOn(entrySarahPascal, 'getPositionInDirectRace').mockImplementation(async () => {return 2});
@@ -270,8 +342,16 @@ describe('when download options are provided', () => {
         it('outputs name as surname, firstname and wraps in quotation marks', async () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
             const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
-            const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT45M53S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
-            const entrySarahPascal = new Entry({...entrySarahPascal6745ScorpionAHAL, sumOfLapTimes: 'PT48M0S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+            vi.spyOn(race, 'getSignedUpToForEntry').mockImplementation((entry) => {
+                if (entry.url === entryChrisMarshall1234ScorpionAHAL._links.self.href) {
+                    return new SignedUp({...signedUpChrisMarshallDinghy1234ScorpionAHAL, correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+                }
+                if (entry.url === entrySarahPascal6745ScorpionAHAL._links.self.href) {
+                    return new SignedUp({...signedUpSarahPascalDinghy6745ScorpionAHAL, correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+                }
+            });
+            const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT45M53S'}, {version: '"0"'}, model);
+            const entrySarahPascal = new Entry({...entrySarahPascal6745ScorpionAHAL, sumOfLapTimes: 'PT48M0S'}, {version: '"0"'}, model);
             vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
             vi.spyOn(entryChrisMarshall, 'getCorrectedTimeInDirectRace').mockImplementation(async () => 0);
             vi.spyOn(entrySarahPascal, 'getPositionInDirectRace').mockImplementation(async () => {return 2});
@@ -301,14 +381,22 @@ describe('when race is a pursuit race', () => {
     it('provides a header row that does not includes elapsed, laps, or corrected headers', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const race = new DirectRace(racePursuitAHAL, {version: '"0"'}, model);
-        const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT45M53S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+        vi.spyOn(race, 'getSignedUpToForEntry').mockImplementation((entry) => {
+            if (entry.url === entryChrisMarshall1234PursuitAHAL._links.self.href) {
+                return new SignedUp(signedUpChrisMarshallDinghy1234PursuitAHAL, {version: '"0"'}, model);
+            }
+            if (entry.url === entryJillMyer826PursuitAHAL._links.self.href) {
+                return new SignedUp(signedUpJillMyerDinghy826PursuitAHAL, {version: '"0"'}, model);
+            }
+        });
+        const entryChrisMarshall = new Entry({...entryChrisMarshall1234PursuitAHAL, sumOfLapTimes: 'PT45M53S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
         vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
         vi.spyOn(entryChrisMarshall, 'getLaps').mockImplementation(async () =>{return new Collection([
             new Lap(1, 923000, {version: '"0"'}, model),
             new Lap(2, 896000, {version: '"0"'}, model),
             new Lap(3, 934000, {version: '"0"'}, model)
         ], {size: 20,totalElements: 3, totalPages: 0,number: 0})});
-        const entryJillMyer = new Entry({...entryJillMyer826CometAHAL, sumOfLapTimes: 'PT0M3S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+        const entryJillMyer = new Entry({...entryJillMyer826PursuitAHAL, sumOfLapTimes: 'PT0M3S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
         vi.spyOn(entryJillMyer, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
         vi.spyOn(entryJillMyer, 'getLaps').mockImplementation(async () =>{return new Collection([
             new Lap(1, 1000, {version: '"0"'}, model),
@@ -325,7 +413,12 @@ describe('when race is a pursuit race', () => {
     it('converts race entry data to an array of comma seperated value data with one row per entry in race', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const race = new DirectRace(racePursuitAHAL, {version: '"0"'}, model);
-        const entryChrisMarshall = new Entry({...entryChrisMarshall1234ScorpionAHAL, sumOfLapTimes: 'PT45M53S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
+        vi.spyOn(race, 'getSignedUpToForEntry').mockImplementation((entry) => {
+            if (entry.url === entryChrisMarshall1234PursuitAHAL._links.self.href) {
+                return new SignedUp(signedUpChrisMarshallDinghy1234PursuitAHAL, {version: '"0"'}, model);
+            }
+        });
+        const entryChrisMarshall = new Entry({...entryChrisMarshall1234PursuitAHAL, sumOfLapTimes: 'PT45M53S', correctedTime: 'PT0M0S'}, {version: '"0"'}, model);
         vi.spyOn(entryChrisMarshall, 'getPositionInDirectRace').mockImplementation(async () =>{return 1});
         vi.spyOn(entryChrisMarshall, 'getLaps').mockImplementation(async () =>{return new Collection([
             new Lap(1, 923000, {version: '"0"'}, model),

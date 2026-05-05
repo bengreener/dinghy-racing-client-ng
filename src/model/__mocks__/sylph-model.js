@@ -573,7 +573,7 @@ class SylphModel {
     }
 
     async getSignedUpToRaceForEntry(race, entry) {
-        version = {version: '"0"'};
+        const version = {version: '"0"'};
         return new SignedUp({}, version, this);
     }
 

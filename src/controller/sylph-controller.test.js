@@ -22,9 +22,10 @@ import { httpRootURL, wsRootURL,
     raceCometAHAL, raceScorpionAHAL,  
     competitorChrisMarshallHAL, competitorLouScrewHAL, competitorJillMyerHAL,
     dinghy826HAL, dinghy1234HAL,
-    entryChrisMarshall1234ScorpionAHAL, entryJillMyer826CometAHAL,
+    entryChrisMarshall1234ScorpionAHAL, entryJillMyer826CometAHAL, entrySarahPascal6745ScorpionAHAL,
     fleetHandicapHAL,
-    lap1HAL, lap2HAL, lap3HAL
+    lap1HAL, lap2HAL, lap3HAL,
+    signedUpChrisMarshallDinghy1234ScorpionAHAL, signedUpSarahPascalDinghy6745ScorpionAHAL
 } from '../model/__mocks__/test-data.js';
 import Collection from '../model/collection.js';
 import Competitor from '../model/competitor.js';
@@ -36,6 +37,7 @@ import Lap from '../model/lap.js';
 import MissingParameter from '../errors/missing-parameter.js';
 import DirectRace from '../model/direct-race.js';
 import RaceType from '../model/race-type.js';
+import SignedUp from '../model/signed-up.js';
 import StartType from '../model/start-type.js';
 
 vi.mock('../model/sylph-model');
@@ -868,7 +870,16 @@ describe('when writing race entries to a CSV file', () => {
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
-        const promise = controller.downloadRaceResults(new DirectRace(raceScorpionAHAL, {version: '"0"'}, model));
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)
+        vi.spyOn(race, 'getSignedUpToForEntry').mockImplementation((entry) => {
+            if (entry.url === entryChrisMarshall1234ScorpionAHAL._links.self.href) {
+                return new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model);
+            }
+            if (entry.url === entrySarahPascal6745ScorpionAHAL._links.self.href) {
+                return new SignedUp(signedUpSarahPascalDinghy6745ScorpionAHAL, {version: '"0"'}, model);
+            }
+        });
+        const promise = controller.downloadRaceResults(race);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
         expect(result).toBe(true);
