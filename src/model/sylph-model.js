@@ -561,17 +561,6 @@ class SylphModel {
     }
 
     /**
-     * Gat an embedded race
-     * @param {String} url 
-     * @returns {<Promise<EmbeddedRace>>}
-     * @throws {Error}
-     */
-    async getEmbeddedRace(url) {
-        const result = await this._read(url);
-        return new EmbeddedRace(result.hal, result.metadata, this);
-    }
-
-    /**
      * Get races from the specified resource location
      * @param {String} url to use to retrieve a collection of races
      * @param {Integer} [page] number to return (0 indexed)
