@@ -569,16 +569,16 @@ class SylphModel {
      * @returns {Promise<Collection<EmbeddedRace>>}
      * @throws {Error}
      */
-    async getEmbeddedRacesFromURL(url, page, size, sortParameters) {
-        const result = await this.getCollection(url, page, size, sortParameters);
+    // async getEmbeddedRacesFromURL(url, page, size, sortParameters) {
+    //     const result = await this.getCollection(url, page, size, sortParameters);
     
-        const promises = [];
-        for (let i = 0; i < result.hal._embedded.embeddedRaces.length; i++  ) {
-            promises.push(this.getRace(result.hal._embedded.embeddedRaces[i]._links.self.href));
-        };
-        const races = await Promise.all(promises);
-        return new Collection(races, result.hal.page);
-    }
+    //     const promises = [];
+    //     for (let i = 0; i < result.hal._embedded.embeddedRaces.length; i++  ) {
+    //         promises.push(this.getRace(result.hal._embedded.embeddedRaces[i]._links.self.href));
+    //     };
+    //     const races = await Promise.all(promises);
+    //     return new Collection(races, result.hal.page);
+    // }
 
     /**
      * Get embedded races hosted in DirectRace
@@ -586,7 +586,8 @@ class SylphModel {
      * @returns {Promise<Collection<EmbeddedRace>>}
      */
     async getEmbeddedRacesInRace(race) {
-        return this.getEmbeddedRacesFromURL(this.httpRootURL + '/embeddedRaces/search/findByHosts?host=' + race.url);
+        // return this.getEmbeddedRacesFromURL(this.httpRootURL + '/embeddedRaces/search/findByHosts?host=' + race.url);
+        return this.getRacesFromURL(this.httpRootURL + '/embeddedRaces/search/findByHosts?host=' + race.url);
     }
 
     /**
@@ -640,8 +641,8 @@ class SylphModel {
      * @throws {Error}
      */
     async getEntryByRaceAndDinghy(race, dinghy) {
-        const result = await this._read(this.httpRootURL + '/entries/search/findBySignedUpToRaceAndDinghy?race=' + race.url + '&dinghy=' + dinghy.url);
-        return this.getEntry(result.hal._links.self.href);
+        // const result = await this._read(this.httpRootURL + '/entries/search/findBySignedUpToRaceAndDinghy?race=' + race.url + '&dinghy=' + dinghy.url);
+        return this.getEntry(this.httpRootURL + '/entries/search/findBySignedUpToRaceAndDinghy?race=' + race.url + '&dinghy=' + dinghy.url);
     }
 
     /**

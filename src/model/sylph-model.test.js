@@ -47,8 +47,12 @@ import { httpRootURL, wsRootURL, competitorsCollectionHAL,
     racePursuitAHAL,
     signedUpChrisMarshallDinghy1234ScorpionAHAL, signedUpSarahPascalDinghy6745ScorpionAHAL,
     signedUpScorpionACollectionHAL,
-    lap1HAL, lap4HAL
+    lap1HAL, lap4HAL,
+    embeddedRaceVeteransAHAL,
+    embeddedRaceLadiesAHAL,
+    signedUpChrisMarshallDinghy1234VeteransAHAL
 } from './__mocks__/test-data';
+import EmbeddedRace from './embedded-race';
 
 global.fetch = vi.fn();
 vi.mock('./clock');
@@ -1244,6 +1248,244 @@ describe('when retrieving a list of races that start between the specified times
     });
 });
 
+describe('when races are requested by URL', () => {
+    describe('when races returned are type race', () => {
+        it('returns a collection containing the races', async () => {
+            fetch.mockImplementation((resource) => {
+                if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2024-03-10T10:10:00Z&endTime=2026-06-19T09:30:00Z') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers(), 
+                        json: () => Promise.resolve({_embedded:{races:[raceScorpionAHAL, raceGraduateAHAL, raceCometAHAL, raceHandicapAHAL]},_links:{
+                            self:{href:'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2024-03-10T10:10:00Z&endTime=2026-06-19T09:30:00Z'}
+                        },page:{size:20,totalElements:4,totalPages:1,number:0}})
+                    });
+                }
+                if (resource === raceScorpionAHAL._links.self.href) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers([['ETag', '"1"']]), 
+                        json: () => Promise.resolve(raceScorpionAHAL)
+                    });
+                }
+                if (resource === raceGraduateAHAL._links.self.href) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        json: () => Promise.resolve(raceGraduateAHAL)
+                    });
+                }
+                if (resource === raceCometAHAL._links.self.href) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        json: () => Promise.resolve(raceCometAHAL)
+                    });
+                }
+                if (resource === raceHandicapAHAL._links.self.href) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        json: () => Promise.resolve(raceHandicapAHAL)
+                    });
+                }
+            });
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const result = await model.getRacesFromURL('http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2024-03-10T10:10:00Z&endTime=2026-06-19T09:30:00Z');
+            expect(result).toEqual(new Collection([
+                new DirectRace(raceScorpionAHAL, {version:'"0"'}, model),
+                new DirectRace(raceGraduateAHAL, {version:'"0"'}, model),
+                new DirectRace(raceCometAHAL, {version:'"0"'}, model),
+                new DirectRace(raceHandicapAHAL, {version:'"0"'}, model)
+            ], {size:20,totalElements:4,totalPages:1,number:0}));
+        });
+    });
+    describe('when races returned are type direct race', () => {
+        it('returns a collection containing the races', async () => {
+            fetch.mockImplementation((resource) => {
+                if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2024-03-10T10:10:00Z&endTime=2026-06-19T09:30:00Z') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers(), 
+                        json: () => Promise.resolve(racesCollectionHAL)
+                    });
+                }
+                if (resource === raceScorpionAHAL._links.self.href) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers([['ETag', '"1"']]), 
+                        json: () => Promise.resolve(raceScorpionAHAL)
+                    });
+                }
+                if (resource === raceGraduateAHAL._links.self.href) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        json: () => Promise.resolve(raceGraduateAHAL)
+                    });
+                }
+                if (resource === raceCometAHAL._links.self.href) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        json: () => Promise.resolve(raceCometAHAL)
+                    });
+                }
+                if (resource === raceHandicapAHAL._links.self.href) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        json: () => Promise.resolve(raceHandicapAHAL)
+                    });
+                }
+            });
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const result = await model.getRacesFromURL('http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2024-03-10T10:10:00Z&endTime=2026-06-19T09:30:00Z');
+            expect(result).toEqual(new Collection([
+                new DirectRace(raceScorpionAHAL, {version:'"0"'}, model),
+                new DirectRace(raceGraduateAHAL, {version:'"0"'}, model),
+                new DirectRace(raceCometAHAL, {version:'"0"'}, model),
+                new DirectRace(raceHandicapAHAL, {version:'"0"'}, model)
+            ], {size:20,totalElements:4,totalPages:1,number:0}));
+        });
+    });
+    describe('when races returned are type type embedded race', () => {
+        it('returns a collection containing the races', async () => {
+            fetch.mockImplementation((resource) => {
+                if (resource === 'http://localhost:8081/dinghyracing/api/dinghyracing/api/embeddedRaces') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers(), 
+                        json: () => Promise.resolve({_embedded:{embeddedRaces:[embeddedRaceVeteransAHAL, embeddedRaceLadiesAHAL]},_links:{
+                            self:{href:'http://localhost:8081/dinghyracing/api/dinghyracing/api/embeddedRaces'}
+                        },page:{size:20,totalElements:2,totalPages:1,number:0}})
+                    });
+                }
+                if (resource === embeddedRaceVeteransAHAL._links.self.href) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers([['ETag', '"1"']]), 
+                        json: () => Promise.resolve(embeddedRaceVeteransAHAL)
+                    });
+                }
+                if (resource === embeddedRaceLadiesAHAL._links.self.href) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        json: () => Promise.resolve(embeddedRaceLadiesAHAL)
+                    });
+                }
+            });
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const result = await model.getRacesFromURL('http://localhost:8081/dinghyracing/api/dinghyracing/api/embeddedRaces');
+            expect(result).toEqual(new Collection([
+                new EmbeddedRace(embeddedRaceVeteransAHAL, {version:'"0"'}, model),
+                new EmbeddedRace(embeddedRaceLadiesAHAL, {version:'"0"'}, model)
+            ], {size:20,totalElements:2,totalPages:1,number:0}));
+        });
+    });
+    describe('when races returned are of all race type', () => {
+        it('returns a collection containing the races', async () => {
+            fetch.mockImplementation((resource) => {
+                if (resource === 'http://localhost:8081/dinghyracing/api/races') {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers(), 
+                        json: () => Promise.resolve({_embedded:{
+                            directRaces:[raceScorpionAHAL, raceGraduateAHAL, raceCometAHAL, raceHandicapAHAL],
+                            embeddedraces:[embeddedRaceVeteransAHAL, embeddedRaceLadiesAHAL]},
+                            _links:{
+                                self:{href:'http://localhost:8081/dinghyracing/api/races'}
+                            },
+                            page:{size:20,totalElements:6,totalPages:1,number:0}
+                        })
+                    });
+                }
+                if (resource === raceScorpionAHAL._links.self.href) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers([['ETag', '"1"']]), 
+                        json: () => Promise.resolve(raceScorpionAHAL)
+                    });
+                }
+                if (resource === raceGraduateAHAL._links.self.href) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        json: () => Promise.resolve(raceGraduateAHAL)
+                    });
+                }
+                if (resource === raceCometAHAL._links.self.href) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        json: () => Promise.resolve(raceCometAHAL)
+                    });
+                }
+                if (resource === raceHandicapAHAL._links.self.href) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        json: () => Promise.resolve(raceHandicapAHAL)
+                    });
+                }
+                if (resource === embeddedRaceVeteransAHAL._links.self.href) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers([['ETag', '"1"']]), 
+                        json: () => Promise.resolve(embeddedRaceVeteransAHAL)
+                    });
+                }
+                if (resource === embeddedRaceLadiesAHAL._links.self.href) {
+                    return Promise.resolve({
+                        ok: true,
+                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        json: () => Promise.resolve(embeddedRaceLadiesAHAL)
+                    });
+                }
+            });
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const result = await model.getRacesFromURL('http://localhost:8081/dinghyracing/api/races');
+            expect(result).toEqual(new Collection([
+                new DirectRace(raceScorpionAHAL, {version:'"0"'}, model),
+                new DirectRace(raceGraduateAHAL, {version:'"0"'}, model),
+                new DirectRace(raceCometAHAL, {version:'"0"'}, model),
+                new DirectRace(raceHandicapAHAL, {version:'"0"'}, model),
+                new EmbeddedRace(embeddedRaceVeteransAHAL, {version:'"0"'}, model),
+                new EmbeddedRace(embeddedRaceLadiesAHAL, {version:'"0"'}, model)
+            ], {size:20,totalElements:6,totalPages:1,number:0}));
+        });
+    });
+});
+
+describe('when retrieving a list of races that start between the specified times', () => {
+    it('calls getRacesFromURL with correct parameters', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const getRacesFromURLSpy = vi.spyOn(model, 'getRacesFromURL').mockImplementation(vi.fn());
+        const startTime = new Date(Date.now() - 100000);
+        const endTime = new Date();
+        await model.getRacesBetweenTimes(startTime, endTime);
+        const resource = httpRootURL + '/races/search/findByPlannedStartTimeBetween?startTime='+ startTime.toISOString() + '&endTime=' + endTime.toISOString();
+        expect(getRacesFromURLSpy).toHaveBeenCalledWith(resource, undefined, undefined, undefined);
+    });
+    it('returns requested races', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const raceCometA = new DirectRace(raceCometAHAL, {version: '"0"'}, this);
+        const raceGraduateA = new DirectRace(raceGraduateAHAL, {version: '"0"'}, this);
+        const raceHandicapA = new DirectRace(raceHandicapAHAL, {version: '"0"'}, this);
+        const raceScorpionA = new DirectRace(raceScorpionAHAL, {version: '"0"'}, this);
+        const collection = [
+            raceScorpionA, raceGraduateA, raceCometA, raceHandicapA
+        ];
+        const racesCollection = new Collection(collection, {size: 20, totalElements: collection.length, totalPages: 0, number: 0})
+        vi.spyOn(model, 'getRacesFromURL').mockImplementation(() => racesCollection);
+        const startTime = new Date(Date.now() - 100000);
+        const endTime = new Date();
+        const result = await model.getDirectRacesBetweenTimes(startTime, endTime);
+        expect(result).toEqual(racesCollection);
+    })
+});
+
 describe('when retrieving a list of races of a specific type that start between the specified times', () => {
     it('calls getRacesFromURL with correct parameters', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -1270,6 +1512,42 @@ describe('when retrieving a list of races of a specific type that start between 
         const result = await model.getDirectRacesBetweenTimesForType(startTime, endTime, RaceType.FLEET);
         expect(result).toEqual(racesCollection);
     })
+});
+
+describe('when embedded races in a race are requested', () => {
+    it('returns a collection of embedded races', async () => {
+        fetch.mockImplementation((resource) => {
+            if (resource === 'http://localhost:8081/dinghyracing/api/embeddedRaces/search/findByHosts?host=' + raceScorpionAHAL._links.self.href) {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, headers: new Headers(), 
+                    json: () => Promise.resolve({_embedded:{embeddedRaces:[embeddedRaceVeteransAHAL, embeddedRaceLadiesAHAL]},_links:{
+                        self:{href:'http://localhost:8081/dinghyracing/api/dinghyracing/api/embeddedRaces'}
+                    },page:{size:20,totalElements:2,totalPages:1,number:0}})
+                });
+            }
+            if (resource === embeddedRaceVeteransAHAL._links.self.href) {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, headers: new Headers([['ETag', '"1"']]), 
+                    json: () => Promise.resolve(embeddedRaceVeteransAHAL)
+                });
+            }
+            if (resource === embeddedRaceLadiesAHAL._links.self.href) {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200, headers: new Headers([['ETag', '"0"']]), 
+                    json: () => Promise.resolve(embeddedRaceLadiesAHAL)
+                });
+            }
+        });
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const result = await model.getEmbeddedRacesInRace(new DirectRace(raceScorpionAHAL, {version:'"0"'}, model));
+        expect(result).toEqual(new Collection([
+            new EmbeddedRace(embeddedRaceVeteransAHAL, {version:'"0"'}, model),
+            new EmbeddedRace(embeddedRaceLadiesAHAL, {version:'"0"'}, model)
+        ], {size:20,totalElements:2,totalPages:1,number:0}));
+    });
 })
 
 describe('when signing up to a race', () => {
@@ -2787,9 +3065,26 @@ describe('when searching for entries by race', () => {
     });
 });
 
+describe('when an entry is requested for a race and dinghy', () => {
+    it('returns the entry', async () => {
+        fetch.mockImplementation(async (resource, options) => {
+            if (resource === 'http://localhost:8081/dinghyracing/api/entries/search/findBySignedUpToRaceAndDinghy?race=' + raceScorpionAHAL._links.self.href + '&dinghy=' + dinghy1234HAL._links.self.href) {
+                return {
+                    ok: true,
+                    status: 200, headers: new Headers([['ETag', '"0"']]),
+                    json: () => Promise.resolve(entryChrisMarshall1234ScorpionAHAL)
+                };
+            };
+        });
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const result = await model.getEntryByRaceAndDinghy(new DirectRace(raceScorpionAHAL, {version :'"0"'}, model), new Dinghy(dinghy1234HAL, {version: '"0"'}, model));
+        expect(result).toEqual(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model));
+    });
+});
+
 describe('when a race is requested', () => {
     it('returns a promise that resolves to the race', async () => {
-        fetch.mockImplementation((resource, options) => {
+        fetch.mockImplementation(async (resource, options) => {
             if (resource === raceScorpionAHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
@@ -2823,21 +3118,22 @@ describe('when a race is requested', () => {
 
 describe('when an embedded race is requested', () => {
     it('returns a promise that resolves to the embedded race', async () => {
-        fetch.mockImplementation((resource, options) => {
-            if (resource === raceScorpionAHAL._links.self.href) {
+        fetch.mockImplementation(async (resource, options) => {
+            if (resource === embeddedRaceVeteransAHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
                     status: 200,
                     headers: new Headers([['ETag', '"3"']]),
-                    json: () => Promise.resolve(raceScorpionAHAL)
+                    json: () => Promise.resolve(embeddedRaceVeteransAHAL)
                 });
             }
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        const promise = model.getRace(raceScorpionAHAL._links.self.href);
+        const promise = model.getRace(embeddedRaceVeteransAHAL._links.self.href);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({hal: raceScorpionAHAL, metadata: {version: '"3"'}, model});
+        expect(result).toBeInstanceOf(EmbeddedRace);
+        expect(result).toEqual({hal: embeddedRaceVeteransAHAL, metadata: {version: '"3"'}, model});
     });
     it('throws an error when race is not returned', async () => {
         fetch.mockImplementation((resource) => {
@@ -2860,7 +3156,8 @@ describe('when a competitor is requested', () => {
         fetch.mockImplementation(() => {
             return Promise.resolve({
                 ok: true,
-                status: 200, headers: new Headers([['ETag', '"0"']]), 
+                status: 200,
+                headers: new Headers([['ETag', '"0"']]), 
                 json: () => Promise.resolve(competitorChrisMarshallHAL)
             });
         });
@@ -2972,6 +3269,7 @@ describe('when updating a race', () => {
     });
     // TODO: Test expected parameters are supplied
 });
+
 describe('when setting a scoring abbreviation for an entry', () => {
     it('calls _update with correct parameters', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -2986,6 +3284,7 @@ describe('when setting a scoring abbreviation for an entry', () => {
         expect(await model.setScoringAbbreviation(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 'RET')).toEqual(new Entry({...entryChrisMarshall1234ScorpionAHAL, scoringAbbreviation: 'RET'}, {version: '"1"'}, model));
     });
 });
+
 describe('when provided with a duration in ISO 8601 format', () => {
     it('converts pt12h13m17.08s to 43,997,080 milliseconds', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -3076,6 +3375,7 @@ describe('when provided with a duration in ISO 8601 format', () => {
         }).toThrow(TypeError);
     });
 });
+
 describe('when adding a lap to a race', () => {
     it('calls fetch with the address of the resource and a body containing the lap time divided by 1000', async () => {
         const fetchSpy = fetch.mockImplementationOnce(() => {
@@ -3105,6 +3405,7 @@ describe('when adding a lap to a race', () => {
         await expect(() => model.addLap(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 1000)).rejects.toThrowError('HTTP Error: 404 Not Found');
     });
 });
+
 describe('when removing a lap from an entry in a race', () => {
     it('calls fetch with the address of the entry remove lap and a body identifying the lap to remove', async () => {
         const fetchSpy = fetch.mockImplementationOnce(() => {
@@ -3134,6 +3435,7 @@ describe('when removing a lap from an entry in a race', () => {
         await expect(() => model.removeLap(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}), {'number': 1, 'time': 1000})).rejects.toThrowError('HTTP Error: 404 Not Found');
     });
 });
+
 describe('when updating the last lap for an entry in a race', () => {
     it('calls fetch with the address of the entry update lap and the new time for the lap divided by 1000', async () => {
         const fetchSpy = fetch.mockImplementationOnce(() => {
@@ -3163,6 +3465,7 @@ describe('when updating the last lap for an entry in a race', () => {
         await expect(() => model.updateLap(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 2000)).rejects.toThrowError('HTTP Error: 404 Not Found');
     });
 });
+
 describe('when a StartSequence is requested', () => {
     it('returns a promise that resolves to a success containing a StartSequence for the races between the start and end times', async () => {
         vi.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
@@ -3311,6 +3614,7 @@ describe('when a StartSequence is requested', () => {
         })
     })
 });
+
 describe('when updating an entries position in the race', () => {
     it('if race exists and entry exists and URLs provided and position provided then updates position', async () => {
         fetch.mockImplementationOnce((resource, options) => {
@@ -3342,6 +3646,7 @@ describe('when updating an entries position in the race', () => {
         await expect(model.updateEntryPosition(new DirectRace(raceScorpionAHAL, {version: '"0"'}, model), new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 2)).rejects.toThrowError('HTTP Error: 500 Internal Server Error');
     });
 });
+
 describe('when entry is requested', () => {
     describe('when dinghy has a crew', () => {
         it('returns a promise that resolves to a result indicating success and containing the entry when the entry is found', async () => {
@@ -3375,6 +3680,7 @@ describe('when entry is requested', () => {
         await expect(() => model.getEntry(entryChrisMarshall1234ScorpionAHAL._links.self.href)).rejects.toThrowError('HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404');
     });
 });
+
 describe('when retrieving dinghies by sail number', () => {
     it('returns a success result containing dinghies with the provided sail number', async () => {
         const dinghy1234ScorpionHAL = {sailNumber: '1234', _links: {self: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, dinghy: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2' }, dinghyClass: {href: 'http://localhost:8081/dinghyracing/api/dinghies/2/dinghyClass' } } };
@@ -3434,6 +3740,7 @@ describe('when retrieving dinghies by sail number', () => {
         });
     });
 });
+
 describe('when the crews that have sailed a dinghy are requested', () => {
     it('returns a promise that resolves to a collection containing the crews', async () => {
         fetch.mockImplementation((resource) => {
@@ -3556,6 +3863,7 @@ describe('when the crews that have sailed a dinghy are requested', () => {
 //         });
 //     });
 });
+
 describe('when a websocket message callback has been set for competitor creation', () => {
     it('calls the callback', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -3602,6 +3910,7 @@ describe('when a websocket message callback has been set for competitor creation
         expect(callback2).toHaveBeenCalled();
     });
 });
+
 describe('when a websocket message callback has been set for competitor update', () => {
     it('calls the callback', () => { 
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -3648,6 +3957,7 @@ describe('when a websocket message callback has been set for competitor update',
         expect(callback2).toHaveBeenCalled();
     });
 });
+
 describe('when a websocket message callback has been set for entry creation', () => {
     it('calls the callback', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -3694,6 +4004,7 @@ describe('when a websocket message callback has been set for entry creation', ()
         expect(callback2).toHaveBeenCalled();
     });
 });
+
 describe('when a websocket message callback has been set for entry update', () => {
     it('calls the callback', () => { 
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -3740,6 +4051,7 @@ describe('when a websocket message callback has been set for entry update', () =
         expect(callback2).toHaveBeenCalled();
     });
 });
+
 describe('when a websocket message callback has been set for entry deletion', () => {
     it('calls the callback', () => { 
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -3786,6 +4098,7 @@ describe('when a websocket message callback has been set for entry deletion', ()
         expect(callback2).toHaveBeenCalled();
     });
 });
+
 describe('when a websocket message callback has been set for race update', () => {
     it('calls the callback', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -3832,6 +4145,7 @@ describe('when a websocket message callback has been set for race update', () =>
         expect(callback2).toHaveBeenCalled();
     });
 });
+
 describe('when a websocket message callback has been set for race entry laps update', () => {
     it('calls the callback', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -3878,6 +4192,7 @@ describe('when a websocket message callback has been set for race entry laps upd
         expect(callback2).toHaveBeenCalled();
     });
 });
+
 describe('when a websocket message callback has been set for dinghy creation', () => {
     it('calls the callback', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -3924,6 +4239,7 @@ describe('when a websocket message callback has been set for dinghy creation', (
         expect(callback2).toHaveBeenCalled();
     });
 });
+
 describe('when a websocket message callback has been set for dinghy class creation', () => {
     it('calls the callback', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -3970,6 +4286,7 @@ describe('when a websocket message callback has been set for dinghy class creati
         expect(callback2).toHaveBeenCalled();
     });
 });
+
 describe('when a websocket message callback has been set for dinghy class update', () => {
     it('calls the callback', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -4016,6 +4333,7 @@ describe('when a websocket message callback has been set for dinghy class update
         expect(callback2).toHaveBeenCalled();
     });
 });
+
 describe('when a websocket message callback has been set for fleet creation', () => {
     it('calls the callback', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -4062,6 +4380,7 @@ describe('when a websocket message callback has been set for fleet creation', ()
         expect(callback2).toHaveBeenCalled();
     });
 });
+
 describe('when a websocket message callback has been set for fleet update', () => {
     it('calls the callback', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -4108,10 +4427,12 @@ describe('when a websocket message callback has been set for fleet update', () =
         expect(callback2).toHaveBeenCalled();
     });
 });
+
 it('provides a clock', () => {
     const model = new SylphModel(httpRootURL, wsRootURL);
     expect(model.getClock()).toBeInstanceOf(Clock);
 });
+
 describe('when a signUp is requested', () => {
     it('returns a promise that resolves to a the signUp', async () => {
         fetch.mockImplementationOnce((resource, options) => {
@@ -4130,6 +4451,7 @@ describe('when a signUp is requested', () => {
         expect(result).toEqual({hal: signedUpChrisMarshallDinghy1234ScorpionAHAL, metadata: {version: ''}, model: model});
     });
 });
+
 describe('when signedUpTo is requested', () => {
     it('returns a promise that resolves to a collection of SignedUps', async () => {
         fetch.mockImplementation((resource, options) => {
@@ -4166,6 +4488,7 @@ describe('when signedUpTo is requested', () => {
         ], undefined));
     });
 });
+
 describe('when a lap is requested', () => {
     it('calls _read with correct parameters', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -4185,6 +4508,7 @@ describe('when a lap is requested', () => {
         expect(await model.getLap(lap1HAL._links.self.href)).toEqual(new Lap(lap1HAL, {version: '"0"'}, model));
     });
 });
+
 describe('when laps collection is requested', () => {
     it('calls getCollection with correct parameters', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -4227,5 +4551,59 @@ describe('when laps collection is requested', () => {
             }
         });
         expect(await model.getLaps(entryChrisMarshall1234ScorpionAHAL._links.laps.href)).toEqual(new Collection([lap1, lap2], {size: 2, totalElements: 2, totalPages: 1, number: 0}));
+    });
+});
+
+describe('when signed up is requested for an entry in a race', () => {
+    it('returns the signed up', async () => {
+        fetch.mockImplementation(async (resource, options) => {
+            if (resource === httpRootURL + '/signedUps/search/findByRaceAndEntry?race=' + raceScorpionAHAL._links.self.href + '&entry=' + entryChrisMarshall1234ScorpionAHAL._links.self.href) {
+                return {
+                    ok: true,
+                    status: 200,
+                    headers: new Headers([['ETag', '"0"']]),
+                    json: () => Promise.resolve(signedUpChrisMarshallDinghy1234ScorpionAHAL)
+                };
+            }
+        });
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const result = await model.getSignedUpToRaceForEntry(new DirectRace(raceScorpionAHAL, {version: '"0"'}, model), new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model));
+        expect(result).toEqual(new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model));
+    });
+});
+
+describe('when a request is made to sign up to an embedded race', () => {
+    it('calls _update with the correct parameters and returns an EmbeddedRace on success', async () => {
+        fetch.mockImplementationOnce((resource, options) => {
+            if (resource === embeddedRaceVeteransAHAL._links.self.href + '/signUp?entry=' + entryChrisMarshall1234ScorpionAHAL._links.self.href && options.method === 'PATCH' && options.headers['Content-Type'] === 'application/json' && options.headers['Accept'] === 'application/hal+json') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 200,
+                    headers: new Headers(),
+                    json: () => Promise.resolve(signedUpChrisMarshallDinghy1234VeteransAHAL)
+                });
+            }
+        });
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const result = await model.signUpToEmbeddedRace(new EmbeddedRace(embeddedRaceVeteransAHAL, {version: '"0"'}, model), new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model));
+        expect(result).toEqual(new SignedUp(signedUpChrisMarshallDinghy1234VeteransAHAL, {version: ''}, model));
+    });
+});
+
+describe('when a request is made to withdraw from an embedded race', () => {
+    it('calls _delete with the correct parameters and returns an true on success', async () => {
+        fetch.mockImplementationOnce((resource, options) => {
+            if (resource === signedUpChrisMarshallDinghy1234VeteransAHAL._links.self.href && options.method === 'DELETE') {
+                return Promise.resolve({
+                    ok: true,
+                    status: 204,
+                    headers: new Headers(),
+                    json: () => null
+                });
+            }
+        });
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const result = await model.withdrawEmbeddedSignUp(new SignedUp(signedUpChrisMarshallDinghy1234VeteransAHAL, {version: '"0"'}, model));
+        expect(result).toBeTruthy();
     });
 });
