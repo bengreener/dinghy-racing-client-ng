@@ -552,7 +552,7 @@ class SylphController {
      */
     async withdrawEmbeddedSignUp(embeddedRace, entry) {
         if (!(embeddedRace instanceof EmbeddedRace)) {
-            throw new MissingParameter('An EmbeddedRace is required to withdraw from.');
+            throw new MissingParameter('An embedded race is required to withdraw from.');
         }
         if (!(entry instanceof Entry)) {
             throw new MissingParameter('An entry to withdraw from the embedded race is required.');

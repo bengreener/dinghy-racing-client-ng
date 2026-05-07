@@ -25,12 +25,16 @@ import { httpRootURL, wsRootURL,
     entryChrisMarshall1234ScorpionAHAL, entryJillMyer826CometAHAL, entrySarahPascal6745ScorpionAHAL,
     fleetHandicapHAL,
     lap1HAL, lap2HAL, lap3HAL,
-    signedUpChrisMarshallDinghy1234ScorpionAHAL, signedUpSarahPascalDinghy6745ScorpionAHAL
+    signedUpChrisMarshallDinghy1234ScorpionAHAL, signedUpSarahPascalDinghy6745ScorpionAHAL,
+    embeddedRaceVeteransAHAL,
+    entryChrisMarshall1234HandicapAHAL,
+    signedUpChrisMarshallDinghy1234VeteransAHAL
 } from '../model/__mocks__/test-data.js';
 import Collection from '../model/collection.js';
 import Competitor from '../model/competitor.js';
 import Dinghy from '../model/dinghy.js';
 import DinghyClass from '../model/dinghy-class.js';
+import EmbeddedRace from '../model/embedded-race.js';
 import Entry from '../model/entry.js';
 import Fleet from '../model/fleet.js';
 import Lap from '../model/lap.js';
@@ -276,6 +280,25 @@ describe('when signing up to a race', () => {
     });
 });
 
+describe('when signing up to an embedded race', () => {
+    it('returns EmbeddedRace when operation is successful', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        const result = await controller.signUpToEmbeddedRace(new EmbeddedRace(embeddedRaceVeteransAHAL, {version: '"0"'}, model), new Entry(entryChrisMarshall1234HandicapAHAL));
+        expect(result).toEqual(new EmbeddedRace(embeddedRaceVeteransAHAL, {version: '"0"'}, model));
+    });
+    it('throws an error when embedded race is not an instance of EmbeddedRace', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        await expect(controller.signUpToEmbeddedRace(null, new Entry(entryChrisMarshall1234HandicapAHAL))).rejects.toThrow('An embedded race is required for a new embedded race entry.');
+    });
+    it('throws an error when entry is not an instance of Entry', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        await expect(controller.signUpToEmbeddedRace(new EmbeddedRace(embeddedRaceVeteransAHAL, {version: '"0"'}, model), null)).rejects.toThrow('An entry in a race is required to sign up to an embedded race.');
+    });
+});
+
 describe('when updating an entry for a race', () => {
     describe('when updated entry does not not include a crew', () => {
         it('returns a promise that resolves to a result indicating success when operation is successful', async () => {
@@ -356,6 +379,25 @@ describe('when withdrawing from a race', () => {
                 await expect(() => controller.withdrawEntry(null)).rejects.toThrowError( 'An entry to withdraw is required.');
             });
         });
+    });
+});
+
+describe('when withdrawing from an embedded race', () => {
+    it('returns true when operation is successful', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        const result = await controller.withdrawEmbeddedSignUp(new EmbeddedRace(embeddedRaceVeteransAHAL, {version: '"0"'}, model), new Entry(entryChrisMarshall1234HandicapAHAL));
+        expect(result).toBeTruthy(result);
+    });
+    it('throws an error when embedded race is not an instance of EmbeddedRace', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        await expect(controller.withdrawEmbeddedSignUp(null, new Entry(entryChrisMarshall1234HandicapAHAL))).rejects.toThrow('An embedded race is required to withdraw from.');
+    });
+    it('throws an error when entry is not an instance of Entry', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        await expect(controller.withdrawEmbeddedSignUp(new EmbeddedRace(embeddedRaceVeteransAHAL, {version: '"0"'}, model), null)).rejects.toThrow('An entry to withdraw from the embedded race is required.');
     });
 });
 

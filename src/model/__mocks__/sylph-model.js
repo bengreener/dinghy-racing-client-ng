@@ -741,8 +741,8 @@ class SylphModel {
         return new DirectRace({}, {version: ''}, this);
     }
 
-    async signUpToEmbeddedRace(embddedRace, entry) {
-        return new EmbeddedRace({}, {version: ''}, this);
+    async signUpToEmbeddedRace(embeddedRace, entry) {
+        return embeddedRace;
     }
 
     unregisterCompetitorCreationCallback(callback) {
