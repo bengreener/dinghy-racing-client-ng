@@ -77,9 +77,8 @@ describe('when creating a new object via REST', () => {
             return Promise.resolve({
                 ok: true,
                 status: 201,
-                statusText: 'Created',
                 headers: new Headers(),
-                json: () => {throw new SyntaxError('Unexpected end of JSON input')}
+                statusText: 'Created'
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -94,9 +93,8 @@ describe('when creating a new object via REST', () => {
             return Promise.resolve({
                 ok: true,
                 status: 201,
-                statusText: 'Created',
                 headers: new Headers(),
-                json: () => {throw new SyntaxError('Unexpected end of JSON input')}
+                statusText: 'Created'
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -112,7 +110,8 @@ describe('when reading a resource from REST', () => {
         fetch.mockImplementation(() => {
             return Promise.resolve({
                 ok: true,
-                status: 200, headers: new Headers([['ETag', '"48"']]),
+                status: 200,
+                headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"48"']]),
                 json: () => Promise.resolve(dinghyClassCollectionHAL)
             });
         });
@@ -128,11 +127,12 @@ describe('when reading a resource from REST', () => {
                 ok: false,
                 status: 404,
                 statusText: 'Not Found',
+                headers: new Headers([['Content-Type', 'application/hal+json']]),
                 json: () => Promise.resolve({message: 'Some error resulting in HTTP 404'})
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model._read('unknown')).rejects.toThrowError('Some error resulting in HTTP 404');
+        await expect(() => model._read('unknown')).rejects.toThrow('Some error resulting in HTTP 404');
     });
     it('throws an error when an error causes fetch to reject; such as a network failure', async () => {
         vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -141,7 +141,7 @@ describe('when reading a resource from REST', () => {
             throw new TypeError('Failed to fetch');
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model._read('dinghyClasses?sort=name,asc')).rejects.toThrowError('Failed to fetch');
+        await expect(() => model._read('dinghyClasses?sort=name,asc')).rejects.toThrow('Failed to fetch');
     });
 });
 
@@ -151,10 +151,10 @@ describe('when updating an object via REST', () => {
         const fetchMock = fetch.mockImplementation((resource, options) => {
             return Promise.resolve({
                 ok: true,
-                status: 201,
-                statusText: 'Created',
-                headers: new Headers(),
-                json: () => {throw new SyntaxError('Unexpected end of JSON input')}
+                status: 200,
+                statusText: 'OK',
+                headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]),
+                json: () => Promise.resolve({prop1: 'foo', prop2: 'bar'})
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -167,7 +167,8 @@ describe('when updating an object via REST', () => {
         fetch.mockImplementation(() => {
             return Promise.resolve({
                 ok: true,
-                status: 200, headers: new Headers(),
+                status: 200,
+                headers: new Headers([['Content-Type', 'application/hal+json']]),
                 json: () => Promise.resolve(competitorChrisMarshallHAL)
             });
         });
@@ -183,11 +184,12 @@ describe('when updating an object via REST', () => {
                 ok: false,
                 status: 500, 
                 statusText: 'Internal Server Error',
+                headers: new Headers([['Content-Type', 'application/hal+json']]),
                 json: () => Promise.resolve({message: 'Some error resulting in HTTP 500'})
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model._update(httpRootURL, {})).rejects.toThrowError('Some error resulting in HTTP 500');
+        await expect(() => model._update(httpRootURL, {})).rejects.toThrow('Some error resulting in HTTP 500');
     });
 });
 
@@ -199,8 +201,7 @@ describe('when deleting an object via REST', () => {
                 ok: true,
                 status: 204,
                 statusText: 'No Content',
-                headers: new Headers(),
-                json: () => {throw new SyntaxError('Unexpected end of JSON input')}
+                headers: new Headers()
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -209,7 +210,7 @@ describe('when deleting an object via REST', () => {
             {method: 'DELETE'}
         );
     });
-    it('returns a promise that resolves to a FetchResult containing any data returned by the server when deletion is successful', async () => {
+    it('returns data returned by server when deletion is successful', async () => {
         vi.spyOn(console, 'error').mockImplementation(() => {});
         fetch.mockImplementationOnce((resource, options) => {
             if (resource === 'http://localhost:8081/dinghyracing/api/entries/6' && options.method === 'DELETE') {
@@ -217,8 +218,8 @@ describe('when deleting an object via REST', () => {
                     ok: true,
                     status: 204,
                     statusText: 'No Content',
-                    headers: new Headers(),
-                    json: () => {throw new SyntaxError('Unexpected end of JSON input')}
+                    headers: new Headers([['Content-Type', 'application/hal+json']]),
+                    json: async () => {return {foo: 'bar'}}
                 });
             }
         });
@@ -226,7 +227,7 @@ describe('when deleting an object via REST', () => {
         const promise = model._delete('http://localhost:8081/dinghyracing/api/entries/6');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({hal: {}, metadata: {version: ''}});
+        expect(result).toEqual({hal: {foo: 'bar'}, metadata: new Metadata('')});
     });
     it('throws an error when deletion is unsuccessful', async () => {
         fetch.mockImplementationOnce(() => {
@@ -234,11 +235,11 @@ describe('when deleting an object via REST', () => {
                 ok: false,
                 status: 404,
                 statusText: 'Not Found',
-                json: () => Promise.resolve({message: 'Some error resulting in HTTP 404'})
+                headers: new Headers()
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model._delete('http://localhost:8081/dinghyracing/api/entries/6')).rejects.toThrowError('Some error resulting in HTTP 404');
+        await expect(() => model._delete('http://localhost:8081/dinghyracing/api/entries/6')).rejects.toThrow('HTTP Error: 404 Not Found');
     });
 });
 
@@ -260,7 +261,8 @@ describe('when creating a new dinghy class', () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,
-                status: 200, headers: new Headers(), 
+                status: 200,
+                headers: new Headers([['Content-Type', 'application/hal+json']]),
                 json: () => Promise.resolve(dinghyClassScorpionHAL)
             });
         });
@@ -275,7 +277,8 @@ describe('when creating a new dinghy class', () => {
             fetch.mockImplementationOnce(() => {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(), 
+                    status: 200,
+                    headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                     json: () => Promise.resolve({...dinghyClassScorpionHAL, externaName: null})
                 });
             });
@@ -283,7 +286,7 @@ describe('when creating a new dinghy class', () => {
             const promise = model.createDinghyClass('Scorpion', 2, 1043);
             const result = await promise;
             expect(promise).toBeInstanceOf(Promise);
-            expect(result).toEqual({hal: {...dinghyClassScorpionHAL, externaName: null}, metadata: {version: ''}, model: model});
+            expect(result).toEqual({hal: {...dinghyClassScorpionHAL, externaName: null}, metadata: {version: '"0"'}, model: model});
         });
     });
     it('throws an error when dinghy class is not created and provides a message explaining the cause of failure', async () => {
@@ -292,11 +295,12 @@ describe('when creating a new dinghy class', () => {
                 ok: false,
                 status: 409,
                 statusText: 'Conflict',
+                headers: new Headers([['Content-Type', 'application/hal+json']]),
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 409'}, 'message': 'Some error resulting in HTTP 409'})
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.createDinghyClass('Scorpion', 2, 1043, 'SCORPION')).rejects.toThrowError('Some error resulting in HTTP 409');
+        await expect(() => model.createDinghyClass('Scorpion', 2, 1043, 'SCORPION')).rejects.toThrow('Some error resulting in HTTP 409');
     });
 });
 
@@ -305,7 +309,8 @@ describe('when searching for a dinghy class by name', () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,
-                status: 200, headers: new Headers([['ETag', '"0"']]), 
+                status: 200,
+                headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                 json: () => Promise.resolve(dinghyClassScorpionHAL)
             });
         });
@@ -322,12 +327,13 @@ describe('when searching for a dinghy class by name', () => {
                 ok: false,
                 status: 404,
                 statusText: 'Not Found',
+                headers: new Headers(),
                 json: () => {throw new SyntaxError('Unexpected end of JSON input')},
                 text: () => {return ''}
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.getDinghyClassByName('Scorpion')).rejects.toThrowError();
+        await expect(() => model.getDinghyClassByName('Scorpion')).rejects.toThrow();
     });
 })
 
@@ -339,9 +345,8 @@ describe('when creating a new race', () => {
                 ok: true,
                 status: 201,
                 statusText: 'Created',
-                headers: new Headers(),
-                json: () => {throw new SyntaxError('Unexpected end of JSON input')},
-                text: () => Promise.resolve(''),
+                headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
+                json: () => Promise.resolve(raceScorpionAHAL)
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -358,16 +363,16 @@ describe('when creating a new race', () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,
-                status: 200, headers: new Headers(), 
-                json: () => Promise.resolve(raceScorpionAHAL),
-                text: () => Promise.resolve(''),
+                status: 200,
+                headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
+                json: () => Promise.resolve(raceScorpionAHAL)
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
         const promise = model.createRace('Scorpion A', new Date('2021-10-14T14:10:00.000Z'), new Fleet(fleetScorpionHAL, {version: '"0"'}, model), 2700000, 5, 'FLEET', 'CSCCLUBSTART');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({hal: raceScorpionAHAL, metadata: {version: ''}, model});
+        expect(result).toEqual({hal: raceScorpionAHAL, metadata: {version: '"0"'}, model});
     });
     it('throws an error when race is not created', async () => {
         fetch.mockImplementationOnce(() => {
@@ -375,13 +380,12 @@ describe('when creating a new race', () => {
                 ok: false,
                 status: 409,
                 statusText: 'Conflict',
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 409'}, 'message': 'Some error resulting in HTTP 409'}),
-                
-                text: () => Promise.resolve('Some error resulting in HTTP 409'),
+                headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
+                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 409'}, 'message': 'Some error resulting in HTTP 409'})
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.createRace('Scorpion A', new Date('2021-10-14T14:10:00.000Z'), new Fleet(fleetScorpionHAL, {version: '"0"'}, model), 2700000, 5, 'FLEET', 'CSCCLUBSTART')).rejects.toThrowError('Some error resulting in HTTP 409'); 
+        await expect(() => model.createRace('Scorpion A', new Date('2021-10-14T14:10:00.000Z'), new Fleet(fleetScorpionHAL, {version: '"0"'}, model), 2700000, 5, 'FLEET', 'CSCCLUBSTART')).rejects.toThrow('Some error resulting in HTTP 409'); 
     });
 });
 
@@ -391,28 +395,29 @@ describe('when retrieving a list of dinghy classes', () => {
             if (resource === dinghyClassCollectionHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(), 
+                    status: 200,
+                    headers: new Headers([['Content-Type', 'application/hal+json']]),
                     json: () => Promise.resolve(dinghyClassCollectionHAL)
                 });
             }
             if (resource === dinghyClassScorpionHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"1"']]), 
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                     json: () => Promise.resolve(dinghyClassScorpionHAL)
                 });
             }
             if (resource === dinghyClassGraduateHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"0"']]), 
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                     json: () => Promise.resolve(dinghyClassGraduateHAL)
                 });
             }
             if (resource === dinghyClassCometHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"0"']]), 
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                     json: () => Promise.resolve(dinghyClassCometHAL)
                 });
             }
@@ -440,35 +445,37 @@ describe('when retrieving a list of dinghy classes', () => {
                     if (resource === dinghyClassCollectionHAL._links.self.href + '?page=0&size=3') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json']]),
                             json: () => Promise.resolve(dinghyClassCollectionHAL)
                         });
                     }
                     if (resource === dinghyClassScorpionHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"1"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                             json: () => Promise.resolve(dinghyClassScorpionHAL)
                         });
                     }
                     if (resource === dinghyClassGraduateHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(dinghyClassGraduateHAL)
                         });
                     }
                     if (resource === dinghyClassCometHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(dinghyClassCometHAL)
                         });
                     }
                 }).mockImplementationOnce(() => {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers(),
+                        status: 200,
+                        headers: new Headers([['Content-Type', 'application/hal+json']]),
                         json: () => Promise.resolve(dinghyClassCollectionHAL_p0)
                     });
                 });
@@ -495,21 +502,22 @@ describe('when retrieving a list of dinghy classes', () => {
                     if (resource === dinghyClassScorpionHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"1"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                             json: () => Promise.resolve(dinghyClassScorpionHAL)
                         });
                     }
                     if (resource === dinghyClassGraduateHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(dinghyClassGraduateHAL)
                         });
                     }
                 }).mockImplementationOnce(() => {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers(), 
+                        status: 200,
+                        headers: new Headers([['Content-Type', 'application/hal+json']]),
                         json: () => Promise.resolve(dinghyClassCollectionHAL_p0)
                     });
                 });
@@ -535,21 +543,22 @@ describe('when retrieving a list of dinghy classes', () => {
                     if (resource === dinghyClassScorpionHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"1"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                             json: () => Promise.resolve(dinghyClassScorpionHAL)
                         });
                     }
                     if (resource === dinghyClassGraduateHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(dinghyClassGraduateHAL)
                         });
                     }
                 }).mockImplementationOnce(() => {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers(), 
+                        status: 200,
+                        headers: new Headers([['Content-Type', 'application/hal+json']]),
                         json: () => Promise.resolve(dinghyClassCollectionHAL_p0)
                     });
                 });
@@ -575,21 +584,23 @@ describe('when retrieving a list of dinghy classes', () => {
                     if (resource === dinghyClassScorpionHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"1"']]), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                             json: () => Promise.resolve(dinghyClassScorpionHAL)
                         });
                     }
                     if (resource === dinghyClassGraduateHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                             json: () => Promise.resolve(dinghyClassGraduateHAL)
                         });
                     }
                 }).mockImplementationOnce(() => {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers(), 
+                        status: 200,headers: new Headers([['Content-Type', 'application/hal+json']]),
                         json: () => Promise.resolve(dinghyClassCollectionHAL_p0)
                     });
                 });
@@ -610,6 +621,7 @@ describe('when retrieving a list of dinghy classes', () => {
                 ok: false,
                 status: 500,
                 statusText: 'internal Server Error',
+                headers: new Headers([['Content-Type', 'application/hal+json']]),
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'}),
                 text: () => Promise.resolve(() => {'Some error resulting in http 500'})
             });
@@ -633,35 +645,36 @@ describe('when retrieving a list of races that start at or after a specified tim
             if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=2021-10-14T10:00:00.000Z') {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(), 
+                    status: 200,
+                    headers: new Headers([['Content-Type', 'application/hal+json']]),
                     json: () => Promise.resolve(racesCollectionHAL)
                 });
             }
             if (resource === raceScorpionAHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"1"']]), 
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                     json: () => Promise.resolve(raceScorpionAHAL)
                 });
             }
             if (resource === raceGraduateAHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"0"']]), 
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                     json: () => Promise.resolve(raceGraduateAHAL)
                 });
             }
             if (resource === raceCometAHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"0"']]), 
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                     json: () => Promise.resolve(raceCometAHAL)
                 });
             }
             if (resource === raceHandicapAHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"0"']]), 
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                     json: () => Promise.resolve(raceHandicapAHAL)
                 });
             }
@@ -685,35 +698,36 @@ describe('when retrieving a list of races that start at or after a specified tim
                     if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0&size=4') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json']]),
                             json: () => Promise.resolve(racesCollectionHAL)
                         });
                     }
                     if (resource === raceScorpionAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"1"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                             json: () => Promise.resolve(raceScorpionAHAL)
                         });
                     }
                     if (resource === raceGraduateAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(raceGraduateAHAL)
                         });
                     }
                     if (resource === raceCometAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(raceCometAHAL)
                         });
                     }
                     if (resource === raceHandicapAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(raceHandicapAHAL)
                         });
                     }
@@ -721,7 +735,7 @@ describe('when retrieving a list of races that start at or after a specified tim
                     if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(racesCollectionHAL_p0)
                         });
                     }
@@ -754,21 +768,23 @@ describe('when retrieving a list of races that start at or after a specified tim
                     if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0&size=4') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(racesCollectionHAL)
                         });
                     }
                     if (resource === raceScorpionAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"1"']]), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                             json: () => Promise.resolve(raceScorpionAHAL)
                         });
                     }
                     if (resource === raceGraduateAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(raceGraduateAHAL)
                         });
                     }
@@ -776,7 +792,7 @@ describe('when retrieving a list of races that start at or after a specified tim
                     if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(racesCollectionHAL_p0)
                         });
                     }
@@ -809,21 +825,24 @@ describe('when retrieving a list of races that start at or after a specified tim
                     if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0&size=4') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(racesCollectionHAL)
                         });
                     }
                     if (resource === raceScorpionAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"1"']]), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                             json: () => Promise.resolve(raceScorpionAHAL)
                         });
                     }
                     if (resource === raceGraduateAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(raceGraduateAHAL)
                         });
                     }
@@ -831,7 +850,7 @@ describe('when retrieving a list of races that start at or after a specified tim
                     if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&size=2') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(racesCollectionHAL_p0)
                         });
                     }
@@ -858,21 +877,24 @@ describe('when retrieving a list of races that start at or after a specified tim
                     if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0&size=4') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(racesCollectionHAL)
                         });
                     }
                     if (resource === raceScorpionAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"1"']]), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                             json: () => Promise.resolve(raceScorpionAHAL)
                         });
                     }
                     if (resource === raceGraduateAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(raceGraduateAHAL)
                         });
                     }
@@ -880,7 +902,8 @@ describe('when retrieving a list of races that start at or after a specified tim
                     if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeGreaterThanEqual?time=2022-10-10T10:00:00.000Z&page=0&size=2') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(racesCollectionHAL_p0)
                         });
                     }
@@ -908,35 +931,36 @@ describe('when retrieving a list of races that start between the specified times
             if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(), 
+                    status: 200,
+                    headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                     json: () => Promise.resolve(racesCollectionHAL)
                 });
             }
             if (resource === raceScorpionAHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"1"']]), 
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                     json: () => Promise.resolve(raceScorpionAHAL)
                 });
             }
             if (resource === raceGraduateAHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"0"']]), 
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                     json: () => Promise.resolve(raceGraduateAHAL)
                 });
             }
             if (resource === raceCometAHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"0"']]), 
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                     json: () => Promise.resolve(raceCometAHAL)
                 });
             }
             if (resource === raceHandicapAHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"0"']]), 
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                     json: () => Promise.resolve(raceHandicapAHAL)
                 });
             }
@@ -961,35 +985,38 @@ describe('when retrieving a list of races that start between the specified times
                     if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&page=0&size=4') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(racesCollectionHAL)
                         });
                     }
                     if (resource === raceScorpionAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"1"']]), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                             json: () => Promise.resolve(raceScorpionAHAL)
                         });
                     }
                     if (resource === raceGraduateAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(raceGraduateAHAL)
                         });
                     }
                     if (resource === raceCometAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(raceCometAHAL)
                         });
                     }
                     if (resource === raceHandicapAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(raceHandicapAHAL)
                         });
                     }
@@ -997,7 +1024,7 @@ describe('when retrieving a list of races that start between the specified times
                     if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(racesCollectionHAL_p0)
                         });
                     }
@@ -1022,35 +1049,35 @@ describe('when retrieving a list of races that start between the specified times
                     if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(racesCollectionHAL)
                         });
                     }
                     if (resource === raceScorpionAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"1"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                             json: () => Promise.resolve(raceScorpionAHAL)
                         });
                     }
                     if (resource === raceGraduateAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(raceGraduateAHAL)
                         });
                     }
                     if (resource === raceCometAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(raceCometAHAL)
                         });
                     }
                     if (resource === raceHandicapAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(raceHandicapAHAL)
                         });
                     }
@@ -1058,7 +1085,7 @@ describe('when retrieving a list of races that start between the specified times
                     if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&page=0') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(racesCollectionHAL_p0)
                         });
                     }
@@ -1081,35 +1108,35 @@ describe('when retrieving a list of races that start between the specified times
                     if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(racesCollectionHAL)
                         });
                     }
                     if (resource === raceScorpionAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"1"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                             json: () => Promise.resolve(raceScorpionAHAL)
                         });
                     }
                     if (resource === raceGraduateAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(raceGraduateAHAL)
                         });
                     }
                     if (resource === raceCometAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(raceCometAHAL)
                         });
                     }
                     if (resource === raceHandicapAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(raceHandicapAHAL)
                         });
                     }
@@ -1117,7 +1144,7 @@ describe('when retrieving a list of races that start between the specified times
                     if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&size=2') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(racesCollectionHAL_p0)
                         });
                     }
@@ -1140,35 +1167,35 @@ describe('when retrieving a list of races that start between the specified times
                     if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(racesCollectionHAL)
                         });
                     }
                     if (resource === raceScorpionAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"1"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                             json: () => Promise.resolve(raceScorpionAHAL)
                         });
                     }
                     if (resource === raceGraduateAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(raceGraduateAHAL)
                         });
                     }
                     if (resource === raceCometAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(raceCometAHAL)
                         });
                     }
                     if (resource === raceHandicapAHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(raceHandicapAHAL)
                         });
                     }
@@ -1176,7 +1203,7 @@ describe('when retrieving a list of races that start between the specified times
                     if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&page=0&size=2') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(racesCollectionHAL_p0)
                         });
                     }
@@ -1201,35 +1228,35 @@ describe('when retrieving a list of races that start between the specified times
                 if (resource === 'http://localhost:8081/dinghyracing/api/directRaces/search/findByPlannedStartTimeBetween?startTime=2022-10-10T10:00:00.000Z&endTime=2022-10-10T11:00:00.000Z&sort=plannedStartTime,ASC') {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers(), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                         json: () => Promise.resolve(racesCollectionHAL)
                     });
                 }
                 if (resource === raceScorpionAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"1"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                         json: () => Promise.resolve(raceScorpionAHAL)
                     });
                 }
                 if (resource === raceGraduateAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                         json: () => Promise.resolve(raceGraduateAHAL)
                     });
                 }
                 if (resource === raceCometAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                         json: () => Promise.resolve(raceCometAHAL)
                     });
                 }
                 if (resource === raceHandicapAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                         json: () => Promise.resolve(raceHandicapAHAL)
                     });
                 }
@@ -1255,7 +1282,7 @@ describe('when races are requested by URL', () => {
                 if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2024-03-10T10:10:00Z&endTime=2026-06-19T09:30:00Z') {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers(), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                         json: () => Promise.resolve({_embedded:{races:[raceScorpionAHAL, raceGraduateAHAL, raceCometAHAL, raceHandicapAHAL]},_links:{
                             self:{href:'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2024-03-10T10:10:00Z&endTime=2026-06-19T09:30:00Z'}
                         },page:{size:20,totalElements:4,totalPages:1,number:0}})
@@ -1264,28 +1291,28 @@ describe('when races are requested by URL', () => {
                 if (resource === raceScorpionAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"1"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                         json: () => Promise.resolve(raceScorpionAHAL)
                     });
                 }
                 if (resource === raceGraduateAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                         json: () => Promise.resolve(raceGraduateAHAL)
                     });
                 }
                 if (resource === raceCometAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                         json: () => Promise.resolve(raceCometAHAL)
                     });
                 }
                 if (resource === raceHandicapAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                         json: () => Promise.resolve(raceHandicapAHAL)
                     });
                 }
@@ -1306,35 +1333,35 @@ describe('when races are requested by URL', () => {
                 if (resource === 'http://localhost:8081/dinghyracing/api/races/search/findByPlannedStartTimeBetween?startTime=2024-03-10T10:10:00Z&endTime=2026-06-19T09:30:00Z') {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers(), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                         json: () => Promise.resolve(racesCollectionHAL)
                     });
                 }
                 if (resource === raceScorpionAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"1"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                         json: () => Promise.resolve(raceScorpionAHAL)
                     });
                 }
                 if (resource === raceGraduateAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                         json: () => Promise.resolve(raceGraduateAHAL)
                     });
                 }
                 if (resource === raceCometAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                         json: () => Promise.resolve(raceCometAHAL)
                     });
                 }
                 if (resource === raceHandicapAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                         json: () => Promise.resolve(raceHandicapAHAL)
                     });
                 }
@@ -1355,7 +1382,7 @@ describe('when races are requested by URL', () => {
                 if (resource === 'http://localhost:8081/dinghyracing/api/dinghyracing/api/embeddedRaces') {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers(), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                         json: () => Promise.resolve({_embedded:{embeddedRaces:[embeddedRaceVeteransAHAL, embeddedRaceLadiesAHAL]},_links:{
                             self:{href:'http://localhost:8081/dinghyracing/api/dinghyracing/api/embeddedRaces'}
                         },page:{size:20,totalElements:2,totalPages:1,number:0}})
@@ -1364,14 +1391,14 @@ describe('when races are requested by URL', () => {
                 if (resource === embeddedRaceVeteransAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"1"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                         json: () => Promise.resolve(embeddedRaceVeteransAHAL)
                     });
                 }
                 if (resource === embeddedRaceLadiesAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                         json: () => Promise.resolve(embeddedRaceLadiesAHAL)
                     });
                 }
@@ -1390,7 +1417,7 @@ describe('when races are requested by URL', () => {
                 if (resource === 'http://localhost:8081/dinghyracing/api/races') {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers(), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                         json: () => Promise.resolve({_embedded:{
                             directRaces:[raceScorpionAHAL, raceGraduateAHAL, raceCometAHAL, raceHandicapAHAL],
                             embeddedraces:[embeddedRaceVeteransAHAL, embeddedRaceLadiesAHAL]},
@@ -1404,42 +1431,42 @@ describe('when races are requested by URL', () => {
                 if (resource === raceScorpionAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"1"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                         json: () => Promise.resolve(raceScorpionAHAL)
                     });
                 }
                 if (resource === raceGraduateAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                         json: () => Promise.resolve(raceGraduateAHAL)
                     });
                 }
                 if (resource === raceCometAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                         json: () => Promise.resolve(raceCometAHAL)
                     });
                 }
                 if (resource === raceHandicapAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                         json: () => Promise.resolve(raceHandicapAHAL)
                     });
                 }
                 if (resource === embeddedRaceVeteransAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"1"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                         json: () => Promise.resolve(embeddedRaceVeteransAHAL)
                     });
                 }
                 if (resource === embeddedRaceLadiesAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                         json: () => Promise.resolve(embeddedRaceLadiesAHAL)
                     });
                 }
@@ -1520,7 +1547,7 @@ describe('when embedded races in a race are requested', () => {
             if (resource === 'http://localhost:8081/dinghyracing/api/embeddedRaces/search/findByHosts?host=' + raceScorpionAHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(), 
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                     json: () => Promise.resolve({_embedded:{embeddedRaces:[embeddedRaceVeteransAHAL, embeddedRaceLadiesAHAL]},_links:{
                         self:{href:'http://localhost:8081/dinghyracing/api/dinghyracing/api/embeddedRaces'}
                     },page:{size:20,totalElements:2,totalPages:1,number:0}})
@@ -1529,14 +1556,15 @@ describe('when embedded races in a race are requested', () => {
             if (resource === embeddedRaceVeteransAHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"1"']]), 
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                     json: () => Promise.resolve(embeddedRaceVeteransAHAL)
                 });
             }
             if (resource === embeddedRaceLadiesAHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"0"']]), 
+                    status: 200,
+                    headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                     json: () => Promise.resolve(embeddedRaceLadiesAHAL)
                 });
             }
@@ -1552,12 +1580,11 @@ describe('when embedded races in a race are requested', () => {
 
 describe('when signing up to a race', () => {
     it('if race provided and helm provided and dinghy provided and crew provided then creates race entry', async () => {
-        // expecting HTTP 204 No Content response
         fetch.mockImplementationOnce((resource, options) => {
                 if (resource === raceScorpionAHAL._links.self.href + '/signUp' && options.body === '{"helm":"http://localhost:8081/dinghyracing/api/competitors/8","dinghy":"http://localhost:8081/dinghyracing/api/dinghies/2","crew":"http://localhost:8081/dinghyracing/api/competitors/12"}') {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"1"']]),
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]),
                     json: () => Promise.resolve(raceScorpionAHAL)
                 });
             };
@@ -1570,12 +1597,12 @@ describe('when signing up to a race', () => {
         expect(result).toEqual({hal: raceScorpionAHAL, metadata: {version: '"1"'}, model: model});
     });
     it('if race provided and helm provided and dinghy provided crew not provided then creates race entry', async () => {
-        // expecting HTTP 204 No Content response
         fetch.mockImplementationOnce((resource, options) => {
                 if (resource === raceScorpionAHAL._links.self.href + '/signUp' && options.body === '{"helm":"http://localhost:8081/dinghyracing/api/competitors/8","dinghy":"http://localhost:8081/dinghyracing/api/dinghies/2"}') {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"1"']]),
+                    status: 200,
+                    headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]),
                     json: () => Promise.resolve(raceScorpionAHAL)
                 });
             };
@@ -1593,9 +1620,9 @@ describe('when signing up to a race', () => {
                 return Promise.resolve({
                     ok: false,
                     status: 409,
-                    statusText: 'Conflict',
-                    json: () => Promise.resolve({message: 'Dinghy [id=2, version=0, dinghyClass=Scorpion, sailNumber=1234] has already signed up for race.'}),
-                    text: () => Promise.resolve({message: 'Dinghy [id=2, version=0, dinghyClass=Scorpion, sailNumber=1234] has already signed up for race.'})
+                    statusText: '',
+                    headers: new Headers([['Content-Type', 'application/hal+json']]),
+                    json: () => Promise.resolve({message: 'Dinghy [id=2, version=0, dinghyClass=Scorpion, sailNumber=1234] has already signed up for race.'})
                 });
             });
             const model = new SylphModel(httpRootURL, wsRootURL);
@@ -1603,7 +1630,7 @@ describe('when signing up to a race', () => {
             const helm = new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model);
             const dinghy = new Dinghy(dinghy1234HAL, {version: '"1"'}, model);
             const crew = new Competitor(competitorLouScrewHAL, {version: '"1"'}, model);
-            await expect(() => model.signUpToRace(race, helm, dinghy, crew)).rejects.toThrowError('HTTP Error: 409 Conflict Message: Dinghy [id=2, version=0, dinghyClass=Scorpion, sailNumber=1234] has already signed up for race.');
+            await expect(() => model.signUpToRace(race, helm, dinghy, crew)).rejects.toThrow('HTTP Error: 409 Message: Dinghy [id=2, version=0, dinghyClass=Scorpion, sailNumber=1234] has already signed up for race.');
         });
     });
     describe('when helm is already recorded for entry in race', () => {
@@ -1614,6 +1641,7 @@ describe('when signing up to a race', () => {
                         ok: false,
                         status: 409,
                         statusText: 'Conflict',
+                        headers: new Headers([['Content-Type', 'application/hal+json']]),
                         json: () => Promise.resolve({message: 'Competitor [id=1, version=0, name=Chris Marshall] has already signed up for race.'})
                     });
                 };
@@ -1623,7 +1651,7 @@ describe('when signing up to a race', () => {
             const helm = new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model);
             const dinghy = new Dinghy(dinghy1234HAL, {version: '"1"'}, model);
             const crew = new Competitor(competitorLouScrewHAL, {version: '"1"'}, model);
-            await expect(() => model.signUpToRace(race, helm, dinghy, crew)).rejects.toThrowError('HTTP Error: 409 Conflict Message: Competitor [id=1, version=0, name=Chris Marshall] has already signed up for race.');
+            await expect(() => model.signUpToRace(race, helm, dinghy, crew)).rejects.toThrow('HTTP Error: 409 Conflict Message: Competitor [id=1, version=0, name=Chris Marshall] has already signed up for race.');
         });
     });
     describe('when crew is already recorded for entry in race', () => {
@@ -1634,6 +1662,7 @@ describe('when signing up to a race', () => {
                         ok: false,
                         status: 409,
                         statusText: 'Conflict',
+                        headers: new Headers([['Content-Type', 'application/hal+json']]),
                         json: () => Promise.resolve({message: 'Competitor [id=1, version=0, name=Chris Marshall] has already signed up for race.'})
                     });
                 };
@@ -1643,7 +1672,7 @@ describe('when signing up to a race', () => {
             const helm = new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model);
             const dinghy = new Dinghy(dinghy1234HAL, {version: '"1"'}, model);
             const crew = new Competitor(competitorLouScrewHAL, {version: '"1"'}, model);
-            await expect(() => model.signUpToRace(race, helm, dinghy, crew)).rejects.toThrowError('HTTP Error: 409 Conflict Message: Competitor [id=1, version=0, name=Chris Marshall] has already signed up for race.');
+            await expect(() => model.signUpToRace(race, helm, dinghy, crew)).rejects.toThrow('HTTP Error: 409 Conflict Message: Competitor [id=1, version=0, name=Chris Marshall] has already signed up for race.');
         });
     });
 });
@@ -1655,7 +1684,7 @@ describe('when updating an entry for a race', () => {
             if ((resource === 'http://localhost:8081/dinghyracing/api/entries/10') && (options.body === JSON.stringify(bodyMatch))) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"1"']]),
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]),
                     json: () => Promise.resolve(entrySarahPascal6745ScorpionAHAL)
                 });
             };
@@ -1676,7 +1705,7 @@ describe('when updating an entry for a race', () => {
             if ((resource === 'http://localhost:8081/dinghyracing/api/entries/10') && (options.body === JSON.stringify(bodyMatch))) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"1"']]),
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]),
                     json: () => Promise.resolve(entrySarahPascal6745ScorpionAHAL)
                 });
             };
@@ -1698,6 +1727,7 @@ describe('when updating an entry for a race', () => {
                         ok: false,
                         status: 409,
                         statusText: 'Conflict',
+                        headers: new Headers([['Content-Type', 'application/hal+json']]),
                         json: () => Promise.resolve({message: 'Dinghy [id=2, version=0, dinghyClass=Scorpion, sailNumber=1234] has already signed up for race.'})
                     });
                 };
@@ -1707,7 +1737,7 @@ describe('when updating an entry for a race', () => {
             const helm = new Competitor(competitorSarahPascalHAL, {version: '"0"'}, model);
             const dinghy = new Dinghy(dinghy6745HAL, {version: '"1"'}, model);
             const crew = new Competitor(competitorLouScrewHAL, {version: '"1"'}, model);
-            await expect(() => model.updateEntry(entry, helm, dinghy, crew)).rejects.toThrowError('HTTP Error: 409 Conflict Message: Dinghy [id=2, version=0, dinghyClass=Scorpion, sailNumber=1234] has already signed up for race.');
+            await expect(() => model.updateEntry(entry, helm, dinghy, crew)).rejects.toThrow('HTTP Error: 409 Conflict Message: Dinghy [id=2, version=0, dinghyClass=Scorpion, sailNumber=1234] has already signed up for race.');
         });
     });
     describe('when helm is already recorded for entry in race', () => {
@@ -1718,6 +1748,7 @@ describe('when updating an entry for a race', () => {
                         ok: false,
                         status: 409,
                         statusText: 'Conflict',
+                        headers: new Headers([['Content-Type', 'application/hal+json']]),
                         json: () => Promise.resolve({message: 'Competitor [id=1, version=0, name=Chris Marshall] has already signed up for race.'})
                     });
                 };
@@ -1727,7 +1758,7 @@ describe('when updating an entry for a race', () => {
             const helm = new Competitor(competitorSarahPascalHAL, {version: '"0"'}, model);
             const dinghy = new Dinghy(dinghy6745HAL, {version: '"1"'}, model);
             const crew = new Competitor(competitorLouScrewHAL, {version: '"1"'}, model);
-            await expect(() => model.updateEntry(entry, helm, dinghy, crew)).rejects.toThrowError('HTTP Error: 409 Conflict Message: Competitor [id=1, version=0, name=Chris Marshall] has already signed up for race.');
+            await expect(() => model.updateEntry(entry, helm, dinghy, crew)).rejects.toThrow('HTTP Error: 409 Conflict Message: Competitor [id=1, version=0, name=Chris Marshall] has already signed up for race.');
         });
     });
     describe('when crew is already recorded for entry in race', () => {
@@ -1738,6 +1769,7 @@ describe('when updating an entry for a race', () => {
                         ok: false,
                         status: 409,
                         statusText: 'Conflict',
+                        headers: new Headers([['Content-Type', 'application/hal+json']]),
                         json: () => Promise.resolve({message: 'Competitor [id=1, version=0, name=Low Screw] has already signed up for race.'})
                     });
                 };
@@ -1747,7 +1779,7 @@ describe('when updating an entry for a race', () => {
             const helm = new Competitor(competitorSarahPascalHAL, {version: '"0"'}, model);
             const dinghy = new Dinghy(dinghy6745HAL, {version: '"1"'}, model);
             const crew = new Competitor(competitorLouScrewHAL, {version: '"1"'}, model);
-            await expect(() => model.updateEntry(entry, helm, dinghy, crew)).rejects.toThrowError('HTTP Error: 409 Conflict Message: Competitor [id=1, version=0, name=Low Screw] has already signed up for race.');
+            await expect(() => model.updateEntry(entry, helm, dinghy, crew)).rejects.toThrow('HTTP Error: 409 Conflict Message: Competitor [id=1, version=0, name=Low Screw] has already signed up for race.');
         });
     });
 });
@@ -1780,7 +1812,7 @@ describe('when withdrawing an entry for a race', () => {
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.withdrawEntry(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model)).rejects.toThrowError('HTTP Error: 404 Not Found'));
+        await expect(() => model.withdrawEntry(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model)).rejects.toThrow('HTTP Error: 404 Not Found'));
     });
 });
 
@@ -1790,49 +1822,49 @@ describe('when retrieving a list of competitors', () => {
             if (resource === 'http://localhost:8081/dinghyracing/api/competitors?sort=name,ASC') {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(),
+                    headers: new Headers([['Content-Type', 'application/hal+json']]),
                     json: () => Promise.resolve(competitorsCollectionHAL)
                 });
             };
             if (resource === competitorChrisMarshallHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag','"0"']]),
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                     json: () => Promise.resolve(competitorChrisMarshallHAL)
                 });
             };
             if (resource === competitorSarahPascalHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag','"0"']]),
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                     json: () => Promise.resolve(competitorSarahPascalHAL)
                 });
             }
             if (resource === competitorJillMyerHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag','"1"']]),
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"1"']]),
                     json: () => Promise.resolve(competitorJillMyerHAL)
                 });
             }
             if (resource === competitorLouScrewHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag','"0"']]),
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                     json: () => Promise.resolve(competitorChrisMarshallHAL)
                 });
             }
             if (resource === competitorOwainDaviesHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag','"0"']]),
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                     json: () => Promise.resolve(competitorOwainDaviesHAL)
                 });
             }
             if (resource === competitorLiuBaoHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag','"0"']]),
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                     json: () => Promise.resolve(competitorLiuBaoHAL)
                 });
             }
@@ -1862,49 +1894,49 @@ describe('when retrieving a list of competitors', () => {
                     if (resource === 'http://localhost:8081/dinghyracing/api/competitors?sort=name,ASC&page=0&size=6') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]),
                             json: () => Promise.resolve(competitorsCollectionHAL)
                         });
                     }
                     if (resource === competitorChrisMarshallHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorChrisMarshallHAL)
                         });
                     };
                     if (resource === competitorSarahPascalHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorSarahPascalHAL)
                         });
                     }
                     if (resource === competitorJillMyerHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"1"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"1"']]),
                             json: () => Promise.resolve(competitorJillMyerHAL)
                         });
                     }
                     if (resource === competitorLouScrewHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorChrisMarshallHAL)
                         });
                     }
                     if (resource === competitorOwainDaviesHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorOwainDaviesHAL)
                         });
                     }
                     if (resource === competitorLiuBaoHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorLiuBaoHAL)
                         });
                     }
@@ -1912,7 +1944,7 @@ describe('when retrieving a list of competitors', () => {
                     if (resource === 'http://localhost:8081/dinghyracing/api/competitors?sort=name,ASC') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]),
                             json: () => Promise.resolve(competitorsCollectionHAL_p0)
                         });
                     }
@@ -1943,42 +1975,42 @@ describe('when retrieving a list of competitors', () => {
                     if (resource === competitorChrisMarshallHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorChrisMarshallHAL)
                         });
                     };
                     if (resource === competitorSarahPascalHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorSarahPascalHAL)
                         });
                     }
                     if (resource === competitorJillMyerHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"1"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"1"']]),
                             json: () => Promise.resolve(competitorJillMyerHAL)
                         });
                     }
                     if (resource === competitorLouScrewHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorChrisMarshallHAL)
                         });
                     }
                     if (resource === competitorOwainDaviesHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorOwainDaviesHAL)
                         });
                     }
                     if (resource === competitorLiuBaoHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorLiuBaoHAL)
                         });
                     }
@@ -1986,7 +2018,7 @@ describe('when retrieving a list of competitors', () => {
                     if (resource === 'http://localhost:8081/dinghyracing/api/competitors?page=0&sort=name,ASC') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]),
                             json: () => Promise.resolve(competitorsCollectionHAL_p0)
                         });
                     }
@@ -2014,42 +2046,42 @@ describe('when retrieving a list of competitors', () => {
                     if (resource === competitorChrisMarshallHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorChrisMarshallHAL)
                         });
                     };
                     if (resource === competitorSarahPascalHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorSarahPascalHAL)
                         });
                     }
                     if (resource === competitorJillMyerHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"1"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"1"']]),
                             json: () => Promise.resolve(competitorJillMyerHAL)
                         });
                     }
                     if (resource === competitorLouScrewHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorChrisMarshallHAL)
                         });
                     }
                     if (resource === competitorOwainDaviesHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorOwainDaviesHAL)
                         });
                     }
                     if (resource === competitorLiuBaoHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorLiuBaoHAL)
                         });
                     }
@@ -2057,7 +2089,7 @@ describe('when retrieving a list of competitors', () => {
                     if (resource === 'http://localhost:8081/dinghyracing/api/competitors?size=3&sort=name,ASC') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]),
                             json: () => Promise.resolve(competitorsCollectionHAL_p0)
                         });
                     }
@@ -2084,49 +2116,49 @@ describe('when retrieving a list of competitors', () => {
                     if (resource === 'http://localhost:8081/dinghyracing/api/competitors?sort=name,asc&page=0&size=6') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]),
                             json: () => Promise.resolve(competitorsCollectionHAL)
                         });
                     }
                     if (resource === competitorChrisMarshallHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorChrisMarshallHAL)
                         });
                     };
                     if (resource === competitorSarahPascalHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorSarahPascalHAL)
                         });
                     }
                     if (resource === competitorJillMyerHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"1"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"1"']]),
                             json: () => Promise.resolve(competitorJillMyerHAL)
                         });
                     }
                     if (resource === competitorLouScrewHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorChrisMarshallHAL)
                         });
                     }
                     if (resource === competitorOwainDaviesHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorOwainDaviesHAL)
                         });
                     }
                     if (resource === competitorLiuBaoHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag','"0"']]),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]),
                             json: () => Promise.resolve(competitorLiuBaoHAL)
                         });
                     }
@@ -2134,7 +2166,7 @@ describe('when retrieving a list of competitors', () => {
                     if (resource === 'http://localhost:8081/dinghyracing/api/competitors?page=0&size=3&sort=name,ASC') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(),
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]),
                             json: () => Promise.resolve(competitorsCollectionHAL_p0)
                         });
                     }
@@ -2159,7 +2191,8 @@ describe('when searching for a competitor by name', () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,
-                status: 200, headers: new Headers(), 
+                status: 200,
+                headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                 json: () => Promise.resolve(competitorChrisMarshallHAL)
             });
         });
@@ -2167,7 +2200,7 @@ describe('when searching for a competitor by name', () => {
         const promise = model.getCompetitorByName('Chris Marshall');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({hal: competitorChrisMarshallHAL, metadata: {version: ''}, model});
+        expect(result).toEqual({hal: competitorChrisMarshallHAL, metadata: {version: '"0"'}, model});
     });
     it('throws an error when competitor is not found', async () => {
         vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -2180,7 +2213,7 @@ describe('when searching for a competitor by name', () => {
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.getCompetitorByName('Bob Smith')).rejects.toThrowError('HTTP Error: 404 Not Found');
+        await expect(() => model.getCompetitorByName('Bob Smith')).rejects.toThrow('HTTP Error: 404 Not Found');
     });
 });
 
@@ -2190,7 +2223,7 @@ describe('when searching for a dinghy by sail number and dinghy class', () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,
-                status: 200, headers: new Headers([['ETag', '"0"']]), 
+                status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                 json: () => Promise.resolve(dinghy1234HAL)
             });
         });
@@ -2211,7 +2244,7 @@ describe('when searching for a dinghy by sail number and dinghy class', () => {
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.getDinghyBySailNumberAndDinghyClass('999', {hal: dinghyClassScorpionHAL, metadata: {version: '"0"'}, model})).rejects.toThrowError('HTTP Error: 404 Not Found');
+        await expect(() => model.getDinghyBySailNumberAndDinghyClass('999', {hal: dinghyClassScorpionHAL, metadata: {version: '"0"'}, model})).rejects.toThrow('HTTP Error: 404 Not Found');
     });
 });
 
@@ -2220,7 +2253,7 @@ describe('when creating a new competitor', () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,
-                status: 200, headers: new Headers(), 
+                status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                 json: () => Promise.resolve(competitorChrisMarshallHAL)
             });
         });
@@ -2228,7 +2261,7 @@ describe('when creating a new competitor', () => {
         const promise = model.createCompetitor('Chris Marshall');
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({hal: competitorChrisMarshallHAL, metadata: {version: ''}, model});
+        expect(result).toEqual({hal: competitorChrisMarshallHAL, metadata: {version: '"0"'}, model});
     });
     it('throws an error when competitor is not created', async () => {
         fetch.mockImplementationOnce(() => {
@@ -2236,11 +2269,12 @@ describe('when creating a new competitor', () => {
                 ok: false,
                 status: 409,
                 statusText: 'Bad Request',
+                headers: new Headers([['Content-Type', 'application/hal+json']]),
                 json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 409'}, 'message': 'Some error resulting in HTTP 409'})
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.createCompetitor('Chris Marshall')).rejects.toThrowError('HTTP Error: 409 Bad Request Message: Some error resulting in HTTP 409'); 
+        await expect(() => model.createCompetitor('Chris Marshall')).rejects.toThrow('HTTP Error: 409 Bad Request Message: Some error resulting in HTTP 409'); 
     });
 });
 
@@ -2250,7 +2284,8 @@ describe('when updating a competitor', () => {
             if ((resource === 'http://localhost:8081/dinghyracing/api/competitors/8') && (options.body === JSON.stringify({name: 'Chris Marshal'}))) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(),
+                    status: 200,
+                    headers: new Headers([['Content-Type', 'application/hal+json']]),
                     json: () => Promise.resolve({...competitorChrisMarshallHAL, name: 'Chris Marshal'})
                 });
             };
@@ -2266,12 +2301,11 @@ describe('when updating a competitor', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404, 
-                statusText: 'Not Found',
-                json: () => Promise.resolve()
+                statusText: 'Not Found'
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.updateCompetitor(new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model), 'Chris Marshal')).rejects.toThrowError('HTTP Error: 404 Not Found');
+        await expect(() => model.updateCompetitor(new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model), 'Chris Marshal')).rejects.toThrow('HTTP Error: 404 Not Found');
     });
 });
 
@@ -2281,7 +2315,8 @@ describe('when updating a dinghy class', () => {
             if ((resource === 'http://localhost:8081/dinghyracing/api/dinghyClasses/1') && (options.body === JSON.stringify({name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215, externalName: 'SCORPION TWO'}))) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(),
+                    status: 200,
+                    headers: new Headers([['Content-Type', 'application/hal+json']]),
                     json: () => Promise.resolve({...dinghyClassScorpionHAL, name: 'Scorpion Two', crewSize: 3, portsmouthNumber: 1215, externalName: 'SCORPION TWO'})
                 });
             };
@@ -2297,12 +2332,11 @@ describe('when updating a dinghy class', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404, 
-                statusText: 'Not Found',
-                json: () => Promise.resolve()
+                statusText: 'Not Found'
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.updateDinghyClass(new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model),'Scorpion Two', 3, 1215, 'SCORPION TWO')).rejects.toThrowError('HTTP Error: 404 Not Found');
+        await expect(() => model.updateDinghyClass(new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model),'Scorpion Two', 3, 1215, 'SCORPION TWO')).rejects.toThrow('HTTP Error: 404 Not Found');
     });
 });
 
@@ -2311,7 +2345,7 @@ describe('when creating a new dinghy', () => {
         fetch.mockImplementation(() => {
             return Promise.resolve({
                 ok: true,
-                status: 200, headers: new Headers([['ETag', '"0"']]), 
+                status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                 json: () => Promise.resolve(dinghy1234HAL)
             });
         });
@@ -2328,6 +2362,7 @@ describe('when creating a new dinghy', () => {
                 ok: false,
                 status: 409,
                 statusText: 'Conflict',
+                headers: new Headers([['Content-Type', 'application/hal+json']]),
                 json: () => Promise.resolve({
                     "cause":{
                         "cause":{
@@ -2338,7 +2373,7 @@ describe('when creating a new dinghy', () => {
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.createDinghy('1234', new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model))).rejects.toThrowError("HTTP Error: 409 Conflict Message: The dinghy '102-None' already exists; this may be caused by an uppercase/ lowercase difference between existing record and the value entered.");
+        await expect(() => model.createDinghy('1234', new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model))).rejects.toThrow("HTTP Error: 409 Conflict Message: The dinghy '102-None' already exists; this may be caused by an uppercase/ lowercase difference between existing record and the value entered.");
     });
 });
 
@@ -2349,42 +2384,48 @@ describe('when retrieving a list of dinghies', () => {
                 if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?sort=sailNumber,ASC') {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers(), 
+                        status: 200,
+                        headers: new Headers([['Content-Type', 'application/hal+json']]),
                         json: () => Promise.resolve(dinghiesCollectionHAL)
                     });
                 }
                 if (resource === dinghy1234HAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200,
+                        headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                         json: () => Promise.resolve(dinghy1234HAL)
                     });
                 }
                 if (resource === dinghy2726HAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200,
+                        headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                         json: () => Promise.resolve(dinghy2726HAL)
                     });
                 }
                 if (resource === dinghy6745HAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200,
+                        headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                         json: () => Promise.resolve(dinghy6745HAL)
                     });
                 }
                 if (resource === dinghy2928HAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200,
+                        headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                         json: () => Promise.resolve(dinghy2928HAL)
                     });
                 }
                 if (resource === dinghy826HAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"1"']]), 
+                        status: 200,
+                        headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]),
                         json: () => Promise.resolve(dinghy826HAL)
                     });
                 }
@@ -2412,42 +2453,48 @@ describe('when retrieving a list of dinghies', () => {
                         if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?sort=sailNumber,ASC&page=0&size=5') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json']]),
                             json: () => Promise.resolve(dinghiesCollectionHAL)
                         });
                     }
                     if (resource === dinghy1234HAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                             json: () => Promise.resolve(dinghy1234HAL)
                         });
                     }
                     if (resource === dinghy2726HAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                             json: () => Promise.resolve(dinghy2726HAL)
                         });
                     }
                     if (resource === dinghy6745HAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                             json: () => Promise.resolve(dinghy6745HAL)
                         });
                     }
                     if (resource === dinghy2928HAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                             json: () => Promise.resolve(dinghy2928HAL)
                         });
                     }
                     if (resource === dinghy826HAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"1"']]), 
+                            status: 200,
+                            headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]),
                             json: () => Promise.resolve(dinghy826HAL)
                         });
                     }
@@ -2455,7 +2502,8 @@ describe('when retrieving a list of dinghies', () => {
                         if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?sort=sailNumber,ASC') {
                             return Promise.resolve({
                                 ok: true,
-                                status: 200, headers: new Headers(), 
+                                status: 200,
+                                headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                                 json: () => Promise.resolve(dinghiesCollectionHAL_p0)
                             });
                         }
@@ -2482,28 +2530,32 @@ describe('when retrieving a list of dinghies', () => {
                         if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?page=0&size=5&sort=sailNumber,ASC') {
                             return Promise.resolve({
                                 ok: true,
-                                status: 200, headers: new Headers(), 
+                                status: 200,
+                                headers: new Headers([['Content-Type', 'application/hal+json']]),
                                 json: () => Promise.resolve(dinghiesCollectionHAL)
                             });
                         }
                         if (resource === dinghy1234HAL._links.self.href) {
                             return Promise.resolve({
                                 ok: true,
-                                status: 200, headers: new Headers([['ETag', '"0"']]), 
+                                status: 200,
+                                headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                                 json: () => Promise.resolve(dinghy1234HAL)
                             });
                         }
                         if (resource === dinghy2726HAL._links.self.href) {
                             return Promise.resolve({
                                 ok: true,
-                                status: 200, headers: new Headers([['ETag', '"0"']]), 
+                                status: 200,
+                                headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                                 json: () => Promise.resolve(dinghy2726HAL)
                             });
                         }
                         if (resource === dinghy6745HAL._links.self.href) {
                             return Promise.resolve({
                                 ok: true,
-                                status: 200, headers: new Headers([['ETag', '"0"']]), 
+                                status: 200,
+                                headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                                 json: () => Promise.resolve(dinghy6745HAL)
                             });
                         }
@@ -2511,7 +2563,8 @@ describe('when retrieving a list of dinghies', () => {
                             if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?page=0&sort=sailNumber,ASC') {
                                 return Promise.resolve({
                                     ok: true,
-                                    status: 200, headers: new Headers(), 
+                                    status: 200,
+                                    headers: new Headers([['Content-Type', 'application/hal+json']]),
                                     json: () => Promise.resolve(dinghiesCollectionHAL_p0)
                                 });
                             }
@@ -2536,28 +2589,32 @@ describe('when retrieving a list of dinghies', () => {
                         if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?page=0&size=5&sort=sailNumber,ASC') {
                             return Promise.resolve({
                                 ok: true,
-                                status: 200, headers: new Headers(), 
+                                status: 200,
+                                headers: new Headers([['Content-Type', 'application/hal+json']]),
                                 json: () => Promise.resolve(dinghiesCollectionHAL)
                             });
                         }
                         if (resource === dinghy1234HAL._links.self.href) {
                             return Promise.resolve({
                                 ok: true,
-                                status: 200, headers: new Headers([['ETag', '"0"']]), 
+                                status: 200,
+                                headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                                 json: () => Promise.resolve(dinghy1234HAL)
                             });
                         }
                         if (resource === dinghy2726HAL._links.self.href) {
                             return Promise.resolve({
                                 ok: true,
-                                status: 200, headers: new Headers([['ETag', '"0"']]), 
+                                status: 200,
+                                headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                                 json: () => Promise.resolve(dinghy2726HAL)
                             });
                         }
                         if (resource === dinghy6745HAL._links.self.href) {
                             return Promise.resolve({
                                 ok: true,
-                                status: 200, headers: new Headers([['ETag', '"0"']]), 
+                                status: 200,
+                                headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                                 json: () => Promise.resolve(dinghy6745HAL)
                             });
                         }
@@ -2565,7 +2622,8 @@ describe('when retrieving a list of dinghies', () => {
                             if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?size=3&sort=sailNumber,ASC') {
                                 return Promise.resolve({
                                     ok: true,
-                                    status: 200, headers: new Headers(), 
+                                    status: 200,
+                                    headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                                     json: () => Promise.resolve(dinghiesCollectionHAL_p0)
                                 });
                             }
@@ -2590,28 +2648,29 @@ describe('when retrieving a list of dinghies', () => {
                         if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?page=0&size=5&sort=sailNumber,ASC') {
                             return Promise.resolve({
                                 ok: true,
-                                status: 200, headers: new Headers(), 
+                                status: 200,
+                                headers: new Headers([['Content-Type', 'application/hal+json']]),
                                 json: () => Promise.resolve(dinghiesCollectionHAL)
                             });
                         }
                         if (resource === dinghy1234HAL._links.self.href) {
                             return Promise.resolve({
                                 ok: true,
-                                status: 200, headers: new Headers([['ETag', '"0"']]), 
+                                status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                                 json: () => Promise.resolve(dinghy1234HAL)
                             });
                         }
                         if (resource === dinghy2726HAL._links.self.href) {
                             return Promise.resolve({
                                 ok: true,
-                                status: 200, headers: new Headers([['ETag', '"0"']]), 
+                                status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                                 json: () => Promise.resolve(dinghy2726HAL)
                             });
                         }
                         if (resource === dinghy6745HAL._links.self.href) {
                             return Promise.resolve({
                                 ok: true,
-                                status: 200, headers: new Headers([['ETag', '"0"']]), 
+                                status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                                 json: () => Promise.resolve(dinghy6745HAL)
                             });
                         }
@@ -2619,7 +2678,7 @@ describe('when retrieving a list of dinghies', () => {
                             if (resource === 'http://localhost:8081/dinghyracing/api/dinghies?page=0&size=3&sort=sailNumber,ASC') {
                                 return Promise.resolve({
                                     ok: true,
-                                    status: 200, headers: new Headers(), 
+                                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                                     json: () => Promise.resolve(dinghiesCollectionHAL_p0)
                                 });
                             }
@@ -2664,7 +2723,7 @@ describe('when creating a new fleet', () => {
                 if (resource === httpRootURL + '/fleets' && options.body === '{"name":"Handicap","dinghyClasses":[]}') {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                         json: () => Promise.resolve(fleetHandicapHAL)
                     });
                 }
@@ -2681,11 +2740,12 @@ describe('when creating a new fleet', () => {
                     ok: false,
                     status: 409,
                     statusText: 'Bad Request',
+                    headers: new Headers([['Content-Type', 'application/hal+json']]),
                     json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 409'}, 'message': 'Some error resulting in HTTP 409'})
                 });
             });
             const model = new SylphModel(httpRootURL, wsRootURL);
-            await expect(() => model.createFleet('Handicap', [])).rejects.toThrowError('HTTP Error: 409 Bad Request Message: Some error resulting in HTTP 409'); 
+            await expect(() => model.createFleet('Handicap', [])).rejects.toThrow('HTTP Error: 409 Bad Request Message: Some error resulting in HTTP 409'); 
         });
     });    
     describe('with associated dinghy classes', () => {
@@ -2694,7 +2754,8 @@ describe('when creating a new fleet', () => {
                 if (resource === httpRootURL + '/fleets' && options.body === '{"name":"Scorpion","dinghyClasses":["http://localhost:8081/dinghyracing/api/dinghyClasses/1"]}') {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"0"']]), 
+                        status: 200,
+                        headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                         json: () => Promise.resolve(fleetScorpionHAL)
                     });
                 }
@@ -2716,7 +2777,8 @@ describe('when updating a fleet', () => {
                 && options.body === '{"name":"Scorpion B","dinghyClasses":["http://localhost:8081/dinghyracing/api/dinghyClasses/1"]}') {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(), 
+                    status: 200,
+                    headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                     json: () => Promise.resolve(fleetScorpionHAL)
                 });                    
             }
@@ -2725,7 +2787,7 @@ describe('when updating a fleet', () => {
         const promise = model.updateFleet(new Fleet(fleetScorpionHAL, {version: '"0"'}, model), 'Scorpion B', [new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)]);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({hal: fleetScorpionHAL, metadata: {version: ''}, model});
+        expect(result).toEqual({hal: fleetScorpionHAL, metadata: {version: '"0"'}, model});
     });
     it('throws an error when dinghy classes are not updated', async () => {
         fetch.mockImplementationOnce(() => {
@@ -2733,11 +2795,12 @@ describe('when updating a fleet', () => {
                 ok: false,
                 status: 400,
                 statusText: 'Bad Request',
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 400'}, 'message': 'Some error resulting in HTTP 400'})
+                headers: new Headers([['Content-Type', 'application/hal+json']]),
+                json: async () => {return {message: 'Some error resulting in HTTP 400'}}
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.updateFleet(new Fleet(fleetScorpionHAL, {version: '"0"'}, model), 'Scorpion B', [new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)])).rejects.toThrowError('HTTP Error: 400 Bad Request Message: Some error resulting in HTTP 400'); 
+        await expect(() => model.updateFleet(new Fleet(fleetScorpionHAL, {version: '"0"'}, model), 'Scorpion B', [new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)])).rejects.toThrow('HTTP Error: 400 Bad Request Message: Some error resulting in HTTP 400'); 
     });
 });
 
@@ -2747,35 +2810,40 @@ describe('when retrieving a list of fleets', () => {
             if (resource === httpRootURL + '/fleets?sort=name,ASC') {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(), 
+                    status: 200,
+                    headers: new Headers([['Content-Type', 'application/hal+json']]),
                     json: () => Promise.resolve(fleetsCollectionHAL)
                 });
             };
             if (resource === fleetScorpionHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"0"']]), 
+                    status: 200,
+                    headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                     json: () => Promise.resolve(fleetScorpionHAL)
                 });
             }
             if (resource === fleetGraduateHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"1"']]), 
+                    status: 200,
+                    headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                     json: () => Promise.resolve(fleetGraduateHAL)
                 });
             }
             if (resource === fleetCometHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"0"']]), 
+                    status: 200,
+                    headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                     json: () => Promise.resolve(fleetCometHAL)
                 });
             }
             if (resource === fleetHandicapHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"0"']]), 
+                    status: 200,
+                    headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                     json: () => Promise.resolve(fleetHandicapHAL)
                 });
             }
@@ -2804,42 +2872,42 @@ describe('when retrieving a list of fleets', () => {
                     if (resource === httpRootURL + '/fleets?sort=name,ASC') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(fleetsCollectionHAL_p0)
                         });
                     };
                     if (resource === httpRootURL + '/fleets?sort=name,ASC&page=0&size=3') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(fleetsCollectionHAL)
                         });
                     };
                     if (resource === fleetScorpionHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(fleetScorpionHAL)
                         });
                     }
                     if (resource === fleetGraduateHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"1"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                             json: () => Promise.resolve(fleetGraduateHAL)
                         });
                     }
                     if (resource === fleetCometHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(fleetCometHAL)
                         });
                     }
                     if (resource === fleetHandicapHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(fleetHandicapHAL)
                         });
                     }
@@ -2868,35 +2936,35 @@ describe('when retrieving a list of fleets', () => {
                     if (resource === httpRootURL + '/fleets?page=1&sort=name,ASC') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(fleetsCollectionHAL_p0)
                         });
                     };
                     if (resource === fleetScorpionHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(fleetScorpionHAL)
                         });
                     }
                     if (resource === fleetGraduateHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"1"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                             json: () => Promise.resolve(fleetGraduateHAL)
                         });
                     }
                     if (resource === fleetCometHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(fleetCometHAL)
                         });
                     }
                     if (resource === fleetHandicapHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(fleetHandicapHAL)
                         });
                     }
@@ -2923,35 +2991,35 @@ describe('when retrieving a list of fleets', () => {
                     if (resource === httpRootURL + '/fleets?size=2&sort=name,ASC') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(fleetsCollectionHAL_p0)
                         });
                     };
                     if (resource === fleetScorpionHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(fleetScorpionHAL)
                         });
                     }
                     if (resource === fleetGraduateHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"1"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                             json: () => Promise.resolve(fleetGraduateHAL)
                         });
                     }
                     if (resource === fleetCometHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(fleetCometHAL)
                         });
                     }
                     if (resource === fleetHandicapHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(fleetHandicapHAL)
                         });
                     }
@@ -2978,35 +3046,35 @@ describe('when retrieving a list of fleets', () => {
                     if (resource === httpRootURL + '/fleets?page=0&size=2&sort=name,ASC') {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers(), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                             json: () => Promise.resolve(fleetsCollectionHAL_p0)
                         });
                     };
                     if (resource === fleetScorpionHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(fleetScorpionHAL)
                         });
                     }
                     if (resource === fleetGraduateHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"1"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                             json: () => Promise.resolve(fleetGraduateHAL)
                         });
                     }
                     if (resource === fleetCometHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(fleetCometHAL)
                         });
                     }
                     if (resource === fleetHandicapHAL._links.self.href) {
                         return Promise.resolve({
                             ok: true,
-                            status: 200, headers: new Headers([['ETag', '"0"']]), 
+                            status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                             json: () => Promise.resolve(fleetHandicapHAL)
                         });
                     }
@@ -3027,12 +3095,11 @@ describe('when retrieving a list of fleets', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404,
-                statusText: 'Not Found',
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
+                statusText: 'Not Found'
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.getFleets('unknown')).rejects.toThrowError('HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404');
+        await expect(() => model.getFleets('unknown')).rejects.toThrow('HTTP Error: 404 Not Found');
     });
 });
 
@@ -3042,7 +3109,8 @@ describe('when searching for entries by race', () => {
             if (resource === 'http://localhost:8081/dinghyracing/api/entries/search/findBySignedUpToRace?race=http://localhost:8081/dinghyracing/api/directRaces/4')
             return Promise.resolve({
                 ok: true,
-                status: 200, headers: new Headers(),
+                status: 200,
+                headers: new Headers([['Content-Type', 'application/hal+json']]),
                 json: () => Promise.resolve(entriesScorpionAHAL)
             });
         });
@@ -3071,7 +3139,7 @@ describe('when an entry is requested for a race and dinghy', () => {
             if (resource === 'http://localhost:8081/dinghyracing/api/entries/search/findBySignedUpToRaceAndDinghy?race=' + raceScorpionAHAL._links.self.href + '&dinghy=' + dinghy1234HAL._links.self.href) {
                 return {
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"0"']]),
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                     json: () => Promise.resolve(entryChrisMarshall1234ScorpionAHAL)
                 };
             };
@@ -3089,7 +3157,7 @@ describe('when a race is requested', () => {
                 return Promise.resolve({
                     ok: true,
                     status: 200,
-                    headers: new Headers([['ETag', '"3"']]),
+                    headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"3"']]),
                     json: () => Promise.resolve(raceScorpionAHAL)
                 });
             }
@@ -3107,12 +3175,12 @@ describe('when a race is requested', () => {
                     ok: false,
                     status: 404,
                     statusText: 'Not Found',
-                    json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
+                    headers: new Headers()
                 });
             }
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.getRace(raceScorpionAHAL._links.self.href)).rejects.toThrowError('HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404');
+        await expect(() => model.getRace(raceScorpionAHAL._links.self.href)).rejects.toThrow('HTTP Error: 404 Not Found');
     });
 });
 
@@ -3123,7 +3191,7 @@ describe('when an embedded race is requested', () => {
                 return Promise.resolve({
                     ok: true,
                     status: 200,
-                    headers: new Headers([['ETag', '"3"']]),
+                    headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"3"']]),
                     json: () => Promise.resolve(embeddedRaceVeteransAHAL)
                 });
             }
@@ -3141,13 +3209,12 @@ describe('when an embedded race is requested', () => {
                 return Promise.resolve({
                     ok: false,
                     status: 404,
-                    statusText: 'Not Found',
-                    json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
+                    statusText: 'Not Found'
                 });
             }
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.getRace(raceScorpionAHAL._links.self.href)).rejects.toThrowError('HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404');
+        await expect(() => model.getRace(raceScorpionAHAL._links.self.href)).rejects.toThrow('HTTP Error: 404 Not Found');
     });
 });
 
@@ -3157,7 +3224,7 @@ describe('when a competitor is requested', () => {
             return Promise.resolve({
                 ok: true,
                 status: 200,
-                headers: new Headers([['ETag', '"0"']]), 
+                headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]), 
                 json: () => Promise.resolve(competitorChrisMarshallHAL)
             });
         });
@@ -3172,12 +3239,11 @@ describe('when a competitor is requested', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404,
-                statusText: 'Not Found',
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
+                statusText: 'Not Found'
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.getCompetitor(competitorChrisMarshallHAL._links.self.href)).rejects.toThrowError('HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404');
+        await expect(() => model.getCompetitor(competitorChrisMarshallHAL._links.self.href)).rejects.toThrow('HTTP Error: 404 Not Found');
     });
 });
 
@@ -3186,7 +3252,7 @@ describe('when a dinghy is requested', () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,
-                status: 200, headers: new Headers([['ETag','"0"']]), 
+                status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]), 
                 json: () => Promise.resolve(dinghy1234HAL)
             });
         });
@@ -3201,12 +3267,11 @@ describe('when a dinghy is requested', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404,
-                statusText: 'Not Found',
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
+                statusText: 'Not Found'
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.getDinghy(dinghy1234HAL._links.self.href)).rejects.toThrowError('HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404');
+        await expect(() => model.getDinghy(dinghy1234HAL._links.self.href)).rejects.toThrow('HTTP Error: 404 Not Found');
     });
 });
 
@@ -3215,7 +3280,7 @@ describe('when a dinghy class is requested', () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,
-                status: 200, headers: new Headers([['ETag', '"1"']]), 
+                status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]), 
                 json: () => Promise.resolve(dinghyClassScorpionHAL)
             });
         });
@@ -3230,12 +3295,11 @@ describe('when a dinghy class is requested', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404,
-                statusText: 'Not Found',
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
+                statusText: 'Not Found'
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.getDinghyClass(dinghyClassScorpionHAL._links.self.href)).rejects.toThrowError('HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404');
+        await expect(() => model.getDinghyClass(dinghyClassScorpionHAL._links.self.href)).rejects.toThrow('HTTP Error: 404 Not Found');
     });
 });
 
@@ -3244,7 +3308,7 @@ describe('when updating a race', () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,
-                status: 200, headers: new Headers(),
+                status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]),
                 json: () => Promise.resolve(raceScorpionAHAL)
             });
         });
@@ -3252,20 +3316,19 @@ describe('when updating a race', () => {
         const promise = model.updateRace(new DirectRace(raceScorpionAHAL, {version: '"0"'}, model), 'Scorpion A', new Date(), new Fleet(fleetScorpionHAL, {version: '"0"'}, model), 2700000, 5, RaceType.FLEET, StartType.CSCCLUBSTART);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({hal: raceScorpionAHAL, metadata: {version: ''}, model});
+        expect(result).toEqual({hal: raceScorpionAHAL, metadata: {version: '"1"'}, model});
     });
     it('if race does not exist throws error', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: false,
                 status: 404, 
-                statusText: 'Not Found',
-                json: () => Promise.resolve()
+                statusText: 'Not Found'
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
         await expect(() => model.updateRace(new DirectRace(raceScorpionAHAL, {version: '"0"'}, model), 'Scorpion A', new Date(), new Fleet(fleetScorpionHAL, {version: '"0"'}, model), 2700000, 5, RaceType.FLEET, StartType.CSCCLUBSTART))
-            .rejects.toThrowError('HTTP Error: 404 Not Found');
+            .rejects.toThrow('HTTP Error: 404 Not Found');
     });
     // TODO: Test expected parameters are supplied
 });
@@ -3381,7 +3444,7 @@ describe('when adding a lap to a race', () => {
         const fetchSpy = fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,
-                status: 200, headers: new Headers(),
+                status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                 json: () => Promise.resolve(entryChrisMarshall1234ScorpionAHAL)
             });
         });
@@ -3389,7 +3452,7 @@ describe('when adding a lap to a race', () => {
         const promise = model.addLap(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 1000);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({hal: entryChrisMarshall1234ScorpionAHAL, metadata: {version: ''}, model: model});
+        expect(result).toEqual({hal: entryChrisMarshall1234ScorpionAHAL, metadata: {version: '"0"'}, model: model});
         expect(fetchSpy).toHaveBeenCalledWith(entryChrisMarshall1234ScorpionAHAL._links.self.href + '/addLap', {method: 'PATCH', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, body: JSON.stringify({time: 1})});
     });
     it('throws an error when lap update fails', async () => {
@@ -3397,12 +3460,11 @@ describe('when adding a lap to a race', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404, 
-                statusText: 'Not Found',
-                json: () => Promise.resolve({})
+                statusText: 'Not Found'
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.addLap(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 1000)).rejects.toThrowError('HTTP Error: 404 Not Found');
+        await expect(() => model.addLap(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 1000)).rejects.toThrow('HTTP Error: 404 Not Found');
     });
 });
 
@@ -3411,7 +3473,7 @@ describe('when removing a lap from an entry in a race', () => {
         const fetchSpy = fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,
-                status: 200, headers: new Headers(),
+                status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                 json: () => Promise.resolve(entryChrisMarshall1234ScorpionAHAL)
             });
         });
@@ -3419,7 +3481,7 @@ describe('when removing a lap from an entry in a race', () => {
         const promise = model.removeLap(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}), new Lap({...lap1HAL, number: 1, time: 1000}, {version: '"0"'}, model));
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({hal: entryChrisMarshall1234ScorpionAHAL, metadata: {version: ''}, model: model});
+        expect(result).toEqual({hal: entryChrisMarshall1234ScorpionAHAL, metadata: {version: '"0"'}, model: model});
         expect(fetchSpy).toHaveBeenCalledWith(entryChrisMarshall1234ScorpionAHAL._links.self.href + '/removeLap', {method: 'PATCH', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, body: JSON.stringify({...lap1HAL, number: 1, time: 1000})});
     });
     it('throws an error when lap removal fails', async () => {
@@ -3427,12 +3489,11 @@ describe('when removing a lap from an entry in a race', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404, 
-                statusText: 'Not Found',
-                json: () => Promise.resolve({})
+                statusText: 'Not Found'
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.removeLap(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}), {'number': 1, 'time': 1000})).rejects.toThrowError('HTTP Error: 404 Not Found');
+        await expect(() => model.removeLap(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}), {'number': 1, 'time': 1000})).rejects.toThrow('HTTP Error: 404 Not Found');
     });
 });
 
@@ -3441,7 +3502,7 @@ describe('when updating the last lap for an entry in a race', () => {
         const fetchSpy = fetch.mockImplementationOnce(() => {
             return Promise.resolve({
                 ok: true,
-                status: 200, headers: new Headers(),
+                status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                 json: () => Promise.resolve(entryChrisMarshall1234ScorpionAHAL)
             });
         });
@@ -3449,7 +3510,7 @@ describe('when updating the last lap for an entry in a race', () => {
         const promise = model.updateLap(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 2000);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({hal: entryChrisMarshall1234ScorpionAHAL, metadata: {version: ''}, model});
+        expect(result).toEqual({hal: entryChrisMarshall1234ScorpionAHAL, metadata: {version: '"0"'}, model});
         expect(fetchSpy).toHaveBeenCalledWith(entryChrisMarshall1234ScorpionAHAL._links.self.href + '/updateLap', {method: 'PATCH', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, body: JSON.stringify({time: 2})});
     });
     it('throws an error when lap update fails', async () => {
@@ -3457,12 +3518,11 @@ describe('when updating the last lap for an entry in a race', () => {
             return Promise.resolve({
                 ok: false,
                 status: 404, 
-                statusText: 'Not Found',
-                json: () => Promise.resolve({})
+                statusText: 'Not Found'
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.updateLap(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 2000)).rejects.toThrowError('HTTP Error: 404 Not Found');
+        await expect(() => model.updateLap(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 2000)).rejects.toThrow('HTTP Error: 404 Not Found');
     });
 });
 
@@ -3622,7 +3682,7 @@ describe('when updating an entries position in the race', () => {
                 return Promise.resolve({
                     ok: true,
                     status: 200,
-                    headers: new Headers(),
+                    headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                     json: () => Promise.resolve(raceScorpionAHAL)
                 });
             };
@@ -3631,7 +3691,7 @@ describe('when updating an entries position in the race', () => {
         const promise = model.updateEntryPosition(new DirectRace(raceScorpionAHAL, {version: '"0"'}, model), new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 2);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({hal: raceScorpionAHAL, metadata: {version: ''}, model});
+        expect(result).toEqual({hal: raceScorpionAHAL, metadata: {version: '"0"'}, model});
     });
     it('throws error if update fails', async () => {
         fetch.mockImplementationOnce(() => {
@@ -3643,7 +3703,7 @@ describe('when updating an entries position in the race', () => {
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(model.updateEntryPosition(new DirectRace(raceScorpionAHAL, {version: '"0"'}, model), new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 2)).rejects.toThrowError('HTTP Error: 500 Internal Server Error');
+        await expect(model.updateEntryPosition(new DirectRace(raceScorpionAHAL, {version: '"0"'}, model), new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 2)).rejects.toThrow('HTTP Error: 500 Internal Server Error');
     });
 });
 
@@ -3654,7 +3714,7 @@ describe('when entry is requested', () => {
                 if (resource === entryChrisMarshall1234ScorpionAHAL._links.self.href) {
                     return Promise.resolve({
                         ok: true,
-                        status: 200, headers: new Headers([['ETag', '"1"']]),
+                        status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]),
                         json: () => Promise.resolve(entryChrisMarshall1234ScorpionAHAL)
                     });
                 }
@@ -3672,12 +3732,11 @@ describe('when entry is requested', () => {
                 ok: false,
                 status: 404,
                 statusText: 'Not Found',
-                headers: new Headers(),
-                json: () => Promise.resolve({'cause': {'cause': null, 'message': 'Some error resulting in HTTP 404'}, 'message': 'Some error resulting in HTTP 404'})
+                headers: new Headers()
             });
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
-        await expect(() => model.getEntry(entryChrisMarshall1234ScorpionAHAL._links.self.href)).rejects.toThrowError('HTTP Error: 404 Not Found Message: Some error resulting in HTTP 404');
+        await expect(() => model.getEntry(entryChrisMarshall1234ScorpionAHAL._links.self.href)).rejects.toThrow('HTTP Error: 404 Not Found');
     });
 });
 
@@ -3693,21 +3752,21 @@ describe('when retrieving dinghies by sail number', () => {
             if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/search/findBySailNumber?sailNumber=1234') {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(), 
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                     json: () => Promise.resolve(dinghy1234CollectionHAL)
                 });
             }
             if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/2') {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag','"0"']]), 
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]), 
                     json: () => Promise.resolve(dinghy1234ScorpionHAL)
                 });
             }
             if (resource === 'http://localhost:8081/dinghyracing/api/dinghies/6') {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag','"0"']]), 
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag','"0"']]), 
                     json: () => Promise.resolve(dinghy1234GraduateHAL)
                 });
             }
@@ -3727,7 +3786,7 @@ describe('when retrieving dinghies by sail number', () => {
                 return Promise.resolve({
                     ok: true,
                     status: 200,
-                    statusText: 'OK', headers: new Headers(),
+                    statusText: 'OK', headers: new Headers([['Content-Type', 'application/hal+json']]),
                     json: () => Promise.resolve({_embedded: {dinghies: []},_links: {self: {href: "http://localhost:8081/dinghyracing/api/dinghies/search/findBySailNumber?sailNumber=1497&page=0&size=20"}},
                         page: {size: 20,totalElements: 0,totalPages: 0,number: 0}})
                 });
@@ -3747,21 +3806,21 @@ describe('when the crews that have sailed a dinghy are requested', () => {
             if (resource === 'http://localhost:8081/dinghyracing/api/crews/search/findCrewsByDinghy?dinghy=http://localhost:8081/dinghyracing/api/dinghies/2') {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(), 
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]),
                     json: () => Promise.resolve(dinghyScorpion1234CrewsHAL)
                 });
             }
             if (resource === dinghyScorpion1234CrewAHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(), 
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                     json: () => Promise.resolve(dinghyScorpion1234CrewAHAL)
                 });
             }            
             if (resource === dinghyScorpion1234CrewBHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(), 
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]), 
                     json: () => Promise.resolve(dinghyScorpion1234CrewBHAL)
                 });
             }
@@ -4439,7 +4498,7 @@ describe('when a signUp is requested', () => {
             if (resource === 'http://localhost:8081/dinghyracing/api/entries/10/signedUpTo') {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(),
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                     json: () => Promise.resolve(signedUpChrisMarshallDinghy1234ScorpionAHAL)
                 });
             }
@@ -4448,7 +4507,7 @@ describe('when a signUp is requested', () => {
         const promise = model.getSignedUp(entryChrisMarshall1234ScorpionAHAL._links.signedUpTo.href);
         const result = await promise;
         expect(promise).toBeInstanceOf(Promise);
-        expect(result).toEqual({hal: signedUpChrisMarshallDinghy1234ScorpionAHAL, metadata: {version: ''}, model: model});
+        expect(result).toEqual({hal: signedUpChrisMarshallDinghy1234ScorpionAHAL, metadata: {version: '"0"'}, model: model});
     });
 });
 
@@ -4459,21 +4518,21 @@ describe('when signedUpTo is requested', () => {
             if (resource === 'http://localhost:8081/dinghyracing/api/races/4/signedUp') {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers(),
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json']]),
                     json: () => Promise.resolve(signedUpScorpionACollectionHAL)
                 });
             }
             if (resource === signedUpChrisMarshallDinghy1234ScorpionAHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"1"']]),
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"1"']]),
                     json: () => Promise.resolve(signedUpChrisMarshallDinghy1234ScorpionAHAL)
                 });
             }
             if (resource === signedUpSarahPascalDinghy6745ScorpionAHAL._links.self.href) {
                 return Promise.resolve({
                     ok: true,
-                    status: 200, headers: new Headers([['ETag', '"0"']]),
+                    status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                     json: () => Promise.resolve(signedUpSarahPascalDinghy6745ScorpionAHAL)
                 });
             }
@@ -4561,7 +4620,7 @@ describe('when signed up is requested for an entry in a race', () => {
                 return {
                     ok: true,
                     status: 200,
-                    headers: new Headers([['ETag', '"0"']]),
+                    headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
                     json: () => Promise.resolve(signedUpChrisMarshallDinghy1234ScorpionAHAL)
                 };
             }
@@ -4579,14 +4638,14 @@ describe('when a request is made to sign up to an embedded race', () => {
                 return Promise.resolve({
                     ok: true,
                     status: 200,
-                    headers: new Headers(),
-                    json: () => Promise.resolve(signedUpChrisMarshallDinghy1234VeteransAHAL)
+                    headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
+                    json: () => Promise.resolve(embeddedRaceVeteransAHAL)
                 });
             }
         });
         const model = new SylphModel(httpRootURL, wsRootURL);
         const result = await model.signUpToEmbeddedRace(new EmbeddedRace(embeddedRaceVeteransAHAL, {version: '"0"'}, model), new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model));
-        expect(result).toEqual(new SignedUp(signedUpChrisMarshallDinghy1234VeteransAHAL, {version: ''}, model));
+        expect(result).toEqual(new EmbeddedRace(embeddedRaceVeteransAHAL, {version: '"0"'}, model));
     });
 });
 
@@ -4597,8 +4656,7 @@ describe('when a request is made to withdraw from an embedded race', () => {
                 return Promise.resolve({
                     ok: true,
                     status: 204,
-                    headers: new Headers(),
-                    json: () => null
+                    headers: new Headers()
                 });
             }
         });

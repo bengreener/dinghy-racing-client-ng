@@ -1445,19 +1445,31 @@ class SylphModel {
         }
         // handle response
         try {
-            // if body is empty reading json() will result in an error
-            json = await response.json();
+            // handle based on Content-Type of response
+            let text;
+            if (response.headers.has('Content-Type')) {
+                const contentType = response.headers.get('Content-Type');
+                switch (contentType) {
+                    case 'application/hal+json':
+                        json = await response.json();
+                        break;
+                    case 'text/plain;charset=UTF-8':
+                        text = await response.text();
+                        json = {message: text}
+                        break;
+                    default:
+                        json = {message: 'Unrecognised content type: ' + contentType};
+                }
+            }
+            else {
+                json = {};
+            }
         }
         catch (error) {
-            // Suppress error from empty JSON.
-            if (!(/JSON.parse: unexpected end of data at line 1 column 1 of the JSON data/.test(error.message))) {
-                console.error(error.message, error);
-            }
-            json = {};
+            json = {message: error.message};
         }
         if (response.ok) {
             let eTag = "";
-            
             if (response.headers.has('ETag')) {
                 eTag = response.headers.get('ETag');
             }
@@ -1469,7 +1481,7 @@ class SylphModel {
     }
 
     /**
-     * Build user friendly message to replace message returned from server
+     * Build error message
      * @param {Response} response
      * @param {Object} json
      * @returns {String}
@@ -1479,13 +1491,11 @@ class SylphModel {
             const regex = /(could not execute statement \[)(Duplicate entry)( ')([\w -]+)(' for key ')(\w+)(.+)/;
             const regexResult = regex.exec(message);
             if (regexResult && regexResult[2] === 'Duplicate entry') {
-                return `HTTP Error: 409 Conflict Message: The ${regexResult[6]} '${regexResult[4]}' already exists; this may be caused by an uppercase/ lowercase difference between existing record and the value entered.`;
+                message = `The ${regexResult[6]} '${regexResult[4]}' already exists; this may be caused by an uppercase/ lowercase difference between existing record and the value entered.`;
             }
-            // no mapping to user message found
-            return 'HTTP Error: ' + response.status + ' ' + response.statusText + ' Message: ' + message;
+            return 'HTTP Error: ' + response.status + (response.statusText ? ' ' : '') + response.statusText + ' Message: ' + message;
         }
-        // additional error details provided by server
-        return 'HTTP Error: ' + response.status + ' ' + response.statusText;
+        return 'HTTP Error: ' + response.status + (response.statusText ? ' ' : '') + response.statusText;
     }
 }
 
