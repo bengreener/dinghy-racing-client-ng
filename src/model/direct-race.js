@@ -49,7 +49,10 @@ class DirectRace extends Race {
     }
 
     get leadEntryLapsSailed() {
-        return this.hal.leadEntry.lapsSailed;
+        if (this.hal.leadEntry) {
+            return this.hal.leadEntry.lapsSailed;
+        }
+        return 0;
     }
 
     get plannedLaps() {
