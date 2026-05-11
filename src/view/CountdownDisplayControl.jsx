@@ -19,10 +19,10 @@ import { useState } from 'react';
 
 /**
  * Display a formatted time countdown and a message
- * @param {Object} prop
- * @param {Integer} prop.time
- * @param {String} prop.message
- * @param {Boolean} [prop.beep = false]
+ * @param {Object} props
+ * @param {Integer} props.time
+ * @param {String} props.message
+ * @param {Boolean} [props.beep = false]
  */
 function CountdownDisplayControl({ time, message, beep = false }) {
     const [beepAudio] = useState(new Audio('./sounds/beep_2000hz_100ms_mono.wav'));

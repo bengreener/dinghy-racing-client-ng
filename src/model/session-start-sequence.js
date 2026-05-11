@@ -26,7 +26,7 @@ class SessionStartSequence {
 
     /**
      * Create a new instance of SessionStartSequence
-     * @param {Array<RaceAndSignedUpClasses>} races
+     * @param {Array<DirectRace>} races
      * @param {Clock} clock
      */
     constructor(races, clock) {
@@ -97,7 +97,7 @@ class SessionStartSequence {
                 upcomingRaces.push(race);
             }
         })
-        const sorted = upcomingRaces.toSorted((a, b) => a - b);
+        const sorted = upcomingRaces.toSorted((a, b) => a.plannedStartTime - b.plannedStartTime);
         return sorted[0];
     }
 
