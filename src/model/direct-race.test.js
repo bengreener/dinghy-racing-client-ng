@@ -14,10 +14,9 @@
 * limitations under the License. 
 */
 
-import { embeddedRaceVeteransAHAL } from './__mocks__/test-data';
 import DirectRace from './direct-race';
 import SylphModel from './sylph-model';
-import { httpRootURL, wsRootURL } from './__mocks__/test-data';
+import { httpRootURL, wsRootURL, raceScorpionAHAL } from './__mocks__/test-data';
 
 vi.mock('./sylph-model');
 vi.mock('./clock');
@@ -25,9 +24,14 @@ vi.mock('./clock');
 const model = new SylphModel(httpRootURL, wsRootURL);
 
 describe('when there is no lead entry', () => {
-    it('leadEntryLapsSailed returns 0', () => {
-        const directRace = new DirectRace(embeddedRaceVeteransAHAL, {version: '"0"'}, model);
+    it('returns 0 for leadEntryLapsSailed', () => {
+        const directRace = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
 
         expect(directRace.leadEntryLapsSailed).toBe(0);
+    });
+    it('returns null for leadEntryLastLapTime', () => {
+        const directRace = new DirectRace({...raceScorpionAHAL, leadEntry: null}, {version: '"0"'}, model);
+
+        expect(directRace.leadEntryLastLapTime).toBeNull();
     });
 })

@@ -20,7 +20,7 @@
  * @returns {Promise<Object>}
  */
 async function getDinghyRacingProperties(resource) {
-    const response =  await fetch(resource, {method: 'GET', headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}, 
+    const response =  await fetch(resource, {method: 'GET', headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
         cache: 'no-store'});
     return response.json();
 }

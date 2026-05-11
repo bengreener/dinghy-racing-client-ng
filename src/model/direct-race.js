@@ -41,13 +41,21 @@ class DirectRace extends Race {
         return this.hal.lapForecast;
     }
 
+    /**
+     * Get last lap time for lead entry
+     * @returns {Integer | null}
+     */
     get leadEntryLastLapTime() {
-        if (this.hal.leadEntry.lastLapTime) {
+        if (this.hal.leadEntry) {
             return this.model.convertISO8601DurationToMilliseconds(this.hal.leadEntry.lastLapTime);
         }
         return null;
     }
 
+    /**
+     * Get number of laps sailed by lead entry
+     * @returns {Integer}
+     */
     get leadEntryLapsSailed() {
         if (this.hal.leadEntry) {
             return this.hal.leadEntry.lapsSailed;
