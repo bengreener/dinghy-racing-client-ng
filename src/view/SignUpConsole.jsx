@@ -25,12 +25,22 @@ function SignUpConsole({ race, model, controller }) {
         setSelectedEntry(entry);
     }
 
+    async function handleEntryUpdate(entry, helm, dinghy, crew = null) {
+        const result = await controller.updateEntry(entry, helm, dinghy, crew);
+        setSelectedEntry(null);
+        return result;
+    }
+
+    function handleEntryUpdateCancel() {
+        setSelectedEntry(null);
+    }
+
     return (
         <div className='sign-up-console w3-container console'>
             <h1>{race.name}</h1>
             <SignUpForm race={race} model={model} entry={selectedEntry} onCreateCompetitor={controller.createCompetitor} 
-                onCreateDinghy={controller.createDinghy} onSignUp={controller.signUpToRace} onUpdate={controller.updateEntry} onEmbeddedSignUp={controller.signUpToEmbeddedRace} 
-                onWithdrawEmbeddedSignUp={controller.withdrawEmbeddedSignUp} />
+                onCreateDinghy={controller.createDinghy} onSignUp={controller.signUpToRace} onUpdate={handleEntryUpdate} onEmbeddedSignUp={controller.signUpToEmbeddedRace} 
+                onWithdrawEmbeddedSignUp={controller.withdrawEmbeddedSignUp} onCancel={handleEntryUpdateCancel} />
             <h3>Signed-up</h3>
             <CurrentEntries race={race} model={model} onEntrySelected={handleEntrySelected} onWithdrawEntry={controller.withdrawEntry} />
         </div>

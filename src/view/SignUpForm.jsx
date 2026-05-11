@@ -16,11 +16,25 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PreviousEntries from './PreviousEntries';
-import CurrentEntries from './CurrentEntries';
 import EmbeddedRacesPanel from './EmbeddedRacesPanel';
 import EmbeddedRace from '../model/embedded-race';
+import SylphModel from '../model/sylph-model';
 
-function SignUpForm({ race, model, entry, onCreateCompetitor, onCreateDinghy, onSignUp, onUpdate, onEmbeddedSignUp, onWithdrawEmbeddedSignUp }) {
+/**
+ * Form to enable entry and updates for sign up to a race
+ * @param {Object} props
+ * @param {DirectRace} race
+ * @param {SylphModel} model
+ * @param {Entry} entry
+ * @param {Function} onCreateCompetitor
+ * @param {Function} onSignUp
+ * @param {Function} onUpdate
+ * @param {Function} onEmbeddedSignUp
+ * @param {Function} onWithdrawEmbeddedSignUp
+ * @param {Function} onCancel
+ * @returns {HTMLFormElement}
+ */
+function SignUpForm({ race, model, entry, onCreateCompetitor, onCreateDinghy, onSignUp, onUpdate, onEmbeddedSignUp, onWithdrawEmbeddedSignUp, onCancel }) {
     const [competitorMap, setCompetitorMap] = useState(new Map());
     const [competitorOptions, setCompetitorOptions] = useState([]);
     const [crewName, setCrewName] = useState('');
@@ -362,14 +376,16 @@ function SignUpForm({ race, model, entry, onCreateCompetitor, onCreateDinghy, on
         setDinghyClassName('');
         setMessage('');
         setSelectedEmbeddedRaces([]);
-        // setSelectedEntry(null);
         if (dinghyClassMap.size === 1) {
             setDinghyClassName(dinghyClassMap.values().next().value.name);
         }
         else {
             dinghyClassSelect.current.focus();
         }
-    }, [dinghyClassMap]);
+        if (onCancel) {
+            onCancel();
+        }
+    }, [dinghyClassMap, onCancel]);
 
     function dinghyClassInput() {
         let dinghyClassInput = null;    

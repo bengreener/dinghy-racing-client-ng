@@ -26,20 +26,49 @@ import { httpRootURL, wsRootURL, raceScorpionAHAL, entryChrisMarshall1234Scorpio
 vi.mock('../model/sylph-model');
 vi.mock('../model/clock');
 
-it('renders', async () => {
-    const model = new SylphModel(httpRootURL, wsRootURL);
-    const controller = new SylphController(model);
+const model = new SylphModel(httpRootURL, wsRootURL);
+const controller = new SylphController(model);
+
+it('renders', async () => {    
     const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
     await act(async () => {
         render(<SignUpConsole model={model} controller={controller} race={race} />);
     });
     expect(screen.getByRole('heading', {name: /scorpion a/i})).toBeInTheDocument();
 });
+describe('when an entry is updated', () => {
+    it('clears selected entry', async () => {
+        const user = userEvent.setup();
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        await act(async () => {
+            render(<SignUpConsole race={race} model={model} controller={controller} />);
+        });
+        const currentEntries = document.getElementsByClassName('current-entries w3-table w3-striped')[0];
+        await user.click(within(currentEntries).getByText(/chris marshall/i));
+        const buttonUpdate = screen.getByRole('button', {'name': /update/i});
+        await user.click(buttonUpdate);
+        expect(screen.queryByRole('button', {'name': /update/i})).not.toBeInTheDocument();
+    });
+});
+describe('when an update to an entry is cancelled', () => {
+    it('clears selected entry', async () => {
+        const user = userEvent.setup();
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        await act(async () => {
+            render(<SignUpConsole race={race} model={model} controller={controller} />);
+        });
+        const currentEntries = document.getElementsByClassName('current-entries w3-table w3-striped')[0];
+        await user.click(within(currentEntries).getByText(/chris marshall/i));
+        const buttonCancel = screen.getByRole('button', {'name': /cancel/i});
+        await user.click(buttonCancel);
+        expect(screen.queryByRole('button', {'name': /update/i})).not.toBeInTheDocument();
+    });
+});
 describe('when the withdraw button for an entry is clicked', () => {
     it('calls the controller withDraw entry method with the entry to be withdrawn', async () => {
         const user = userEvent.setup();
-        const model = new SylphModel(httpRootURL, wsRootURL);
-        const controller = new SylphController(model);
+        // const model = new SylphModel(httpRootURL, wsRootURL);
+        // const controller = new SylphController(model);
         const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const withdrawEntrySpy = vi.spyOn(controller, 'withdrawEntry');
         await act(async () => {
