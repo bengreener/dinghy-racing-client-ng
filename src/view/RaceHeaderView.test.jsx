@@ -344,7 +344,11 @@ describe('when race has started and an entry has sailed a lap', () => {
         vi.setSystemTime(new Date('2021-10-14T10:35:00Z'));
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
-        render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, leadEntry: {...raceScorpionAHAL.leadEntry, lapsSailed: 1}, plannedStartTime: new Date(Date.now() - 60000)}, {version: '"0"'}, model)} />);
+        render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(
+            {...raceScorpionAHAL, leadEntry: {
+                scoringAbbreviation: '', onLastLap: false, finishedRace: false, lapsSailed: 1, sumOfLapTimes: 'PT16M23.256S', averageLapTime: 'PT16M23.256S', lastLapTime: 'PT16M23.256S'
+            }, plannedStartTime: new Date(Date.now() - 60000)
+        }, {version: '"0"'}, model)} />);
         expect(screen.queryByRole('button', {name: /restart/i})).not.toBeInTheDocument();    
     });
 });

@@ -92,7 +92,7 @@ class SylphModel {
 
     convertISO8601DurationToMilliseconds(duration) {
         const match = /(^|\+)[Pp][Tt](\+?(\d+)[Hh])?(\+?(\d+)[Mm])?(\+?(\d+([.,]\d+)?)[Ss])?$/.exec(duration);
-        // check id duration is a valid ISO 801 duration format
+        // check id duration is a valid ISO 8601 duration format
         if (!match) {
             throw new TypeError('Duration not in expected format or range. ISO 8601 format, positive time values only expected.');
         }
