@@ -14,6 +14,7 @@
  * limitations under the License. 
  */
 
+
 import SignalIndicator from './SignalIndicator';
 
 /**
@@ -25,7 +26,8 @@ import SignalIndicator from './SignalIndicator';
 function SignalsPanel({ signals = [], clock }) {
     // build a map with keyed by flags used and with an order based on timing of first signal using the flags
     const flagsMap = new Map();
-    signals.filter(signal => signal.visualSignal).sort((a, b) => a.time - b.time).forEach(signal => {
+    // signals.filter(signal => signal.visualSignal).sort((a, b) => a.time - b.time).forEach(signal => {
+    signals.filter(signal => signal.visualSignal).sort(sortSignals).forEach(signal => {
         // generate a key to avoid issues with matching by reference
         const generateFlagsKey = (flags) => {
             const flagNames = flags.map(flag => flag.name);
@@ -41,15 +43,32 @@ function SignalsPanel({ signals = [], clock }) {
             flagsMap.set(flagsKey, [signal]);
         }
     });
-    
-
-    // group signals by flags used
 
     return (
         <div className='signals-panel'>
             {Array.from(flagsMap.values()).map((signals, index) => <SignalIndicator key={index} signals={signals} clock={clock} />)}
         </div>
     );
+}
+
+/**
+ * Sort signals by time of signal; earliest to latest.
+ * Preparatory signals (Blue Peter) to be sorted before other signals with the same time 
+ * @param {Signal} a 
+ * @param {Signal} b 
+ */
+function sortSignals(a, b) {
+    let aWeighting = 0;
+    let bWeighting = 0;
+    if (a.time === b.time) {
+        if (a.meaning === 'Preparatory signal') {
+            aWeighting = -1; // move a.time earlier than b.time
+        }
+        else if (b.meaning === 'Preparatory signal')  {
+            bWeighting = -1; // move b.time earlier than a.time
+        }
+    }
+    return (a.time + aWeighting) - (b.time + bWeighting);
 }
 
 export default SignalsPanel;
