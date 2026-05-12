@@ -95,7 +95,7 @@ function UpcomingRacesConsole({ model, showSignUpConsole }) {
                 <table className='w3-table w3-striped'>
                     <thead>
                         <tr>
-                            <th>Race</th><th>Class</th><th>Start Time</th><th>Type</th><th>Start Type</th>
+                            <th>Race</th><th>Fleet</th><th>Start Time</th><th>Type</th><th>Start Type</th>
                         </tr>
                     </thead>
                     <tbody>

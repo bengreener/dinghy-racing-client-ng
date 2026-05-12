@@ -38,11 +38,11 @@ it('renders', async () => {
     expect(screen.getByRole('heading', {name: /upcoming races/i})).toBeInTheDocument();
     expect(screen.getByLabelText(/session start/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/session end/i)).toBeInTheDocument();
-    expect(screen.getByText(/^race$/i)).toBeInTheDocument();
-    expect(screen.getByText(/class/i)).toBeInTheDocument();
-    expect(screen.getByText(/start time/i)).toBeInTheDocument();
-    expect(screen.getByText(/^type/i)).toBeInTheDocument();
-    expect(screen.getByText(/start type/i)).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', {name: /^race$/i})).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', {name: /fleet/i})).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', {name: /start time/i})).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', {name: /^type/i})).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', {name: /start type/i})).toBeInTheDocument();
 });
 it('defaults start time for race selection to now', async () => {
     const model = new SylphModel(httpRootURL, wsRootURL);
