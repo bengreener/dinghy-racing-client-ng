@@ -299,8 +299,7 @@ function RaceStartConsole ({ model, controller }) {
                     <SignalsPanel signals={signals} clock={model.getClock()} />
                 </CollapsableContainer>
                 <CollapsableContainer heading={'Races'}>
-                    {selectedRaces.map(raceName => {
-                        const race = raceMap.get(raceName);
+                    {selectedRaces.map(raceName => raceMap.get(raceName)).toSorted((a, b) => a.plannedStartTime - b.plannedStartTime).map(race => {
                         return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} model={model} controller={controller} showInRaceData={false} />
                     })}
                 </CollapsableContainer>

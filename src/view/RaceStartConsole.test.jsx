@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { act, render, screen, within } from '@testing-library/react';
+import { act, render, screen, within, prettyDOM } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RaceStartConsole from './RaceStartConsole';
 import SylphModel from '../model/sylph-model';
@@ -260,7 +260,6 @@ it('displays time to next flag state change for each flag', async () => {
     expect(within(signalsPanel).getAllByText(/10:00/i)).toHaveLength(1);
 });
 it('displays race headers for races in session', async () => {
-
     const model = new SylphModel(httpRootURL, wsRootURL);
     const controller = new SylphController(model);
 
@@ -301,6 +300,27 @@ it('displays race headers for races in session', async () => {
     expect(within(raceD).getByLabelText(/countdown/i)).toHaveValue('20:00');
     expect(within(raceD).getByRole('button', {name: /postpone/i})).toBeInTheDocument();
     expect(within(raceD).getByRole('button', {name: /start now/i})).toBeInTheDocument();
+});
+it('displays race headers for races in session in start time order earliest to latest', async () => {
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    vi.spyOn(model, 'getDirectRacesBetweenTimesForType').mockImplementation(async () => {
+        let collection = [];
+        const raceGraduateA = new DirectRace({...raceGraduateAHAL, plannedStartTime: '2021-10-14T10:30:00'}, {version: '"0"'}, model);
+        const raceScorpionA = new DirectRace({...raceScorpionAHAL, plannedStartTime: '2021-10-14T10:35:00'}, {version: '"0"'}, model);
+        
+        collection = [
+            raceScorpionA, raceGraduateA
+        ];
+        return new Collection(collection, {size: 20, totalElements: collection.length, totalPages: 0, number: 0});
+    })
+    const controller = new SylphController(model);
+
+    await act(async () => {
+        render(<RaceStartConsole model={model} controller={controller} />);
+    });
+    const raceHeaders = document.getElementsByClassName('race-header-view');
+    expect(within(raceHeaders[0]).getByText(/graduate a/i)).toBeInTheDocument();
+    expect(within(raceHeaders[1]).getByText(/scorpion a/i)).toBeInTheDocument();
 });
 it('does not display in race data in race headers', async () => {
     const model = new SylphModel(httpRootURL, wsRootURL);
