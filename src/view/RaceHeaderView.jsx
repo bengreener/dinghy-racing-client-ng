@@ -164,7 +164,7 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
                 </div>
                 <div className='w3-col m1 s6'>
                     {elapsedTime < 0 ? <button id='race-postpone-button' className='w3-col' onClick={handleRacePostponeClick}>Postpone Start</button> : null}
-                    {(elapsedTime >= 0 && (updatedRace.leadEntryLapsSailed == null || updatedRace.leadEntryLapsSailed < 1)) ? <button id='race-restart-button' className='w3-col' onClick={handleRacePostponeClick}>Restart DirectRace</button> : null}
+                    {(elapsedTime >= 0 && (updatedRace.leadEntryLapsSailed == null || updatedRace.leadEntryLapsSailed < 1)) ? <button id='race-restart-button' className='w3-col' onClick={handleRacePostponeClick}>Restart Race</button> : null}
                 </div>
                 <div className='w3-col m1 s6'>
                     {elapsedTime < 0 ? <button id='race-start-button' className='w3-col' onClick={handleRaceStartClick}>Start Now</button> : null}

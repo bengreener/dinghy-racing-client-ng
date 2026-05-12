@@ -98,10 +98,10 @@ function CreateRace({ model, onCreate }) {
 
     return (
         <div className='w3-container console' >
-            <h1>Create DirectRace</h1>
+            <h1>Create Race</h1>
             <form className='w3-container' action='' method='post'>
                 <div className='w3-row'>
-                    <label htmlFor='race-name-input' className='w3-col m2' >DirectRace Name</label>
+                    <label htmlFor='race-name-input' className='w3-col m2' >Race Name</label>
                     <input id='race-name-input' ref={raceNameInputRef} name='name' className='w3-half' type='text' onChange={handleChange} value={raceInput.name} autoFocus />
                 </div>
                 <div className='w3-row'>

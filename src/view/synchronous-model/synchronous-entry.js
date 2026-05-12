@@ -20,29 +20,9 @@ class SynchronousEntry{
     #helm;
     #race;
     #laps;
-    // #position;
     #signedUp;
     #crew;
 
-    // /**
-    //  * 
-    //  * @param {Entry} entry 
-    //  * @param {SynchronousDinghy} dinghy 
-    //  * @param {Competitor} helm 
-    //  * @param {DirectRace} race 
-    //  * @param {Collection<Lap>} laps 
-    //  * @param {Integer} position 
-    //  * @param {Competitor} [crew]
-    //  */
-    // constructor(entry, dinghy, helm, race, laps, position, crew) {
-    //     this.#entry = entry;
-    //     this.#dinghy = dinghy;
-    //     this.#helm = helm;
-    //     this.#race = race;
-    //     this.#laps = laps;
-    //     this.#position = position;
-    //     this.#crew = crew;
-    // }
     /**
      * 
      * @param {Entry} entry 

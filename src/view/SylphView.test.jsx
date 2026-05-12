@@ -196,7 +196,7 @@ describe('when create race button clicked', () => {
 		await user.click(btnMenu);
 		const btnCreateRace = await screen.findByRole('button', {name: /create race\b/i});
 		await user.click(btnCreateRace);
-		expect(await screen.findByLabelText('DirectRace Name')).toBeInTheDocument();
+		expect(await screen.findByLabelText('Race Name')).toBeInTheDocument();
 	});
 	it('main menu buttons are not shown as selected', async () => {
 		const user = userEvent.setup();

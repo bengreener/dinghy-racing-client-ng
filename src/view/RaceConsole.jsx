@@ -158,7 +158,7 @@ function RaceConsole({ model, controller }) {
                     <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
                     <div className='w3-row'>
                         <fieldset className='w3-third' >
-                            <legend>DirectRace Type:</legend>
+                            <legend>Race Type:</legend>
                             <div className='w3-cell-row'>
                                 <div className='w3-cell'>
                                     <input id='radio-race-type-fleet' name='race-type' type='radio' value='FLEET' onChange={handleRaceTypeChange} checked={raceType === RaceType.FLEET} />
@@ -171,7 +171,7 @@ function RaceConsole({ model, controller }) {
                             </div>
                         </fieldset>
                     </div>
-                    <label htmlFor='race-select' className='w3-left w3-col' >Select DirectRace</label>
+                    <label htmlFor='race-select' className='w3-left w3-col' >Select Race</label>
                     <select id='race-select' name='race' multiple={true} className='w3-col w3-third' onChange={handleRaceSelect} value={selectedRaces}>{raceOptions}</select>
                 </form>
                 <p className={userMessageClasses()}>{message}</p>

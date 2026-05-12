@@ -44,7 +44,7 @@ it('renders', async () => {
     await act(async () => {        
         render(<RaceConsole model={model} />);
     });
-    const selectRace = screen.getByLabelText(/Select DirectRace/i);
+    const selectRace = screen.getByLabelText(/Select Race/i);
     expect(selectRace).toBeInTheDocument();
     expect(screen.getByLabelText(/fleet/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/fleet/i)).toBeChecked();
@@ -73,7 +73,7 @@ it('enables a race to be selected', async () => {
     const model = new SylphModel(httpRootURL, wsRootURL);
     const controller = new SylphController(model);
     render(<RaceConsole model={model} controller={controller} />);
-    const selectRace = await screen.findByLabelText(/DirectRace/i);
+    const selectRace = await screen.findByLabelText(/Race/i);
     await screen.findAllByRole('option');
     await user.selectOptions(selectRace, 'Scorpion A');
     expect(selectRace.value).toBe('Scorpion A');
@@ -83,7 +83,7 @@ it('enables more than one race to be selected', async () => {
     const model = new SylphModel(httpRootURL, wsRootURL);
     const controller = new SylphController(model);
     render(<RaceConsole model={model} controller={controller} />);
-    const selectRace = await screen.findByLabelText(/DirectRace/i);
+    const selectRace = await screen.findByLabelText(/Race/i);
     await screen.findAllByRole('option');
     await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
     const selected = [];
@@ -99,7 +99,7 @@ describe('when a race is selected', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
         render(<RaceConsole model={model} controller={controller} />);
-        const selectRace = await screen.findByLabelText(/DirectRace/i);
+        const selectRace = await screen.findByLabelText(/Race/i);
         await screen.findAllByRole('option');
         await user.selectOptions(selectRace, 'Scorpion A');
         const outputDuration = screen.getByLabelText(/duration/i)
@@ -111,7 +111,7 @@ describe('when a race is selected', () => {
         const controller = new SylphController(model);
         render(<RaceConsole model={model} controller={controller} />);
         
-        const selectRace = await screen.findByLabelText(/DirectRace/i);
+        const selectRace = await screen.findByLabelText(/Race/i);
         screen.findAllByRole('option');
         user.selectOptions(selectRace, 'Scorpion A');
         const entry1 = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -129,7 +129,7 @@ describe('when more than one race is selected', () => {
         await act(async () => {
             render(<RaceConsole model={model} controller={controller} />);
         });
-        const selectRace = await screen.findByLabelText(/DirectRace/i);
+        const selectRace = await screen.findByLabelText(/Race/i);
         await screen.findAllByRole('option');
         await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
         const outputDuration = await screen.findAllByLabelText(/duration/i);
@@ -144,7 +144,7 @@ describe('when more than one race is selected', () => {
         await act(async () => {
             render(<RaceConsole model={model} controller={controller} />);
         });
-        const selectRace = await screen.findByLabelText(/DirectRace/i);
+        const selectRace = await screen.findByLabelText(/Race/i);
         await screen.findAllByRole('option');
         await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
         const entry1 = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -163,7 +163,7 @@ describe('when a race is unselected', () => {
         await act(async () => {
             render(<RaceConsole model={model} controller={controller} />);
         });        
-        const selectRace = await screen.findByLabelText(/DirectRace/i);
+        const selectRace = await screen.findByLabelText(/Race/i);
         await screen.findAllByRole('option');
         await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
 
@@ -181,7 +181,7 @@ describe('when a race is unselected', () => {
         await act(async () => {
             render(<RaceConsole model={model} controller={controller} />);
         });        
-        const selectRace = await screen.findByLabelText(/DirectRace/i);
+        const selectRace = await screen.findByLabelText(/Race/i);
         await screen.findAllByRole('option');
         await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
         const graduateEntries = await within(document.getElementsByClassName('race-entries-view')[0]).findAllByText(/Graduate/i);
