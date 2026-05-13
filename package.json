@@ -1,7 +1,7 @@
 {
   "name": "sylph",
   "private": true,
-  "version": "2025.9.3.dev",
+  "version": "2026.5.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
