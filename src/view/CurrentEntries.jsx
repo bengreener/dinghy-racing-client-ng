@@ -134,7 +134,7 @@ function CurrentEntries({ race, onEntrySelected, onWithdrawEntry }) {
     }
 
     return (
-        <div>
+        <div className='w3-container scrollable'>
             <p>{message}</p>
             <table className='current-entries w3-table w3-striped'>
                 <thead>
