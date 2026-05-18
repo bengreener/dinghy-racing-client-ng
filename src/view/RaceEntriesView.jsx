@@ -120,24 +120,28 @@ function RaceEntriesView({ races, controller, model }) {
             // sort by number of laps and then by time to complete last lap
             case 'lapTimes':
                 ordered = entries.sort((a, b) => {
-                    const aWeighting = (!(a.scoringAbbreviation == null || a.scoringAbbreviation === '')) ? Date.now() : 0;
-                    const bWeighting = (!(b.scoringAbbreviation == null || b.scoringAbbreviation === '')) ? Date.now() : 0;
+                    const aWeighting = (a.scoringAbbreviation == null || a.scoringAbbreviation === '') ? 0 : Date.now();
+                    const bWeighting = (b.scoringAbbreviation == null || b.scoringAbbreviation === '') ? 0 : Date.now();
                     let aWeighted = [a.laps.entities.length - aWeighting, a.sumOfLapTimes];
                     let bWeighted = [b.laps.entities.length - bWeighting, b.sumOfLapTimes];
                     
+                    // if b has sailed more laps than a then b is the faster boat
                     if (aWeighted[0] < bWeighted[0]) {
                         return 1;
                     }
+                    // if a has sailed more laps than b then a is the faster boat
                     else if (aWeighted[0] > bWeighted[0]) {
                         return -1;
                     }
+                    // if a lap time is less than b lap times then a is the faster boat
                     if (aWeighted[1] < bWeighted[1]) {
                         return -1;
                     }
+                    // if a lap time is greater than b lap time then b is the faster boat
                     else if (aWeighted[1] > bWeighted[1]) {
                         return 1;
                     }
-                    return 0;
+                    return 0; // both boats took the same amount of time to sail the same number of laps
                 });
                 break;
             case 'position':
