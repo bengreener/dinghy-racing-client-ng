@@ -18,22 +18,28 @@
 
 * {
 	font-family: Helvetica;
+	/* font-family: "Atkinson Hyperlegible", sans-serif; */
 }
+
 html {
 	margin: 0;
 	height: 100%;
 	overflow: hidden;
 }
+
 body {
 	margin: 0px;
 }
+
 h1 {
 	margin-top: 0.335em;
 	margin-bottom: 0.335em;
 }
+
 button:active {
     transform: translateY(.5px);
 }
+
 button.embedded {
 	border-radius: 0pt;
     padding: 0pt;
@@ -42,14 +48,21 @@ button.embedded {
     cursor: pointer;
     background-color: inherit;
 }
+
 button.selected {
 	background-color: #85D6FF;
 }
+
 .action-list-view {
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
+
+.adjust-course-form {
+	font-size: large;
+}
+
 .console {
 	height: 100%;
 	display: flex;
@@ -58,37 +71,46 @@ button.selected {
 .cursor-pointer {
 	cursor: pointer;
 }
+
 .disabled {
 	/* applies to disabled race entries (HTML class applied through code/ html) */
 	color: lightgray;
 }
+
 :disabled {
 	/* applies to disabled input elements via disabled HTML element attribute */
 	/* class used to indicate elemnt is disabled while processing takes place; e.g. updating server and waiting for response */
 	background-color: lightGray;
 }
+
 .display-port {
 	overflow: hidden;
 	height:91vh;
 }
- .preserve-whitespace {
+
+.preserve-whitespace {
 	white-space: pre;
- }
+}
+
 .race-entries-view {
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
+
 .hidden {
     display: none;
 }
+
 .list-group {
 	grid-area: menu;
 }
+
 .list-group button {
 	display: block;
 	width: 100%;
 }
+
 .list-group-item {
 	border-radius: 25pt;
     margin: 5px 0px 5px 0px;
@@ -96,79 +118,99 @@ button.selected {
     cursor: pointer;
     background-color: #85D6FF;
 }
+
 .link-primary {
 	color: blue;
 	text-decoration: underline;
 	cursor: auto;
 }
+
 .scrollable {
 	overflow: auto;
 }
+
 .clickable-table-row {
 	cursor: pointer;
 }
+
 .on-course-side {
 	background-color: lightgrey;
 }
+
 .did-not-compete {
 	background-color: darkgrey;
 }
+
 .did-not-start {
 	background-color: lightgrey;
 }
+
 .did-not-finish {
 	background-color: gainsboro;
 }
+
 .retired {
 	background-color: gainsboro;
 }
+
 .disqualified {
 	background-color: grey;
 }
+
 .on-last-lap {
 	background-color: #FFEE75;
 }
+
 .finished-race {
 	background-color: palegreen;
 }
+
 .warning-flag-prepare-raise {
 	padding: 5pt;
 	margin: 0;
 	background: linear-gradient(to top right, white, cornflowerblue);
 }
+
 .warning-flag-raised {
 	padding: 5pt;
 	margin: 0;
 	background-color: cornflowerblue;
 }
+
 .warning-flag-prepare-lower {
 	padding: 5pt;
 	margin: 0;
 	background: linear-gradient(to bottom left, white, cornflowerblue);
 }
+
 .warning-flag-lowered {
 	padding: 5pt;
 	margin: 0;
 }
+
 .blue-peter-prepare-raise {
 	padding: 5pt;
 	margin: 0;
 	background: linear-gradient(to top right, white, blue);
 }
+
 .blue-peter-raised {
 	padding: 5pt;
 	margin: 0;
 	background-color: blue;
 }
+
 .blue-peter-prepare-lower {
 	padding: 5pt;
 	margin: 0;
 	background: linear-gradient(to bottom left, white, blue);
 }
+
 .blue-peter-lowered {
 	padding: 5pt;
 	margin: 0;
 }
+
 .console-error-message {
 	color: red;
 	font-weight: bold;

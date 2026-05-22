@@ -46,6 +46,10 @@ function RaceEntriesView({ races, controller, model }) {
         buildSynchronousEntries(races).then((entries) => {
             entries.forEach(sEntry => {
                 entriesMap.set(sEntry.dinghy.dinghyClass.name + sEntry.dinghy.sailNumber + sEntry.helm.name, sEntry);
+                const cumulativeLapTimes = sEntry.laps.entities.reduce((previous, current) => previous + current.time, 0);
+                if (sEntry.sumOfLapTimes != cumulativeLapTimes) {
+                    console.debug(`Entry sumOfLapTimes  not equal to cumulativeLapTimes, entry, ${sEntry.url}, sumOfLapTimes, ${sEntry.sumOfLapTimes}, cumulativeLapTime, ${cumulativeLapTimes}`);
+                }
             });
             if (!cancel) {
                 setEntriesMap(entriesMap);

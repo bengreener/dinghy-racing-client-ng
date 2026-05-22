@@ -24,11 +24,12 @@ import SynchronousRace from './synchronous-race';
     return new SynchronousDinghy(dinghy, dinghyClass);
 }
 
-// async function buildSynchronousEntry(entry) {
-//     const results = await Promise.all([entry.getDinghy(), entry.getHelm(), entry.getDirectRace(), entry.getLaps(), entry.getPositionInDirectRace(), entry.getCrew()]);
-//     const dinghy = await buildSynchronousDinghy(results[0]);
-//     return new SynchronousEntry(entry, dinghy, results[1], results[2], results[3], results[4], results[5]);
-// }
+/**
+ * Expand entry to include related entities so values can be requested and calculated synchronously.
+ * For use in view components that display or utilise values from the entry and related entities for which asynchronous queries would degrade the user experience.
+ * @param {Entry} entry 
+ * @returns {Promise<SynchronousEntry>}
+ */
 async function buildSynchronousEntry(entry) {
     const results = await Promise.all([entry.getDinghy(), entry.getHelm(), entry.getDirectRace(), entry.getLaps(), entry.getSignedUpToDirectRace(), entry.getCrew()]);
     const dinghy = await buildSynchronousDinghy(results[0]);
@@ -46,7 +47,6 @@ async function buildSynchronousEntries(races) {
     }));
     const entries = arrayEntriesCollections.flatMap((entryCollection) => {return entryCollection.entities});
     return Promise.all(entries.map((entry) => {return buildSynchronousEntry(entry)}));
-    // return entries.map((entry) => {return buildSynchronousEntry(entry)});
 }
 
 async function buildSynchronousFleet(fleet) {

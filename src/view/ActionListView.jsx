@@ -87,7 +87,7 @@ function ActionListView({ signals, clock }) {
                 <td key='time'>
                     {timeFormat.format(new Date(timekey))}
                 </td>
-                <td key='action'className='preserve-whitespace'>
+                <td key='action' className='preserve-whitespace'>
                     {actionDescription}
                 </td>
                 <td key='countdown'>

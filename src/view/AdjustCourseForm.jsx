@@ -27,7 +27,7 @@ import { useState } from 'react';
  * @param {ModalDialog~closeDialog} props.closeParent call this to close a dialog containing this form
  * @returns {HTMLFormElement}
  */
-function AdjustCourseForm({ race, minLaps = 1, maxLaps = 100, initialValue, onUpdate, closeParent}) {
+function AdjustCourseForm({ race, minLaps = 0, maxLaps = 100, initialValue, onUpdate, closeParent}) {
     const [laps, setLaps] = useState(initialValue ? initialValue : minLaps);
 
     function handleChange({ target }) {
@@ -46,6 +46,7 @@ function AdjustCourseForm({ race, minLaps = 1, maxLaps = 100, initialValue, onUp
 
     return (
         <form onSubmit={handleSubmit}>
+        {/* <form className='adjust-course-form' onSubmit={handleSubmit}> */}
             <div>
                 <label htmlFor='set-laps-input'>Set Laps</label>
                 <input id='set-laps-input' name='laps' type='number' min={minLaps.toString()} max={maxLaps.toString()} value={laps} onChange={handleChange} autoFocus/>

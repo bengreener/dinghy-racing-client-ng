@@ -29,7 +29,7 @@ import RaceType from '../model/race-type';
  * @returns {HTMLDivElement}
  */
 function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
-    const [updatedRace, setUpdatedRace] = useState(race); // used to get current lead entry information for race after a lap recorded. May not reflect chnages to planned start time or planned laps
+    const [updatedRace, setUpdatedRace] = useState(race); // used to get current lead entry information for race after a lap recorded. May not reflect changes to planned start time or planned laps
     const [elapsedTime, setElapsedTime] = useState(model.getClock().getElapsedTime(race.plannedStartTime));
     const [message, setMessage] = useState('');
     const [showPostponeRace, setShowPostponeRace] = useState(false);
@@ -178,8 +178,8 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
                 <PostponeRaceForm race={updatedRace} onPostpone={controller.postponeRace} closeParent={closePostponeRaceFormDialog} />
             </ModalDialog>
             <ModalDialog show={showShortenCourse} onClose={closeShortenCourseDialog} testid={'shorten-course-dialog'}>
-                {showInRaceData ? <AdjustCourseForm race={updatedRace} minLaps={Math.max(1, updatedRace.leadEntryLapsSailed)} maxLaps={updatedRace.plannedLaps - 1} initialValue={Math.max(1, updatedRace.plannedLaps - 1)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} /> :
-                    <AdjustCourseForm race={updatedRace} minLaps={Math.max(1, updatedRace.leadEntryLapsSailed)} initialValue={Math.max(1, updatedRace.plannedLaps)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} />}
+                {showInRaceData ? <AdjustCourseForm key={race.plannedLaps} race={updatedRace} minLaps={Math.max(1, updatedRace.leadEntryLapsSailed)} maxLaps={updatedRace.plannedLaps - 1} initialValue={Math.max(1, updatedRace.plannedLaps - 1)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} /> :
+                    <AdjustCourseForm key={race.plannedLaps} race={updatedRace} minLaps={Math.max(1, updatedRace.leadEntryLapsSailed)} initialValue={Math.max(1, updatedRace.plannedLaps)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} />}
             </ModalDialog>
         </div>
     );

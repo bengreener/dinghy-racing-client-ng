@@ -63,12 +63,12 @@ function ScoringAbbreviation({value = '', onChange}) {
         <select value={sc} onClick={handleOnClick} onAuxClick={handleAuxClick} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp} onPointerOut={handlePointerOut} onPointerLeave={handlePointerLeave} onPointerCancel={handleCancel} onChange={handleChange} >
             <option></option>
-            <option>OCS</option>
-            <option>DNC</option>
-            <option>DNS</option>
-            <option>DNF</option>
-            <option>DSQ</option>
-            <option>RET</option>
+            <option title='On course side'>OCS</option>
+            <option title='Did not compete'>DNC</option>
+            <option title='Did not sail'>DNS</option>
+            <option title='Did not finish'>DNF</option>
+            <option title='Disqualified'>DSQ</option>
+            <option title='Retired'>RET</option>
         </select>
     )
 }

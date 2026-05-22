@@ -92,6 +92,9 @@ class SynchronousEntry{
         return this.#signedUp;
     }
 
+    /**
+     * @returns {Integer}
+     */
     get sumOfLapTimes() {
         return this.#entry.sumOfLapTimes;
     }

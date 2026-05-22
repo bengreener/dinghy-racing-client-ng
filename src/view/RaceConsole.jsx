@@ -179,7 +179,7 @@ function RaceConsole({ model, controller }) {
             <CollapsableContainer heading={'Races'}>
                 {selectedRaces.map(selectedRace => {
                     const race = raceMap.get(selectedRace);
-                    return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} model={model} controller={controller} />
+                    return <RaceHeaderView key={race.name + race.plannedStartTime.toISOString() + race.plannedLaps} race={race} model={model} controller={controller} />
                 })}
             </CollapsableContainer>
             <RaceEntriesView races={selectedRaces.map(selectedRace => raceMap.get(selectedRace))} model={model} controller={controller} />

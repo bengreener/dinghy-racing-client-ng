@@ -36,6 +36,9 @@ class Entry extends Entity {
         return this.hal.scoringAbbreviation;
     }
 
+    /**
+     * @returns {Integer}
+     */
     get sumOfLapTimes() {
         return this.model.convertISO8601DurationToMilliseconds(this.hal.sumOfLapTimes);
     }
