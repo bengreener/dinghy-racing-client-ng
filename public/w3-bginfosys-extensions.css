@@ -19,7 +19,6 @@ html,body{
     font-size: initial;
 }
 
-
 .bgis-table,.bgis-table-all{border-collapse:collapse;border-spacing:0;display:table}
 .w3-striped tbody tr:nth-child(even){background-color:lightgray}
 
@@ -37,9 +36,13 @@ html,body{
 
 .bgis-border-2{border:2px solid #ccc}
 
+.w3-bginfosys-third{float:left;width:100%}
+.w3-row-padding>.w3-bginfosys-third{padding:0 8px}
+
 @media (min-width:601px) {
     .w3-bginfosys-display-bottommiddle-m1{position:absolute;left:50%;bottom:0;transform:translate(-50%,0%)}
     .w3-col.m1-half{width:4.16665%}
+    .w3-bginfosys-third{width:33%}
 }
 
 @media (min-width:980px) {
