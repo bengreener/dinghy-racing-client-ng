@@ -23,10 +23,6 @@ html,body{
 .bgis-table,.bgis-table-all{border-collapse:collapse;border-spacing:0;display:table}
 .w3-striped tbody tr:nth-child(even){background-color:lightgray}
 
-.bgis-min-content {
-    min-width: min-content;
-}
-
 .bgis-cell {
     overflow: hidden;
 }

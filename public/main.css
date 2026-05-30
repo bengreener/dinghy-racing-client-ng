@@ -17,7 +17,7 @@
  @charset "ISO-8859-1";
 
 * {
-	font-family: Helvetica;
+	font-family: Helvetica, sans-serif;
 }
 html {
 	margin: 0;
