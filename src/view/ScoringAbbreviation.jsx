@@ -63,12 +63,12 @@ function ScoringAbbreviation({value = '', onChange}) {
         <select value={sc} onClick={handleOnClick} onAuxClick={handleAuxClick} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp} onPointerOut={handlePointerOut} onPointerLeave={handlePointerLeave} onPointerCancel={handleCancel} onChange={handleChange} >
             <option></option>
-            <option>OCS</option>
-            <option>DNC</option>
-            <option>DNS</option>
-            <option>DNF</option>
-            <option>DSQ</option>
-            <option>RET</option>
+            <option title='On Course Side - Over the line at the start time' >OCS</option>
+            <option title='Did Not Compete - Did not launch boat' >DNC</option>
+            <option title='Did Not Start - Launched to start area but did not cross the line' >DNS</option>
+            <option title='Did Not Finish - Rare, typically missed a mark of the course' >DNF</option>
+            <option title='Disqualified - Rare, not eligible to sail, or after a protest committee' >DSQ</option>
+            <option title='Retired - Chose to stop before the finish' >RET</option>
         </select>
     )
 }
