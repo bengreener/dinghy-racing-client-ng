@@ -129,9 +129,13 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
         <div className='race-header-view' >
             <div className='w3-row' >
                 <label  className='w3-col m2' ><b>{updatedRace.name}</b></label>
+                {!showInRaceData ? <div className='w3-col m1 s6'>
+                    <label htmlFor={'race-start-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >Start Time</label>
+                    <output id={'race-start-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{Clock.formatTime(race.plannedStartTime)}</output>
+                </div>: null}
                 <div className='w3-col m1 s6'>
-                    {race.type !== RaceType.PURSUIT ? <label htmlFor={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >Laps</label> : null}
-                    {race.type !== RaceType.PURSUIT ? <output id={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{race.plannedLaps}</output> : null}
+                    {race.type !== RaceType.PURSUIT ? <label htmlFor={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col w3-center' >Laps</label> : null}
+                    {race.type !== RaceType.PURSUIT ? <output id={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col w3-center' >{race.plannedLaps}</output> : null}
                 </div>
                 <div className='w3-col m1 s6'>
                     <label htmlFor={'race-duration-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >Duration</label>

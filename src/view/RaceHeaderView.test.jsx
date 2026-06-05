@@ -236,7 +236,13 @@ describe('when showInRaceData is false', () => {
         render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000).toISOString().replaceAll('Z', '')}, {version: '"0"'}, model)} showInRaceData={false} />);
         expect(screen.queryByRole('button', {name: /shorten course/i})).not.toBeInTheDocument();
         expect(screen.getByRole('button', {name: /adjust laps/i})).toBeInTheDocument();
-    })
+    });
+    it('displays planned start time of race', () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000).toISOString().replaceAll('Z', '')}, {version: '"0"'}, model)} showInRaceData={false} />);
+        expect(screen.getByLabelText(/start time/i)).toBeInTheDocument();
+    });
 });
 
 describe('when race has not yet started', () => {
