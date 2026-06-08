@@ -27,8 +27,7 @@ import { httpRootURL, wsRootURL,
     lap1HAL, lap2HAL, lap3HAL,
     signedUpChrisMarshallDinghy1234ScorpionAHAL, signedUpSarahPascalDinghy6745ScorpionAHAL,
     embeddedRaceVeteransAHAL,
-    entryChrisMarshall1234HandicapAHAL,
-    signedUpChrisMarshallDinghy1234VeteransAHAL
+    entryChrisMarshall1234HandicapAHAL
 } from '../model/__mocks__/test-data.js';
 import Collection from '../model/collection.js';
 import Competitor from '../model/competitor.js';
@@ -941,7 +940,7 @@ describe('when race is postponed', () => {
         const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const fleet = new Fleet(fleetScorpionHAL, {version: ''}, model)
         await controller.postponeRace(race, 300000);
-        expect(updateRaceSpy).toHaveBeenCalledWith(race, race.name, new Date(race.plannedStartTime.getTime() + 300000), fleet, race.duration, race.plannedLaps, race.type, race.startType);
+        expect(updateRaceSpy).toHaveBeenCalledWith(race, race.name, new Date(race.plannedStartTime.getTime()), fleet, race.duration, race.plannedLaps, race.type, race.startType, 300000);
     });
     describe('when race is not provided', () => {
         it('throws an error', async () => {

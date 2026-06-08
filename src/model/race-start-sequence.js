@@ -91,7 +91,7 @@ class RaceStartSequence {
      * @returns {DirectRace | null | undefined}
      */
     getNextRaceToStart(time) {
-        return this._race.plannedStartTime >= time ? this._race : null;
+        return this._race.currentStartTime >= time ? this._race : null;
     }
 
     /**
@@ -135,10 +135,10 @@ class RaceStartSequence {
         const warningFlag = {name: fleet.name + ' Class Flag'};
         const preparatoryFlag = {name: 'Blue Peter'};
 
-        signals.push({meaning: 'Warning signal', time: race.plannedStartTime.getTime() + classSignalOffsets.raise, soundSignal: {description: 'One'}, visualSignal: {flags: [warningFlag], flagsState: FlagState.RAISED}});
-        signals.push({meaning: 'Preparatory signal', time: race.plannedStartTime.getTime() + preparatorySignalOffsets.raise, soundSignal: {description: 'One'}, visualSignal: {flags: [preparatoryFlag], flagsState: FlagState.RAISED}});
-        signals.push({meaning: preparatorySignalLowerMeaning, time: race.plannedStartTime.getTime() + preparatorySignalOffsets.lower, soundSignal: preparatorySignalLowerSoundSignal, visualSignal: {flags: [preparatoryFlag], flagsState: FlagState.LOWERED}});
-        signals.push({meaning: 'Starting signal', time: race.plannedStartTime.getTime(), soundSignal: {description: 'One'}, visualSignal: {flags: [warningFlag], flagsState: FlagState.LOWERED}});
+        signals.push({meaning: 'Warning signal', time: race.currentStartTime.getTime() + classSignalOffsets.raise, soundSignal: {description: 'One'}, visualSignal: {flags: [warningFlag], flagsState: FlagState.RAISED}});
+        signals.push({meaning: 'Preparatory signal', time: race.currentStartTime.getTime() + preparatorySignalOffsets.raise, soundSignal: {description: 'One'}, visualSignal: {flags: [preparatoryFlag], flagsState: FlagState.RAISED}});
+        signals.push({meaning: preparatorySignalLowerMeaning, time: race.currentStartTime.getTime() + preparatorySignalOffsets.lower, soundSignal: preparatorySignalLowerSoundSignal, visualSignal: {flags: [preparatoryFlag], flagsState: FlagState.LOWERED}});
+        signals.push({meaning: 'Starting signal', time: race.currentStartTime.getTime(), soundSignal: {description: 'One'}, visualSignal: {flags: [warningFlag], flagsState: FlagState.LOWERED}});
         if (race.type === RaceType.PURSUIT) {
             // need dinghy classes for entries in races and slowest dinghy class in fleet (to get start time offset for other classes)
             const fleet = await race.getFleet();
@@ -158,7 +158,7 @@ class RaceStartSequence {
                 // set up start signals for subsequent dinghy classes
                 let offset = Math.ceil((baseDuration - ((baseDuration * sortedDinghyClasses[i].portsmouthNumber) / basePN)) / 1000) * 1000; // round to the nearest second as this is the precision we are working with
 
-                signals.push({meaning: sortedDinghyClasses[i].name + ' start', time: race.plannedStartTime.getTime() + offset, soundSignal: {description: 'One'}});
+                signals.push({meaning: sortedDinghyClasses[i].name + ' start', time: race.currentStartTime.getTime() + offset, soundSignal: {description: 'One'}});
             }
         }
         return signals;

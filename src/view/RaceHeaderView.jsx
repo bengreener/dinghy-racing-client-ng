@@ -30,7 +30,7 @@ import RaceType from '../model/race-type';
  */
 function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
     const [updatedRace, setUpdatedRace] = useState(race); // used to get current lead entry information for race after a lap recorded. May not reflect chnages to planned start time or planned laps
-    const [elapsedTime, setElapsedTime] = useState(model.getClock().getElapsedTime(race.plannedStartTime));
+    const [elapsedTime, setElapsedTime] = useState(model.getClock().getElapsedTime(race.currentStartTime));
     const [message, setMessage] = useState('');
     const [showPostponeRace, setShowPostponeRace] = useState(false);
     const [showShortenCourse, setShowShortenCourse] = useState(false);
@@ -68,7 +68,7 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
     }, [model, race]);
 
     const tickHandler = useCallback(() => {
-        const currentElapsedTime = model.getClock().getElapsedTime(race.plannedStartTime); // ensure state calculated on current time uses the same value
+        const currentElapsedTime = model.getClock().getElapsedTime(race.currentStartTime); // ensure state calculated on current time uses the same value
         setElapsedTime(currentElapsedTime); // takes effect next render so can't be used to drive caluclations of other state updates based on time in this handler
         if (pursuitEndWarningAudioRef.current != null && (Math.floor(currentElapsedTime / 1000) * 1000) === race.duration - 60000) {
             pursuitEndWarningAudioRef.current.play();
@@ -76,7 +76,7 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
         if (pursuitEndAudioRef.current != null && (Math.floor(currentElapsedTime / 1000) * 1000) === race.duration) {
             pursuitEndAudioRef.current.play();
         }
-    }, [model, race.plannedStartTime, race.duration]);
+    }, [model, race.currentStartTime, race.duration]);
 
     function handleRacePostponeClick() {
         setShowPostponeRace(true);
@@ -131,7 +131,7 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
                 <label  className='w3-col m2' ><b>{updatedRace.name}</b></label>
                 {!showInRaceData ? <div className='w3-col m1 s6'>
                     <label htmlFor={'race-start-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >Start Time</label>
-                    <output id={'race-start-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{Clock.formatTime(race.plannedStartTime)}</output>
+                    <output id={'race-start-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{Clock.formatTime(race.currentStartTime)}</output>
                 </div>: null}
                 <div className='w3-col m1 s6'>
                     {race.type !== RaceType.PURSUIT ? <label htmlFor={'race-laps-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col w3-center' >Laps</label> : null}

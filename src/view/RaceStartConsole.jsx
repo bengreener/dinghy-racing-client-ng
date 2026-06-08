@@ -252,7 +252,7 @@ function RaceStartConsole ({ model, controller }) {
         const nextRaceToStart = sessionStartSequence?.getNextRaceToStart(new Date(timestamp));
         let countdown;
         if (nextRaceToStart) {
-            const timeLeft = nextRaceToStart.plannedStartTime.getTime() - model.getClock().getTimeToSecondPrecision();
+            const timeLeft = nextRaceToStart.currentStartTime.getTime() - model.getClock().getTimeToSecondPrecision();
             const playAudio = timeLeft <= 10000 && timeLeft > 0;
             countdown = <CountdownDisplayControl title={'Start Countdown'} message={nextRaceToStart.name} time={timeLeft} beep={playAudio} />;
         }
@@ -287,7 +287,7 @@ function RaceStartConsole ({ model, controller }) {
                         </fieldset>
                     <label htmlFor='race-select' className='w3-left w3-col' >Select DirectRace</label>
                     <select id='race-select' name='race' multiple={true} className='w3-col w3-third' onChange={handleRaceSelect} value={selectedRaces}>
-                        {Array.from(raceMap.values()).map(race => <option key={race.name + race.plannedStartTime.toISOString()} value={race.name} >{race.name}</option>)}
+                        {Array.from(raceMap.values()).map(race => <option key={race.name + race.currentStartTime.toISOString()} value={race.name} >{race.name}</option>)}
                     </select>
                     </div>
                 </form>
@@ -299,7 +299,7 @@ function RaceStartConsole ({ model, controller }) {
                     <SignalsPanel signals={signals} clock={model.getClock()} />
                 </CollapsableContainer>
                 <CollapsableContainer heading={'Races'}>
-                    {selectedRaces.map(raceName => raceMap.get(raceName)).toSorted((a, b) => a.plannedStartTime - b.plannedStartTime).map(race => {
+                    {selectedRaces.map(raceName => raceMap.get(raceName)).toSorted((a, b) => a.currentStartTime - b.currentStartTime).map(race => {
                         return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} model={model} controller={controller} showInRaceData={false} />
                     })}
                 </CollapsableContainer>

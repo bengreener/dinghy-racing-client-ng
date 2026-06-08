@@ -704,7 +704,7 @@ class SylphModel {
     }
 
     /**
-     * Gat a race
+     * Get a race
      * Don't know when this is called if return value wil be a direct or embedded race
      * @param {String} url 
      * @returns {<Promise<DirectRace | EmbeddedRace>>}
@@ -1332,13 +1332,14 @@ class SylphModel {
      * @param {Integer} plannedLaps
      * @param {RaceType} type
      * @param {StartType} startType
+     * @param {Integer} startTimeOffset in milliseconds
      * @returns {Promise<DirectRace>}
      * @throws {Error}
      */
-    async updateRace(race, name, plannedStartTime, fleet, duration, plannedLaps, type, startType) {
+    async updateRace(race, name, plannedStartTime, fleet, duration, plannedLaps, type, startType, startTimeOffset) {
         const updatedRace = {
             name: name, plannedStartTime:plannedStartTime, fleet: fleet.url, duration: duration / 1000, plannedLaps: plannedLaps,
-            type: type, startType: startType
+            type: type, startType: startType, startTimeOffset: startTimeOffset/ 1000
         };
         const result = await this._update(race.url, updatedRace);
         return new DirectRace(result.hal, result.metadata, this);

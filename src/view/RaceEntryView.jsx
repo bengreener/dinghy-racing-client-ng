@@ -113,7 +113,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
                 }    
             }
             else if (event.button === 0) {
-                if (!entry.finishedRace && !entry.scoringAbbreviation && entry.race.plannedStartTime < new Date()  && addLap) {
+                if (!entry.finishedRace && !entry.scoringAbbreviation && entry.race.currentStartTime < new Date()  && addLap) {
                     setDisabled(true);
                     result = await addLap(entry);
                 }

@@ -23,6 +23,13 @@ vi.mock('./clock');
 
 const model = new SylphModel(httpRootURL, wsRootURL);
 
+describe('when a start time offset has been set', () => {
+    it('returns the correct current start time', () => {
+        const directRace = new DirectRace({...raceScorpionAHAL, startTimeOffset: 'PT5M'}, {version: '"0"'}, model);
+        expect(directRace.currentStartTime).toEqual(new Date('2021-10-14T10:35:00Z'));
+    });
+});
+
 describe('when there is no lead entry', () => {
     it('returns 0 for leadEntryLapsSailed', () => {
         const directRace = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
@@ -34,4 +41,4 @@ describe('when there is no lead entry', () => {
 
         expect(directRace.leadEntryLastLapTime).toBeNull();
     });
-})
+});

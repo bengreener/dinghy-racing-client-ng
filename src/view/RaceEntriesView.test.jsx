@@ -23,7 +23,6 @@ import { httpRootURL, wsRootURL, raceGraduateAHAL, raceScorpionAHAL, entryChrisM
     signedUpChrisMarshallDinghy1234PursuitAHAL, signedUpJillMyerDinghy826PursuitAHAL, signedUpSarahPascalDinghy6745ScorpionAHAL,
     competitorChrisMarshallHAL
 } from '../model/__mocks__/test-data';
-// import { entriesGraduateA_bigData } from '../model/__mocks__/test-data-more-data';
 import DinghyRacingController from '../controller/sylph-controller';
 import Collection from '../model/collection';
 import Entry from '../model/entry';

@@ -3310,6 +3310,15 @@ describe('when a dinghy class is requested', () => {
 });
 
 describe('when updating a race', () => {
+    it('calls _update with correct parameters', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const _updateSpy = vi.spyOn(model, '_update').mockImplementation(() => vi.fn());
+        const newPlannedStartTime = new Date();
+        model.updateRace(new DirectRace(raceScorpionAHAL, {version: '"0"'}, model), 'Scorpion A', newPlannedStartTime, new Fleet(fleetScorpionHAL, {version: '"0"'}, model), 2700000, 5, RaceType.FLEET, StartType.CSCCLUBSTART, 300000);
+        
+        expect(_updateSpy).toHaveBeenCalledWith(raceScorpionAHAL._links.self.href, {name: 'Scorpion A', plannedStartTime: newPlannedStartTime, fleet: fleetScorpionHAL._links.self.href, duration: 2700, plannedLaps: 5,
+            type: RaceType.FLEET, startType: StartType.CSCCLUBSTART, startTimeOffset: 300});
+    });
     it('if all values provided then updates race', async () => {
         fetch.mockImplementationOnce(() => {
             return Promise.resolve({

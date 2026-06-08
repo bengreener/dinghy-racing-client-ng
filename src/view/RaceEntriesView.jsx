@@ -171,8 +171,8 @@ function RaceEntriesView({ races, controller, model }) {
                     }
                     const aLastLapTime = a.sumOfLapTimes ? a.sumOfLapTimes : 0;
                     const bLastLapTime = b.sumOfLapTimes ? b.sumOfLapTimes : 0;
-                    let aWeighted = (a.race.plannedStartTime.getTime() + aLastLapTime + ((a.race.duration / a.race.plannedLaps) * a.dinghy.dinghyClass.portsmouthNumber / 1000)) * aWeight;
-                    let bWeighted = (b.race.plannedStartTime.getTime() + bLastLapTime + ((b.race.duration / b.race.plannedLaps) * b.dinghy.dinghyClass.portsmouthNumber / 1000)) * bWeight;
+                    let aWeighted = (a.race.currentStartTime.getTime() + aLastLapTime + ((a.race.duration / a.race.plannedLaps) * a.dinghy.dinghyClass.portsmouthNumber / 1000)) * aWeight;
+                    let bWeighted = (b.race.currentStartTime.getTime() + bLastLapTime + ((b.race.duration / b.race.plannedLaps) * b.dinghy.dinghyClass.portsmouthNumber / 1000)) * bWeight;
                     
                     if (aWeighted < bWeighted) {
                         return -1;
@@ -218,7 +218,7 @@ function RaceEntriesView({ races, controller, model }) {
             return accumulator + initialValue.time;
         }, 0);
         try {
-            await controller.addLap(entry.entry, entry.race.clock.getElapsedTime(entry.race.plannedStartTime) - lapTimes);
+            await controller.addLap(entry.entry, entry.race.clock.getElapsedTime(entry.race.currentStartTime) - lapTimes);
             return true;
         }
         catch (error) {

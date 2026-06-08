@@ -32,6 +32,11 @@ class DirectRace extends Race {
     get clock() {
         return this.model.getClock();
     }
+
+    get currentStartTime() {
+        return new Date(this.plannedStartTime.valueOf() + this.model.convertISO8601DurationToMilliseconds(this.hal.startTimeOffset));
+
+    }
     
     get duration() {
         return this.model.convertISO8601DurationToMilliseconds(this.hal.duration);
@@ -73,6 +78,10 @@ class DirectRace extends Race {
 
     get type() {
         return this.hal.type;
+    }
+
+    get startTimeOffset() {
+        return this.model.convertISO8601DurationToMilliseconds(this.hal.startTimeOffset);
     }
 
     get startType() {

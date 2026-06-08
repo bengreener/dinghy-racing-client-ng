@@ -53,7 +53,7 @@ const fleetsCollectionHAL = { '_embedded': { 'fleets': [ fleetCometHAL, fleetGra
 }}, 'page': { 'size': 20, 'totalElements': 1, 'totalPages': 1, 'number': 0 } };
 
 const raceCometAHAL = {
-	name: 'Comet A', plannedStartTime: '2021-10-14T10:40:00', duration: 'PT45M', type: 'FLEET', plannedLaps: 4, startType: 'CSCCLUBSTART', 
+	name: 'Comet A', plannedStartTime: '2021-10-14T10:40:00', "startTimeOffset": "PT0S", duration: 'PT45M', type: 'FLEET', plannedLaps: 4, startType: 'CSCCLUBSTART', 
     lapForecast: 4.0, leadEntry: null, _links: {
 		self: {href: 'http://localhost:8081/dinghyracing/api/directRaces/17' }, 
 		directRace: {href: 'http://localhost:8081/dinghyracing/api/directRaces/17' }, 
@@ -62,7 +62,7 @@ const raceCometAHAL = {
 	} 
 };
 const raceGraduateAHAL = {
-	name: 'Graduate A', plannedStartTime: '2021-10-14T10:35:00', duration: 'PT45M', type: 'FLEET', plannedLaps: 4, startType: 'CSCCLUBSTART', 
+	name: 'Graduate A', plannedStartTime: '2021-10-14T10:35:00', "startTimeOffset": "PT0S", duration: 'PT45M', type: 'FLEET', plannedLaps: 4, startType: 'CSCCLUBSTART', 
     lapForecast: 4.0, leadEntry: null, _links: {
 		self: {href: 'http://localhost:8081/dinghyracing/api/directRaces/7' }, 
 		directRace: {href: 'http://localhost:8081/dinghyracing/api/directRaces/7' }, 
@@ -71,7 +71,7 @@ const raceGraduateAHAL = {
 	} 
 };
 const raceHandicapAHAL = {
-	name: 'Handicap A', plannedStartTime:'2021-10-14T10:45:00', duration: 'PT45M', type: 'FLEET', plannedLaps: 5, startType: 'CSCCLUBSTART', 
+	name: 'Handicap A', plannedStartTime:'2021-10-14T10:45:00', "startTimeOffset": "PT0S", duration: 'PT45M', type: 'FLEET', plannedLaps: 5, startType: 'CSCCLUBSTART', 
     lapForecast: 5.0, leadEntry: null, _links:{
 		self:{href:'http://localhost:8081/dinghyracing/api/directRaces/8'},
 		directRace:{href:'http://localhost:8081/dinghyracing/api/directRaces/8'},
@@ -80,7 +80,7 @@ const raceHandicapAHAL = {
 	}
 };
 const raceScorpionAHAL = { 
-	name : 'Scorpion A', plannedStartTime : '2021-10-14T10:30:00', duration: 'PT45M', type: 'FLEET', plannedLaps: 5, startType: 'CSCCLUBSTART', 
+	name : 'Scorpion A', plannedStartTime : '2021-10-14T10:30:00', "startTimeOffset": "PT0S", duration: 'PT45M', type: 'FLEET', plannedLaps: 5, startType: 'CSCCLUBSTART', 
 	lapForecast: 5.0, leadEntry: null, _links : { 
         self : { href : 'http://localhost:8081/dinghyracing/api/directRaces/4' }, 
         directRace: { href : 'http://localhost:8081/dinghyracing/api/directRaces/4' }, 
@@ -88,7 +88,7 @@ const raceScorpionAHAL = {
         fleet : { href :  'http://localhost:8081/dinghyracing/api/races/4/fleet' }
     } 
 };
-const racePursuitAHAL = {name: 'Pursuit A', plannedStartTime:'2021-10-14T10:45:00', duration: 'PT45M', type: 'PURSUIT', plannedLaps: 5, startType: 'RRS26',
+const racePursuitAHAL = {name: 'Pursuit A', plannedStartTime:'2021-10-14T10:45:00', "startTimeOffset": "PT0S", duration: 'PT45M', type: 'PURSUIT', plannedLaps: 5, startType: 'RRS26',
     lapForecast: 5.0, leadEntry: null, _links:{
         self:{href:'http://localhost:8081/dinghyracing/api/directRaces/9'},
         directRace:{href:'http://localhost:8081/dinghyracing/api/directRaces/9'},

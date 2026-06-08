@@ -33,4 +33,4 @@ it('returns next race to start', async () => {
     const sessionStartSequence = new SessionStartSequence([raceHandicap, raceScorpion], model.getClock());
 
     expect(sessionStartSequence.getNextRaceToStart(new Date())).toEqual(raceScorpion);
-})
+});

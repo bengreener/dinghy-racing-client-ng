@@ -240,7 +240,7 @@ class SylphController {
             throw new Error('Cannot postpone start after an entry has sailed a lap.');
         }
         const fleet = await race.getFleet();
-        return this.model.updateRace(race, race.name, new Date(race.plannedStartTime.getTime() + duration), fleet, race.duration, race.plannedLaps, race.type, race.startType);
+        return this.model.updateRace(race, race.name, race.plannedStartTime, fleet, race.duration, race.plannedLaps, race.type, race.startType, duration);
     }
 
     /**
