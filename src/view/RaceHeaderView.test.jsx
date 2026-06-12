@@ -30,15 +30,21 @@ vi.mock('@stomp/stompjs');
 HTMLDialogElement.prototype.showModal = vi.fn();
 HTMLDialogElement.prototype.close = vi.fn();
 
+beforeAll(() => {
+    vi.useFakeTimers();
+});
+
 beforeEach(() => {
     vi.resetAllMocks();
-    vi.useFakeTimers();
 });
 
 afterEach(async () => {
     await act(async () => {
         vi.runOnlyPendingTimers();
     });
+});
+
+afterAll(() => {
     vi.useRealTimers();
 });
 
@@ -320,14 +326,13 @@ it('updates values when a new race is selected', async () => {
 });
 
 describe('when postpone race button clicked', () => {
-    it('displays postpone race dialog', () => {
-        const user = userEvent.setup();
+    it('displays postpone race dialog', async () => {
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:25:00Z'));
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
-        render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 60000)}, {version: '"0"'}, model)} />);
-        act(() => {
-            user.click(screen.getByRole('button', {'name': /postpone start/i}));
-        });
+        render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
+        await user.click(screen.getByRole('button', {'name': /postpone start/i}));
         const dialog = within(screen.getByTestId('postpone-race-dialog'));
         expect(dialog.getByRole('spinbutton', {'name': /delay/i, 'hidden': true})).toBeInTheDocument();
         expect(dialog.getByRole('button', {'name': /cancel/i, 'hidden': true})).toBeInTheDocument();
@@ -360,15 +365,13 @@ describe('when race has started and an entry has sailed a lap', () => {
 });
 
 describe('when restart race button clicked', () => {
-    it('displays postpone race dialog', () => {
-        const user = userEvent.setup();
+    it('displays postpone race dialog', async () => {
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
         vi.setSystemTime(new Date('2021-10-14T10:35:00Z'));
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
         render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
-        act(() => {
-            user.click(screen.getByRole('button', {'name': /restart/i}));
-        });
+        await user.click(screen.getByRole('button', {'name': /restart/i}));
         const dialog = within(screen.getByTestId('postpone-race-dialog'));
         expect(dialog.getByRole('spinbutton', {'name': /delay/i, 'hidden': true})).toBeInTheDocument();
         expect(dialog.getByRole('button', {'name': /cancel/i, 'hidden': true})).toBeInTheDocument();
@@ -379,16 +382,15 @@ describe('when restart race button clicked', () => {
 describe('when start now button clicked', () => {
     it('starts race', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:25:00Z'));
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
         const startRaceSpy = vi.spyOn(controller, 'startRace');
         await act(async () => {
-            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
         });
         const startRaceButton = screen.getByRole('button', {'name': /start now/i});
-        await act(async () => {
-            user.click(startRaceButton);
-        });
+        await user.click(startRaceButton);
         
         expect(startRaceSpy).toHaveBeenCalled();
     });
@@ -397,16 +399,15 @@ describe('when start now button clicked', () => {
 describe('when shorten course button clicked', () => {
     it('displays shorten course dialog', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
         await act(async () => {
-            // render(<RaceHeaderView race={ {...raceScorpionA, 'plannedStartTime': new Date(Date.now() + 10000), 'clock': new Clock(new Date(Date.now() + 10000))} } />, model, controller);
-            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() - 10000)}, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
         });
         
-        await act(async () => {
-            user.click(screen.getByRole('button', {'name': /shorten course/i}));
-        });
+        await user.click(screen.getByRole('button', {'name': /shorten course/i}));
+        
         const dialog = within(screen.getByTestId('shorten-course-dialog'));
         expect(dialog.getByRole('spinbutton', {'name': /laps/i, 'hidden': true})).toBeInTheDocument();
         expect(dialog.getByRole('button', {'name': /cancel/i, 'hidden': true})).toBeInTheDocument();
@@ -421,15 +422,14 @@ describe('when lap sheet button clicked', () => {
             pathname: ''
         });
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:25:00Z'));
         const openSpy = vi.spyOn(window, 'open').mockImplementation(vi.fn());
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
         await act(async () => {
-            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, 'plannedStartTime': new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
         });
-        await act(async () => {
-            user.click(screen.getByRole('button', {name: /lap sheet/i}));
-        });
+        await user.click(screen.getByRole('button', {name: /lap sheet/i}));
         expect(openSpy).toBeCalledWith('http://localhost/lap-sheet/4');
     });
 });
