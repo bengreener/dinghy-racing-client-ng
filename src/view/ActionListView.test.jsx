@@ -30,13 +30,19 @@ const formatOptions = {
 };
 const timeFormat = new Intl.DateTimeFormat('utc', formatOptions);
 
-beforeEach(() => {
+beforeAll(() => {
     vi.useFakeTimers();
 });
 
-afterEach(() => {
-    vi.useRealTimers();
+afterEach(async () => {
+    await act(async () => {
+        vi.runOnlyPendingTimers();
+    });
 });
+
+afterAll(() => {
+    vi.useRealTimers();
+})
 
 it('renders', () => {
     act(() => {
