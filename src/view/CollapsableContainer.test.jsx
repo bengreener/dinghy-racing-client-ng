@@ -48,7 +48,8 @@ describe('when hide button clicked', () => {
         const buttonHide = screen.getByRole('button', {'name': /hide/i});
         await act(async () => {
             await user.click(buttonHide);
-        });expect(screen.queryByText(/hello/i, {hidden: true})).not.toBeVisible();
+        });
+        expect(screen.queryByText(/hello/i, {hidden: true})).not.toBeVisible();
         expect(screen.queryByText(/world/i, {hidden: true})).not.toBeVisible();
     });
     it('changes label on hide button to show', async () => {

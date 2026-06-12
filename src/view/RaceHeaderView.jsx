@@ -29,7 +29,7 @@ import RaceType from '../model/race-type';
  * @returns {HTMLDivElement}
  */
 function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
-    const [updatedRace, setUpdatedRace] = useState(race); // used to get current lead entry information for race after a lap recorded. May not reflect chnages to planned start time or planned laps
+    const [updatedRace, setUpdatedRace] = useState(race); // used to get current lead entry information for race after a lap recorded. May not reflect changes to planned start time or planned laps
     const [elapsedTime, setElapsedTime] = useState(model.getClock().getElapsedTime(race.currentStartTime));
     const [message, setMessage] = useState('');
     const [showPostponeRace, setShowPostponeRace] = useState(false);
@@ -57,7 +57,6 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
         }
     }, [race.type]);
     
-
     const handleRaceEntryLapsUpdate = useCallback(() => {
         model.getRace(race.url).then(result => {
             setUpdatedRace(result);
@@ -178,13 +177,13 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
                 </div>
             </div>
             <p className={userMessageClasses()}>{message}</p>
-            <ModalDialog show={showPostponeRace} onClose={() => setShowPostponeRace(false)} testid={'postpone-race-dialog'} >
-                <PostponeRaceForm race={updatedRace} onPostpone={controller.postponeRace} closeParent={closePostponeRaceFormDialog} />
-            </ModalDialog>
-            <ModalDialog show={showShortenCourse} onClose={closeShortenCourseDialog} testid={'shorten-course-dialog'}>
+            {showPostponeRace ? <ModalDialog show={showPostponeRace} onClose={() => setShowPostponeRace(false)} testid={'postpone-race-dialog'} >
+                <PostponeRaceForm race={race} onPostpone={controller.postponeRace} closeParent={closePostponeRaceFormDialog} />
+            </ModalDialog> : null}
+            {showShortenCourse ? <ModalDialog show={showShortenCourse} onClose={closeShortenCourseDialog} testid={'shorten-course-dialog'}>
                 {showInRaceData ? <AdjustCourseForm race={updatedRace} minLaps={Math.max(1, updatedRace.leadEntryLapsSailed)} maxLaps={updatedRace.plannedLaps - 1} initialValue={Math.max(1, updatedRace.plannedLaps - 1)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} /> :
-                    <AdjustCourseForm race={updatedRace} minLaps={Math.max(1, updatedRace.leadEntryLapsSailed)} initialValue={Math.max(1, updatedRace.plannedLaps)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} />}
-            </ModalDialog>
+                    <AdjustCourseForm race={race} minLaps={Math.max(1, updatedRace.leadEntryLapsSailed)} initialValue={Math.max(1, updatedRace.plannedLaps)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} />}
+            </ModalDialog> : null}
         </div>
     );
 }

@@ -35,7 +35,6 @@ class DirectRace extends Race {
 
     get currentStartTime() {
         return new Date(this.plannedStartTime.valueOf() + this.model.convertISO8601DurationToMilliseconds(this.hal.startTimeOffset));
-
     }
     
     get duration() {
