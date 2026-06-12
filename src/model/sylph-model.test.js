@@ -58,17 +58,23 @@ global.fetch = vi.fn();
 vi.mock('./clock');
 vi.mock('@stomp/stompjs');
 
-beforeEach(() => {
-    fetch.mockClear();
+beforeAll(() => {
     vi.useFakeTimers();
-    vi.clearAllMocks();
+});
+
+beforeEach(() => {
     vi.restoreAllMocks();
 });
 
-afterEach(() => {
-    // vi.runOnlyPendingTimers();
+// running pending timers results in timeouts possibly due to mock clock ticking away in the background :-/
+// afterEach(() => {
+//     vi.runOnlyPendingTimers();
+// });
+
+afterAll(() => {
+    vi.runOnlyPendingTimersAsync();
     vi.useRealTimers();
-})
+});
 
 describe('when creating a new object via REST', () => {
     it('calls fetch with correct body and headers', async () => {
@@ -3528,7 +3534,7 @@ describe('when updating the last lap for an entry in a race', () => {
 
 describe('when a StartSequence is requested', () => {
     it('returns a promise that resolves to a success containing a StartSequence for the races between the start and end times', async () => {
-        vi.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
+        vi.setSystemTime(new Date('2021-10-14T10:10:00Z'));
         const model = new SylphModel(httpRootURL, wsRootURL);
         vi.spyOn(model, 'getFleet').mockImplementation((url) => {
             switch (url) {
@@ -3596,15 +3602,12 @@ describe('when a StartSequence is requested', () => {
         expect(promise).toBeInstanceOf(Promise);
         expect(signals.length).toBe(10);
         expect(signals).toEqual(expect.arrayContaining([scorpionWarningSignal, preparatorySignal, graduateWarningSignal, scorpionStartSignal, cometWarningSignal, graduateStartSignal, handicapWarningSignal, endSequenceSignal, cometStartSignal, handicapStartSignal]));
-
-        vi.runOnlyPendingTimers();
-        vi.useRealTimers();
     });
     describe('when race is a pursuit race', () => {
         describe('when race is an open handicap', () => {
             it('provides the base class to be used for the fleet when calculating start offsets', async () => {
                 // open handicap is defined as a fleet with no explicit classes set and RaceStartSequence needs a base class to caclculate offsets so additional action is required by SylphModel to supply this class
-                vi.useFakeTimers().setSystemTime(new Date('2021-10-14T10:10:00Z'));
+                vi.setSystemTime(new Date('2021-10-14T10:10:00Z'));
                 const dinghyClassOptimistHAL = {name: 'Optimist (Club)', crewSize: 1, portsmouthNumber: 1835, externalName: null, '_links': { 'self': { 'href': 'http://localhost:8081/dinghyracing/api/dinghyClasses/31' }, 'dinghyClass': { 'href': 'http://localhost:8081/dinghyracing/api/dinghyClasses/31' } } };
                 const model = new SylphModel(httpRootURL, wsRootURL);
                 vi.spyOn(model, 'getFleet').mockImplementation((url) => {
@@ -3658,9 +3661,6 @@ describe('when a StartSequence is requested', () => {
 
                 expect(signals).toHaveLength(6);
                 expect(signals).toEqual(expect.arrayContaining([handicapWarningSignal, preparatorySignal, oneMinuteSignal, handicapStartSignal, cometStartSignal, scorpionStartSignal]));
-                        
-                vi.runOnlyPendingTimers();
-                vi.useRealTimers();
             });
         });
     });
@@ -3929,7 +3929,7 @@ describe('when a websocket message callback has been set for competitor creation
         const callback = vi.fn();
         model.registerCompetitorCreationCallback(callback);
         vi.advanceTimersByTime(1);
-        expect(callback).toBeCalled();
+        expect(callback).toHaveBeenCalled();
     });
     it('does not set another reference to the same callback', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -4023,7 +4023,7 @@ describe('when a websocket message callback has been set for entry creation', ()
         const callback = vi.fn();
         model.registerEntryCreationCallback(callback);
         vi.advanceTimersByTime(1);
-        expect(callback).toBeCalled();
+        expect(callback).toHaveBeenCalled();
     });
     it('does not set another reference to the same callback', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -4258,7 +4258,7 @@ describe('when a websocket message callback has been set for dinghy creation', (
         const callback = vi.fn();
         model.registerDinghyCreationCallback(callback);
         vi.advanceTimersByTime(1);
-        expect(callback).toBeCalled();
+        expect(callback).toHaveBeenCalled();
     });
     it('does not set another reference to the same callback', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -4305,7 +4305,7 @@ describe('when a websocket message callback has been set for dinghy class creati
         const callback = vi.fn();
         model.registerDinghyClassCreationCallback(callback);
         vi.advanceTimersByTime(1);
-        expect(callback).toBeCalled();
+        expect(callback).toHaveBeenCalled();
     });
     it('does not set another reference to the same callback', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -4352,7 +4352,7 @@ describe('when a websocket message callback has been set for dinghy class update
         const callback = vi.fn();
         model.registerDinghyClassUpdateCallback('http://localhost:8081/dinghyracing/api/dinghyClasses/1', callback);
         vi.advanceTimersByTime(1);
-        expect(callback).toBeCalled();
+        expect(callback).toHaveBeenCalled();
     });
     it('does not set another reference to the same callback', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -4399,7 +4399,7 @@ describe('when a websocket message callback has been set for fleet creation', ()
         const callback = vi.fn();
         model.registerFleetCreationCallback(callback);
         vi.advanceTimersByTime(1);
-        expect(callback).toBeCalled();
+        expect(callback).toHaveBeenCalled();
     });
     it('does not set another reference to the same callback', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -4446,7 +4446,7 @@ describe('when a websocket message callback has been set for fleet update', () =
         const callback = vi.fn();
         model.registerFleetUpdateCallback('http://localhost:8081/dinghyracing/api/fleet/1', callback);
         vi.advanceTimersByTime(1);
-        expect(callback).toBeCalled();
+        expect(callback).toHaveBeenCalled();
     });
     it('does not set another reference to the same callback', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
