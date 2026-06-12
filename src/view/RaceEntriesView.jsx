@@ -211,6 +211,7 @@ function RaceEntriesView({ races, controller, model }) {
     /**
      * Add a lap to an entry in a race
      * @param {SynchronousEntry} entry
+     * @returns {Boolean}
      */
     async function addLap(entry) {
         const lapTimes = entry.laps.entities.reduce((accumulator, initialValue) => {

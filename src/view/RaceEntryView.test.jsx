@@ -111,8 +111,9 @@ it('displays position', () => {
 });
 
 describe('before race has started', () => {
-    it('calls addLap callback with entry', async () => {
+    it('does not allow a lap to be added to an entry', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:25:00Z'));
         const addLapCallback = vi.fn();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
@@ -125,17 +126,15 @@ describe('before race has started', () => {
         );
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
-        user.click(SMScorp1234entry);
-        // wait for async function in RaceEntryView
-        await vi.waitFor(async () => {
-            expect(addLapCallback).not.toBeCalledWith(entryChrisMarshallScorpionA1234);
-        });
+        await user.click(SMScorp1234entry);
+        expect(addLapCallback).not.toBeCalledWith(entryChrisMarshallScorpionA1234);
     });
 });
 
 describe('after race has started', () => {
     it('calls addLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
         const addLapCallback = vi.fn();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const entry = new SynchronousEntry(
@@ -148,17 +147,15 @@ describe('after race has started', () => {
         );
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
-        user.click(SMScorp1234entry);
-        // wait for async function in RaceEntryView
-        await vi.waitFor(async () => {
-            expect(addLapCallback).toBeCalledWith(entry);
-        });
+        await user.click(SMScorp1234entry);
+        expect(addLapCallback).toBeCalledWith(entry);
     });
 });
 
 describe('when a lap is removed from an entry', () => {
     it('calls removeLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
         const removeLapCallback = vi.fn();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const entry = new SynchronousEntry(
@@ -172,13 +169,12 @@ describe('when a lap is removed from an entry', () => {
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         user.keyboard('{Control>}');
-        await act(async () => {
-            user.click(SMScorp1234entry);
-        });
+        await user.click(SMScorp1234entry);
         expect(removeLapCallback).toBeCalledWith(entry);
     });
     it('updates the display to show the delete lap instruction has been sent to the server', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
         const removeLapCallback = vi.fn(async () => true);
         const model = new SylphModel(httpRootURL, wsRootURL);
         const entry = new SynchronousEntry(
@@ -192,14 +188,13 @@ describe('when a lap is removed from an entry', () => {
         render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         user.keyboard('{Control>}');
-        await act(async () => {
-            user.click(SMScorp1234entry);
-        });
+        await user.click(SMScorp1234entry);
         expect(screen.getByText((content, node) => /^Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).toMatch(/disabled/i);
     });
     describe('when lap removal fails', () => {
         it('entry view is enabled to accept input', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+            vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
             const removeLapCallback = vi.fn(async () => false);
             const model = new SylphModel(httpRootURL, wsRootURL);
             const entry = new SynchronousEntry(
@@ -213,9 +208,7 @@ describe('when a lap is removed from an entry', () => {
             render(<RaceEntryView entry={entry} removeLap={removeLapCallback} />);
             const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
             user.keyboard('{Control>}');
-            await act(async () => {
-                user.click(SMScorp1234entry);
-            });
+            await user.click(SMScorp1234entry);
             await (act(async () => {}));
             expect(screen.getByText((content, node) => /^Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET$/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).not.toMatch(/disabled/i);
         });
@@ -226,6 +219,7 @@ describe('when secondary mouse button is clicked', () => {
     describe('when a lap has been recorded for the entry', () => {
         it('accepts a new lap time input in the last field of the row', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+            vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
             const model = new SylphModel(httpRootURL, wsRootURL);
             const entry = new SynchronousEntry(
                 new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
@@ -241,12 +235,12 @@ describe('when secondary mouse button is clicked', () => {
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
             await act(async () => {
-                user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+                await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
             });
             const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
             await act(async () => {
-                user.clear(lapEntryCellInput);
-                user.type(lapEntryCellInput, '00:15');
+                await user.clear(lapEntryCellInput);
+                await user.type(lapEntryCellInput, '00:15');
             });
             expect(lapEntryCellInput).toHaveValue('00:15');
         });
@@ -254,6 +248,7 @@ describe('when secondary mouse button is clicked', () => {
     describe('when a lap has not been recorded for the entry', () => {
         it('does not enter edit mode and accepts a lap time via left click', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+            vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
             const addLapCallback = vi.fn();
             const model = new SylphModel(httpRootURL, wsRootURL);
             const entry = new SynchronousEntry(
@@ -266,10 +261,8 @@ describe('when secondary mouse button is clicked', () => {
             );
             render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
-            user.pointer({target: raceEntryView, keys: '[MouseRight]'});
-            await act(async () => {
-                user.click(raceEntryView);
-            });
+            await user.pointer({target: raceEntryView, keys: '[MouseRight]'});
+            await user.click(raceEntryView);
             expect(addLapCallback).toBeCalledWith(entry);
         });
     });
@@ -278,6 +271,7 @@ describe('when secondary mouse button is clicked', () => {
 describe('when editing a lap time', () => {
     it('does not add new lap when primary button clicked', async () => { 
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
         const addLapCallback = vi.fn();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const entry = new SynchronousEntry(
@@ -291,16 +285,13 @@ describe('when editing a lap time', () => {
         render(<RaceEntryView entry={entry} addLap={addLapCallback} updateLap={vi.fn()} />);
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
-        await act(async () => {
-            user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
-        });
-        await act(async () => {
-            user.click(lapEntryCellOutput);
-        });
+        await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+        await user.click(lapEntryCellOutput);
         expect(addLapCallback).not.toHaveBeenCalled();
     });
     it('does not remove last lap when ctrl+primary button clicked', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
         const removeLapCallback = vi.fn();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const entry = new SynchronousEntry(
@@ -314,16 +305,15 @@ describe('when editing a lap time', () => {
         render(<RaceEntryView entry={entry} updateLap={vi.fn()} removeLap={removeLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         const lastCell = within(SMScorp1234entry).getByText('00:06');
-        user.pointer({target: lastCell, keys: '[MouseRight]'});
-        await act(async () => {
-            user.keyboard('{Control>}');
-            user.click(lastCell);
-        });
+        await user.pointer({target: lastCell, keys: '[MouseRight]'});
+        await user.keyboard('{Control>}');
+        await user.click(lastCell);
         expect(removeLapCallback).not.toHaveBeenCalled();
     });
     describe('when lap time has not changed', () => {
         it('does not update lap time', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+            vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
             const updateLapCallback = vi.fn();
             const model = new SylphModel(httpRootURL, wsRootURL);
             const entry = new SynchronousEntry(
@@ -338,13 +328,13 @@ describe('when editing a lap time', () => {
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
             await act(async () => {
-                user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+                await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
             });
             const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
             await act(async () => {
-                user.clear(lapEntryCellInput);
-                user.type(lapEntryCellInput, '0:06');
-                user.keyboard('{Enter}');
+                await user.clear(lapEntryCellInput);
+                await user.type(lapEntryCellInput, '0:06');
+                await user.keyboard('{Enter}');
             });
             expect(updateLapCallback).not.toHaveBeenCalled();
             expect(raceEntryView.getAttribute('class')).not.toMatch(/disabled/i);
@@ -352,6 +342,7 @@ describe('when editing a lap time', () => {
     });
     it('updates lap with new time supplied', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
         const model = new SylphModel(httpRootURL, wsRootURL);
         const updateLapCallback = vi.fn();
         const entry = new SynchronousEntry(
@@ -365,22 +356,17 @@ describe('when editing a lap time', () => {
         render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
         const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
-        await act(async () => {
-            user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
-        });
+        await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
         
         const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
-        await act(async () => {
-            user.clear(lapEntryCellInput);
-            user.type(lapEntryCellInput, '15:53');
-        });
-        user.keyboard('{Enter}');
-        await vi.waitFor(async () => {
-            expect(updateLapCallback).toBeCalledWith(entry, 953000);
-        });
+        await user.clear(lapEntryCellInput);
+        await user.type(lapEntryCellInput, '15:53');
+        await user.keyboard('{Enter}');
+        expect(updateLapCallback).toBeCalledWith(entry, 953000);
     });
     it('updates the display to show the edited lap time is being sent to the server', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
         const updateLapCallback = vi.fn(async (entry, value) => {return true});
         const model = new SylphModel(httpRootURL, wsRootURL);
         const entry = new SynchronousEntry(
@@ -410,6 +396,7 @@ describe('when editing a lap time', () => {
     describe('when lap update fails', () => {
         it('entry view is enabled to accept input', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+            vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
             const updateLapCallback = vi.fn((entry, value) => {return false});
             const model = new SylphModel(httpRootURL, wsRootURL);
             const entry = new SynchronousEntry(
@@ -420,26 +407,22 @@ describe('when editing a lap time', () => {
                 new Collection([new Lap({number: 1, time: 'PT0M06S'}, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0,number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
             );
-            await act(async () => {
-                render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
-            });
+            render(<RaceEntryView entry={entry} updateLap={updateLapCallback} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall100:06OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
-            await act(async () => {
-                user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
-            });
+            await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
             const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
-            await act(async () => {
-                user.clear(lapEntryCellInput);
-                user.type(lapEntryCellInput, '15:53');
-                user.keyboard('{Enter}');
-            });
+            await user.clear(lapEntryCellInput);
+            await user.type(lapEntryCellInput, '15:53');
+            await user.keyboard('{Enter}');
+            await act(async () => {});
             expect(raceEntryView.getAttribute('class')).not.toMatch(/disabled/i);
         });
     });
     describe('when the new lap time is entered in an invalid format', () => {
         it('does not accept the incorrect format and keeps edit mode open', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+            vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
             const model = new SylphModel(httpRootURL, wsRootURL);
             const entry = new SynchronousEntry(
                 new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
@@ -452,19 +435,18 @@ describe('when editing a lap time', () => {
             render(<RaceEntryView entry={entry} updateLap={vi.fn()} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall100:06OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
-            await act(async () => {
-                user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
-            });
+            await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
             const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
             await act(async () => {
-                user.clear(lapEntryCellInput);
-                user.type(lapEntryCellInput, '15530');
-                user.keyboard('{Enter}');
+                await user.clear(lapEntryCellInput);
+                await user.type(lapEntryCellInput, '15530');
+                await user.keyboard('{Enter}');
             });
             expect(lapEntryCellInput).toHaveValue('15530');
         });
         it('calls showUserMessage prop with message explainging error', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+            vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
             const showUserMessage = vi.fn();
             const model = new SylphModel(httpRootURL, wsRootURL);
             const entry = new SynchronousEntry(
@@ -479,13 +461,13 @@ describe('when editing a lap time', () => {
             const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'}).parentElement.parentElement;
             const lapEntryCellOutput = within(raceEntryView).getByText('00:06');
             await act(async () => {
-                user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
+                await user.pointer({target: lapEntryCellOutput, keys: '[MouseRight]'});
             });
             const lapEntryCellInput = within(raceEntryView).getByRole('textbox', '00:06');
             await act(async () => {
-                user.clear(lapEntryCellInput);
-                user.type(lapEntryCellInput, '15530');
-                user.keyboard('{Enter}');
+                await user.clear(lapEntryCellInput);
+                await user.type(lapEntryCellInput, '15530');
+                await user.keyboard('{Enter}');
             });
             expect(showUserMessage).toHaveBeenCalledWith('Time must be in the format [hh:][mm:]ss.');
         });
@@ -495,6 +477,7 @@ describe('when editing a lap time', () => {
 describe('when user taps row', () => {
     it('calls addLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
         const addLapCallback = vi.fn();
         const model = new SylphModel(httpRootURL, wsRootURL);
         const entry = new SynchronousEntry(
@@ -507,14 +490,13 @@ describe('when user taps row', () => {
         );
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
-        await act(async () => {
-            user.pointer([{keys: '[TouchA]', target: SMScorp1234entry}]);
-        });
+        await user.pointer([{keys: '[TouchA]', target: SMScorp1234entry}]);
         expect(addLapCallback).toBeCalledWith(entry);
     });
     describe('when add lap fails', () => {
         it('entry view is enabled to accept input', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+            vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
             const addLapCallback = vi.fn(() => {return false});
             const model = new SylphModel(httpRootURL, wsRootURL);
             const entry = new SynchronousEntry(
@@ -528,9 +510,7 @@ describe('when user taps row', () => {
             let container;
             ({ container } = render(<RaceEntryView entry={entry} addLap={addLapCallback} />));
             const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
-            await act(async () => {
-                user.pointer([{keys: '[TouchA]', target: SMScorp1234entry}]);
-            });
+            await user.pointer([{keys: '[TouchA]', target: SMScorp1234entry}]);
             await act(async () => {});
             const raceEntryView = container.getElementsByClassName('race-entry-view')[0];
             expect(raceEntryView.getAttribute('class')).not.toMatch(/disabled/i);
@@ -541,6 +521,7 @@ describe('when user taps row', () => {
 describe('when user taps and holds on row', () => {
     it('accepts a new lap time input in the last field of the row', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
         const model = new SylphModel(httpRootURL, wsRootURL);
         const entry = new SynchronousEntry(
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
@@ -572,6 +553,7 @@ describe('when user taps and holds on row', () => {
 describe('when user swipes left on row', () => {
     it.skip('calls removeLap callback with entry', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
         const entry = {...entryChrisMarshallScorpionA1234, 'laps': [
             {...SylphModel.lapTemplate(), number: 1, time: 1000},
             {...SylphModel.lapTemplate(), number: 2, time: 2000},
@@ -583,7 +565,7 @@ describe('when user swipes left on row', () => {
         const position1 = SMScorp1234entry.parentElement.children[3];
         const position2 = SMScorp1234entry.parentElement.children[2];
         await act(async () => {
-            user.pointer([{target: position1, coords: {x: 100, y: 100}, keys: '[TouchA>]'}, 
+            await user.pointer([{target: position1, coords: {x: 100, y: 100}, keys: '[TouchA>]'}, 
                 {target:position2, coords: {x: 80, y: 100}, keys: '[TouchA]'}, {keys: '[/TouchA]'}]);
         });
         expect(removeLapCallback).toBeCalledWith(entry);
@@ -690,9 +672,7 @@ describe('when a scoring abbreviation is selected', () => {
         );
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
         const selectSA = screen.getByRole('combobox');
-        await act(async() => {
-            user.selectOptions(selectSA, 'DNS');
-        });
+            await user.selectOptions(selectSA, 'DNS');
         expect(setScoringAbbreviationSpy).toHaveBeenCalledWith(entryChrisMarshallScorpionA1234, 'DNS');
     });
     it('updates the display to show a scoring abbreviation is being sent to the server', async () => {
@@ -709,9 +689,7 @@ describe('when a scoring abbreviation is selected', () => {
         );
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
         const selectSA = screen.getByRole('combobox');
-        await act(async () => {
-            user.selectOptions(selectSA, 'DNS');
-        });
+        await user.selectOptions(selectSA, 'DNS');
         expect(screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).toMatch(/disabled/i);
     });
     describe('when adding scoring abbreviation fails', () => {
@@ -729,7 +707,8 @@ describe('when a scoring abbreviation is selected', () => {
             );
             render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
             const selectSA = screen.getByRole('combobox');
-            user.selectOptions(selectSA, 'DNS');
+            await user.selectOptions(selectSA, 'DNS');
+            await act(async () => {});
             expect(screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).not.toMatch(/disabled/i);
         });
     });
@@ -775,7 +754,8 @@ describe('when a scoring abbreviation is selected', () => {
                 new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
                 new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
-            );render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
+            );
+            render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/disqualified/i);
         });
@@ -790,7 +770,8 @@ describe('when a scoring abbreviation is selected', () => {
                 new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
                 new Collection([], {size: 20, totalElements: 0, totalPages: 0, number: 0}),
                 new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
-            );render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
+            );
+            render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
             expect(raceEntryView.getAttribute('class')).toMatch(/did-not-compete/i);
         });
@@ -832,6 +813,7 @@ describe('when a scoring abbreviation is selected', () => {
 describe('when the entry is selected to add a new lap', () => {
     it('updates the display to show it has been selected', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
         const model = new SylphModel(httpRootURL, wsRootURL);
         const entry = new SynchronousEntry(
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
@@ -844,13 +826,12 @@ describe('when the entry is selected to add a new lap', () => {
         const addLapCallback = vi.fn(() => {return true});
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const raceEntryView = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
-        await act(async () => {
-            user.click(raceEntryView);
-        });
+        await user.click(raceEntryView);
         expect(screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view')).getAttribute('class')).toMatch(/disabled/i);
     });
     it('does not allow user to immediately add another lap time', async () => {
         const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
         const model = new SylphModel(httpRootURL, wsRootURL);
         const entry = new SynchronousEntry(
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
@@ -864,17 +845,18 @@ describe('when the entry is selected to add a new lap', () => {
         render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
         const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
         await act(async () => {
-            user.click(SMScorp1234entry);
+            await user.click(SMScorp1234entry);
         });
         expect(addLapCallback).toHaveBeenCalledTimes(1);
         await act(async () => {
-            user.click(SMScorp1234entry);
+            await user.click(SMScorp1234entry);
         });
         expect(addLapCallback).toHaveBeenCalledTimes(1);
     });
     describe('when add lap fails', () => {
         it('entry view is enabled to accept input', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+            vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
             const model = new SylphModel(httpRootURL, wsRootURL);
             const entry = new SynchronousEntry(
                 new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
@@ -888,7 +870,8 @@ describe('when the entry is selected to add a new lap', () => {
             let container;
             ({ container } = render(<RaceEntryView entry={entry} addLap={addLapCallback} />));
             const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
-            user.click(SMScorp1234entry);
+            await user.click(SMScorp1234entry);
+            await act(async () => {});
             const raceEntryView = container.getElementsByClassName('race-entry-view')[0];
             expect(raceEntryView.getAttribute('class')).not.toMatch(/disabled/i);
         });
@@ -897,22 +880,16 @@ describe('when the entry is selected to add a new lap', () => {
     describe.skip('when confirmation is received of the recorded lap', () => {
         it('updates the display to show it can be selected for lap entry', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+            vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
             const entry = new Entry(competitorChrisMarshall, competitorLouScrew, [], dinghy1234, [], 0, 0, false, false, null, 'http://localhost:8081/dinghyracing/api/entries/20', {eTag: '"1"'});
             entry.signedUpTo = [new SignedUp(raceScorpionA, entry)];
             const addLapCallback = vi.fn();
             const { rerender } = render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
             const SMScorp1234entry = await screen.findByText(/1234/i);
-            await act(async () => {
-                user.click(SMScorp1234entry);
-            });
+            await user.click(SMScorp1234entry);
             entry.laps.push({number:1, time: 1000 });
-            await act(async () => {
-                rerender(<RaceEntryView entry={entry} addLap={addLapCallback} />);
-            });
-            
-            await waitFor(() => {
-                expect(SMScorp1234entry.parentElement.getAttribute('class')).not.toMatch(/disabled/i);
-            });            
+            rerender(<RaceEntryView entry={entry} addLap={addLapCallback} />);
+            expect(SMScorp1234entry.parentElement.getAttribute('class')).not.toMatch(/disabled/i);
         });
         it('accepts selection to add a new lap time', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
@@ -921,16 +898,10 @@ describe('when the entry is selected to add a new lap', () => {
             const addLapCallback = vi.fn();
             const { rerender } = render(<RaceEntryView entry={entry} addLap={addLapCallback} />);
             const SMScorp1234entry = screen.getByRole('status', {name: (content, node) => node.textContent === '1234'});
-            await act(async () => {
-                user.click(SMScorp1234entry);
-            });
+            await user.click(SMScorp1234entry);
             entry.laps.push({number: 1, time: 1000 });
-            await act(async () => {
-                rerender(<RaceEntryView entry={entry} addLap={addLapCallback} />);
-            });
-            await act(async () => {
-                user.click(SMScorp1234entry);
-            });
+            rerender(<RaceEntryView entry={entry} addLap={addLapCallback} />);
+            await user.click(SMScorp1234entry);
             expect(addLapCallback).toHaveBeenCalledTimes(2);
         });
     });
@@ -1237,9 +1208,7 @@ describe('when handler set for onFastGroup', () => {
         );
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} onFastGroup={onFastGroupHandlerSpy} />);
         const fastGroupButton = screen.getByRole('checkbox');
-        await act(async () => {
-            user.click(fastGroupButton);
-        });
+        await user.click(fastGroupButton);
 
         expect(onFastGroupHandlerSpy).toHaveBeenCalledWith('Scorpion1234Chris Marshall');
     });

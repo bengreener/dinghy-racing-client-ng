@@ -306,7 +306,7 @@ describe('when a race has started', () => {
 });
 
 it('updates values when a new race is selected', async () => {
-    const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});;
+    const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
     const model = new SylphModel(httpRootURL, wsRootURL);
     const controller = new SylphController(model);
     const clock = new Clock();
