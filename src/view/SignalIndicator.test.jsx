@@ -22,7 +22,20 @@ import { httpRootURL, wsRootURL } from '../model/__mocks__/test-data';
 import { raceScorpionAHAL } from '../model/__mocks__/test-data';
 
 vi.mock('../model/clock');
-vi.useFakeTimers();
+
+beforeAll(() => {
+    vi.useFakeTimers();
+});
+
+afterEach(async () => {
+    await act(async () => {
+        vi.runOnlyPendingTimers();
+    });
+});
+
+afterAll(() => {
+    vi.useRealTimers();
+});
 
 const scorpionClassFlag = {name: 'Scorpion Class Flag'};
 const scorpionWarningVisualSignal = {flags: [scorpionClassFlag], flagsState: FlagState.RAISED};
