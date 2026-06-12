@@ -31,20 +31,23 @@ import DirectRace from '../model/direct-race';
 import SignedUp from '../model/signed-up';
 import SynchronousDinghy from './synchronous-model/synchronous-dinghy';
 import SynchronousEntry from './synchronous-model/synchronous-entry';
+import { afterEach } from 'vitest';
 
 vi.mock('../model/sylph-model');
 vi.mock('../model/clock');
 
 const entryRowLastCellLapTimeCellOffset = 4;
 
-beforeEach(() => {
+beforeAll(() => {
     vi.useFakeTimers();
-    // vi.spyOn(global, 'setTimeout');
 });
 
 afterEach(() => {
     vi.runOnlyPendingTimers();
-    // vi.useRealTimers();
+});
+
+afterAll(() => {
+    vi.useRealTimers();
 });
 
 it('renders', () => {
