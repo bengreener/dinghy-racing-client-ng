@@ -17,6 +17,7 @@
 import ClockDisplay from './ClockDisplay';
 import { act, render, screen } from '@testing-library/react';
 import Clock from '../model/clock';
+import { afterEach } from 'vitest';
 
 vi.mock('../model/clock');
 
@@ -30,12 +31,21 @@ const formatOptions = {
 };
 const timeFormat = new Intl.DateTimeFormat(resolvedOptions.locale, formatOptions);
 
+beforeAll(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2021-10-14T10:41:42Z'));
+})
 beforeEach(() => {
     vi.clearAllMocks();
-    vi.useFakeTimers().setSystemTime(new Date('2021-10-14T10:41:42Z'));
 });
 
-afterEach(() => {
+afterEach(async () => {
+    await act(async () => {
+        vi.runOnlyPendingTimers();
+    });
+});
+
+afterAll(() => {
     vi.useRealTimers();
 });
 
