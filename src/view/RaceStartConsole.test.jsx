@@ -42,10 +42,13 @@ const formatOptions = {
 };
 const timeFormat = new Intl.DateTimeFormat('utc', formatOptions);
 
+beforeAll(() => {
+    vi.useFakeTimers();
+});
 
 beforeEach(() => {
-    vi.useFakeTimers().setSystemTime(new Date('2021-10-14T10:25:00Z'));
     vi.restoreAllMocks();
+    vi.setSystemTime(new Date('2021-10-14T10:25:00Z'));
 });
 
 afterEach(async () => {
@@ -56,8 +59,11 @@ afterEach(async () => {
     sessionStorage.removeItem('sessionStart');
     sessionStorage.removeItem('sessionEnd');
     sessionStorage.removeItem('raceType');
-    vi.useRealTimers();
 });
+
+afterAll(() => {
+    vi.useRealTimers();
+})
 
 it('renders', async () => {
     const model = new SylphModel(httpRootURL, wsRootURL);
