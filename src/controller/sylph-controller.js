@@ -342,7 +342,7 @@ class SylphController {
             throw new MissingParameter('A race to start is required.');
         }
         const fleet = await race.getFleet();
-        return this.model.updateRace(race, race.name, new Date(), fleet, race.duration, race.plannedLaps, race.type, race.startType);
+        return this.model.updateRace(race, race.name, new Date(), fleet, race.duration, race.plannedLaps, race.type, race.startType, race.startTimeOffset);
     }
 
     /**
@@ -526,7 +526,7 @@ class SylphController {
             throw new InvalidParameter('Number of laps must be a whole number greater than zero.')
         }
         const fleet = await race.getFleet();
-        return this.model.updateRace(race, race.name, race.plannedStartTime, fleet, race.duration, plannedLaps, race.type, race.startType);
+        return this.model.updateRace(race, race.name, race.plannedStartTime, fleet, race.duration, plannedLaps, race.type, race.startType, race.startTimeOffset);
     }
 
     /**

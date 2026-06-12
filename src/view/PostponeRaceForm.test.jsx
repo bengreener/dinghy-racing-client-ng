@@ -18,28 +18,38 @@ import { act, render } from '@testing-library/react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import PostponeRaceForm from './PostponeRaceForm';
-import { raceScorpionA } from '../model/__mocks__/test-data';
+import SylphModel from '../model/sylph-model';
+import DirectRace from '../model/direct-race';
+import { httpRootURL, wsRootURL, raceScorpionAHAL } from '../model/__mocks__/test-data';
+
+vi.mock('../model/sylph-model');
+vi.mock('../model/clock.js');
+
+const model = new SylphModel(httpRootURL, wsRootURL);
 
 describe('when contained in a modal dialog', () => {
     it('renders', () => {
-        render(<PostponeRaceForm closeParent={vi.fn()} />);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        render(<PostponeRaceForm race={race} closeParent={vi.fn()} />);
         expect(screen.getByRole('spinbutton', {'name': /delay/i})).toBeInTheDocument();
         expect(screen.getByRole('button', {'name': /cancel/i})).toBeInTheDocument();
         expect(screen.getByRole('button', {'name': /postpone/i})).toBeInTheDocument();
     });
     it('when cancelled it closes containing dialog', async () => {
-        const closeDialogeCallbackMock = vi.fn(() => {});
+        const closeDialogCallbackMock = vi.fn(() => {});
         const user = userEvent.setup();
-        render(<PostponeRaceForm closeParent={closeDialogeCallbackMock} />);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        render(<PostponeRaceForm race={race} closeParent={closeDialogCallbackMock} />);
         const cancelButtton = screen.getByRole('button', {'name': /cancel/i});
         await user.click(cancelButtton);
-        expect(closeDialogeCallbackMock).toBeCalledTimes(1);
+        expect(closeDialogCallbackMock).toBeCalledTimes(1);
     });
 });
 
 describe('when displayed as a component in a non-modal container', () => {
     it('renders', () => {
-        render(<PostponeRaceForm />);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        render(<PostponeRaceForm race={race}/>);
         expect(screen.getByRole('spinbutton', {'name': /delay/i})).toBeInTheDocument();
         expect(screen.queryByRole('button', {'name': /cancel/i})).not.toBeInTheDocument();
         expect(screen.getByRole('button', {'name': /postpone/i})).toBeInTheDocument();
@@ -49,7 +59,8 @@ describe('when displayed as a component in a non-modal container', () => {
 describe('when delay is input', () => {
     it('accepts delay input', async () => {
         const user = userEvent.setup();
-        render(<PostponeRaceForm />);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        render(<PostponeRaceForm race={race}/>);
         const delayInput = screen.getByRole('spinbutton', {'name': /delay/i});
         await act(async () => {
             await user.clear(delayInput);
@@ -59,7 +70,8 @@ describe('when delay is input', () => {
     });
     it('does not accept negative duration value', async () => {
         const user = userEvent.setup();
-        render(<PostponeRaceForm />);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        render(<PostponeRaceForm race={race}/>);
         const delayInput = screen.getByRole('spinbutton', {'name': /delay/i});
         await act(async () => {
             await user.clear(delayInput);
@@ -73,7 +85,8 @@ describe('when postpone button clicked', () => {
     it('postpones race', async () => {
         const postponeCallbackMock = vi.fn((race, duration) => {});
         const user = userEvent.setup();
-        render(<PostponeRaceForm race={raceScorpionA} onPostpone={postponeCallbackMock} />);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        render(<PostponeRaceForm race={race} onPostpone={postponeCallbackMock} />);
         const postponeButtton = screen.getByRole('button', {'name': /postpone/i});
         await user.click(postponeButtton);
         expect(postponeCallbackMock).toBeCalledTimes(1);
@@ -84,7 +97,8 @@ describe('when enter button is pressed', () => {
     it('postpones race', async () => {
         const postponeCallbackMock = vi.fn((race, duration) => {});
         const user = userEvent.setup();
-        render(<PostponeRaceForm race={raceScorpionA} onPostpone={postponeCallbackMock} />);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        render(<PostponeRaceForm race={race} onPostpone={postponeCallbackMock} />);
         const delayInput = screen.getByRole('spinbutton', {'name': /delay/i});
         await user.keyboard('{Enter}');
         expect(postponeCallbackMock).toBeCalledTimes(1);
