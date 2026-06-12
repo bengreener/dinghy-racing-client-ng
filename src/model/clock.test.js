@@ -14,9 +14,8 @@
  * limitations under the License. 
  */
 
+import { afterAll, afterEach } from 'vitest';
 import Clock from './clock';
-
-vi.useFakeTimers();
 
 // mock tick-worker web worker
 const Worker = vi.fn(function(url) {
@@ -51,12 +50,17 @@ const Worker = vi.fn(function(url) {
 });
 vi.stubGlobal('Worker', Worker);
 
+beforeAll(() => {
+    vi.useFakeTimers();
+});
+
 afterEach(() => {
     vi.runOnlyPendingTimers();
 });
 
 afterAll(() => {
     vi.unstubAllGlobals();
+    vi.useRealTimers();
 });
 
 it('returns the correct time', () => {
