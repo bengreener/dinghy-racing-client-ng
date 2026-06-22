@@ -32,7 +32,8 @@ import Clock from '../model/clock';
     function handleChange({ target }) {
         if (target.value != "") {
             const timeArray = target.value.split(':');
-            const date = new Date(newStartTime.getFullYear(), newStartTime.getMonth(), newStartTime.getDate(), Number.parseInt(timeArray[0]), Number.parseInt(timeArray[1]), Number.parseInt(timeArray[2]));
+            // some time input controls may not return seconds component
+            const date = new Date(newStartTime.getFullYear(), newStartTime.getMonth(), newStartTime.getDate(), Number.parseInt(timeArray[0]), Number.parseInt(timeArray[1]), Number.parseInt(timeArray[2] ?? 0));
             setNewStartTime(date);
         }
     }
@@ -48,12 +49,16 @@ import Clock from '../model/clock';
     return(
         <form onSubmit={handleSubmit}>
             <div>
-                <label>Current Start Time</label>
-                <output>{Clock.formatTime(race.currentStartTime.valueOf())}</output>
+                <label htmlFor='planned-start-time'>Planned Start Time</label>
+                <input id='planned-start-time' value={Clock.formatTime(race.plannedStartTime.valueOf())} disabled />
+            </div>
+            <div>
+                <label htmlFor='current-start-time'>Current Start Time</label>
+                <input id='current-start-time' value={Clock.formatTime(race.currentStartTime.valueOf())} disabled />
             </div>
             <div>
                 <label htmlFor='new-start-time' >New Start Time</label>
-                <input id='new-start-time' type='time' name='new-start-time' min={Clock.formatTime(race.plannedStartTime.valueOf())} step='1' value={Clock.formatTime(newStartTime.valueOf())} onChange={handleChange} />
+                <input id='new-start-time' type='time' name='new-start-time' min={Clock.formatTime(race.plannedStartTime.valueOf())} step='1' value={Clock.formatTime(newStartTime.valueOf())} onChange={handleChange} autoFocus />
             </div>
             <div>
                 {closeParent ? <button type='button' onClick={closeParent}>Cancel</button> : null}
