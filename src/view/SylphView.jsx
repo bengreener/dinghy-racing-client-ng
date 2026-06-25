@@ -122,7 +122,7 @@ function SylphView({model, controller}) {
             <div className='w3-row w3-display-container w3-white' >
                 <div className='w3-display-container'>
                     <img className='w3-image' src='/dinghy-icon.svg' alt='Dinghy Icon' />
-                    <button className='w3-button w3-xlarge w3-display-right' onClick={w3_open}>☰</button>
+                    <button className='w3-btn w3-xlarge w3-display-right' onClick={w3_open}>☰</button>
                 </div>
                 <div ref={sidebarRef} className='w3-sidebar w3-bar-block w3-border-left' style={{display:'none', right:'0'}} >
                     <button onClick={w3_close} className='w3-bar-item w3-btn'>Close &times;</button>
@@ -144,15 +144,15 @@ function SylphView({model, controller}) {
                     }
                     <button key={9} type='button' className='w3-bar-item w3-btn' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
                 </div>
-                <nav className='w3-row w3-bginfosys-display-bottommiddle-m1' >
+                <nav className='w3-row bgis-display-bottommiddle-min-601' >
                     {/* bgis-min-content prevents button collapsing 1/3 it's required size due to w3-thrid and navbar container sizing relationship */}
-                    <button key={3} ref={enrolmentButtonRef} type='button' className='w3-third w3-btn w3-card bgis-min-content' onClick={() => showUpcomingRaces(model)}>Enrolment</button>
+                    <button key={3} ref={enrolmentButtonRef} type='button' className='bgis-max-content w3-btn' onClick={() => showUpcomingRaces(model)}>Enrolment</button>
                     {roles.includes('ROLE_RACE_OFFICER') ? 
-                        <button key={4} ref={raceStartButtonRef} type='button' className='w3-third w3-btn w3-card' onClick={showRaceStartConsole}>Race Start</button>
+                        <button key={4} ref={raceStartButtonRef} type='button' className='bgis-max-content w3-btn' onClick={showRaceStartConsole}>Race Start</button>
                         : null
                     }
                     {roles.includes('ROLE_RACE_OFFICER') ? 
-                        <button key={5} ref={runRaceButtonRef} type='button' className='w3-third w3-btn w3-card' onClick={showRaceConsole}>Run Race</button>
+                        <button key={5} ref={runRaceButtonRef} type='button' className='bgis-max-content w3-btn' onClick={showRaceConsole}>Run Race</button>
                         : null
                     }
                 </nav>

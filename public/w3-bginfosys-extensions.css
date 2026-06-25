@@ -27,9 +27,7 @@ html,body{
     overflow: hidden;
 }
 
-.bgis-min-content {
-    min-width: min-content;
-}
+.bgis-max-content{float:left;width:100%}
 
 .bgis-table-cell {
 	white-space: preserve nowrap;
@@ -38,8 +36,9 @@ html,body{
 .bgis-border-2{border:2px solid #ccc}
 
 @media (min-width:601px) {
-    .w3-bginfosys-display-bottommiddle-m1{position:absolute;left:50%;bottom:0;transform:translate(-50%,0%)}
+    .bgis-display-bottommiddle-min-601{position:absolute;left:50%;bottom:0;transform:translate(-50%,0%)}
     .w3-col.m1-half{width:4.16665%}
+    .bgis-max-content{max-width: max-content;}
 }
 
 @media (min-width:980px) {
