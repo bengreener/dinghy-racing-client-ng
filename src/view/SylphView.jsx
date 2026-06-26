@@ -146,13 +146,13 @@ function SylphView({model, controller}) {
                 </div>
                 <nav className='w3-row bgis-display-bottommiddle-min-601' >
                     {/* bgis-min-content prevents button collapsing 1/3 it's required size due to w3-thrid and navbar container sizing relationship */}
-                    <button key={3} ref={enrolmentButtonRef} type='button' className='bgis-max-content w3-btn' onClick={() => showUpcomingRaces(model)}>Enrolment</button>
+                    <button key={3} ref={enrolmentButtonRef} type='button' className='bgis-max-content w3-btn w3-border w3-border-white w3-pale-blue w3-hover-blue' onClick={() => showUpcomingRaces(model)}>Enrolment</button>
                     {roles.includes('ROLE_RACE_OFFICER') ? 
-                        <button key={4} ref={raceStartButtonRef} type='button' className='bgis-max-content w3-btn' onClick={showRaceStartConsole}>Race Start</button>
+                        <button key={4} ref={raceStartButtonRef} type='button' className='bgis-max-content w3-btn w3-border w3-border-white w3-pale-blue w3-hover-blue' onClick={showRaceStartConsole}>Race Start</button>
                         : null
                     }
                     {roles.includes('ROLE_RACE_OFFICER') ? 
-                        <button key={5} ref={runRaceButtonRef} type='button' className='bgis-max-content w3-btn' onClick={showRaceConsole}>Run Race</button>
+                        <button key={5} ref={runRaceButtonRef} type='button' className='bgis-max-content w3-btn w3-border w3-border-white w3-pale-blue w3-hover-blue' onClick={showRaceConsole}>Run Race</button>
                         : null
                     }
                 </nav>

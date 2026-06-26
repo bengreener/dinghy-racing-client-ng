@@ -35,6 +35,8 @@ html,body{
 
 .bgis-border-2{border:2px solid #ccc}
 
+.bgis-pale-amber,.bgis-hover-pale-amber:hover{color:#000!important;background-color:#fcedc1!important}
+
 @media (min-width:601px) {
     .bgis-display-bottommiddle-min-601{position:absolute;left:50%;bottom:0;transform:translate(-50%,0%)}
     .w3-col.m1-half{width:4.16665%}

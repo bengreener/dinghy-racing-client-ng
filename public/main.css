@@ -43,7 +43,7 @@ button.embedded {
     background-color: inherit;
 }
 button.selected {
-	background-color: #85D6FF;
+	background-color: #85D6FF!important;
 }
 .action-list-view {
     display: flex;

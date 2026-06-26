@@ -144,7 +144,7 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
                     {showInRaceData && elapsedTime >= 0 ? <label htmlFor={'race-elapsed-time-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >Elapsed</label> : null}
                     {showInRaceData && elapsedTime >= 0 ? <output id={'race-elapsed-time-' + race.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{Clock.formatDuration(elapsedTime)}</output> : null}
                 </div>
-                <div className='w3-col m2 s6'>
+                <div className='w3-col m1 s6'>
                     <label htmlFor={'race-duration-remaining-' + updatedRace.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{(elapsedTime < 0) ? 'Countdown' : 'Remaining'}</label>
                     {/** When formatting time remaining adjust elapsed time to prevent formatted time remaining from being one second fast after formatting */}
                     <output id={'race-duration-remaining-' + updatedRace.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{(elapsedTime < 0) ? Clock.formatDuration(elapsedTime, false, true) : Clock.formatDuration(race.duration - (Math.floor(elapsedTime /1000) * 1000))}</output>
@@ -162,18 +162,18 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
                     {showInRaceData && updatedRace.type !== RaceType.PURSUIT && updatedRace.leadEntryLastLapTime > 0 ? <output id={'average-lap-' + updatedRace.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{Clock.formatDuration(updatedRace.leadEntryAverageLapTime)}</output> : null}
                 </div>
                 <div className='w3-col m1 s6'>
-                    {showInRaceData && updatedRace.type !== RaceType.PURSUIT && updatedRace.leadEntryLapsSailed < updatedRace.plannedLaps ? <button id='shorten-course-button' className='w3-col' onClick={handleShortenCourseClick}>Shorten Course</button> : null}
-                    {!showInRaceData && updatedRace.type !== RaceType.PURSUIT ? <button id='adjust-course-button' className='w3-col' onClick={handleShortenCourseClick}>Adjust Laps</button> : null}
+                    {showInRaceData && updatedRace.type !== RaceType.PURSUIT && updatedRace.leadEntryLapsSailed < updatedRace.plannedLaps ? <button id='shorten-course-button' className='w3-btn w3-col w3-border w3-border-white w3-pale-blue w3-hover-blue' onClick={handleShortenCourseClick}>Shorten</button> : null}
+                    {!showInRaceData && updatedRace.type !== RaceType.PURSUIT ? <button id='adjust-course-button' className='w3-btn w3-col w3-border w3-border-white w3-pale-blue w3-hover-blue' onClick={handleShortenCourseClick}>Set Laps</button> : null}
                 </div>
                 <div className='w3-col m1 s6'>
-                    {elapsedTime < 0 ? <button id='race-postpone-button' className='w3-col' onClick={handleRacePostponeClick}>Postpone Start</button> : null}
-                    {(elapsedTime >= 0 && (updatedRace.leadEntryLapsSailed == null || updatedRace.leadEntryLapsSailed < 1)) ? <button id='race-restart-button' className='w3-col' onClick={handleRacePostponeClick}>Restart Race</button> : null}
+                    {elapsedTime < 0 ? <button id='race-postpone-button' className='w3-btn w3-col w3-border w3-border-white w3-pale-blue w3-hover-blue' onClick={handleRacePostponeClick}>Postpone</button> : null}
+                    {(elapsedTime >= 0 && (updatedRace.leadEntryLapsSailed == null || updatedRace.leadEntryLapsSailed < 1)) ? <button id='race-restart-button' className='w3-btn w3-col w3-border w3-border-white w3-pale-blue w3-hover-blue' onClick={handleRacePostponeClick}>Restart</button> : null}
                 </div>
                 <div className='w3-col m1 s6'>
-                    {elapsedTime < 0 ? <button id='race-start-button' className='w3-col' onClick={handleRaceStartClick}>Start Now</button> : null}
+                    {elapsedTime < 0 ? <button id='race-start-button' className='w3-btn w3-col w3-border w3-border-white w3-pale-blue w3-hover-blue' onClick={handleRaceStartClick}>Start Now</button> : null}
                 </div>
                 <div className='w3-col m1 s6'>
-                    <button id='race-start-button' className='w3-col' onClick={handleLapSheetClick}>Lap Sheet</button>
+                    <button id='race-start-button' className='w3-btn w3-col w3-border w3-border-white w3-pale-blue w3-hover-blue' onClick={handleLapSheetClick}>Lap Sheet</button>
                 </div>
             </div>
             <p className={userMessageClasses()}>{message}</p>

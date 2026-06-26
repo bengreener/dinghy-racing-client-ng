@@ -89,8 +89,8 @@ import Clock from '../model/clock';
                 </div>
             </div>
             <div className={'w3-row w3-right-align'}>
-                {closeParent ? <button className={'w3-btn w3-border w3-border-amber w3-hover-amber'} type='button' onClick={closeParent}>Cancel</button> : null}
-                <button type='submit' className={'w3-btn w3-border w3-border-blue w3-hover-blue'} >Set New Time</button>
+                {closeParent ? <button className={'w3-btn w3-border w3-border-white bgis-pale-amber w3-hover-amber'} type='button' onClick={closeParent}>Cancel</button> : null}
+                <button type='submit' className={'w3-btn w3-border w3-border-white w3-pale-green w3-hover-green'} >Set New Time</button>
             </div>
         </form>
     )
