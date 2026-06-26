@@ -31,10 +31,13 @@ function EmbeddedRaceSelector({ embeddedRace, raceSelected, onChange }) {
     }
 
     return (
-        <div>
-            <label htmlFor={embeddedRace.name + '-checkbox'}>{embeddedRace.name}</label>
-            <input id={embeddedRace.name + '-checkbox'} type='checkbox' onChange={handleChange} checked={raceSelected} />
+        <>
+        <h2>Embedded Race(s)</h2>
+        <div className='w3-row'>
+            <label className='w3-col m2' htmlFor={embeddedRace.name + '-checkbox'}>{embeddedRace.name}</label>
+            <input className={'w3-check'} id={embeddedRace.name + '-checkbox'} type='checkbox' onChange={handleChange} checked={raceSelected} />
         </div>
+        </>
     )
 }
 
