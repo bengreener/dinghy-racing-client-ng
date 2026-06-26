@@ -20,6 +20,7 @@ import PostponeRaceForm from './PostponeRaceForm';
 import ModalDialog from './ModalDialog';
 import AdjustCourseForm from './AdjustCourseForm';
 import RaceType from '../model/race-type';
+import NameFormat from '../controller/name-format';
 
 /**
  * Present summary information ablout a race
@@ -93,6 +94,15 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
         // get race id
         const id = race.url.match(/(\d+$)/)[0];
         window.open(window.location.origin + '/lap-sheet/' + id);
+    }
+
+    function handleResultClick() {
+        // get race id
+        const id = race.url.match(/(\d+$)/)[0];
+        window.open(window.location.origin + '/race-result/' + id);
+        controller.downloadRaceResults(updatedRace,  {nameFormat: NameFormat.FIRSTNAMESURNAME}).catch(error => {
+            setMessage('Unable to download result\n' + error.message);
+        });
     }
 
     useEffect(() => {
@@ -171,6 +181,9 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
                 </div>
                 <div className='w3-col m1 s6'>
                     {elapsedTime < 0 ? <button id='race-start-button' className='w3-btn w3-col w3-border w3-border-white w3-pale-blue w3-hover-blue' onClick={handleRaceStartClick}>Start Now</button> : null}
+                </div>
+                <div className='w3-col m1 s6'>
+                    {elapsedTime > 0 ? <button id='race-end-button' className='w3-btn w3-col w3-border w3-border-white w3-pale-blue w3-hover-blue' onClick={handleResultClick}>Result</button> : null}
                 </div>
                 <div className='w3-col m1 s6'>
                     <button id='race-start-button' className='w3-btn w3-col w3-border w3-border-white w3-pale-blue w3-hover-blue' onClick={handleLapSheetClick}>Lap Sheet</button>
