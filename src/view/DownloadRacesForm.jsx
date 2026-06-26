@@ -36,6 +36,8 @@ function DownloadRacesForm({ model, controller }) {
     const [message, setMessage] = useState(''); // feedback to user
 
     const handleRaceResultDownloadClick = useCallback((race, options) => {
+        const id = race.url.match(/(\d+$)/)[0];
+        window.open(window.location.origin + '/race-result/' + id);
         controller.downloadRaceResults(race, options).catch(error => {
             setMessage('Unable to download results\n' + error.message);
         });

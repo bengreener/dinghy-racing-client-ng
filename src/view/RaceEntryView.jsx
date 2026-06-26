@@ -333,7 +333,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
                     <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
                 </div>
             </div>
-            {onFastGroup ? <div className='w3-col m1-half w3-padding-small'><input type='checkbox' onClick={handleFastGroupClick} onChange={handleFastGroupChange} checked={inFastGroup} /></div> : null}
+            {onFastGroup ? <div className='w3-col m1-half w3-padding-small'><input className={'bgis-check'} type='checkbox' onClick={handleFastGroupClick} onChange={handleFastGroupChange} checked={inFastGroup} /></div> : null}
         </div>
     )
 }

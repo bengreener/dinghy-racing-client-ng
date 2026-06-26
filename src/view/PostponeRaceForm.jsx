@@ -88,7 +88,7 @@ import Clock from '../model/clock';
                     <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => handleAddDuration(600000)}>+10 minutes</button>
                 </div>
             </div>
-            <div className={'w3-row w3-right-align'}>
+            <div className={'w3-row w3-right'}>
                 {closeParent ? <button className={'w3-btn w3-border w3-border-white bgis-pale-amber w3-hover-amber'} type='button' onClick={closeParent}>Cancel</button> : null}
                 <button type='submit' className={'w3-btn w3-border w3-border-white w3-pale-green w3-hover-green'} >Set New Time</button>
             </div>

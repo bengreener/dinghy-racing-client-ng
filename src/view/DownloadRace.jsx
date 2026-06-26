@@ -43,24 +43,24 @@ function DownloadRace({ race, downloadFunction }) {
                 <label className='w3-col m3' >{race.name}</label>
             </div>
             <div className='w3-row'>
-                <fieldset className='w3-half' >
+                <fieldset >
                     <legend>Choose Name Format</legend>
-                    <div className='w3-cell-row'>
+                    <div className='w3-row'>
                         {/** name of radio buttons in a group needs to be unique among all radio button groups on page; for example multiple DownloadRace componenent */}
-                        <div className='w3-cell'>
-                            <input id={race.name + '-firstname-surname'} name={race.name + '-name-format'} type="radio" value={NameFormat.FIRSTNAMESURNAME} checked={selectedNameFormat === NameFormat.FIRSTNAMESURNAME} onChange={handleOptionChange} />
+                        <div className='w3-half'>
+                            <input className={'bgis-check w3-col m1 s2'} id={race.name + '-firstname-surname'} name={race.name + '-name-format'} type="radio" value={NameFormat.FIRSTNAMESURNAME} checked={selectedNameFormat === NameFormat.FIRSTNAMESURNAME} onChange={handleOptionChange} />
                             <label htmlFor={race.name + '-firstname-surname'}>Firstname Surname</label>
                         </div>
-                        <div className='w3-cell'>
-                            <input id={race.name + '-surname-firstname'} name={race.name + '-name-format'} type="radio" value={NameFormat.SURNAMEFIRSTNAME} checked={selectedNameFormat === NameFormat.SURNAMEFIRSTNAME} onChange={handleOptionChange} />
+                        <div className='w3-half'>
+                            <input className={'bgis-check w3-col m1 s2'} id={race.name + '-surname-firstname'} name={race.name + '-name-format'} type="radio" value={NameFormat.SURNAMEFIRSTNAME} checked={selectedNameFormat === NameFormat.SURNAMEFIRSTNAME} onChange={handleOptionChange} />
                             <label htmlFor={race.name + '-surname-firstname'}>Surname, Firstname</label>
                         </div>
                     </div>
                 </fieldset>
             </div>
             <div className='w3-row' >
-                <div className='w3-half' >
-                    <button id='race-result-download-button' className='w3-right' type='button' onClick={handleDownloadButtonClick} >Download Results</button>
+                <div className='w3-right' >
+                    <button id='race-result-download-button' className='w3-btn w3-border w3-border-white w3-pale-green w3-hover-green w3-right' type='button' onClick={handleDownloadButtonClick} >Download Results</button>
                 </div>
             </div>
         </form>

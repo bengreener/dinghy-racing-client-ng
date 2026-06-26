@@ -46,13 +46,13 @@ function AdjustCourseForm({ race, minLaps = 1, maxLaps = 100, initialValue, onUp
 
     return (
         <form onSubmit={handleSubmit}>
-            <div>
+            <div className={'w3-row-padding'}>
                 <label htmlFor='set-laps-input'>Set Laps</label>
-                <input id='set-laps-input' name='laps' type='number' min={minLaps.toString()} max={maxLaps.toString()} value={laps} onChange={handleChange} autoFocus/>
+                <input className={'w3-large'} id='set-laps-input' name='laps' type='number' min={minLaps.toString()} max={maxLaps.toString()} value={laps} onChange={handleChange} autoFocus/>
             </div>
-            <div>
-                {closeParent ? <button type='button' onClick={closeParent}>Cancel</button> : null}
-                <button type='submit' >Update Laps</button>
+            <div className={'w3-row'}>
+                {closeParent ? <button className={'w3-btn w3-border w3-border-white bgis-pale-amber w3-hover-amber'} type='button' onClick={closeParent}>Cancel</button> : null}
+                <button className={'w3-btn w3-border w3-border-white w3-pale-green w3-hover-green'} type='submit' >Update Laps</button>
             </div>
         </form>
     )

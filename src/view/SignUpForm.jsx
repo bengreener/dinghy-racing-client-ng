@@ -491,8 +491,8 @@ function SignUpForm({ race, model, entry, onCreateCompetitor, onCreateDinghy, on
             <EmbeddedRacesPanel embeddedRaces={embeddedRaces} selectedRaces={selectedEmbeddedRaces} onRaceSelectionChanged={handleEmbeddedRaceSelectionChanged} />
             <div className='w3-row' >
                 <div className='w3-col m8' >
-                    <button id='entry-update-button' className='w3-right' type='button' onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
-                    {<button id='cancel-button' className='w3-right' type='button' onClick={clear} >Cancel</button>}
+                    <button id='entry-update-button' className={'w3-btn w3-border w3-border-white w3-pale-green w3-hover-green w3-right'} type='button' onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
+                    {<button id='cancel-button' className={'w3-btn w3-border w3-border-white bgis-pale-amber w3-hover-amber w3-right'} type='button' onClick={clear} >Cancel</button>}
                 </div>
             </div>
             {/* TODO: if dinghy class selected pass only selected dinghyclass */}

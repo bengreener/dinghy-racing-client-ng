@@ -35,7 +35,7 @@ function EmbeddedRaceSelector({ embeddedRace, raceSelected, onChange }) {
         <h2>Embedded Race(s)</h2>
         <div className='w3-row'>
             <label className='w3-col m2' htmlFor={embeddedRace.name + '-checkbox'}>{embeddedRace.name}</label>
-            <input className={'w3-check'} id={embeddedRace.name + '-checkbox'} type='checkbox' onChange={handleChange} checked={raceSelected} />
+            <input className={'bgis-check'} id={embeddedRace.name + '-checkbox'} type='checkbox' onChange={handleChange} checked={raceSelected} />
         </div>
         </>
     )
