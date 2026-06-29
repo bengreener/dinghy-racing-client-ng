@@ -333,6 +333,7 @@ class SylphController {
 
     /**
      * Start a race
+     * Planned start time must have passed 
      * @param {DirectRace} race to start
      * @return {Promise<DirectRace>}
      */
@@ -341,8 +342,11 @@ class SylphController {
         if (!(race instanceof DirectRace)) {
             throw new MissingParameter('A race to start is required.');
         }
+        if (race.plannedStartTime.getTime() > Date.now()) {
+            throw new InvalidParameter('Cannot start a race before the planned start time.');
+        }
         const fleet = await race.getFleet();
-        return this.model.updateRace(race, race.name, new Date(), fleet, race.duration, race.plannedLaps, race.type, race.startType, race.startTimeOffset);
+        return this.model.updateRace(race, race.name, race.plannedStartTime, fleet, race.duration, race.plannedLaps, race.type, race.startType, Date.now() - race.plannedStartTime.getTime());
     }
 
     /**

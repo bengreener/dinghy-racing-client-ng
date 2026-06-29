@@ -623,6 +623,18 @@ describe('when updating a fleet', () => {
 });
 
 describe('when starting a race', () => {
+    it('calls model updateRace with correct parameters', async () => {
+        vi.useFakeTimers().setSystemTime(new Date('2021-10-14T10:33:00Z'));
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        const updateRaceSpy = vi.spyOn(model, 'updateRace');
+        const race = new DirectRace({...raceScorpionAHAL, startTimeOffset: 'PT5M'}, {version: '"0"'}, model);
+        const fleet = new Fleet(fleetScorpionHAL, {version: ''}, model)
+        await controller.startRace(race);
+        expect(updateRaceSpy).toHaveBeenCalledWith(race, race.name, race.plannedStartTime, fleet, race.duration, race.plannedLaps, race.type, race.startType, 180000);
+        vi.runOnlyPendingTimers();
+        vi.useRealTimers();
+    });
     it('returns a promise that resolves to the race when operation is successful', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
@@ -639,6 +651,15 @@ describe('when starting a race', () => {
             await expect(() => controller.startRace()).rejects.toThrowError('A race to start is required.');
         });
     });
+    describe('when an attempt is made to start race before planned start time', () => {
+        it('throws an error', async () => {
+            vi.useFakeTimers().setSystemTime(new Date('2021-10-14T10:28:00Z'));const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
+            await expect(() => controller.startRace(new DirectRace(raceScorpionAHAL, {version: '"1"'}, model))).rejects.toThrowError('Cannot start a race before the planned start time.');
+            vi.runOnlyPendingTimers();
+            vi.useRealTimers();
+        });
+    })
 });
 
 describe('when adding a lap to an entry', () => {
