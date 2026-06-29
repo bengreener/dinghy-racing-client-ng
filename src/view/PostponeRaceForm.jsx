@@ -43,7 +43,7 @@ import Clock from '../model/clock';
      * @param {Integer} duration in milliseconds 
      */
     function handleAddDuration(duration) {
-        const nstMilliseconds = newStartTime.valueOf() + duration;
+        const nstMilliseconds = newStartTime.getTime() + duration;
         const nstDate = new Date(nstMilliseconds);
         if (nstDate >= race.plannedStartTime) {
             setNewStartTime(nstDate);
@@ -52,7 +52,7 @@ import Clock from '../model/clock';
 
     function handleSubmit(event) {
         event.preventDefault();
-        onPostpone(race, newStartTime.valueOf() - race.plannedStartTime.valueOf());
+        onPostpone(race, newStartTime.getTime() - race.plannedStartTime.getTime());
         if (closeParent) {
             closeParent();
         }
@@ -63,28 +63,28 @@ import Clock from '../model/clock';
             <div className={'w3-half'}>
                 <div className={'w3-row'}>
                     <label className={'w3-half'} htmlFor='planned-start-time'>Planned Start Time</label>
-                    <output className={'w3-half w3-center'} id='planned-start-time' >{Clock.formatTime(race.plannedStartTime.valueOf())}</output>
+                    <output className={'w3-half w3-center'} id='planned-start-time' >{Clock.formatTime(race.plannedStartTime.getTime())}</output>
                 </div>
                 <div className={'w3-row'}>
                     <label className={'w3-half'} htmlFor='current-start-time'>Current Start Time</label>
-                    <output className={'w3-half w3-center'} id='current-start-time'>{Clock.formatTime(race.currentStartTime.valueOf())}</output>
+                    <output className={'w3-half w3-center'} id='current-start-time'>{Clock.formatTime(race.currentStartTime.getTime())}</output>
                 </div>
                 <div className={'w3-row'}>
                     <label className={'w3-half'} htmlFor='new-start-time'>New Start Time</label>
-                    <input className={'w3-half w3-center'} id='new-start-time' type='time' name='new-start-time' min={Clock.formatTime(race.plannedStartTime.valueOf())} step='1' value={Clock.formatTime(newStartTime.valueOf())} onChange={handleChange} autoFocus />
+                    <input className={'w3-half w3-center'} id='new-start-time' type='time' name='new-start-time' min={Clock.formatTime(race.plannedStartTime.getTime())} step='1' value={Clock.formatTime(newStartTime.getTime())} onChange={handleChange} autoFocus />
                 </div>
             </div>
             <div className={'w3-half'}>
                 <div className={'w3-row'}>
-                    <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => handleAddDuration(-60000)} disabled={newStartTime.valueOf() - 60000 < race.plannedStartTime.valueOf()}>-1 minute</button>
+                    <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => handleAddDuration(-60000)} disabled={newStartTime.getTime() - 60000 < race.plannedStartTime.getTime()}>-1 minute</button>
                     <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => handleAddDuration(60000)}>+1 minute</button>
                 </div>
                 <div className={'w3-row'}>
-                    <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => handleAddDuration(-300000)} disabled={newStartTime.valueOf() - 300000 < race.plannedStartTime.valueOf()}>-5 minutes</button>
+                    <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => handleAddDuration(-300000)} disabled={newStartTime.getTime() - 300000 < race.plannedStartTime.getTime()}>-5 minutes</button>
                     <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => handleAddDuration(300000)}>+5 minutes</button>
                 </div>
                 <div className={'w3-row'}>
-                    <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => handleAddDuration(-600000)} disabled={newStartTime.valueOf() - 600000 < race.plannedStartTime.valueOf()}>-10 minutes</button>
+                    <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => handleAddDuration(-600000)} disabled={newStartTime.getTime() - 600000 < race.plannedStartTime.getTime()}>-10 minutes</button>
                     <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => handleAddDuration(600000)}>+10 minutes</button>
                 </div>
             </div>
