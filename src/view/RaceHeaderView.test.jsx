@@ -336,9 +336,8 @@ describe('when postpone race button clicked', () => {
         render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
         await user.click(screen.getByRole('button', {'name': /postpone start/i}));
         const dialog = within(screen.getByTestId('postpone-race-dialog'));
-        expect(dialog.getByRole('spinbutton', {'name': /delay/i, 'hidden': true})).toBeInTheDocument();
         expect(dialog.getByRole('button', {'name': /cancel/i, 'hidden': true})).toBeInTheDocument();
-        expect(dialog.getByRole('button', {'name': 'Postpone', 'hidden': true})).toBeInTheDocument();
+        expect(dialog.getByRole('button', {'name': /Set New Time/i, 'hidden': true})).toBeInTheDocument();
     });
 });
 
@@ -375,9 +374,8 @@ describe('when restart race button clicked', () => {
         render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
         await user.click(screen.getByRole('button', {'name': /restart/i}));
         const dialog = within(screen.getByTestId('postpone-race-dialog'));
-        expect(dialog.getByRole('spinbutton', {'name': /delay/i, 'hidden': true})).toBeInTheDocument();
         expect(dialog.getByRole('button', {'name': /cancel/i, 'hidden': true})).toBeInTheDocument();
-        expect(dialog.getByRole('button', {'name': 'Postpone', 'hidden': true})).toBeInTheDocument();
+        expect(dialog.getByRole('button', {'name': /Set New Time/i, 'hidden': true})).toBeInTheDocument();
     });
 });
 

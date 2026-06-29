@@ -1030,7 +1030,7 @@ describe('when updating the planned laps for a race', () => {
         const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const updateRaceSpy = vi.spyOn(model, 'updateRace');
         await controller.updateRacePlannedLaps(race, 4);
-        expect(updateRaceSpy).toBeCalledWith(race, race.name, race.plannedStartTime, new Fleet(fleetScorpionHAL, {version: ''}, model), race.duration, 4, race.type, race.startType);
+        expect(updateRaceSpy).toBeCalledWith(race, race.name, race.plannedStartTime, new Fleet(fleetScorpionHAL, {version: ''}, model), race.duration, 4, race.type, race.startType, race.startTimeOffset);
     });
     describe('when race is not provided', () => {
         it('throws error', async () => {

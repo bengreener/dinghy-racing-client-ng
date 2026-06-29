@@ -59,11 +59,10 @@ import Clock from '../model/clock';
     }
 
     return(
-        <form className={'w3-container'} onSubmit={handleSubmit}>
+        <form className={'postpone-race-form w3-container'} onSubmit={handleSubmit}>
             <div className={'w3-half'}>
                 <div className={'w3-row'}>
                     <label className={'w3-half'} htmlFor='planned-start-time'>Planned Start Time</label>
-                    {/* <input id='planned-start-time' className={'w3-half'} value={Clock.formatTime(race.plannedStartTime.valueOf())} disabled /> */}
                     <output className={'w3-half w3-center'} id='planned-start-time' >{Clock.formatTime(race.plannedStartTime.valueOf())}</output>
                 </div>
                 <div className={'w3-row'}>

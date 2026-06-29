@@ -37,7 +37,7 @@ describe('when contained in a modal dialog', () => {
         expect(screen.getByLabelText('Current Start Time')).toHaveValue('11:40:00');
         expect(screen.getByLabelText('New Start Time')).toHaveValue('11:40:00');
         expect(screen.queryByRole('button', {'name': /cancel/i})).toBeInTheDocument();
-        expect(screen.getByRole('button', {'name': /postpone/i})).toBeInTheDocument();
+        expect(screen.getByRole('button', {'name': /Set New Time/i})).toBeInTheDocument();
     });
     it('when cancelled it closes containing dialog', async () => {
         const closeDialogCallbackMock = vi.fn(() => {});
@@ -58,7 +58,7 @@ describe('when displayed as a component in a non-modal container', () => {
         expect(screen.getByLabelText('Current Start Time')).toHaveValue('11:30:00');
         expect(screen.getByLabelText('New Start Time')).toHaveValue('11:30:00');
         expect(screen.queryByRole('button', {'name': /cancel/i})).not.toBeInTheDocument();
-        expect(screen.getByRole('button', {'name': /postpone/i})).toBeInTheDocument();
+        expect(screen.getByRole('button', {'name': /Set New Time/i})).toBeInTheDocument();
     });
 })
 
@@ -114,13 +114,13 @@ describe('when new start time is entered', () => {
     });
 });
 
-describe('when postpone button clicked', () => {
-    it('postpones race', async () => {
+describe('when Set New Time button clicked', () => {
+    it('sets new time for race', async () => {
         const postponeCallbackMock = vi.fn((race, duration) => {});
         const user = userEvent.setup();
         const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         render(<PostponeRaceForm race={race} onPostpone={postponeCallbackMock} />);
-        const postponeButtton = screen.getByRole('button', {'name': /postpone/i});
+        const postponeButtton = screen.getByRole('button', {'name': /Set New Time/i});
         await user.click(postponeButtton);
         expect(postponeCallbackMock).toBeCalledTimes(1);
     });
