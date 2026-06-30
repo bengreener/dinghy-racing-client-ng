@@ -100,7 +100,7 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
         // get race id
         const id = updatedRace.url.match(/(\d+$)/)[0];
         window.open(window.location.origin + '/race-result/' + id);
-        controller.downloadRaceResults(updatedRace,  {nameFormat: NameFormat.FIRSTNAMESURNAME}).catch(error => {
+        controller.downloadRaceResults(updatedRace, {nameFormat: NameFormat.FIRSTNAMESURNAME}).catch(error => {
             setMessage('Unable to download result\n' + error.message);
         });
     }

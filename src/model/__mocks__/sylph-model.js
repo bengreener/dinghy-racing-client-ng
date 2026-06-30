@@ -573,8 +573,17 @@ class SylphModel {
     }
 
     async getSignedUpToRaceForEntry(race, entry) {
+        let signedUpHAL = {};
         const version = {version: '"0"'};
-        return new SignedUp({}, version, this);
+        if (race.url === raceScorpionAHAL._links.self.href) {
+            if (entry.url === entryChrisMarshall1234ScorpionAHAL._links.self.href) {
+                signedUpHAL = signedUpChrisMarshallDinghy1234ScorpionAHAL;
+            }
+            else if (entry.url === entrySarahPascal6745ScorpionAHAL._links.self.href) {
+                signedUpHAL = signedUpSarahPascalDinghy6745ScorpionAHAL;
+            }
+        }
+        return new SignedUp(signedUpHAL, version, this);
     }
 
     getStartSequence(races) {

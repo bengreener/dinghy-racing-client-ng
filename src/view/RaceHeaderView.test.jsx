@@ -21,6 +21,7 @@ import SylphModel from '../model/sylph-model';
 import SylphController from '../controller/sylph-controller';
 import Clock from '../model/clock';
 import DirectRace from '../model/direct-race';
+import NameFormat from '../controller/name-format';
 import { httpRootURL, wsRootURL, raceCometAHAL, raceScorpionAHAL, raceGraduateAHAL, racePursuitAHAL, } from '../model/__mocks__/test-data';
 
 vi.mock('../model/sylph-model');
@@ -501,5 +502,38 @@ describe('when a lap is added to the race', () => {
             model.handleRaceEntryLapsUpdate({'body': race.url});
         });
         expect(screen.getByText('Comet A')).toBeInTheDocument();
+    });
+});
+
+describe('when result button clicked', () => {
+    it('opens a new window for the result sheet for that race', async () => {
+        vi.spyOn(window, 'location', 'get').mockReturnValue({
+            origin: 'http://localhost',
+            pathname: ''
+        });
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:31:00Z'));
+        const openSpy = vi.spyOn(window, 'open').mockImplementation(vi.fn());
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        await act(async () => {
+            render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
+        });
+        await user.click(screen.getByRole('button', {name: /result/i}));
+        expect(openSpy).toBeCalledWith('http://localhost/race-result/4');
+    });
+    it('downloads the race', async () => {
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:31:00Z'));
+        vi.spyOn(window, 'open').mockImplementation(vi.fn());
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        const downloadRaceResultsSpy = vi.spyOn(controller, 'downloadRaceResults');
+        await act(async () => {
+            render(<RaceHeaderView model={model} controller={controller} race={race} />);
+        });
+        await user.click(screen.getByRole('button', {name: /result/i}));
+        expect(downloadRaceResultsSpy).toBeCalledWith(race, {nameFormat: NameFormat.FIRSTNAMESURNAME});
     });
 });
