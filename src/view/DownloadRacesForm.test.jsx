@@ -166,6 +166,7 @@ it('displays races that start within the time window specified', async () => {
 describe('when download results button clicked', () => {
     it('calls controller download results function', async () => {
         const user = userEvent.setup();
+        vi.spyOn(window, 'open').mockImplementation(vi.fn());
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
         vi.spyOn(model, 'getRacesBetweenTimes').mockImplementation(async () => {return new Collection([new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0, number: 0})});
@@ -179,6 +180,7 @@ describe('when download results button clicked', () => {
     });
     it('displays the error message if the request to download is unsuccessful', async () => {
         const user = userEvent.setup();
+        vi.spyOn(window, 'open').mockImplementation(vi.fn());
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
         vi.spyOn(model, 'getRacesBetweenTimes').mockImplementation(async () => {return new Collection([new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0, number: 0})});
@@ -189,5 +191,22 @@ describe('when download results button clicked', () => {
         const downloadButton = await screen.findByText(/download results/i)
         await user.click(downloadButton);
         expect(await screen.findByText(/oops/i)).toBeInTheDocument();
+    });
+    it('opens a new window for the result sheet for that race', async () => {
+        vi.spyOn(window, 'location', 'get').mockReturnValue({
+            origin: 'http://localhost',
+            pathname: ''
+        });
+        const user = userEvent.setup();
+        const openSpy = vi.spyOn(window, 'open').mockImplementation(vi.fn());
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        vi.spyOn(model, 'getRacesBetweenTimes').mockImplementation(async () => {return new Collection([new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)], {size: 20, totalElements: 1, totalPages: 0, number: 0})});
+        const downloadFunctionSpy = vi.spyOn(controller, 'downloadRaceResults').mockImplementation(async () => {return {'success': true}});
+        act(() => {
+            render(<DownloadRacesForm model={model} controller={controller}/>);
+        });
+        await user.click(await screen.findByText(/download results/i));
+        expect(openSpy).toBeCalledWith('http://localhost/race-result/4');
     });
 });
