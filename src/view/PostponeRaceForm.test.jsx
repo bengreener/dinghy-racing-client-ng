@@ -120,9 +120,17 @@ describe('when Set New Time button clicked', () => {
         const user = userEvent.setup();
         const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         render(<PostponeRaceForm race={race} onPostpone={postponeCallbackMock} />);
+        const newTimeInput = screen.getByLabelText('New Start Time');
         const postponeButtton = screen.getByRole('button', {'name': /Set New Time/i});
+        await act(async () => {
+            await user.type(newTimeInput, '1', {initialSelectionStart: 0, initialSelectionEnd: 1});
+            await user.type(newTimeInput, '1', {initialSelectionStart: 1, initialSelectionEnd: 2});
+            await user.type(newTimeInput, '4', {initialSelectionStart: 3, initialSelectionEnd: 4});
+            await user.type(newTimeInput, '0', {initialSelectionStart: 4, initialSelectionEnd: 5});
+        });
         await user.click(postponeButtton);
         expect(postponeCallbackMock).toBeCalledTimes(1);
+        expect(postponeCallbackMock).toBeCalledWith(race, 600000);
     });
 });
 
@@ -134,5 +142,101 @@ describe('when enter button is pressed', () => {
         render(<PostponeRaceForm race={race} onPostpone={postponeCallbackMock} />);
         await user.keyboard('{Enter}');
         expect(postponeCallbackMock).toBeCalledTimes(1);
+    });
+});
+
+describe('when add 1 minute button is pressed', () => {
+    it('adds 1 minute to the new start time', async () => {
+        const user = userEvent.setup();
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        render(<PostponeRaceForm race={race}/>);
+        const plusButton = screen.getByText(/\+1 minute/i);
+        await user.click(plusButton);
+        expect(screen.getByLabelText('New Start Time')).toHaveValue('11:31:00');
+    });
+});
+
+describe('when add 5 minutes button is pressed', () => {
+    it('adds 5 minutes to the new start time', async () => {
+        const user = userEvent.setup();
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        render(<PostponeRaceForm race={race}/>);
+        const plusButton = screen.getByText(/\+5 minute/i);
+        await user.click(plusButton);
+        expect(screen.getByLabelText('New Start Time')).toHaveValue('11:35:00');
+    });
+});
+
+describe('when add 10 minutes button is pressed', () => {
+    it('adds 10 minutes to the new start time', async () => {
+        const user = userEvent.setup();
+        const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
+        render(<PostponeRaceForm race={race}/>);
+        const plusButton = screen.getByText(/\+10 minute/i);
+        await user.click(plusButton);
+        expect(screen.getByLabelText('New Start Time')).toHaveValue('11:40:00');
+    });
+});
+
+describe('when current start time greater than planned start time by at least 1 minute when subtract 1 minute button is pressed', () => {
+    it('subtracts 1 minute from the new start time', async () => {
+        const user = userEvent.setup();
+        const race = new DirectRace({...raceScorpionAHAL, startTimeOffset: 'PT1M'}, {version: '"0"'}, model);
+        render(<PostponeRaceForm race={race}/>);
+        const subtractButton = screen.getByText(/-1 minute/i);
+        await user.click(subtractButton);
+        expect(screen.getByLabelText('New Start Time')).toHaveValue('11:30:00');
+    });
+});
+
+describe('when current start time greater than planned start time by at least 5 minutes when subtract 5 minute button is pressed', () => {
+    it('subtracts 5 minutes from the new start time', async () => {
+        const user = userEvent.setup();
+        const race = new DirectRace({...raceScorpionAHAL, startTimeOffset: 'PT5M'}, {version: '"0"'}, model);
+        render(<PostponeRaceForm race={race}/>);
+        const subtractButton = screen.getByText(/-5 minute/i);
+        await user.click(subtractButton);
+        expect(screen.getByLabelText('New Start Time')).toHaveValue('11:30:00');
+    });
+});
+
+describe('when current start time greater than planned start time by at least 10 minutes when subtract 5 minute button is pressed', () => {
+    it('subtracts 10 minutes from the new start time', async () => {
+        const user = userEvent.setup();
+        const race = new DirectRace({...raceScorpionAHAL, startTimeOffset: 'PT10M'}, {version: '"0"'}, model);
+        render(<PostponeRaceForm race={race}/>);
+        const subtractButton = screen.getByText(/-10 minute/i);
+        await user.click(subtractButton);
+        expect(screen.getByLabelText('New Start Time')).toHaveValue('11:30:00');
+    });
+});
+
+describe('when current start time less than 1 minute more than planned start time', () => {
+    it('subtract 1 minute button is disabled', async () => {
+        const user = userEvent.setup();
+        const race = new DirectRace({...raceScorpionAHAL, startTimeOffset: 'PT59S'}, {version: '"0"'}, model);
+        render(<PostponeRaceForm race={race}/>);
+        const subtractButton = screen.getByText(/-1 minute/i);
+        expect(subtractButton).toBeDisabled();
+    });
+});
+
+describe('when current start time less than 5 minutes more than planned start time', () => {
+    it('subtract 5 minute button is disabled', async () => {
+        const user = userEvent.setup();
+        const race = new DirectRace({...raceScorpionAHAL, startTimeOffset: 'PT4M59S'}, {version: '"0"'}, model);
+        render(<PostponeRaceForm race={race}/>);
+        const subtractButton = screen.getByText(/-5 minute/i);
+        expect(subtractButton).toBeDisabled();
+    });
+});
+
+describe('when current start time less than 10 minutes more than planned start time', () => {
+    it('subtract 10 minute button is disabled', async () => {
+        const user = userEvent.setup();
+        const race = new DirectRace({...raceScorpionAHAL, startTimeOffset: 'PT9M59S'}, {version: '"0"'}, model);
+        render(<PostponeRaceForm race={race}/>);
+        const subtractButton = screen.getByText(/-10 minute/i);
+        expect(subtractButton).toBeDisabled();
     });
 });
