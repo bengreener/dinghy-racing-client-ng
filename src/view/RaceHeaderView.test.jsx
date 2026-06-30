@@ -116,7 +116,7 @@ describe('when rendered', () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
             const controller = new SylphController(model);
             render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
-            expect(screen.getByRole('button', {name: /postpone start/i})).toBeInTheDocument();
+            expect(screen.getByRole('button', {name: /postpone/i})).toBeInTheDocument();
         });
         it('displays start race button', () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
@@ -204,7 +204,7 @@ describe('when rendered', () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
             const controller = new SylphController(model);
             render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...racePursuitAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
-            expect(screen.getByRole('button', {name: /postpone start/i})).toBeInTheDocument();
+            expect(screen.getByRole('button', {name: /postpone/i})).toBeInTheDocument();
         });
         it('displays start race button', () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
@@ -233,7 +233,7 @@ describe('when showInRaceData is false', () => {
         expect(screen.queryByLabelText(/estimate/i)).not.toBeInTheDocument();
         expect(screen.queryByLabelText(/last/i)).not.toBeInTheDocument();
         expect(screen.queryByLabelText(/average/i)).not.toBeInTheDocument();
-        expect(screen.getByRole('button', {name: /postpone start/i})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: /postpone/i})).toBeInTheDocument();
         expect(screen.getByRole('button', {name: /start now/i})).toBeInTheDocument();
     });
     it('displays adjust course button', () => {
@@ -241,7 +241,7 @@ describe('when showInRaceData is false', () => {
         const controller = new SylphController(model);
         render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000).toISOString().replaceAll('Z', '')}, {version: '"0"'}, model)} showInRaceData={false} />);
         expect(screen.queryByRole('button', {name: /shorten course/i})).not.toBeInTheDocument();
-        expect(screen.getByRole('button', {name: /adjust laps/i})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: /set laps/i})).toBeInTheDocument();
     });
     it('displays current start time of race', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -292,7 +292,7 @@ describe('when a race has started', () => {
             removeTickHandler: vi.fn()
         }});
         render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
-        expect(screen.queryByText(/postpone start/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/postpone/i)).not.toBeInTheDocument();
     });
     it('no longer shows option to start race', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -334,7 +334,7 @@ describe('when postpone race button clicked', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
         render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
-        await user.click(screen.getByRole('button', {'name': /postpone start/i}));
+        await user.click(screen.getByRole('button', {'name': /postpone/i}));
         const dialog = within(screen.getByTestId('postpone-race-dialog'));
         expect(dialog.getByRole('button', {'name': /cancel/i, 'hidden': true})).toBeInTheDocument();
         expect(dialog.getByRole('button', {'name': /Set New Time/i, 'hidden': true})).toBeInTheDocument();
@@ -406,7 +406,7 @@ describe('when shorten course button clicked', () => {
             render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
         });
         
-        await user.click(screen.getByRole('button', {'name': /shorten course/i}));
+        await user.click(screen.getByRole('button', {'name': /shorten/i}));
         
         const dialog = within(screen.getByTestId('shorten-course-dialog'));
         expect(dialog.getByRole('spinbutton', {'name': /laps/i, 'hidden': true})).toBeInTheDocument();
