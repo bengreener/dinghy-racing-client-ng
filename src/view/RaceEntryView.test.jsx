@@ -728,7 +728,7 @@ describe('when a scoring abbreviation is selected', () => {
             );
             render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
-            expect(raceEntryView.getAttribute('class')).toMatch(/did-not-start/i);
+            expect(raceEntryView.getAttribute('class')).toMatch(/ did-not-start/i);
         });
     });
     describe('when entry retired', () => {
@@ -744,7 +744,7 @@ describe('when a scoring abbreviation is selected', () => {
             );
             render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
-            expect(raceEntryView.getAttribute('class')).toMatch(/retired/i);
+            expect(raceEntryView.getAttribute('class')).toMatch(/ retired/i);
         });
     });
     describe('when entry disqualified', () => {
@@ -760,7 +760,7 @@ describe('when a scoring abbreviation is selected', () => {
             );
             render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
-            expect(raceEntryView.getAttribute('class')).toMatch(/disqualified/i);
+            expect(raceEntryView.getAttribute('class')).toMatch(/ disqualified/i);
         });
     });
     describe('when entry did not compete in the race', () => {
@@ -776,7 +776,7 @@ describe('when a scoring abbreviation is selected', () => {
             );
             render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
-            expect(raceEntryView.getAttribute('class')).toMatch(/did-not-compete/i);
+            expect(raceEntryView.getAttribute('class')).toMatch(/ did-not-compete/i);
         });
     });
     describe('when entry on course side at start of race', () => {
@@ -792,7 +792,7 @@ describe('when a scoring abbreviation is selected', () => {
             );
             render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
-            expect(raceEntryView.getAttribute('class')).toMatch(/on-course-side/i);
+            expect(raceEntryView.getAttribute('class')).toMatch(/ on-course-side/i);
         });
     });
     describe('when entry did not finish the race', () => {
@@ -808,7 +808,7 @@ describe('when a scoring abbreviation is selected', () => {
             );
             render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
             const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
-            expect(raceEntryView.getAttribute('class')).toMatch(/did-not-finish/i);
+            expect(raceEntryView.getAttribute('class')).toMatch(/ did-not-finish/i);
         });
     });
 });

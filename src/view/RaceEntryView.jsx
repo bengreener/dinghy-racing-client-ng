@@ -275,7 +275,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     }    
 
     if (entry.scoringAbbreviation === 'DNS') {
-        classes += 'did-not-start';
+        classes += ' did-not-start';
     }
     else if (entry.scoringAbbreviation === 'DSQ') {
         classes += ' disqualified';
