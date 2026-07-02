@@ -644,7 +644,7 @@ describe('when entry has not finished race', () => {
 });
 
 describe('when a scoring abbreviation is not selected', () => {
-    it('only has a classes of race-entry-view w3-row w3-border w3-hover-border-blue cursor-pointer preserve-whitespace', () => {
+    it('only has a classes of race-entry-view w3-row w3-border w3-pale-blue w3-hover-blue', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
             new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"', model}), 
@@ -656,7 +656,7 @@ describe('when a scoring abbreviation is not selected', () => {
         );
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
         const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
-        expect(raceEntryView.getAttribute('class')).toMatch(/^race-entry-view w3-row w3-border w3-hover-border-blue$/i);
+        expect(raceEntryView.getAttribute('class')).toMatch(/^race-entry-view w3-row w3-border w3-pale-blue w3-hover-blue$/i);
     });
 });
 

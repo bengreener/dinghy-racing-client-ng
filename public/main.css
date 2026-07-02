@@ -62,13 +62,16 @@ button.selected {
 }
 .disabled {
 	/* applies to disabled race entries (HTML class applied through code/ html) */
-	color: lightgray;
+	/* color: lightgray; */
+	cursor:not-allowed!important;
+	opacity:0.3;
+	pointer-events:none!important;
 }
-:disabled {
+/** :disabled { */
 	/* applies to disabled input elements via disabled HTML element attribute */
 	/* class used to indicate elemnt is disabled while processing takes place; e.g. updating server and waiting for response */
-	background-color: lightGray;
-}
+/**	background-color: lightGray;
+} */
 .display-port {
 	overflow: hidden;
 	height:91vh;
@@ -109,29 +112,60 @@ button.selected {
 .clickable-table-row {
 	cursor: pointer;
 }
-.on-course-side {
-	background-color: lightgrey;
+.on-course-side,.did-not-compete,.did-not-start,.did-not-finish,.retired,.disqualified {
+	background-color: lightgrey!important;
 }
-.did-not-compete {
-	background-color: darkgrey;
+.on-course-side:hover,.did-not-compete:hover,.did-not-start:hover,.did-not-finish:hover,.retired:hover,.disqualified:hover {
+	background-color: lightgrey!important;
+	color: black!important;
 }
-.did-not-start {
-	background-color: lightgrey;
-}
-.did-not-finish {
-	background-color: gainsboro;
-}
-.retired {
-	background-color: gainsboro;
-}
-.disqualified {
-	background-color: grey;
-}
+/* .did-not-compete {
+	background-color: darkgrey!important;
+} */
+/* .did-not-compete:hover {
+	background-color: darkgrey!important;
+	color: black!important;
+} */
+/* .did-not-start {
+	background-color: lightgrey!important;
+} */
+/* .did-not-start:hover {
+	background-color: lightgrey!important;
+	color: black!important;
+} */
+/* .did-not-finish {
+	background-color: gainsboro!important;
+} */
+/* .did-not-finish:hover {
+	background-color: gainsboro!important;
+	color: black!important;
+} */
+/* .retired {
+	background-color: gainsboro!important;
+} */
+/* .retired:hover {
+	background-color: gainsboro!important;
+	color: black!important;
+} */
+/* .disqualified {
+	background-color: grey!important;
+} */
+/* .disqualified:hover {
+	background-color: grey!important;
+	color: black!important;
+} */
 .on-last-lap {
-	background-color: #FFEE75;
+	background-color: #ffee75!important;
+}
+.on-last-lap:hover {
+	background-color: #fadd00!important;
+	color: black!important;
 }
 .finished-race {
-	background-color: palegreen;
+	background-color: palegreen!important;
+}
+.finished-race:hover {
+	background-color: green!important;
 }
 .warning-flag-prepare-raise {
 	padding: 5pt;
