@@ -23,6 +23,10 @@ class SignedUp extends Entity {
     }
 
     get correctedTime() {
+        // if corrected time is 'infinity' return 0
+        if (this.hal.correctedTime === 'PT2562047788015215H30M7S') {
+            return 0;
+        }
         return this.model.convertISO8601DurationToMilliseconds(this.hal.correctedTime);
     }
 
