@@ -406,11 +406,10 @@ describe('when shorten course button clicked', () => {
         await act(async () => {
             render(<RaceHeaderView model={model} controller={controller} race={new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)} />);
         });
-        
         await user.click(screen.getByRole('button', {'name': /shorten/i}));
         
         const dialog = within(screen.getByTestId('shorten-course-dialog'));
-        expect(dialog.getByRole('spinbutton', {'name': /laps/i, 'hidden': true})).toBeInTheDocument();
+        expect(dialog.getByRole('button', {'name': /\+1 lap/i, 'hidden': true})).toBeInTheDocument();
         expect(dialog.getByRole('button', {'name': /cancel/i, 'hidden': true})).toBeInTheDocument();
         expect(dialog.getByRole('button', {'name': 'Update Laps', 'hidden': true})).toBeInTheDocument();
     });

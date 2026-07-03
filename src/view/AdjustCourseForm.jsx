@@ -27,30 +27,86 @@ import { useState } from 'react';
  * @param {ModalDialog~closeDialog} props.closeParent call this to close a dialog containing this form
  * @returns {HTMLFormElement}
  */
-function AdjustCourseForm({ race, minLaps = 1, maxLaps = 100, initialValue, onUpdate, closeParent}) {
+function AdjustCourseForm({ race, minLaps = 1, maxLaps, initialValue, onUpdate, closeParent}) {
     const [laps, setLaps] = useState(initialValue ? initialValue : minLaps);
+    const [message, setMessage] = useState('');
+
+    /**
+     * Update the number of laps displayed
+     * @param {Integer} inputLaps
+     */
+    function updateLaps(laps) {
+        let newLaps = laps;
+        if (newLaps < 0) {
+            setMessage('Cannot adjust course to less than 1 lap.');
+            newLaps = 0;
+        }
+        else if (newLaps === 0) {
+            setMessage('Cannot adjust course to less than 1 lap.');
+        }
+        else if (newLaps < minLaps) {
+            newLaps = minLaps;
+            setMessage(`Cannot adjust course to less than ${minLaps} laps.`);
+        }
+        else if (newLaps > maxLaps) {
+            newLaps = maxLaps;
+            setMessage(`Cannot adjust course to more than ${maxLaps} laps.`);
+        }
+        else {
+            setMessage('');
+        }
+        setLaps(newLaps);
+    }
 
     function handleChange({ target }) {
-        if (target.value >= minLaps && target.value <= maxLaps) {
-            setLaps(target.value);
+        if (target.value === '') {
+            updateLaps(0);
+        }
+        const inputValue = Number.parseInt(target.value);
+        if (!Number.isNaN(inputValue)) {
+            updateLaps(inputValue);
+        }
+    }
+
+    function handleKeyUp(event) {
+        if (event.key === 'ArrowUp') {
+            updateLaps(laps + 1);
+        }
+        else if (event.key === 'ArrowDown') {
+            updateLaps(laps - 1);
         }
     }
 
     function handleSubmit(event) {
         event.preventDefault();
-        onUpdate(race, Number(laps));
-        if (closeParent) {
-            closeParent();
+        if (laps >= minLaps && (maxLaps ? laps <= maxLaps : true)) {
+            onUpdate(race, Number(laps));
+            if (closeParent) {
+                closeParent();
+            }
         }
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div className={'w3-row-padding'}>
-                <label htmlFor='set-laps-input'>Set Laps</label>
-                <input className={'w3-large'} id='set-laps-input' name='laps' type='number' min={minLaps.toString()} max={maxLaps.toString()} value={laps} onChange={handleChange} autoFocus/>
-            </div>
+        <form className={'adjust-course-form w3-container'} onSubmit={handleSubmit}>
             <div className={'w3-row'}>
+                <div className={'w3-row'}>
+                    <label className={'w3-half'} htmlFor={'current-laps-output'}>Current Laps</label>
+                    <output className={'w3-half w3-center'} id={'current-laps-output'}>{race.plannedLaps}</output>
+                </div>
+                <div className={'w3-row'}>
+                    <label className={'w3-half'} htmlFor='set-laps-input'>New Laps</label>
+                    <input className={'w3-half w3-center'} id='set-laps-input' name='laps' type='text' value={laps} onKeyUp={handleKeyUp} onChange={handleChange} autoFocus/>
+                </div>
+                <div className={'w3-row'}>
+                    <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => updateLaps(laps - 1)} disabled={laps <= minLaps} >-1 Lap</button>
+                    <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => updateLaps(laps + 1)} disabled={laps >= maxLaps} >+1 Lap</button>
+                </div>
+            </div>
+            <div>
+                {message ? <p className={'console-error-message'}>{message}</p> : null}
+            </div>
+            <div className={'w3-row w3-right'}>
                 {closeParent ? <button className={'w3-btn w3-border w3-border-white bgis-pale-amber w3-hover-amber'} type='button' onClick={closeParent}>Cancel</button> : null}
                 <button className={'w3-btn w3-border w3-border-white w3-pale-green w3-hover-green'} type='submit' >Update Laps</button>
             </div>

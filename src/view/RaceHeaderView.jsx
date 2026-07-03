@@ -194,8 +194,8 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
                 <PostponeRaceForm race={race} onPostpone={controller.postponeRace} closeParent={closePostponeRaceFormDialog} />
             </ModalDialog> : null}
             {showShortenCourse ? <ModalDialog show={showShortenCourse} onClose={closeShortenCourseDialog} testid={'shorten-course-dialog'}>
-                {showInRaceData ? <AdjustCourseForm race={updatedRace} minLaps={Math.max(1, updatedRace.leadEntryLapsSailed)} maxLaps={updatedRace.plannedLaps - 1} initialValue={Math.max(1, updatedRace.plannedLaps - 1)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} /> :
-                    <AdjustCourseForm race={race} minLaps={Math.max(1, updatedRace.leadEntryLapsSailed)} initialValue={Math.max(1, updatedRace.plannedLaps)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} />}
+                {showInRaceData ? <AdjustCourseForm race={race} minLaps={Math.max(1, race.leadEntryLapsSailed)} maxLaps={race.plannedLaps - 1} initialValue={Math.max(1, race.plannedLaps - 1)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} /> :
+                    <AdjustCourseForm race={race} minLaps={Math.max(1, updatedRace.leadEntryLapsSailed)} initialValue={Math.max(1, race.plannedLaps)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} />}
             </ModalDialog> : null}
         </div>
     );
