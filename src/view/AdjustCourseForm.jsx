@@ -99,16 +99,16 @@ function AdjustCourseForm({ race, minLaps = 1, maxLaps, initialValue, onUpdate, 
                     <input className={'w3-half w3-center'} id='set-laps-input' name='laps' type='text' value={laps} onKeyUp={handleKeyUp} onChange={handleChange} autoFocus/>
                 </div>
                 <div className={'w3-row'}>
-                    <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => updateLaps(laps - 1)} disabled={laps <= minLaps} >-1 Lap</button>
-                    <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => updateLaps(laps + 1)} disabled={laps >= maxLaps} >+1 Lap</button>
+                    <button className={'adjust-value-button w3-half w3-btn w3-border bgis-light-blue bgis-hover-dark-blue'} type='button' onClick={() => updateLaps(laps - 1)} disabled={laps <= minLaps} >-1 Lap</button>
+                    <button className={'adjust-value-button w3-half w3-btn w3-border bgis-light-blue bgis-hover-dark-blue'} type='button' onClick={() => updateLaps(laps + 1)} disabled={laps >= maxLaps} >+1 Lap</button>
                 </div>
             </div>
             <div>
                 {message ? <p className={'console-error-message'}>{message}</p> : null}
             </div>
             <div className={'w3-row w3-right'}>
-                {closeParent ? <button className={'w3-btn w3-border w3-border-white bgis-pale-amber w3-hover-amber'} type='button' onClick={closeParent}>Cancel</button> : null}
-                <button className={'w3-btn w3-border w3-border-white w3-pale-green w3-hover-green'} type='submit' >Update Laps</button>
+                {closeParent ? <button className={'cancel-button w3-btn w3-border bgis-pale-amber w3-hover-amber'} type='button' onClick={closeParent}>Cancel</button> : null}
+                <button className={'submit-button w3-btn w3-border w3-light-green w3-hover-green'} type='submit' >Update Laps</button>
             </div>
         </form>
     )

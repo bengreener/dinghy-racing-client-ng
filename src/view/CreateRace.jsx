@@ -136,7 +136,7 @@ function CreateRace({ model, onCreate }) {
                 </div>
                 <div className='w3-row'>
                     <div className='w3-col m8' >
-                        <button id='race-create-button' className='w3-btn w3-border w3-border-white w3-pale-green w3-hover-green w3-right' type='button' onClick={handleCreate}>Create</button>
+                        <button id='race-create-button' className='w3-btn w3-border w3-light-green w3-hover-green w3-right' type='button' onClick={handleCreate}>Create</button>
                     </div>
                 </div>
             </form>

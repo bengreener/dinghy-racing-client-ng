@@ -180,8 +180,8 @@ function DinghyClassConsole({ model, controller }) {
                 </div>
                 <div className='w3-row' >
                     <div className='w3-col m8' >
-                        {selectedDinghyClass ? <button id='dinghy-class-update-button' className='w3-btn w3-border w3-border-white w3-pale-green w3-hover-green w3-right' type='button' onClick={handleUpdate} >Update</button> : <button id='dinghy-class-create-button' className='w3-btn w3-border w3-border-white w3-pale-green w3-hover-green w3-right' type='button' onClick={handleCreate}>Create</button>}
-                        <button id='dinghy-class-cancel-button' className='w3-btn w3-border w3-border-white bgis-pale-amber w3-hover-amber w3-right' type='button' onClick={clear}>Cancel</button>
+                        {selectedDinghyClass ? <button id='dinghy-class-update-button' className='w3-btn w3-border w3-light-green w3-hover-green w3-right' type='button' onClick={handleUpdate} >Update</button> : <button id='dinghy-class-create-button' className='w3-btn w3-border w3-light-green w3-hover-green w3-right' type='button' onClick={handleCreate}>Create</button>}
+                        <button id='dinghy-class-cancel-button' className='w3-btn w3-border bgis-pale-amber w3-hover-amber w3-right' type='button' onClick={clear}>Cancel</button>
                     </div>
                 </div>
             </form>

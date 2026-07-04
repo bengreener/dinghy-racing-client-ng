@@ -181,8 +181,8 @@ function FleetConsole({ model, controller }) {
                 </div>
                 <div className='w3-row'>
                     <div className='w3-col m8' >
-                        {!updatingFleet ? <button className='w3-btn w3-border w3-border-white w3-pale-green w3-hover-green w3-right' type='button' onClick={handleCreateButtonClick} >Create</button> : <button className='w3-btn w3-border w3-border-white w3-pale-green w3-hover-green w3-right' type='button' onClick={handleUpdateButtonClick} >Update</button>}
-                        <button className='w3-btn w3-border w3-border-white bgis-pale-amber w3-hover-amber w3-right' type='button' onClick={clear} >Cancel</button>
+                        {!updatingFleet ? <button className='w3-btn w3-border w3-light-green w3-hover-green w3-right' type='button' onClick={handleCreateButtonClick} >Create</button> : <button className='w3-btn w3-border w3-light-green w3-hover-green w3-right' type='button' onClick={handleUpdateButtonClick} >Update</button>}
+                        <button className='w3-btn w3-border bgis-pale-amber w3-hover-amber w3-right' type='button' onClick={clear} >Cancel</button>
                     </div>
                 </div>
             </form>

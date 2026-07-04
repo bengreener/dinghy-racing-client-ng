@@ -172,21 +172,21 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
                     {showInRaceData && updatedRace.type !== RaceType.PURSUIT && updatedRace.leadEntryLastLapTime > 0 ? <output id={'average-lap-' + updatedRace.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{Clock.formatDuration(updatedRace.leadEntryAverageLapTime)}</output> : null}
                 </div>
                 <div className='w3-col m1 s6'>
-                    {showInRaceData && updatedRace.type !== RaceType.PURSUIT && updatedRace.leadEntryLapsSailed < updatedRace.plannedLaps ? <button id='shorten-course-button' className='w3-btn w3-col w3-border w3-border-white w3-pale-blue w3-hover-blue' onClick={handleShortenCourseClick}>Shorten</button> : null}
-                    {!showInRaceData && updatedRace.type !== RaceType.PURSUIT ? <button id='adjust-course-button' className='w3-btn w3-col w3-border w3-border-white w3-pale-blue w3-hover-blue' onClick={handleShortenCourseClick}>Set Laps</button> : null}
+                    {showInRaceData && updatedRace.type !== RaceType.PURSUIT && updatedRace.leadEntryLapsSailed < updatedRace.plannedLaps ? <button id='shorten-course-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' onClick={handleShortenCourseClick}>Shorten</button> : null}
+                    {!showInRaceData && updatedRace.type !== RaceType.PURSUIT ? <button id='adjust-course-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' onClick={handleShortenCourseClick}>Set Laps</button> : null}
                 </div>
                 <div className='w3-col m1 s6'>
-                    {elapsedTime < 0 ? <button id='race-postpone-button' className='w3-btn w3-col w3-border w3-border-white w3-pale-blue w3-hover-blue' onClick={handleRacePostponeClick}>Postpone</button> : null}
-                    {(elapsedTime >= 0 && (updatedRace.leadEntryLapsSailed == null || updatedRace.leadEntryLapsSailed < 1)) ? <button id='race-restart-button' className='w3-btn w3-col w3-border w3-border-white w3-pale-blue w3-hover-blue' onClick={handleRacePostponeClick}>Restart</button> : null}
+                    {elapsedTime < 0 ? <button id='race-postpone-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' onClick={handleRacePostponeClick}>Postpone</button> : null}
+                    {(elapsedTime >= 0 && (updatedRace.leadEntryLapsSailed == null || updatedRace.leadEntryLapsSailed < 1)) ? <button id='race-restart-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' onClick={handleRacePostponeClick}>Restart</button> : null}
                 </div>
                 <div className='w3-col m1 s6'>
-                    {elapsedTime < 0 ? <button id='race-start-button' className='w3-btn w3-col w3-border w3-border-white w3-pale-blue w3-hover-blue' onClick={handleRaceStartClick}>Start Now</button> : null}
+                    {elapsedTime < 0 ? <button id='race-start-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' onClick={handleRaceStartClick}>Start Now</button> : null}
                 </div>
                 <div className='w3-col m1 s6'>
-                    {elapsedTime > 0 ? <button id='race-end-button' className='w3-btn w3-col w3-border w3-border-white w3-pale-blue w3-hover-blue' onClick={handleResultClick}>Result</button> : null}
+                    {elapsedTime > 0 ? <button id='race-end-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' onClick={handleResultClick}>Result</button> : null}
                 </div>
                 <div className='w3-col m1 s6'>
-                    <button id='race-start-button' className='w3-btn w3-col w3-border w3-border-white w3-pale-blue w3-hover-blue' onClick={handleLapSheetClick}>Lap Sheet</button>
+                    <button id='race-start-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' onClick={handleLapSheetClick}>Lap Sheet</button>
                 </div>
             </div>
             <p className={userMessageClasses()}>{message}</p>

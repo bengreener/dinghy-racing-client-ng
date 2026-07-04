@@ -60,7 +60,7 @@ function DownloadRace({ race, downloadFunction }) {
             </div>
             <div className='w3-row' >
                 <div className='w3-right' >
-                    <button id='race-result-download-button' className='w3-btn w3-border w3-border-white w3-pale-green w3-hover-green w3-right' type='button' onClick={handleDownloadButtonClick} >Download Results</button>
+                    <button id='race-result-download-button' className='w3-btn w3-border w3-light-green w3-hover-green w3-right' type='button' onClick={handleDownloadButtonClick} >Download Results</button>
                 </div>
             </div>
         </form>

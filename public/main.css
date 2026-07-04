@@ -43,7 +43,9 @@ button.embedded {
     background-color: inherit;
 }
 button.selected {
-	background-color: #85D6FF!important;
+	/* background-color: #85D6FF!important; */
+	background-color: #0096E0!important;
+	color: white;
 }
 .action-list-view {
     display: flex;

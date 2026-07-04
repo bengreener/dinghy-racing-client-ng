@@ -76,21 +76,21 @@ import Clock from '../model/clock';
             </div>
             <div className={'w3-half'}>
                 <div className={'w3-row'}>
-                    <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => handleAddDuration(-60000)} disabled={newStartTime.getTime() - 60000 < race.plannedStartTime.getTime()}>-1 minute</button>
-                    <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => handleAddDuration(60000)}>+1 minute</button>
+                    <button className={'w3-half w3-btn w3-border bgis-light-blue bgis-hover-dark-blue'} type='button' onClick={() => handleAddDuration(-60000)} disabled={newStartTime.getTime() - 60000 < race.plannedStartTime.getTime()}>-1 minute</button>
+                    <button className={'w3-half w3-btn w3-border bgis-light-blue bgis-hover-dark-blue'} type='button' onClick={() => handleAddDuration(60000)}>+1 minute</button>
                 </div>
                 <div className={'w3-row'}>
-                    <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => handleAddDuration(-300000)} disabled={newStartTime.getTime() - 300000 < race.plannedStartTime.getTime()}>-5 minutes</button>
-                    <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => handleAddDuration(300000)}>+5 minutes</button>
+                    <button className={'w3-half w3-btn w3-border bgis-light-blue bgis-hover-dark-blue'} type='button' onClick={() => handleAddDuration(-300000)} disabled={newStartTime.getTime() - 300000 < race.plannedStartTime.getTime()}>-5 minutes</button>
+                    <button className={'w3-half w3-btn w3-border bgis-light-blue bgis-hover-dark-blue'} type='button' onClick={() => handleAddDuration(300000)}>+5 minutes</button>
                 </div>
                 <div className={'w3-row'}>
-                    <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => handleAddDuration(-600000)} disabled={newStartTime.getTime() - 600000 < race.plannedStartTime.getTime()}>-10 minutes</button>
-                    <button className={'w3-half w3-btn w3-border w3-pale-blue w3-hover-blue'} type='button' onClick={() => handleAddDuration(600000)}>+10 minutes</button>
+                    <button className={'w3-half w3-btn w3-border bgis-light-blue bgis-hover-dark-blue'} type='button' onClick={() => handleAddDuration(-600000)} disabled={newStartTime.getTime() - 600000 < race.plannedStartTime.getTime()}>-10 minutes</button>
+                    <button className={'w3-half w3-btn w3-border bgis-light-blue bgis-hover-dark-blue'} type='button' onClick={() => handleAddDuration(600000)}>+10 minutes</button>
                 </div>
             </div>
             <div className={'w3-row w3-right'}>
-                {closeParent ? <button className={'w3-btn w3-border w3-border-white bgis-pale-amber w3-hover-amber'} type='button' onClick={closeParent}>Cancel</button> : null}
-                <button type='submit' className={'w3-btn w3-border w3-border-white w3-pale-green w3-hover-green'} >Set New Time</button>
+                {closeParent ? <button className={'w3-btn w3-border bgis-pale-amber w3-hover-amber'} type='button' onClick={closeParent}>Cancel</button> : null}
+                <button type='submit' className={'w3-btn w3-border w3-light-green w3-hover-green'} >Set New Time</button>
             </div>
         </form>
     )
