@@ -67,11 +67,6 @@ button.selected {
 	opacity:0.3;
 	pointer-events:none!important;
 }
-/** :disabled { */
-	/* applies to disabled input elements via disabled HTML element attribute */
-	/* class used to indicate elemnt is disabled while processing takes place; e.g. updating server and waiting for response */
-/**	background-color: lightGray;
-} */
 .display-port {
 	overflow: hidden;
 	height:91vh;
@@ -119,41 +114,6 @@ button.selected {
 	background-color: lightgrey!important;
 	color: black!important;
 }
-/* .did-not-compete {
-	background-color: darkgrey!important;
-} */
-/* .did-not-compete:hover {
-	background-color: darkgrey!important;
-	color: black!important;
-} */
-/* .did-not-start {
-	background-color: lightgrey!important;
-} */
-/* .did-not-start:hover {
-	background-color: lightgrey!important;
-	color: black!important;
-} */
-/* .did-not-finish {
-	background-color: gainsboro!important;
-} */
-/* .did-not-finish:hover {
-	background-color: gainsboro!important;
-	color: black!important;
-} */
-/* .retired {
-	background-color: gainsboro!important;
-} */
-/* .retired:hover {
-	background-color: gainsboro!important;
-	color: black!important;
-} */
-/* .disqualified {
-	background-color: grey!important;
-} */
-/* .disqualified:hover {
-	background-color: grey!important;
-	color: black!important;
-} */
 .on-last-lap {
 	background-color: #ffee75!important;
 }

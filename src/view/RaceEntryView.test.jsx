@@ -656,7 +656,7 @@ describe('when a scoring abbreviation is not selected', () => {
         );
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} />);
         const raceEntryView = screen.getByText((content, node) => /Scorpion1234Chris Marshall1 OCSDNCDNSDNFDSQRET/.test(node.textContent) && node.classList.contains('race-entry-view'));
-        expect(raceEntryView.getAttribute('class')).toMatch(/^race-entry-view w3-row w3-border w3-pale-blue w3-hover-blue$/i);
+        expect(raceEntryView.getAttribute('class')).toMatch(/^race-entry-view w3-row w3-border bgis-light-blue bgis-hover-dark-blue$/i);
     });
 });
 

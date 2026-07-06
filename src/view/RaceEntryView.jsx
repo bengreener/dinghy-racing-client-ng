@@ -39,7 +39,7 @@ function RaceEntryView({entry, addLap, removeLap, updateLap, setScoringAbbreviat
     const prevVersion = useRef(entry.entry.metadata.version);
     const prevSignedUpVersion = useRef(entry.signedUp.metadata.version);
     const lapsView = [];
-    let classes = 'race-entry-view w3-row w3-border w3-pale-blue w3-hover-blue';
+    let classes = 'race-entry-view w3-row w3-border bgis-light-blue bgis-hover-dark-blue';
 
     // gesture tracking variables
     let start = {};
