@@ -209,6 +209,10 @@ button.selected {
 	object-position: center;
 }
 
+.one-minute-to-flag-change {
+	background-color: orange;
+}
+
 .flipped {
 	transform: rotate(180deg);
 }

@@ -123,9 +123,24 @@ function SignalIndicator({ signals, clock }) {
         }
     }
 
+    const oneMinuteToChange = () => {
+        if (lastSignal?.time === time) {
+            return '';
+        }
+        else if (nextSignal) {
+            if ((nextSignal.time - time) <= 60000 && (nextSignal.time - time) > 0) {
+                return 'one-minute-to-flag-change';
+            }
+            return '';
+        }
+        else {
+            return '';
+        }
+    };
+
     return (
         <div className='signal-indicator w3-col bgis-fifth w3-border-right'>
-            <div>
+            <div className='w3-border-bottom'>
                 <output id='flag-name-output' className='w3-cell bgis-bold' >{flags.map(flag => flag.name).join(" ")}</output>
             </div>
             {lastSignal?.visualSignal.flagsState === FlagState.RAISED ? 
@@ -133,19 +148,23 @@ function SignalIndicator({ signals, clock }) {
                     <div className='signal-flag-container w3-border-bottom'>
                         {flagImages.map(image => <img class="signal-flag w3-image" src={image} />)}
                     </div>
-                    <div className='bgis-centered-element'>
-                        {timeToChange() ? <img className='signal-flag-action-icon flipped' src='./icons/arrow_shape_up.svg' /> : <img className='signal-flag-action-icon flipped' src='./icons/no_arrow_shape.svg' />}
-                    </div>
-                    <div>
-                        <output id='change-in-output' className='w3-col w3-center w3-xxlarge' >{Clock.formatDuration(timeToChange(), false, true)}</output>
+                    <div className={`${oneMinuteToChange()}`}>
+                        <div className='bgis-centered-element'>
+                            {timeToChange() ? <img className='signal-flag-action-icon flipped' src='./icons/arrow_shape_up.svg' /> : <img className='signal-flag-action-icon flipped' src='./icons/no_arrow_shape.svg' />}
+                        </div>
+                        <div className='bgis-centered-element'>
+                            <output id='change-in-output' className='bgis-centered-element w3-xxlarge' >{Clock.formatDuration(timeToChange(), false, true)}</output>
+                        </div>
                     </div>
                 </div> : 
                 <div>
-                    <div>
-                        <output id='change-in-output' className='w3-col w3-center w3-xxlarge' >{Clock.formatDuration(timeToChange(), false, true)}</output>
-                    </div>
-                    <div className='bgis-centered-element'>
-                        {timeToChange() ? <img className='signal-flag-action-icon' src='./icons/arrow_shape_up.svg' /> : <img className='signal-flag-action-icon flipped' src='./icons/no_arrow_shape.svg' />}
+                    <div className={`${oneMinuteToChange()}`}>
+                        <div className='bgis-centered-element'>
+                            <output id='change-in-output' className='bgis-centered-element w3-xxlarge' >{Clock.formatDuration(timeToChange(), false, true)}</output>
+                        </div>
+                        <div className='bgis-centered-element'>
+                            {timeToChange() ? <img className='signal-flag-action-icon' src='./icons/arrow_shape_up.svg' /> : <img className='signal-flag-action-icon flipped' src='./icons/no_arrow_shape.svg' />}
+                        </div>
                     </div>
                     <div className='signal-flag-container w3-border-top'>
                         {flagImages.map(image => <img class="signal-flag w3-image" src={image} />)}
