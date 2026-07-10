@@ -26,6 +26,74 @@ import FlagState from '../model/flag-state';
  */
 function SignalIndicator({ signals, clock }) {
     const [time, setTime] = useState(clock.getTimeToSecondPrecision());
+    const [flagImages] = useState(() => {
+        const images = [];
+        signals[0]?.visualSignal.flags.forEach(flag => {
+            switch(flag.name) {
+                case 'Blue Peter':
+                    images.push('./flags/p.svg');
+                    break;
+                case 'Open Handicap Class Flag':
+                    images.push('./flags/i.svg');
+                    break;
+                case 'Solo Class Flag':
+                    images.push('./flags/s.svg');
+                    break;
+                case 'Comet Class Flag':
+                    images.push('./flags/c.svg');
+                    break;
+                case 'Topper Class Flag':
+                    images.push('./flags/t.svg');
+                    break;
+                case 'Laser & Radial Class Flag':
+                    images.push('./flags/laser.svg');
+                    break;
+                case 'Graduate Class Flag':
+                    images.push('./flags/g.svg');
+                    break;
+                case 'Enterprise Class Flag':
+                    images.push('./flags/e.svg');
+                    break;
+                case 'Firefly Class Flag':
+                    images.push('./flags/f.svg');
+                    break;
+                case 'Heron Class Flag':
+                    images.push('./flags/h.svg');
+                    break;
+                case 'Fast Handicap Class Flag':
+                    images.push('./flags/chipstead_pennant.svg');
+                    break;
+                case 'Slow Handicap Class Flag':
+                    images.push('./flags/o.svg');
+                    break;
+                case 'Optimist Class Flag':
+                    images.push('./flags/optimist.svg');
+                    break;
+                case 'Graduate Goblet Class Flag':
+                    images.push('./flags/g.svg');
+                    break;
+                case 'Chipstead Pin Class Flag':
+                    images.push('./flags/chipstead_pennant.svg');
+                    break;
+                case 'Commodores Class Flag':
+                    images.push('./flags/chipstead_pennant.svg');
+                    break;
+                case 'Novice Class Flag':
+                    images.push('./flags/chipstead_pennant.svg');
+                    break;
+                case 'Christmas Pudding Class Flag':
+                    images.push('./flags/chipstead_pennant.svg');
+                    break;
+                case 'Junior Regatta Class Flag':
+                    images.push('./flags/chipstead_pennant.svg');
+                    break;                    
+                default:
+                    images.push('./flags/chipstead_pennant.svg');
+                    break;
+            }
+        });
+        return images;
+    })
 
     const tickHandler = useCallback(() => {
         setTime(clock.getTimeToSecondPrecision());
@@ -56,19 +124,34 @@ function SignalIndicator({ signals, clock }) {
     }
 
     return (
-        <div className='signal-indicator w3-row'>
-            <div className='w3-col s4 m3 w3-cell-row'>
-                <label htmlFor={'flag-name-output'} className='w3-cell' >Flag</label>
-                <output id='flag-name-output' className='w3-cell' >{flags.map(flag => flag.name).join(" ")}</output>
+        <div className='signal-indicator w3-col bgis-fifth w3-border-right'>
+            <div>
+                <output id='flag-name-output' className='w3-cell bgis-bold' >{flags.map(flag => flag.name).join(" ")}</output>
             </div>
-            <div className='w3-col s4 m2 w3-cell-row'>
-                <label htmlFor={'current-state-output'} className='w3-cell' >State</label>
-                <output id='current-state-output' className='w3-cell' >{lastSignal?.visualSignal.flagsState === FlagState.RAISED ? 'Raised' : 'Lowered' }</output>
-            </div>
-            <div className='w3-col s4 m2 w3-cell-row'>
-                <label htmlFor={'change-in-output'} className='w3-cell' >Change In</label>
-                <output id='change-in-output' className='w3-cell' >{Clock.formatDuration(timeToChange(), false, true)}</output>
-            </div>
+            {lastSignal?.visualSignal.flagsState === FlagState.RAISED ? 
+                <div>
+                    <div className='signal-flag-container w3-border-bottom'>
+                        {flagImages.map(image => <img class="signal-flag w3-image" src={image} />)}
+                    </div>
+                    <div className='bgis-centered-element'>
+                        {timeToChange() ? <img className='signal-flag-action-icon flipped' src='./icons/arrow_shape_up.svg' /> : <img className='signal-flag-action-icon flipped' src='./icons/no_arrow_shape.svg' />}
+                    </div>
+                    <div>
+                        <output id='change-in-output' className='w3-col w3-center w3-xxlarge' >{Clock.formatDuration(timeToChange(), false, true)}</output>
+                    </div>
+                </div> : 
+                <div>
+                    <div>
+                        <output id='change-in-output' className='w3-col w3-center w3-xxlarge' >{Clock.formatDuration(timeToChange(), false, true)}</output>
+                    </div>
+                    <div className='bgis-centered-element'>
+                        {timeToChange() ? <img className='signal-flag-action-icon' src='./icons/arrow_shape_up.svg' /> : <img className='signal-flag-action-icon flipped' src='./icons/no_arrow_shape.svg' />}
+                    </div>
+                    <div className='signal-flag-container w3-border-top'>
+                        {flagImages.map(image => <img class="signal-flag w3-image" src={image} />)}
+                    </div>
+                </div>
+            }
         </div>
     )
 }

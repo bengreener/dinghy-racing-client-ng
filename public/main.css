@@ -184,18 +184,33 @@ button.selected {
 }
 
 .small-loader {
-	/* border: 4px solid #f3f3f3; /* Light grey */
-	/* border-top: 4px solid #3498db; /* Blue */
-	/* border-radius: 50%;
-	width: 30px;
-	height: 30px; */
-	
 	border: .5ex solid #f3f3f3; /* Light grey */
 	border-top: .5ex solid #3498db; /* Blue */
 	border-radius: 50%;
 	width: 3ex;
 	height: 3ex;
 	animation: spin 2s linear infinite;
+}
+
+.signal-flag {
+	object-fit: contain;
+}
+
+.signal-flag-container {
+    display: flex;
+    justify-content: center;
+	align-items: center;
+	aspect-ratio: 4/3;
+}
+
+.signal-flag-action-icon {
+	scale: 3;
+	z-index: 1;
+	object-position: center;
+}
+
+.flipped {
+	transform: rotate(180deg);
 }
 
 @keyframes spin {

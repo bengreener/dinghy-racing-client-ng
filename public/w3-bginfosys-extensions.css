@@ -31,6 +31,12 @@ html,body{
     overflow: hidden;
 }
 
+.bgis-centered-element{
+    float: none;
+    margin: 0 auto;
+    width: fit-content;
+}
+
 .bgis-sticky-top {
     position: sticky;
     top: 0;
@@ -51,9 +57,13 @@ html,body{
 .bgis-light-blue,.bgis-hover-light-blue:hover{color:#000!important;background-color:#85d6ff!important}
 .bgis-border-light-blue,.bgis-hover-border-light-blue:hover{background-color:#85d6ff;}
 
+.bgis-fifth{float:left;width:100%}
+.w3-row-padding>.bgis-fifth{padding:0 8px}
+
 @media (min-width:601px) {
     .bgis-display-bottommiddle-min-601{position:absolute;left:50%;bottom:0;transform:translate(-50%,0%)}
     .w3-col.m1-half{width:4.16665%}
+    .w3-col.bgis-fifth{width:20%}
     .bgis-max-content{max-width: max-content;}
 }
 

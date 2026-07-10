@@ -1,0 +1,27 @@
+/*
+ * Copyright 2022-2024 BG Information Systems Ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
+import FlagState from './flag-state';
+
+/**
+ * A signal to competitors to indicate the progress of a race start sequence.
+ * Meaning should be treated as an enumeration. Recognised values are: 'Warning signal', 'Preparatory signal', 'Starting signal'. 
+ * @typedef VisualSignal
+ * @property {Array<Flag>} flags that make up the visual signal
+ * @property {FlagState} flagsState the current state of the flags that make up the visual signal
+ */
+
+export default VisualSignal;
