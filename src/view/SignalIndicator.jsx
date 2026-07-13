@@ -64,7 +64,7 @@ function SignalIndicator({ signals, clock }) {
                     images.push('./flags/chipstead_pennant.svg');
                     break;
                 case 'Slow Handicap Class Flag':
-                    images.push('./flags/o.svg');
+                    images.push('./flags/r.svg');
                     break;
                 case 'Optimist Class Flag':
                     images.push('./flags/optimist.svg');
