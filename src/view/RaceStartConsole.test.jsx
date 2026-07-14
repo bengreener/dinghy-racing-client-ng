@@ -247,9 +247,12 @@ it('displays initial state for each flag', async () => {
     await act(async () => {
         ({ container } = render(<RaceStartConsole model={model} controller={controller} />));
     });
-    const signalsPanel = container.getElementsByClassName('signals-panel')[0];
-    expect(within(signalsPanel).getAllByText(/raised/i)).toHaveLength(3);
-    expect(within(signalsPanel).getAllByText(/lowered/i)).toHaveLength(2);
+    const signalIndicators = container.getElementsByClassName('signal-indicator');
+    expect(within(signalIndicators[0]).getByTestId('signal-flag-action-time').compareDocumentPosition(within(signalIndicators[0]).getByTestId('signal-flag-./flags/z.svg'))).toBe(Node.DOCUMENT_POSITION_PRECEDING);
+    expect(within(signalIndicators[1]).getByTestId('signal-flag-action-time').compareDocumentPosition(within(signalIndicators[1]).getByTestId('signal-flag-./flags/p.svg'))).toBe(Node.DOCUMENT_POSITION_PRECEDING);
+    expect(within(signalIndicators[2]).getByTestId('signal-flag-action-time').compareDocumentPosition(within(signalIndicators[2]).getByTestId('signal-flag-./flags/g.svg'))).toBe(Node.DOCUMENT_POSITION_PRECEDING);
+    expect(within(signalIndicators[3]).getByTestId('signal-flag-action-time').compareDocumentPosition(within(signalIndicators[3]).getByTestId('signal-flag-./flags/c.svg'))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(within(signalIndicators[4]).getByTestId('signal-flag-action-time').compareDocumentPosition(within(signalIndicators[4]).getByTestId('signal-flag-./external/Handicap Class Flag.svg'))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
 });
 it('displays time to next flag state change for each flag', async () => {
     const model = new SylphModel(httpRootURL, wsRootURL);
@@ -389,15 +392,19 @@ describe('when clock ticks', () => {
         it('updates the displayed flag state to the new flag state', async () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
             const controller = new SylphController(model);
+            let container;
             await act(async () => {
-                render(<RaceStartConsole model={model} controller={controller} />);
+                ({ container } = render(<RaceStartConsole model={model} controller={controller} />));
             });
             await act(async () => {
                 vi.advanceTimersByTime(300000);
             });
-
-            expect(screen.getAllByText(/raised/i)).toHaveLength(3);
-            expect(screen.getAllByText(/lowered/i)).toHaveLength(2);
+            const signalIndicators = container.getElementsByClassName('signal-indicator');
+            expect(within(signalIndicators[0]).getByTestId('signal-flag-action-time').compareDocumentPosition(within(signalIndicators[0]).getByTestId('signal-flag-./flags/z.svg'))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+            expect(within(signalIndicators[1]).getByTestId('signal-flag-action-time').compareDocumentPosition(within(signalIndicators[1]).getByTestId('signal-flag-./flags/p.svg'))).toBe(Node.DOCUMENT_POSITION_PRECEDING);
+            expect(within(signalIndicators[2]).getByTestId('signal-flag-action-time').compareDocumentPosition(within(signalIndicators[2]).getByTestId('signal-flag-./flags/g.svg'))).toBe(Node.DOCUMENT_POSITION_PRECEDING);
+            expect(within(signalIndicators[3]).getByTestId('signal-flag-action-time').compareDocumentPosition(within(signalIndicators[3]).getByTestId('signal-flag-./flags/c.svg'))).toBe(Node.DOCUMENT_POSITION_PRECEDING);
+            expect(within(signalIndicators[4]).getByTestId('signal-flag-action-time').compareDocumentPosition(within(signalIndicators[4]).getByTestId('signal-flag-./external/Handicap Class Flag.svg'))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
         });
     });
     it('updates countdown for actions', async () => {

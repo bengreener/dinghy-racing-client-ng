@@ -26,7 +26,7 @@ import FlagState from '../model/flag-state';
  */
 function SignalIndicator({ signals, clock }) {
     const [time, setTime] = useState(clock.getTimeToSecondPrecision());
-    const [flagImages] = useState(() => {
+    const [flagImageFilenames] = useState(() => {
         const images = [];
         signals[0]?.visualSignal.flags.forEach(flag => {
             switch(flag.name) {
@@ -86,9 +86,12 @@ function SignalIndicator({ signals, clock }) {
                     break;
                 case 'Junior Regatta Class Flag':
                     images.push('./flags/chipstead_pennant.svg');
-                    break;                    
+                    break;
+                    case 'Scorpion Class Flag':
+                        images.push('./flags/z.svg');
+                        break;
                 default:
-                    images.push('./flags/chipstead_pennant.svg');
+                    images.push(`./external/${flag.name}.svg`);
                     break;
             }
         });
@@ -144,32 +147,32 @@ function SignalIndicator({ signals, clock }) {
                 <output id='flag-name-output' className='w3-cell bgis-bold' >{flags.map(flag => flag.name).join(" ")}</output>
             </div>
             {lastSignal?.visualSignal.flagsState === FlagState.RAISED ? 
-                <div>
+                <>
                     <div className='signal-flag-container w3-border-bottom'>
-                        {flagImages.map(image => <img class="signal-flag w3-image" src={image} />)}
+                        {flagImageFilenames.map(imageFilename => <img key={imageFilename} data-testid={`signal-flag-${imageFilename}`} className="signal-flag w3-image" src={imageFilename} />)}
                     </div>
-                    <div className={`${oneMinuteToChange()}`}>
+                    <div data-testid='signal-flag-action-container' className={`${oneMinuteToChange()}`}>
                         <div className='bgis-centered-element'>
-                            {timeToChange() ? <img className='signal-flag-action-icon flipped' src='./icons/arrow_shape_up.svg' /> : <img className='signal-flag-action-icon flipped' src='./icons/no_arrow_shape.svg' />}
+                            {timeToChange() ? <img data-testid='signal-flag-action-icon' className='signal-flag-action-icon flipped' src='./icons/arrow_shape_up.svg' /> : <img className='signal-flag-action-icon flipped' src='./icons/no_arrow_shape.svg' />}
                         </div>
                         <div className='bgis-centered-element'>
-                            <output id='change-in-output' className='bgis-centered-element w3-xxlarge' >{Clock.formatDuration(timeToChange(), false, true)}</output>
+                            <output id='change-in-output' data-testid={`signal-flag-action-time`} className='bgis-centered-element w3-xxlarge' >{Clock.formatDuration(timeToChange(), false, true)}</output>
                         </div>
                     </div>
-                </div> : 
-                <div>
-                    <div className={`${oneMinuteToChange()}`}>
+                </> : 
+                <>
+                    <div data-testid='signal-flag-action-container' className={`${oneMinuteToChange()}`}>
                         <div className='bgis-centered-element'>
-                            <output id='change-in-output' className='bgis-centered-element w3-xxlarge' >{Clock.formatDuration(timeToChange(), false, true)}</output>
+                            <output id='change-in-output' data-testid={`signal-flag-action-time`} className='bgis-centered-element w3-xxlarge' >{Clock.formatDuration(timeToChange(), false, true)}</output>
                         </div>
                         <div className='bgis-centered-element'>
-                            {timeToChange() ? <img className='signal-flag-action-icon' src='./icons/arrow_shape_up.svg' /> : <img className='signal-flag-action-icon flipped' src='./icons/no_arrow_shape.svg' />}
+                            {timeToChange() ? <img data-testid='signal-flag-action-icon' className='signal-flag-action-icon' src='./icons/arrow_shape_up.svg' /> : <img className='signal-flag-action-icon flipped' src='./icons/no_arrow_shape.svg' />}
                         </div>
                     </div>
                     <div className='signal-flag-container w3-border-top'>
-                        {flagImages.map(image => <img class="signal-flag w3-image" src={image} />)}
+                        {flagImageFilenames.map(imageFilename => <img key={imageFilename} data-testid={`signal-flag-${imageFilename}`} className="signal-flag w3-image" src={imageFilename} />)}
                     </div>
-                </div>
+                </>
             }
         </div>
     )

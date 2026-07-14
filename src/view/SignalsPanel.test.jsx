@@ -58,12 +58,21 @@ describe('when time is before any signals are due to have been made', () => {
         const { container } = render(<SignalsPanel signals={signals} clock={new Clock()} />);
         const signalIndicators = container.getElementsByClassName('signal-indicator');
     
-        expect(within(signalIndicators[0]).getByText('flag 1')).toBeInTheDocument();
-        expect(within(signalIndicators[0]).getByText('Lowered')).toBeInTheDocument();
-        expect(within(signalIndicators[0]).getByText('00:01')).toBeInTheDocument();
-        expect(within(signalIndicators[1]).getByText('flag 2 flag 3')).toBeInTheDocument();
-        expect(within(signalIndicators[1]).getByText('Lowered')).toBeInTheDocument();
-        expect(within(signalIndicators[1]).getByText('01:01')).toBeInTheDocument();
+        let signalFlag = within(signalIndicators[0]).getByTestId('signal-flag-./external/flag 1.svg');
+	    let signalFlagActionIcon = within(signalIndicators[0]).getByTestId('signal-flag-action-icon');
+	    let signalFlagActionTime = within(signalIndicators[0]).getByTestId('signal-flag-action-time');
+
+        expect(signalFlagActionTime.compareDocumentPosition(signalFlagActionIcon)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+        expect(signalFlagActionIcon.classList.contains('flipped')).toBeFalsy();
+        expect(signalFlagActionIcon.compareDocumentPosition(signalFlag)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+       
+        signalFlag = within(signalIndicators[1]).getByTestId('signal-flag-./external/flag 2.svg');
+	    signalFlagActionIcon = within(signalIndicators[1]).getByTestId('signal-flag-action-icon');
+	    signalFlagActionTime = within(signalIndicators[1]).getByTestId('signal-flag-action-time');
+
+        expect(signalFlagActionTime.compareDocumentPosition(signalFlagActionIcon)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+        expect(signalFlagActionIcon.classList.contains('flipped')).toBeFalsy();
+        expect(signalFlagActionIcon.compareDocumentPosition(signalFlag)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     });
 });
 
@@ -78,12 +87,21 @@ describe('when after time of first signal amd before time of all other signals',
         const { container } = render(<SignalsPanel signals={signals} clock={new Clock()} />);
         const signalIndicators = container.getElementsByClassName('signal-indicator');
         
-        expect(within(signalIndicators[0]).getByText('flag 1')).toBeInTheDocument();
-        expect(within(signalIndicators[0]).getByText('Raised')).toBeInTheDocument();
-        expect(within(signalIndicators[0]).getByText('04:59')).toBeInTheDocument();
-        expect(within(signalIndicators[1]).getByText('flag 2 flag 3')).toBeInTheDocument();
-        expect(within(signalIndicators[1]).getByText('Lowered')).toBeInTheDocument();
-        expect(within(signalIndicators[1]).getByText('00:59')).toBeInTheDocument();
+        let signalFlag = within(signalIndicators[0]).getByTestId('signal-flag-./external/flag 1.svg');
+	    let signalFlagActionIcon = within(signalIndicators[0]).getByTestId('signal-flag-action-icon');
+	    let signalFlagActionTime = within(signalIndicators[0]).getByTestId('signal-flag-action-time');
+
+        expect(signalFlagActionTime.compareDocumentPosition(signalFlagActionIcon)).toBe(Node.DOCUMENT_POSITION_PRECEDING);
+        expect(signalFlagActionIcon.classList.contains('flipped')).toBeTruthy();
+        expect(signalFlagActionIcon.compareDocumentPosition(signalFlag)).toBe(Node.DOCUMENT_POSITION_PRECEDING);
+       
+        signalFlag = within(signalIndicators[1]).getByTestId('signal-flag-./external/flag 2.svg');
+	    signalFlagActionIcon = within(signalIndicators[1]).getByTestId('signal-flag-action-icon');
+	    signalFlagActionTime = within(signalIndicators[1]).getByTestId('signal-flag-action-time');
+
+        expect(signalFlagActionTime.compareDocumentPosition(signalFlagActionIcon)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+        expect(signalFlagActionIcon.classList.contains('flipped')).toBeFalsy();
+        expect(signalFlagActionIcon.compareDocumentPosition(signalFlag)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     });
 });
 
