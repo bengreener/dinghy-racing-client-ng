@@ -241,7 +241,7 @@ describe('when showInRaceData is false', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
         render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000).toISOString().replaceAll('Z', '')}, {version: '"0"'}, model)} showInRaceData={false} />);
-        expect(screen.queryByRole('button', {name: /shorten course/i})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: /shorten/i})).not.toBeInTheDocument();
         expect(screen.getByRole('button', {name: /set laps/i})).toBeInTheDocument();
     });
     it('displays current start time of race', () => {
@@ -251,6 +251,49 @@ describe('when showInRaceData is false', () => {
         const currentStartTime = new Date(Date.now() + 10000 + 300000);
         render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, plannedStartTime: plannedStartTime.toISOString().replaceAll('Z', ''), startTimeOffset: 'PT5M'}, {version: '"0"'}, model)} showInRaceData={false} />);
         expect(screen.getByLabelText(/start time/i).value).toBe(Clock.formatTime(currentStartTime));
+    });
+});
+
+describe('when showInRaceData is true', () => {
+    it('displays shorten course button', () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000).toISOString().replaceAll('Z', '')}, {version: '"0"'}, model)} showInRaceData={true} />);
+        expect(screen.getByRole('button', {name: /shorten/i})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: /set laps/i})).not.toBeInTheDocument();
+    });
+    it('sets default new value for a shortened course to leadEntry.lapsSailed + 1', async () => {
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({
+            ...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000).toISOString().replaceAll('Z', ''),
+            leadEntry: {onLastLap: false, finishedRace: false, sumOfLapTimes: 'PT15M', lapsSailed: 2, lastLapTime: 'PT7M30S'}
+        }, {version: '"0"'}, model)} showInRaceData={true} />);
+
+        await user.click(screen.getByRole('button', {name: /shorten/i}));
+
+        const dialog = within(screen.getByTestId('shorten-course-dialog'));
+        expect(dialog.getByLabelText('New Laps', {hidden: true})).toHaveValue('3');
+    });
+    it('removes shorten option if lead entry has finished after course is shortened', async () => {
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        let renderResult;
+        renderResult = render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({
+            ...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000).toISOString().replaceAll('Z', ''),
+            leadEntry: {onLastLap: false, finishedRace: false, sumOfLapTimes: 'PT15M', lapsSailed: 2, lastLapTime: 'PT7M30S'}
+        }, {version: '"0"'}, model)} showInRaceData={true} />);
+
+        expect(screen.getByRole('button', {name: /shorten/i})).toBeInTheDocument();
+
+        renderResult.rerender(<RaceHeaderView model={model} controller={controller} race={new DirectRace({
+            ...raceScorpionAHAL, plannedStartTime: new Date(Date.now() + 10000).toISOString().replaceAll('Z', ''), plannedLaps: 2,
+            leadEntry: {onLastLap: false, finishedRace: false, sumOfLapTimes: 'PT15M', lapsSailed: 2, lastLapTime: 'PT7M30S'}
+        }, {version: '"0"'}, model)} showInRaceData={true} />);
+
+        expect(screen.queryByRole('button', {name: /shorten/i})).not.toBeInTheDocument();
     });
 });
 

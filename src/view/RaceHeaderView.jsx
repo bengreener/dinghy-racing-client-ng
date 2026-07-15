@@ -30,7 +30,7 @@ import NameFormat from '../controller/name-format';
  * @returns {HTMLDivElement}
  */
 function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
-    const [updatedRace, setUpdatedRace] = useState(race); // used to get current lead entry information for race after a lap recorded. May not reflect changes to planned start time or planned laps
+    const [updatedRace, setUpdatedRace] = useState(race); // used to get current lead entry information for race after a lap recorded. May not reflect changes to planned start time or planned laps; props.race should have that data
     const [elapsedTime, setElapsedTime] = useState(model.getClock().getElapsedTime(race.currentStartTime));
     const [message, setMessage] = useState('');
     const [showPostponeRace, setShowPostponeRace] = useState(false);
@@ -172,7 +172,7 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
                     {showInRaceData && updatedRace.type !== RaceType.PURSUIT && updatedRace.leadEntryLastLapTime > 0 ? <output id={'average-lap-' + updatedRace.name.replace(/ /g, '-').toLowerCase()} className='w3-col' >{Clock.formatDuration(updatedRace.leadEntryAverageLapTime)}</output> : null}
                 </div>
                 <div className='w3-col m1 s6'>
-                    {showInRaceData && updatedRace.type !== RaceType.PURSUIT && updatedRace.leadEntryLapsSailed < updatedRace.plannedLaps ? <button id='shorten-course-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' onClick={handleShortenCourseClick}>Shorten</button> : null}
+                    {showInRaceData && updatedRace.type !== RaceType.PURSUIT && updatedRace.leadEntryLapsSailed < race.plannedLaps ? <button id='shorten-course-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' onClick={handleShortenCourseClick}>Shorten</button> : null}
                     {!showInRaceData && updatedRace.type !== RaceType.PURSUIT ? <button id='adjust-course-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' onClick={handleShortenCourseClick}>Set Laps</button> : null}
                 </div>
                 <div className='w3-col m1 s6'>
@@ -194,7 +194,7 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
                 <PostponeRaceForm race={race} onPostpone={controller.postponeRace} closeParent={closePostponeRaceFormDialog} />
             </ModalDialog> : null}
             {showShortenCourse ? <ModalDialog show={showShortenCourse} onClose={closeShortenCourseDialog} testid={'shorten-course-dialog'}>
-                {showInRaceData ? <AdjustCourseForm race={race} minLaps={Math.max(1, race.leadEntryLapsSailed)} maxLaps={race.plannedLaps - 1} initialValue={Math.max(1, race.plannedLaps - 1)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} /> :
+                {showInRaceData ? <AdjustCourseForm race={race} minLaps={Math.max(1, race.leadEntryLapsSailed)} maxLaps={race.plannedLaps - 1} initialValue={Math.max(1, race.leadEntryLapsSailed + 1)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} /> :
                     <AdjustCourseForm race={race} minLaps={Math.max(1, updatedRace.leadEntryLapsSailed)} initialValue={Math.max(1, race.plannedLaps)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} />}
             </ModalDialog> : null}
         </div>
