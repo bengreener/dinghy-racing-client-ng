@@ -44,8 +44,10 @@ it('renders', async () => {
     await act(async () => {        
         render(<RaceConsole model={model} />);
     });
-    const selectRace = screen.getByLabelText(/Select Race/i);
+    const selectRace = screen.getByLabelText(/Select Race$/i);
     expect(selectRace).toBeInTheDocument();
+    expect(screen.getByLabelText('Show Select Races')).toBeChecked();
+    expect(screen.getByLabelText('Show Race Summary')).toBeChecked();
     expect(screen.getByLabelText(/fleet/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/fleet/i)).toBeChecked();
     expect(screen.getByLabelText(/pursuit/i)).toBeInTheDocument();
@@ -73,7 +75,7 @@ it('enables a race to be selected', async () => {
     const model = new SylphModel(httpRootURL, wsRootURL);
     const controller = new SylphController(model);
     render(<RaceConsole model={model} controller={controller} />);
-    const selectRace = await screen.findByLabelText(/Race/i);
+    const selectRace = await screen.findByLabelText(/Select Race$/i);
     await screen.findAllByRole('option');
     await user.selectOptions(selectRace, 'Scorpion A');
     expect(selectRace.value).toBe('Scorpion A');
@@ -83,7 +85,7 @@ it('enables more than one race to be selected', async () => {
     const model = new SylphModel(httpRootURL, wsRootURL);
     const controller = new SylphController(model);
     render(<RaceConsole model={model} controller={controller} />);
-    const selectRace = await screen.findByLabelText(/Race/i);
+    const selectRace = await screen.findByLabelText(/Select Race$/i);
     await screen.findAllByRole('option');
     await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
     const selected = [];
@@ -99,7 +101,7 @@ describe('when a race is selected', () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
         render(<RaceConsole model={model} controller={controller} />);
-        const selectRace = await screen.findByLabelText(/Race/i);
+        const selectRace = await screen.findByLabelText(/Select Race$/i);
         await screen.findAllByRole('option');
         await user.selectOptions(selectRace, 'Scorpion A');
         const outputDuration = screen.getByLabelText(/duration/i)
@@ -111,7 +113,7 @@ describe('when a race is selected', () => {
         const controller = new SylphController(model);
         render(<RaceConsole model={model} controller={controller} />);
         
-        const selectRace = await screen.findByLabelText(/Race/i);
+        const selectRace = await screen.findByLabelText(/Select Race$/i);
         screen.findAllByRole('option');
         user.selectOptions(selectRace, 'Scorpion A');
         const entry1 = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -129,7 +131,7 @@ describe('when more than one race is selected', () => {
         await act(async () => {
             render(<RaceConsole model={model} controller={controller} />);
         });
-        const selectRace = await screen.findByLabelText(/Race/i);
+        const selectRace = await screen.findByLabelText(/Select Race$/i);
         await screen.findAllByRole('option');
         await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
         const outputDuration = await screen.findAllByLabelText(/duration/i);
@@ -144,7 +146,7 @@ describe('when more than one race is selected', () => {
         await act(async () => {
             render(<RaceConsole model={model} controller={controller} />);
         });
-        const selectRace = await screen.findByLabelText(/Race/i);
+        const selectRace = await screen.findByLabelText(/Select Race$/i);
         await screen.findAllByRole('option');
         await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
         const entry1 = await screen.findByRole('status', {name: (content, node) => node.textContent === '1234'});
@@ -163,7 +165,7 @@ describe('when a race is unselected', () => {
         await act(async () => {
             render(<RaceConsole model={model} controller={controller} />);
         });        
-        const selectRace = await screen.findByLabelText(/Race/i);
+        const selectRace = await screen.findByLabelText(/Select Race$/i);
         await screen.findAllByRole('option');
         await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
 
@@ -181,7 +183,7 @@ describe('when a race is unselected', () => {
         await act(async () => {
             render(<RaceConsole model={model} controller={controller} />);
         });        
-        const selectRace = await screen.findByLabelText(/Race/i);
+        const selectRace = await screen.findByLabelText(/Select Race$/i);
         await screen.findAllByRole('option');
         await user.selectOptions(selectRace, ['Scorpion A', 'Graduate A']);
         const graduateEntries = await within(document.getElementsByClassName('race-entries-view')[0]).findAllByText(/Graduate/i);
@@ -459,4 +461,46 @@ describe('when session storage is not available', () => {
             expect(checkboxPursuit).not.toBeChecked();
         });
     });
+});
+describe('when show select races is checked', () => {
+    it('displays select races', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        await act(async () => {        
+            render(<RaceConsole model={model} />);
+        });
+        expect(screen.getByLabelText('Show Select Races')).toBeChecked();
+        expect(screen.getByRole('heading', {name: 'Select Races'})).toBeInTheDocument();
+    })
+});
+describe('when show select races is not checked', () => {
+    it('it does not display select races', async () => {
+        const user = userEvent.setup();
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        await act(async () => {        
+            render(<RaceConsole model={model} />);
+        });
+        await user.click(screen.getByLabelText('Show Select Races'));
+        expect(screen.queryByRole('heading', {name: 'Select Races'})).not.toBeInTheDocument();
+    })
+});
+describe('when show race summary is checked', () => {
+    it('displays race summary', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        await act(async () => {        
+            render(<RaceConsole model={model} />);
+        });
+        expect(screen.getByLabelText('Show Select Races')).toBeChecked();
+        expect(screen.getByRole('heading', {name: 'Races'})).toBeInTheDocument();
+    })
+});
+describe('when show race summary is not checked', () => {
+    it('it does not display race summary', async () => {
+        const user = userEvent.setup();
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        await act(async () => {        
+            render(<RaceConsole model={model} />);
+        });
+        await user.click(screen.getByLabelText('Show Race Summary'));
+        expect(screen.queryByRole('heading', {name: 'Races'})).not.toBeInTheDocument();
+    })
 });

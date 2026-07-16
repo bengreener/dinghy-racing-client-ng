@@ -17,7 +17,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import RaceEntriesView from './RaceEntriesView';
 import RaceHeaderView from './RaceHeaderView';
-import CollapsableContainer from './CollapsableContainer';
 import SelectSession from './SelectSession';
 import RaceType from '../model/race-type';
 import { SortOrder } from '../model/sylph-model';
@@ -43,20 +42,20 @@ function RaceConsole({ model, controller }) {
             }
             return sessionStart;
         });
-        const [sessionEnd, setSessionEnd] = useState(() => {
-            let sessionEnd;
-            if (sessionStorageAvailable) {
-                const storedValue = sessionStorage.getItem('sessionEnd');
-                if (storedValue) {
-                    sessionEnd = new Date(storedValue);
-                }
+    const [sessionEnd, setSessionEnd] = useState(() => {
+        let sessionEnd;
+        if (sessionStorageAvailable) {
+            const storedValue = sessionStorage.getItem('sessionEnd');
+            if (storedValue) {
+                sessionEnd = new Date(storedValue);
             }
-            if (!sessionEnd) {
-                sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000); // create as 20:00 UTC intially
-                sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
-            }
-            return sessionEnd;
-        });
+        }
+        if (!sessionEnd) {
+            sessionEnd = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 72000000); // create as 20:00 UTC intially
+            sessionEnd.setMinutes(sessionEnd.getMinutes() + sessionEnd.getTimezoneOffset()); // adjust to be equivalent to 18:00 local time
+        }
+        return sessionEnd;
+    });
     const [racesUpdateRequestAt, setRacesUpdateRequestAt] = useState(); // time of last request to fetch races from server. change triggers a new fetch; for instance when server notifies a race has been updated
     const [raceType, setRaceType] = useState(() => {
         let raceType;
@@ -71,6 +70,8 @@ function RaceConsole({ model, controller }) {
         }
         return raceType;
     });
+    const [showSelectRaces, setShowSelectRaces] = useState(true);
+    const [showRaceSummary, setShowRaceSummary] = useState(true);
 
     const handleRaceUpdate = useCallback(() => {
         setRacesUpdateRequestAt(Date.now());
@@ -147,41 +148,65 @@ function RaceConsole({ model, controller }) {
         setRaceType(RaceType.from(target.value));
     }
 
+    function handleSelectRacesCheckboxChange() {
+        setShowSelectRaces(s => !s);
+    }
+
+    function handleShowRaceSummaryCheckboxChange() {
+        setShowRaceSummary(s => !s);
+    }
+
     function userMessageClasses() {
         return !message ? 'hidden' : 'console-error-message';
     }
 
     return (
         <div className='w3-container console'>
-            <CollapsableContainer heading={'Select Races'}>
-                <form className='w3-container' >
-                    <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
-                    <div className='w3-row'>
-                        <fieldset className='w3-third' >
-                            <legend>Race Type:</legend>
-                            <div className='w3-cell-row'>
-                                <div className='w3-cell'>
-                                    <input id='radio-race-type-fleet' name='race-type' type='radio' value='FLEET' onChange={handleRaceTypeChange} checked={raceType === RaceType.FLEET} />
-                                    <label htmlFor='radio-race-type-fleet'>Fleet</label>
+            <div className='w3-row'>
+                <div className='w3-col m2 s6' >
+                    <label className='w3-col m10' htmlFor='select-races-checkbox'>Show Select Races</label>
+                    <input className='bgis-check' id='select-races-checkbox' type='checkbox' onChange={handleSelectRacesCheckboxChange} checked={showSelectRaces} />
+                </div>
+                <div className='w3-col m4 s6' >
+                    <label className='w3-col m6' htmlFor='show-race-summary-checkbox'>Show Race Summary</label>
+                    <input className='bgis-check' id='show-race-summary-checkbox' type='checkbox' onChange={handleShowRaceSummaryCheckboxChange} checked={showRaceSummary} />
+                </div>
+            </div>
+            {showSelectRaces ? 
+                <div>
+                    <h1>Select Races</h1>
+                    <form className='w3-container' >
+                        <SelectSession sessionStart={sessionStart} sessionEnd={sessionEnd} onSessionStartChange={handlesessionStartInputChange} onSessionEndChange={handlesessionEndInputChange} />
+                        <div className='w3-row'>
+                            <fieldset className='w3-third' >
+                                <legend>Race Type:</legend>
+                                <div className='w3-cell-row'>
+                                    <div className='w3-cell'>
+                                        <input id='radio-race-type-fleet' name='race-type' type='radio' value='FLEET' onChange={handleRaceTypeChange} checked={raceType === RaceType.FLEET} />
+                                        <label htmlFor='radio-race-type-fleet'>Fleet</label>
+                                    </div>
+                                    <div className='w3-cell'>
+                                        <input id='radio-race-type-pursuit' name='race-type' type='radio' value='PURSUIT' onChange={handleRaceTypeChange} checked={raceType === RaceType.PURSUIT} />
+                                        <label htmlFor='radio-race-type-pursuit'>Pursuit</label>
+                                    </div>
                                 </div>
-                                <div className='w3-cell'>
-                                    <input id='radio-race-type-pursuit' name='race-type' type='radio' value='PURSUIT' onChange={handleRaceTypeChange} checked={raceType === RaceType.PURSUIT} />
-                                    <label htmlFor='radio-race-type-pursuit'>Pursuit</label>
-                                </div>
-                            </div>
-                        </fieldset>
-                    </div>
-                    <label htmlFor='race-select' className='w3-left w3-col' >Select Race</label>
-                    <select id='race-select' name='race' multiple={true} className='w3-col w3-third' onChange={handleRaceSelect} value={selectedRaces}>{raceOptions}</select>
-                </form>
-                <p className={userMessageClasses()}>{message}</p>
-            </CollapsableContainer>
-            <CollapsableContainer heading={'Races'}>
-                {selectedRaces.map(selectedRace => {
-                    const race = raceMap.get(selectedRace);
-                    return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} model={model} controller={controller} />
-                })}
-            </CollapsableContainer>
+                            </fieldset>
+                        </div>
+                        <label htmlFor='race-select' className='w3-left w3-col' >Select Race</label>
+                        <select id='race-select' name='race' multiple={true} className='w3-col w3-third' onChange={handleRaceSelect} value={selectedRaces}>{raceOptions}</select>
+                    </form>
+                    <p className={userMessageClasses()}>{message}</p>
+                </div> : null
+            }
+            {showRaceSummary ? 
+                <div>
+                    <h1>Race Summary</h1>
+                    {selectedRaces.map(selectedRace => {
+                        const race = raceMap.get(selectedRace);
+                        return <RaceHeaderView key={race.name+race.plannedStartTime.toISOString()} race={race} model={model} controller={controller} />
+                    })}
+                </div> : null
+            }
             <RaceEntriesView races={selectedRaces.map(selectedRace => raceMap.get(selectedRace))} model={model} controller={controller} />
         </div>
     );
