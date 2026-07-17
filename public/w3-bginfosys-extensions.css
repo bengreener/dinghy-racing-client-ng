@@ -23,8 +23,17 @@ html,body{
 .bgis-table,.bgis-table-all{border-collapse:collapse;border-spacing:0;display:table}
 .w3-striped tbody tr:nth-child(even){background-color:lightgray}
 
+.bgis-bold {
+    font-weight: bold;
+}
+
 .bgis-cell {
     overflow: hidden;
+}
+
+.bgis-sticky-top {
+    position: sticky;
+    top: 0;
 }
 
 .bgis-max-content{float:left;width:100%}
