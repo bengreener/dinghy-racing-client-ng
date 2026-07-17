@@ -45,7 +45,7 @@ function SignalsPanel({ signals = [], clock }) {
     });
 
     return (
-        <div className='signals-panel w3-row w3-border'>
+        <div className='signals-panel w3-row '>
             {Array.from(flagsMap.values()).map((signals) => <SignalIndicator key={signals[0]?.visualSignal.flags[0].name} data-testid={signals[0]?.visualSignal.flags[0].name} signals={signals} clock={clock} />)}
         </div>
     );

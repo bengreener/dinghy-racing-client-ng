@@ -142,7 +142,7 @@ function SignalIndicator({ signals, clock }) {
     };
 
     return (
-        <div className='signal-indicator w3-col bgis-fifth w3-border-right'>
+        <div className='signal-indicator w3-col bgis-fifth w3-border'>
             <div className='w3-border-bottom'>
                 <output id='flag-name-output' className='w3-cell bgis-bold' >{flags.map(flag => flag.name).join(" ")}</output>
             </div>
