@@ -80,9 +80,9 @@ it('renders', async () => {
     expect(screen.getByLabelText(/fleet/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/fleet/i)).toBeChecked();
     expect(screen.getByLabelText(/pursuit/i)).toBeInTheDocument();
-    expect(screen.getByRole('heading', {name: /start races/i})).toBeInTheDocument();
+    expect(screen.getByRole('heading', {name: /select races/i})).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: /flags/i})).toBeInTheDocument();
-    expect(screen.getByRole('heading', {name: /^races$/i})).toBeInTheDocument();
+    expect(screen.getByRole('heading', {name: /race summary/i})).toBeInTheDocument();
 });
 describe('when no races selected', () => {
     it('renders', async () => {
@@ -100,9 +100,9 @@ describe('when no races selected', () => {
         expect(screen.getByLabelText(/fleet/i)).toBeInTheDocument();
         expect(screen.getByLabelText(/fleet/i)).toBeChecked();
         expect(screen.getByLabelText(/pursuit/i)).toBeInTheDocument();
-        expect(screen.getByRole('heading', {name: /start races/i})).toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: /select races/i})).toBeInTheDocument();
         expect(screen.getByRole('heading', {name: /flags/i})).toBeInTheDocument();
-        expect(screen.getByRole('heading', {name: /^races$/i})).toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: /race summary/i})).toBeInTheDocument();
     });
 });
 it('displays races included in selected session', async () => {
@@ -273,7 +273,7 @@ it('displays race headers for races in session', async () => {
         render(<RaceStartConsole model={model} controller={controller} />);
     });
 
-    const raceHeaders = (screen.getByRole('heading', {name: /^races$/i})).parentNode;
+    const raceHeaders = (screen.getByRole('heading', {name: /race summary/i})).parentNode;
 
     expect(within(raceHeaders).getByText(/scorpion a/i)).toBeInTheDocument();
     const raceA = within(raceHeaders).getByText(/scorpion a/i).parentNode.parentNode.parentNode;
@@ -336,7 +336,7 @@ it('does not display in race data in race headers', async () => {
         render(<RaceStartConsole model={model} controller={controller} />);
     });
 
-    const raceHeaders = (screen.getByRole('heading', {name: /^races$/i})).parentNode;
+    const raceHeaders = (screen.getByRole('heading', {name: /race summary/i})).parentNode;
     expect(within(raceHeaders).getByText(/scorpion a/i)).toBeInTheDocument();
     const raceA = within(raceHeaders).getByText(/scorpion a/i).parentNode;
     expect(within(raceA).queryByLabelText(/remaining/i)).not.toBeInTheDocument();
@@ -679,7 +679,7 @@ describe('when selected races changed', () => {
         await act(async () => {
             render(<RaceStartConsole model={model} controller={controller} />);
         });
-        const raceHeaders = (screen.getByRole('heading', {name: /^races$/i})).parentNode;
+        const raceHeaders = (screen.getByRole('heading', {name: /race summary/i})).parentNode;
         let raceA = within(raceHeaders).getByText(/scorpion a/i);
         expect(raceA).toBeInTheDocument();
         const selectRace = screen.getByLabelText(/DirectRace/i);
@@ -831,4 +831,96 @@ describe('when session storage is not available', () => {
             expect(checkboxPursuit).not.toBeChecked();
         });
     });
+});
+describe('when show select races is checked', () => {
+    it('displays select races', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        await act(async () => {        
+            render(<RaceStartConsole model={model} controller={controller} />);
+        });
+        expect(screen.getByLabelText('Show Select Races')).toBeChecked();
+        expect(screen.getByRole('heading', {name: 'Select Races'})).toBeInTheDocument();
+    })
+});
+describe('when show select races is not checked', () => {
+    it('it does not display select races', async () => {
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        await act(async () => {        
+            render(<RaceStartConsole model={model} controller={controller} />);
+        });
+        await user.click(screen.getByLabelText('Show Select Races'));
+        expect(screen.queryByRole('heading', {name: 'Select Races'})).not.toBeInTheDocument();
+    })
+});
+describe('when show flags is checked', () => {
+    it('displays flags', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        await act(async () => {        
+            render(<RaceStartConsole model={model} controller={controller} />);
+        });
+        expect(screen.getByLabelText('Show Flags')).toBeChecked();
+        expect(screen.getByRole('heading', {name: 'Flags'})).toBeInTheDocument();
+    })
+});
+describe('when show flags is not checked', () => {
+    it('it does not display flags', async () => {
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        await act(async () => {        
+            render(<RaceStartConsole model={model} controller={controller} />);
+        });
+        await user.click(screen.getByLabelText('Show Flags'));
+        expect(screen.queryByRole('heading', {name: 'Flags'})).not.toBeInTheDocument();
+    })
+});
+describe('when show race summary is checked', () => {
+    it('displays race summary', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        await act(async () => {        
+            render(<RaceStartConsole model={model} controller={controller} />);
+        });
+        expect(screen.getByLabelText('Show Select Races')).toBeChecked();
+        expect(screen.getByRole('heading', {name: 'Race Summary'})).toBeInTheDocument();
+    })
+});
+describe('when show race summary is not checked', () => {
+    it('it does not display race summary', async () => {
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        await act(async () => {        
+            render(<RaceStartConsole model={model} controller={controller} />);
+        });
+        await user.click(screen.getByLabelText('Show Race Summary'));
+        expect(screen.queryByRole('heading', {name: 'Race Summary'})).not.toBeInTheDocument();
+    })
+});
+describe('when action list is checked is checked', () => {
+    it('displays action list', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        await act(async () => {        
+            render(<RaceStartConsole model={model} controller={controller} />);
+        });
+        expect(screen.getByLabelText('Show Action List')).toBeChecked();
+        expect(screen.getByRole('heading', {name: 'Action List'})).toBeInTheDocument();
+    })
+});
+describe('when show action list is not checked', () => {
+    it('it does not display action list', async () => {
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        await act(async () => {        
+            render(<RaceStartConsole model={model} controller={controller} />);
+        });
+        await user.click(screen.getByLabelText('Show Action List'));
+        expect(screen.queryByRole('heading', {name: 'Action List'})).not.toBeInTheDocument();
+    })
 });

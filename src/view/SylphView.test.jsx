@@ -289,7 +289,7 @@ describe('when race start console button is clicked', ()  => {
 		});
 		const btnRaceStartConsole = await screen.findByRole('button', {name: /race start\b/i});
 		await user.click(btnRaceStartConsole);
-		expect(await screen.findByRole('heading', {name: /start races/i})).toBeInTheDocument();
+		expect(await screen.findByRole('heading', {name: /start countdown/i})).toBeInTheDocument();
 	});
 	it('only race start button shown as selected', async () => {
 		const user = userEvent.setup();
