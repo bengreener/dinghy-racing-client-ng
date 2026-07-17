@@ -490,7 +490,7 @@ describe('when show race summary is checked', () => {
             render(<RaceConsole model={model} />);
         });
         expect(screen.getByLabelText('Show Select Races')).toBeChecked();
-        expect(screen.getByRole('heading', {name: 'Races'})).toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: 'Race Summary'})).toBeInTheDocument();
     })
 });
 describe('when show race summary is not checked', () => {
@@ -501,6 +501,6 @@ describe('when show race summary is not checked', () => {
             render(<RaceConsole model={model} />);
         });
         await user.click(screen.getByLabelText('Show Race Summary'));
-        expect(screen.queryByRole('heading', {name: 'Races'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('heading', {name: 'Race Summary'})).not.toBeInTheDocument();
     })
 });
