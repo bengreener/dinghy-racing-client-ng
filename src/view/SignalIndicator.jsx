@@ -34,7 +34,7 @@ function SignalIndicator({ signals, clock }) {
                     images.push('./flags/p.svg');
                     break;
                 case 'Open Handicap Class Flag':
-                    images.push('./flags/i.svg');
+                    images.push('./flags/chipstead_pennant.svg');
                     break;
                 case 'Solo Class Flag':
                     images.push('./flags/s.svg');
@@ -87,9 +87,9 @@ function SignalIndicator({ signals, clock }) {
                 case 'Junior Regatta Class Flag':
                     images.push('./flags/chipstead_pennant.svg');
                     break;
-                    case 'Scorpion Class Flag':
-                        images.push('./flags/z.svg');
-                        break;
+                case 'Scorpion Class Flag':
+                    images.push('./flags/z.svg');
+                    break;
                 default:
                     images.push(`./external/${flag.name}.svg`);
                     break;
