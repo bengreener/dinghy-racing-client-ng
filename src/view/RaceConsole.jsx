@@ -163,12 +163,12 @@ function RaceConsole({ model, controller }) {
     return (
         <div className='w3-container console'>
             <div className='w3-row'>
-                <div className='w3-col m2 s6' >
-                    <label className='w3-col m10' htmlFor='select-races-checkbox'>Show Select Races</label>
+                <div className='w3-col m3 s6' >
+                    <label className='w3-col m7' htmlFor='select-races-checkbox'>Show Select Races</label>
                     <input className='bgis-check' id='select-races-checkbox' type='checkbox' onChange={handleSelectRacesCheckboxChange} checked={showSelectRaces} />
                 </div>
-                <div className='w3-col m4 s6' >
-                    <label className='w3-col m6' htmlFor='show-race-summary-checkbox'>Show Race Summary</label>
+                <div className='w3-col m3 s6' >
+                    <label className='w3-col m8' htmlFor='show-race-summary-checkbox'>Show Race Summary</label>
                     <input className='bgis-check' id='show-race-summary-checkbox' type='checkbox' onChange={handleShowRaceSummaryCheckboxChange} checked={showRaceSummary} />
                 </div>
             </div>
