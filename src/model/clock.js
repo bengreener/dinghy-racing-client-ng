@@ -14,6 +14,8 @@
  * limitations under the License. 
  */
 
+import InvalidParameter from '../errors/invalid-parameter';
+
 class Clock {
     static _synchOffset = 0;
     static _broadcastChannel = new BroadcastChannel('DinghyRacingClock');
@@ -36,6 +38,28 @@ class Clock {
     _dateNowPerformanceNowDiff; // difference between Date.now() and performance.now() on clock initialisation
     _tickHandlers = new Map();
     _ticker;
+
+    /**
+     * @param {String} duration in format [hh:][mm:]ss
+     * @returns {Integer}
+     */
+    static convertStringDurationToMilliseconds(duration) {
+        let timeInMilliseconds = 0;
+        // validate entry
+        if (/^(\d+:(?=[0-5]?\d:[0-5]?\d))?([0-5]?\d:(?=[0-5]?\d))?([0-5]?\d)$/.test(duration)) {
+            const timeComponents = /^((?<=^)\d*(?=:[0-5]?\d:))*:?((?<=^|:)[0-5]?\d(?=:))?:?((?<=^|:)[0-5]?\d(?=$))$/.exec(duration);
+            // get hours
+            timeInMilliseconds += isNaN(timeComponents[1]) ? 0 : 3600000 * timeComponents[1];
+            // get minutes
+            timeInMilliseconds += isNaN(timeComponents[2]) ? 0 : 60000 * timeComponents[2];
+            // get seconds
+            timeInMilliseconds += isNaN(timeComponents[3]) ? 0 : 1000 * timeComponents[3];
+        }
+        else {
+            throw new InvalidParameter('Time must be in the format [hh:][mm:]ss.');
+        }
+        return timeInMilliseconds;
+    }
 
     /**
      * Format a time in milliseconds into a string

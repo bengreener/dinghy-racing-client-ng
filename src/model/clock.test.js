@@ -434,3 +434,36 @@ it('provides time to the nearest second precision', () => {
 
     expect(clock.getTimeToSecondPrecision()).toEqual(timeToSecondPrecision);
 });
+
+describe('when converting a time string to milliseconds', () => {
+    it('converts 0 to 0ms', () => {
+        expect(Clock.convertStringDurationToMilliseconds('0')).toBe(0);
+    });
+    it('converts 00:00 to 0ms', () => {
+        expect(Clock.convertStringDurationToMilliseconds('00:00')).toBe(0);
+    });
+    it('converts 00:00:00 to 0ms', () => {
+        expect(Clock.convertStringDurationToMilliseconds('00:00:00')).toBe(0);
+    });
+    it('converts 1 to 1000ms', () => {
+        expect(Clock.convertStringDurationToMilliseconds('1')).toBe(1000);
+    });
+    it('converts 00:01 to 1000ms', () => {
+        expect(Clock.convertStringDurationToMilliseconds('00:01')).toBe(1000);
+    });
+    it('converts 4:01 to 1000ms', () => {
+        expect(Clock.convertStringDurationToMilliseconds('4:01')).toBe(241000);
+    });
+    it('converts 5:4:1 to 1000ms', () => {
+        expect(Clock.convertStringDurationToMilliseconds('5:4:1')).toBe(18241000);
+    });
+    it('converts 23:59:59 to 86399000ms', () => {
+        expect(Clock.convertStringDurationToMilliseconds('23:59:59')).toBe(86399000);
+    });
+    it('converts 24:00:00 to 86400000ms', () => {
+        expect(Clock.convertStringDurationToMilliseconds('24:00:00')).toBe(86400000);
+    });
+    it('converts 01:27:36 to be 5256000ms', () => {
+        expect(Clock.convertStringDurationToMilliseconds('01:27:36')).toBe(5256000);
+    });
+});
