@@ -56,7 +56,7 @@ class Clock {
         }
         return timeInMilliseconds;
     }
-    
+
     /**
      * Format a time in milliseconds into a string
      * @param {Number} duration Duration in milliseconds
@@ -137,6 +137,10 @@ class Clock {
 
     static now() {
         return Date.now() + Clock._synchOffset;
+    }
+    
+    static validateStringDuration(duration) {
+        return /(^\d+):?((?<=:)[0-5]?\d(?:(?=:)|$))?:?((?<=:)[0-5]?\d(?=$))?$/.test(duration);
     }
 
     /**

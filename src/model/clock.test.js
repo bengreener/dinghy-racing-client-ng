@@ -466,4 +466,55 @@ describe('when converting a time string to milliseconds', () => {
     it('converts 01:27:36 to be 5256000ms', () => {
         expect(Clock.convertStringDurationToMilliseconds('01:27:36')).toBe(5256000);
     });
+    it('throws exception if an invalid parameter is passed', () => {
+        expect(() => Clock.convertStringDurationToMilliseconds('01:')).toThrow('Time must be in the format [hh:][mm:]ss.');
+    });
+});
+
+describe('when validating a time string', () => {
+    it('0 is valid', () => {
+        expect(Clock.validateStringDuration('0')).toBeTruthy();
+    });
+    it('00:00 is valid', () => {
+        expect(Clock.validateStringDuration('00:00')).toBeTruthy();
+    });
+    it('00:00:00 is valid', () => {
+        expect(Clock.validateStringDuration('00:00:00')).toBeTruthy();
+    });
+    it('1 is valid', () => {
+        expect(Clock.validateStringDuration('1')).toBeTruthy();
+    });
+    it('5:4:1 is valid', () => {
+        expect(Clock.validateStringDuration('5:4:1')).toBeTruthy();
+    });
+    it('23:59:59 is valid', () => {
+        expect(Clock.validateStringDuration('23:59:59')).toBeTruthy();
+    });
+    it('2400:00:00 is valid', () => {
+        expect(Clock.validateStringDuration('24:00:00')).toBeTruthy();
+    });
+    it('01:27:36 is valid', () => {
+        expect(Clock.validateStringDuration('01:27:36')).toBeTruthy();
+    });
+    it('0:8 is valid', () => {
+        expect(Clock.validateStringDuration('0:8')).toBeTruthy();
+    });
+    it('8:8:8 is valid', () => {
+        expect(Clock.validateStringDuration('0:8')).toBeTruthy();
+    });
+    it('x is not valid', () => {
+        expect(Clock.validateStringDuration('x')).toBeFalsy();
+    });
+    it(': is not valid', () => {
+        expect(Clock.validateStringDuration(':')).toBeFalsy();
+    });
+    it(':0 is not valid', () => {
+        expect(Clock.validateStringDuration(':0')).toBeFalsy();
+    });
+    it('0:81 is not valid', () => {
+        expect(Clock.validateStringDuration(':0')).toBeFalsy();
+    });
+    it('81:0:81 is not valid', () => {
+        expect(Clock.validateStringDuration(':0')).toBeFalsy();
+    });
 });

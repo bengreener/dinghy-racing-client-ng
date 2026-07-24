@@ -146,6 +146,15 @@ class Clock {
     }
 
     /**
+     * Validate a potential time string as a valid input during data entry 
+     * @param {String} duration 
+     * @returns {boolean}
+     */
+    static validateStringDuration(duration) {
+        return /(^\d+):?((?<=:)[0-5]?\d(?:(?=:)|$))?:?((?<=:)[0-5]?\d(?=$))?$/.test(duration);
+    }
+
+    /**
      * Create a new instance of Clock
      * @param {Date} startTime The start time for the clock. Defaults to the time of instantiation.
      */
