@@ -27,6 +27,7 @@ import RaceStartConsole from './RaceStartConsole';
 import RaceConsole from './RaceConsole';
 import Authorisation from '../controller/authorisation';
 import UpcomingRacesConsole from './UpcomingRacesConsole';
+import EditRaceResultsConsole from './EditRaceResultsConsole';
 
 function SylphView({model, controller}) {
     const [displayPort, setDisplayPort] = useState();
@@ -109,6 +110,13 @@ function SylphView({model, controller}) {
         setDisplayPort(<DownloadRacesForm key={Date.now()} model={model} controller={controller} />);
     }
 
+    function showEditRaceResults() {
+        raceStartButtonRef.current?.classList.remove('selected');
+        runRaceButtonRef.current?.classList.remove('selected');
+        enrolmentButtonRef.current?.classList.remove('selected');
+        setDisplayPort(<EditRaceResultsConsole key={Date.now()} model={model} controller={controller} />);
+    }
+
     function w3_open() {
         sidebarRef.current.style.display = 'block';
     }
@@ -139,7 +147,11 @@ function SylphView({model, controller}) {
                     }
                     <button key={6} type='button' className='w3-bar-item w3-btn' onClick={showCompetitorsConsole}>Competitors</button>
                     {roles.includes('ROLE_RACE_OFFICER') ? 
-                        <button key={7} type='button' className='w3-bar-item w3-btn' onClick={showDownloadRaces}>Download Races</button>
+                        <button key={7} type='button' className='w3-bar-item w3-btn' onClick={showEditRaceResults}>Edit Results</button>
+                        : null
+                    }
+                    {roles.includes('ROLE_RACE_OFFICER') ? 
+                        <button key={8} type='button' className='w3-bar-item w3-btn' onClick={showDownloadRaces}>Download Races</button>
                         : null
                     }
                     <button key={9} type='button' className='w3-bar-item w3-btn' onClick={() => {window.location.href = window.origin + '/logout'}}>Logout</button>
