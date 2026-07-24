@@ -64,7 +64,8 @@ describe('when error occurs', () => {
 describe('when fetch operation is not successful', () => {
     it('returns an empty array', async () => {
         vi.spyOn(window, 'fetch').mockImplementation((resource, options) => {
-            if (resource === 'http://localhost/authentication/roles') {
+            // Believe JSDOM is incorrectly returning a value for windows.path.origin that includes a terminating /. (Specifically, believe windows.path.origin should not be terminated by /.)
+            if (resource === 'http://localhost//authentication/roles') {
                 return Promise.resolve({
                     ok: false,
                     status: 400, 
@@ -80,7 +81,8 @@ describe('when fetch operation is not successful', () => {
 describe('when response does not include roles', () => {
     it('returns an empty array', async () => {
         vi.spyOn(window, 'fetch').mockImplementation((resource, options) => {
-            if (resource === 'http://localhost/authentication/roles') {
+            // Believe JSDOM is incorrectly returning a value for windows.path.origin that includes a terminating /. (Specifically, believe windows.path.origin should not be terminated by /.)
+            if (resource === 'http://localhost//authentication/roles') {
                 return Promise.resolve({
                     ok: true,
                     status: 200, 
