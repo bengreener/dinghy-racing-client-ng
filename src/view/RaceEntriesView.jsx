@@ -14,7 +14,6 @@
  * limitations under the License. 
  */
 
-// import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import RaceEntryView from './RaceEntryView';
 import RaceType from '../model/race-type';

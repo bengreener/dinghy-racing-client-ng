@@ -29,19 +29,19 @@ function RaceConsole({ model, controller }) {
     const [raceMap, setRaceMap] = useState(new Map()); // map of race names to races
     const [message, setMessage] = useState(''); // feedback to user
     const [sessionStart, setSessionStart] = useState(() => {
-            let sessionStart;
-            if (sessionStorageAvailable) {
-                const storedValue = sessionStorage.getItem('sessionStart');
-                if (storedValue) {
-                    sessionStart = new Date(storedValue);
-                }
+        let sessionStart;
+        if (sessionStorageAvailable) {
+            const storedValue = sessionStorage.getItem('sessionStart');
+            if (storedValue) {
+                sessionStart = new Date(storedValue);
             }
-            if (!sessionStart) {
-                sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
-                sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
-            }
-            return sessionStart;
-        });
+        }
+        if (!sessionStart) {
+            sessionStart = new Date(Math.floor(Date.now() / 86400000) * 86400000 + 28800000); // create as 8:00 UTC intially
+            sessionStart.setMinutes(sessionStart.getMinutes() + sessionStart.getTimezoneOffset()); // adjust to be equivalent to 8:00 local time
+        }
+        return sessionStart;
+    });
     const [sessionEnd, setSessionEnd] = useState(() => {
         let sessionEnd;
         if (sessionStorageAvailable) {

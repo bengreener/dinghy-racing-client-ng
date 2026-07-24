@@ -59,7 +59,7 @@ class SylphController {
     /**
      * Add a lap to race entry
      * @param {Entry} entry
-     * @param {Number} time The time to sail the lap in milliseconds
+     * @param {Integer} time The time to sail the lap in milliseconds
      * @returns {Promise<Entry>}
      * @throws {InvalidParameter}
      * @throws {MissingParameter}
