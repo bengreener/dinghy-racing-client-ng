@@ -37,7 +37,7 @@ function SignalIndicator({ signals, clock }) {
                     images.push('./flags/chipstead_pennant.svg');
                     break;
                 case 'Solo Class Flag':
-                    images.push('./flags/s.svg');
+                    images.push('./flags/n1.svg');
                     break;
                 case 'Comet Class Flag':
                     images.push('./flags/c.svg');
