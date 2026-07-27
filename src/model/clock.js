@@ -146,12 +146,14 @@ class Clock {
     }
 
     /**
-     * Validate a potential time string as a valid input during data entry 
+     * Validate a potential time string as a valid input during data entry
+     * Allows values to be entered that would not be valid complete time strings; limits acceptable characters rather than imposing structure to make it easier to edit values.
      * @param {String} duration 
      * @returns {boolean}
      */
     static validateStringDuration(duration) {
-        return /(^\d+):?((?<=:)[0-5]?\d(?:(?=:)|$))?:?((?<=:)[0-5]?\d(?=$))?$/.test(duration);
+        // return /(^\d+):?((?<=:)[0-5]?\d(?:(?=:)|$))?:?((?<=:)[0-5]?\d(?=$))?$/.test(duration);
+        return /[\d:]+/.test(duration);
     }
 
     /**

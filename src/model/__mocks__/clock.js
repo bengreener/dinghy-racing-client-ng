@@ -140,7 +140,8 @@ class Clock {
     }
     
     static validateStringDuration(duration) {
-        return /(^\d+):?((?<=:)[0-5]?\d(?:(?=:)|$))?:?((?<=:)[0-5]?\d(?=$))?$/.test(duration);
+        // return /(^\d+):?((?<=:)[0-5]?\d(?:(?=:)|$))?:?((?<=:)[0-5]?\d(?=$))?$/.test(duration);
+        return /[\d:]+/.test(duration);
     }
 
     /**

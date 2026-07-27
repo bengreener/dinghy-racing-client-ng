@@ -502,19 +502,19 @@ describe('when validating a time string', () => {
     it('8:8:8 is valid', () => {
         expect(Clock.validateStringDuration('0:8')).toBeTruthy();
     });
+    it(': is valid', () => {
+        expect(Clock.validateStringDuration(':')).toBeTruthy();
+    });
+    it(':0 is valid', () => {
+        expect(Clock.validateStringDuration(':0')).toBeTruthy();
+    });
+    it('0:81 is valid', () => {
+        expect(Clock.validateStringDuration(':0')).toBeTruthy();
+    });
+    it('81:0:81 is valid', () => {
+        expect(Clock.validateStringDuration(':0')).toBeTruthy();
+    });
     it('x is not valid', () => {
         expect(Clock.validateStringDuration('x')).toBeFalsy();
-    });
-    it(': is not valid', () => {
-        expect(Clock.validateStringDuration(':')).toBeFalsy();
-    });
-    it(':0 is not valid', () => {
-        expect(Clock.validateStringDuration(':0')).toBeFalsy();
-    });
-    it('0:81 is not valid', () => {
-        expect(Clock.validateStringDuration(':0')).toBeFalsy();
-    });
-    it('81:0:81 is not valid', () => {
-        expect(Clock.validateStringDuration(':0')).toBeFalsy();
     });
 });
