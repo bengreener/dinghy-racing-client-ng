@@ -675,7 +675,7 @@ describe('when a scoring abbreviation is selected', () => {
         );
         render(<RaceEntryView entry={entryChrisMarshallScorpionA1234} setScoringAbbreviation={setScoringAbbreviationSpy}/>);
         const selectSA = screen.getByRole('combobox');
-            await user.selectOptions(selectSA, 'DNS');
+        await user.selectOptions(selectSA, 'DNS');
         expect(setScoringAbbreviationSpy).toHaveBeenCalledWith(entryChrisMarshallScorpionA1234, 'DNS');
     });
     it('updates the display to show a scoring abbreviation is being sent to the server', async () => {

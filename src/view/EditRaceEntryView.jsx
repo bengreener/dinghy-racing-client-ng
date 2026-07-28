@@ -24,7 +24,10 @@ import Clock from '../model/clock';
  * @param {SynchronousEntry} entry
  * @returns {HTMLTableRowElement}
  */
-function EditEntryView({entry}) {
+function EditRaceEntryView({entry}) {
+    const [lapCount, setLapCount] = useState(() => entry.laps.totalElements);
+    const [sailingTime, setSailingTime] = useState(() => Clock.formatDuration(entry.sumOfLapTimes));
+    const [scoringAbbreviation, setScoringAbbreviation] = useState(() => entry.scoringAbbreviation);
     const [disabled, setDisabled] = useState(false);
     const prevVersion = useRef(entry.entry.metadata.version);
     const prevSignedUpVersion = useRef(entry.signedUp.metadata.version);
@@ -47,20 +50,48 @@ function EditEntryView({entry}) {
         prevSignedUpVersion.current = entry.signedUp.metadata.version;
     }, [entry, disabled]);
 
-    // async function handleScoringAbbreviationSelection(event) {
-    async function handleScoringAbbreviationSelection() {
-        // if (setScoringAbbreviation) {
-            setDisabled(true);
-        //     const result = await setScoringAbbreviation(entry, event.target.value);
-        //     if (!result) {
-        //         setDisabled(false);
-        //     }
-        // }
+    function handleLapCountChange({target}) {
+        if (/\d*/.test(target.value)) {
+            updateLapCount(target.value);
+        }
+    }
+
+    /**
+     * Update the lap count
+     * @param {Integer} inputLaps
+     */
+    function updateLapCount(lapCount) {
+        let newLapCount = lapCount;
+        if (newLapCount < 0) {
+            newLapCount = 0;
+        }
+        if (newLapCount <= entry.race.plannedLaps) {
+            setLapCount(newLapCount);
+        }        
+    }
+
+    function handleLapCountKeyUp(event) {
+        if (event.key === 'ArrowUp') {
+            updateLapCount(lapCount + 1);
+        }
+        else if (event.key === 'ArrowDown') {
+            updateLapCount(lapCount - 1);
+        }
+    }
+
+    function handleSailingTimeChange({target}) {
+        if (target.value === '' || Clock.validateStringDuration(target.value)) {
+            setSailingTime(target.value);
+        }
+    }
+
+    async function handleScoringAbbreviationSelection({target}) {
+        setScoringAbbreviation(target.value);
     }
 
     if (disabled) {
         if (classes === '') {
-            classes = 'race-entry-view w3-row disabled';
+            classes = 'edit-race-entry-view w3-row disabled';
         }
         else {
             classes += ' disabled';
@@ -82,16 +113,19 @@ function EditEntryView({entry}) {
                 <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'}>{entry.position != null ? entry.position : ' '}</output>
             </div>
             <div className='w3-col m1 w3-padding-small w3-border'>
-                <output>{entry.laps.totalElements}</output>
+                <input data-testid={`lap-count-input-${entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber}`} className='w3-col w3-center' value={lapCount} onChange={handleLapCountChange} onKeyUp={handleLapCountKeyUp} />
             </div>
             <div className='w3-col m1 w3-padding-small w3-border'>
-                <output>{Clock.formatDuration(entry.sumOfLapTimes)}</output>
+                <input data-testid={`sailing-time-input-${entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber}`} className='w3-col w3-right-align' type='text' value={sailingTime} onChange={handleSailingTimeChange} />
             </div>
             <div className='w3-col m1 w3-padding-small w3-border'>
-                <ScoringAbbreviation key={entry.scoringAbbreviation} value={entry.scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
+                <ScoringAbbreviation key={entry.scoringAbbreviation} value={scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
+            </div>
+            <div className='w3-col m1'>
+                {lapCount != entry.laps.entities.length || sailingTime != Clock.formatDuration(entry.sumOfLapTimes) || scoringAbbreviation != entry.scoringAbbreviation ? <button className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' type='button'>Update</button> : null}
             </div>
         </div>
     )
 }
 
-export default EditEntryView;
+export default EditRaceEntryView;
