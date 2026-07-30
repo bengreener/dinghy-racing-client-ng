@@ -745,6 +745,10 @@ class SylphModel {
     async setScoringAbbreviation(entry, scoringAbbreviation) {
         return entry;
     }
+
+    async setLapTotal(entry, lapCount, time) {
+        return new Entry({}, {version: ''}, this);
+    }
     
     async signUpToRace(race, helm, dinghy, crew) {
         return new DirectRace({}, {version: ''}, this);

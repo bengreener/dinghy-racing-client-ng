@@ -4674,3 +4674,32 @@ describe('when a request is made to withdraw from an embedded race', () => {
         expect(result).toBeTruthy();
     });
 });
+
+describe('when updating the lap total for an entry in a race', () => {
+    it('calls fetch with the address of the entry the new lap count and the new time for the lap divided by 1000', async () => {
+        const fetchSpy = fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: true,
+                status: 200, headers: new Headers([['Content-Type', 'application/hal+json'], ['ETag', '"0"']]),
+                json: () => Promise.resolve(entryChrisMarshall1234ScorpionAHAL)
+            });
+        });
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const promise = model.setLapTotal(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 1, 2000);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual({hal: entryChrisMarshall1234ScorpionAHAL, metadata: {version: '"0"'}, model});
+        expect(fetchSpy).toHaveBeenCalledWith(entryChrisMarshall1234ScorpionAHAL._links.self.href + '/setLapTotal', {method: 'PATCH', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}, body: JSON.stringify({number: 1, time: 2})});
+    });
+    it('throws an error when lap total update fails', async () => {
+        fetch.mockImplementationOnce(() => {
+            return Promise.resolve({
+                ok: false,
+                status: 404, 
+                statusText: 'Not Found'
+            });
+        });
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        await expect(() => model.setLapTotal(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 2, 2000)).rejects.toThrow('HTTP Error: 404 Not Found');
+    });
+});

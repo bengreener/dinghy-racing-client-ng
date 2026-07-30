@@ -93,6 +93,7 @@ class SylphModel {
         this.getSignedUp = this.getSignedUp.bind(this);
         this.getSignedUpTo = this.getSignedUpTo.bind(this);
         this.removeLap = this.removeLap.bind(this);
+        this.setLapTotal = this.setLapTotal.bind(this);
         this.setScoringAbbreviation = this.setScoringAbbreviation.bind(this);
         this.signUpToRace = this.signUpToRace.bind(this);
         this.updateCompetitor = this.updateCompetitor.bind(this);
@@ -1093,6 +1094,19 @@ class SylphModel {
      */
     async setScoringAbbreviation(entry, scoringAbbreviation) {
         const result = await this._update(entry.url, {scoringAbbreviation: scoringAbbreviation});
+        return new Entry(result.hal, result.metadata, this);
+    }
+
+    /**
+     * Set final results for an entry based on the number of laps sailed and the total time taken to sail the laps
+     * @param {Entry} entry 
+     * @param {Integer} lapCount 
+     * @param {Integer} time in milliseconds
+     * @returns {Promise<Entry>}
+     * @throws {Error}
+     */
+    async setLapTotal(entry, lapCount, time) {
+        const result = await this._update(entry.url + '/setLapTotal', {number: lapCount, time: time / 1000});
         return new Entry(result.hal, result.metadata, this);
     }
 
