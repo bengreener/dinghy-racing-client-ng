@@ -41,6 +41,7 @@ class SylphController {
         this.downloadRaceResults = this.downloadRaceResults.bind(this);
         this.postponeRace = this.postponeRace.bind(this);
         this.removeLap = this.removeLap.bind(this);
+        this.setLapTotal = this.setLapTotal.bind(this);
         this.setScoringAbbreviation = this.setScoringAbbreviation.bind(this);
         this.signUpToRace = this.signUpToRace.bind(this);
         this.signUpToEmbeddedRace = this.signUpToEmbeddedRace.bind(this);
@@ -277,6 +278,50 @@ class SylphController {
         }
         // if scoring abbreviation is an empty string pass null to model or will fail validation on REST server
         return this.model.setScoringAbbreviation(entry, scoringAbbreviation ? scoringAbbreviation.toUpperCase() : null);
+    }
+
+    /**
+     * Set final results for an entry based on the number of laps sailed and the total time taken to sail the laps
+     * @param {Entry} entry
+     * @param {Integer} lapCount
+     * @param {String} time The total time sailed to the end of the lap in the format [hh:][mm:]ss
+     * @returns {Promise<Entry>}
+     * @throws {InvalidParameter}
+     * @throws {MissingParameter}
+     * @throws {Error}
+     */
+    async setLapTotal(entry, lapCount, time) {
+        if (!entry || !(entry instanceof Entry)) {
+            throw new MissingParameter('An entry to update is required.')
+        }
+        if (lapCount == null || (Number.isInteger(lapCount) && lapCount < 0)) {
+            throw new MissingParameter('A lap count of 0 or more is needed to update the entry.');
+        }
+        if (!time) {
+            throw new MissingParameter('A time is needed to update the entry.');
+        }
+        let timeInMilliseconds = 0;
+        // convert time to number of milliseconds
+        if (/^(\d+:(?=[0-5]?\d:[0-5]?\d))?([0-5]?\d:(?=[0-5]?\d))?([0-5]?\d)$/.test(time)) {
+            const timeComponents = /^((?<=^)\d*(?=:[0-5]?\d:))*:?((?<=^|:)[0-5]?\d(?=:))?:?((?<=^|:)[0-5]?\d(?=$))$/.exec(time);
+            // get hours
+            timeInMilliseconds += isNaN(timeComponents[1]) ? 0 : 3600000 * timeComponents[1];
+            // get minutes
+            timeInMilliseconds += isNaN(timeComponents[2]) ? 0 : 60000 * timeComponents[2];
+            // get seconds
+            timeInMilliseconds += isNaN(timeComponents[3]) ? 0 : 1000 * timeComponents[3];
+        }
+        else {
+            throw new InvalidParameter('Time must be a string value in the format [hh:][mm:]ss.');
+        }
+        const directRace = await entry.getDirectRace();
+        if (lapCount > directRace.plannedLaps) {
+            throw new InvalidParameter('Lap count cannot be greater than the number of laps set for the race.');
+        }
+        if (timeInMilliseconds > directRace.getElapsedTime()) {
+            throw new InvalidParameter('Time should be less than or equal to the elapsed time of the race.');
+        }
+        return this.model.setLapTotal(entry, lapCount, timeInMilliseconds);
     }
 
     /**

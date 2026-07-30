@@ -1095,3 +1095,155 @@ describe('when updating the position of an entry in a race', () => {
         });
     });
 });
+
+describe('when updating the lap total for an entry in a race', () => {
+    it('accepts a lap count less than or equal to the number of laps in the race and a string time value in the format [hh:][mm:]ss and returns a promise that resolves the entry with the updated laps and time', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
+        vi.spyOn(entry, 'getDirectRace').mockImplementation(async () => {return new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)});
+        vi.spyOn(entry, 'getLaps').mockImplementation(async () => {return new Collection([new Lap(lap1HAL, {version: '"0"'}, model)], {"size": 20, "totalElements": 1, "totalPages": 1, "number": 0})});
+        vi.spyOn(model, 'updateLap').mockImplementation(async () => {return entry});
+        const controller = new SylphController(model);
+        const promise = controller.updateLap(entry, 840000);
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model));
+    });
+    it('accepts a string n:n where n is a string integer > 0 and less than 59 and returns a promise that resolves to a result indicating success', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
+        vi.spyOn(entry, 'getDirectRace').mockImplementation(async () => {return new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)});
+        vi.spyOn(entry, 'getLaps').mockImplementation(async () => {return new Collection([new Lap(lap1HAL, {version: '"0"'}, model)], {"size": 20, "totalElements": 1, "totalPages": 1, "number": 0})});
+        vi.spyOn(model, 'setLapTotal').mockImplementation(async () => {return entry});
+        const controller = new SylphController(model);
+        const promise = controller.setLapTotal(entry, 1, '23:43');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model));
+    });
+    it('accepts a string h:n:n where h is a string integer >= 0 and n is a string integer > 0 and less than 59 and returns a promise that resolves to a result indicating success', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
+        vi.spyOn(entry, 'getDirectRace').mockImplementation(async () => {return new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)});
+        vi.spyOn(entry, 'getLaps').mockImplementation(async () => {return new Collection([new Lap(lap1HAL, {version: '"0"'}, model)], {"size": 20, "totalElements": 1, "totalPages": 1, "number": 0})});
+        vi.spyOn(model, 'setLapTotal').mockImplementation(async () => {return entry});
+        const controller = new SylphController(model);
+        const promise = controller.setLapTotal(entry, 1, '999:1:1');
+        const result = await promise;
+        expect(promise).toBeInstanceOf(Promise);
+        expect(result).toEqual(new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model));
+    });
+    describe('when passed a string time value', () => {
+        it('correctly converts a seconds only value to milliseconds', async () => {
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entry = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
+            vi.spyOn(entry, 'getDirectRace').mockImplementation(async () => {return new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)});
+            vi.spyOn(entry, 'getLaps').mockImplementation(async () => {return new Collection([new Lap(lap1HAL, {version: '"0"'}, model)], {"size": 20, "totalElements": 1, "totalPages": 1, "number": 0})});
+            const updateLapSpy = vi.spyOn(model, 'setLapTotal').mockImplementation(async () => {return entry});
+            const controller = new SylphController(model);
+            await controller.setLapTotal(entry, 1, '47');
+
+            expect(updateLapSpy).toBeCalledWith(entry, 1, 47000);
+        });
+        it('correctly converts a minutes and seconds value to milliseconds', async () => {
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entry = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
+            vi.spyOn(entry, 'getDirectRace').mockImplementation(async () => {return new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)});
+            vi.spyOn(entry, 'getLaps').mockImplementation(async () => {return new Collection([new Lap(lap1HAL, {version: '"0"'}, model)], {"size": 20, "totalElements": 1, "totalPages": 1, "number": 0})});
+            const updateLapSpy = vi.spyOn(model, 'setLapTotal').mockImplementation(async () => {return entry});
+            const controller = new SylphController(model);
+            await controller.setLapTotal(entry, 1, '23:47');
+            
+            expect(updateLapSpy).toBeCalledWith(entry, 1, 1427000);
+        });
+        it('correctly converts an hours, minutes and seconds value to milliseconds', async () => {
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const entry = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
+            vi.spyOn(entry, 'getDirectRace').mockImplementation(async () => {return new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)});
+            vi.spyOn(entry, 'getLaps').mockImplementation(async () => {return new Collection([new Lap(lap1HAL, {version: '"0"'}, model)], {"size": 20, "totalElements": 1, "totalPages": 1, "number": 0})});
+            const updateLapSpy = vi.spyOn(model, 'setLapTotal').mockImplementation(async () => {return entry});
+            const controller = new SylphController(model);
+            await controller.setLapTotal(entry, 1, '1:23:47');
+            
+            expect(updateLapSpy).toBeCalledWith(entry, 1, 5027000);
+        });
+    });
+    it('does not accept a value greater than the elapsed time for the race', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        vi.spyOn(model, 'getClock').mockImplementation(() => {return {getElapsedTime: () => 1500}});
+        const entry = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
+        vi.spyOn(entry, 'getDirectRace').mockImplementation(async () => {return new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)});
+        vi.spyOn(entry, 'getLaps').mockImplementation(async () => {return new Collection([
+            new Lap({...lap1HAL, time: 'PT2S'}, {version: '"0"'}, model)
+        ], {"size": 20, "totalElements": 1, "totalPages": 1, "number": 0})});
+        const controller = new SylphController(model);
+        
+        await expect(() => controller.setLapTotal(entry, 1, '00:04')).rejects.toThrowError('Time should be less than or equal to the elapsed time of the race.');
+    });
+    it('throws error when set lap total is unsuccessful and provides a message explaining the cause of failure', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
+        vi.spyOn(entry, 'getDirectRace').mockImplementation(async () => {return new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)});
+        vi.spyOn(entry, 'getLaps').mockImplementation(async () => {return new Collection([new Lap(lap1HAL, {version: '"0"'}, model)], {"size": 20, "totalElements": 1, "totalPages": 1, "number": 0})});
+        vi.spyOn(model, 'setLapTotal').mockImplementationOnce((entry, time) => {throw new Error('Something went wrong')});
+        const controller = new SylphController(model);
+        
+        await expect(() => controller.setLapTotal(entry, 1, '20:00')).rejects.toThrowError('Something went wrong');
+    });
+    it('throws error when entry is null or undefined and provides a message explaining the cause of failure', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        
+        await expect(() => controller.setLapTotal(null, 2, '2000')).rejects.toThrowError('An entry to update is required.');
+    });
+    it('throws an error when lap count is null or undefined and provides a message explaining the cause of failure', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
+        vi.spyOn(entry, 'getDirectRace').mockImplementation(async () => {return new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)});
+        vi.spyOn(entry, 'getLaps').mockImplementation(async () => {return new Collection([new Lap(lap1HAL, {version: '"0"'}, model)], {"size": 20, "totalElements": 1, "totalPages": 1, "number": 0})});
+        const controller = new SylphController(model);
+        
+        await expect(() => controller.setLapTotal(entry, null, '2000')).rejects.toThrowError('A lap count of 0 or more is needed to update the entry.');
+    });
+    it('throws an error when lap count is less than 0 and provides a message explaining the cause of failure', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
+        vi.spyOn(entry, 'getDirectRace').mockImplementation(async () => {return new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)});
+        vi.spyOn(entry, 'getLaps').mockImplementation(async () => {return new Collection([new Lap(lap1HAL, {version: '"0"'}, model)], {"size": 20, "totalElements": 1, "totalPages": 1, "number": 0})});
+        const controller = new SylphController(model);
+        
+        await expect(() => controller.setLapTotal(entry, -1, '2000')).rejects.toThrowError('A lap count of 0 or more is needed to update the entry.');
+    });
+    it('throws an error when lap count is greater than the number of laps in the race and provides a message explaining the cause of failure', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
+        vi.spyOn(entry, 'getDirectRace').mockImplementation(async () => {return new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)});
+        vi.spyOn(entry, 'getLaps').mockImplementation(async () => {return new Collection([new Lap(lap1HAL, {version: '"0"'}, model)], {"size": 20, "totalElements": 1, "totalPages": 1, "number": 0})});
+        const controller = new SylphController(model);
+        
+        await expect(() => controller.setLapTotal(entry, 6, '20:00')).rejects.toThrowError('Lap count cannot be greater than the number of laps set for the race.');
+    });
+    it('throws an error when time is null or undefined and provides a message explaining the cause of failure', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
+        vi.spyOn(entry, 'getDirectRace').mockImplementation(async () => {return new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)});
+        vi.spyOn(entry, 'getLaps').mockImplementation(async () => {return new Collection([new Lap(lap1HAL, {version: '"0"'}, model)], {"size": 20, "totalElements": 1, "totalPages": 1, "number": 0})});
+        const controller = new SylphController(model);
+        
+        await expect(() => controller.setLapTotal(entry, 1, null)).rejects.toThrowError('A time is needed to update the entry.');
+    });
+    it('throws an error when time is not a string in format [hh:][mm:]ss and provides a message explaining the cause of failure', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
+        const controller = new SylphController(model);
+        
+        await expect(() => controller.setLapTotal(entry, 1, 'two thousand')).rejects.toThrowError('Time must be a string value in the format [hh:][mm:]ss.');
+    });
+    it('throws an error when time is negative and provides a message explaining the cause of failure', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entry = new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model);
+        const controller = new SylphController(model);
+        
+        await expect(() => controller.setLapTotal(entry, 0, '-1')).rejects.toThrowError('Time must be a string value in the format [hh:][mm:]ss.');
+    });
+});
