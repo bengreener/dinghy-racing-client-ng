@@ -19,7 +19,7 @@ import EditRaceEntryView from './EditRaceEntryView';
 import RaceType from '../model/race-type';
 import { buildSynchronousEntries } from './synchronous-model/synchronous-model';
 
-function EditRaceEntriesView ({ races, model }) {
+function EditRaceEntriesView ({ races, model, controller }) {
     const [entriesMap, setEntriesMap] = useState(new Map());
     const [message, setMessage] = useState('');
     const [sortOrder, setSortOrder] = useState('default');
@@ -214,10 +214,10 @@ function EditRaceEntriesView ({ races, model }) {
             const entry = entriesMap.get(key);
             if (!entry) return null; // allow for display keys that map to a non existent entry after a race is removed from the selection; fixed by next render
             if (entry.race.type === RaceType.FLEET) {
-                return <EditRaceEntryView key={key} entry={entry} />
+                return <EditRaceEntryView key={key} entry={entry} onSetLapTotal={controller.setLapTotal} onSetScoringAbbreviation={controller.setScoringAbbreviation}/>
             }
             else {
-                return <EditRaceEntryView key={key} entry={entry} />
+                return <EditRaceEntryView key={key} entry={entry} onSetLapTotal={controller.setLapTotal} onSetScoringAbbreviation={controller.setScoringAbbreviation}/>
             }
         });
     }

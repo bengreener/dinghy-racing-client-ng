@@ -21,7 +21,7 @@ import { SortOrder } from '../model/sylph-model';
 import { storageAvailable } from '../utilities/storage-utilities';
 import EditRaceEntriesView from './EditRaceEntriesView';
 
-function EditRaceResultsConsole({ model }) {
+function EditRaceResultsConsole({ model, controller }) {
     const sessionStorageAvailable = useMemo(() => storageAvailable('sessionStorage'), []);
     const [selectedRaces, setSelectedRaces] = useState([]); // array of race names selected by user
     const [raceOptions, setRaceOptions] = useState([]); // list of names of races names for selection
@@ -188,7 +188,7 @@ function EditRaceResultsConsole({ model }) {
                     <p className={userMessageClasses()}>{message}</p>
                 </div> : null
             }
-            <EditRaceEntriesView races={selectedRaces.map(selectedRace => raceMap.get(selectedRace))}/>
+            <EditRaceEntriesView races={selectedRaces.map(selectedRace => raceMap.get(selectedRace))} model={model} controller={controller}/>
         </div>
     )
 }

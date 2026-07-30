@@ -24,7 +24,7 @@ import Clock from '../model/clock';
  * @param {SynchronousEntry} entry
  * @returns {HTMLTableRowElement}
  */
-function EditRaceEntryView({entry}) {
+function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation}) {
     const [lapCount, setLapCount] = useState(() => entry.laps.totalElements);
     const [sailingTime, setSailingTime] = useState(() => Clock.formatDuration(entry.sumOfLapTimes));
     const [scoringAbbreviation, setScoringAbbreviation] = useState(() => entry.scoringAbbreviation);
@@ -71,17 +71,35 @@ function EditRaceEntryView({entry}) {
     }
 
     function handleLapCountKeyUp(event) {
+        const oldLapCount = lapCount ? Number.parseInt(lapCount) : 0;
         if (event.key === 'ArrowUp') {
-            updateLapCount(lapCount + 1);
+            updateLapCount(oldLapCount + 1);
         }
         else if (event.key === 'ArrowDown') {
-            updateLapCount(lapCount - 1);
+            updateLapCount(oldLapCount - 1);
         }
     }
 
     function handleSailingTimeChange({target}) {
         if (target.value === '' || Clock.validateStringDuration(target.value)) {
             setSailingTime(target.value);
+        }
+    }
+
+    async function handleUpdateClick() {
+        if (!disabled) {
+            let result;
+            if (onSetScoringAbbreviation && scoringAbbreviation != entry.scoringAbbreviation) {
+                setDisabled(true);
+                result = await onSetScoringAbbreviation(entry.entry, scoringAbbreviation);
+            }
+            else if (onSetLapTotal && (Number.parseInt(lapCount) != entry.laps.entities.length || sailingTime != Clock.formatDuration(entry.sumOfLapTimes))) {
+                setDisabled(true);
+                result = await onSetLapTotal(entry.entry, Number.parseInt(lapCount), sailingTime);
+            }
+            if (!result) {
+                setDisabled(false);
+            }
         }
     }
 
@@ -122,7 +140,7 @@ function EditRaceEntryView({entry}) {
                 <ScoringAbbreviation key={entry.scoringAbbreviation} value={scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
             </div>
             <div className='w3-col m1'>
-                {lapCount != entry.laps.entities.length || sailingTime != Clock.formatDuration(entry.sumOfLapTimes) || scoringAbbreviation != entry.scoringAbbreviation ? <button className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' type='button'>Update</button> : null}
+                {lapCount != entry.laps.entities.length || sailingTime != Clock.formatDuration(entry.sumOfLapTimes) || scoringAbbreviation != entry.scoringAbbreviation ? <button className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' type='button' onClick={handleUpdateClick} >Update</button> : null}
             </div>
         </div>
     )
