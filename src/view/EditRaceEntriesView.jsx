@@ -214,12 +214,16 @@ function EditRaceEntriesView ({ races, model, controller }) {
             const entry = entriesMap.get(key);
             if (!entry) return null; // allow for display keys that map to a non existent entry after a race is removed from the selection; fixed by next render
             if (entry.race.type === RaceType.FLEET) {
-                return <EditRaceEntryView key={key} entry={entry} onSetLapTotal={controller.setLapTotal} onSetScoringAbbreviation={controller.setScoringAbbreviation}/>
+                return <EditRaceEntryView key={key + entry.entry.metadata.version} entry={entry} onSetLapTotal={controller.setLapTotal} onSetScoringAbbreviation={controller.setScoringAbbreviation} showUserMessage={showChildUserMessage} />
             }
             else {
-                return <EditRaceEntryView key={key} entry={entry} onSetLapTotal={controller.setLapTotal} onSetScoringAbbreviation={controller.setScoringAbbreviation}/>
+                return <EditRaceEntryView key={key + entry.entry.metadata.version} entry={entry} onSetLapTotal={controller.setLapTotal} onSetScoringAbbreviation={controller.setScoringAbbreviation}  showUserMessage={showChildUserMessage} />
             }
         });
+    }
+
+    function showChildUserMessage(message) {
+        setMessage(message);
     }
 
     function sortButtonClick(sortOrder) {

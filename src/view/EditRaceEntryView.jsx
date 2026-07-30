@@ -24,7 +24,7 @@ import Clock from '../model/clock';
  * @param {SynchronousEntry} entry
  * @returns {HTMLTableRowElement}
  */
-function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation}) {
+function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation, showUserMessage}) {
     const [lapCount, setLapCount] = useState(() => entry.laps.totalElements);
     const [sailingTime, setSailingTime] = useState(() => Clock.formatDuration(entry.sumOfLapTimes));
     const [scoringAbbreviation, setScoringAbbreviation] = useState(() => entry.scoringAbbreviation);
@@ -67,7 +67,8 @@ function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation}) {
         }
         if (newLapCount <= entry.race.plannedLaps) {
             setLapCount(newLapCount);
-        }        
+        } 
+        checkLapsTotalAndScoringAbbreviation(entry, newLapCount, sailingTime, scoringAbbreviation);
     }
 
     function handleLapCountKeyUp(event) {
@@ -84,6 +85,7 @@ function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation}) {
         if (target.value === '' || Clock.validateStringDuration(target.value)) {
             setSailingTime(target.value);
         }
+        checkLapsTotalAndScoringAbbreviation(entry, lapCount, target.value, scoringAbbreviation);
     }
 
     async function handleUpdateClick() {
@@ -105,6 +107,18 @@ function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation}) {
 
     async function handleScoringAbbreviationSelection({target}) {
         setScoringAbbreviation(target.value);
+        checkLapsTotalAndScoringAbbreviation(entry, lapCount, sailingTime, target.value);
+    }
+
+    function checkLapsTotalAndScoringAbbreviation(entry, lapCount, sailingTime, scoringAbbreviation) {
+        if (showUserMessage) {
+            if ((lapCount != entry.laps.entities.length || sailingTime != Clock.formatDuration(entry.sumOfLapTimes)) && scoringAbbreviation != entry.scoringAbbreviation) {
+                showUserMessage('Updating an entry with a change to scoring abbreviation will ignore changes to laps and time sailed.')
+            }
+            else {
+                showUserMessage('');
+            }
+        }
     }
 
     if (disabled) {

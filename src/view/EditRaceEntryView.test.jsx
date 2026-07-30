@@ -357,4 +357,26 @@ describe('when update button clicked', () => {
             expect(await onSetLapTotalSpy).not.toHaveBeenCalled();
         });
     });
-})
+});
+describe('when new values entered for laps count or time sailed and scoring abbreviation', () => {
+    it('warns user that change to lap count and time sailed will be ignored', async () => {
+        const user = userEvent.setup();
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const showUserMessageSpy = vi.fn(async () => {});
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
+        render(<EditRaceEntryView entry={entryChrisMarshallScorpionA1234} showUserMessage={showUserMessageSpy} />);
+        const lapCountInput = screen.getByTestId('lap-count-input-Scorpion-1234');
+        const scoringAbbreviationInput = screen.getByRole('combobox');
+        await user.clear(lapCountInput);
+        await user.type(lapCountInput, '3');
+        await user.selectOptions(scoringAbbreviationInput, 'OCS');
+        expect(await showUserMessageSpy).toHaveBeenCalledWith('Updating an entry with a change to scoring abbreviation will ignore changes to laps and time sailed.');
+    });
+});
