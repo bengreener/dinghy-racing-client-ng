@@ -74,7 +74,7 @@ button.selected {
  .preserve-whitespace {
 	white-space: pre;
  }
-.race-entries-view {
+.race-entries-view, .edit-race-entries-view {
     display: flex;
     flex-direction: column;
     overflow: hidden;
