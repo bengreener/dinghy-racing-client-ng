@@ -91,16 +91,24 @@ function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation, show
     async function handleUpdateClick() {
         if (!disabled) {
             let result;
-            if (onSetScoringAbbreviation && scoringAbbreviation != entry.scoringAbbreviation) {
-                setDisabled(true);
-                result = await onSetScoringAbbreviation(entry.entry, scoringAbbreviation);
+            try {
+                if (onSetScoringAbbreviation && scoringAbbreviation != entry.scoringAbbreviation) {
+                    setDisabled(true);
+                    result = await onSetScoringAbbreviation(entry.entry, scoringAbbreviation);
+                }
+                else if (onSetLapTotal && (Number.parseInt(lapCount) != entry.laps.entities.length || sailingTime != Clock.formatDuration(entry.sumOfLapTimes))) {
+                    setDisabled(true);
+                    result = await onSetLapTotal(entry.entry, Number.parseInt(lapCount), sailingTime);
+                }
+                if (!result) {
+                    setDisabled(false);
+                }
             }
-            else if (onSetLapTotal && (Number.parseInt(lapCount) != entry.laps.entities.length || sailingTime != Clock.formatDuration(entry.sumOfLapTimes))) {
-                setDisabled(true);
-                result = await onSetLapTotal(entry.entry, Number.parseInt(lapCount), sailingTime);
-            }
-            if (!result) {
+            catch(error) {
                 setDisabled(false);
+                if (showUserMessage) {
+                    showUserMessage(error.message);
+                }
             }
         }
     }
@@ -131,7 +139,7 @@ function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation, show
     }
 
     return (
-        <div className={classes} >
+        <div data-testid={entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name} className={classes} >
             <div className='w3-col m2 w3-padding-small bgis-cell w3-border' >
                 <output>{entry.dinghy.dinghyClass.name}</output>
             </div>

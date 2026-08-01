@@ -358,6 +358,51 @@ describe('when update button clicked', () => {
         });
     });
 });
+describe('when entry update fails', () => {
+    it('displays a message to the user explaining the cause of the failure', async () => {
+        const user = userEvent.setup();
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const showUserMessageSpy = vi.fn(async () => {});
+        const controller = new SylphController(model);
+        const onSetLapTotalSpy = vi.spyOn(controller, 'setLapTotal').mockImplementation(async () => {throw new Error('Something went wrong.')});
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
+        render(<EditRaceEntryView entry={entryChrisMarshallScorpionA1234} onSetLapTotal={onSetLapTotalSpy} showUserMessage={showUserMessageSpy} />);
+        const lapCountInput = screen.getByTestId('lap-count-input-Scorpion-1234');
+        await user.clear(lapCountInput);
+        await user.type(lapCountInput, '3');
+        await user.click(screen.getByRole('button', {name: 'Update'}));
+        expect(await showUserMessageSpy).toHaveBeenCalledWith('Something went wrong.');
+    });
+    it('entry is enabled to allow edits', async () => {
+        const user = userEvent.setup();
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const showUserMessageSpy = vi.fn(async () => {});
+        const controller = new SylphController(model);
+        const onSetLapTotalSpy = vi.spyOn(controller, 'setLapTotal').mockImplementation(async () => {throw new Error('Something went wrong.')});
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
+        render(<EditRaceEntryView entry={entryChrisMarshallScorpionA1234} onSetLapTotal={onSetLapTotalSpy} showUserMessage={showUserMessageSpy} />);
+        const editRaceEntryView = screen.getByTestId('Scorpion1234Chris Marshall');
+        const lapCountInput = screen.getByTestId('lap-count-input-Scorpion-1234');
+        await user.clear(lapCountInput);
+        await user.type(lapCountInput, '3');
+        await user.click(screen.getByRole('button', {name: 'Update'}));
+        expect(editRaceEntryView.getAttribute('class')).not.toMatch(/disabled/i);
+    });
+})
 describe('when new values entered for laps count or time sailed and scoring abbreviation', () => {
     it('warns user that change to lap count and time sailed will be ignored', async () => {
         const user = userEvent.setup();
