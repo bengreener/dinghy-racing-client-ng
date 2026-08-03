@@ -246,6 +246,23 @@ describe('when value entered for time sailed does not equal value recorded as ti
         await user.type(sailingTimeInput, '1:15:12');
         expect(screen.getByRole('button', {name: 'Update'})).toBeInTheDocument();
     });
+    it('displays cancel button', async () => {
+        const user = userEvent.setup();
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
+        render(<EditRaceEntryView entry={entryChrisMarshallScorpionA1234} />);
+        const sailingTimeInput = screen.getByTestId('sailing-time-input-Scorpion-1234');
+        await user.clear(sailingTimeInput);
+        await user.type(sailingTimeInput, '1:15:12');
+        expect(screen.getByRole('button', {name: 'Cancel'})).toBeInTheDocument();
+    });
 });
 describe('when value entered for scoring abbreviation does not equal value recorded as scoring abbreviation for entry', () => {
     it('displays update button', async () => {
@@ -263,6 +280,22 @@ describe('when value entered for scoring abbreviation does not equal value recor
         const scoringAbbreviationInput = screen.getByRole('combobox');
         await user.selectOptions(scoringAbbreviationInput, 'OCS');
         expect(screen.getByRole('button', {name: 'Update'})).toBeInTheDocument();
+    });
+    it('displays cancel button', async () => {
+        const user = userEvent.setup();
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
+        render(<EditRaceEntryView entry={entryChrisMarshallScorpionA1234} />);
+        const scoringAbbreviationInput = screen.getByRole('combobox');
+        await user.selectOptions(scoringAbbreviationInput, 'OCS');
+        expect(screen.getByRole('button', {name: 'Cancel'})).toBeInTheDocument();
     });
 });
 describe('when update button clicked', () => {
@@ -358,6 +391,34 @@ describe('when update button clicked', () => {
         });
     });
 });
+describe('when cancel button clicked', () => {
+    it('replaces values entered with values currently set for entry', async () => {
+        const user = userEvent.setup();
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const showUserMessageSpy = vi.fn(async () => {});
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
+        render(<EditRaceEntryView entry={entryChrisMarshallScorpionA1234} showUserMessage={showUserMessageSpy} />);
+        const lapCountInput = screen.getByTestId('lap-count-input-Scorpion-1234');
+        const sailingTimeInput = screen.getByTestId('sailing-time-input-Scorpion-1234');
+        const scoringAbbreviationInput = screen.getByRole('combobox');
+        await user.clear(lapCountInput);
+        await user.type(lapCountInput, '3');
+        await user.clear(sailingTimeInput);
+        await user.type(sailingTimeInput, '1:15:12');
+        await user.selectOptions(scoringAbbreviationInput, 'OCS');
+        await user.click(screen.getByRole('button', {name: 'Cancel'}));
+        expect(lapCountInput).toHaveValue('0');
+        expect(sailingTimeInput).toHaveValue('33:20');
+        expect(scoringAbbreviationInput).toHaveValue('');
+    });
+});
 describe('when entry update fails', () => {
     it('displays a message to the user explaining the cause of the failure', async () => {
         const user = userEvent.setup();
@@ -402,7 +463,7 @@ describe('when entry update fails', () => {
         await user.click(screen.getByRole('button', {name: 'Update'}));
         expect(editRaceEntryView.getAttribute('class')).not.toMatch(/disabled/i);
     });
-})
+});
 describe('when new values entered for laps count or time sailed and scoring abbreviation', () => {
     it('warns user that change to lap count and time sailed will be ignored', async () => {
         const user = userEvent.setup();

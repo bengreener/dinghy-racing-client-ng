@@ -113,6 +113,13 @@ function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation, show
         }
     }
 
+    function handleCancelClick() {
+        setLapCount(entry.laps.totalElements);
+        setSailingTime(Clock.formatDuration(entry.sumOfLapTimes));
+        setScoringAbbreviation(entry.scoringAbbreviation);
+        showUserMessage('');
+    }
+
     async function handleScoringAbbreviationSelection({target}) {
         setScoringAbbreviation(target.value);
         checkLapsTotalAndScoringAbbreviation(entry, lapCount, sailingTime, target.value);
@@ -161,8 +168,15 @@ function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation, show
             <div className='w3-col m1 w3-padding-small w3-border'>
                 <ScoringAbbreviation key={entry.scoringAbbreviation} value={scoringAbbreviation} onChange={handleScoringAbbreviationSelection} />
             </div>
-            <div className='w3-col m1'>
-                {lapCount != entry.laps.entities.length || sailingTime != Clock.formatDuration(entry.sumOfLapTimes) || scoringAbbreviation != entry.scoringAbbreviation ? <button className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' type='button' onClick={handleUpdateClick} >Update</button> : null}
+            <div className='w3-col m2'>
+                {
+                    lapCount != entry.laps.entities.length || sailingTime != Clock.formatDuration(entry.sumOfLapTimes) || scoringAbbreviation != entry.scoringAbbreviation ? 
+                    <>
+                        <button className='w3-btn w3-col m6 w3-border w3-light-green w3-hover-green' type='button' onClick={handleUpdateClick} >Update</button>
+                        <button className='w3-btn w3-col m6 w3-border bgis-pale-amber w3-hover-amber' type='button' onClick={handleCancelClick} >Cancel</button>
+                    </>
+                     : null
+                }
             </div>
         </div>
     )
