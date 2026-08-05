@@ -14,6 +14,32 @@
  * limitations under the License. 
  */
 
-it('renders', () => {
+import { act, render, screen } from '@testing-library/react';
+import EditRaceEntriesView from './EditRaceEntriesView';
+import SylphModel from '../model/sylph-model';
+import SylphController from '../controller/sylph-controller';
+import DirectRace from '../model/direct-race';
+import { httpRootURL, wsRootURL, raceScorpionAHAL } from '../model/__mocks__/test-data';
 
+vi.mock('../model/sylph-model');
+vi.mock('../controller/sylph-controller');
+vi.mock('../model/clock');
+
+afterEach(() => {
+    vi.resetAllMocks();
+});
+
+it('renders', async () => {
+    const model = new SylphModel(httpRootURL, wsRootURL);
+    const controller = new SylphController(model);
+    await act(async () => {
+        render(<EditRaceEntriesView model={model} controller={controller} races={[new DirectRace(raceScorpionAHAL, {version: '"0"'}, model)]} />);
+    });
+    expect(screen.getByRole('button', {name: /by sail number/i})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /by class & sail number/i})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /by lap times/i})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /by position/i})).toBeInTheDocument();
+    expect(screen.getByRole('status', {name: (content, node) => node.textContent === '1234'})).toBeInTheDocument();
+    expect(screen.getAllByText(/Scorpion/i)[0]).toBeInTheDocument();
+    expect(screen.getByText(/Chris marshaLL/i)).toBeInTheDocument();
 });

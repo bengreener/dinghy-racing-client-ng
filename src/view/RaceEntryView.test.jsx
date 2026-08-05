@@ -447,7 +447,7 @@ describe('when editing a lap time', () => {
             });
             expect(lapEntryCellInput).toHaveValue('15530');
         });
-        it('calls showUserMessage prop with message explainging error', async () => {
+        it('calls showUserMessage prop with message explaining error', async () => {
             const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
             vi.setSystemTime(new Date('2021-10-14T10:45:00Z'));
             const showUserMessage = vi.fn();
