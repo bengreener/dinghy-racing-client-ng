@@ -46,7 +46,7 @@ class Clock {
     static convertStringDurationToMilliseconds(duration) {
         let timeInMilliseconds = 0;
         // validate entry
-        if (/^(\d+:(?=[0-5]?\d:[0-5]?\d))?([0-5]?\d:(?=[0-5]?\d))?([0-5]?\d)$/.test(duration)) {
+        if (Clock.validateStringDuration(duration)) {
             const timeComponents = /^((?<=^)\d*(?=:[0-5]?\d:))*:?((?<=^|:)[0-5]?\d(?=:))?:?((?<=^|:)[0-5]?\d(?=$))$/.exec(duration);
             // get hours
             timeInMilliseconds += isNaN(timeComponents[1]) ? 0 : 3600000 * timeComponents[1];
@@ -127,7 +127,6 @@ class Clock {
      */
     static formatDurationAsSeconds(duration) {
         let d = Math.floor(duration / 1000);
-
         return d.toString();
     }
 
@@ -146,13 +145,21 @@ class Clock {
     }
 
     /**
+     * Validate a string as a valid duration
+     * @param {String} duration 
+     * @returns {boolean}
+     */
+    static validateStringDuration(duration) {
+        return /^(\d+:(?=[0-5]?\d:[0-5]?\d))?([0-5]?\d:(?=[0-5]?\d))?([0-5]?\d)$/.test(duration);
+    }
+
+    /**
      * Validate a potential time string as a valid input during data entry
      * Allows values to be entered that would not be valid complete time strings; limits acceptable characters rather than imposing structure to make it easier to edit values.
      * @param {String} duration 
      * @returns {boolean}
      */
-    static validateStringDuration(duration) {
-        // return /(^\d+):?((?<=:)[0-5]?\d(?:(?=:)|$))?:?((?<=:)[0-5]?\d(?=$))?$/.test(duration);
+    static validateStringDurationDuringEntry(duration) {
         return /[\d:]+/.test(duration);
     }
 

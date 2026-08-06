@@ -138,9 +138,12 @@ class Clock {
     static now() {
         return Date.now() + Clock._synchOffset;
     }
-    
+
     static validateStringDuration(duration) {
-        // return /(^\d+):?((?<=:)[0-5]?\d(?:(?=:)|$))?:?((?<=:)[0-5]?\d(?=$))?$/.test(duration);
+        return /^(\d+:(?=[0-5]?\d:[0-5]?\d))?([0-5]?\d:(?=[0-5]?\d))?([0-5]?\d)$/.test(duration);
+    }
+    
+    static validateStringDurationDuringEntry(duration) {
         return /[\d:]+/.test(duration);
     }
 

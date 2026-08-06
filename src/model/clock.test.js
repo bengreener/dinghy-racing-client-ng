@@ -435,6 +435,30 @@ it('provides time to the nearest second precision', () => {
     expect(clock.getTimeToSecondPrecision()).toEqual(timeToSecondPrecision);
 });
 
+describe('when validating a time duration string', () => {
+    it('accepts 0', () => {
+        expect(Clock.validateStringDuration('0')).toBe(true);
+    });
+    it('accepts 00:00', () => {
+        expect(Clock.validateStringDuration('00:00')).toBe(true);
+    });
+    it('accepts 00:00:00', () => {
+        expect(Clock.validateStringDuration('00:00:00')).toBe(true);
+    });
+    it('accepts 4:01', () => {
+        expect(Clock.validateStringDuration('4:01')).toBe(true);
+    });
+    it('accepts 5:4:1', () => {
+        expect(Clock.validateStringDuration('5:4:1')).toBe(true);
+    });
+    it('does not accept 60', () => {
+        expect(Clock.validateStringDuration('60')).toBe(false);
+    });
+    it('does not accept 24:00', () => {
+        expect(Clock.validateStringDuration('60')).toBe(false);
+    });
+});
+
 describe('when converting a time string to milliseconds', () => {
     it('converts 0 to 0ms', () => {
         expect(Clock.convertStringDurationToMilliseconds('0')).toBe(0);
@@ -471,50 +495,50 @@ describe('when converting a time string to milliseconds', () => {
     });
 });
 
-describe('when validating a time string', () => {
+describe('when validating a time duration string during input', () => {
     it('0 is valid', () => {
-        expect(Clock.validateStringDuration('0')).toBeTruthy();
+        expect(Clock.validateStringDurationDuringEntry('0')).toBeTruthy();
     });
     it('00:00 is valid', () => {
-        expect(Clock.validateStringDuration('00:00')).toBeTruthy();
+        expect(Clock.validateStringDurationDuringEntry('00:00')).toBeTruthy();
     });
     it('00:00:00 is valid', () => {
-        expect(Clock.validateStringDuration('00:00:00')).toBeTruthy();
+        expect(Clock.validateStringDurationDuringEntry('00:00:00')).toBeTruthy();
     });
     it('1 is valid', () => {
-        expect(Clock.validateStringDuration('1')).toBeTruthy();
+        expect(Clock.validateStringDurationDuringEntry('1')).toBeTruthy();
     });
     it('5:4:1 is valid', () => {
-        expect(Clock.validateStringDuration('5:4:1')).toBeTruthy();
+        expect(Clock.validateStringDurationDuringEntry('5:4:1')).toBeTruthy();
     });
     it('23:59:59 is valid', () => {
-        expect(Clock.validateStringDuration('23:59:59')).toBeTruthy();
+        expect(Clock.validateStringDurationDuringEntry('23:59:59')).toBeTruthy();
     });
     it('2400:00:00 is valid', () => {
-        expect(Clock.validateStringDuration('24:00:00')).toBeTruthy();
+        expect(Clock.validateStringDurationDuringEntry('24:00:00')).toBeTruthy();
     });
     it('01:27:36 is valid', () => {
-        expect(Clock.validateStringDuration('01:27:36')).toBeTruthy();
+        expect(Clock.validateStringDurationDuringEntry('01:27:36')).toBeTruthy();
     });
     it('0:8 is valid', () => {
-        expect(Clock.validateStringDuration('0:8')).toBeTruthy();
+        expect(Clock.validateStringDurationDuringEntry('0:8')).toBeTruthy();
     });
     it('8:8:8 is valid', () => {
-        expect(Clock.validateStringDuration('0:8')).toBeTruthy();
+        expect(Clock.validateStringDurationDuringEntry('0:8')).toBeTruthy();
     });
     it(': is valid', () => {
-        expect(Clock.validateStringDuration(':')).toBeTruthy();
+        expect(Clock.validateStringDurationDuringEntry(':')).toBeTruthy();
     });
     it(':0 is valid', () => {
-        expect(Clock.validateStringDuration(':0')).toBeTruthy();
+        expect(Clock.validateStringDurationDuringEntry(':0')).toBeTruthy();
     });
     it('0:81 is valid', () => {
-        expect(Clock.validateStringDuration(':0')).toBeTruthy();
+        expect(Clock.validateStringDurationDuringEntry(':0')).toBeTruthy();
     });
     it('81:0:81 is valid', () => {
-        expect(Clock.validateStringDuration(':0')).toBeTruthy();
+        expect(Clock.validateStringDurationDuringEntry(':0')).toBeTruthy();
     });
     it('x is not valid', () => {
-        expect(Clock.validateStringDuration('x')).toBeFalsy();
+        expect(Clock.validateStringDurationDuringEntry('x')).toBeFalsy();
     });
 });
