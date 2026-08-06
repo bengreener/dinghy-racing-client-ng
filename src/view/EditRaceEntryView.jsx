@@ -22,9 +22,13 @@ import Clock from '../model/clock';
  * Display the details of a race entry
  * @param {Object} props
  * @param {SynchronousEntry} entry
+ * @param {Function} onSetLapTotal
+ * @param {Function} onSetScoringAbbreviation
+ * @param {Function} [onUpdateDisplayedLapCountAndSailingTime]
+ * @param {Function} showUserMessage
  * @returns {HTMLTableRowElement}
  */
-function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation, showUserMessage}) {
+function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation, onUpdateDisplayedLapCountAndSailingTime, showUserMessage}) {
     const [lapCount, setLapCount] = useState(() => entry.laps.totalElements);
     const [sailingTime, setSailingTime] = useState(() => Clock.formatDuration(entry.sumOfLapTimes));
     const [scoringAbbreviation, setScoringAbbreviation] = useState(() => entry.scoringAbbreviation);
@@ -67,6 +71,10 @@ function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation, show
         }
         if (newLapCount <= entry.race.plannedLaps) {
             setLapCount(newLapCount);
+            const key = entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name + entry.entry.metadata.version;
+            if (onUpdateDisplayedLapCountAndSailingTime) {
+                onUpdateDisplayedLapCountAndSailingTime(key, Number.parseInt(newLapCount), sailingTime);
+            }
         } 
         checkLapsTotalAndScoringAbbreviation(entry, newLapCount, sailingTime, scoringAbbreviation);
     }
@@ -82,10 +90,14 @@ function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation, show
     }
 
     function handleSailingTimeChange({target}) {
-        if (target.value === '' || Clock.validateStringDuration(target.value)) {
+        if (target.value === '' || Clock.validateStringDurationDuringEntry(target.value)) {
             setSailingTime(target.value);
+            if (onUpdateDisplayedLapCountAndSailingTime && Clock.validateStringDuration(target.value)) {
+                const key = entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name + entry.entry.metadata.version;;
+                onUpdateDisplayedLapCountAndSailingTime(key, lapCount, target.value);
+            }
         }
-        checkLapsTotalAndScoringAbbreviation(entry, lapCount, target.value, scoringAbbreviation);
+        checkLapsTotalAndScoringAbbreviation(entry, Number.parseInt(lapCount), target.value, scoringAbbreviation);
     }
 
     async function handleUpdateClick() {

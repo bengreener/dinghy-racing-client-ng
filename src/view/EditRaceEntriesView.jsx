@@ -16,6 +16,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import EditRaceEntryView from './EditRaceEntryView';
+import Clock from '../model/clock';
 import RaceType from '../model/race-type';
 import { buildSynchronousEntries } from './synchronous-model/synchronous-model';
 
@@ -25,7 +26,8 @@ function EditRaceEntriesView ({ races, model, controller }) {
     const [sortOrder, setSortOrder] = useState('default');
     const [displayOrder, setDisplayOrder] = useState([]); // holds entriesMap keys in the order they are to be displayed
     const [entriesUpdateRequestAt, setEntriesUpdateRequestAt] = useState(); // time of last request to fetch entries from server. change triggers a new fetch; for instance when server notifies an entry has been updated
-   
+    const [displayedValuesMap, setDisplayedValuesMap] = useState(new Map()); // record lap count and time sailed values that have been entered but possibly not updated so
+    
     const updateEntries = useCallback(() => {
         setEntriesUpdateRequestAt(Date.now());
     }, []);
@@ -36,7 +38,8 @@ function EditRaceEntriesView ({ races, model, controller }) {
         const entriesMap = new Map();
         buildSynchronousEntries(races).then((entries) => {
             entries.forEach(sEntry => {
-                entriesMap.set(sEntry.dinghy.dinghyClass.name + sEntry.dinghy.sailNumber + sEntry.helm.name, sEntry);
+                const key = sEntry.dinghy.dinghyClass.name + sEntry.dinghy.sailNumber + sEntry.helm.name + sEntry.entry.metadata.version;
+                entriesMap.set(key, sEntry);
             });
             if (!cancel) {
                 setEntriesMap(entriesMap);
@@ -113,9 +116,14 @@ function EditRaceEntriesView ({ races, model, controller }) {
                 ordered = entries.sort((a, b) => {
                     const aWeighting = (a.scoringAbbreviation == null || a.scoringAbbreviation === '') ? 0 : Date.now();
                     const bWeighting = (b.scoringAbbreviation == null || b.scoringAbbreviation === '') ? 0 : Date.now();
-                    let aWeighted = [a.laps.entities.length - aWeighting, a.sumOfLapTimes];
-                    let bWeighted = [b.laps.entities.length - bWeighting, b.sumOfLapTimes];
-                    
+                    const aKey = a.dinghy.dinghyClass.name + a.dinghy.sailNumber + a.helm.name + a.entry.metadata.version;
+                    const bKey = b.dinghy.dinghyClass.name + b.dinghy.sailNumber + b.helm.name + b.entry.metadata.version;
+
+                    let aWeighted = displayedValuesMap.has(aKey) ? [displayedValuesMap.get(aKey).lapCount - aWeighting, Clock.convertStringDurationToMilliseconds(displayedValuesMap.get(aKey).timeSailed)] : 
+                        [a.laps.entities.length - aWeighting, a.sumOfLapTimes];
+                    let bWeighted = displayedValuesMap.has(bKey) ? [displayedValuesMap.get(bKey).lapCount - bWeighting, Clock.convertStringDurationToMilliseconds(displayedValuesMap.get(bKey).timeSailed)] :
+                        [b.laps.entities.length - bWeighting, b.sumOfLapTimes];
+
                     // if b has sailed more laps than a then b is the faster boat
                     if (aWeighted[0] < bWeighted[0]) {
                         return 1;
@@ -150,30 +158,6 @@ function EditRaceEntriesView ({ races, model, controller }) {
                     return aWeighted - bWeighted;
                 });
                 break;
-            case 'forecast':
-                ordered = entries.sort((a, b) => {
-                    let aWeight = 1;
-                    let bWeight = 1;
-                    if (!(a.scoringAbbreviation == null || a.scoringAbbreviation === '')) {
-                        aWeight = aWeight * 2;
-                    }
-                    if (!(b.scoringAbbreviation == null || b.scoringAbbreviation === '')) {
-                        bWeight = bWeight * 2;
-                    }
-                    const aLastLapTime = a.sumOfLapTimes ? a.sumOfLapTimes : 0;
-                    const bLastLapTime = b.sumOfLapTimes ? b.sumOfLapTimes : 0;
-                    let aWeighted = (a.race.currentStartTime.getTime() + aLastLapTime + ((a.race.duration / a.race.plannedLaps) * a.dinghy.dinghyClass.portsmouthNumber / 1000)) * aWeight;
-                    let bWeighted = (b.race.currentStartTime.getTime() + bLastLapTime + ((b.race.duration / b.race.plannedLaps) * b.dinghy.dinghyClass.portsmouthNumber / 1000)) * bWeight;
-                    
-                    if (aWeighted < bWeighted) {
-                        return -1;
-                    }
-                    else if (aWeighted > bWeighted) {
-                        return 1;
-                    }
-                    return 0;
-                });
-                break;
             default:
                 ordered = entries.sort((a, b) => {
                     const snEndDigitsA = a.dinghy.sailNumber.substring(a.dinghy.sailNumber.length - 3, a.dinghy.sailNumber.length);
@@ -196,7 +180,8 @@ function EditRaceEntriesView ({ races, model, controller }) {
                     return 0;
                 });
         }
-        return ordered.map(entry => entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
+        // return an array of entriesMap keys in the order set
+        return ordered.map(entry => entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name + entry.entry.metadata.version);
     }
 
     function getEntriesDisplay() {
@@ -214,10 +199,12 @@ function EditRaceEntriesView ({ races, model, controller }) {
             const entry = entriesMap.get(key);
             if (!entry) return null; // allow for display keys that map to a non existent entry after a race is removed from the selection; fixed by next render
             if (entry.race.type === RaceType.FLEET) {
-                return <EditRaceEntryView key={key + entry.entry.metadata.version} entry={entry} onSetLapTotal={controller.setLapTotal} onSetScoringAbbreviation={controller.setScoringAbbreviation} showUserMessage={showChildUserMessage} />
+                return <EditRaceEntryView key={key} entry={entry} onSetLapTotal={controller.setLapTotal} 
+                    onSetScoringAbbreviation={controller.setScoringAbbreviation} onUpdateDisplayedLapCountAndSailingTime={handleUpdateDisplayedLapCountAndSailingTime} showUserMessage={showChildUserMessage} />
             }
             else {
-                return <EditRaceEntryView key={key + entry.entry.metadata.version} entry={entry} onSetLapTotal={controller.setLapTotal} onSetScoringAbbreviation={controller.setScoringAbbreviation}  showUserMessage={showChildUserMessage} />
+                return <EditRaceEntryView key={key} entry={entry} onSetLapTotal={controller.setLapTotal}
+                    onSetScoringAbbreviation={controller.setScoringAbbreviation} onUpdateDisplayedLapCountAndSailingTime={handleUpdateDisplayedLapCountAndSailingTime} showUserMessage={showChildUserMessage} />
             }
         });
     }
@@ -229,6 +216,28 @@ function EditRaceEntriesView ({ races, model, controller }) {
     function sortButtonClick(sortOrder) {
         setDisplayOrder(sorted(Array.from(entriesMap.values()), sortOrder));
         setSortOrder(sortOrder);
+    }
+
+    /**
+     * @param {String} key of entry in entries map
+     * @param {Integer} lapCount
+     * @param {String} time The total time sailed to the end of the lap in the format [hh:][mm:]ss
+     */
+    function handleUpdateDisplayedLapCountAndSailingTime(key, lapCount, time) {
+        const displayMap = new Map();
+        // copy existing display values to a new array so not adjusting a state object directly
+        displayedValuesMap.forEach((value, key) => {
+            displayMap.set(key, value);
+        });
+        // remove records from displayMap that are not in entriesMap
+        displayMap.forEach((value, key, map) => {
+            if (!entriesMap.has(key)) {
+                map.delete(key);
+            }
+        });
+        // update display map
+        displayMap.set(key, {lapCount: lapCount, timeSailed: time});
+        setDisplayedValuesMap(displayMap);
     }
 
     return (

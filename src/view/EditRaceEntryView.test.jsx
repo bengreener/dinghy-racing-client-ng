@@ -103,6 +103,26 @@ describe('when entering a time', () => {
         await user.type(sailingTimeInput, 'a.;');
         expect(sailingTimeInput).toHaveValue('');
     });
+    describe('when value entered is a valid time', () => {
+        it('calls function passed to onUpdateDisplayedLapCountAndSailingTime with entered value of lap count and sailing time', async () => {
+            const user = userEvent.setup();
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const onUpdateDisplayedLapCountAndSailingTimeSpy = vi.fn();
+            const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+                new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 
+                new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+                new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+                new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
+                new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+                new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+            );
+            render(<EditRaceEntryView entry={entryChrisMarshallScorpionA1234} onUpdateDisplayedLapCountAndSailingTime={onUpdateDisplayedLapCountAndSailingTimeSpy} />);
+            const sailingTimeInput = screen.getByTestId('sailing-time-input-Scorpion-1234');
+            await user.clear(sailingTimeInput);
+            await user.type(sailingTimeInput, '14:56');
+            expect(onUpdateDisplayedLapCountAndSailingTimeSpy).toHaveBeenCalledWith('Scorpion1234Chris Marshall"0"', 0, '14:56');
+        });
+    });    
 });
 describe('when entering a lap count', () => {
     it('accepts 0', async () => {
@@ -189,6 +209,23 @@ describe('when entering a lap count', () => {
         await user.clear(lapCountInput);
         await user.type(lapCountInput, '{backspace}');
         expect(lapCountInput).toHaveValue('');
+    });it('calls function passed to onUpdateDisplayedLapCountAndSailingTime with entered value of lap count and sailing time', async () => {
+        const user = userEvent.setup();
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const onUpdateDisplayedLapCountAndSailingTimeSpy = vi.fn();
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
+        render(<EditRaceEntryView entry={entryChrisMarshallScorpionA1234} onUpdateDisplayedLapCountAndSailingTime={onUpdateDisplayedLapCountAndSailingTimeSpy} />);
+        const lapCountInput = screen.getByTestId('lap-count-input-Scorpion-1234');
+        await user.clear(lapCountInput);
+        await user.type(lapCountInput, '5');
+        expect(onUpdateDisplayedLapCountAndSailingTimeSpy).toHaveBeenCalledWith('Scorpion1234Chris Marshall"0"', 5, '33:20');
     });
 });
 describe('when entering a scoring abbreviation', () => {
