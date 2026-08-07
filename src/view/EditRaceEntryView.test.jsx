@@ -176,6 +176,23 @@ describe('when entering a lap count', () => {
         await user.type(lapCountInput, '-1');
         expect(lapCountInput).toHaveValue('1');
     });
+    it('does not accept a space character', async () => {
+        const user = userEvent.setup();
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const entryChrisMarshallScorpionA1234 = new SynchronousEntry(
+            new Entry(entryChrisMarshall1234ScorpionAHAL, {version: '"0"'}, model), 
+            new SynchronousDinghy(new Dinghy(dinghy1234HAL, {version: '"0"'}, model), new DinghyClass(dinghyClassScorpionHAL, {version: '"0"'}, model)),
+            new Competitor(competitorChrisMarshallHAL, {version: '"0"'}, model),
+            new DirectRace(raceScorpionAHAL, {version: '"0"'}, model),
+            new Collection([], {size: 20, totalElements: 0, totalPages: 0,number: 0}),
+            new SignedUp(signedUpChrisMarshallDinghy1234ScorpionAHAL, {version: '"0"'}, model)
+        );
+        render(<EditRaceEntryView entry={entryChrisMarshallScorpionA1234} />);
+        const lapCountInput = screen.getByTestId('lap-count-input-Scorpion-1234');
+        await user.clear(lapCountInput);
+        await user.type(lapCountInput, ' ');
+        expect(lapCountInput).toHaveValue('0');
+    });
     it('does not accept a value greater than the number of planned laps for the direct race', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);
@@ -191,7 +208,7 @@ describe('when entering a lap count', () => {
         const lapCountInput = screen.getByTestId('lap-count-input-Scorpion-1234');
         await user.clear(lapCountInput);
         await user.type(lapCountInput, '6');
-        expect(lapCountInput).toHaveValue('');
+        expect(lapCountInput).toHaveValue('0');
     });
     it('allows value to be cleared', async () => {
         const user = userEvent.setup();
@@ -208,7 +225,7 @@ describe('when entering a lap count', () => {
         const lapCountInput = screen.getByTestId('lap-count-input-Scorpion-1234');
         await user.clear(lapCountInput);
         await user.type(lapCountInput, '{backspace}');
-        expect(lapCountInput).toHaveValue('');
+        expect(lapCountInput).toHaveValue('0');
     });it('calls function passed to onUpdateDisplayedLapCountAndSailingTime with entered value of lap count and sailing time', async () => {
         const user = userEvent.setup();
         const model = new SylphModel(httpRootURL, wsRootURL);

@@ -54,26 +54,33 @@ function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation, onUp
         prevSignedUpVersion.current = entry.signedUp.metadata.version;
     }, [entry, disabled]);
 
+    /**
+     * Handles a change in the value in an input field used to enter the number of laps sailed.
+     * Accepts an empty string value to allow the input to be cleared by backspace or delete.
+     * @param {Event} event 
+     */
     function handleLapCountChange({target}) {
-        if (/\d*/.test(target.value)) {
+        if (/^$|\d+/.test(target.value)) {
             updateLapCount(target.value);
         }
     }
 
     /**
      * Update the lap count
-     * @param {Integer} inputLaps
+     * An empty string is accepted to allow entry to be cleared
+     * @param {String} lapCount either an empty string or a value that can be converted to an integer
      */
     function updateLapCount(lapCount) {
-        let newLapCount = lapCount;
-        if (newLapCount < 0) {
+        let newLapCount = Number.parseInt(lapCount);
+        // if a non-numeric value passed treat as 0 laps sailed. Also, lap count cannot be negative
+        if (Number.isNaN(newLapCount) || newLapCount < 0) {
             newLapCount = 0;
         }
         if (newLapCount <= entry.race.plannedLaps) {
             setLapCount(newLapCount);
             const key = entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name + entry.entry.metadata.version;
             if (onUpdateDisplayedLapCountAndSailingTime) {
-                onUpdateDisplayedLapCountAndSailingTime(key, Number.parseInt(newLapCount), sailingTime);
+                onUpdateDisplayedLapCountAndSailingTime(key, newLapCount, sailingTime);
             }
         } 
         checkLapsTotalAndScoringAbbreviation(entry, newLapCount, sailingTime, scoringAbbreviation);
@@ -169,7 +176,7 @@ function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation, onUp
                 <output>{entry.helm.name}</output>
             </div>
             <div className='w3-col m1-half w3-padding-small w3-border' >
-                <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'}>{entry.position != null ? entry.position : ' '}</output>
+                <output id={entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber + '-' + entry.helm.name + '-position'} className='preserve-whitespace'>{entry.position != null ? entry.position : ' '}</output>
             </div>
             <div className='w3-col m1 w3-padding-small w3-border'>
                 <input data-testid={`lap-count-input-${entry.dinghy.dinghyClass.name + '-' + entry.dinghy.sailNumber}`} className='w3-col w3-center' value={lapCount} onChange={handleLapCountChange} onKeyUp={handleLapCountKeyUp} />

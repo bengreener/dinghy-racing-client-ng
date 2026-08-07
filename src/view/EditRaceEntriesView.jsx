@@ -119,10 +119,30 @@ function EditRaceEntriesView ({ races, model, controller }) {
                     const aKey = a.dinghy.dinghyClass.name + a.dinghy.sailNumber + a.helm.name + a.entry.metadata.version;
                     const bKey = b.dinghy.dinghyClass.name + b.dinghy.sailNumber + b.helm.name + b.entry.metadata.version;
 
-                    let aWeighted = displayedValuesMap.has(aKey) ? [displayedValuesMap.get(aKey).lapCount - aWeighting, Clock.convertStringDurationToMilliseconds(displayedValuesMap.get(aKey).timeSailed)] : 
-                        [a.laps.entities.length - aWeighting, a.sumOfLapTimes];
-                    let bWeighted = displayedValuesMap.has(bKey) ? [displayedValuesMap.get(bKey).lapCount - bWeighting, Clock.convertStringDurationToMilliseconds(displayedValuesMap.get(bKey).timeSailed)] :
-                        [b.laps.entities.length - bWeighting, b.sumOfLapTimes];
+                    let aLapCount;
+                    let aTimeSailed;
+                    let bLapCount;
+                    let bTimeSailed;
+                    if (displayedValuesMap.has(aKey)) {
+                        aLapCount = displayedValuesMap.get(aKey).lapCount;
+                        if (aLapCount === '') aLapCount = 0; // replace an empty laps sailed value with 0 so entries are sorted correctly based on numeric values
+                        aTimeSailed = Clock.convertStringDurationToMilliseconds(displayedValuesMap.get(aKey).timeSailed);
+                    }
+                    else {
+                        aLapCount = a.laps.entities.length;
+                        aTimeSailed = a.sumOfLapTimes;
+                    }
+                    if (displayedValuesMap.has(bKey)) {
+                        bLapCount = displayedValuesMap.get(bKey).lapCount;
+                        if (bLapCount === '') bLapCount = 0; // replace an empty laps sailed value with 0 so entries are sorted correctly based on numeric values
+                        bTimeSailed = Clock.convertStringDurationToMilliseconds(displayedValuesMap.get(bKey).timeSailed);
+                    }
+                    else {
+                        bLapCount = b.laps.entities.length;
+                        bTimeSailed = b.sumOfLapTimes;
+                    }
+                    let aWeighted =  [aLapCount - aWeighting, aTimeSailed];
+                    let bWeighted = [bLapCount - bWeighting, bTimeSailed];;
 
                     // if b has sailed more laps than a then b is the faster boat
                     if (aWeighted[0] < bWeighted[0]) {
