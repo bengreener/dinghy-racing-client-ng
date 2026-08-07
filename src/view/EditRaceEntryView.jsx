@@ -25,7 +25,7 @@ import Clock from '../model/clock';
  * @param {Function} onSetLapTotal
  * @param {Function} onSetScoringAbbreviation
  * @param {Function} [onUpdateDisplayedLapCountAndSailingTime]
- * @param {Function} showUserMessage
+ * @param {Function} [showUserMessage]
  * @returns {HTMLTableRowElement}
  */
 function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation, onUpdateDisplayedLapCountAndSailingTime, showUserMessage}) {
@@ -72,6 +72,7 @@ function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation, onUp
      */
     function updateLapCount(lapCount) {
         let newLapCount = Number.parseInt(lapCount);
+        let userMessage = '';
         // if a non-numeric value passed treat as 0 laps sailed. Also, lap count cannot be negative
         if (Number.isNaN(newLapCount) || newLapCount < 0) {
             newLapCount = 0;
@@ -82,8 +83,15 @@ function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation, onUp
             if (onUpdateDisplayedLapCountAndSailingTime) {
                 onUpdateDisplayedLapCountAndSailingTime(key, newLapCount, sailingTime);
             }
-        } 
-        checkLapsTotalAndScoringAbbreviation(entry, newLapCount, sailingTime, scoringAbbreviation);
+        }
+        else {
+            // showUserMessage('Laps sailed cannot exceed race length.');
+            userMessage = 'Laps sailed cannot exceed race length.';
+        }
+        if (!userMessage) userMessage = checkLapsTotalAndScoringAbbreviation(entry, newLapCount, sailingTime, scoringAbbreviation);
+        if (showUserMessage) {
+            showUserMessage(userMessage);
+        }
     }
 
     function handleLapCountKeyUp(event) {
@@ -97,6 +105,7 @@ function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation, onUp
     }
 
     function handleSailingTimeChange({target}) {
+        let userMessage = '';
         if (target.value === '' || Clock.validateStringDurationDuringEntry(target.value)) {
             setSailingTime(target.value);
             if (onUpdateDisplayedLapCountAndSailingTime && Clock.validateStringDuration(target.value)) {
@@ -104,7 +113,10 @@ function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation, onUp
                 onUpdateDisplayedLapCountAndSailingTime(key, lapCount, target.value);
             }
         }
-        checkLapsTotalAndScoringAbbreviation(entry, Number.parseInt(lapCount), target.value, scoringAbbreviation);
+        userMessage = checkLapsTotalAndScoringAbbreviation(entry, Number.parseInt(lapCount), target.value, scoringAbbreviation);
+        if (showUserMessage) {
+            showUserMessage(userMessage);
+        }
     }
 
     async function handleUpdateClick() {
@@ -140,19 +152,25 @@ function EditRaceEntryView({entry, onSetLapTotal, onSetScoringAbbreviation, onUp
     }
 
     async function handleScoringAbbreviationSelection({target}) {
+        let userMessage = '';
         setScoringAbbreviation(target.value);
-        checkLapsTotalAndScoringAbbreviation(entry, lapCount, sailingTime, target.value);
+        userMessage = checkLapsTotalAndScoringAbbreviation(entry, lapCount, sailingTime, target.value);
+        if (showUserMessage) {
+            showUserMessage(userMessage);
+        }
     }
 
     function checkLapsTotalAndScoringAbbreviation(entry, lapCount, sailingTime, scoringAbbreviation) {
-        if (showUserMessage) {
+        // if (showUserMessage) {
             if ((lapCount != entry.laps.entities.length || sailingTime != Clock.formatDuration(entry.sumOfLapTimes)) && scoringAbbreviation != entry.scoringAbbreviation) {
-                showUserMessage('Updating an entry with a change to scoring abbreviation will ignore changes to laps and time sailed.')
+                // showUserMessage('Updating an entry with a change to scoring abbreviation will ignore changes to laps and time sailed.')
+                return 'Updating an entry with a change to scoring abbreviation will ignore changes to laps and time sailed.';
             }
             else {
-                showUserMessage('');
+                // showUserMessage('');
+                return '';
             }
-        }
+        // }
     }
 
     if (disabled) {
