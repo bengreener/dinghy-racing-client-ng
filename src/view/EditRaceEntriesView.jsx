@@ -208,6 +208,8 @@ function EditRaceEntriesView ({ races, model, controller }) {
         // check if entries to display match entries in display order list (every entry should be mapped to position in displayOrder and every position in displayOrder should locate an entry)
         // if not sort entries into a display order according to the sort order selected
         // running this check here so as not to build dependency on useEffect that fetches entries on sort order; avoid refetching entries from server each time sort order is changed
+        // EditRaceEntriesView will resort display order when an entry is updated as the version identifier is included in the key. This is different to the behaviour for RaceEntriesView
+        // retaining the check to ensure new entries are displayed in correct position in sot order and removed entries are removed from display order 
         const entriesInDisplayOrder = Array.from(entriesMap.keys()).every(key => displayOrder.includes(key));
         const displayOrderIncludesEntries = displayOrder.every(key => entriesMap.has(key));
         if (!(entriesInDisplayOrder && displayOrderIncludesEntries)) {
