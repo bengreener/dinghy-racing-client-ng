@@ -244,4 +244,7 @@ button.selected {
 	.no-print {
 		display: none;
 	}
+	.print-no-scroll {
+		overflow: visible !important;
+	}
 }
