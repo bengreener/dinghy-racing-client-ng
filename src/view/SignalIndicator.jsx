@@ -46,7 +46,7 @@ function SignalIndicator({ signals, clock }) {
                     images.push('./flags/t.svg');
                     break;
                 case 'Laser & Radial Class Flag':
-                    images.push('./flags/laser.svg');
+                    images.push('./flags/laser_white_on_red.svg');
                     break;
                 case 'Graduate Class Flag':
                     images.push('./flags/g.svg');
