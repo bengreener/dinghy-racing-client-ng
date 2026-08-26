@@ -689,7 +689,7 @@ describe('when selected races changed', () => {
         const raceHeaders = (screen.getByRole('heading', {name: /race summary/i})).parentNode;
         let raceA = within(raceHeaders).getByText(/scorpion a/i);
         expect(raceA).toBeInTheDocument();
-        const selectRace = screen.getByLabelText(/DirectRace/i);
+        const selectRace = screen.getByLabelText(/Select Race$/i);
         user.deselectOptions(selectRace, ['Scorpion A']);
         raceA = within(raceHeaders).queryByText(/scorpion a/i);
         expect(raceA).not.toBeInTheDocument();
@@ -702,7 +702,7 @@ describe('when selected races changed', () => {
         await act(async () => {
             render(<RaceStartConsole model={model} controller={controller} />);
         });
-        const selectRace = screen.getByLabelText(/DirectRace/i);
+        const selectRace = screen.getByLabelText(/Select Race$/i);
         user.deselectOptions(selectRace, ['Scorpion A']);
         expect(getStartSequenceSpy).toHaveBeenLastCalledWith([
             new DirectRace(raceGraduateAHAL, {version: '"0"'}, model),
@@ -717,7 +717,7 @@ describe('when selected races changed', () => {
         await act(async () => {
             render(<RaceStartConsole model={model} controller={controller} />);
         });
-        const selectRace = screen.getByLabelText(/DirectRace/i);
+        const selectRace = screen.getByLabelText(/Select Race$/i);
         user.deselectOptions(selectRace, ['Scorpion A']);
         await act(async () => {});
         
@@ -735,7 +735,7 @@ describe('when selected races changed', () => {
         await act(async () => {
             render(<RaceStartConsole model={model} controller={controller} />);
         });
-        const selectRace = screen.getByLabelText(/DirectRace/i);
+        const selectRace = screen.getByLabelText(/Select Race$/i);
         user.deselectOptions(selectRace, ['Scorpion A']);
         const actionRows = screen.getAllByRole('row');
         expect(actionRows).toHaveLength(6);
