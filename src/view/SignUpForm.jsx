@@ -478,7 +478,7 @@ function SignUpForm({ race, model, entry, onCreateCompetitor, onCreateDinghy, on
     }
 
     return (
-        <form className='w3-container' action='' method='get'>
+        <form className='w3-container scrollable' action='' method='get'>
             <datalist id='competitor-datalist'>{competitorOptions}</datalist>
             <datalist id='dinghy-datalist'>{dinghyOptions}</datalist>
             {dinghyClassInput(race)}
@@ -489,6 +489,7 @@ function SignUpForm({ race, model, entry, onCreateCompetitor, onCreateDinghy, on
                 <input id='sail-number-input' name='sailNumber' className='w3-half' list='dinghy-datalist' onChange={handleChange} value={sailNumber} />
             </div>
             <EmbeddedRacesPanel embeddedRaces={embeddedRaces} selectedRaces={selectedEmbeddedRaces} onRaceSelectionChanged={handleEmbeddedRaceSelectionChanged} />
+            <p className={userMessageClasses()}>{message}</p>
             <div className='w3-row' >
                 <div className='w3-col m8' >
                     <button id='entry-update-button' className={'w3-btn w3-border w3-light-green w3-hover-green w3-right'} type='button' onClick={handleEntryUpdateButtonClick} >{getButtonText()}</button>
@@ -497,7 +498,6 @@ function SignUpForm({ race, model, entry, onCreateCompetitor, onCreateDinghy, on
             </div>
             {/* TODO: if dinghy class selected pass only selected dinghyclass */}
             <PreviousEntries sailNumber={sailNumber} dinghyClasses={dinghyClassName ? [dinghyClassMap.get(dinghyClassName)] : Array.from(dinghyClassMap.values())} model={model} onSelectPreviousEntry={handleSelectPreviousEntry} />
-            <p className={userMessageClasses()}>{message}</p>
         </form>
     )
 }
