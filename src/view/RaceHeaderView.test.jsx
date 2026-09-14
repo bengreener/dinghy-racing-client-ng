@@ -220,13 +220,21 @@ describe('when rendered', () => {
             expect(screen.getByRole('button', {name: /lap sheet/i})).toBeInTheDocument();
         });
         describe('when showInRaceData is false', () => {
-            it('displays class starts button', () => {
+            it('displays class start times button', () => {
                 const model = new SylphModel(httpRootURL, wsRootURL);
                 const controller = new SylphController(model);
                 render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...racePursuitAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)}  showInRaceData={false} />);
                 expect(screen.getByRole('button', {name: /start times/i})).toBeInTheDocument();
             });
-        });     
+        });
+        describe('when showInRaceData is true', () => {
+            it('does not display class start times button', () => {
+                const model = new SylphModel(httpRootURL, wsRootURL);
+                const controller = new SylphController(model);
+                render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...racePursuitAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
+                expect(screen.queryByRole('button', {name: /start times/i})).not.toBeInTheDocument();
+            });
+        });
     });
 });
 

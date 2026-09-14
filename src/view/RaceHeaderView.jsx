@@ -194,9 +194,11 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
                 <div className='w3-col m1 s6'>
                     <button id='race-start-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue bgis-less-padded-btn' onClick={handleLapSheetClick}>Lap Sheet</button>
                 </div>
-                <div className='w3-col m1 s6'>
-                    <button id='race-start-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue bgis-less-padded-btn' onClick={handleClassStartsClick}>Start Times</button>
-                </div>
+                {!showInRaceData && updatedRace.type === RaceType.PURSUIT ? 
+                    <div className='w3-col m1 s6'>
+                        <button id='race-start-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue bgis-less-padded-btn' onClick={handleClassStartsClick}>Start Times</button>
+                    </div> : null
+                }
             </div>
             <p className={userMessageClasses()}>{message}</p>
             {showPostponeRace ? <ModalDialog show={showPostponeRace} onClose={() => setShowPostponeRace(false)} testid={'postpone-race-dialog'} >
