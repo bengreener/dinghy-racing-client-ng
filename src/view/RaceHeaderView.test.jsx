@@ -219,6 +219,14 @@ describe('when rendered', () => {
             render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...racePursuitAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)} />);
             expect(screen.getByRole('button', {name: /lap sheet/i})).toBeInTheDocument();
         });
+        describe('when showInRaceData is false', () => {
+            it('displays class starts button', () => {
+                const model = new SylphModel(httpRootURL, wsRootURL);
+                const controller = new SylphController(model);
+                render(<RaceHeaderView model={model} controller={controller} race={new DirectRace({...racePursuitAHAL, plannedStartTime: new Date(Date.now() + 10000)}, {version: '"0"'}, model)}  showInRaceData={false} />);
+                expect(screen.getByRole('button', {name: /start times/i})).toBeInTheDocument();
+            });
+        });     
     });
 });
 

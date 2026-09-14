@@ -96,6 +96,12 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
         window.open(window.location.origin + '/lap-sheet/' + id);
     }
 
+    function handleClassStartsClick() {
+        // get race id
+        const id = race.url.match(/(\d+$)/)[0];
+        window.open(window.location.origin + '/pursuit-start/' + id);
+    }
+
     function handleResultClick() {
         // get race id
         const id = updatedRace.url.match(/(\d+$)/)[0];
@@ -173,20 +179,23 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
                 </div>
                 <div className='w3-col m1 s6'>
                     {showInRaceData && updatedRace.type !== RaceType.PURSUIT && updatedRace.leadEntryLapsSailed < race.plannedLaps ? <button id='shorten-course-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' onClick={handleShortenCourseClick}>Shorten</button> : null}
-                    {!showInRaceData && updatedRace.type !== RaceType.PURSUIT ? <button id='adjust-course-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' onClick={handleShortenCourseClick}>Set Laps</button> : null}
+                    {!showInRaceData && updatedRace.type !== RaceType.PURSUIT ? <button id='adjust-course-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue bgis-less-padded-btn' onClick={handleShortenCourseClick}>Set Laps</button> : null}
                 </div>
                 <div className='w3-col m1 s6'>
-                    {elapsedTime < 0 ? <button id='race-postpone-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' onClick={handleRacePostponeClick}>Postpone</button> : null}
-                    {(elapsedTime >= 0 && (updatedRace.leadEntryLapsSailed == null || updatedRace.leadEntryLapsSailed < 1)) ? <button id='race-restart-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' onClick={handleRacePostponeClick}>Restart</button> : null}
+                    {elapsedTime < 0 ? <button id='race-postpone-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue bgis-less-padded-btn' onClick={handleRacePostponeClick}>Postpone</button> : null}
+                    {(elapsedTime >= 0 && (updatedRace.leadEntryLapsSailed == null || updatedRace.leadEntryLapsSailed < 1)) ? <button id='race-restart-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue bgis-less-padded-btn' onClick={handleRacePostponeClick}>Restart</button> : null}
                 </div>
                 <div className='w3-col m1 s6'>
-                    {elapsedTime < 0 ? <button id='race-start-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' onClick={handleRaceStartClick}>Start Now</button> : null}
+                    {elapsedTime < 0 ? <button id='race-start-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue bgis-less-padded-btn' onClick={handleRaceStartClick}>Start Now</button> : null}
                 </div>
                 <div className='w3-col m1 s6'>
-                    {elapsedTime > 0 ? <button id='race-end-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' onClick={handleResultClick}>Result</button> : null}
+                    {elapsedTime > 0 ? <button id='race-end-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue bgis-less-padded-btn' onClick={handleResultClick}>Result</button> : null}
                 </div>
                 <div className='w3-col m1 s6'>
-                    <button id='race-start-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue' onClick={handleLapSheetClick}>Lap Sheet</button>
+                    <button id='race-start-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue bgis-less-padded-btn' onClick={handleLapSheetClick}>Lap Sheet</button>
+                </div>
+                <div className='w3-col m1 s6'>
+                    <button id='race-start-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue bgis-less-padded-btn' onClick={handleClassStartsClick}>Start Times</button>
                 </div>
             </div>
             <p className={userMessageClasses()}>{message}</p>

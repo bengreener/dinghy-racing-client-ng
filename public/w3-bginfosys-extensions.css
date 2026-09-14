@@ -48,6 +48,10 @@ html,body{
 	white-space: preserve nowrap;
 }
 
+.bgis-less-padded-btn {
+    padding:8px 4px !important;
+}
+
 .bgis-border-2{border:2px solid #ccc}
 
 .bgis-check,.bgis-radio{width:24px;height:24px;}
