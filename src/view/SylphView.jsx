@@ -28,6 +28,7 @@ import RaceConsole from './RaceConsole';
 import Authorisation from '../controller/authorisation';
 import UpcomingRacesConsole from './UpcomingRacesConsole';
 import EditRaceResultsConsole from './EditRaceResultsConsole';
+import DropboxAuthorisationForm from './DropboxAuthorisationForm';
 
 function SylphView({model, controller}) {
     const [displayPort, setDisplayPort] = useState();
@@ -117,6 +118,13 @@ function SylphView({model, controller}) {
         setDisplayPort(<EditRaceResultsConsole key={Date.now()} model={model} controller={controller} />);
     }
 
+    function showDropboxAuthorisationForm() {
+        raceStartButtonRef.current?.classList.remove('selected');
+        runRaceButtonRef.current?.classList.remove('selected');
+        enrolmentButtonRef.current?.classList.remove('selected');
+        setDisplayPort(<DropboxAuthorisationForm key={Date.now()} getUrl={model.getDropboxAuthUrl} onSubmit={controller.setDropboxAuthorisationCode} />);
+    }
+
     function w3_open() {
         sidebarRef.current.style.display = 'block';
     }
@@ -143,6 +151,10 @@ function SylphView({model, controller}) {
                     }
                     {roles.includes('ROLE_RACE_SCHEDULER') ? 
                         <button key={2} type='button' className='w3-bar-item w3-btn' onClick={showCreateRaceForm}>Create Race</button>
+                        : null
+                    }
+                    {roles.includes('ROLE_RACE_SCHEDULER') ? 
+                        <button key={3} type='button' className='w3-bar-item w3-btn' onClick={showDropboxAuthorisationForm}>Dropbox Authorisation</button>
                         : null
                     }
                     <button key={6} type='button' className='w3-bar-item w3-btn' onClick={showCompetitorsConsole}>Competitors</button>

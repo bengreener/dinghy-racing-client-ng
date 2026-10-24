@@ -341,6 +341,10 @@ class SylphModel {
         return new Collection(collection, {size: 20, totalElements: collection.length, totalPages: 0, number: 0});
     }
 
+    async getDropboxAuthUrl() {
+        return '';
+    }
+
     async getEmbeddedRacesInRace(race) {
         let embeddedRaces = [];
         const embeddedRaceVeteransA = new EmbeddedRace(embeddedRaceVeteransAHAL, {version: '"0"'}, this);
@@ -740,6 +744,10 @@ class SylphModel {
         else {
             this.#raceEntryLapsUpdateCallbacks.set(key, new Set([callback]));
         }
+    }
+
+    async setDropboxAuthorisationCode(code) {
+        
     }
 
     async setScoringAbbreviation(entry, scoringAbbreviation) {

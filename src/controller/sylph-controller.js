@@ -41,6 +41,7 @@ class SylphController {
         this.downloadRaceResults = this.downloadRaceResults.bind(this);
         this.postponeRace = this.postponeRace.bind(this);
         this.removeLap = this.removeLap.bind(this);
+        this.setDropboxAuthorisationCode = this.setDropboxAuthorisationCode.bind(this);
         this.setLapTotal = this.setLapTotal.bind(this);
         this.setScoringAbbreviation = this.setScoringAbbreviation.bind(this);
         this.signUpToRace = this.signUpToRace.bind(this);
@@ -278,6 +279,18 @@ class SylphController {
         }
         // if scoring abbreviation is an empty string pass null to model or will fail validation on REST server
         return this.model.setScoringAbbreviation(entry, scoringAbbreviation ? scoringAbbreviation.toUpperCase() : null);
+    }
+
+    /**
+     * Send Dropbox authorisation code to server.
+     * Expected to result in server acquiring Dropbox authorisation tokens for users Dropbox account
+     * Object contained in returned promise will be empty
+     * @param {String} code
+     * @returns {Promise<Object>}
+     * @throws {Error}
+     */
+    async setDropboxAuthorisationCode(code) {
+        return this.model.setDropboxAuthorisationCode(code);
     }
 
     /**

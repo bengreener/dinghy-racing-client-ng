@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-import { render, screen, act, within } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SylphView from './SylphView';
 import SylphController from '../controller/sylph-controller';
@@ -67,6 +67,20 @@ it('displays time', async () => {
 	});
 	expect(screen.getByText(Clock.formatTime(new Date()))).toBeInTheDocument();
 });
+describe('user roles includes ROLE_RACE_SCHEDULER', () => {
+	it('provides option to set dropbox authorisation', async () => {
+		const user = userEvent.setup();
+		const model = new SylphModel(httpRootURL, wsRootURL);
+		const controller = new SylphController(model);
+		vi.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve(['ROLE_RACE_SCHEDULER'])});
+		await act(async () => {
+			render(<SylphView model={model} controller={controller} />);
+		});
+		await user.click(screen.getByRole('button', {name: '☰'}));
+		const btnDropboxAuthorisation = screen.getByRole('button', {name: /dropbox\b/i});
+		expect(btnDropboxAuthorisation).toBeInTheDocument();
+	});
+});
 describe('user roles does not include ROLE_RACE_SCHEDULER', () => {
 	it('does not provide option to add dinghy class', async () => {
 		const model = new SylphModel(httpRootURL, wsRootURL);
@@ -97,6 +111,16 @@ describe('user roles does not include ROLE_RACE_SCHEDULER', () => {
 		});
 		const btnFleets = screen.queryByRole('button', {name: /fleets\b/i});
 		expect(btnFleets).not.toBeInTheDocument();
+	});
+	it('does not provide option to set dropbox authorisation', async () => {
+		const model = new SylphModel(httpRootURL, wsRootURL);
+		const controller = new SylphController(model);
+		vi.spyOn(Authorisation.prototype, 'getRoles').mockImplementation(() => {return Promise.resolve([])});
+		await act(async () => {
+			render(<SylphView model={model} controller={controller} />);
+		});
+		const btnDropboxAuthorisation = screen.queryByRole('button', {name: /dropbox\b/i});
+		expect(btnDropboxAuthorisation).not.toBeInTheDocument();
 	});
 });
 describe('user roles does not include ROLE_RACE_OFFICER', () => {

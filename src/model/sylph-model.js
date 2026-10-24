@@ -77,6 +77,7 @@ class SylphModel {
         this.getDinghyClasses = this.getDinghyClasses.bind(this);
         this.getDinghyClassesFromURL = this.getDinghyClassesFromURL.bind(this);
         this.getDinghyClassesInRace = this.getDinghyClassesInRace.bind(this);
+        this.getDropboxAuthUrl = this.getDropboxAuthUrl.bind(this);
         this.getEntriesByRace = this.getEntriesByRace.bind(this);
         this.getEntriesFromURL = this.getEntriesFromURL.bind(this);
         this.getEntry = this.getEntry.bind(this);
@@ -93,6 +94,7 @@ class SylphModel {
         this.getSignedUp = this.getSignedUp.bind(this);
         this.getSignedUpTo = this.getSignedUpTo.bind(this);
         this.removeLap = this.removeLap.bind(this);
+        this.setDropboxAuthorisationCode = this.setDropboxAuthorisationCode.bind(this);
         this.setLapTotal = this.setLapTotal.bind(this);
         this.setScoringAbbreviation = this.setScoringAbbreviation.bind(this);
         this.signUpToRace = this.signUpToRace.bind(this);
@@ -562,24 +564,13 @@ class SylphModel {
     }
 
     /**
-     * Get races from the specified resource location
-     * @param {String} url to use to retrieve a collection of races
-     * @param {Integer} [page] number to return (0 indexed)
-     * @param {Integer} [size] number of elements to return per page
-     * @param {SortParameters} [sortParameters] order for sorting the requested races
-     * @returns {Promise<Collection<EmbeddedRace>>}
-     * @throws {Error}
+     * Get the URL from which to obtain a Dropbox authorisation code
+     * @returns {Promise<String>}
      */
-    // async getEmbeddedRacesFromURL(url, page, size, sortParameters) {
-    //     const result = await this.getCollection(url, page, size, sortParameters);
-    
-    //     const promises = [];
-    //     for (let i = 0; i < result.hal._embedded.embeddedRaces.length; i++  ) {
-    //         promises.push(this.getRace(result.hal._embedded.embeddedRaces[i]._links.self.href));
-    //     };
-    //     const races = await Promise.all(promises);
-    //     return new Collection(races, result.hal.page);
-    // }
+    async getDropboxAuthUrl() {
+        const result = await this._read(this.httpRootURL + '/dropbox/getAuthUrl');
+        return result.hal.url;
+    }
 
     /**
      * Get embedded races hosted in DirectRace
@@ -1083,6 +1074,20 @@ class SylphModel {
     async removeLap(entry, lap) {
         const result = await this._update(entry.url + '/removeLap', lap.hal);
         return new Entry(result.hal, result.metadata, this);
+    }
+
+    /**
+     * Send Dropbox authorisation code to server.
+     * Expected to result in server acquiring Dropbox authorisation tokens for users Dropbox account
+     * Object contained in returned promise will be empty
+     * @param {String} code
+     * @returns {Promise<Object>}
+     * @throws {Error}
+     */
+    async setDropboxAuthorisationCode(code) {
+        await this._processFetch(this.httpRootURL + '/dropbox/getAuthTokens?code=' + code, 
+            {method: 'POST', headers: {'Content-Type': 'application/json', 'Accept': 'application/hal+json'}});
+        return {};
     }
 
     /**

@@ -19,6 +19,18 @@
 * {
 	font-family: Helvetica, sans-serif;
 }
+a:link {
+	color: #0096E0;
+}
+a:visited {
+	color: green;
+}
+a:hover {
+	color: #85D6FF;
+}
+a:active {
+	color: #33BBFF;
+}
 html {
 	margin: 0;
 	height: 100%;
@@ -95,11 +107,6 @@ button.selected {
     border: 0pt;
     cursor: pointer;
     background-color: #85D6FF;
-}
-.link-primary {
-	color: blue;
-	text-decoration: underline;
-	cursor: auto;
 }
 .scrollable {
 	overflow: auto;

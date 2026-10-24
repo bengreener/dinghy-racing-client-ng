@@ -1247,3 +1247,13 @@ describe('when updating the lap total for an entry in a race', () => {
         await expect(() => controller.setLapTotal(entry, 0, '-1')).rejects.toThrowError('Time must be a string value in the format [hh:][mm:]ss.');
     });
 });
+
+describe('when setting Dropbox authorisation code', () => {
+    it('calls model setDroboxAuthorisationCode with the supplied code', async () => {
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const setDropboxAuthorisationCodeSpy = vi.spyOn(model, 'setDropboxAuthorisationCode');
+        const controller = new SylphController(model);
+        await controller.setDropboxAuthorisationCode('somecode45678orother');
+        expect(setDropboxAuthorisationCodeSpy).toHaveBeenCalledWith('somecode45678orother');
+    });
+})
