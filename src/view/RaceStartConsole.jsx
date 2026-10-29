@@ -16,8 +16,9 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import RaceType from '../model/race-type';
-import CollapsableContainer from './CollapsableContainer';
 import CountdownDisplayControl from './CountdownDisplayControl';
+import PostponeRaceForm from './PostponeRaceForm';
+import ModalDialog from './ModalDialog';
 import SelectSession from './SelectSession';
 import SignalsPanel from './SignalsPanel';
 import RaceHeaderView from './RaceHeaderView';
@@ -86,6 +87,7 @@ function RaceStartConsole ({ model, controller }) {
     const [showFlags, setShowFlags] = useState(true);
     const [showRaceSummary, setShowRaceSummary] = useState(true);
     const [showActionList, setShowActionList] = useState(true);
+    const [showPostponeRace, setShowPostponeRace] = useState(false);
     
     const handleClockTick = useCallback(() => {
         setTimestamp(model.getClock().getTimeToSecondPrecision());
@@ -220,6 +222,10 @@ function RaceStartConsole ({ model, controller }) {
         }
     }, [model, raceMap, handleFleetUpdate])
 
+    function closePostponeRaceFormDialog() {
+        setShowPostponeRace(false);
+    }
+
     function handleSessionStartInputChange(date) {
         if (sessionStorageAvailable) {
             sessionStorage.setItem('sessionStart', date.toISOString());
@@ -285,6 +291,19 @@ function RaceStartConsole ({ model, controller }) {
         )
     }
 
+    function handleRacePostponeClick() {
+        setShowPostponeRace(true);
+    };
+
+    async function handlePostpone(races, duration) {
+        try {
+            await controller.postponeRace(races, duration);
+        }
+        catch (error) {
+            setMessage(error.message);
+        }
+    }
+
     return (
         <div className='w3-container console'>
             <div className='w3-row'>
@@ -305,6 +324,7 @@ function RaceStartConsole ({ model, controller }) {
                     <input className='bgis-check' id='show-action-list-checkbox' type='checkbox' onChange={handleShowActionListCheckboxChange} checked={showActionList} />
                 </div>
             </div>
+            <p className={userMessageClasses()}>{message}</p>
             {showSelectRaces ? 
                 <div>
                     <h1>Select Races</h1>
@@ -330,10 +350,17 @@ function RaceStartConsole ({ model, controller }) {
                         </select>
                         </div>
                     </form>
-                    <p className={userMessageClasses()}>{message}</p>
                 </div> : null
             }
             {buildStartCountdown()}
+            {showPostponeRace ? <ModalDialog show={showPostponeRace} onClose={() => setShowPostponeRace(false)} testid={'postpone-race-dialog'} >
+                <PostponeRaceForm races={selectedRaces.map((raceName) => {
+                    return raceMap.get(raceName);
+                })} onPostpone={handlePostpone} closeParent={closePostponeRaceFormDialog} />
+            </ModalDialog> : null}
+            <div className='w3-col m2 s6'>
+                <button id='postpone-session-button' className='w3-btn w3-col w3-border bgis-light-blue bgis-hover-dark-blue bgis-less-padded-btn' onClick={handleRacePostponeClick} >Postpone Session</button>
+            </div>
             <div className='scrollable'>
                 {showFlags ? 
                     <div>

@@ -21,13 +21,13 @@ import Clock from '../model/clock';
  * Provide a form to get the duration of a race postponement
  * Time is set in 5 minute intervals with an initial value of 30 minutes
  * @param {Object} props
- * @param {DirectRace} props.race to postpone
+ * @param {Array<DirectRace>} props.race to postpone
  * @param {PostponeRaceForm~postponeRace} props.onPostpone called when postpone button clicked
  * @param {ModalDialog~closeDialog} props.closeParent call this to close a dialog containing this form
  * @returns {HTMLFormElement}
  */
- function PostponeRaceForm({race, onPostpone, closeParent}) {
-    const [newStartTime, setNewStartTime] = useState(race.currentStartTime);
+ function PostponeRaceForm({races, onPostpone, closeParent}) {
+    const [newStartTime, setNewStartTime] = useState(races[0].currentStartTime);
 
     function handleChange({ target }) {
         if (target.value != "") {
@@ -45,14 +45,14 @@ import Clock from '../model/clock';
     function handleAddDuration(duration) {
         const nstMilliseconds = newStartTime.getTime() + duration;
         const nstDate = new Date(nstMilliseconds);
-        if (nstDate >= race.plannedStartTime) {
+        if (nstDate >= races[0].plannedStartTime) {
             setNewStartTime(nstDate);
         }
     }
 
     function handleSubmit(event) {
         event.preventDefault();
-        onPostpone(race, newStartTime.getTime() - race.plannedStartTime.getTime());
+        onPostpone(races, newStartTime.getTime() - races[0].plannedStartTime.getTime());
         if (closeParent) {
             closeParent();
         }
@@ -63,28 +63,31 @@ import Clock from '../model/clock';
             <div className={'w3-half'}>
                 <div className={'w3-row'}>
                     <label className={'w3-half'} htmlFor='planned-start-time'>Planned Start Time</label>
-                    <output className={'w3-half w3-center'} id='planned-start-time' >{Clock.formatTime(race.plannedStartTime.getTime())}</output>
+                    <output className={'w3-half w3-center'} id='planned-start-time' >{Clock.formatTime(races[0].plannedStartTime.getTime())}</output>
                 </div>
                 <div className={'w3-row'}>
                     <label className={'w3-half'} htmlFor='current-start-time'>Current Start Time</label>
-                    <output className={'w3-half w3-center'} id='current-start-time'>{Clock.formatTime(race.currentStartTime.getTime())}</output>
+                    <output className={'w3-half w3-center'} id='current-start-time'>{Clock.formatTime(races[0].currentStartTime.getTime())}</output>
                 </div>
                 <div className={'w3-row'}>
                     <label className={'w3-half'} htmlFor='new-start-time'>New Start Time</label>
-                    <input className={'w3-half w3-center'} id='new-start-time' type='time' name='new-start-time' min={Clock.formatTime(race.plannedStartTime.getTime())} step='1' value={Clock.formatTime(newStartTime.getTime())} onChange={handleChange} autoFocus />
+                    <input className={'w3-half w3-center'} id='new-start-time' type='time' name='new-start-time' min={Clock.formatTime(races[0].plannedStartTime.getTime())} step='1' value={Clock.formatTime(newStartTime.getTime())} onChange={handleChange} autoFocus />
+                </div>
+                <div className={'w3-row'}>
+                    <p className={'w3-half'}>Select new time for 1st race. All other races will be postponed by the same amount.</p>
                 </div>
             </div>
             <div className={'w3-half'}>
                 <div className={'w3-row'}>
-                    <button className={'w3-half w3-btn w3-border bgis-light-blue bgis-hover-dark-blue'} type='button' onClick={() => handleAddDuration(-60000)} disabled={newStartTime.getTime() - 60000 < race.plannedStartTime.getTime()}>-1 minute</button>
+                    <button className={'w3-half w3-btn w3-border bgis-light-blue bgis-hover-dark-blue'} type='button' onClick={() => handleAddDuration(-60000)} disabled={newStartTime.getTime() - 60000 < races[0].plannedStartTime.getTime()}>-1 minute</button>
                     <button className={'w3-half w3-btn w3-border bgis-light-blue bgis-hover-dark-blue'} type='button' onClick={() => handleAddDuration(60000)}>+1 minute</button>
                 </div>
                 <div className={'w3-row'}>
-                    <button className={'w3-half w3-btn w3-border bgis-light-blue bgis-hover-dark-blue'} type='button' onClick={() => handleAddDuration(-300000)} disabled={newStartTime.getTime() - 300000 < race.plannedStartTime.getTime()}>-5 minutes</button>
+                    <button className={'w3-half w3-btn w3-border bgis-light-blue bgis-hover-dark-blue'} type='button' onClick={() => handleAddDuration(-300000)} disabled={newStartTime.getTime() - 300000 < races[0].plannedStartTime.getTime()}>-5 minutes</button>
                     <button className={'w3-half w3-btn w3-border bgis-light-blue bgis-hover-dark-blue'} type='button' onClick={() => handleAddDuration(300000)}>+5 minutes</button>
                 </div>
                 <div className={'w3-row'}>
-                    <button className={'w3-half w3-btn w3-border bgis-light-blue bgis-hover-dark-blue'} type='button' onClick={() => handleAddDuration(-600000)} disabled={newStartTime.getTime() - 600000 < race.plannedStartTime.getTime()}>-10 minutes</button>
+                    <button className={'w3-half w3-btn w3-border bgis-light-blue bgis-hover-dark-blue'} type='button' onClick={() => handleAddDuration(-600000)} disabled={newStartTime.getTime() - 600000 < races[0].plannedStartTime.getTime()}>-10 minutes</button>
                     <button className={'w3-half w3-btn w3-border bgis-light-blue bgis-hover-dark-blue'} type='button' onClick={() => handleAddDuration(600000)}>+10 minutes</button>
                 </div>
             </div>

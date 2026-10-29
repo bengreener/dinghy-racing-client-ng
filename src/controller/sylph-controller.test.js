@@ -960,14 +960,21 @@ describe('when race is postponed', () => {
         const updateRaceSpy = vi.spyOn(model, 'updateRace');
         const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
         const fleet = new Fleet(fleetScorpionHAL, {version: ''}, model)
-        await controller.postponeRace(race, 300000);
+        await controller.postponeRace([race], 300000);
         expect(updateRaceSpy).toHaveBeenCalledWith(race, race.name, new Date(race.plannedStartTime.getTime()), fleet, race.duration, race.plannedLaps, race.type, race.startType, 300000);
     });
-    describe('when race is not provided', () => {
+    describe('when an array of races is not provided', () => {
         it('throws an error', async () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
             const controller = new SylphController(model);
-            await expect(() => controller.postponeRace(null, 300000)).rejects.toThrow('A race to postpone is required.');
+            await expect(() => controller.postponeRace(null, 300000)).rejects.toThrow('A race or races to postpone is required.');
+        });
+    });
+    describe('when the provided array does not contain races', () => {
+        it('throws an error', async () => {
+            const model = new SylphModel(httpRootURL, wsRootURL);
+            const controller = new SylphController(model);
+            await expect(() => controller.postponeRace([], 300000)).rejects.toThrow('A race or races to postpone is required.');
         });
     });
     describe('when delay is not provided', () => {
@@ -975,7 +982,7 @@ describe('when race is postponed', () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
             const controller = new SylphController(model);
             const race = new DirectRace(raceScorpionAHAL, {version: '"0"'}, model);
-            await expect(() => controller.postponeRace(race)).rejects.toThrow('Duration must be a number.');
+            await expect(() => controller.postponeRace([race])).rejects.toThrow('Duration must be a number.');
         });
     });
     describe('when an entry has sailed at least one lap', () => {
@@ -983,7 +990,7 @@ describe('when race is postponed', () => {
             const model = new SylphModel(httpRootURL, wsRootURL);
             const controller = new SylphController(model);
             const race = new DirectRace({...raceScorpionAHAL, leadEntry: {...raceScorpionAHAL.leadEntry, lapsSailed: 1}}, {version: '"0"'}, model);
-            await expect(() => controller.postponeRace(race, 300000)).rejects.toThrow('Cannot postpone start after an entry has sailed a lap.');
+            await expect(() => controller.postponeRace([race], 300000)).rejects.toThrow('Cannot postpone start after an entry has sailed a lap.');
         });
     })
 });

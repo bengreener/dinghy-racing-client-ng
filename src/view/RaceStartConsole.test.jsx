@@ -30,8 +30,9 @@ vi.mock('../model/sylph-model');
 vi.mock('../controller/sylph-controller');
 vi.mock('../model/clock');
 
-HTMLDialogElement.prototype.close = vi.fn();
 HTMLMediaElement.prototype.play = vi.fn();
+HTMLDialogElement.prototype.showModal = vi.fn();
+HTMLDialogElement.prototype.close = vi.fn();
 
 const formatOptions = {
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -80,6 +81,7 @@ it('renders', async () => {
     expect(screen.getByLabelText(/fleet/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/fleet/i)).toBeChecked();
     expect(screen.getByLabelText(/pursuit/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Postpone Session'})).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: /select races/i})).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: /flags/i})).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: /race summary/i})).toBeInTheDocument();
@@ -908,7 +910,7 @@ describe('when show race summary is not checked', () => {
         expect(screen.queryByRole('heading', {name: 'Race Summary'})).not.toBeInTheDocument();
     })
 });
-describe('when action list is checked is checked', () => {
+describe('when action list is checked', () => {
     it('displays action list', async () => {
         const model = new SylphModel(httpRootURL, wsRootURL);
         const controller = new SylphController(model);
@@ -931,3 +933,18 @@ describe('when show action list is not checked', () => {
         expect(screen.queryByRole('heading', {name: 'Action List'})).not.toBeInTheDocument();
     })
 });
+describe('when postpone session button is clicked', () => {
+    it('displays postpone race dialog', async () => {
+        const user = userEvent.setup({advanceTimers: vi.advanceTimersByTime});
+        vi.setSystemTime(new Date('2021-10-14T10:25:00Z'));
+        const model = new SylphModel(httpRootURL, wsRootURL);
+        const controller = new SylphController(model);
+        await act(async () => {
+            render(<RaceStartConsole model={model} controller={controller} />);
+        });
+        await user.click(screen.getByRole('button', {'name': /postpone session/i}));
+        const dialog = within(screen.getByTestId('postpone-race-dialog'));
+        expect(dialog.getByRole('button', {'name': /cancel/i, 'hidden': true})).toBeInTheDocument();
+        expect(dialog.getByRole('button', {'name': /Set New Time/i, 'hidden': true})).toBeInTheDocument();
+    });
+})

@@ -224,25 +224,33 @@ class SylphController {
         const result = await this.model.getEntriesByRace(race);
         return downloadRaceEntriesCSV(race, result.entities, options);
     }
-
+    
     /**
      * Postpone a race
-     * @param {race} race to postpone
+     * @param {Array<Race>} races to postpone
      * @param {Number} duration, in milliseconds, by which to delay the race
+     * @returns {Promise<Array<DirectRace>>}
      */
-    async postponeRace(race, duration) {
+    async postponeRace(races, duration) {
         // check valid race (a URL is sufficient, otherwise a name and start time is required)
-        if (!(race instanceof DirectRace)) {
-            throw new MissingParameter('A race to postpone is required.');
+        if (races == null || races.length == 0) {
+            throw new MissingParameter('A race or races to postpone is required.');
         }
         if (!(Number.isInteger(duration))) {
             throw new InvalidParameter('Duration must be a number.');
         }
-        if (race.leadEntryLapsSailed > 0) {
-            throw new Error('Cannot postpone start after an entry has sailed a lap.');
-        }
-        const fleet = await race.getFleet();
-        return this.model.updateRace(race, race.name, race.plannedStartTime, fleet, race.duration, race.plannedLaps, race.type, race.startType, duration);
+        races.forEach(race => {
+            if (!(race instanceof DirectRace)) {
+                throw new MissingParameter('A race or races to postpone is required.');
+            }
+            if (race.leadEntryLapsSailed > 0) {
+                throw new Error('Cannot postpone start after an entry has sailed a lap.');
+            }
+        });
+        return Promise.all(races.map(async race => {
+            const fleet = await race.getFleet();
+            return this.model.updateRace(race, race.name, race.plannedStartTime, fleet, race.duration, race.plannedLaps, race.type, race.startType, duration);
+        }));
     }
 
     /**

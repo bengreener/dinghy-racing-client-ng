@@ -202,7 +202,7 @@ function RaceHeaderView({ race, model, controller, showInRaceData = true }) {
             </div>
             <p className={userMessageClasses()}>{message}</p>
             {showPostponeRace ? <ModalDialog show={showPostponeRace} onClose={() => setShowPostponeRace(false)} testid={'postpone-race-dialog'} >
-                <PostponeRaceForm race={race} onPostpone={controller.postponeRace} closeParent={closePostponeRaceFormDialog} />
+                <PostponeRaceForm races={[race]} onPostpone={controller.postponeRace} closeParent={closePostponeRaceFormDialog} />
             </ModalDialog> : null}
             {showShortenCourse ? <ModalDialog show={showShortenCourse} onClose={closeShortenCourseDialog} testid={'shorten-course-dialog'}>
                 {showInRaceData ? <AdjustCourseForm race={race} minLaps={Math.max(1, race.leadEntryLapsSailed)} maxLaps={race.plannedLaps - 1} initialValue={Math.max(1, race.leadEntryLapsSailed + 1)} onUpdate={controller.updateRacePlannedLaps} closeParent={closeShortenCourseDialog} /> :
