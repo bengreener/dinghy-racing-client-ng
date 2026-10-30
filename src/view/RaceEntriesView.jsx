@@ -85,35 +85,48 @@ function RaceEntriesView({ races, controller, model }) {
         switch (order) {
             case 'sailNumber':
                 ordered = entries.sort((a, b) => {
-                    const sailNumberA = Number.isNaN(a.dinghy.sailNumber) ? a.dinghy.sailNumber : Number(a.dinghy.sailNumber);
-                    const sailNumberB = Number.isNaN(b.dinghy.sailNumber) ? b.dinghy.sailNumber : Number(b.dinghy.sailNumber);
-                    if (sailNumberA < sailNumberB) {
+                    // sort sail numbers that start with a number before any that don't
+                    if (!Number.isNaN(Number.parseInt(a.dinghy.sailNumber)) && Number.isNaN(Number.parseInt(b.dinghy.sailNumber))) {
                         return -1;
                     }
-                    if (sailNumberA > sailNumberB) {
+                    if (Number.isNaN(Number.parseInt(a.dinghy.sailNumber)) && !Number.isNaN(Number.parseInt(b.dinghy.sailNumber))) {
                         return 1;
                     }
-                    return 0;
+                    // sort by initial numeric component
+                    if (Number.parseInt(a.dinghy.sailNumber) < Number.parseInt(b.dinghy.sailNumber)) {
+                        return -1;
+                    }
+                    if (Number.parseInt(a.dinghy.sailNumber) > Number.parseInt(b.dinghy.sailNumber)) {
+                        return 1;
+                    }
+                    // split ties
+                    return a.dinghy.sailNumber.localeCompare(b.dinghy.sailNumber);
                 });
                 break;
             case 'classSailNumber':
                 ordered = entries.sort((a, b) => {
-                    const sailNumberA = Number.isNaN(a.dinghy.sailNumber) ? a.dinghy.sailNumber : Number(a.dinghy.sailNumber);
-                    const sailNumberB = Number.isNaN(b.dinghy.sailNumber) ? b.dinghy.sailNumber : Number(b.dinghy.sailNumber);
-                    
                     if (a.dinghy.dinghyClass.name < b.dinghy.dinghyClass.name) {
                         return -1;
                     }
                     else if (a.dinghy.dinghyClass.name > b.dinghy.dinghyClass.name) {
                         return 1;
                     }
-                    if (sailNumberA < sailNumberB) {
+                    // sort sail numbers that start with a number before any that don't
+                    if (!Number.isNaN(Number.parseInt(a.dinghy.sailNumber)) && Number.isNaN(Number.parseInt(b.dinghy.sailNumber))) {
                         return -1;
                     }
-                    if (sailNumberA > sailNumberB) {
+                    if (Number.isNaN(Number.parseInt(a.dinghy.sailNumber)) && !Number.isNaN(Number.parseInt(b.dinghy.sailNumber))) {
                         return 1;
                     }
-                    return 0;
+                    // sort by initial numeric component
+                    if (Number.parseInt(a.dinghy.sailNumber) < Number.parseInt(b.dinghy.sailNumber)) {
+                        return -1;
+                    }
+                    if (Number.parseInt(a.dinghy.sailNumber) > Number.parseInt(b.dinghy.sailNumber)) {
+                        return 1;
+                    }
+                    // split ties
+                    return a.dinghy.sailNumber.localeCompare(b.dinghy.sailNumber);
                 });
                 break;
             // sort by number of laps and then by time to complete last lap
@@ -184,24 +197,28 @@ function RaceEntriesView({ races, controller, model }) {
                 break;
             default:
                 ordered = entries.sort((a, b) => {
-                    const snEndDigitsA = a.dinghy.sailNumber.substring(a.dinghy.sailNumber.length - 3, a.dinghy.sailNumber.length);
-                    const snEndDigitsB = b.dinghy.sailNumber.substring(b.dinghy.sailNumber.length - 3, b.dinghy.sailNumber.length);
-                    const sailNumberA = Number.isNaN(snEndDigitsA) ? snEndDigitsA : Number(snEndDigitsA);
-                    const sailNumberB = Number.isNaN(snEndDigitsB) ? snEndDigitsB : Number(snEndDigitsB);
-                    
                     if (a.dinghy.dinghyClass.name < b.dinghy.dinghyClass.name) {
                         return -1;
                     }
                     else if (a.dinghy.dinghyClass.name > b.dinghy.dinghyClass.name) {
                         return 1;
                     }
-                    if (sailNumberA < sailNumberB) {
+                    // sort sail numbers that start with a number before any that don't
+                    if (!Number.isNaN(Number.parseInt(a.dinghy.sailNumber)) && Number.isNaN(Number.parseInt(b.dinghy.sailNumber))) {
                         return -1;
                     }
-                    if (sailNumberA > sailNumberB) {
+                    if (Number.isNaN(Number.parseInt(a.dinghy.sailNumber)) && !Number.isNaN(Number.parseInt(b.dinghy.sailNumber))) {
                         return 1;
                     }
-                    return 0;
+                    // sort by initial numeric component
+                    if (Number.parseInt(a.dinghy.sailNumber) < Number.parseInt(b.dinghy.sailNumber)) {
+                        return -1;
+                    }
+                    if (Number.parseInt(a.dinghy.sailNumber) > Number.parseInt(b.dinghy.sailNumber)) {
+                        return 1;
+                    }
+                    // split ties
+                    return a.dinghy.sailNumber.localeCompare(b.dinghy.sailNumber);
                 });
         }
         return ordered.map(entry => entry.dinghy.dinghyClass.name + entry.dinghy.sailNumber + entry.helm.name);
